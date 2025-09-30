@@ -44,31 +44,35 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
     const returnDate = flight.itineraries[1] ? new Date(flight.itineraries[1].segments[0].departure.at).toISOString().split('T')[0] : '';
     const airline = firstSegment.carrierCode;
     
-    // Map of airline codes to their booking URLs
+    // Format dates for URLs (remove hyphens for some airlines)
+    const depDateCompact = departureDate.replace(/-/g, '');
+    const retDateCompact = returnDate.replace(/-/g, '');
+    
+    // Construct airline-specific booking URLs with parameters
     const airlineUrls: { [key: string]: string } = {
-      'AA': `https://www.aa.com/booking/find-flights`,
-      'DL': `https://www.delta.com/flight-search/book-a-flight`,
-      'UA': `https://www.united.com/en/us/fsr/choose-flights`,
-      'WN': `https://www.southwest.com/air/booking/select.html`,
-      'B6': `https://www.jetblue.com/booking/flights`,
-      'AS': `https://www.alaskaair.com/shopping`,
-      'F9': `https://www.flyfrontier.com/flight/search/`,
-      'NK': `https://www.spirit.com/book/flights`,
-      'G4': `https://www.allegiantair.com/booking/flights`,
-      'SY': `https://www.sun-air.dk/booking`,
-      // International carriers
-      'BA': `https://www.britishairways.com/travel/home/public/en_us`,
-      'LH': `https://www.lufthansa.com/us/en/homepage`,
-      'AF': `https://www.airfrance.us/`,
-      'KL': `https://www.klm.com/`,
-      'EK': `https://www.emirates.com/us/english/`,
-      'QR': `https://www.qatarairways.com/en/homepage.html`,
-      'SQ': `https://www.singaporeair.com/`,
-      'AC': `https://www.aircanada.com/`,
+      // US Airlines
+      'AA': `https://www.aa.com/booking/search?slices=${origin}|${destination}|${departureDate}${returnDate ? `&slices=${destination}|${origin}|${returnDate}` : ''}`,
+      'DL': `https://www.delta.com/flight-search/book-a-flight?origin=${origin}&destination=${destination}&departureDate=${departureDate}${returnDate ? `&returnDate=${returnDate}` : ''}`,
+      'UA': `https://www.united.com/en/us/fsr/choose-flights?f=${origin}&t=${destination}&d=${departureDate}${returnDate ? `&r=${returnDate}` : '&tt=1'}`,
+      'WN': `https://www.southwest.com/air/booking/select.html?originationAirportCode=${origin}&destinationAirportCode=${destination}&returnAirportCode=${returnDate ? origin : ''}&departureDate=${departureDate}&departureTimeOfDay=ALL_DAY${returnDate ? `&returnDate=${returnDate}` : ''}`,
+      'B6': `https://www.jetblue.com/booking/flights?from=${origin}&to=${destination}&depart=${departureDate}${returnDate ? `&return=${returnDate}` : ''}`,
+      'AS': `https://www.alaskaair.com/booking/shopping?from=${origin}&to=${destination}&departure=${departureDate}${returnDate ? `&return=${returnDate}` : ''}`,
+      'F9': `https://www.flyfrontier.com/travel/book/?outboundRouting=${origin}~${destination}~${depDateCompact}${returnDate ? `&returnRouting=${destination}~${origin}~${retDateCompact}` : ''}`,
+      'NK': `https://www.spirit.com/book/flights?airport-origin=${origin}&airport-destination=${destination}&date-departing=${departureDate}${returnDate ? `&date-returning=${returnDate}` : ''}`,
+      
+      // International carriers - many don't support deep linking, using search aggregators
+      'BA': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'LH': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'AF': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'KL': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'EK': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'QR': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'SQ': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
+      'AC': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
     };
     
-    // Return airline-specific URL or generic search
-    return airlineUrls[airline] || `https://www.${getAirlineName(airline).toLowerCase().replace(/\s+/g, '')}.com`;
+    // Return airline-specific URL or Google Flights as fallback
+    return airlineUrls[airline] || `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`;
   };
 
   return (
