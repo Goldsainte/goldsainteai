@@ -320,7 +320,8 @@ async function searchHotels(args: any, apiKey: string) {
     }
 
     const destId = locationData.data[0].dest_id;
-    console.log('Found destination ID:', destId);
+    const searchType = locationData.data[0].search_type || 'CITY';
+    console.log('Found destination ID:', destId, 'Search type:', searchType);
 
     // Get default dates if not provided
     const today = new Date();
@@ -332,7 +333,7 @@ async function searchHotels(args: any, apiKey: string) {
     // Build URL with filters
     const params = new URLSearchParams({
       dest_id: destId.toString(),
-      search_type: 'CITY',
+      search_type: searchType.toUpperCase(),
       arrival_date: defaultCheckIn,
       departure_date: defaultCheckOut,
       adults: guests.toString(),
