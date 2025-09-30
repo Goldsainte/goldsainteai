@@ -318,8 +318,10 @@ const Index = () => {
                 <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
                   Goldsainte: Your AI Travel Concierge
                 </h1>
-                <p className="text-muted-foreground text-center max-w-md">
-                  Your intelligent travel companion powered by AI. Find hotels, destinations, and plan your perfect trip.
+                <p className="text-muted-foreground text-center max-w-2xl leading-relaxed">
+                  <span className="font-semibold text-foreground">AI-powered efficiency. Human-powered access.</span>
+                  <br />
+                  Our cutting-edge AI handles quick requests with speed and precision— while our licensed travel experts' step in to unlock contract-only rates, navigate complex ticketing, and deliver exclusive perks you won't find on public sites.
                 </p>
                 {userLocation && (
                   <div className="flex items-center gap-2 text-xs text-muted-foreground">
