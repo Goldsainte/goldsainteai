@@ -281,8 +281,12 @@ async function searchHotels(args: any, apiKey: string) {
     console.log('Searching for location:', location);
     
     const locationController = new AbortController();
-    const locationTimeout = setTimeout(() => locationController.abort(), 10000); // 10s timeout
+    const locationTimeout = setTimeout(() => {
+      console.log('Location search timeout triggered');
+      locationController.abort();
+    }, 8000); // 8s timeout
     
+    console.log('About to call location API...');
     const locationResponse = await fetch(
       `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
       {
@@ -293,7 +297,10 @@ async function searchHotels(args: any, apiKey: string) {
         },
         signal: locationController.signal
       }
-    ).finally(() => clearTimeout(locationTimeout));
+    ).finally(() => {
+      console.log('Location API call completed');
+      clearTimeout(locationTimeout);
+    });
 
     console.log('Location API response status:', locationResponse.status);
     
@@ -360,8 +367,12 @@ async function searchHotels(args: any, apiKey: string) {
     console.log('Hotels API URL:', hotelsUrl);
     
     const hotelsController = new AbortController();
-    const hotelsTimeout = setTimeout(() => hotelsController.abort(), 15000); // 15s timeout
+    const hotelsTimeout = setTimeout(() => {
+      console.log('Hotels search timeout triggered');
+      hotelsController.abort();
+    }, 12000); // 12s timeout
     
+    console.log('About to call hotels API...');
     const hotelsResponse = await fetch(hotelsUrl, {
       method: 'GET',
       headers: {
@@ -369,7 +380,10 @@ async function searchHotels(args: any, apiKey: string) {
         'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
       },
       signal: hotelsController.signal
-    }).finally(() => clearTimeout(hotelsTimeout));
+    }).finally(() => {
+      console.log('Hotels API call completed');
+      clearTimeout(hotelsTimeout);
+    });
 
     console.log('Hotels API response status:', hotelsResponse.status);
 
