@@ -316,61 +316,14 @@ async function searchHotels(args: any, apiKey: string) {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    // City name to IATA code mapping
-    const cityCodeMap: { [key: string]: string } = {
-      'new york': 'NYC', 'nyc': 'NYC', 'manhattan': 'NYC',
-      'paris': 'PAR',
-      'london': 'LON',
-      'dubai': 'DXB',
-      'tokyo': 'TYO',
-      'los angeles': 'LAX', 'la': 'LAX',
-      'san francisco': 'SFO',
-      'chicago': 'CHI',
-      'miami': 'MIA',
-      'rome': 'ROM',
-      'barcelona': 'BCN',
-      'amsterdam': 'AMS',
-      'berlin': 'BER',
-      'madrid': 'MAD',
-      'singapore': 'SIN',
-      'hong kong': 'HKG',
-      'sydney': 'SYD',
-      'melbourne': 'MEL',
-      'toronto': 'YTO',
-      'vancouver': 'YVR',
-      'las vegas': 'LAS',
-      'seattle': 'SEA',
-      'boston': 'BOS',
-      'washington': 'WAS', 'dc': 'WAS',
-      'orlando': 'ORL',
-      'bangkok': 'BKK',
-      'istanbul': 'IST',
-      'lisbon': 'LIS',
-      'vienna': 'VIE',
-      'prague': 'PRG',
-      'athens': 'ATH',
-      'brussels': 'BRU',
-      'munich': 'MUC',
-      'zurich': 'ZRH'
-    };
-
-    const normalizedLocation = location.toLowerCase().trim();
-    const cityCode = cityCodeMap[normalizedLocation];
-    
-    if (!cityCode) {
-      return { 
-        error: `City "${location}" not supported yet. Try: New York, Paris, London, Dubai, Tokyo, etc.`,
-        results: [] 
-      };
-    }
-
-    // Get Amadeus token
+    // Get Amadeus credentials
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
     const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
     if (!amadeusKey || !amadeusSecret) {
       return { error: 'Amadeus credentials not configured', results: [] };
     }
 
+    // Get Amadeus token
     const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -383,6 +336,29 @@ async function searchHotels(args: any, apiKey: string) {
 
     const tokenData = await tokenResponse.json();
     const token = tokenData.access_token;
+
+    // Search for city code dynamically
+    const locationParams = new URLSearchParams({
+      keyword: location,
+      subType: 'CITY',
+      'page[limit]': '5'
+    });
+
+    const locationResponse = await fetch(
+      `https://test.api.amadeus.com/v1/reference-data/locations?${locationParams}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+
+    if (!locationResponse.ok || !(await locationResponse.clone().json()).data?.length) {
+      return { 
+        error: `Could not find city "${location}". Please try a different spelling.`,
+        results: [] 
+      };
+    }
+
+    const locationData = await locationResponse.json();
+    const cityCode = locationData.data[0].iataCode;
+    console.log(`Found city code for "${location}": ${cityCode}`);
 
     // Default dates
     const today = new Date();

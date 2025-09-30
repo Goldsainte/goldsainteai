@@ -5,44 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// City name to IATA code mapping
-const cityCodeMap: { [key: string]: string } = {
-  'new york': 'NYC', 'nyc': 'NYC', 'manhattan': 'NYC',
-  'paris': 'PAR',
-  'london': 'LON',
-  'dubai': 'DXB',
-  'tokyo': 'TYO',
-  'los angeles': 'LAX', 'la': 'LAX',
-  'san francisco': 'SFO',
-  'chicago': 'CHI',
-  'miami': 'MIA',
-  'rome': 'ROM',
-  'barcelona': 'BCN',
-  'amsterdam': 'AMS',
-  'berlin': 'BER',
-  'madrid': 'MAD',
-  'singapore': 'SIN',
-  'hong kong': 'HKG',
-  'sydney': 'SYD',
-  'melbourne': 'MEL',
-  'toronto': 'YTO',
-  'vancouver': 'YVR',
-  'las vegas': 'LAS',
-  'seattle': 'SEA',
-  'boston': 'BOS',
-  'washington': 'WAS', 'dc': 'WAS',
-  'orlando': 'ORL',
-  'bangkok': 'BKK',
-  'istanbul': 'IST',
-  'lisbon': 'LIS',
-  'vienna': 'VIE',
-  'prague': 'PRG',
-  'athens': 'ATH',
-  'brussels': 'BRU',
-  'munich': 'MUC',
-  'zurich': 'ZRH'
-};
-
 // Get Amadeus access token
 async function getAmadeusToken() {
   const apiKey = Deno.env.get('AMADEUS_API_KEY');
@@ -68,6 +30,44 @@ async function getAmadeusToken() {
   return data.access_token;
 }
 
+// Search for city code using Amadeus location API
+async function findCityCode(location: string, token: string): Promise<string | null> {
+  try {
+    const params = new URLSearchParams({
+      keyword: location,
+      subType: 'CITY',
+      'page[limit]': '5'
+    });
+
+    const response = await fetch(
+      `https://test.api.amadeus.com/v1/reference-data/locations?${params}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      console.log('Location search failed:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('Location search results:', data.data?.length || 0);
+
+    if (!data.data || data.data.length === 0) {
+      return null;
+    }
+
+    // Return the IATA code of the first city match
+    return data.data[0].iataCode || null;
+  } catch (error) {
+    console.error('Error finding city code:', error);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -78,26 +78,6 @@ serve(async (req) => {
     
     console.log('Amadeus hotel search request:', { location, checkIn, checkOut, guests });
 
-    // Convert location to city code
-    const normalizedLocation = (location || '').toString().toLowerCase().trim();
-    const base = normalizedLocation.split(',')[0].trim();
-    let cityCode = cityCodeMap[base];
-    if (!cityCode) {
-      // Fuzzy contains match
-      const match = Object.keys(cityCodeMap).find(k => base.includes(k));
-      if (match) cityCode = cityCodeMap[match];
-    }
-    
-    if (!cityCode) {
-      return new Response(JSON.stringify({ 
-        results: [], 
-        error: `City "${location}" not supported yet. Try: New York, Paris, London, Dubai, Tokyo, etc.` 
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      });
-    }
-
     // Default dates if not provided
     const today = new Date();
     const tomorrow = new Date(today);
@@ -106,6 +86,21 @@ serve(async (req) => {
     const departure = checkOut && String(checkOut).trim() !== '' ? checkOut : tomorrow.toISOString().split('T')[0];
 
     const token = await getAmadeusToken();
+
+    // Dynamically find city code using Amadeus location API
+    const cityCode = await findCityCode(location, token);
+    
+    if (!cityCode) {
+      return new Response(JSON.stringify({ 
+        results: [], 
+        error: `Could not find city "${location}". Please try a different spelling or a nearby major city.` 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    console.log(`Found city code for "${location}": ${cityCode}`);
 
     // Step 1: Get hotel IDs from Hotel List API
     console.log('Fetching hotel list for city:', cityCode);
