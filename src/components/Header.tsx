@@ -1,7 +1,6 @@
 import { Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import logomark from "@/assets/logomark-gold.png";
-import wordmark from "@/assets/wordmark-gold.png";
+import logomark from "@/assets/logomark-seal-gold.png";
 
 export const Header = () => {
   return (
