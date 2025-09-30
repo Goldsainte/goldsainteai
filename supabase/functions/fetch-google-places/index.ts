@@ -23,12 +23,29 @@ serve(async (req) => {
 
     // Handle general location search (for cities, destinations)
     if (query) {
+      // First, try the Find Place API for robust city/destination lookup
+      const findUrl = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=name,formatted_address,geometry,place_id,types&key=${apiKey}`;
+      const findResp = await fetch(findUrl);
+      const findData = await findResp.json();
+
+      if (findData.candidates && findData.candidates.length > 0) {
+        console.log('Found candidates via Find Place:', findData.candidates.length);
+        return new Response(JSON.stringify({ 
+          success: true,
+          results: findData.candidates
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+
+      // Fallback to Text Search if Find Place yields nothing
       const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`;
-      
       const searchResponse = await fetch(searchUrl);
       const searchData = await searchResponse.json();
 
-      if (!searchData.results || searchData.results.length === 0) {
+      const results = searchData.results || [];
+      if (results.length === 0) {
         console.log('No place found for query:', query);
         return new Response(JSON.stringify({ 
           success: false,
@@ -40,10 +57,9 @@ serve(async (req) => {
         });
       }
 
-      // Return results for location search
       return new Response(JSON.stringify({ 
         success: true,
-        results: searchData.results
+        results
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
