@@ -79,8 +79,14 @@ serve(async (req) => {
     console.log('Amadeus hotel search request:', { location, checkIn, checkOut, guests });
 
     // Convert location to city code
-    const normalizedLocation = location.toLowerCase().trim();
-    const cityCode = cityCodeMap[normalizedLocation];
+    const normalizedLocation = (location || '').toString().toLowerCase().trim();
+    const base = normalizedLocation.split(',')[0].trim();
+    let cityCode = cityCodeMap[base];
+    if (!cityCode) {
+      // Fuzzy contains match
+      const match = Object.keys(cityCodeMap).find(k => base.includes(k));
+      if (match) cityCode = cityCodeMap[match];
+    }
     
     if (!cityCode) {
       return new Response(JSON.stringify({ 

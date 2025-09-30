@@ -262,7 +262,33 @@ Always show results first with minimal text, ask questions later. Be conversatio
       });
     }
 
-    // No tool calls, return direct response
+    // No tool calls - attempt a smart fallback if the user likely provided a city
+    const simpleText = (message || '').trim();
+    const looksLikeCity = simpleText.length > 0 && simpleText.length <= 60 && /[a-zA-Z]/.test(simpleText) && simpleText.split(/\s+/).length <= 5;
+
+    if (looksLikeCity) {
+      console.log('No tool calls from AI. Fallback: trying searchHotels with', simpleText);
+      const fallbackResult = await searchHotels({ location: simpleText, guests: 2, sortBy: 'popularity' }, '');
+
+      if (fallbackResult && Array.isArray(fallbackResult.results) && fallbackResult.results.length > 0) {
+        const finalMessage = `Perfect! I found some great hotels in ${simpleText}. Check out the options below!`;
+        return new Response(JSON.stringify({
+          message: finalMessage,
+          toolResults: [fallbackResult],
+          conversationHistory: [...conversationHistory,
+            { role: 'user', content: message },
+            { role: 'assistant', content: finalMessage }
+          ]
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+
+      console.log('Fallback search returned no results for', simpleText);
+    }
+
+    // No tool calls and no fallback results, return direct response
     return new Response(JSON.stringify({
       message: assistantMessage.content,
       toolResults: [],
