@@ -277,8 +277,12 @@ async function searchHotels(args: any, apiKey: string) {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    // Search for location first
+    // Search for location first with timeout
     console.log('Searching for location:', location);
+    
+    const locationController = new AbortController();
+    const locationTimeout = setTimeout(() => locationController.abort(), 10000); // 10s timeout
+    
     const locationResponse = await fetch(
       `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
       {
@@ -286,9 +290,10 @@ async function searchHotels(args: any, apiKey: string) {
         headers: {
           'x-rapidapi-key': apiKey,
           'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
+        },
+        signal: locationController.signal
       }
-    );
+    ).finally(() => clearTimeout(locationTimeout));
 
     console.log('Location API response status:', locationResponse.status);
     
@@ -354,13 +359,17 @@ async function searchHotels(args: any, apiKey: string) {
     const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
     console.log('Hotels API URL:', hotelsUrl);
     
+    const hotelsController = new AbortController();
+    const hotelsTimeout = setTimeout(() => hotelsController.abort(), 15000); // 15s timeout
+    
     const hotelsResponse = await fetch(hotelsUrl, {
       method: 'GET',
       headers: {
         'x-rapidapi-key': apiKey,
         'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-      }
-    });
+      },
+      signal: hotelsController.signal
+    }).finally(() => clearTimeout(hotelsTimeout));
 
     console.log('Hotels API response status:', hotelsResponse.status);
 
@@ -394,7 +403,7 @@ async function searchHotels(args: any, apiKey: string) {
     return {
       type: 'hotels',
       location: locationData.data[0],
-      results: hotels.slice(0, 6),
+      results: hotels.slice(0, 20), // Return more results
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
       guests,
@@ -404,6 +413,15 @@ async function searchHotels(args: any, apiKey: string) {
     console.error('Error in searchHotels:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error details:', errorMessage);
+    
+    // Check if it's a timeout
+    if (error instanceof Error && error.name === 'AbortError') {
+      return { 
+        error: 'Search timed out. The booking API is responding slowly. Please try again.', 
+        results: [] 
+      };
+    }
+    
     return { error: errorMessage, results: [] };
   }
 }
