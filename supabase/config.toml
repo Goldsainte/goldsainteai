@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.search-destinations]
 verify_jwt = false
+
+[functions.travel-ai-agent]
+verify_jwt = false
