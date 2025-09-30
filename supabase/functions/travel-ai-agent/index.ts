@@ -162,6 +162,11 @@ serve(async (req) => {
               nonStop: {
                 type: "boolean",
                 description: "Whether to show only direct flights (default false)"
+              },
+              sortBy: {
+                type: "string",
+                enum: ["best", "price", "duration", "departure_early", "departure_late"],
+                description: "How to sort flight results: best (Amadeus recommendation), price (cheapest first), duration (shortest first), departure_early (earliest departure), departure_late (latest departure). Default is 'best'."
               }
             },
             required: ["origin", "destination", "departureDate"]
@@ -699,8 +704,8 @@ async function searchRestaurants(args: any) {
 // Search flights using Amadeus API
 async function searchFlights(args: any) {
   try {
-    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false } = args;
-    console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop });
+    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false, sortBy = 'best' } = args;
+    console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop, sortBy });
 
     // Get Amadeus credentials
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
@@ -789,15 +794,69 @@ async function searchFlights(args: any) {
     const flightData = await flightResponse.json();
     console.log('Flights found:', flightData.data?.length || 0);
 
+    // Sort flights based on sortBy parameter
+    let sortedFlights = flightData.data || [];
+    
+    if (sortBy && sortedFlights.length > 0) {
+      switch (sortBy) {
+        case 'price':
+          // Sort by total price (lowest first)
+          sortedFlights.sort((a: any, b: any) => {
+            const priceA = parseFloat(a.price.total);
+            const priceB = parseFloat(b.price.total);
+            return priceA - priceB;
+          });
+          break;
+          
+        case 'duration':
+          // Sort by duration (shortest first)
+          sortedFlights.sort((a: any, b: any) => {
+            const getDurationMinutes = (duration: string) => {
+              const hours = duration.match(/(\d+)H/)?.[1] || '0';
+              const minutes = duration.match(/(\d+)M/)?.[1] || '0';
+              return parseInt(hours) * 60 + parseInt(minutes);
+            };
+            const durationA = getDurationMinutes(a.itineraries[0].duration);
+            const durationB = getDurationMinutes(b.itineraries[0].duration);
+            return durationA - durationB;
+          });
+          break;
+          
+        case 'departure_early':
+          // Sort by earliest departure time
+          sortedFlights.sort((a: any, b: any) => {
+            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
+            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
+            return timeA - timeB;
+          });
+          break;
+          
+        case 'departure_late':
+          // Sort by latest departure time
+          sortedFlights.sort((a: any, b: any) => {
+            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
+            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
+            return timeB - timeA;
+          });
+          break;
+          
+        case 'best':
+        default:
+          // Keep Amadeus default sorting (combination of price, duration, and quality)
+          break;
+      }
+    }
+
     return {
       type: 'flights',
       origin: { code: originCode, name: origin },
       destination: { code: destinationCode, name: destination },
       departureDate,
       returnDate,
-      results: flightData.data || [],
+      results: sortedFlights,
       dictionaries: flightData.dictionaries,
-      meta: flightData.meta
+      meta: flightData.meta,
+      filters: { sortBy }
     };
 
   } catch (error) {

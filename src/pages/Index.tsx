@@ -12,6 +12,7 @@ import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
+import { FlightFilters } from "@/components/FlightFilters";
 import logomark from "@/assets/logomark-gold.png";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
@@ -544,13 +545,55 @@ const Index = () => {
 
                     {result.type === 'flights' && result.results.length > 0 && (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-semibold text-foreground">
+                        <div>
+                          <h3 className="text-xl font-semibold text-foreground mb-4">
                             ✈️ Flights from {result.origin?.name} to {result.destination?.name}
                           </h3>
-                          <span className="text-sm text-muted-foreground">
-                            {result.results.length} flight{result.results.length !== 1 ? 's' : ''} found
-                          </span>
+                          <FlightFilters
+                            resultsCount={result.results.length}
+                            currentSort={result.filters?.sortBy || 'best'}
+                            onSortChange={(sortBy) => {
+                              const origin = result.origin?.name;
+                              const destination = result.destination?.name;
+                              const departureDate = result.departureDate;
+                              const returnDate = result.returnDate;
+                              
+                              const sortLabels = {
+                                'best': 'best available',
+                                'price': 'lowest price',
+                                'duration': 'shortest duration',
+                                'departure_early': 'earliest departure',
+                                'departure_late': 'latest departure'
+                              };
+                              
+                              let query = `Show me flights from ${origin} to ${destination}`;
+                              if (departureDate) {
+                                query += ` departing ${departureDate}`;
+                              }
+                              if (returnDate) {
+                                query += ` returning ${returnDate}`;
+                              }
+                              query += ` sorted by ${sortLabels[sortBy as keyof typeof sortLabels]}`;
+                              
+                              handleSearch(query);
+                            }}
+                            onClearFilters={() => {
+                              const origin = result.origin?.name;
+                              const destination = result.destination?.name;
+                              const departureDate = result.departureDate;
+                              const returnDate = result.returnDate;
+                              
+                              let query = `Show me flights from ${origin} to ${destination}`;
+                              if (departureDate) {
+                                query += ` departing ${departureDate}`;
+                              }
+                              if (returnDate) {
+                                query += ` returning ${returnDate}`;
+                              }
+                              
+                              handleSearch(query);
+                            }}
+                          />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {result.results.map((flight: any, flightIdx: number) => (
