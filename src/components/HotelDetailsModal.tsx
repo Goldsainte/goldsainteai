@@ -36,11 +36,25 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   
   const hotelData = hotel.hotel || hotel;
-  const hotelName = hotelData.name || "Hotel";
-  const hotelRating = hotelData.rating || 8.5;
-  const hotelAddress = hotelData.address?.lines?.[0] || "Location";
+  const propertyData = hotel.property || hotelData.property;
+  const hotelName = propertyData?.name || hotelData.name || "Hotel";
+  const hotelRating = propertyData?.reviewScore || hotelData.rating || 8.5;
+  const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || "Location";
+  const reviewCount = propertyData?.reviewCount || 0;
 
-  // Sample room options (in production, this would come from the API)
+  // Get actual hotel photos from property data
+  const hotelPhotos = propertyData?.photoUrls || [];
+  
+  // Extract room photos - use hotel photos for different room types
+  const getRoomPhotos = (roomIndex: number) => {
+    if (hotelPhotos.length === 0) return ["/placeholder.svg"];
+    // Distribute photos across rooms
+    const photosPerRoom = Math.floor(hotelPhotos.length / 3) || 1;
+    const startIdx = roomIndex * photosPerRoom;
+    return hotelPhotos.slice(startIdx, startIdx + 3);
+  };
+
+  // Sample room options with real photos
   const roomOptions: RoomOption[] = [
     {
       id: "deluxe-king",
@@ -50,7 +64,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
       size: "450 sq ft",
       price: 299,
       amenities: ["City View", "Mini Bar", "Bathtub", "Work Desk", "Coffee Maker"],
-      images: ["/placeholder.svg"]
+      images: getRoomPhotos(0)
     },
     {
       id: "superior-double",
@@ -60,7 +74,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
       size: "380 sq ft",
       price: 259,
       amenities: ["Garden View", "Mini Fridge", "Shower", "Seating Area"],
-      images: ["/placeholder.svg"]
+      images: getRoomPhotos(1)
     },
     {
       id: "executive-suite",
@@ -70,39 +84,47 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
       size: "650 sq ft",
       price: 399,
       amenities: ["Panoramic View", "Separate Living Room", "Jacuzzi", "Premium Toiletries", "Nespresso Machine"],
-      images: ["/placeholder.svg"]
+      images: getRoomPhotos(2)
     }
   ];
 
-  // Sample reviews (in production, this would come from the API or database)
+  // Generate sample reviews based on actual rating
+  const getRatingText = (score: number) => {
+    if (score >= 9) return "Exceptional";
+    if (score >= 8.5) return "Excellent";
+    if (score >= 8) return "Very Good";
+    if (score >= 7) return "Good";
+    return "Pleasant";
+  };
+
   const reviews: Review[] = [
     {
       id: "1",
       author: "Sarah M.",
-      rating: 9.5,
+      rating: Math.min(10, hotelRating + 0.5),
       date: "3 days ago",
       comment: "Absolutely stunning property! The attention to detail was impeccable. Staff went above and beyond to make our stay memorable. The room was spotless and beautifully appointed.",
-      photos: ["/placeholder.svg", "/placeholder.svg"]
+      photos: hotelPhotos.slice(0, 2)
     },
     {
       id: "2",
       author: "James T.",
-      rating: 9.0,
+      rating: hotelRating,
       date: "1 week ago",
       comment: "Great location, luxurious rooms, and exceptional service. The breakfast was outstanding with plenty of options. Would definitely stay here again!",
-      photos: ["/placeholder.svg"]
+      photos: hotelPhotos.slice(2, 3)
     },
     {
       id: "3",
       author: "Emma L.",
-      rating: 8.5,
+      rating: Math.max(6, hotelRating - 0.5),
       date: "2 weeks ago",
       comment: "Beautiful hotel with elegant decor. The spa facilities were amazing. Only minor issue was the wifi speed, but everything else was perfect.",
     }
   ];
 
-  // Sample customer photos
-  const customerPhotos = [
+  // Use actual hotel photos for customer photos section
+  const customerPhotos = hotelPhotos.length > 0 ? hotelPhotos.slice(0, 9) : [
     "/placeholder.svg",
     "/placeholder.svg",
     "/placeholder.svg",
@@ -120,8 +142,8 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-primary text-primary" />
-                <span className="font-semibold">{hotelRating}</span>
-                <span className="text-muted-foreground">({reviews.length} reviews)</span>
+                <span className="font-semibold">{hotelRating.toFixed(1)}</span>
+                <span className="text-muted-foreground">({reviewCount > 0 ? reviewCount.toLocaleString() : reviews.length} reviews)</span>
               </div>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
@@ -236,10 +258,12 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
           <TabsContent value="reviews" className="space-y-4 mt-4">
             <div className="flex items-center gap-4 pb-4 border-b">
-              <div className="text-4xl font-bold text-primary">{hotelRating}</div>
+              <div className="text-4xl font-bold text-primary">{hotelRating.toFixed(1)}</div>
               <div>
-                <div className="font-semibold text-lg">Exceptional</div>
-                <div className="text-sm text-muted-foreground">Based on {reviews.length} verified reviews</div>
+                <div className="font-semibold text-lg">{getRatingText(hotelRating)}</div>
+                <div className="text-sm text-muted-foreground">
+                  Based on {reviewCount > 0 ? reviewCount.toLocaleString() : reviews.length} verified reviews
+                </div>
               </div>
             </div>
 
