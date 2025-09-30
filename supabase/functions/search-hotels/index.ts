@@ -5,6 +5,69 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// City name to IATA code mapping
+const cityCodeMap: { [key: string]: string } = {
+  'new york': 'NYC', 'nyc': 'NYC', 'manhattan': 'NYC',
+  'paris': 'PAR',
+  'london': 'LON',
+  'dubai': 'DXB',
+  'tokyo': 'TYO',
+  'los angeles': 'LAX', 'la': 'LAX',
+  'san francisco': 'SFO',
+  'chicago': 'CHI',
+  'miami': 'MIA',
+  'rome': 'ROM',
+  'barcelona': 'BCN',
+  'amsterdam': 'AMS',
+  'berlin': 'BER',
+  'madrid': 'MAD',
+  'singapore': 'SIN',
+  'hong kong': 'HKG',
+  'sydney': 'SYD',
+  'melbourne': 'MEL',
+  'toronto': 'YTO',
+  'vancouver': 'YVR',
+  'las vegas': 'LAS',
+  'seattle': 'SEA',
+  'boston': 'BOS',
+  'washington': 'WAS', 'dc': 'WAS',
+  'orlando': 'ORL',
+  'bangkok': 'BKK',
+  'istanbul': 'IST',
+  'lisbon': 'LIS',
+  'vienna': 'VIE',
+  'prague': 'PRG',
+  'athens': 'ATH',
+  'brussels': 'BRU',
+  'munich': 'MUC',
+  'zurich': 'ZRH'
+};
+
+// Get Amadeus access token
+async function getAmadeusToken() {
+  const apiKey = Deno.env.get('AMADEUS_API_KEY');
+  const apiSecret = Deno.env.get('AMADEUS_API_SECRET');
+  
+  if (!apiKey || !apiSecret) {
+    throw new Error('Amadeus credentials not configured');
+  }
+
+  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `grant_type=client_credentials&client_id=${apiKey}&client_secret=${apiSecret}`
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to authenticate with Amadeus');
+  }
+
+  const data = await response.json();
+  return data.access_token;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -13,115 +76,130 @@ serve(async (req) => {
   try {
     const { location, checkIn, checkOut, guests } = await req.json();
     
-    console.log('Search hotels request:', { location, checkIn, checkOut, guests });
+    console.log('Amadeus hotel search request:', { location, checkIn, checkOut, guests });
 
-    const apiKey = Deno.env.get('BOOKING_API_KEY');
-    if (!apiKey) {
-      throw new Error('BOOKING_API_KEY not configured');
-    }
-
-    // Search for location first to get destination ID
-    const locationResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
-      {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
-      }
-    );
-
-    if (!locationResponse.ok) {
-      throw new Error(`Location search failed: ${locationResponse.statusText}`);
-    }
-
-    const locationData = await locationResponse.json();
-    console.log('Location data:', locationData);
-
-    if (!locationData.data || locationData.data.length === 0) {
-      return new Response(JSON.stringify({ error: 'Location not found', results: [] }), {
+    // Convert location to city code
+    const normalizedLocation = location.toLowerCase().trim();
+    const cityCode = cityCodeMap[normalizedLocation];
+    
+    if (!cityCode) {
+      return new Response(JSON.stringify({ 
+        results: [], 
+        error: `City "${location}" not supported yet. Try: New York, Paris, London, Dubai, Tokyo, etc.` 
+      }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       });
     }
 
-    // Build destination candidates with preference order
-    const rawResults = Array.isArray(locationData.data) ? locationData.data : [];
-    const preference = ['city', 'district', 'region', 'landmark'];
-    const candidates = rawResults
-      .filter((d: any) => d?.dest_id && d?.search_type)
-      .sort((a: any, b: any) => preference.indexOf(a.search_type?.toLowerCase()) - preference.indexOf(b.search_type?.toLowerCase()))
-      .map((d: any) => ({ dest_id: String(d.dest_id), search_type: String(d.search_type).toUpperCase(), raw: d }));
-
-    if (candidates.length === 0) {
-      return new Response(JSON.stringify({ results: [], error: 'No valid destinations found' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      });
-    }
-
-    // Fallback dates if not provided
+    // Default dates if not provided
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const arrival = checkIn && String(checkIn).trim() !== '' ? checkIn : today.toISOString().split('T')[0];
     const departure = checkOut && String(checkOut).trim() !== '' ? checkOut : tomorrow.toISOString().split('T')[0];
 
-    let chosen: any = null;
-    let hotels: any[] = [];
-    let lastError: string | null = null;
+    const token = await getAmadeusToken();
 
-    for (const c of candidates) {
-      const params = new URLSearchParams({
-        dest_id: c.dest_id,
-        search_type: c.search_type,
-        arrival_date: arrival,
-        departure_date: departure,
-        adults: String(guests || 2),
-        room_qty: '1',
-        page_number: '1',
-        units: 'metric',
-        temperature_unit: 'c',
-        languagecode: 'en-us',
-        currency_code: 'USD'
-      });
-      const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
-      console.log('Trying destination', { dest_id: c.dest_id, search_type: c.search_type, hotelsUrl });
-
-      const hotelsResponse = await fetch(hotelsUrl, {
-        method: 'GET',
+    // Step 1: Get hotel IDs from Hotel List API
+    console.log('Fetching hotel list for city:', cityCode);
+    const hotelListResponse = await fetch(
+      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}`,
+      {
         headers: {
-          'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
+          'Authorization': `Bearer ${token}`
         }
-      });
-
-      if (!hotelsResponse.ok) {
-        lastError = `Hotels search failed: ${hotelsResponse.status} ${hotelsResponse.statusText}`;
-        continue;
       }
+    );
 
-      const hotelsData = await hotelsResponse.json();
-      const count = hotelsData?.data?.hotels?.length || 0;
-      console.log(`Hotels found for ${c.search_type} ${c.dest_id}:`, count);
-
-      if (count > 0) {
-        chosen = c;
-        hotels = hotelsData.data.hotels;
-        break;
-      }
+    if (!hotelListResponse.ok) {
+      throw new Error(`Hotel list fetch failed: ${hotelListResponse.statusText}`);
     }
 
+    const hotelListData = await hotelListResponse.json();
+    console.log('Hotels found in city:', hotelListData.data?.length || 0);
+
+    if (!hotelListData.data || hotelListData.data.length === 0) {
+      return new Response(JSON.stringify({ 
+        results: [],
+        message: 'No hotels found in this city'
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    // Get first 15 hotel IDs
+    const hotelIds = hotelListData.data.slice(0, 15).map((hotel: any) => hotel.hotelId).join(',');
+    console.log('Fetching offers for hotel IDs');
+
+    // Step 2: Get hotel offers with prices
+    const offerParams = new URLSearchParams({
+      hotelIds,
+      checkInDate: arrival,
+      checkOutDate: departure,
+      adults: String(guests || 2),
+      currency: 'USD',
+      roomQuantity: '1',
+      bestRateOnly: 'true'
+    });
+
+    const offersResponse = await fetch(
+      `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!offersResponse.ok) {
+      throw new Error(`Hotel offers fetch failed: ${offersResponse.statusText}`);
+    }
+
+    const offersData = await offersResponse.json();
+    console.log('Hotel offers found:', offersData.data?.length || 0);
+
+    // Transform Amadeus format to match expected property card format
+    const transformedResults = (offersData.data || []).map((offer: any) => {
+      const hotel = offer.hotel;
+      const firstOffer = offer.offers?.[0];
+      const price = firstOffer?.price;
+
+      return {
+        hotel_id: hotel.hotelId,
+        property: {
+          name: hotel.name,
+          photoUrls: [], // Amadeus doesn't provide photos in this endpoint
+          reviewScore: hotel.rating ? parseFloat(hotel.rating) : 0,
+          reviewCount: 0,
+          externalUrls: {
+            default: `https://www.amadeus.com/hotel/${hotel.hotelId}` // placeholder
+          }
+        },
+        location: `${hotel.cityCode}`,
+        region: hotel.address?.cityName || location,
+        cityCode: hotel.cityCode,
+        price: price?.total ? parseFloat(price.total) : 0,
+        priceBreakdown: {
+          grossPrice: {
+            value: price?.total ? parseFloat(price.total) : 0,
+            currency: price?.currency || 'USD'
+          }
+        },
+        accessibilityLabel: `${hotel.name}. ${hotel.address?.cityName || ''}. Current price ${price?.total || 0} ${price?.currency || 'USD'}`,
+        // Keep full Amadeus data for booking
+        amadeusOffer: offer
+      };
+    });
+
     return new Response(JSON.stringify({ 
-      results: hotels,
-      location: chosen?.raw || rawResults[0] || null,
-      debug: { tried: candidates.map((cand: any) => ({ dest_id: cand.dest_id, search_type: cand.search_type })), lastError }
+      results: transformedResults,
+      location: { name: location, dest_id: cityCode }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
-
 
   } catch (error) {
     console.error('Error in search-hotels:', error);

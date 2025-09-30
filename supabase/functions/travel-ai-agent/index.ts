@@ -290,120 +290,169 @@ async function searchHotels(args: any, apiKey: string) {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    // Search for location first
-    console.log('Searching for location:', location);
-    const locationResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
-      {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
-      }
-    );
+    // City name to IATA code mapping
+    const cityCodeMap: { [key: string]: string } = {
+      'new york': 'NYC', 'nyc': 'NYC', 'manhattan': 'NYC',
+      'paris': 'PAR',
+      'london': 'LON',
+      'dubai': 'DXB',
+      'tokyo': 'TYO',
+      'los angeles': 'LAX', 'la': 'LAX',
+      'san francisco': 'SFO',
+      'chicago': 'CHI',
+      'miami': 'MIA',
+      'rome': 'ROM',
+      'barcelona': 'BCN',
+      'amsterdam': 'AMS',
+      'berlin': 'BER',
+      'madrid': 'MAD',
+      'singapore': 'SIN',
+      'hong kong': 'HKG',
+      'sydney': 'SYD',
+      'melbourne': 'MEL',
+      'toronto': 'YTO',
+      'vancouver': 'YVR',
+      'las vegas': 'LAS',
+      'seattle': 'SEA',
+      'boston': 'BOS',
+      'washington': 'WAS', 'dc': 'WAS',
+      'orlando': 'ORL',
+      'bangkok': 'BKK',
+      'istanbul': 'IST',
+      'lisbon': 'LIS',
+      'vienna': 'VIE',
+      'prague': 'PRG',
+      'athens': 'ATH',
+      'brussels': 'BRU',
+      'munich': 'MUC',
+      'zurich': 'ZRH'
+    };
 
-    console.log('Location API response status:', locationResponse.status);
+    const normalizedLocation = location.toLowerCase().trim();
+    const cityCode = cityCodeMap[normalizedLocation];
     
-    if (!locationResponse.ok) {
-      const errorText = await locationResponse.text();
-      console.error('Location API error:', errorText);
-      return { error: `Failed to find location: ${locationResponse.status}`, results: [] };
+    if (!cityCode) {
+      return { 
+        error: `City "${location}" not supported yet. Try: New York, Paris, London, Dubai, Tokyo, etc.`,
+        results: [] 
+      };
     }
 
-    const locationData = await locationResponse.json();
-    console.log('Location API response:', JSON.stringify(locationData).slice(0, 500));
-    
-    if (!locationData.data || locationData.data.length === 0) {
-      console.log('No location data found');
-      return { error: 'Location not found', results: [] };
+    // Get Amadeus token
+    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
+    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
+    if (!amadeusKey || !amadeusSecret) {
+      return { error: 'Amadeus credentials not configured', results: [] };
     }
 
-    // Build destination candidates (prefer city > district > region > landmark)
-    const rawResults = Array.isArray(locationData.data) ? locationData.data : [];
-    const preference = ['city', 'district', 'region', 'landmark'];
-    const candidates = rawResults
-      .filter((d: any) => d?.dest_id && d?.search_type)
-      .sort((a: any, b: any) => preference.indexOf(a.search_type?.toLowerCase()) - preference.indexOf(b.search_type?.toLowerCase()))
-      .map((d: any) => ({ dest_id: String(d.dest_id), search_type: String(d.search_type).toUpperCase(), raw: d }));
+    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
+    });
 
-    // Get default dates if not provided
+    if (!tokenResponse.ok) {
+      return { error: 'Failed to authenticate with Amadeus', results: [] };
+    }
+
+    const tokenData = await tokenResponse.json();
+    const token = tokenData.access_token;
+
+    // Default dates
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const defaultCheckIn = checkIn || today.toISOString().split('T')[0];
     const defaultCheckOut = checkOut || tomorrow.toISOString().split('T')[0];
 
-    let chosen: any = null;
-    let hotels: any[] = [];
+    // Step 1: Get hotel IDs
+    const hotelListResponse = await fetch(
+      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
 
-    for (const c of candidates) {
-      const params = new URLSearchParams({
-        dest_id: c.dest_id,
-        search_type: c.search_type,
-        arrival_date: defaultCheckIn,
-        departure_date: defaultCheckOut,
-        adults: guests.toString(),
-        room_qty: '1',
-        page_number: '1',
-        units: 'metric',
-        temperature_unit: 'c',
-        languagecode: 'en-us',
-        currency_code: 'USD'
-      });
+    if (!hotelListResponse.ok) {
+      return { error: 'Failed to fetch hotel list', results: [] };
+    }
 
-      // Sorting
-      if (sortBy) {
-        const sortMap: { [key: string]: string } = {
-          'popularity': 'popularity',
-          'price': 'price',
-          'distance': 'distance',
-          'review_score': 'review_score'
-        };
-        if (sortMap[sortBy]) {
-          params.append('order_by', sortMap[sortBy]);
-        }
-      }
-      // Price filter
-      if (maxPrice) params.append('price_max', maxPrice.toString());
+    const hotelListData = await hotelListResponse.json();
+    if (!hotelListData.data || hotelListData.data.length === 0) {
+      return { error: 'No hotels found in this city', results: [] };
+    }
 
-      const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
-      console.log('Trying hotels with', { dest_id: c.dest_id, search_type: c.search_type, hotelsUrl });
+    const hotelIds = hotelListData.data.slice(0, 15).map((h: any) => h.hotelId).join(',');
 
-      const hotelsResponse = await fetch(hotelsUrl, {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
-      });
+    // Step 2: Get hotel offers
+    const offerParams = new URLSearchParams({
+      hotelIds,
+      checkInDate: defaultCheckIn,
+      checkOutDate: defaultCheckOut,
+      adults: guests.toString(),
+      currency: 'USD',
+      roomQuantity: '1',
+      bestRateOnly: 'true'
+    });
 
-      console.log('Hotels API response status:', hotelsResponse.status);
+    const offersResponse = await fetch(
+      `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
 
-      if (!hotelsResponse.ok) {
-        continue;
-      }
+    if (!offersResponse.ok) {
+      return { error: 'Failed to fetch hotel offers', results: [] };
+    }
 
-      const hotelsData = await hotelsResponse.json();
-      let list = hotelsData?.data?.hotels || [];
-      console.log(`Found ${list.length} hotels for`, { dest_id: c.dest_id, search_type: c.search_type });
+    const offersData = await offersResponse.json();
+    let hotels = offersData.data || [];
+    console.log('Amadeus hotels found:', hotels.length);
 
-      // Apply client-side filters
-      if (minRating) {
-        list = list.filter((h: any) => (h.property?.reviewScore || 0) >= minRating);
-      }
+    // Transform to expected format
+    let transformedHotels = hotels.map((offer: any) => {
+      const hotel = offer.hotel;
+      const firstOffer = offer.offers?.[0];
+      const price = firstOffer?.price;
 
-      if (list.length > 0) {
-        chosen = c;
-        hotels = list;
-        break;
-      }
+      return {
+        hotel_id: hotel.hotelId,
+        property: {
+          name: hotel.name,
+          photoUrls: [],
+          reviewScore: hotel.rating ? parseFloat(hotel.rating) : 0,
+          reviewCount: 0,
+          externalUrls: { default: `https://www.amadeus.com/hotel/${hotel.hotelId}` }
+        },
+        location: hotel.cityCode,
+        region: hotel.address?.cityName || location,
+        cityCode: hotel.cityCode,
+        price: price?.total ? parseFloat(price.total) : 0,
+        priceBreakdown: {
+          grossPrice: {
+            value: price?.total ? parseFloat(price.total) : 0,
+            currency: price?.currency || 'USD'
+          }
+        },
+        accessibilityLabel: `${hotel.name}. ${hotel.address?.cityName || ''}. Current price ${price?.total || 0} ${price?.currency || 'USD'}`,
+        amadeusOffer: offer
+      };
+    });
+
+    // Apply filters
+    if (minRating) {
+      transformedHotels = transformedHotels.filter((h: any) => h.property.reviewScore >= minRating);
+    }
+    if (maxPrice) {
+      transformedHotels = transformedHotels.filter((h: any) => h.price <= maxPrice);
+    }
+    if (sortBy === 'price') {
+      transformedHotels.sort((a: any, b: any) => a.price - b.price);
+    } else if (sortBy === 'review_score') {
+      transformedHotels.sort((a: any, b: any) => b.property.reviewScore - a.property.reviewScore);
     }
 
     return {
       type: 'hotels',
-      location: chosen?.raw || rawResults[0],
-      results: hotels.slice(0, 6),
+      location: { name: location, dest_id: cityCode },
+      results: transformedHotels.slice(0, 6),
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
       guests,
@@ -411,9 +460,7 @@ async function searchHotels(args: any, apiKey: string) {
     };
   } catch (error) {
     console.error('Error in searchHotels:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Error details:', errorMessage);
-    return { error: errorMessage, results: [] };
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
   }
 }
 
