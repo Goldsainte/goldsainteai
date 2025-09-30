@@ -10,6 +10,7 @@ import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
+import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
 import logomark from "@/assets/logomark-gold.png";
 import property1 from "@/assets/property1.jpg";
@@ -51,6 +52,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState<{ type: "hotel" | "flight"; context: string } | null>(null);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -154,6 +156,29 @@ const Index = () => {
     }
   };
 
+  const handleDatePickerRequest = (type: "hotel" | "flight", context: string) => {
+    setShowDatePicker({ type, context });
+  };
+
+  const handleDatesSelected = async (dates: { checkIn?: string; checkOut?: string; departureDate?: string; returnDate?: string }) => {
+    if (!showDatePicker) return;
+
+    const { type, context } = showDatePicker;
+    setShowDatePicker(null);
+
+    let query = context;
+    if (type === "hotel" && dates.checkIn && dates.checkOut) {
+      query += ` from ${dates.checkIn} to ${dates.checkOut}`;
+    } else if (type === "flight" && dates.departureDate) {
+      query += ` on ${dates.departureDate}`;
+      if (dates.returnDate) {
+        query += ` returning ${dates.returnDate}`;
+      }
+    }
+
+    handleSearch(query);
+  };
+
   const handleQuickAction = async (action: string) => {
     const queries = {
       hotels: userLocation 
@@ -247,7 +272,7 @@ const Index = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-primary/5"
-                    onClick={() => handleQuickAction('hotels')}
+                    onClick={() => handleDatePickerRequest("hotel", "Show me hotels near me")}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative p-6 flex flex-col items-center gap-3">
@@ -261,7 +286,7 @@ const Index = () => {
 
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
-                    onClick={() => handleQuickAction('flights')}
+                    onClick={() => handleDatePickerRequest("flight", "Show me flights from my location")}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative p-6 flex flex-col items-center gap-3">
@@ -389,6 +414,17 @@ const Index = () => {
                     </div>
                   </div>
                 ))}
+
+                {/* Date Picker */}
+                {showDatePicker && (
+                  <div className="animate-in fade-in slide-in-from-bottom-4">
+                    <ChatDatePicker
+                      type={showDatePicker.type}
+                      onDatesSelected={handleDatesSelected}
+                      onCancel={() => setShowDatePicker(null)}
+                    />
+                  </div>
+                )}
 
                 {/* Search Results */}
                 {searchResults.map((result, idx) => (
