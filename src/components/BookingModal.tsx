@@ -1,11 +1,40 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+
+const bookingFormSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email address"),
+  country: z.string().min(1, "Country is required"),
+  region: z.string().min(1, "Region/State is required"),
+  phoneCountryCode: z.string().min(1, "Country code is required"),
+  phone: z.string().min(1, "Phone number is required"),
+  paperlessConfirmation: z.boolean().default(false),
+  confirmByEmail: z.boolean().default(true),
+  confirmByText: z.boolean().default(false),
+  bookingFor: z.enum(["self", "someone_else"]),
+  guestName: z.string().optional(),
+  travelingForWork: z.boolean().default(false),
+  needFlight: z.boolean().default(false),
+  needCarTransfer: z.boolean().default(false),
+  specialRequests: z.string().optional(),
+  estimatedArrivalTime: z.string().optional(),
+  needCrib: z.boolean().default(false),
+});
 
 interface BookingModalProps {
   open: boolean;
@@ -26,47 +55,63 @@ export const BookingModal = ({
 }: BookingModalProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    country: ''
+  
+  const form = useForm<z.infer<typeof bookingFormSchema>>({
+    resolver: zodResolver(bookingFormSchema),
+    defaultValues: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      country: '',
+      region: '',
+      phoneCountryCode: '+1',
+      phone: '',
+      paperlessConfirmation: false,
+      confirmByEmail: true,
+      confirmByText: false,
+      bookingFor: 'self',
+      travelingForWork: false,
+      needFlight: false,
+      needCarTransfer: false,
+      needCrib: false,
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const bookingFor = form.watch('bookingFor');
+  
+  // Calculate tax and fees (assuming 10% tax and 5% service fee)
+  const subtotal = totalPrice;
+  const tax = subtotal * 0.10;
+  const serviceFee = subtotal * 0.05;
+  const total = subtotal + tax + serviceFee;
+
+  const onSubmit = async (values: z.infer<typeof bookingFormSchema>) => {
     setLoading(true);
 
     try {
-      // Create booking
       const { data: bookingResult, error: bookingError } = await supabase.functions.invoke('create-booking', {
         body: {
           bookingType,
           bookingData,
-          totalPrice,
+          totalPrice: total,
           currency,
-          guestInfo: formData
+          guestInfo: values
         }
       });
 
       if (bookingError) throw bookingError;
 
-      console.log('Booking created:', bookingResult.booking);
-
-      // Create checkout session
       const { data: checkoutResult, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
         body: {
           bookingId: bookingResult.booking.id,
-          amount: totalPrice,
+          amount: total,
           currency,
-          guestEmail: formData.email
+          guestEmail: values.email
         }
       });
 
       if (checkoutError) throw checkoutError;
 
-      // Redirect to Stripe checkout
       if (checkoutResult.url) {
         window.open(checkoutResult.url, '_blank');
         onClose();
@@ -89,63 +134,360 @@ export const BookingModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Guest Information</DialogTitle>
+          <DialogTitle>Complete Your Booking</DialogTitle>
+          <DialogDescription>Please provide your information to complete the reservation</DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                required
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            
+            {/* Room Details */}
+            {bookingType === 'hotel' && bookingData?.room && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">Room Details</h3>
+                <div className="text-sm space-y-1">
+                  <p><strong>Room Type:</strong> {bookingData.room.description?.text || 'Standard Room'}</p>
+                  <p><strong>Beds:</strong> {bookingData.room.typeEstimated?.bedType || 'Not specified'}</p>
+                  {bookingData.room.description?.text && (
+                    <p><strong>Features:</strong> {bookingData.room.description.text}</p>
+                  )}
+                </div>
+                <Separator />
+              </div>
+            )}
+
+            {/* Guest Information */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Guest Information</h3>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input type="email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="region"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Region/State</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <FormField
+                  control={form.control}
+                  name="phoneCountryCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Code</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="+1">+1 (US/CA)</SelectItem>
+                          <SelectItem value="+44">+44 (UK)</SelectItem>
+                          <SelectItem value="+33">+33 (FR)</SelectItem>
+                          <SelectItem value="+49">+49 (DE)</SelectItem>
+                          <SelectItem value="+91">+91 (IN)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Booking Details */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Booking Details</h3>
+              
+              <FormField
+                control={form.control}
+                name="bookingFor"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Who is this booking for?</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="self">I'm the main guest</SelectItem>
+                        <SelectItem value="someone_else">Booking for someone else</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {bookingFor === 'someone_else' && (
+                <FormField
+                  control={form.control}
+                  name="guestName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Guest Full Name</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Enter guest's full name" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              <FormField
+                control={form.control}
+                name="travelingForWork"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0 font-normal">I'm traveling for work</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="estimatedArrivalTime"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Estimated Arrival Time (Optional)</FormLabel>
+                    <FormControl>
+                      <Input type="time" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                required
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+
+            <Separator />
+
+            {/* Special Requests */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Special Requests & Add-ons</h3>
+              
+              <FormField
+                control={form.control}
+                name="needCrib"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0 font-normal">I need a crib</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="needFlight"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0 font-normal">I need to book a flight</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="needCarTransfer"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0 font-normal">I need a car transfer</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="specialRequests"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Special Requests (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        {...field} 
+                        placeholder="Any special requests or notes..."
+                        className="h-20"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              type="tel"
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="country">Country</Label>
-            <Input
-              id="country"
-              value={formData.country}
-              onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-            />
-          </div>
-          <div className="pt-4 border-t">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-sm text-muted-foreground">Total Amount:</span>
-              <span className="text-2xl font-bold">{currency} {totalPrice.toFixed(2)}</span>
+
+            <Separator />
+
+            {/* Confirmation Preferences */}
+            <div className="space-y-4">
+              <h3 className="font-semibold">Confirmation Preferences</h3>
+              
+              <FormField
+                control={form.control}
+                name="paperlessConfirmation"
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2 space-y-0">
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                    <FormLabel className="!mt-0 font-normal">I prefer paperless confirmation</FormLabel>
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-2">
+                <Label>Send confirmation by:</Label>
+                <FormField
+                  control={form.control}
+                  name="confirmByEmail"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 font-normal">Email</FormLabel>
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="confirmByText"
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 font-normal">Text Message</FormLabel>
+                    </FormItem>
+                  )}
+                />
+              </div>
             </div>
+
+            <Separator />
+
+            {/* Price Breakdown */}
+            <div className="space-y-2 bg-muted p-4 rounded-lg">
+              <h3 className="font-semibold">Price Breakdown</h3>
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between">
+                  <span>Subtotal:</span>
+                  <span>{currency} {subtotal.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Tax (10%):</span>
+                  <span>{currency} {tax.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Service Fee (5%):</span>
+                  <span>{currency} {serviceFee.toFixed(2)}</span>
+                </div>
+                <Separator className="my-2" />
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total:</span>
+                  <span>{currency} {total.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? (
                 <>
@@ -156,8 +498,8 @@ export const BookingModal = ({
                 'Proceed to Payment'
               )}
             </Button>
-          </div>
-        </form>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
