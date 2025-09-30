@@ -352,6 +352,17 @@ const Index = () => {
                 </div>
               </div>
 
+              {/* Date Picker - Initial View */}
+              {showDatePicker && (
+                <div className="animate-in fade-in slide-in-from-bottom-4">
+                  <ChatDatePicker
+                    type={showDatePicker.type}
+                    onDatesSelected={handleDatesSelected}
+                    onCancel={() => setShowDatePicker(null)}
+                  />
+                </div>
+              )}
+
               {/* Footer */}
               <p className="text-xs text-muted-foreground text-center pt-8">
                 By using Goldsainte AI, you agree to our{" "}
