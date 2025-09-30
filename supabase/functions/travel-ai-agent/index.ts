@@ -382,7 +382,7 @@ async function searchHotels(args: any, apiKey: string) {
       return { error: 'No hotels found in this city', results: [] };
     }
 
-    const hotelIds = hotelListData.data.slice(0, 15).map((h: any) => h.hotelId).join(',');
+    const hotelIds = hotelListData.data.slice(0, 50).map((h: any) => h.hotelId).join(',');
 
     // Step 2: Get hotel offers
     const offerParams = new URLSearchParams({
