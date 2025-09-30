@@ -430,6 +430,52 @@ const Index = () => {
                         </div>
                       </div>
                     )}
+
+                    {result.type === 'restaurants' && result.results.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          🍽️ Restaurants Nearby
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {result.results.map((restaurant: any, restIdx: number) => (
+                            <Card key={restaurant.id || restIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-0 bg-gradient-to-br from-background to-muted/20">
+                              <div className="space-y-3">
+                                {restaurant.photoUrl && (
+                                  <img 
+                                    src={restaurant.photoUrl} 
+                                    alt={restaurant.name}
+                                    className="w-full h-32 object-cover rounded-lg"
+                                  />
+                                )}
+                                <div>
+                                  <h4 className="font-semibold text-foreground mb-1">{restaurant.name}</h4>
+                                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                                    {restaurant.rating > 0 && (
+                                      <span className="flex items-center gap-1">
+                                        ⭐ {restaurant.rating.toFixed(1)}
+                                        <span className="text-xs">({restaurant.userRatingsTotal})</span>
+                                      </span>
+                                    )}
+                                    {restaurant.priceLevel && (
+                                      <span>{'$'.repeat(restaurant.priceLevel)}</span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-muted-foreground">{restaurant.address}</p>
+                                  {restaurant.openNow !== undefined && (
+                                    <Badge 
+                                      variant={restaurant.openNow ? "default" : "secondary"}
+                                      className="mt-2"
+                                    >
+                                      {restaurant.openNow ? "Open Now" : "Closed"}
+                                    </Badge>
+                                  )}
+                                </div>
+                              </div>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
 

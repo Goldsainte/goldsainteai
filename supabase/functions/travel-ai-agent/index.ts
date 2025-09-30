@@ -92,15 +92,44 @@ serve(async (req) => {
             required: ["query"]
           }
         }
+      },
+      {
+        type: "function",
+        function: {
+          name: "search_restaurants",
+          description: "Search for restaurants near a specific location or coordinates. Use this when users ask about restaurants, dining, food, or places to eat. If the user provides coordinates (latitude, longitude), use those. Otherwise, use a city name and it will find restaurants in that area.",
+          parameters: {
+            type: "object",
+            properties: {
+              location: {
+                type: "string",
+                description: "The city or area to search for restaurants (e.g., 'New York', 'Paris')"
+              },
+              latitude: {
+                type: "number",
+                description: "Latitude coordinate if user provided specific location"
+              },
+              longitude: {
+                type: "number",
+                description: "Longitude coordinate if user provided specific location"
+              },
+              radius: {
+                type: "number",
+                description: "Search radius in meters (default 5000)"
+              }
+            },
+            required: []
+          }
+        }
       }
     ];
 
     const messages = [
       {
         role: "system",
-        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, and answer travel-related questions.
+        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, and answer travel-related questions.
 
-IMPORTANT: Be action-oriented and helpful. When users ask about hotels or destinations, IMMEDIATELY use the search tools with smart defaults.
+IMPORTANT: Be action-oriented and helpful. When users ask about hotels, destinations, or restaurants, IMMEDIATELY use the search tools with smart defaults.
 
 Smart Defaults:
 - If no dates mentioned: use today and tomorrow
@@ -109,16 +138,17 @@ Smart Defaults:
 - If they say "popular": use sortBy "popularity"
 - If they say "cheap" or "budget": use sortBy "price"
 - If no guest count: assume 2 guests
+- For restaurants: if user provides coordinates, use those; otherwise try to use major city coordinates (NYC: 40.7128, -74.0060; Paris: 48.8566, 2.3522; London: 51.5074, -0.1278; Tokyo: 35.6762, 139.6503)
 
-CRITICAL: When you use search tools and get results, DO NOT list out all the hotel details in text. The interface will show beautiful visual cards automatically. Instead, give a brief, friendly response like:
+CRITICAL: When you use search tools and get results, DO NOT list out all the details in text. The interface will show beautiful visual cards automatically. Instead, give a brief, friendly response like:
 
 "Perfect! I found some great hotels in Paris for you. Check out the options below!"
 
 OR 
 
-"Here are the top-rated hotels in Dubai - take a look at these beautiful properties!"
+"Here are amazing restaurants nearby - check out these top-rated places!"
 
-Then ask if they'd like to refine by budget, rating, amenities, dates, or guest count.
+Then ask if they'd like to refine by budget, rating, amenities, dates, or other criteria.
 
 Always show results first with minimal text, ask questions later. Be conversational but let the visual interface do the heavy lifting.`
       },
@@ -174,6 +204,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
           toolResult = await searchHotels(functionArgs, BOOKING_API_KEY);
         } else if (functionName === 'search_destinations') {
           toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
+        } else if (functionName === 'search_restaurants') {
+          toolResult = await searchRestaurants(functionArgs);
         }
         
         toolResults.push({
@@ -408,6 +440,88 @@ async function searchDestinations(args: any, apiKey: string) {
     };
   } catch (error) {
     console.error('Error searching destinations:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { error: errorMessage, results: [] };
+  }
+}
+
+async function searchRestaurants(args: any) {
+  try {
+    const { location, latitude, longitude, radius = 5000 } = args;
+    console.log('searchRestaurants called with:', { location, latitude, longitude, radius });
+
+    // City coordinates lookup
+    const cityCoordinates: { [key: string]: { lat: number; lng: number } } = {
+      'new york': { lat: 40.7128, lng: -74.0060 },
+      'nyc': { lat: 40.7128, lng: -74.0060 },
+      'paris': { lat: 48.8566, lng: 2.3522 },
+      'london': { lat: 51.5074, lng: -0.1278 },
+      'tokyo': { lat: 35.6762, lng: 139.6503 },
+      'dubai': { lat: 25.2048, lng: 55.2708 },
+      'los angeles': { lat: 34.0522, lng: -118.2437 },
+      'san francisco': { lat: 37.7749, lng: -122.4194 },
+      'chicago': { lat: 41.8781, lng: -87.6298 },
+      'miami': { lat: 25.7617, lng: -80.1918 },
+      'rome': { lat: 41.9028, lng: 12.4964 },
+      'barcelona': { lat: 41.3851, lng: 2.1734 },
+    };
+
+    let searchLat = latitude;
+    let searchLng = longitude;
+
+    // If no coordinates provided, try to look up city
+    if (!searchLat || !searchLng) {
+      if (location) {
+        const normalizedLocation = location.toLowerCase().trim();
+        const coords = cityCoordinates[normalizedLocation];
+        if (coords) {
+          searchLat = coords.lat;
+          searchLng = coords.lng;
+          console.log(`Using coordinates for ${location}:`, coords);
+        }
+      }
+      
+      // Default to NYC if still no coordinates
+      if (!searchLat || !searchLng) {
+        searchLat = 40.7128;
+        searchLng = -74.0060;
+        console.log('Using default NYC coordinates');
+      }
+    }
+
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/fetch-restaurants`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_ANON_KEY || '',
+      },
+      body: JSON.stringify({
+        latitude: searchLat,
+        longitude: searchLng,
+        radius
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Restaurant search error:', errorText);
+      return { error: 'Failed to search restaurants', results: [] };
+    }
+
+    const data = await response.json();
+    console.log('Restaurants found:', data.restaurants?.length || 0);
+    
+    return {
+      type: 'restaurants',
+      results: data.restaurants || [],
+      location: { latitude: searchLat, longitude: searchLng }
+    };
+  } catch (error) {
+    console.error('Error searching restaurants:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return { error: errorMessage, results: [] };
   }
