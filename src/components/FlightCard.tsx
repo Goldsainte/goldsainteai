@@ -37,16 +37,38 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
     return dictionaries?.carriers?.[code] || code;
   };
 
-  const getBookingUrl = () => {
+  const getAirlineBookingUrl = () => {
     const origin = firstSegment.departure.iataCode;
     const destination = lastSegment.arrival.iataCode;
     const departureDate = new Date(firstSegment.departure.at).toISOString().split('T')[0];
+    const returnDate = flight.itineraries[1] ? new Date(flight.itineraries[1].segments[0].departure.at).toISOString().split('T')[0] : '';
     const airline = firstSegment.carrierCode;
     
-    // Create a search URL based on the airline
-    // For now, using a general flight search aggregator
-    const kayakUrl = `https://www.kayak.com/flights/${origin}-${destination}/${departureDate}`;
-    return kayakUrl;
+    // Map of airline codes to their booking URLs
+    const airlineUrls: { [key: string]: string } = {
+      'AA': `https://www.aa.com/booking/find-flights`,
+      'DL': `https://www.delta.com/flight-search/book-a-flight`,
+      'UA': `https://www.united.com/en/us/fsr/choose-flights`,
+      'WN': `https://www.southwest.com/air/booking/select.html`,
+      'B6': `https://www.jetblue.com/booking/flights`,
+      'AS': `https://www.alaskaair.com/shopping`,
+      'F9': `https://www.flyfrontier.com/flight/search/`,
+      'NK': `https://www.spirit.com/book/flights`,
+      'G4': `https://www.allegiantair.com/booking/flights`,
+      'SY': `https://www.sun-air.dk/booking`,
+      // International carriers
+      'BA': `https://www.britishairways.com/travel/home/public/en_us`,
+      'LH': `https://www.lufthansa.com/us/en/homepage`,
+      'AF': `https://www.airfrance.us/`,
+      'KL': `https://www.klm.com/`,
+      'EK': `https://www.emirates.com/us/english/`,
+      'QR': `https://www.qatarairways.com/en/homepage.html`,
+      'SQ': `https://www.singaporeair.com/`,
+      'AC': `https://www.aircanada.com/`,
+    };
+    
+    // Return airline-specific URL or generic search
+    return airlineUrls[airline] || `https://www.${getAirlineName(airline).toLowerCase().replace(/\s+/g, '')}.com`;
   };
 
   return (
@@ -107,12 +129,12 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
             className="w-full"
           >
             <a 
-              href={getBookingUrl()} 
+              href={getAirlineBookingUrl()} 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2"
             >
-              Book Flight
+              Book on {getAirlineName(firstSegment.carrierCode)}
               <ExternalLink className="h-4 w-4" />
             </a>
           </Button>
