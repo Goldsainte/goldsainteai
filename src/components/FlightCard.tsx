@@ -1,9 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Clock, Calendar } from "lucide-react";
-import { useState } from "react";
-import { BookingModal } from "./BookingModal";
+import { Plane, Clock, Calendar, ExternalLink } from "lucide-react";
 
 interface FlightCardProps {
   flight: any;
@@ -11,7 +9,6 @@ interface FlightCardProps {
 }
 
 export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
-  const [showBookingModal, setShowBookingModal] = useState(false);
   
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
@@ -38,6 +35,18 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
 
   const getAirlineName = (code: string) => {
     return dictionaries?.carriers?.[code] || code;
+  };
+
+  const handleBookFlight = () => {
+    // Construct Google Flights URL with flight details
+    const origin = firstSegment.departure.iataCode;
+    const destination = lastSegment.arrival.iataCode;
+    const departureDate = new Date(firstSegment.departure.at).toISOString().split('T')[0];
+    
+    // Google Flights URL format
+    const googleFlightsUrl = `https://www.google.com/travel/flights/search?tfs=CBwQAhooEgoyMDI1LTEwLTA5agcIARIDJHtvcmlnaW59cgcIARIDJHtkZXN0aW5hdGlvbn0&hl=en&curr=${currency}`.replace('{origin}', origin).replace('{destination}', destination);
+    
+    window.open(googleFlightsUrl, '_blank');
   };
 
   return (
@@ -94,22 +103,14 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
 
           {/* Actions */}
           <Button 
-            onClick={() => setShowBookingModal(true)}
-            className="w-full"
+            onClick={handleBookFlight}
+            className="w-full group"
           >
             Book Flight
+            <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
         </div>
       </Card>
-
-      <BookingModal
-        open={showBookingModal}
-        onClose={() => setShowBookingModal(false)}
-        bookingType="flight"
-        bookingData={flight}
-        totalPrice={price}
-        currency={currency}
-      />
     </>
   );
 };
