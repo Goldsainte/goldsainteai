@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -32,6 +32,7 @@ import luxuryHotels from "@/assets/luxury-hotels.jpg";
 import luxuryFlights from "@/assets/luxury-flights.jpg";
 import luxuryDestinations from "@/assets/luxury-destinations.jpg";
 import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
+import luxuryVisa from "@/assets/luxury-visa.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -283,7 +284,8 @@ const Index = () => {
       destinations: "What are some popular travel destinations?",
       restaurants: userLocation
         ? `Show me popular restaurants near my current location`
-        : "Show me popular restaurants near me"
+        : "Show me popular restaurants near me",
+      visa: "What are visa requirements for traveling abroad?"
     };
     const query = queries[action as keyof typeof queries];
     console.log('Quick action selected:', action, '->', query);
@@ -369,7 +371,7 @@ const Index = () => {
               {/* Quick Actions */}
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground text-center font-medium tracking-wide uppercase">Start Your Journey</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
                     onClick={() => handleDatePickerRequest("hotel", "Show me hotels near me")}
@@ -459,6 +461,27 @@ const Index = () => {
                         <p className="text-xs text-muted-foreground">Fine dining</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
+                    </div>
+                  </Card>
+
+                  <Card
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
+                    onClick={() => handleQuickAction('visa')}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="relative p-8 flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                          <img src={luxuryVisa} alt="Visa Requirements" className="w-full h-full object-cover" />
+                        </div>
+                      </div>
+                      <div className="space-y-1 text-center">
+                        <span className="text-xl font-extrabold text-foreground tracking-tight font-chiffon">Visa</span>
+                        <p className="text-xs text-muted-foreground">Requirements</p>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
                     </div>
                   </Card>
                 </div>
