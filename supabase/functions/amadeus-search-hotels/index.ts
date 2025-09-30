@@ -38,27 +38,20 @@ serve(async (req) => {
   }
 
   try {
-    const { cityCode, checkInDate, checkOutDate, adults, radius = 5, radiusUnit = 'KM', currency = 'USD' } = await req.json();
+    const { cityCode, checkInDate, checkOutDate, adults = 1, currency = 'USD' } = await req.json();
     
     console.log('Hotel search request:', { cityCode, checkInDate, checkOutDate, adults });
 
     const token = await getAmadeusToken();
 
-    // Build query parameters
-    const params = new URLSearchParams({
-      cityCode,
-      radius: radius.toString(),
-      radiusUnit,
-      checkInDate,
-      checkOutDate,
-      adults: adults.toString(),
-      currency,
-      ratings: '3,4,5', // Only 3+ star hotels
-      hotelSource: 'ALL'
+    // Step 1: Get hotel IDs from Hotel List API
+    console.log('Fetching hotel list for city:', cityCode);
+    const hotelListParams = new URLSearchParams({
+      cityCode
     });
 
-    const response = await fetch(
-      `https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`,
+    const hotelListResponse = await fetch(
+      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?${hotelListParams}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -66,18 +59,61 @@ serve(async (req) => {
       }
     );
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Amadeus hotel search error:', error);
-      throw new Error(`Hotel search failed: ${response.statusText}`);
+    if (!hotelListResponse.ok) {
+      const error = await hotelListResponse.text();
+      console.error('Hotel List API error:', error);
+      throw new Error(`Hotel list fetch failed: ${hotelListResponse.statusText}`);
     }
 
-    const data = await response.json();
-    console.log('Hotels found:', data.data?.length || 0);
+    const hotelListData = await hotelListResponse.json();
+    console.log('Hotels found in city:', hotelListData.data?.length || 0);
+
+    if (!hotelListData.data || hotelListData.data.length === 0) {
+      return new Response(JSON.stringify({ 
+        results: [],
+        message: 'No hotels found in this city'
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    // Get first 10 hotel IDs
+    const hotelIds = hotelListData.data.slice(0, 10).map((hotel: any) => hotel.hotelId).join(',');
+    console.log('Fetching offers for hotel IDs:', hotelIds);
+
+    // Step 2: Get hotel offers with prices
+    const offerParams = new URLSearchParams({
+      hotelIds,
+      checkInDate,
+      checkOutDate,
+      adults: adults.toString(),
+      currency,
+      roomQuantity: '1',
+      bestRateOnly: 'true'
+    });
+
+    const offersResponse = await fetch(
+      `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+
+    if (!offersResponse.ok) {
+      const error = await offersResponse.text();
+      console.error('Hotel offers API error:', error);
+      throw new Error(`Hotel offers fetch failed: ${offersResponse.statusText}`);
+    }
+
+    const offersData = await offersResponse.json();
+    console.log('Hotel offers found:', offersData.data?.length || 0);
 
     return new Response(JSON.stringify({ 
-      results: data.data || [],
-      meta: data.meta
+      results: offersData.data || [],
+      meta: offersData.meta
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
