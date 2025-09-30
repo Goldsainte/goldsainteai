@@ -157,6 +157,11 @@ const Index = () => {
   };
 
   const handleDatePickerRequest = (type: "hotel" | "flight", context: string) => {
+    console.log('Quick action date picker requested:', { type, context });
+    toast({
+      title: type === "hotel" ? "Select your stay dates" : "Select your flight dates",
+      description: "Pick dates to continue.",
+    });
     setShowDatePicker({ type, context });
   };
 
@@ -192,7 +197,10 @@ const Index = () => {
         ? `Show me popular restaurants near my current location`
         : "Show me popular restaurants near me"
     };
-    handleSearch(queries[action as keyof typeof queries]);
+    const query = queries[action as keyof typeof queries];
+    console.log('Quick action selected:', action, '->', query);
+    toast({ title: "Searching", description: query });
+    await handleSearch(query);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -273,6 +281,10 @@ const Index = () => {
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-primary/5"
                     onClick={() => handleDatePickerRequest("hotel", "Show me hotels near me")}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Search Hotels"
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleDatePickerRequest("hotel", "Show me hotels near me"); }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative p-6 flex flex-col items-center gap-3">
@@ -287,6 +299,10 @@ const Index = () => {
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
                     onClick={() => handleDatePickerRequest("flight", "Show me flights from my location")}
+                    role="button"
+                    tabIndex={0}
+                    aria-label="Search Flights"
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleDatePickerRequest("flight", "Show me flights from my location"); }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative p-6 flex flex-col items-center gap-3">
@@ -354,7 +370,7 @@ const Index = () => {
 
               {/* Date Picker - Initial View */}
               {showDatePicker && (
-                <div className="animate-in fade-in slide-in-from-bottom-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
                   <ChatDatePicker
                     type={showDatePicker.type}
                     onDatesSelected={handleDatesSelected}
