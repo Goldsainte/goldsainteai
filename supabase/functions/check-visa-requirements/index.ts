@@ -15,40 +15,65 @@ serve(async (req) => {
     
     console.log('Visa requirement check:', { fromCountry, toCountry });
 
-    const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
-    if (!RAPIDAPI_KEY) {
-      throw new Error('RAPIDAPI_KEY not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
 
-    // Using the Visa Requirements API from RapidAPI
-    // You can find this at: https://rapidapi.com/ptwebsolution/api/visa-requirements
-    const response = await fetch(
-      `https://visa-requirements.p.rapidapi.com/visa-requirements`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-RapidAPI-Key': RAPIDAPI_KEY,
-          'X-RapidAPI-Host': 'visa-requirements.p.rapidapi.com'
-        },
-        body: JSON.stringify({
-          from: fromCountry,
-          to: toCountry
-        })
-      }
-    );
+    // Use Lovable AI to get accurate, current visa information
+    const prompt = `Check the current visa requirements for travelers from ${fromCountry} to ${toCountry}. 
+
+Provide accurate, up-to-date information including:
+1. Whether a visa is required (yes/no/visa on arrival/eVisa)
+2. The specific visa type(s) available
+3. Typical fees (in USD if possible)
+4. Processing time
+5. Any important notes or requirements
+
+Be specific and accurate. For countries like Indonesia/Bali, note that US citizens typically need a visa on arrival or can get an eVisa.
+
+Format your response as JSON with this structure:
+{
+  "required": boolean,
+  "visaType": string (e.g., "Visa on Arrival", "eVisa", "Tourist Visa"),
+  "fee": string (e.g., "$35 USD"),
+  "processingTime": string,
+  "notes": string,
+  "officialSource": string (government website URL if available)
+}`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          { 
+            role: 'system', 
+            content: 'You are a visa requirements expert. Provide accurate, current information about visa requirements between countries. Always return valid JSON.' 
+          },
+          { role: 'user', content: prompt }
+        ],
+        response_format: { type: "json_object" }
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('RapidAPI error:', response.status, errorText);
+      console.error('Lovable AI error:', response.status, errorText);
       throw new Error(`Visa check failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    console.log('Visa requirement result:', data);
+    const aiResponse = await response.json();
+    const visaInfo = JSON.parse(aiResponse.choices[0].message.content);
+    
+    console.log('Visa requirement result:', visaInfo);
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify(visaInfo), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
