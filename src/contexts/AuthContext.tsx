@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       toast({
         title: "Account created!",
-        description: "Welcome to Goldsainte AI!",
+        description: "Welcome to Sainté Voyage AI!",
       });
       
       navigate('/');

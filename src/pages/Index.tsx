@@ -317,7 +317,7 @@ const Index = () => {
               <div className="flex flex-col items-center space-y-4 mb-8">
                 <div className="relative">
                   <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                  <img src={logomark} alt="Goldsainte" className="h-24 w-24 relative z-10" />
+                  <img src={logomark} alt="Sainté Voyage AI" className="h-24 w-24 relative z-10" />
                 </div>
                 <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                   Sainté Voyage Ai
@@ -579,7 +579,7 @@ const Index = () => {
 
               {/* Footer */}
               <p className="text-xs text-muted-foreground text-center pt-8">
-                By using Goldsainte AI, you agree to our{" "}
+                By using Sainté Voyage AI, you agree to our{" "}
                 <a href="#" className="underline hover:text-foreground">Terms</a>
                 {" "}and{" "}
                 <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
@@ -601,9 +601,9 @@ const Index = () => {
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
-                  <img src={logomark} alt="Goldsainte" className="h-8 w-8" />
+                  <img src={logomark} alt="Sainté Voyage AI" className="h-8 w-8" />
                   <div>
-                    <h1 className="text-lg font-semibold text-foreground">Goldsainte AI</h1>
+                    <h1 className="text-lg font-semibold text-foreground">Sainté Voyage AI</h1>
                     <p className="text-xs text-muted-foreground">Your travel assistant</p>
                   </div>
                 </div>

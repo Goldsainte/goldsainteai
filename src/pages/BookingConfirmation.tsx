@@ -54,7 +54,7 @@ const BookingConfirmation = () => {
     <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-6">
       <Card className="max-w-2xl w-full p-8 space-y-6">
         <div className="flex flex-col items-center text-center space-y-4">
-          <img src={logomark} alt="Goldsainte" className="h-16 w-16" />
+          <img src={logomark} alt="Sainté Voyage AI" className="h-16 w-16" />
           
           {isSuccess ? (
             <>

@@ -36,8 +36,8 @@ export function AppSidebar() {
         {/* Logo Section */}
         <div className="p-4 border-b border-border">
           <div className="flex items-center gap-3">
-            <img src={logomark} alt="Goldsainte" className="h-8 w-8" />
-            {open && <span className="font-primary text-lg font-semibold text-primary">Goldsainte</span>}
+            <img src={logomark} alt="Sainté Voyage AI" className="h-8 w-8" />
+            {open && <span className="font-primary text-lg font-semibold text-primary">Sainté Voyage AI</span>}
           </div>
         </div>
 
