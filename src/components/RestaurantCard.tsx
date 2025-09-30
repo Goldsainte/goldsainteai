@@ -1,8 +1,12 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, DollarSign } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Star, MapPin, DollarSign, Calendar } from "lucide-react";
+import { RestaurantReservationModal } from "./RestaurantReservationModal";
 
 interface RestaurantCardProps {
+  id: string;
   name: string;
   rating: number;
   userRatingsTotal: number;
@@ -13,6 +17,7 @@ interface RestaurantCardProps {
 }
 
 export const RestaurantCard = ({ 
+  id,
   name, 
   rating, 
   userRatingsTotal, 
@@ -21,13 +26,16 @@ export const RestaurantCard = ({
   photoUrl,
   openNow 
 }: RestaurantCardProps) => {
+  const [showReservationModal, setShowReservationModal] = useState(false);
+
   const getPriceLevelSymbol = (level?: number) => {
     if (!level) return '';
     return '$'.repeat(level);
   };
 
   return (
-    <Card className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl border-0 h-[400px]">
+    <>
+      <Card className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border-0 h-[400px]">
       {/* Image with overlay */}
       <div className="absolute inset-0">
         {photoUrl ? (
@@ -84,6 +92,16 @@ export const RestaurantCard = ({
               {address}
             </p>
           </div>
+
+          {/* Booking Button */}
+          <Button 
+            onClick={() => setShowReservationModal(true)}
+            className="mt-4 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            size="sm"
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Book a Table
+          </Button>
         </div>
 
         {/* Decorative accent */}
@@ -95,5 +113,12 @@ export const RestaurantCard = ({
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
       </div>
     </Card>
+
+    <RestaurantReservationModal
+      isOpen={showReservationModal}
+      onClose={() => setShowReservationModal(false)}
+      restaurant={{ id, name, address, photoUrl }}
+    />
+    </>
   );
 };
