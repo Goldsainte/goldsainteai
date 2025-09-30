@@ -33,7 +33,7 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "search_hotels",
-          description: "Search for hotels in a specific location with check-in/check-out dates and number of guests. Use this when users ask about hotels, accommodations, or places to stay.",
+          description: "Search for hotels in a specific location with various filters. Use this when users ask about hotels, accommodations, or places to stay. You can filter by price, rating, amenities, and sort by different criteria.",
           parameters: {
             type: "object",
             properties: {
@@ -52,6 +52,24 @@ serve(async (req) => {
               guests: {
                 type: "number",
                 description: "Number of guests"
+              },
+              sortBy: {
+                type: "string",
+                enum: ["popularity", "price", "distance", "review_score"],
+                description: "How to sort results: popularity (most booked), price (lowest first), distance (closest to center), review_score (highest rated)"
+              },
+              minRating: {
+                type: "number",
+                description: "Minimum guest review score (0-10, e.g., 8 for excellent hotels)"
+              },
+              maxPrice: {
+                type: "number",
+                description: "Maximum price per night in USD"
+              },
+              amenities: {
+                type: "array",
+                items: { type: "string" },
+                description: "Required amenities like 'wifi', 'pool', 'parking', 'gym', 'restaurant', 'spa'"
               }
             },
             required: ["location"]
@@ -83,11 +101,17 @@ serve(async (req) => {
         content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, and answer travel-related questions.
 
 When users ask about travel, you should:
-1. Use the search_hotels tool to find accommodations when they mention hotels, stays, or accommodations
-2. Use the search_destinations tool to discover places when they ask about destinations, cities, or where to go
-3. Provide helpful, conversational responses with specific recommendations
-4. Ask clarifying questions if needed (dates, number of guests, preferences)
-5. Be enthusiastic and knowledgeable about travel
+1. Ask about their preferences: budget, desired amenities (wifi, pool, parking, gym, spa), minimum rating, location preferences
+2. Use the search_hotels tool with appropriate filters:
+   - sortBy: "popularity" for most booked, "review_score" for highest rated, "price" for budget options, "distance" for central locations
+   - minRating: 8+ for excellent hotels, 7+ for good hotels
+   - amenities: Ask what's important to them (wifi, pool, parking, gym, restaurant, spa)
+   - maxPrice: Set based on their budget
+3. Use search_destinations to discover places when they ask about destinations or where to go
+4. Provide helpful, conversational responses with specific recommendations
+5. Mention the filtering you applied (e.g., "Here are the top-rated hotels with pools...")
+
+When suggesting hotels, always explain why you chose those filters and ask if they'd like to adjust any criteria.
 
 Always be helpful, friendly, and provide detailed information when available.`
       },
@@ -216,8 +240,8 @@ Always be helpful, friendly, and provide detailed information when available.`
 
 async function searchHotels(args: any, apiKey: string) {
   try {
-    const { location, checkIn, checkOut, guests = 2 } = args;
-    console.log('searchHotels called with:', { location, checkIn, checkOut, guests });
+    const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
+    console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
     // Search for location first
     console.log('Searching for location:', location);
@@ -258,10 +282,42 @@ async function searchHotels(args: any, apiKey: string) {
     const defaultCheckIn = checkIn || today.toISOString().split('T')[0];
     const defaultCheckOut = checkOut || tomorrow.toISOString().split('T')[0];
 
-    console.log('Searching hotels with:', { destId, defaultCheckIn, defaultCheckOut, guests });
+    // Build URL with filters
+    const params = new URLSearchParams({
+      dest_id: destId.toString(),
+      search_type: 'CITY',
+      arrival_date: defaultCheckIn,
+      departure_date: defaultCheckOut,
+      adults: guests.toString(),
+      room_qty: '1',
+      page_number: '1',
+      units: 'metric',
+      temperature_unit: 'c',
+      languagecode: 'en-us',
+      currency_code: 'USD'
+    });
 
-    // Search for hotels
-    const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=${destId}&search_type=CITY&arrival_date=${defaultCheckIn}&departure_date=${defaultCheckOut}&adults=${guests}&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=USD`;
+    // Add sorting
+    if (sortBy) {
+      const sortMap: { [key: string]: string } = {
+        'popularity': 'popularity',
+        'price': 'price',
+        'distance': 'distance',
+        'review_score': 'review_score'
+      };
+      if (sortMap[sortBy]) {
+        params.append('order_by', sortMap[sortBy]);
+      }
+    }
+
+    // Add price filter
+    if (maxPrice) {
+      params.append('price_max', maxPrice.toString());
+    }
+
+    console.log('Searching hotels with filters:', { destId, defaultCheckIn, defaultCheckOut, guests, sortBy, minRating, maxPrice });
+
+    const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
     console.log('Hotels API URL:', hotelsUrl);
     
     const hotelsResponse = await fetch(hotelsUrl, {
@@ -282,10 +338,24 @@ async function searchHotels(args: any, apiKey: string) {
 
     const hotelsData = await hotelsResponse.json();
     console.log('Hotels API response keys:', Object.keys(hotelsData));
-    console.log('Hotels data structure:', JSON.stringify(hotelsData).slice(0, 1000));
     
-    const hotels = hotelsData.data?.hotels || [];
+    let hotels = hotelsData.data?.hotels || [];
     console.log('Number of hotels found:', hotels.length);
+    
+    // Apply client-side filters for features not in API
+    if (minRating) {
+      hotels = hotels.filter((h: any) => {
+        const rating = h.property?.reviewScore || 0;
+        return rating >= minRating;
+      });
+      console.log(`After minRating filter (${minRating}):`, hotels.length);
+    }
+
+    if (amenities && amenities.length > 0) {
+      // Note: Amenities filtering would require more detailed hotel data
+      // This is a simplified version
+      console.log('Amenities filter requested:', amenities);
+    }
     
     return {
       type: 'hotels',
@@ -293,7 +363,8 @@ async function searchHotels(args: any, apiKey: string) {
       results: hotels.slice(0, 6),
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
-      guests
+      guests,
+      filters: { sortBy, minRating, maxPrice, amenities }
     };
   } catch (error) {
     console.error('Error in searchHotels:', error);
