@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
-import { RestaurantReservationModal } from "@/components/RestaurantReservationModal";
 import { FlightCard } from "@/components/FlightCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
@@ -81,7 +80,6 @@ const Index = () => {
     toCountry: "", 
     visaInformation: null 
   });
-  const [selectedRestaurant, setSelectedRestaurant] = useState<{ id: string; name: string; address: string; photoUrl: string | null } | null>(null);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -597,18 +595,15 @@ const Index = () => {
                         <Button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            setSelectedRestaurant({
-                              id: restaurant.id,
-                              name: restaurant.title,
-                              address: restaurant.address,
-                              photoUrl: restaurant.image
-                            });
+                            const query = encodeURIComponent(`${restaurant.title} ${restaurant.address}`);
+                            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+                            window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
                           }}
                           className="w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                           size="sm"
                         >
                           <UtensilsCrossed className="h-4 w-4 mr-2" />
-                          Book a Table
+                          View on Google Maps
                         </Button>
                       </div>
                     </Card>
@@ -937,15 +932,6 @@ const Index = () => {
           toCountry={visaModalData.toCountry}
           visaInformation={visaModalData.visaInformation}
         />
-
-        {/* Restaurant Reservation Modal */}
-        {selectedRestaurant && (
-          <RestaurantReservationModal
-            isOpen={!!selectedRestaurant}
-            onClose={() => setSelectedRestaurant(null)}
-            restaurant={selectedRestaurant}
-          />
-        )}
 
         {/* Date Picker Modal */}
         {showDatePicker && (

@@ -1,9 +1,7 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin, DollarSign, Calendar, Heart } from "lucide-react";
-import { RestaurantReservationModal } from "./RestaurantReservationModal";
 import { useFavorites } from "@/hooks/useFavorites";
 
 interface RestaurantCardProps {
@@ -27,7 +25,6 @@ export const RestaurantCard = ({
   photoUrl,
   openNow 
 }: RestaurantCardProps) => {
-  const [showReservationModal, setShowReservationModal] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
   const restaurantData = { id, name, rating, userRatingsTotal, priceLevel, address, photoUrl, openNow };
@@ -42,14 +39,21 @@ export const RestaurantCard = ({
     }
   };
 
+  const handleBookTable = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Construct Google Maps search URL with restaurant name and address
+    const query = encodeURIComponent(`${name} ${address}`);
+    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
+    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const getPriceLevelSymbol = (level?: number) => {
     if (!level) return '';
     return '$'.repeat(level);
   };
 
   return (
-    <>
-      <Card className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border-0 h-[400px]">
+    <Card className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border-0 h-[400px]">
       {/* Image with overlay */}
       <div className="absolute inset-0">
         {photoUrl ? (
@@ -119,15 +123,12 @@ export const RestaurantCard = ({
 
           {/* Booking Button */}
           <Button 
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowReservationModal(true);
-            }}
+            onClick={handleBookTable}
             className="mt-4 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 relative z-10"
             size="sm"
           >
             <Calendar className="h-4 w-4 mr-2" />
-            Book a Table
+            View on Google Maps
           </Button>
         </div>
 
@@ -140,12 +141,5 @@ export const RestaurantCard = ({
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
       </div>
     </Card>
-
-    <RestaurantReservationModal
-      isOpen={showReservationModal}
-      onClose={() => setShowReservationModal(false)}
-      restaurant={{ id, name, address, photoUrl }}
-    />
-    </>
   );
 };
