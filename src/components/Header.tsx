@@ -1,5 +1,7 @@
-import { Building2, Heart, User } from "lucide-react";
+import { Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logomark from "@/assets/logomark-gold.png";
+import wordmark from "@/assets/wordmark-gold.png";
 
 export const Header = () => {
   return (
@@ -7,9 +9,9 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-8">
-            <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
-              <Building2 className="h-8 w-8 text-accent" />
-              <span className="text-2xl font-bold">Goldsainte</span>
+            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+              <img src={logomark} alt="Goldsainte Logo" className="h-10 w-10" />
+              <img src={wordmark} alt="Goldsainte" className="h-6 hidden sm:block" />
             </a>
             
             <nav className="hidden md:flex items-center gap-6">

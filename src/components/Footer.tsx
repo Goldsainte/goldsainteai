@@ -1,4 +1,5 @@
-import { Building2, Facebook, Instagram, Twitter } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
+import verticalLogo from "@/assets/primary-vertical-logo-gold.png";
 
 export const Footer = () => {
   return (
@@ -6,9 +7,8 @@ export const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Building2 className="h-6 w-6 text-accent" />
-              <span className="text-xl font-bold text-primary">Goldsainte</span>
+            <div className="flex items-center mb-4">
+              <img src={verticalLogo} alt="Goldsainte" className="h-24 w-auto" />
             </div>
             <p className="text-sm text-muted-foreground">
               Your trusted partner for exceptional travel experiences worldwide.
