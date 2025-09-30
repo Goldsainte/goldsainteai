@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, Compass, Search, Send, Loader2, Sparkles, ArrowLeft } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
-import { RestaurantCard } from "@/components/RestaurantCard";
+import { InspirationCard } from "@/components/InspirationCard";
 import logomark from "@/assets/logomark-gold.png";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
@@ -41,40 +41,45 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
-  const [restaurants, setRestaurants] = useState<any[]>([]);
-  const [restaurantsLoading, setRestaurantsLoading] = useState(true);
 
-  // Fetch restaurants on mount - default to NYC
-  useEffect(() => {
-    const fetchRestaurants = async () => {
-      try {
-        setRestaurantsLoading(true);
-        const { data, error } = await supabase.functions.invoke('fetch-restaurants', {
-          body: {
-            latitude: 40.7128,  // NYC coordinates
-            longitude: -74.0060,
-            radius: 5000
-          }
-        });
-
-        if (error) throw error;
-        if (data?.restaurants) {
-          setRestaurants(data.restaurants);
-        }
-      } catch (err: any) {
-        console.error('Error fetching restaurants:', err);
-        toast({
-          title: "Error",
-          description: "Failed to load restaurants",
-          variant: "destructive",
-        });
-      } finally {
-        setRestaurantsLoading(false);
-      }
-    };
-
-    fetchRestaurants();
-  }, [toast]);
+  const inspirationDestinations = [
+    {
+      image: property1,
+      title: "Santorini Paradise",
+      location: "Greece",
+      description: "Experience breathtaking sunsets and pristine white architecture overlooking the Aegean Sea."
+    },
+    {
+      image: property2,
+      title: "Alpine Luxury",
+      location: "Swiss Alps",
+      description: "Discover world-class skiing and cozy mountain retreats in the heart of the Alps."
+    },
+    {
+      image: property3,
+      title: "Tropical Escape",
+      location: "Maldives",
+      description: "Unwind in overwater bungalows surrounded by crystal-clear turquoise waters."
+    },
+    {
+      image: property4,
+      title: "Urban Elegance",
+      location: "Paris, France",
+      description: "Immerse yourself in art, culture, and world-renowned cuisine in the City of Light."
+    },
+    {
+      image: property5,
+      title: "Desert Oasis",
+      location: "Dubai, UAE",
+      description: "Experience luxury redefined with stunning architecture and endless entertainment."
+    },
+    {
+      image: property6,
+      title: "Coastal Charm",
+      location: "Amalfi Coast, Italy",
+      description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
+    }
+  ];
 
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
@@ -120,7 +125,7 @@ const Index = () => {
       hotels: "Show me popular hotels",
       flights: "I need to find flights",
       destinations: "What are some popular travel destinations?",
-      explore: "Help me explore new places to visit"
+      restaurants: "Show me popular restaurants near me"
     };
     handleSearch(queries[action as keyof typeof queries]);
   };
@@ -238,55 +243,42 @@ const Index = () => {
 
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
-                    onClick={() => handleQuickAction('explore')}
+                    onClick={() => handleQuickAction('restaurants')}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     <div className="relative p-6 flex flex-col items-center gap-3">
                       <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Compass className="h-7 w-7 text-accent" />
+                        <UtensilsCrossed className="h-7 w-7 text-accent" />
                       </div>
-                      <span className="text-base font-semibold text-foreground">Explore</span>
+                      <span className="text-base font-semibold text-foreground">Restaurants</span>
                       <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary transition-all duration-300 group-hover:w-full" />
                     </div>
                   </Card>
                 </div>
               </div>
 
-              {/* Popular Restaurants Section */}
+              {/* Get Inspired Section */}
               <div className="space-y-6 pt-12">
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    Popular Restaurants
+                    Get Inspired
                   </h2>
                   <p className="text-muted-foreground">
-                    Discover top-rated dining experiences near you
+                    Discover your next dream destination
                   </p>
                 </div>
                 
-                {restaurantsLoading ? (
-                  <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : restaurants.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {restaurants.map((restaurant, idx) => (
-                      <RestaurantCard
-                        key={restaurant.id || idx}
-                        name={restaurant.name}
-                        rating={restaurant.rating}
-                        userRatingsTotal={restaurant.userRatingsTotal}
-                        priceLevel={restaurant.priceLevel}
-                        address={restaurant.address}
-                        photoUrl={restaurant.photoUrl}
-                        openNow={restaurant.openNow}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    No restaurants found in this area
-                  </p>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {inspirationDestinations.map((destination, idx) => (
+                    <InspirationCard
+                      key={idx}
+                      image={destination.image}
+                      title={destination.title}
+                      location={destination.location}
+                      description={destination.description}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* Footer */}
