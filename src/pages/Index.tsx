@@ -1,108 +1,75 @@
-import { SearchBar } from "@/components/SearchBar";
-import { SimplePropertyCard } from "@/components/SimplePropertyCard";
-import property1 from "@/assets/property1.jpg";
-import property2 from "@/assets/property2.jpg";
-import property3 from "@/assets/property3.jpg";
-import property4 from "@/assets/property4.jpg";
-import property5 from "@/assets/property5.jpg";
-import property6 from "@/assets/property6.jpg";
-
-const properties = [
-  {
-    id: 1,
-    image: property1,
-    title: "Grand Luxury Hotel & Spa",
-    location: "Miami Beach, Florida",
-    rating: 9.2,
-    reviews: 2847,
-    price: 299,
-    originalPrice: 399,
-  },
-  {
-    id: 2,
-    image: property2,
-    title: "Oceanfront Paradise Resort",
-    location: "Maldives",
-    rating: 9.5,
-    reviews: 1923,
-    price: 599,
-    originalPrice: 799,
-  },
-  {
-    id: 3,
-    image: property3,
-    title: "Metropolitan Suites Downtown",
-    location: "New York City, NY",
-    rating: 8.9,
-    reviews: 3156,
-    price: 249,
-  },
-  {
-    id: 4,
-    image: property4,
-    title: "Alpine Peak Lodge",
-    location: "Aspen, Colorado",
-    rating: 9.1,
-    reviews: 1567,
-    price: 449,
-    originalPrice: 599,
-  },
-  {
-    id: 5,
-    image: property5,
-    title: "Heritage Boutique Hotel",
-    location: "Paris, France",
-    rating: 9.4,
-    reviews: 2234,
-    price: 379,
-  },
-  {
-    id: 6,
-    image: property6,
-    title: "Tropical Villa Retreat",
-    location: "Bali, Indonesia",
-    rating: 9.3,
-    reviews: 1891,
-    price: 329,
-    originalPrice: 429,
-  },
-];
+import { Plane, Hotel, MapPin, Compass } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import logomark from "@/assets/logomark-gold.png";
 
 const Index = () => {
   return (
-    <main className="flex-1 overflow-auto">
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
-        {/* Hero Section */}
-        <div className="text-center space-y-4 py-12">
-          <h1 className="text-4xl md:text-5xl font-primary font-bold text-foreground">
-            Find your perfect stay
+    <main className="flex-1 flex items-center justify-center">
+      <div className="w-full max-w-3xl mx-auto px-6 py-12 flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)]">
+        {/* Logo and Title */}
+        <div className="flex flex-col items-center gap-4 mb-12">
+          <img src={logomark} alt="Goldsainte" className="h-16 w-16" />
+          <h1 className="text-4xl md:text-5xl font-primary font-bold text-center">
+            Goldsainte AI
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Discover exceptional hotels, resorts, and accommodations worldwide
-          </p>
         </div>
 
-        {/* Search Bar */}
-        <SearchBar />
-
-        {/* Properties Section */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold">
-                {properties.length} properties available
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Handpicked stays for your perfect vacation
-              </p>
-            </div>
+        {/* Main Search Input */}
+        <div className="w-full space-y-4">
+          <div className="relative">
+            <Input
+              placeholder="Where Can Goldsainte AI Help You Travel To"
+              className="w-full h-14 px-6 text-base border-border rounded-3xl shadow-sm focus-visible:ring-2 focus-visible:ring-primary"
+            />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {properties.map((property) => (
-              <SimplePropertyCard key={property.id} {...property} />
-            ))}
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button
+              variant="outline"
+              className="rounded-full h-10 px-4 border-border hover:bg-muted"
+            >
+              <Hotel className="h-4 w-4 mr-2" />
+              Hotels
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full h-10 px-4 border-border hover:bg-muted"
+            >
+              <Plane className="h-4 w-4 mr-2" />
+              Flights
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full h-10 px-4 border-border hover:bg-muted"
+            >
+              <MapPin className="h-4 w-4 mr-2" />
+              Destinations
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full h-10 px-4 border-border hover:bg-muted"
+            >
+              <Compass className="h-4 w-4 mr-2" />
+              Explore
+            </Button>
           </div>
+        </div>
+
+        {/* Footer Text */}
+        <div className="mt-auto pt-12">
+          <p className="text-sm text-muted-foreground text-center">
+            By using Goldsainte AI, you agree to our{" "}
+            <a href="#" className="underline hover:text-foreground">
+              Terms
+            </a>{" "}
+            and have read our{" "}
+            <a href="#" className="underline hover:text-foreground">
+              Privacy Policy
+            </a>
+            .
+          </p>
         </div>
       </div>
     </main>

@@ -1,4 +1,5 @@
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Button } from "@/components/ui/button";
 
 export const SimpleHeader = () => {
   return (
@@ -6,6 +7,14 @@ export const SimpleHeader = () => {
       <div className="flex h-14 items-center px-4">
         <SidebarTrigger className="mr-4" />
         <div className="flex-1" />
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" className="rounded-full">
+            Log in
+          </Button>
+          <Button className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90">
+            Sign up for free
+          </Button>
+        </div>
       </div>
     </header>
   );
