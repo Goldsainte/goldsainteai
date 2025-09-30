@@ -23,6 +23,7 @@ const SearchResults = () => {
     const performSearch = async () => {
       setLoading(true);
       setError(null);
+      setResults([]); // Clear previous results immediately
 
       try {
         if (searchType === "hotels") {
@@ -54,6 +55,7 @@ const SearchResults = () => {
       performSearch();
     } else {
       setLoading(false);
+      setResults([]);
     }
   }, [searchType, location, checkIn, checkOut, guests]);
 

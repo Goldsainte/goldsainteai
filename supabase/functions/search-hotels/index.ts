@@ -171,7 +171,7 @@ serve(async (req) => {
         hotel_id: hotel.hotelId,
         property: {
           name: hotel.name,
-          photoUrls: [], // Amadeus doesn't provide photos in this endpoint
+          photoUrls: [`https://placehold.co/800x600/1a1a1a/d4af37?text=${encodeURIComponent(hotel.name.substring(0, 30))}&font=roboto`],
           reviewScore: hotel.rating ? parseFloat(hotel.rating) : 0,
           reviewCount: 0,
           externalUrls: {
