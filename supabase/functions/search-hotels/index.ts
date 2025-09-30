@@ -161,13 +161,14 @@ serve(async (req) => {
     const offersData = await offersResponse.json();
     console.log('Hotel offers found:', offersData.data?.length || 0);
 
-    // Transform Amadeus format to match expected property card format
-    const transformedResults = (offersData.data || []).map((offer: any) => {
+    // Transform Amadeus format to match expected property card format with Google Places enrichment
+    const baseOffers = offersData.data || [];
+    const transformedResults = await Promise.all(baseOffers.map(async (offer: any) => {
       const hotel = offer.hotel;
       const firstOffer = offer.offers?.[0];
       const price = firstOffer?.price;
 
-      return {
+      const item: any = {
         hotel_id: hotel.hotelId,
         property: {
           name: hotel.name,
@@ -192,7 +193,30 @@ serve(async (req) => {
         // Keep full Amadeus data for booking
         amadeusOffer: offer
       };
-    });
+
+      // Enrich with Google Places (photo, rating, reviews)
+      try {
+        const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY') || Deno.env.get('GOOGLE_PLACES_API_KEY_2');
+        if (apiKey) {
+          const query = `${hotel.name} ${hotel.address?.cityName || location}`.trim();
+          const placesResp = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&type=lodging&key=${apiKey}`);
+          if (placesResp.ok) {
+            const placesData = await placesResp.json();
+            const place = placesData.results?.[0];
+            if (place) {
+              if (typeof place.rating === 'number') item.property.reviewScore = place.rating;
+              if (typeof place.user_ratings_total === 'number') item.property.reviewCount = place.user_ratings_total;
+              const photoRef = place.photos?.[0]?.photo_reference;
+              if (photoRef) {
+                item.property.photoUrls = [`https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${photoRef}&key=${apiKey}`];
+              }
+            }
+          }
+        }
+      } catch (_) { /* ignore enrichment errors */ }
+
+      return item;
+    }));
 
     return new Response(JSON.stringify({ 
       results: transformedResults,

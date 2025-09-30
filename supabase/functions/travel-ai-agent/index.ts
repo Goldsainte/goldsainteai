@@ -408,13 +408,13 @@ async function searchHotels(args: any, apiKey: string) {
     let hotels = offersData.data || [];
     console.log('Amadeus hotels found:', hotels.length);
 
-    // Transform to expected format
-    let transformedHotels = hotels.map((offer: any) => {
+    // Transform to expected format with Google Places enrichment
+    let transformedHotels = await Promise.all(hotels.map(async (offer: any) => {
       const hotel = offer.hotel;
       const firstOffer = offer.offers?.[0];
       const price = firstOffer?.price;
 
-      return {
+      const item: any = {
         hotel_id: hotel.hotelId,
         property: {
           name: hotel.name,
@@ -428,15 +428,34 @@ async function searchHotels(args: any, apiKey: string) {
         cityCode: hotel.cityCode,
         price: price?.total ? parseFloat(price.total) : 0,
         priceBreakdown: {
-          grossPrice: {
-            value: price?.total ? parseFloat(price.total) : 0,
-            currency: price?.currency || 'USD'
-          }
+          grossPrice: { value: price?.total ? parseFloat(price.total) : 0, currency: price?.currency || 'USD' }
         },
         accessibilityLabel: `${hotel.name}. ${hotel.address?.cityName || ''}. Current price ${price?.total || 0} ${price?.currency || 'USD'}`,
         amadeusOffer: offer
       };
-    });
+
+      try {
+        const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY') || Deno.env.get('GOOGLE_PLACES_API_KEY_2');
+        if (apiKey) {
+          const q = `${hotel.name} ${hotel.address?.cityName || location}`;
+          const resp = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&type=lodging&key=${apiKey}`);
+          if (resp.ok) {
+            const data = await resp.json();
+            const place = data.results?.[0];
+            if (place) {
+              if (typeof place.rating === 'number') item.property.reviewScore = place.rating;
+              if (typeof place.user_ratings_total === 'number') item.property.reviewCount = place.user_ratings_total;
+              const ref = place.photos?.[0]?.photo_reference;
+              if (ref) {
+                item.property.photoUrls = [`https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${ref}&key=${apiKey}`];
+              }
+            }
+          }
+        }
+      } catch (_) { /* ignore enrichment errors */ }
+
+      return item;
+    }));
 
     // Apply filters
     if (minRating) {
