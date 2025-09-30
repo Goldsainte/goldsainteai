@@ -382,33 +382,48 @@ async function searchHotels(args: any, apiKey: string) {
       return { error: 'No hotels found in this city', results: [] };
     }
 
-    const hotelIds = hotelListData.data.slice(0, 100).map((h: any) => h.hotelId).join(',');
+    // Build hotel id list and fetch offers in batches to avoid URL limits
+    const hotelIdList: string[] = hotelListData.data.slice(0, 100).map((h: any) => h.hotelId);
+    const chunk = (arr: string[], size: number) => arr.reduce<string[][]>((acc, _, i) => {
+      if (i % size === 0) acc.push(arr.slice(i, i + size));
+      return acc;
+    }, []);
 
-    // Step 2: Get hotel offers
-    const offerParams = new URLSearchParams({
-      hotelIds,
-      checkInDate: defaultCheckIn,
-      checkOutDate: defaultCheckOut,
-      adults: guests.toString(),
-      currency: 'USD',
-      roomQuantity: '1',
-      bestRateOnly: 'true'
-    });
+    const fetchOffersForIds = async (ids: string[], checkInDate: string, checkOutDate: string, bestRateOnly: boolean) => {
+      const offerParams = new URLSearchParams({
+        hotelIds: ids.join(','),
+        checkInDate,
+        checkOutDate,
+        adults: guests.toString(),
+        currency: 'USD',
+        roomQuantity: '1',
+        bestRateOnly: bestRateOnly ? 'true' : 'false',
+      });
+      const resp = await fetch(
+        `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      if (!resp.ok) {
+        console.warn('Offers fetch failed for batch:', ids.length, 'status:', resp.status);
+        return [] as any[];
+      }
+      const data = await resp.json();
+      return (data.data || []) as any[];
+    };
 
-    const offersResponse = await fetch(
-      `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
-      { headers: { 'Authorization': `Bearer ${token}` } }
-    );
+    const idBatches = chunk(hotelIdList, 20); // Amadeus works reliably with <=20 IDs per request
+    let hotels: any[] = [];
 
-    if (!offersResponse.ok) {
-      return { error: 'Failed to fetch hotel offers', results: [] };
+    // Fetch all batches sequentially to be gentle with API rate limits
+    for (const batch of idBatches) {
+      const batchHotels = await fetchOffersForIds(batch, defaultCheckIn, defaultCheckOut, true);
+      console.log('Batch offers found:', batchHotels.length, 'for', batch.length, 'ids');
+      hotels.push(...batchHotels);
     }
 
-    const offersData = await offersResponse.json();
-    let hotels = offersData.data || [];
-    console.log('Amadeus hotels found:', hotels.length);
+    console.log('Total Amadeus hotels found:', hotels.length);
 
-    // Fallback retry: if no offers for default dates, try +30 days
+    // Fallback retry: if no offers for default dates, try +30 days and disable bestRateOnly
     if (!hotels.length) {
       const baseIn = new Date(defaultCheckIn);
       const altIn = new Date(baseIn);
@@ -416,25 +431,18 @@ async function searchHotels(args: any, apiKey: string) {
       const altOut = new Date(altIn);
       altOut.setDate(altIn.getDate() + 1);
 
-      const retryParams = new URLSearchParams({
-        hotelIds,
-        checkInDate: altIn.toISOString().split('T')[0],
-        checkOutDate: altOut.toISOString().split('T')[0],
-        adults: guests.toString(),
-        currency: 'USD',
-        roomQuantity: '1',
-        bestRateOnly: 'false'
-      });
-
-      const retryResp = await fetch(
-        `https://test.api.amadeus.com/v3/shopping/hotel-offers?${retryParams}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-      if (retryResp.ok) {
-        const retryData = await retryResp.json();
-        hotels = retryData.data || [];
-        console.log('Retry (+30 days) hotels found:', hotels.length);
+      for (const batch of idBatches) {
+        const retryHotels = await fetchOffersForIds(
+          batch,
+          altIn.toISOString().split('T')[0],
+          altOut.toISOString().split('T')[0],
+          false
+        );
+        console.log('Retry batch (+30 days) offers:', retryHotels.length);
+        hotels.push(...retryHotels);
       }
+
+      console.log('Total hotels after retry:', hotels.length);
     }
 
     // Transform to expected format with Google Places enrichment
