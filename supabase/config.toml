@@ -29,3 +29,6 @@ verify_jwt = false
 
 [functions.get-hotel-details]
 verify_jwt = false
+
+[functions.fetch-google-places]
+verify_jwt = false

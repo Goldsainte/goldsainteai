@@ -5,9 +5,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown, Clock, CreditCard, Calendar, Shield, Baby, Accessibility, Wind, Coffee, Tv, Bath, Phone, Ruler, Info } from "lucide-react";
-import { useState, useMemo } from "react";
+import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown, Clock, CreditCard, Calendar, Shield, Baby, Accessibility, Wind, Coffee, Tv, Bath, Phone, Ruler, Info, Loader2 } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 import { HotelMap } from "./HotelMap";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 interface RoomOption {
   id: string;
@@ -39,15 +41,54 @@ interface HotelDetailsModalProps {
 export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelDetailsModalProps) => {
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [reviewSort, setReviewSort] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
+  const [googleData, setGoogleData] = useState<any>(null);
+  const [loadingGoogleData, setLoadingGoogleData] = useState(false);
+  const { toast } = useToast();
   
   const hotelData = hotel.hotel || hotel;
   const propertyData = hotelData.property || hotel.property;
   
   const hotelName = propertyData?.name || hotelData.name || "Hotel";
-  const hotelRating = propertyData?.reviewScore || hotelData.rating || 8.5;
+  const hotelRating = googleData?.rating || propertyData?.reviewScore || hotelData.rating || 8.5;
   const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || "Location";
-  const reviewCount = propertyData?.reviewCount || 0;
+  const reviewCount = googleData?.reviewCount || propertyData?.reviewCount || 0;
   const hotelId = propertyData?.id || hotelData.hotel_id || 0;
+  const latitude = propertyData?.latitude;
+  const longitude = propertyData?.longitude;
+
+  // Fetch Google Places data when modal opens
+  useEffect(() => {
+    if (open && hotelName && latitude && longitude && !googleData) {
+      fetchGooglePlacesData();
+    }
+  }, [open, hotelName, latitude, longitude]);
+
+  const fetchGooglePlacesData = async () => {
+    setLoadingGoogleData(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-google-places', {
+        body: { hotelName, latitude, longitude }
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        setGoogleData(data.data);
+        console.log('Google Places data loaded:', data.data);
+      } else {
+        console.log('Could not fetch Google data:', data?.message);
+      }
+    } catch (error) {
+      console.error('Error fetching Google Places data:', error);
+      toast({
+        title: "Note",
+        description: "Using default hotel information",
+        variant: "default",
+      });
+    } finally {
+      setLoadingGoogleData(false);
+    }
+  };
 
   // Get actual hotel photos from multiple possible fields and dedupe by base image id (prefer highest resolution)
   const hotelPhotos = useMemo(() => {
@@ -162,7 +203,13 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     return reviews;
   };
 
-  const allReviews = useMemo(() => generateReviews(hotelId, hotelRating), [hotelId, hotelRating]);
+  // Use Google reviews if available, otherwise generate fallback reviews
+  const allReviews = useMemo(() => {
+    if (googleData?.reviews && googleData.reviews.length > 0) {
+      return googleData.reviews;
+    }
+    return generateReviews(hotelId, hotelRating);
+  }, [googleData, hotelId, hotelRating]);
 
   // Sort reviews based on selected filter
   const sortedReviews = useMemo(() => {
@@ -233,10 +280,16 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     }
   ];
 
-  // Photos tab: prefer dedicated guest photos if available; otherwise use property photos
-  const customerPhotos = (propertyData?.guestPhotoUrls && propertyData.guestPhotoUrls.length > 0)
-    ? propertyData.guestPhotoUrls
-    : hotelPhotos.slice(0, 12);
+  // Photos: Use Google photos if available, otherwise use hotel photos
+  const customerPhotos = useMemo(() => {
+    if (googleData?.photos && googleData.photos.length > 0) {
+      return googleData.photos;
+    }
+    if (propertyData?.guestPhotoUrls && propertyData.guestPhotoUrls.length > 0) {
+      return propertyData.guestPhotoUrls;
+    }
+    return hotelPhotos.slice(0, 12);
+  }, [googleData, propertyData, hotelPhotos]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -935,16 +988,31 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
           </TabsContent>
 
           <TabsContent value="reviews" className="space-y-4 mt-4">
-            <div className="flex items-center justify-between pb-4 border-b">
-              <div className="flex items-center gap-4">
-                <div className="text-4xl font-bold text-primary">{hotelRating.toFixed(1)}</div>
-                <div>
-                  <div className="font-semibold text-lg">{getRatingText(hotelRating)}</div>
-                  <div className="text-sm text-muted-foreground">
-                    Based on {reviewCount > 0 ? reviewCount.toLocaleString() : allReviews.length} verified reviews
-                  </div>
-                </div>
+            {loadingGoogleData ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Loading reviews from Google...</span>
               </div>
+            ) : (
+              <>
+                <div className="flex items-center justify-between pb-4 border-b">
+                  <div className="flex items-center gap-4">
+                    <div className="text-4xl font-bold text-primary">{hotelRating.toFixed(1)}</div>
+                    <div>
+                      <div className="font-semibold text-lg flex items-center gap-2">
+                        {getRatingText(hotelRating)}
+                        {googleData && (
+                          <Badge variant="secondary" className="text-xs">
+                            <Check className="h-3 w-3 mr-1" />
+                            Google Reviews
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Based on {reviewCount > 0 ? reviewCount.toLocaleString() : allReviews.length} verified reviews
+                      </div>
+                    </div>
+                  </div>
               
               <div className="flex items-center gap-2">
                 <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
@@ -959,59 +1027,80 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <SelectItem value="lowest">Lowest Rated</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-
-            <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {sortedReviews.map((review) => (
-                <div key={review.id} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold">{review.author}</div>
-                      <div className="text-xs text-muted-foreground">{review.date}</div>
-                    </div>
-                    <Badge className="gap-1">
-                      <Star className="h-3 w-3 fill-current" />
-                      {review.rating}
-                    </Badge>
-                  </div>
-                  
-                  <p className="text-sm leading-relaxed">{review.comment}</p>
-                  
-                  {review.photos && review.photos.length > 0 && (
-                    <div className="flex gap-2">
-                      {review.photos.map((photo, idx) => (
-                        <div key={idx} className="w-20 h-20 rounded overflow-hidden">
-                          <img src={photo} alt={`Guest photo of ${hotelName}`} loading="lazy" className="w-full h-full object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
-              ))}
-            </div>
-            
-            <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-              Showing {sortedReviews.length} reviews • Sorted by {reviewSort}
-            </div>
+              </div>
+
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                {sortedReviews.map((review) => (
+                  <div key={review.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        {review.profilePhoto && (
+                          <img 
+                            src={review.profilePhoto} 
+                            alt={review.author}
+                            className="w-10 h-10 rounded-full"
+                          />
+                        )}
+                        <div>
+                          <div className="font-semibold">{review.author}</div>
+                          <div className="text-xs text-muted-foreground">{review.date}</div>
+                        </div>
+                      </div>
+                      <Badge className="gap-1">
+                        <Star className="h-3 w-3 fill-current" />
+                        {review.rating}
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-sm leading-relaxed">{review.comment}</p>
+                    
+                    {review.photos && review.photos.length > 0 && (
+                      <div className="flex gap-2">
+                        {review.photos.map((photo, idx) => (
+                          <div key={idx} className="w-20 h-20 rounded overflow-hidden">
+                            <img src={photo} alt={`Guest photo of ${hotelName}`} loading="lazy" className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+              
+              <div className="text-center text-sm text-muted-foreground pt-4 border-t">
+                Showing {sortedReviews.length} reviews • Sorted by {reviewSort}
+                {googleData && <span className="ml-2">• Powered by Google Places</span>}
+              </div>
+            </>
+          )}
           </TabsContent>
 
           <TabsContent value="photos" className="mt-4">
-            <div className="grid grid-cols-3 gap-3">
-              {customerPhotos.map((photo, idx) => (
-                <div key={idx} className="aspect-square rounded-lg overflow-hidden">
-                  <img 
-                    src={photo} 
-                    alt={`${hotelName} photo ${idx + 1}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
-                  />
+            {loadingGoogleData ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <span className="ml-3 text-muted-foreground">Loading photos from Google...</span>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-3 gap-3">
+                  {customerPhotos.map((photo, idx) => (
+                    <div key={idx} className="aspect-square rounded-lg overflow-hidden">
+                      <img 
+                        src={photo} 
+                        alt={`${hotelName} photo ${idx + 1}`}
+                        loading="lazy"
+                        className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              {customerPhotos.length} photos from verified guests
-            </p>
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  {customerPhotos.length} photos {googleData ? 'from Google Places' : 'from verified guests'}
+                </p>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>
