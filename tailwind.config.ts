@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        chiffon: ['Chiffon', 'serif'],
         primary: ['Cormorant Garamond', 'serif'],
         secondary: ['Work Sans', 'sans-serif'],
       },
