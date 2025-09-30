@@ -388,7 +388,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Hotels</span>
+                        <span className="text-xl font-extrabold text-foreground tracking-tight font-chiffon">Hotels</span>
                         <p className="text-xs text-muted-foreground">Luxury stays</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -413,7 +413,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Flights</span>
+                        <span className="text-xl font-extrabold text-foreground tracking-tight font-chiffon">Flights</span>
                         <p className="text-xs text-muted-foreground">Premium travel</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
@@ -434,7 +434,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Destinations</span>
+                        <span className="text-xl font-extrabold text-foreground tracking-tight font-chiffon">Destinations</span>
                         <p className="text-xs text-muted-foreground">Dream places</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -455,7 +455,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Restaurants</span>
+                        <span className="text-xl font-extrabold text-foreground tracking-tight font-chiffon">Restaurants</span>
                         <p className="text-xs text-muted-foreground">Fine dining</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
