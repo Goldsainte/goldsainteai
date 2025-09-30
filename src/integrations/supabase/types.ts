@@ -197,6 +197,57 @@ export type Database = {
         }
         Relationships: []
       }
+      visa_service_requests: {
+        Row: {
+          additional_notes: string | null
+          assigned_to: string | null
+          completed_at: string | null
+          created_at: string
+          from_country: string
+          id: string
+          status: string
+          to_country: string
+          travel_dates: Json | null
+          updated_at: string
+          user_email: string
+          user_name: string | null
+          user_phone: string | null
+          visa_information: Json
+        }
+        Insert: {
+          additional_notes?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          from_country: string
+          id?: string
+          status?: string
+          to_country: string
+          travel_dates?: Json | null
+          updated_at?: string
+          user_email: string
+          user_name?: string | null
+          user_phone?: string | null
+          visa_information: Json
+        }
+        Update: {
+          additional_notes?: string | null
+          assigned_to?: string | null
+          completed_at?: string | null
+          created_at?: string
+          from_country?: string
+          id?: string
+          status?: string
+          to_country?: string
+          travel_dates?: Json | null
+          updated_at?: string
+          user_email?: string
+          user_name?: string | null
+          user_phone?: string | null
+          visa_information?: Json
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -13,6 +13,7 @@ import { FlightCard } from "@/components/FlightCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
+import { VisaServiceModal } from "@/components/VisaServiceModal";
 import logomark from "@/assets/logomark-seal-gold.png";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
@@ -68,6 +69,17 @@ const Index = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showDatePicker, setShowDatePicker] = useState<{ type: "hotel" | "flight"; context: string } | null>(null);
   const [pendingFlightDates, setPendingFlightDates] = useState<{ departureDate: string; returnDate?: string } | null>(null);
+  const [visaModalData, setVisaModalData] = useState<{ 
+    open: boolean; 
+    fromCountry: string; 
+    toCountry: string; 
+    visaInformation: any 
+  }>({ 
+    open: false, 
+    fromCountry: "", 
+    toCountry: "", 
+    visaInformation: null 
+  });
 
   // Get user's current location on mount
   useEffect(() => {
@@ -222,6 +234,34 @@ const Index = () => {
       
       if (data.toolResults && data.toolResults.length > 0) {
         setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+        
+        // Check for visa results
+        const visaResult = data.toolResults.find((r: any) => r.type === 'visa');
+        if (visaResult && visaResult.fromCountry && visaResult.toCountry) {
+          // Store visa data for potential service request
+          const isVisaRequired = visaResult.information && 
+            (visaResult.information.toLowerCase().includes('visa required') || 
+             visaResult.information.toLowerCase().includes('visa is required') ||
+             visaResult.information.toLowerCase().includes('must obtain'));
+          
+          // Check if AI suggests visa assistance or user asks for help
+          const userWantsHelp = queryToSend.toLowerCase().includes('help') || 
+                               queryToSend.toLowerCase().includes('assist') ||
+                               queryToSend.toLowerCase().includes('yes') ||
+                               data.message.toLowerCase().includes('assist you with your visa');
+          
+          if (isVisaRequired && userWantsHelp) {
+            // Show the visa service modal
+            setTimeout(() => {
+              setVisaModalData({
+                open: true,
+                fromCountry: visaResult.fromCountry,
+                toCountry: visaResult.toCountry,
+                visaInformation: visaResult
+              });
+            }, 1000); // Small delay so user can read the AI message first
+          }
+        }
       }
 
       if (data.conversationHistory) {
@@ -861,6 +901,26 @@ const Index = () => {
                 </Card>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Visa Service Modal */}
+        <VisaServiceModal
+          open={visaModalData.open}
+          onOpenChange={(open) => setVisaModalData(prev => ({ ...prev, open }))}
+          fromCountry={visaModalData.fromCountry}
+          toCountry={visaModalData.toCountry}
+          visaInformation={visaModalData.visaInformation}
+        />
+
+        {/* Date Picker Modal */}
+        {showDatePicker && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+            <ChatDatePicker
+              type={showDatePicker.type}
+              onDatesSelected={handleDatesSelected}
+              onCancel={() => setShowDatePicker(null)}
+            />
           </div>
         )}
       </div>

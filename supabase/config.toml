@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.check-visa-requirements]
 verify_jwt = false
+
+[functions.submit-visa-request]
+verify_jwt = false
