@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
+import { RestaurantReservationModal } from "@/components/RestaurantReservationModal";
 import { FlightCard } from "@/components/FlightCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
@@ -80,6 +81,7 @@ const Index = () => {
     toCountry: "", 
     visaInformation: null 
   });
+  const [selectedRestaurant, setSelectedRestaurant] = useState<{ id: string; name: string; address: string; photoUrl: string | null } | null>(null);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -153,23 +155,29 @@ const Index = () => {
 
   const featuredRestaurants = [
     {
+      id: "maison-dor",
       image: restaurant1,
       title: "Maison d'Or",
       cuisine: "French Fine Dining",
+      address: "123 Champs-Élysées, Paris, France",
       rating: 4.9,
       description: "Exquisite French cuisine in an intimate setting with impeccable service."
     },
     {
+      id: "sky-lounge",
       image: restaurant2,
       title: "Sky Lounge",
       cuisine: "Contemporary Fusion",
+      address: "456 Tower Plaza, New York, NY",
       rating: 4.8,
       description: "Panoramic city views paired with innovative culinary creations."
     },
     {
+      id: "azure-coast",
       image: restaurant3,
       title: "Azure Coast",
       cuisine: "Mediterranean Seafood",
+      address: "789 Coastal Drive, Monaco",
       rating: 4.9,
       description: "Fresh ocean catches and coastal flavors in a stunning beachfront location."
     }
@@ -566,8 +574,7 @@ const Index = () => {
                   {featuredRestaurants.map((restaurant, idx) => (
                     <Card
                       key={idx}
-                      className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/20"
-                      onClick={() => handleQuickAction('restaurants')}
+                      className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border border-accent/20 h-[400px]"
                     >
                       <div className="relative h-64 overflow-hidden">
                         <img
@@ -581,10 +588,28 @@ const Index = () => {
                           {restaurant.rating}
                         </Badge>
                       </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                        <h3 className="text-2xl font-bold mb-1">{restaurant.title}</h3>
-                        <p className="text-sm text-accent mb-2">{restaurant.cuisine}</p>
-                        <p className="text-sm text-white/80 line-clamp-2">{restaurant.description}</p>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white space-y-3">
+                        <div>
+                          <h3 className="text-2xl font-bold mb-1">{restaurant.title}</h3>
+                          <p className="text-sm text-accent mb-2">{restaurant.cuisine}</p>
+                          <p className="text-sm text-white/80 line-clamp-2">{restaurant.description}</p>
+                        </div>
+                        <Button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedRestaurant({
+                              id: restaurant.id,
+                              name: restaurant.title,
+                              address: restaurant.address,
+                              photoUrl: restaurant.image
+                            });
+                          }}
+                          className="w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                          size="sm"
+                        >
+                          <UtensilsCrossed className="h-4 w-4 mr-2" />
+                          Book a Table
+                        </Button>
                       </div>
                     </Card>
                   ))}
@@ -912,6 +937,15 @@ const Index = () => {
           toCountry={visaModalData.toCountry}
           visaInformation={visaModalData.visaInformation}
         />
+
+        {/* Restaurant Reservation Modal */}
+        {selectedRestaurant && (
+          <RestaurantReservationModal
+            isOpen={!!selectedRestaurant}
+            onClose={() => setSelectedRestaurant(null)}
+            restaurant={selectedRestaurant}
+          />
+        )}
 
         {/* Date Picker Modal */}
         {showDatePicker && (
