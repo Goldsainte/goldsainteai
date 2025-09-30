@@ -184,16 +184,34 @@ Always show results first with minimal text, ask questions later. Be conversatio
       }
 
       // Send results back to AI for final response
+      console.log('Tool results to send to AI:', JSON.stringify(toolResults.map(tr => ({
+        function: tr.function_name,
+        resultType: tr.result?.type,
+        resultCount: tr.result?.results?.length || 0,
+        hasError: !!tr.result?.error
+      }))));
+
       const finalMessages = [
         ...messages,
         assistantMessage,
-        ...toolResults.map(tr => ({
-          role: "tool",
-          tool_call_id: tr.tool_call_id,
-          content: JSON.stringify(tr.result)
-        }))
+        ...toolResults.map(tr => {
+          const result = tr.result || { error: 'No result', results: [] };
+          const summary = result.results?.length > 0 
+            ? `Found ${result.results.length} ${result.type || 'items'} ${(result as any).location?.name ? `in ${(result as any).location.name}` : ''}`
+            : result.error || 'No results found';
+          
+          return {
+            role: "tool" as const,
+            tool_call_id: tr.tool_call_id,
+            content: JSON.stringify({
+              ...result,
+              summary
+            })
+          };
+        })
       ];
 
+      console.log('Sending final messages to AI...');
       const finalResponse = await fetch(LOVABLE_AI_URL, {
         method: 'POST',
         headers: {
@@ -206,12 +224,21 @@ Always show results first with minimal text, ask questions later. Be conversatio
         }),
       });
 
+      if (!finalResponse.ok) {
+        const errorText = await finalResponse.text();
+        console.error('Final AI response error:', finalResponse.status, errorText);
+        throw new Error(`Final AI response error: ${finalResponse.status}`);
+      }
+
       const finalData = await finalResponse.json();
       const finalMessage = finalData.choices[0].message.content;
 
+      console.log('Final AI message:', finalMessage);
+      console.log('Returning tool results count:', toolResults.length);
+
       return new Response(JSON.stringify({
         message: finalMessage,
-        toolResults: toolResults.map(tr => tr.result),
+        toolResults: toolResults.map(tr => tr.result).filter(Boolean),
         conversationHistory: [...conversationHistory, 
           { role: 'user', content: message },
           { role: 'assistant', content: finalMessage }
