@@ -95,8 +95,11 @@ export const RestaurantCard = ({
 
           {/* Booking Button */}
           <Button 
-            onClick={() => setShowReservationModal(true)}
-            className="mt-4 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowReservationModal(true);
+            }}
+            className="mt-4 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 relative z-10"
             size="sm"
           >
             <Calendar className="h-4 w-4 mr-2" />
