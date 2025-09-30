@@ -277,42 +277,11 @@ async function searchHotels(args: any, apiKey: string) {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    // Use Google Places to find location
-    console.log('Using Google Places to search for location:', location);
+    // Search for destination using Booking.com API
+    console.log('Searching for destination using Booking.com:', location);
     
-    const placesResponse = await fetch(
-      `${Deno.env.get('SUPABASE_URL')}/functions/v1/fetch-google-places`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
-        },
-        body: JSON.stringify({ query: location })
-      }
-    );
-
-    if (!placesResponse.ok) {
-      console.error('Google Places API error:', placesResponse.status);
-      return { error: 'Failed to find location', results: [] };
-    }
-
-    const placesData = await placesResponse.json();
-    console.log('Google Places response:', JSON.stringify(placesData).slice(0, 500));
-    
-    if (!placesData.results || placesData.results.length === 0) {
-      console.log('No location data found from Google Places');
-      return { error: 'Location not found', results: [] };
-    }
-
-    const place = placesData.results[0];
-    const lat = place.geometry.location.lat;
-    const lng = place.geometry.location.lng;
-    console.log('Found location:', place.name, 'at', lat, lng);
-    
-    // Now search for destination ID using Booking.com with the city name
-    const bookingLocationResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(place.name)}`,
+    const locationResponse = await fetch(
+      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
       {
         method: 'GET',
         headers: {
@@ -322,20 +291,22 @@ async function searchHotels(args: any, apiKey: string) {
       }
     );
 
-    if (!bookingLocationResponse.ok) {
-      console.error('Booking location API error:', bookingLocationResponse.status);
-      return { error: 'Failed to find hotels in location', results: [] };
+    if (!locationResponse.ok) {
+      console.error('Booking.com location search failed:', locationResponse.status);
+      return { error: 'Failed to find location', results: [] };
     }
 
-    const bookingLocationData = await bookingLocationResponse.json();
+    const locationData = await locationResponse.json();
+    console.log('Booking.com location response:', JSON.stringify(locationData).slice(0, 500));
     
-    if (!bookingLocationData.data || bookingLocationData.data.length === 0) {
-      console.log('No booking destination found');
-      return { error: 'No hotels found in this location', results: [] };
+    if (!locationData.data || locationData.data.length === 0) {
+      console.log('No destination found for:', location);
+      return { error: 'Location not found', results: [] };
     }
 
-    const destId = bookingLocationData.data[0].dest_id;
-    console.log('Found destination ID:', destId);
+    const destination = locationData.data[0];
+    const destId = destination.dest_id;
+    console.log('Found destination:', destination.name, 'ID:', destId);
 
     // Get default dates if not provided
     const today = new Date();
@@ -432,7 +403,7 @@ async function searchHotels(args: any, apiKey: string) {
     
     return {
       type: 'hotels',
-      location: { name: place.name, dest_id: destId },
+      location: { name: destination.name, dest_id: destId },
       results: hotels.slice(0, 20),
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
@@ -459,33 +430,34 @@ async function searchHotels(args: any, apiKey: string) {
 async function searchDestinations(args: any, apiKey: string) {
   try {
     const { query } = args;
+    console.log('Searching destinations with Booking.com:', query);
 
-    // Use Google Places for destination search
     const response = await fetch(
-      `${Deno.env.get('SUPABASE_URL')}/functions/v1/fetch-google-places`,
+      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(query)}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
-        },
-        body: JSON.stringify({ query })
+          'x-rapidapi-key': apiKey,
+          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
+        }
       }
     );
 
     if (!response.ok) {
+      console.error('Booking.com destination search failed:', response.status);
       return { error: 'Failed to search destinations', results: [] };
     }
 
     const data = await response.json();
+    console.log('Booking.com found destinations:', data.data?.length || 0);
     
-    // Convert Google Places format to match expected format
-    const results = (data.results || []).map((place: any) => ({
-      name: place.name,
-      dest_type: place.types?.[0] || 'city',
-      label: place.formatted_address,
-      latitude: place.geometry?.location?.lat,
-      longitude: place.geometry?.location?.lng
+    const results = (data.data || []).map((dest: any) => ({
+      name: dest.name,
+      dest_type: dest.dest_type,
+      label: dest.label,
+      dest_id: dest.dest_id,
+      latitude: dest.latitude,
+      longitude: dest.longitude
     }));
     
     return {
