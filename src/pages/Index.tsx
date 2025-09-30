@@ -107,6 +107,7 @@ const Index = () => {
     if (!queryToSend.trim()) return;
     
     setIsLoading(true);
+    setSearchResults([]);
     setMessages(prev => [...prev, { role: 'user', content: queryToSend }]);
     setSearchQuery("");
 

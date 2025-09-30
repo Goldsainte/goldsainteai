@@ -418,7 +418,7 @@ async function searchHotels(args: any, apiKey: string) {
         hotel_id: hotel.hotelId,
         property: {
           name: hotel.name,
-          photoUrls: [],
+          photoUrls: [`https://placehold.co/800x600/1a1a1a/d4af37?text=${encodeURIComponent(hotel.name.substring(0, 30))}&font=roboto`],
           reviewScore: hotel.rating ? parseFloat(hotel.rating) : 0,
           reviewCount: 0,
           externalUrls: { default: `https://www.amadeus.com/hotel/${hotel.hotelId}` }
