@@ -28,6 +28,10 @@ import flight2 from "@/assets/flight2.jpg";
 import flight3 from "@/assets/flight3.jpg";
 import destination7 from "@/assets/destination7.jpg";
 import destination8 from "@/assets/destination8.jpg";
+import luxuryHotels from "@/assets/luxury-hotels.jpg";
+import luxuryFlights from "@/assets/luxury-flights.jpg";
+import luxuryDestinations from "@/assets/luxury-destinations.jpg";
+import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -378,12 +382,12 @@ const Index = () => {
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
                         <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
-                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/30 via-primary/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                          <Hotel className="h-8 w-8 text-primary drop-shadow-lg" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                          <img src={luxuryHotels} alt="Luxury Hotels" className="w-full h-full object-cover" />
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight">Hotels</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Hotels</span>
                         <p className="text-xs text-muted-foreground">Luxury stays</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -408,7 +412,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight">Flights</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Flights</span>
                         <p className="text-xs text-muted-foreground">Premium travel</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
@@ -424,12 +428,12 @@ const Index = () => {
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
                         <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
-                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/30 via-primary/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
-                          <MapPin className="h-8 w-8 text-primary drop-shadow-lg" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                          <img src={luxuryDestinations} alt="Luxury Destinations" className="w-full h-full object-cover" />
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight">Destinations</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Destinations</span>
                         <p className="text-xs text-muted-foreground">Dream places</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -445,12 +449,12 @@ const Index = () => {
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
                         <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
-                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-accent/30 via-accent/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
-                          <UtensilsCrossed className="h-8 w-8 text-accent drop-shadow-lg" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg">
+                          <img src={luxuryRestaurants} alt="Luxury Restaurants" className="w-full h-full object-cover" />
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight">Restaurants</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Restaurants</span>
                         <p className="text-xs text-muted-foreground">Fine dining</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
