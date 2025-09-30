@@ -36,26 +36,17 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   
   const hotelData = hotel.hotel || hotel;
-  const propertyData = hotel.property || hotelData.property;
-  
-  console.log('HotelDetailsModal - hotelData:', hotelData);
-  console.log('HotelDetailsModal - propertyData:', propertyData);
-  console.log('HotelDetailsModal - photoUrls:', propertyData?.photoUrls);
+  const propertyData = hotelData.property || hotel.property;
   
   const hotelName = propertyData?.name || hotelData.name || "Hotel";
   const hotelRating = propertyData?.reviewScore || hotelData.rating || 8.5;
   const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || "Location";
   const reviewCount = propertyData?.reviewCount || 0;
 
-  // Get actual hotel photos from property data - check multiple possible locations
-  const hotelPhotos = propertyData?.photoUrls || 
-                      propertyData?.photos || 
-                      hotelData.photoUrls || 
-                      hotelData.photos || 
-                      (hotelData.property?.photoUrls) || 
-                      [];
+  // Get actual hotel photos - they are nested at property.photoUrls
+  const hotelPhotos = propertyData?.photoUrls || [];
   
-  console.log('HotelDetailsModal - extracted hotelPhotos:', hotelPhotos.length, hotelPhotos);
+  console.log('Hotel photos loaded:', hotelPhotos.length);
   
   // Extract room photos - use hotel photos for different room types
   const getRoomPhotos = (roomIndex: number) => {
