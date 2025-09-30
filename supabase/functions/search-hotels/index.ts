@@ -47,10 +47,36 @@ serve(async (req) => {
     }
 
     const destId = locationData.data[0].dest_id;
+    const searchType = (locationData.data[0].search_type || 'CITY').toUpperCase();
+
+    // Fallback dates if not provided
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const arrival = checkIn && String(checkIn).trim() !== '' ? checkIn : today.toISOString().split('T')[0];
+    const departure = checkOut && String(checkOut).trim() !== '' ? checkOut : tomorrow.toISOString().split('T')[0];
+
+    // Build URL with proper params
+    const params = new URLSearchParams({
+      dest_id: String(destId),
+      search_type: searchType,
+      arrival_date: arrival,
+      departure_date: departure,
+      adults: String(guests || 2),
+      room_qty: '1',
+      page_number: '1',
+      units: 'metric',
+      temperature_unit: 'c',
+      languagecode: 'en-us',
+      currency_code: 'USD'
+    });
+
+    const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
+    console.log('Hotels URL:', hotelsUrl);
 
     // Search for hotels
     const hotelsResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=${destId}&search_type=CITY&arrival_date=${checkIn}&departure_date=${checkOut}&adults=${guests || 2}&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=USD`,
+      hotelsUrl,
       {
         method: 'GET',
         headers: {
