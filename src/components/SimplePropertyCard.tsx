@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { BookingModal } from "./BookingModal";
+import { DateSelectionModal } from "./DateSelectionModal";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -10,12 +11,23 @@ interface SimplePropertyCardProps {
 }
 
 export const SimplePropertyCard = ({ property, type = "hotels" }: SimplePropertyCardProps) => {
+  const [showDateModal, setShowDateModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedHotelOffer, setSelectedHotelOffer] = useState<any>(null);
+  const [bookingDates, setBookingDates] = useState<{ checkIn: string; checkOut: string; adults: number } | null>(null);
   
   // Parse Booking.com API data properly
   const image = property.property?.photoUrls?.[0] || property.image || "/placeholder.svg";
   const title = property.property?.name || property.title || property.label || "Hotel";
   const propertyUrl = property.property?.externalUrls?.default || property.url || "#";
+  
+  // Extract city code for Amadeus (would need proper mapping in production)
+  const getCityCode = () => {
+    // This is a simplified version - in production, you'd need a proper city code mapping
+    const location = property.location || property.region || "";
+    // For now, return a common code or extract from property data
+    return property.cityCode || "PAR"; // Default to Paris for demo
+  };
   
   // Extract clean location from accessibilityLabel
   const getCleanLocation = () => {
@@ -84,6 +96,12 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
     if (propertyUrl && propertyUrl !== "#") {
       window.open(propertyUrl, "_blank", "noopener,noreferrer");
     }
+  };
+
+  const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
+    setSelectedHotelOffer(hotelOffer);
+    setBookingDates({ checkIn, checkOut, adults });
+    setShowBookingModal(true);
   };
 
   return (
@@ -156,7 +174,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
                   <Button 
                     size="sm" 
                     className="text-xs h-8"
-                    onClick={() => setShowBookingModal(true)}
+                    onClick={() => setShowDateModal(true)}
                   >
                     Book
                   </Button>
@@ -167,14 +185,31 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
         </div>
       </div>
 
-      {showBookingModal && displayPrice > 0 && (
+      <DateSelectionModal
+        open={showDateModal}
+        onClose={() => setShowDateModal(false)}
+        onAvailabilityConfirmed={handleAvailabilityConfirmed}
+        cityCode={getCityCode()}
+        hotelName={title}
+      />
+
+      {showBookingModal && selectedHotelOffer && bookingDates && (
         <BookingModal
           open={showBookingModal}
-          onClose={() => setShowBookingModal(false)}
+          onClose={() => {
+            setShowBookingModal(false);
+            setSelectedHotelOffer(null);
+            setBookingDates(null);
+          }}
           bookingType="hotel"
-          bookingData={property}
-          totalPrice={displayPrice}
-          currency={currency}
+          bookingData={{
+            ...selectedHotelOffer,
+            checkIn: bookingDates.checkIn,
+            checkOut: bookingDates.checkOut,
+            adults: bookingDates.adults
+          }}
+          totalPrice={selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : displayPrice}
+          currency={selectedHotelOffer.offers?.[0]?.price?.currency || currency}
         />
       )}
     </>
