@@ -16,6 +16,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
   const [checkOut, setCheckOut] = useState<Date>();
   const [departureDate, setDepartureDate] = useState<Date>();
   const [returnDate, setReturnDate] = useState<Date>();
+  const [tripType, setTripType] = useState<"one-way" | "return" | null>(null);
   const [mode, setMode] = useState<"checkIn" | "checkOut" | "departure" | "return">(
     type === "hotel" ? "checkIn" : "departure"
   );
@@ -33,6 +34,10 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
     } else {
       if (mode === "departure") {
         setDepartureDate(date);
+        // For one-way trips, skip to confirmation
+        if (tripType === "one-way") {
+          return;
+        }
         setMode("return");
       } else {
         setReturnDate(date);
@@ -56,7 +61,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
 
   const canConfirm = type === "hotel" 
     ? checkIn && checkOut 
-    : departureDate;
+    : tripType === "one-way" ? departureDate : departureDate && returnDate;
 
   const getTitle = () => {
     if (type === "hotel") {
@@ -84,6 +89,42 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
     return null;
   };
 
+  // Show trip type selection for flights first
+  if (type === "flight" && tripType === null) {
+    return (
+      <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <CalendarIcon className="h-5 w-5 text-primary" />
+            Select Trip Type
+          </h3>
+          <Button variant="ghost" size="icon" onClick={onCancel}>
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="space-y-3">
+          <Button
+            variant="outline"
+            className="w-full h-auto py-4 flex flex-col items-start gap-1 hover:border-primary hover:bg-primary/5"
+            onClick={() => setTripType("one-way")}
+          >
+            <span className="font-semibold">One-way</span>
+            <span className="text-sm text-muted-foreground">Single flight to your destination</span>
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full h-auto py-4 flex flex-col items-start gap-1 hover:border-primary hover:bg-primary/5"
+            onClick={() => setTripType("return")}
+          >
+            <span className="font-semibold">Return trip</span>
+            <span className="text-sm text-muted-foreground">Round trip with return flight</span>
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4">
       <div className="flex items-center justify-between">
@@ -110,7 +151,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
       />
 
       <div className="flex gap-2 pt-4">
-        {type === "flight" && mode === "return" && (
+        {type === "flight" && mode === "return" && tripType === "one-way" && (
           <Button
             variant="outline"
             onClick={() => {
