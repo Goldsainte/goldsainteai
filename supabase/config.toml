@@ -8,3 +8,21 @@ verify_jwt = false
 
 [functions.travel-ai-agent]
 verify_jwt = false
+
+[functions.amadeus-search-hotels]
+verify_jwt = false
+
+[functions.amadeus-search-flights]
+verify_jwt = false
+
+[functions.amadeus-search-cars]
+verify_jwt = false
+
+[functions.create-booking]
+verify_jwt = false
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.verify-payment]
+verify_jwt = false

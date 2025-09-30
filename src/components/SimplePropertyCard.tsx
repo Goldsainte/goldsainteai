@@ -1,6 +1,8 @@
 import { Heart, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { BookingModal } from "./BookingModal";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -8,16 +10,12 @@ interface SimplePropertyCardProps {
 }
 
 export const SimplePropertyCard = ({ property, type = "hotels" }: SimplePropertyCardProps) => {
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  
   // Parse Booking.com API data properly
   const image = property.property?.photoUrls?.[0] || property.image || "/placeholder.svg";
   const title = property.property?.name || property.title || property.label || "Hotel";
   const propertyUrl = property.property?.externalUrls?.default || property.url || "#";
-  
-  const handleClick = () => {
-    if (propertyUrl && propertyUrl !== "#") {
-      window.open(propertyUrl, "_blank", "noopener,noreferrer");
-    }
-  };
   
   // Extract clean location from accessibilityLabel
   const getCleanLocation = () => {
@@ -82,73 +80,103 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
     return symbols[curr] || curr + ' ';
   };
 
-  return (
-    <div 
-      onClick={handleClick}
-      className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-300 cursor-pointer"
-    >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm hover:bg-background hover:text-destructive transition-colors"
-        >
-          <Heart className="h-5 w-5" />
-        </Button>
-      </div>
+  const handleViewClick = () => {
+    if (propertyUrl && propertyUrl !== "#") {
+      window.open(propertyUrl, "_blank", "noopener,noreferrer");
+    }
+  };
 
-      <div className="p-4 space-y-3">
-        <div className="space-y-2">
-          <h3 className="font-semibold text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-            {title}
-          </h3>
-          <p className="text-sm text-muted-foreground flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
-            {location}
-          </p>
+  return (
+    <>
+      <div className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-300">
+        <div className="relative aspect-[4/3] overflow-hidden">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm hover:bg-background hover:text-destructive transition-colors"
+          >
+            <Heart className="h-5 w-5" />
+          </Button>
         </div>
 
-        {rating > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <Badge variant="secondary" className="gap-1 font-semibold">
-              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-              {rating.toFixed(1)}
-            </Badge>
-            <span className="text-sm font-medium text-foreground">
-              {getRatingText(rating)}
-            </span>
-            {reviews > 0 && (
-              <span className="text-xs text-muted-foreground">
-                ({reviews.toLocaleString()} reviews)
-              </span>
-            )}
+        <div className="p-4 space-y-3">
+          <div className="space-y-2">
+            <h3 className="font-semibold text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">
+              {title}
+            </h3>
+            <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {location}
+            </p>
           </div>
-        )}
 
-        {displayPrice > 0 && (
-          <div className="pt-2 border-t border-border">
-            <div className="flex items-end justify-between">
-              <div className="space-y-1">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-foreground">
-                    {getCurrencySymbol(currency)}{Math.round(displayPrice)}
-                  </span>
-                </div>
-                <p className="text-xs text-muted-foreground">per night</p>
-              </div>
-              <Button size="sm" className="text-xs h-8">
-                View
-              </Button>
+          {rating > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="secondary" className="gap-1 font-semibold">
+                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+                {rating.toFixed(1)}
+              </Badge>
+              <span className="text-sm font-medium text-foreground">
+                {getRatingText(rating)}
+              </span>
+              {reviews > 0 && (
+                <span className="text-xs text-muted-foreground">
+                  ({reviews.toLocaleString()} reviews)
+                </span>
+              )}
             </div>
-          </div>
-        )}
+          )}
+
+          {displayPrice > 0 && (
+            <div className="pt-2 border-t border-border">
+              <div className="flex items-end justify-between gap-2">
+                <div className="space-y-1 flex-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-foreground">
+                      {getCurrencySymbol(currency)}{Math.round(displayPrice)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">per night</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-xs h-8"
+                    onClick={handleViewClick}
+                  >
+                    View
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="text-xs h-8"
+                    onClick={() => setShowBookingModal(true)}
+                  >
+                    Book
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {showBookingModal && displayPrice > 0 && (
+        <BookingModal
+          open={showBookingModal}
+          onClose={() => setShowBookingModal(false)}
+          bookingType="hotel"
+          bookingData={property}
+          totalPrice={displayPrice}
+          currency={currency}
+        />
+      )}
+    </>
   );
 };

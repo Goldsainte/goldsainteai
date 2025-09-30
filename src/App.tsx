@@ -8,6 +8,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { SimpleHeader } from "@/components/SimpleHeader";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
+import BookingConfirmation from "./pages/BookingConfirmation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/search" element={<SearchResults />} />
+                <Route path="/booking-confirmation" element={<BookingConfirmation />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
