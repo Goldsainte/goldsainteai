@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -45,7 +45,7 @@ const Index = () => {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   // Get user's current location on mount
-  const getUserLocation = () => {
+  useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -53,19 +53,15 @@ const Index = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
-          toast({
-            title: "Location detected",
-            description: "Using your current location for better search results.",
-          });
+          console.log('Location detected:', position.coords.latitude, position.coords.longitude);
         },
         (error) => {
-          console.error("Error getting location:", error);
-          // Silently fall back to default behavior without showing error
-          // User can still search without location
+          console.log("User denied location access or error:", error);
+          // Silently fall back - user can still search without location
         }
       );
     }
-  };
+  }, []);
 
   const inspirationDestinations = [
     {
@@ -118,7 +114,11 @@ const Index = () => {
       const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
         body: { 
           message: queryToSend,
-          conversationHistory 
+          conversationHistory,
+          userLocation: userLocation ? {
+            latitude: userLocation.lat,
+            longitude: userLocation.lng
+          } : undefined
         }
       });
 
@@ -146,23 +146,17 @@ const Index = () => {
   };
 
   const handleQuickAction = async (action: string) => {
-    // For location-based searches, get location first
-    if (['hotels', 'flights', 'restaurants'].includes(action) && !userLocation) {
-      getUserLocation();
-      
-      // Wait a bit for location to be fetched
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
-
-    const locationInfo = userLocation 
-      ? `near my current location (${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)})`
-      : "near me";
-
     const queries = {
-      hotels: `Show me popular hotels ${locationInfo}`,
-      flights: `I need to find flights from ${locationInfo}`,
+      hotels: userLocation 
+        ? `Show me popular hotels near my current location`
+        : "Show me popular hotels near me",
+      flights: userLocation
+        ? `I need to find flights from my current location`
+        : "I need to find flights",
       destinations: "What are some popular travel destinations?",
-      restaurants: `Show me popular restaurants ${locationInfo}`
+      restaurants: userLocation
+        ? `Show me popular restaurants near my current location`
+        : "Show me popular restaurants near me"
     };
     handleSearch(queries[action as keyof typeof queries]);
   };
@@ -200,6 +194,12 @@ const Index = () => {
                 <p className="text-muted-foreground text-center max-w-md">
                   Your intelligent travel companion powered by AI. Find hotels, destinations, and plan your perfect trip.
                 </p>
+                {userLocation && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <MapPinned className="h-3 w-3 text-primary" />
+                    <span>Location detected - showing nearby results</span>
+                  </div>
+                )}
               </div>
 
               {/* Main Search */}

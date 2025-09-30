@@ -13,9 +13,13 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory = [] } = await req.json();
+    const { message, conversationHistory = [], userLocation } = await req.json();
     
-    console.log('AI Agent request:', { message, historyLength: conversationHistory.length });
+    console.log('AI Agent request:', { 
+      message, 
+      historyLength: conversationHistory.length,
+      hasLocation: !!userLocation 
+    });
 
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
@@ -124,10 +128,14 @@ serve(async (req) => {
       }
     ];
 
+    const locationInfo = userLocation 
+      ? `\n\nIMPORTANT: The user's current location is ${userLocation.latitude}, ${userLocation.longitude}. When they ask for restaurants, hotels, or things "near me" or "near my current location", use these exact coordinates in your search.`
+      : '';
+
     const messages = [
       {
         role: "system",
-        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, and answer travel-related questions.
+        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, and answer travel-related questions.${locationInfo}
 
 IMPORTANT: Be action-oriented and helpful. When users ask about hotels, destinations, or restaurants, IMMEDIATELY use the search tools with smart defaults.
 
