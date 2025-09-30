@@ -32,3 +32,6 @@ verify_jwt = false
 
 [functions.fetch-google-places]
 verify_jwt = false
+
+[functions.fetch-restaurants]
+verify_jwt = false

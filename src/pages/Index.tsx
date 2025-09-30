@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plane, Hotel, MapPin, Compass, Search, Send, Loader2, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,14 +7,8 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
-import { InspirationCard } from "@/components/InspirationCard";
+import { RestaurantCard } from "@/components/RestaurantCard";
 import logomark from "@/assets/logomark-gold.png";
-import property1 from "@/assets/property1.jpg";
-import property2 from "@/assets/property2.jpg";
-import property3 from "@/assets/property3.jpg";
-import property4 from "@/assets/property4.jpg";
-import property5 from "@/assets/property5.jpg";
-import property6 from "@/assets/property6.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -33,6 +27,17 @@ interface SearchResult {
   filters?: any;
 }
 
+interface Restaurant {
+  id: string;
+  name: string;
+  rating: number;
+  userRatingsTotal: number;
+  priceLevel?: number;
+  vicinity: string;
+  photo: string | null;
+  types: string[];
+}
+
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -41,45 +46,43 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [loadingRestaurants, setLoadingRestaurants] = useState(true);
 
-  const inspirationDestinations = [
-    {
-      image: property1,
-      title: "Santorini Paradise",
-      location: "Greece",
-      description: "Experience breathtaking sunsets and pristine white architecture overlooking the Aegean Sea."
-    },
-    {
-      image: property2,
-      title: "Alpine Luxury",
-      location: "Swiss Alps",
-      description: "Discover world-class skiing and cozy mountain retreats in the heart of the Alps."
-    },
-    {
-      image: property3,
-      title: "Tropical Escape",
-      location: "Maldives",
-      description: "Unwind in overwater bungalows surrounded by crystal-clear turquoise waters."
-    },
-    {
-      image: property4,
-      title: "Urban Elegance",
-      location: "Paris, France",
-      description: "Immerse yourself in art, culture, and world-renowned cuisine in the City of Light."
-    },
-    {
-      image: property5,
-      title: "Desert Oasis",
-      location: "Dubai, UAE",
-      description: "Experience luxury redefined with stunning architecture and endless entertainment."
-    },
-    {
-      image: property6,
-      title: "Coastal Charm",
-      location: "Amalfi Coast, Italy",
-      description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
+  useEffect(() => {
+    fetchNearbyRestaurants();
+  }, []);
+
+  const fetchNearbyRestaurants = async () => {
+    try {
+      // Default to New York City coordinates if location not available
+      const defaultLat = 40.7128;
+      const defaultLng = -74.0060;
+      
+      const { data, error } = await supabase.functions.invoke('fetch-restaurants', {
+        body: { 
+          latitude: defaultLat, 
+          longitude: defaultLng,
+          radius: 5000 
+        }
+      });
+
+      if (error) throw error;
+
+      if (data.success && data.restaurants) {
+        setRestaurants(data.restaurants);
+      }
+    } catch (err: any) {
+      console.error('Error fetching restaurants:', err);
+      toast({
+        title: "Info",
+        description: "Unable to load nearby restaurants",
+        variant: "default",
+      });
+    } finally {
+      setLoadingRestaurants(false);
     }
-  ];
+  };
 
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
@@ -261,28 +264,41 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Get Inspired Section */}
+              {/* Nearby Restaurants Section */}
               <div className="space-y-6 pt-12">
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    Get Inspired
+                    Nearby Restaurants
                   </h2>
                   <p className="text-muted-foreground">
-                    Discover your next dream destination
+                    Discover great dining experiences around you
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {inspirationDestinations.map((destination, idx) => (
-                    <InspirationCard
-                      key={idx}
-                      image={destination.image}
-                      title={destination.title}
-                      location={destination.location}
-                      description={destination.description}
-                    />
-                  ))}
-                </div>
+                {loadingRestaurants ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : restaurants.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {restaurants.map((restaurant) => (
+                      <RestaurantCard
+                        key={restaurant.id}
+                        name={restaurant.name}
+                        rating={restaurant.rating}
+                        userRatingsTotal={restaurant.userRatingsTotal}
+                        priceLevel={restaurant.priceLevel}
+                        vicinity={restaurant.vicinity}
+                        photo={restaurant.photo}
+                        types={restaurant.types}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12 text-muted-foreground">
+                    No restaurants found nearby
+                  </div>
+                )}
               </div>
 
               {/* Footer */}
