@@ -35,6 +35,7 @@ import luxuryFlights from "@/assets/luxury-flights.jpg";
 import luxuryDestinations from "@/assets/luxury-destinations.jpg";
 import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
 import luxuryVisa from "@/assets/luxury-visa.jpg";
+import luxuryEvents from "@/assets/luxury-events.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -542,8 +543,8 @@ const Index = () => {
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
                         <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
-                          <Ticket className="h-10 w-10 text-accent" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg">
+                          <img src={luxuryEvents} alt="Luxury Events" className="w-full h-full object-cover" />
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
