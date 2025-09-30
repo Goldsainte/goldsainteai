@@ -66,6 +66,30 @@ serve(async (req) => {
 
     console.log('Booking created:', booking.id, 'Reference:', bookingReference);
 
+    // Send confirmation email in the background
+    const emailData = {
+      guestEmail: guestInfo.email,
+      guestName: `${guestInfo.firstName} ${guestInfo.lastName}`,
+      bookingReference,
+      bookingType,
+      bookingData,
+      checkInDate: bookingData.checkInDate,
+      checkOutDate: bookingData.checkOutDate,
+      totalPrice,
+      currency,
+      specialRequests: guestInfo.specialRequests
+    };
+
+    // Send email without blocking the response
+    fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-confirmation-email`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('SUPABASE_ANON_KEY')}`
+      },
+      body: JSON.stringify(emailData)
+    }).catch(error => console.error('Failed to send confirmation email:', error));
+
     return new Response(JSON.stringify({ 
       booking,
       bookingReference
