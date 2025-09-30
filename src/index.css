@@ -30,6 +30,11 @@ All colors MUST be HSL.
 
     --accent: 46 38% 60%;
     --accent-foreground: 174 73% 17%;
+    
+    /* Additional Accent Colors */
+    --accent-cream: 48 39% 84%;
+    --accent-dark: 187 57% 9%;
+    --accent-gray: 0 0% 55%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -76,6 +81,11 @@ All colors MUST be HSL.
 
     --accent: 46 38% 60%;
     --accent-foreground: 174 73% 17%;
+    
+    /* Additional Accent Colors */
+    --accent-cream: 48 39% 84%;
+    --accent-dark: 187 57% 9%;
+    --accent-gray: 0 0% 55%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
