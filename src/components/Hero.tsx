@@ -1,8 +1,28 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export const Hero = () => {
+  const navigate = useNavigate();
+  const [location, setLocation] = useState("");
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
+  const [guests, setGuests] = useState("2");
+
+  const handleSearch = () => {
+    if (!location.trim()) return;
+    const params = new URLSearchParams({
+      type: "hotels",
+      location,
+      checkIn,
+      checkOut,
+      guests
+    });
+    navigate(`/search?${params.toString()}`);
+  };
+
   return (
     <section className="bg-gradient-hero text-primary-foreground py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -21,6 +41,8 @@ export const Hero = () => {
                 <Input
                   placeholder="Where are you going?"
                   className="pl-10 h-12 bg-background text-foreground"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                 />
               </div>
 
@@ -29,6 +51,8 @@ export const Hero = () => {
                 <Input
                   type="date"
                   className="pl-10 h-12 bg-background text-foreground"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
                 />
               </div>
 
@@ -37,6 +61,8 @@ export const Hero = () => {
                 <Input
                   type="date"
                   className="pl-10 h-12 bg-background text-foreground"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
                 />
               </div>
 
@@ -46,10 +72,15 @@ export const Hero = () => {
                   type="number"
                   placeholder="2 adults"
                   className="pl-10 h-12 bg-background text-foreground"
+                  value={guests}
+                  onChange={(e) => setGuests(e.target.value)}
                 />
               </div>
 
-              <Button className="h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold">
+              <Button 
+                className="h-12 px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                onClick={handleSearch}
+              >
                 Search
               </Button>
             </div>
