@@ -211,8 +211,18 @@ EXCEPTION - FLIGHTS REQUIRE ORIGIN: For flight searches, if the user does NOT sp
 
 VISA REQUIREMENTS PROTOCOL:
 When you provide visa information using check_visa_requirements tool:
-1. First, provide the visa requirement details clearly
-2. If the destination country REQUIRES a visa (not visa-free, not visa on arrival), ALWAYS ask: "Would you like Goldsainte to assist you with your visa application? Our team can handle the entire process for you."
+1. First, provide the visa requirement details clearly, including:
+   - Visa status (required, visa-free, visa on arrival, eVisa)
+   - Duration of stay allowed
+   - Passport validity requirements
+   - IMPORTANT: Explain visa fee considerations:
+     * Fees vary by destination country
+     * Different visa types (tourism, business, study, work) have different fees
+     * Petition-based visas (like work visas) may have different fee structures
+     * Expedited processing typically costs more
+     * Additional charges may apply (SEVIS fees, service center fees)
+     * User should verify exact fees on official embassy/consulate website
+2. If the destination country REQUIRES a visa (not visa-free, not visa on arrival), ALWAYS ask: "Would you like Goldsainte to assist you with your visa application? Our team can handle the entire process for you, including helping you understand the exact fees and requirements."
 3. If they say yes or express interest, inform them: "Great! To get started with your visa application, I'll need to collect some information. Please provide your contact details and travel information."
 4. DO NOT collect information in the chat - the interface will show a form for them to fill out.
 
@@ -917,11 +927,26 @@ async function checkVisaRequirements(args: any) {
     
 1. Visa requirement status (visa required, visa-free, visa on arrival, eVisa available, etc.)
 2. Maximum stay duration if visa-free or visa on arrival
-3. Passport validity requirements
-4. Any special conditions or requirements
-5. Official embassy/government website link if available
+3. Passport validity requirements (e.g., must be valid for 6 months beyond stay)
 
-Be specific and factual. If you're not certain, indicate that the traveler should verify with official sources.`;
+IMPORTANT - VISA FEE CONSIDERATIONS:
+Explain that visa fees vary based on:
+- Destination Country: Each country has different fee structures
+- Visa Type: Purpose of visit (tourism, business, study, work) affects the category and fee
+- Petition vs. Non-Petition Based: Some visas (like work visas) are petition-based with different fees
+- Application Processing Time: Expedited processing may cost more
+- Additional Charges: May include SEVIS fees (for exchange visitors) or visa service center fees
+
+4. Estimated fee range (if available) and note that exact fees should be verified on:
+   - Official embassy or consulate website of ${toCountry}
+   - Official government visa fee schedules (.gov websites)
+
+5. Any special conditions or requirements
+6. Official embassy/government website link if available
+
+If visa is required, mention that Goldsainte can assist with the application process and handle all the complexity.
+
+Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

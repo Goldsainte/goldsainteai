@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,6 +32,7 @@ export const VisaServiceModal = ({
     userPhone: "",
     departureDate: "",
     returnDate: "",
+    visaType: "tourism",
     additionalNotes: ""
   });
 
@@ -46,7 +48,10 @@ export const VisaServiceModal = ({
           userPhone: formData.userPhone,
           fromCountry,
           toCountry,
-          visaInformation,
+          visaInformation: {
+            ...visaInformation,
+            visaType: formData.visaType
+          },
           travelDates: {
             departure: formData.departureDate,
             return: formData.returnDate
@@ -69,6 +74,7 @@ export const VisaServiceModal = ({
         userPhone: "",
         departureDate: "",
         returnDate: "",
+        visaType: "tourism",
         additionalNotes: ""
       });
       onOpenChange(false);
@@ -128,6 +134,31 @@ export const VisaServiceModal = ({
               value={formData.userPhone}
               onChange={(e) => setFormData({ ...formData, userPhone: e.target.value })}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="visaType">Visa Purpose *</Label>
+            <Select
+              value={formData.visaType}
+              onValueChange={(value) => setFormData({ ...formData, visaType: value })}
+            >
+              <SelectTrigger id="visaType">
+                <SelectValue placeholder="Select purpose of visit" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="tourism">Tourism / Vacation</SelectItem>
+                <SelectItem value="business">Business</SelectItem>
+                <SelectItem value="study">Study / Education</SelectItem>
+                <SelectItem value="work">Work / Employment</SelectItem>
+                <SelectItem value="family">Family Visit</SelectItem>
+                <SelectItem value="medical">Medical Treatment</SelectItem>
+                <SelectItem value="transit">Transit</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Note: Visa fees vary by purpose. Our team will provide exact fee information.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
