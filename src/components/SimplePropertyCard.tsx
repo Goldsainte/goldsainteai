@@ -11,6 +11,13 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   // Parse Booking.com API data properly
   const image = property.property?.photoUrls?.[0] || property.image || "/placeholder.svg";
   const title = property.property?.name || property.title || property.label || "Hotel";
+  const propertyUrl = property.property?.externalUrls?.default || property.url || "#";
+  
+  const handleClick = () => {
+    if (propertyUrl && propertyUrl !== "#") {
+      window.open(propertyUrl, "_blank", "noopener,noreferrer");
+    }
+  };
   
   // Extract clean location from accessibilityLabel
   const getCleanLocation = () => {
@@ -76,7 +83,10 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   };
 
   return (
-    <div className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-300 cursor-pointer">
+    <div 
+      onClick={handleClick}
+      className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-300 cursor-pointer"
+    >
       <div className="relative aspect-[4/3] overflow-hidden">
         <img
           src={image}
