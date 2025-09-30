@@ -99,10 +99,14 @@ const Index = () => {
 
       if (error) throw error;
 
+      console.log('AI Agent response:', data);
       setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
       
       if (data.toolResults && data.toolResults.length > 0) {
-        setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+        console.log('Tool results received:', data.toolResults);
+        const filteredResults = data.toolResults.filter((r: any) => r.results && r.results.length > 0);
+        console.log('Filtered results:', filteredResults);
+        setSearchResults(filteredResults);
       }
 
       if (data.conversationHistory) {
@@ -345,57 +349,63 @@ const Index = () => {
                 ))}
 
                 {/* Search Results */}
-                {searchResults.map((result, idx) => (
-                  <div key={`result-${idx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                    {result.type === 'hotels' && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-semibold text-foreground">
-                            {result.filters?.sortBy === 'popularity' && '🔥 Most Popular Hotels'}
-                            {result.filters?.sortBy === 'review_score' && '⭐ Top Rated Hotels'}
-                            {result.filters?.sortBy === 'price' && '💰 Budget-Friendly Hotels'}
-                            {!result.filters?.sortBy && 'Available Hotels'}
-                          </h3>
-                          {result.filters && (
-                            <div className="flex gap-2">
-                              {result.filters.minRating && (
-                                <Badge variant="secondary">⭐ {result.filters.minRating}+</Badge>
-                              )}
-                              {result.filters.maxPrice && (
-                                <Badge variant="secondary">≤ ${result.filters.maxPrice}</Badge>
-                              )}
-                            </div>
-                          )}
+                {searchResults.map((result, idx) => {
+                  console.log(`Rendering result ${idx}:`, result);
+                  return (
+                    <div key={`result-${idx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                      {result.type === 'hotels' && result.results.length > 0 && (
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-xl font-semibold text-foreground">
+                              {result.filters?.sortBy === 'popularity' && '🔥 Most Popular Hotels'}
+                              {result.filters?.sortBy === 'review_score' && '⭐ Top Rated Hotels'}
+                              {result.filters?.sortBy === 'price' && '💰 Budget-Friendly Hotels'}
+                              {!result.filters?.sortBy && 'Available Hotels'}
+                            </h3>
+                            {result.filters && (
+                              <div className="flex gap-2">
+                                {result.filters.minRating && (
+                                  <Badge variant="secondary">⭐ {result.filters.minRating}+</Badge>
+                                )}
+                                {result.filters.maxPrice && (
+                                  <Badge variant="secondary">≤ ${result.filters.maxPrice}</Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {result.results.map((hotel: any, hotelIdx: number) => {
+                              console.log(`Rendering hotel ${hotelIdx}:`, hotel);
+                              return (
+                                <SimplePropertyCard
+                                  key={hotel.hotel_id || hotelIdx}
+                                  property={hotel}
+                                  type="hotels"
+                                />
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {result.results.map((hotel: any, hotelIdx: number) => (
-                            <SimplePropertyCard
-                              key={hotel.hotel_id || hotelIdx}
-                              property={hotel}
-                              type="hotels"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      )}
 
-                    {result.type === 'destinations' && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground">
-                          🌍 Destinations
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {result.results.slice(0, 6).map((dest: any, destIdx: number) => (
-                            <Card key={dest.dest_id || destIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary">
-                              <h4 className="font-semibold text-foreground mb-1">{dest.label}</h4>
-                              <p className="text-sm text-muted-foreground">{dest.region || dest.dest_type}</p>
-                            </Card>
-                          ))}
+                      {result.type === 'destinations' && result.results.length > 0 && (
+                        <div className="space-y-4">
+                          <h3 className="text-xl font-semibold text-foreground">
+                            🌍 Destinations
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {result.results.slice(0, 6).map((dest: any, destIdx: number) => (
+                              <Card key={dest.dest_id || destIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary">
+                                <h4 className="font-semibold text-foreground mb-1">{dest.label}</h4>
+                                <p className="text-sm text-muted-foreground">{dest.region || dest.dest_type}</p>
+                              </Card>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                      )}
+                    </div>
+                  );
+                })}
 
                 {/* Loading indicator */}
                 {isLoading && (
