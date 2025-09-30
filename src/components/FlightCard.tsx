@@ -37,16 +37,16 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
     return dictionaries?.carriers?.[code] || code;
   };
 
-  const handleBookFlight = () => {
-    // Construct Google Flights URL with flight details
+  const getBookingUrl = () => {
     const origin = firstSegment.departure.iataCode;
     const destination = lastSegment.arrival.iataCode;
     const departureDate = new Date(firstSegment.departure.at).toISOString().split('T')[0];
+    const airline = firstSegment.carrierCode;
     
-    // Google Flights URL format
-    const googleFlightsUrl = `https://www.google.com/travel/flights/search?tfs=CBwQAhooEgoyMDI1LTEwLTA5agcIARIDJHtvcmlnaW59cgcIARIDJHtkZXN0aW5hdGlvbn0&hl=en&curr=${currency}`.replace('{origin}', origin).replace('{destination}', destination);
-    
-    window.open(googleFlightsUrl, '_blank');
+    // Create a search URL based on the airline
+    // For now, using a general flight search aggregator
+    const kayakUrl = `https://www.kayak.com/flights/${origin}-${destination}/${departureDate}`;
+    return kayakUrl;
   };
 
   return (
@@ -103,11 +103,18 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
 
           {/* Actions */}
           <Button 
-            onClick={handleBookFlight}
-            className="w-full group"
+            asChild
+            className="w-full"
           >
-            Book Flight
-            <ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            <a 
+              href={getBookingUrl()} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2"
+            >
+              Book Flight
+              <ExternalLink className="h-4 w-4" />
+            </a>
           </Button>
         </div>
       </Card>
