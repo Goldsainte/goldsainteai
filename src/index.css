@@ -17,33 +17,33 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    /* Goldsainte Navy Blue - Primary Brand Color */
-    --primary: 215 95% 20%;
+    /* Goldsainte Dark Teal - Primary Brand Color */
+    --primary: 174 73% 17%;
     --primary-foreground: 0 0% 100%;
     
     /* Goldsainte Gold - Accent Brand Color */
-    --secondary: 45 95% 50%;
-    --secondary-foreground: 215 95% 20%;
+    --secondary: 46 38% 60%;
+    --secondary-foreground: 174 73% 17%;
 
     --muted: 210 30% 96%;
     --muted-foreground: 215 15% 45%;
 
-    --accent: 45 95% 50%;
-    --accent-foreground: 215 95% 20%;
+    --accent: 46 38% 60%;
+    --accent-foreground: 174 73% 17%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 214 25% 88%;
     --input: 214 25% 88%;
-    --ring: 215 95% 20%;
+    --ring: 174 73% 17%;
 
     --radius: 0.5rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(215 95% 20%), hsl(215 85% 30%));
-    --gradient-gold: linear-gradient(135deg, hsl(45 95% 50%), hsl(38 90% 55%));
-    --gradient-hero: linear-gradient(135deg, hsl(215 95% 20%) 0%, hsl(215 85% 30%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(174 73% 17%), hsl(174 60% 25%));
+    --gradient-gold: linear-gradient(135deg, hsl(46 38% 60%), hsl(46 45% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(174 73% 17%) 0%, hsl(174 60% 25%) 100%);
     
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 hsl(215 25% 15% / 0.05);
@@ -65,24 +65,24 @@ All colors MUST be HSL.
     --popover: 215 20% 12%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 45 95% 50%;
-    --primary-foreground: 215 95% 20%;
+    --primary: 46 38% 60%;
+    --primary-foreground: 174 73% 17%;
 
-    --secondary: 215 85% 30%;
+    --secondary: 174 60% 25%;
     --secondary-foreground: 0 0% 100%;
 
     --muted: 215 20% 18%;
     --muted-foreground: 215 10% 65%;
 
-    --accent: 45 95% 50%;
-    --accent-foreground: 215 95% 20%;
+    --accent: 46 38% 60%;
+    --accent-foreground: 174 73% 17%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 215 20% 20%;
     --input: 215 20% 20%;
-    --ring: 45 95% 50%;
+    --ring: 46 38% 60%;
   }
 }
 
