@@ -389,10 +389,7 @@ const Index = () => {
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h3 className="text-xl font-semibold text-foreground">
-                            {result.filters?.sortBy === 'popularity' && '🔥 Most Popular Hotels'}
-                            {result.filters?.sortBy === 'review_score' && '⭐ Top Rated Hotels'}
-                            {result.filters?.sortBy === 'price' && '💰 Budget-Friendly Hotels'}
-                            {!result.filters?.sortBy && 'Available Hotels'}
+                            {result.results.length} properties in {result.location?.name || 'this area'}
                           </h3>
                           {result.filters && (
                             <div className="flex gap-2">
@@ -405,7 +402,7 @@ const Index = () => {
                             </div>
                           )}
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-4">
                           {result.results.map((hotel: any, hotelIdx: number) => (
                             <SimplePropertyCard
                               key={hotel.hotel_id || hotelIdx}
