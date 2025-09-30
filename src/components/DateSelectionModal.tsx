@@ -17,6 +17,7 @@ interface DateSelectionModalProps {
   onAvailabilityConfirmed: (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => void;
   cityCode: string;
   hotelName: string;
+  currency?: string;
 }
 
 export const DateSelectionModal = ({ 
@@ -24,7 +25,8 @@ export const DateSelectionModal = ({
   onClose, 
   onAvailabilityConfirmed,
   cityCode,
-  hotelName
+  hotelName,
+  currency = 'USD'
 }: DateSelectionModalProps) => {
   const { toast } = useToast();
   const [checkInDate, setCheckInDate] = useState<Date>();
@@ -60,6 +62,7 @@ export const DateSelectionModal = ({
           checkInDate: format(checkInDate, 'yyyy-MM-dd'),
           checkOutDate: format(checkOutDate, 'yyyy-MM-dd'),
           adults,
+          currency,
         }
       });
 

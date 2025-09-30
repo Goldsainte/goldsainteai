@@ -206,6 +206,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
         onAvailabilityConfirmed={handleAvailabilityConfirmed}
         cityCode={getCityCode()}
         hotelName={title}
+        currency={currency}
       />
 
       {showBookingModal && selectedHotelOffer && bookingDates && (
