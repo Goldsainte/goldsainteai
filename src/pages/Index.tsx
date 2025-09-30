@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -20,6 +20,12 @@ import property3 from "@/assets/property3.jpg";
 import property4 from "@/assets/property4.jpg";
 import property5 from "@/assets/property5.jpg";
 import property6 from "@/assets/property6.jpg";
+import restaurant1 from "@/assets/restaurant1.jpg";
+import restaurant2 from "@/assets/restaurant2.jpg";
+import restaurant3 from "@/assets/restaurant3.jpg";
+import flight1 from "@/assets/flight1.jpg";
+import flight2 from "@/assets/flight2.jpg";
+import flight3 from "@/assets/flight3.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -111,6 +117,51 @@ const Index = () => {
       title: "Coastal Charm",
       location: "Amalfi Coast, Italy",
       description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
+    }
+  ];
+
+  const featuredRestaurants = [
+    {
+      image: restaurant1,
+      title: "Maison d'Or",
+      cuisine: "French Fine Dining",
+      rating: 4.9,
+      description: "Exquisite French cuisine in an intimate setting with impeccable service."
+    },
+    {
+      image: restaurant2,
+      title: "Sky Lounge",
+      cuisine: "Contemporary Fusion",
+      rating: 4.8,
+      description: "Panoramic city views paired with innovative culinary creations."
+    },
+    {
+      image: restaurant3,
+      title: "Azure Coast",
+      cuisine: "Mediterranean Seafood",
+      rating: 4.9,
+      description: "Fresh ocean catches and coastal flavors in a stunning beachfront location."
+    }
+  ];
+
+  const featuredFlights = [
+    {
+      image: flight1,
+      title: "First Class Experience",
+      route: "International Routes",
+      description: "Travel in ultimate luxury with our premium first-class service."
+    },
+    {
+      image: flight2,
+      title: "Scenic Journeys",
+      route: "European Destinations",
+      description: "Enjoy breathtaking views and comfort on your next European adventure."
+    },
+    {
+      image: flight3,
+      title: "Business Elite",
+      route: "Global Network",
+      description: "Work or relax in style with lie-flat seats and premium amenities."
     }
   ];
 
@@ -296,69 +347,97 @@ const Index = () => {
 
               {/* Quick Actions */}
               <div className="space-y-4">
-                <p className="text-sm text-muted-foreground text-center font-medium">Quick actions</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <p className="text-sm text-muted-foreground text-center font-medium tracking-wide uppercase">Start Your Journey</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-primary/5"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
                     onClick={() => handleDatePickerRequest("hotel", "Show me hotels near me")}
                     role="button"
                     tabIndex={0}
                     aria-label="Search Hotels"
                     onKeyDown={(e) => { if (e.key === 'Enter') handleDatePickerRequest("hotel", "Show me hotels near me"); }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-6 flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Hotel className="h-7 w-7 text-primary" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="relative p-8 flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
+                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/30 via-primary/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                          <Hotel className="h-8 w-8 text-primary drop-shadow-lg" />
+                        </div>
                       </div>
-                      <span className="text-base font-semibold text-foreground">Hotels</span>
-                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full" />
+                      <div className="space-y-1 text-center">
+                        <span className="text-lg font-bold text-foreground tracking-tight">Hotels</span>
+                        <p className="text-xs text-muted-foreground">Luxury stays</p>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
                     </div>
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/10 bg-gradient-to-br from-background via-accent/5 to-primary/10"
                     onClick={() => handleDatePickerRequest("flight", "Show me flights from my location")}
                     role="button"
                     tabIndex={0}
                     aria-label="Search Flights"
                     onKeyDown={(e) => { if (e.key === 'Enter') handleDatePickerRequest("flight", "Show me flights from my location"); }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-6 flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Plane className="h-7 w-7 text-accent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="relative p-8 flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
+                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-accent/30 via-accent/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                          <Plane className="h-8 w-8 text-accent drop-shadow-lg" />
+                        </div>
                       </div>
-                      <span className="text-base font-semibold text-foreground">Flights</span>
-                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary transition-all duration-300 group-hover:w-full" />
+                      <div className="space-y-1 text-center">
+                        <span className="text-lg font-bold text-foreground tracking-tight">Flights</span>
+                        <p className="text-xs text-muted-foreground">Premium travel</p>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
                     </div>
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-primary/5"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
                     onClick={() => handleQuickAction('destinations')}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-6 flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <MapPin className="h-7 w-7 text-primary" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="relative p-8 flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
+                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/30 via-primary/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500">
+                          <MapPin className="h-8 w-8 text-primary drop-shadow-lg" />
+                        </div>
                       </div>
-                      <span className="text-base font-semibold text-foreground">Destinations</span>
-                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full" />
+                      <div className="space-y-1 text-center">
+                        <span className="text-lg font-bold text-foreground tracking-tight">Destinations</span>
+                        <p className="text-xs text-muted-foreground">Dream places</p>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
                     </div>
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/10 bg-gradient-to-br from-background via-accent/5 to-primary/10"
                     onClick={() => handleQuickAction('restaurants')}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="relative p-6 flex flex-col items-center gap-3">
-                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <UtensilsCrossed className="h-7 w-7 text-accent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="relative p-8 flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
+                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-accent/30 via-accent/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                          <UtensilsCrossed className="h-8 w-8 text-accent drop-shadow-lg" />
+                        </div>
                       </div>
-                      <span className="text-base font-semibold text-foreground">Restaurants</span>
-                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary transition-all duration-300 group-hover:w-full" />
+                      <div className="space-y-1 text-center">
+                        <span className="text-lg font-bold text-foreground tracking-tight">Restaurants</span>
+                        <p className="text-xs text-muted-foreground">Fine dining</p>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
                     </div>
                   </Card>
                 </div>
@@ -384,6 +463,85 @@ const Index = () => {
                       location={destination.location}
                       description={destination.description}
                     />
+                  ))}
+                </div>
+              </div>
+
+              {/* Featured Restaurants */}
+              <div className="space-y-6 pt-12">
+                <div className="text-center space-y-2">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent">
+                    Fine Dining Experiences
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Savor exceptional cuisine at world-renowned restaurants
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {featuredRestaurants.map((restaurant, idx) => (
+                    <Card
+                      key={idx}
+                      className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/20"
+                      onClick={() => handleQuickAction('restaurants')}
+                    >
+                      <div className="relative h-64 overflow-hidden">
+                        <img
+                          src={restaurant.image}
+                          alt={restaurant.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                        <Badge className="absolute top-4 right-4 bg-accent/90 backdrop-blur-sm border-accent/50 gap-1">
+                          <Star className="h-3 w-3 fill-current" />
+                          {restaurant.rating}
+                        </Badge>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                        <h3 className="text-2xl font-bold mb-1">{restaurant.title}</h3>
+                        <p className="text-sm text-accent mb-2">{restaurant.cuisine}</p>
+                        <p className="text-sm text-white/80 line-clamp-2">{restaurant.description}</p>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Featured Flights */}
+              <div className="space-y-6 pt-12">
+                <div className="text-center space-y-2">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                    Premium Flight Services
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Fly in comfort and style to destinations worldwide
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {featuredFlights.map((flight, idx) => (
+                    <Card
+                      key={idx}
+                      className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/20"
+                      onClick={() => handleDatePickerRequest("flight", "Show me flights from my location")}
+                    >
+                      <div className="relative h-64 overflow-hidden">
+                        <img
+                          src={flight.image}
+                          alt={flight.title}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                        <div className="absolute top-4 right-4">
+                          <Plane className="h-6 w-6 text-white drop-shadow-lg" />
+                        </div>
+                      </div>
+                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                        <h3 className="text-2xl font-bold mb-1">{flight.title}</h3>
+                        <p className="text-sm text-primary mb-2">{flight.route}</p>
+                        <p className="text-sm text-white/80 line-clamp-2">{flight.description}</p>
+                      </div>
+                    </Card>
                   ))}
                 </div>
               </div>
