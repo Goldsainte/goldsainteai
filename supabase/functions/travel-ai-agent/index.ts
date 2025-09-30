@@ -172,6 +172,27 @@ serve(async (req) => {
             required: ["origin", "destination", "departureDate"]
           }
         }
+      },
+      {
+        type: "function",
+        function: {
+          name: "check_visa_requirements",
+          description: "Check visa requirements for travel between two countries. Use this when users ask about visa requirements, travel documents needed, or whether they need a visa to visit a country. Provide country names or ISO codes.",
+          parameters: {
+            type: "object",
+            properties: {
+              fromCountry: {
+                type: "string",
+                description: "Origin country name or ISO code (e.g., 'United States', 'USA', 'US')"
+              },
+              toCountry: {
+                type: "string",
+                description: "Destination country name or ISO code (e.g., 'France', 'FRA', 'FR')"
+              }
+            },
+            required: ["fromCountry", "toCountry"]
+          }
+        }
       }
     ];
 
@@ -282,6 +303,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
           toolResult = await searchRestaurants(functionArgs);
         } else if (functionName === 'search_flights') {
           toolResult = await searchFlights(functionArgs);
+        } else if (functionName === 'check_visa_requirements') {
+          toolResult = await checkVisaRequirements(functionArgs);
         }
         
         toolResults.push({
@@ -865,5 +888,66 @@ async function searchFlights(args: any) {
   } catch (error) {
     console.error('Error in searchFlights:', error);
     return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+async function checkVisaRequirements(args: any) {
+  try {
+    const { fromCountry, toCountry } = args;
+    console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
+
+    const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
+    
+    if (!RAPIDAPI_KEY) {
+      return { 
+        error: 'Visa check service not configured',
+        requirement: 'unknown'
+      };
+    }
+
+    const response = await fetch(
+      `https://visa-requirements.p.rapidapi.com/visa-requirements`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RapidAPI-Key': RAPIDAPI_KEY,
+          'X-RapidAPI-Host': 'visa-requirements.p.rapidapi.com'
+        },
+        body: JSON.stringify({
+          from: fromCountry,
+          to: toCountry
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Visa API error:', response.status, errorText);
+      return { 
+        error: `Visa check failed: ${response.statusText}`,
+        requirement: 'unknown'
+      };
+    }
+
+    const data = await response.json();
+    console.log('Visa requirement result:', data);
+
+    return {
+      type: 'visa',
+      fromCountry,
+      toCountry,
+      requirement: data.requirement || data.status || 'unknown',
+      details: data.details || data.message || '',
+      duration: data.duration || data.max_stay || '',
+      notes: data.notes || data.additional_info || ''
+    };
+
+  } catch (error) {
+    console.error('Error in checkVisaRequirements:', error);
+    return { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      requirement: 'unknown'
+    };
   }
 }
