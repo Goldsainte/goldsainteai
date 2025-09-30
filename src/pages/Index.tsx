@@ -53,6 +53,7 @@ const Index = () => {
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [showDatePicker, setShowDatePicker] = useState<{ type: "hotel" | "flight"; context: string } | null>(null);
+  const [pendingFlightDates, setPendingFlightDates] = useState<{ departureDate: string; returnDate?: string } | null>(null);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -116,6 +117,17 @@ const Index = () => {
     const queryToSend = query || searchQuery;
     if (!queryToSend.trim()) return;
     
+    // If we have pending flight dates, include them in the query
+    let finalQuery = queryToSend;
+    if (pendingFlightDates) {
+      if (pendingFlightDates.returnDate) {
+        finalQuery = `Find flights to ${queryToSend} departing ${pendingFlightDates.departureDate} returning ${pendingFlightDates.returnDate}`;
+      } else {
+        finalQuery = `Find one-way flights to ${queryToSend} on ${pendingFlightDates.departureDate}`;
+      }
+      setPendingFlightDates(null);
+    }
+    
     setIsLoading(true);
     setSearchResults([]);
     setMessages(prev => [...prev, { role: 'user', content: queryToSend }]);
@@ -124,7 +136,7 @@ const Index = () => {
     try {
       const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
         body: { 
-          message: queryToSend,
+          message: finalQuery,
           conversationHistory,
           userLocation: userLocation ? {
             latitude: userLocation.lat,
@@ -171,17 +183,23 @@ const Index = () => {
     const { type, context } = showDatePicker;
     setShowDatePicker(null);
 
-    let query = context;
     if (type === "hotel" && dates.checkIn && dates.checkOut) {
-      query += ` from ${dates.checkIn} to ${dates.checkOut}`;
+      const query = `${context} from ${dates.checkIn} to ${dates.checkOut}`;
+      handleSearch(query);
     } else if (type === "flight" && dates.departureDate) {
-      query += ` on ${dates.departureDate}`;
-      if (dates.returnDate) {
-        query += ` returning ${dates.returnDate}`;
-      }
+      // Store flight dates and prompt for destination
+      setPendingFlightDates({
+        departureDate: dates.departureDate,
+        returnDate: dates.returnDate
+      });
+      
+      const promptMessage = dates.returnDate 
+        ? `Great! You're looking for a round-trip flight departing on ${dates.departureDate} and returning on ${dates.returnDate}. Where would you like to fly to?`
+        : `Great! You're looking for a one-way flight on ${dates.departureDate}. Where would you like to fly to?`;
+      
+      setMessages([{ role: 'assistant', content: promptMessage }]);
+      setConversationHistory([{ role: 'assistant', content: promptMessage }]);
     }
-
-    handleSearch(query);
   };
 
   const handleQuickAction = async (action: string) => {
@@ -213,6 +231,7 @@ const Index = () => {
     setMessages([]);
     setSearchResults([]);
     setConversationHistory([]);
+    setPendingFlightDates(null);
   };
 
   const showChat = messages.length > 0;
