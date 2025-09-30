@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plane, Hotel, MapPin, Compass, Search, Send, Loader2, Sparkles, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,8 +7,14 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
-import { RestaurantCard } from "@/components/RestaurantCard";
+import { InspirationCard } from "@/components/InspirationCard";
 import logomark from "@/assets/logomark-gold.png";
+import property1 from "@/assets/property1.jpg";
+import property2 from "@/assets/property2.jpg";
+import property3 from "@/assets/property3.jpg";
+import property4 from "@/assets/property4.jpg";
+import property5 from "@/assets/property5.jpg";
+import property6 from "@/assets/property6.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -27,17 +33,6 @@ interface SearchResult {
   filters?: any;
 }
 
-interface Restaurant {
-  id: string;
-  name: string;
-  rating: number;
-  userRatingsTotal: number;
-  priceLevel?: number;
-  vicinity: string;
-  photo: string | null;
-  types: string[];
-}
-
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -46,43 +41,45 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [loadingRestaurants, setLoadingRestaurants] = useState(true);
 
-  useEffect(() => {
-    fetchNearbyRestaurants();
-  }, []);
-
-  const fetchNearbyRestaurants = async () => {
-    try {
-      // Default to New York City coordinates if location not available
-      const defaultLat = 40.7128;
-      const defaultLng = -74.0060;
-      
-      const { data, error } = await supabase.functions.invoke('fetch-restaurants', {
-        body: { 
-          latitude: defaultLat, 
-          longitude: defaultLng,
-          radius: 5000 
-        }
-      });
-
-      if (error) throw error;
-
-      if (data.success && data.restaurants) {
-        setRestaurants(data.restaurants);
-      }
-    } catch (err: any) {
-      console.error('Error fetching restaurants:', err);
-      toast({
-        title: "Info",
-        description: "Unable to load nearby restaurants",
-        variant: "default",
-      });
-    } finally {
-      setLoadingRestaurants(false);
+  const inspirationDestinations = [
+    {
+      image: property1,
+      title: "Santorini Paradise",
+      location: "Greece",
+      description: "Experience breathtaking sunsets and pristine white architecture overlooking the Aegean Sea."
+    },
+    {
+      image: property2,
+      title: "Alpine Luxury",
+      location: "Swiss Alps",
+      description: "Discover world-class skiing and cozy mountain retreats in the heart of the Alps."
+    },
+    {
+      image: property3,
+      title: "Tropical Escape",
+      location: "Maldives",
+      description: "Unwind in overwater bungalows surrounded by crystal-clear turquoise waters."
+    },
+    {
+      image: property4,
+      title: "Urban Elegance",
+      location: "Paris, France",
+      description: "Immerse yourself in art, culture, and world-renowned cuisine in the City of Light."
+    },
+    {
+      image: property5,
+      title: "Desert Oasis",
+      location: "Dubai, UAE",
+      description: "Experience luxury redefined with stunning architecture and endless entertainment."
+    },
+    {
+      image: property6,
+      title: "Coastal Charm",
+      location: "Amalfi Coast, Italy",
+      description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
     }
-  };
+  ];
 
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
@@ -102,14 +99,10 @@ const Index = () => {
 
       if (error) throw error;
 
-      console.log('AI Agent response:', data);
       setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
       
       if (data.toolResults && data.toolResults.length > 0) {
-        console.log('Tool results received:', data.toolResults);
-        const filteredResults = data.toolResults.filter((r: any) => r.results && r.results.length > 0);
-        console.log('Filtered results:', filteredResults);
-        setSearchResults(filteredResults);
+        setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
       }
 
       if (data.conversationHistory) {
@@ -264,41 +257,28 @@ const Index = () => {
                 </div>
               </div>
 
-              {/* Nearby Restaurants Section */}
+              {/* Get Inspired Section */}
               <div className="space-y-6 pt-12">
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                    Nearby Restaurants
+                    Get Inspired
                   </h2>
                   <p className="text-muted-foreground">
-                    Discover great dining experiences around you
+                    Discover your next dream destination
                   </p>
                 </div>
                 
-                {loadingRestaurants ? (
-                  <div className="flex justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : restaurants.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {restaurants.map((restaurant) => (
-                      <RestaurantCard
-                        key={restaurant.id}
-                        name={restaurant.name}
-                        rating={restaurant.rating}
-                        userRatingsTotal={restaurant.userRatingsTotal}
-                        priceLevel={restaurant.priceLevel}
-                        vicinity={restaurant.vicinity}
-                        photo={restaurant.photo}
-                        types={restaurant.types}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 text-muted-foreground">
-                    No restaurants found nearby
-                  </div>
-                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {inspirationDestinations.map((destination, idx) => (
+                    <InspirationCard
+                      key={idx}
+                      image={destination.image}
+                      title={destination.title}
+                      location={destination.location}
+                      description={destination.description}
+                    />
+                  ))}
+                </div>
               </div>
 
               {/* Footer */}
@@ -365,63 +345,57 @@ const Index = () => {
                 ))}
 
                 {/* Search Results */}
-                {searchResults.map((result, idx) => {
-                  console.log(`Rendering result ${idx}:`, result);
-                  return (
-                    <div key={`result-${idx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                      {result.type === 'hotels' && result.results.length > 0 && (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <h3 className="text-xl font-semibold text-foreground">
-                              {result.filters?.sortBy === 'popularity' && '🔥 Most Popular Hotels'}
-                              {result.filters?.sortBy === 'review_score' && '⭐ Top Rated Hotels'}
-                              {result.filters?.sortBy === 'price' && '💰 Budget-Friendly Hotels'}
-                              {!result.filters?.sortBy && 'Available Hotels'}
-                            </h3>
-                            {result.filters && (
-                              <div className="flex gap-2">
-                                {result.filters.minRating && (
-                                  <Badge variant="secondary">⭐ {result.filters.minRating}+</Badge>
-                                )}
-                                {result.filters.maxPrice && (
-                                  <Badge variant="secondary">≤ ${result.filters.maxPrice}</Badge>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {result.results.map((hotel: any, hotelIdx: number) => {
-                              console.log(`Rendering hotel ${hotelIdx}:`, hotel);
-                              return (
-                                <SimplePropertyCard
-                                  key={hotel.hotel_id || hotelIdx}
-                                  property={hotel}
-                                  type="hotels"
-                                />
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-
-                      {result.type === 'destinations' && result.results.length > 0 && (
-                        <div className="space-y-4">
+                {searchResults.map((result, idx) => (
+                  <div key={`result-${idx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                    {result.type === 'hotels' && result.results.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
                           <h3 className="text-xl font-semibold text-foreground">
-                            🌍 Destinations
+                            {result.filters?.sortBy === 'popularity' && '🔥 Most Popular Hotels'}
+                            {result.filters?.sortBy === 'review_score' && '⭐ Top Rated Hotels'}
+                            {result.filters?.sortBy === 'price' && '💰 Budget-Friendly Hotels'}
+                            {!result.filters?.sortBy && 'Available Hotels'}
                           </h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {result.results.slice(0, 6).map((dest: any, destIdx: number) => (
-                              <Card key={dest.dest_id || destIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary">
-                                <h4 className="font-semibold text-foreground mb-1">{dest.label}</h4>
-                                <p className="text-sm text-muted-foreground">{dest.region || dest.dest_type}</p>
-                              </Card>
-                            ))}
-                          </div>
+                          {result.filters && (
+                            <div className="flex gap-2">
+                              {result.filters.minRating && (
+                                <Badge variant="secondary">⭐ {result.filters.minRating}+</Badge>
+                              )}
+                              {result.filters.maxPrice && (
+                                <Badge variant="secondary">≤ ${result.filters.maxPrice}</Badge>
+                              )}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {result.results.map((hotel: any, hotelIdx: number) => (
+                            <SimplePropertyCard
+                              key={hotel.hotel_id || hotelIdx}
+                              property={hotel}
+                              type="hotels"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {result.type === 'destinations' && result.results.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          🌍 Destinations
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {result.results.slice(0, 6).map((dest: any, destIdx: number) => (
+                            <Card key={dest.dest_id || destIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary">
+                              <h4 className="font-semibold text-foreground mb-1">{dest.label}</h4>
+                              <p className="text-sm text-muted-foreground">{dest.region || dest.dest_type}</p>
+                            </Card>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
 
                 {/* Loading indicator */}
                 {isLoading && (

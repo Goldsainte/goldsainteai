@@ -184,34 +184,16 @@ Always show results first with minimal text, ask questions later. Be conversatio
       }
 
       // Send results back to AI for final response
-      console.log('Tool results to send to AI:', JSON.stringify(toolResults.map(tr => ({
-        function: tr.function_name,
-        resultType: tr.result?.type,
-        resultCount: tr.result?.results?.length || 0,
-        hasError: !!tr.result?.error
-      }))));
-
       const finalMessages = [
         ...messages,
         assistantMessage,
-        ...toolResults.map(tr => {
-          const result = tr.result || { error: 'No result', results: [] };
-          const summary = result.results?.length > 0 
-            ? `Found ${result.results.length} ${result.type || 'items'} ${(result as any).location?.name ? `in ${(result as any).location.name}` : ''}`
-            : result.error || 'No results found';
-          
-          return {
-            role: "tool" as const,
-            tool_call_id: tr.tool_call_id,
-            content: JSON.stringify({
-              ...result,
-              summary
-            })
-          };
-        })
+        ...toolResults.map(tr => ({
+          role: "tool",
+          tool_call_id: tr.tool_call_id,
+          content: JSON.stringify(tr.result)
+        }))
       ];
 
-      console.log('Sending final messages to AI...');
       const finalResponse = await fetch(LOVABLE_AI_URL, {
         method: 'POST',
         headers: {
@@ -224,21 +206,12 @@ Always show results first with minimal text, ask questions later. Be conversatio
         }),
       });
 
-      if (!finalResponse.ok) {
-        const errorText = await finalResponse.text();
-        console.error('Final AI response error:', finalResponse.status, errorText);
-        throw new Error(`Final AI response error: ${finalResponse.status}`);
-      }
-
       const finalData = await finalResponse.json();
       const finalMessage = finalData.choices[0].message.content;
 
-      console.log('Final AI message:', finalMessage);
-      console.log('Returning tool results count:', toolResults.length);
-
       return new Response(JSON.stringify({
         message: finalMessage,
-        toolResults: toolResults.map(tr => tr.result).filter(Boolean),
+        toolResults: toolResults.map(tr => tr.result),
         conversationHistory: [...conversationHistory, 
           { role: 'user', content: message },
           { role: 'assistant', content: finalMessage }
@@ -277,9 +250,8 @@ async function searchHotels(args: any, apiKey: string) {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    // Search for destination using Booking.com API
-    console.log('Searching for destination using Booking.com:', location);
-    
+    // Search for location first
+    console.log('Searching for location:', location);
     const locationResponse = await fetch(
       `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
       {
@@ -291,22 +263,24 @@ async function searchHotels(args: any, apiKey: string) {
       }
     );
 
+    console.log('Location API response status:', locationResponse.status);
+    
     if (!locationResponse.ok) {
-      console.error('Booking.com location search failed:', locationResponse.status);
-      return { error: 'Failed to find location', results: [] };
+      const errorText = await locationResponse.text();
+      console.error('Location API error:', errorText);
+      return { error: `Failed to find location: ${locationResponse.status}`, results: [] };
     }
 
     const locationData = await locationResponse.json();
-    console.log('Booking.com location response:', JSON.stringify(locationData).slice(0, 500));
+    console.log('Location API response:', JSON.stringify(locationData).slice(0, 500));
     
     if (!locationData.data || locationData.data.length === 0) {
-      console.log('No destination found for:', location);
+      console.log('No location data found');
       return { error: 'Location not found', results: [] };
     }
 
-    const destination = locationData.data[0];
-    const destId = destination.dest_id;
-    console.log('Found destination:', destination.name, 'ID:', destId);
+    const destId = locationData.data[0].dest_id;
+    console.log('Found destination ID:', destId);
 
     // Get default dates if not provided
     const today = new Date();
@@ -353,23 +327,12 @@ async function searchHotels(args: any, apiKey: string) {
     const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
     console.log('Hotels API URL:', hotelsUrl);
     
-    const hotelsController = new AbortController();
-    const hotelsTimeout = setTimeout(() => {
-      console.log('Hotels search timeout triggered');
-      hotelsController.abort();
-    }, 12000); // 12s timeout
-    
-    console.log('About to call hotels API...');
     const hotelsResponse = await fetch(hotelsUrl, {
       method: 'GET',
       headers: {
         'x-rapidapi-key': apiKey,
         'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-      },
-      signal: hotelsController.signal
-    }).finally(() => {
-      console.log('Hotels API call completed');
-      clearTimeout(hotelsTimeout);
+      }
     });
 
     console.log('Hotels API response status:', hotelsResponse.status);
@@ -403,8 +366,8 @@ async function searchHotels(args: any, apiKey: string) {
     
     return {
       type: 'hotels',
-      location: { name: destination.name, dest_id: destId },
-      results: hotels.slice(0, 20),
+      location: locationData.data[0],
+      results: hotels.slice(0, 6),
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
       guests,
@@ -414,15 +377,6 @@ async function searchHotels(args: any, apiKey: string) {
     console.error('Error in searchHotels:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Error details:', errorMessage);
-    
-    // Check if it's a timeout
-    if (error instanceof Error && error.name === 'AbortError') {
-      return { 
-        error: 'Search timed out. The booking API is responding slowly. Please try again.', 
-        results: [] 
-      };
-    }
-    
     return { error: errorMessage, results: [] };
   }
 }
@@ -430,7 +384,6 @@ async function searchHotels(args: any, apiKey: string) {
 async function searchDestinations(args: any, apiKey: string) {
   try {
     const { query } = args;
-    console.log('Searching destinations with Booking.com:', query);
 
     const response = await fetch(
       `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(query)}`,
@@ -444,25 +397,14 @@ async function searchDestinations(args: any, apiKey: string) {
     );
 
     if (!response.ok) {
-      console.error('Booking.com destination search failed:', response.status);
       return { error: 'Failed to search destinations', results: [] };
     }
 
     const data = await response.json();
-    console.log('Booking.com found destinations:', data.data?.length || 0);
-    
-    const results = (data.data || []).map((dest: any) => ({
-      name: dest.name,
-      dest_type: dest.dest_type,
-      label: dest.label,
-      dest_id: dest.dest_id,
-      latitude: dest.latitude,
-      longitude: dest.longitude
-    }));
     
     return {
       type: 'destinations',
-      results
+      results: data.data || []
     };
   } catch (error) {
     console.error('Error searching destinations:', error);
