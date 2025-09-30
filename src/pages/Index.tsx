@@ -196,45 +196,64 @@ const Index = () => {
               </Card>
 
               {/* Quick Actions */}
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground text-center">Quick actions</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <Button
-                    variant="outline"
-                    className="h-auto py-4 flex-col gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground text-center font-medium">Quick actions</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <Card
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-primary/5"
                     onClick={() => handleQuickAction('hotels')}
-                    disabled={isLoading}
                   >
-                    <Hotel className="h-6 w-6 text-primary" />
-                    <span className="text-sm font-medium">Hotels</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto py-4 flex-col gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative p-6 flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Hotel className="h-7 w-7 text-primary" />
+                      </div>
+                      <span className="text-base font-semibold text-foreground">Hotels</span>
+                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full" />
+                    </div>
+                  </Card>
+
+                  <Card
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
                     onClick={() => handleQuickAction('flights')}
-                    disabled={isLoading}
                   >
-                    <Plane className="h-6 w-6 text-primary" />
-                    <span className="text-sm font-medium">Flights</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto py-4 flex-col gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative p-6 flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Plane className="h-7 w-7 text-accent" />
+                      </div>
+                      <span className="text-base font-semibold text-foreground">Flights</span>
+                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary transition-all duration-300 group-hover:w-full" />
+                    </div>
+                  </Card>
+
+                  <Card
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-primary/5"
                     onClick={() => handleQuickAction('destinations')}
-                    disabled={isLoading}
                   >
-                    <MapPin className="h-6 w-6 text-primary" />
-                    <span className="text-sm font-medium">Destinations</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-auto py-4 flex-col gap-2 border-2 hover:border-primary hover:bg-primary/5 transition-all"
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative p-6 flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <MapPin className="h-7 w-7 text-primary" />
+                      </div>
+                      <span className="text-base font-semibold text-foreground">Destinations</span>
+                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary to-accent transition-all duration-300 group-hover:w-full" />
+                    </div>
+                  </Card>
+
+                  <Card
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border-0 bg-gradient-to-br from-background via-background to-accent/5"
                     onClick={() => handleQuickAction('explore')}
-                    disabled={isLoading}
                   >
-                    <Compass className="h-6 w-6 text-primary" />
-                    <span className="text-sm font-medium">Explore</span>
-                  </Button>
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative p-6 flex flex-col items-center gap-3">
+                      <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Compass className="h-7 w-7 text-accent" />
+                      </div>
+                      <span className="text-base font-semibold text-foreground">Explore</span>
+                      <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-accent to-primary transition-all duration-300 group-hover:w-full" />
+                    </div>
+                  </Card>
                 </div>
               </div>
 
