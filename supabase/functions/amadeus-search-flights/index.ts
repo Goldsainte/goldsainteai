@@ -38,14 +38,15 @@ serve(async (req) => {
   }
 
   try {
-    const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, travelClass = 'ECONOMY', nonStop = 'false', currencyCode = 'USD', max = 10 } = await req.json();
+    const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, travelClass = 'ECONOMY', nonStop = 'false', currencyCode = 'USD', max = 20, includedAirlineCodes } = await req.json();
     
     console.log('Flight search request:', { 
       originLocationCode, 
       destinationLocationCode, 
       departureDate, 
       returnDate,
-      adults 
+      adults,
+      includedAirlineCodes 
     });
 
     const token = await getAmadeusToken();
@@ -65,6 +66,11 @@ serve(async (req) => {
     // Add return date if provided (round trip)
     if (returnDate) {
       params.append('returnDate', returnDate);
+    }
+
+    // Add airline filters if provided (e.g., "AA,DL" for American and Delta)
+    if (includedAirlineCodes) {
+      params.append('includedAirlineCodes', includedAirlineCodes);
     }
 
     const response = await fetch(
