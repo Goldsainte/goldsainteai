@@ -473,7 +473,7 @@ async function searchHotels(args: any, apiKey: string) {
     return {
       type: 'hotels',
       location: { name: location, dest_id: cityCode },
-      results: transformedHotels.slice(0, 6),
+      results: transformedHotels,
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
       guests,

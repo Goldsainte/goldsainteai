@@ -109,14 +109,13 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
 
   return (
     <>
-      <div className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-300">
-        <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row">
+        <div className="relative w-full md:w-80 h-64 md:h-auto flex-shrink-0 overflow-hidden">
           <img
             src={image}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           <Button
             variant="ghost"
             size="icon"
@@ -126,61 +125,64 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
           </Button>
         </div>
 
-        <div className="p-4 space-y-3">
-          <div className="space-y-2">
-            <h3 className="font-semibold text-lg line-clamp-2 leading-tight group-hover:text-primary transition-colors">
-              {title}
-            </h3>
-            <p className="text-sm text-muted-foreground flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              {location}
-            </p>
+        <div className="flex-1 p-5 flex flex-col justify-between">
+          <div className="space-y-3">
+            <div className="space-y-2">
+              <h3 className="font-semibold text-xl leading-tight group-hover:text-primary transition-colors">
+                {title}
+              </h3>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <MapPin className="h-4 w-4" />
+                {location}
+              </p>
+            </div>
+
+            {rating > 0 && (
+              <div className="flex items-center gap-3 flex-wrap">
+                <Badge variant="secondary" className="gap-1 font-bold text-base px-3 py-1">
+                  {rating.toFixed(1)}
+                </Badge>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold text-foreground">
+                    {getRatingText(rating)}
+                  </span>
+                  {reviews > 0 && (
+                    <span className="text-xs text-muted-foreground">
+                      {reviews.toLocaleString()} reviews
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {rating > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="gap-1 font-semibold">
-                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                {rating.toFixed(1)}
-              </Badge>
-              <span className="text-sm font-medium text-foreground">
-                {getRatingText(rating)}
-              </span>
-              {reviews > 0 && (
-                <span className="text-xs text-muted-foreground">
-                  ({reviews.toLocaleString()} reviews)
-                </span>
-              )}
-            </div>
-          )}
-
           {displayPrice > 0 && (
-            <div className="pt-2 border-t border-border">
-              <div className="flex items-end justify-between gap-2">
-                <div className="space-y-1 flex-1">
+            <div className="pt-4 mt-4 border-t border-border">
+              <div className="flex items-end justify-between gap-4">
+                <div className="space-y-1">
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-foreground">
+                    <span className="text-3xl font-bold text-foreground">
                       {getCurrencySymbol(currency)}{Math.round(displayPrice)}
                     </span>
+                    <span className="text-sm text-muted-foreground">nightly</span>
                   </div>
-                  <p className="text-xs text-muted-foreground">per night</p>
+                  <p className="text-xs text-muted-foreground">
+                    Total includes taxes and fees
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   <Button 
-                    size="sm" 
-                    variant="outline" 
-                    className="text-xs h-8"
+                    size="default" 
+                    variant="outline"
                     onClick={() => setShowDetailsModal(true)}
                   >
-                    <Eye className="h-3 w-3 mr-1" />
-                    Details
+                    View Details
                   </Button>
                   <Button 
-                    size="sm" 
-                    className="text-xs h-8"
+                    size="default"
                     onClick={() => setShowDateModal(true)}
                   >
-                    Book
+                    Reserve
                   </Button>
                 </div>
               </div>

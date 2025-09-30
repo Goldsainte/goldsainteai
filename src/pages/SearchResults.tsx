@@ -82,12 +82,14 @@ const SearchResults = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <h2 className="text-2xl font-primary font-semibold text-foreground">
-              {searchType === "hotels" ? "Hotels" : "Destinations"} in {location}
-              {searchType === "hotels" && checkIn && ` • ${checkIn} to ${checkOut}`}
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-primary font-semibold text-foreground">
+                {results.length} {searchType === "hotels" ? "properties" : "destinations"} in {location}
+                {searchType === "hotels" && checkIn && ` • ${checkIn} to ${checkOut}`}
+              </h2>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="space-y-4">
               {results.map((result, index) => (
                 <SimplePropertyCard
                   key={result.hotel_id || result.dest_id || index}
