@@ -1,8 +1,5 @@
-import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
-import { SearchFilters } from "@/components/SearchFilters";
-import { PropertyCard } from "@/components/PropertyCard";
-import { Footer } from "@/components/Footer";
+import { SearchBar } from "@/components/SearchBar";
+import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
 import property3 from "@/assets/property3.jpg";
@@ -73,35 +70,42 @@ const properties = [
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <Hero />
-      
-      <main className="container mx-auto px-4 py-8 flex-1">
-        <div className="flex flex-col md:flex-row gap-8">
-          <SearchFilters />
-          
-          <div className="flex-1">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-2">
-                {properties.length} properties found
+    <main className="flex-1 overflow-auto">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-12">
+        {/* Hero Section */}
+        <div className="text-center space-y-4 py-12">
+          <h1 className="text-4xl md:text-5xl font-primary font-bold text-foreground">
+            Find your perfect stay
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Discover exceptional hotels, resorts, and accommodations worldwide
+          </p>
+        </div>
+
+        {/* Search Bar */}
+        <SearchBar />
+
+        {/* Properties Section */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold">
+                {properties.length} properties available
               </h2>
-              <p className="text-muted-foreground">
-                Compare prices from different travel sites to find the best deals
+              <p className="text-sm text-muted-foreground mt-1">
+                Handpicked stays for your perfect vacation
               </p>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {properties.map((property) => (
-                <PropertyCard key={property.id} {...property} />
-              ))}
-            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {properties.map((property) => (
+              <SimplePropertyCard key={property.id} {...property} />
+            ))}
           </div>
         </div>
-      </main>
-      
-      <Footer />
-    </div>
+      </div>
+    </main>
   );
 };
 
