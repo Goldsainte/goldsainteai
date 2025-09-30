@@ -462,7 +462,7 @@ const Index = () => {
               {/* Get Inspired Section */}
               <div className="space-y-6 pt-12">
                 <div className="text-center space-y-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
                   </h2>
                   <p className="text-muted-foreground">
@@ -486,7 +486,7 @@ const Index = () => {
               {/* Featured Restaurants */}
               <div className="space-y-6 pt-12">
                 <div className="text-center space-y-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
                     Fine Dining Experiences
                   </h2>
                   <p className="text-muted-foreground">
@@ -526,7 +526,7 @@ const Index = () => {
               {/* Featured Flights */}
               <div className="space-y-6 pt-12">
                 <div className="text-center space-y-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Premium Flight Services
                   </h2>
                   <p className="text-muted-foreground">
