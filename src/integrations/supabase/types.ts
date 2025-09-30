@@ -61,6 +61,38 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          created_at: string
+          favorite_data: Json
+          favorite_type: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          favorite_data: Json
+          favorite_type: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          favorite_data?: Json
+          favorite_type?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests: {
         Row: {
           country: string | null
@@ -140,6 +172,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {
