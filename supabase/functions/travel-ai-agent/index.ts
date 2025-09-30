@@ -176,6 +176,40 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "search_events",
+          description: "Search for upcoming events, concerts, sports, theater shows, and entertainment using Ticketmaster. Use this when users ask about events, concerts, shows, tickets, or things to do.",
+          parameters: {
+            type: "object",
+            properties: {
+              city: {
+                type: "string",
+                description: "The city name to search events in"
+              },
+              keyword: {
+                type: "string",
+                description: "Search keyword for event name, artist, or venue"
+              },
+              startDate: {
+                type: "string",
+                description: "Start date for event search in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)"
+              },
+              endDate: {
+                type: "string",
+                description: "End date for event search in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)"
+              },
+              classificationName: {
+                type: "string",
+                enum: ["Music", "Sports", "Arts & Theatre", "Film", "Miscellaneous"],
+                description: "Event category/classification"
+              }
+            },
+            required: []
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "check_visa_requirements",
           description: "Check visa requirements for travel between two countries. Use this when users ask about visa requirements, travel documents needed, or whether they need a visa to visit a country. Provide country names or ISO codes.",
           parameters: {
@@ -329,6 +363,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
           toolResult = await searchRestaurants(functionArgs);
         } else if (functionName === 'search_flights') {
           toolResult = await searchFlights(functionArgs);
+        } else if (functionName === 'search_events') {
+          toolResult = await searchEvents(functionArgs);
         } else if (functionName === 'check_visa_requirements') {
           toolResult = await checkVisaRequirements(functionArgs);
         }
@@ -1003,5 +1039,48 @@ Be specific and factual. Always recommend verifying exact fees and requirements 
       error: error instanceof Error ? error.message : 'Unknown error',
       requirement: 'unknown'
     };
+  }
+}
+
+async function searchEvents(args: any) {
+  try {
+    const { city, keyword, startDate, endDate, classificationName } = args;
+    console.log('searchEvents called with:', { city, keyword, startDate, endDate, classificationName });
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return { error: 'Supabase configuration missing', results: [] };
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/search-events`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ city, keyword, startDate, endDate, classificationName }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('search-events error:', response.status, errorText);
+      return { error: `Failed to fetch events: ${response.statusText}`, results: [] };
+    }
+
+    const data = await response.json();
+    console.log('Events found:', data.events?.length || 0);
+
+    return {
+      type: 'events',
+      results: data.events || [],
+      page: data.page,
+      city
+    };
+
+  } catch (error) {
+    console.error('Error in searchEvents:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
   }
 }

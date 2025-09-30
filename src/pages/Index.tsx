@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
+import { EventCard } from "@/components/EventCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
@@ -331,7 +332,8 @@ const Index = () => {
       restaurants: userLocation
         ? `Show me popular restaurants near my current location`
         : "Show me popular restaurants near me",
-      visa: "What are visa requirements for traveling abroad?"
+      visa: "What are visa requirements for traveling abroad?",
+      events: "Show me upcoming events and concerts near me"
     };
     const query = queries[action as keyof typeof queries];
     console.log('Quick action selected:', action, '->', query);
@@ -417,7 +419,7 @@ const Index = () => {
               {/* Quick Actions */}
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground text-center font-medium tracking-wide uppercase">Start Your Journey</p>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
                   <Card
                     className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
                     onClick={() => handleDatePickerRequest("hotel", "Show me hotels near me")}
@@ -528,6 +530,27 @@ const Index = () => {
                         <p className="text-xs text-muted-foreground">Requirements</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
+                    </div>
+                  </Card>
+
+                  <Card
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/10 bg-gradient-to-br from-background via-accent/5 to-primary/10"
+                    onClick={() => handleQuickAction('events')}
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
+                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="relative p-8 flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg bg-gradient-to-br from-accent/20 to-primary/20 flex items-center justify-center">
+                          <Ticket className="h-10 w-10 text-accent" />
+                        </div>
+                      </div>
+                      <div className="space-y-1 text-center">
+                        <span className="text-xl font-extrabold text-foreground tracking-tight font-chiffon">Events</span>
+                        <p className="text-xs text-muted-foreground">Concerts & Shows</p>
+                      </div>
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
                     </div>
                   </Card>
                 </div>
@@ -863,6 +886,22 @@ const Index = () => {
                               key={flight.id || flightIdx}
                               flight={flight}
                               dictionaries={result.dictionaries}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {result.type === 'events' && result.results.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          🎫 Upcoming Events
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {result.results.map((event: any, eventIdx: number) => (
+                            <EventCard
+                              key={event.id || eventIdx}
+                              event={event}
                             />
                           ))}
                         </div>
