@@ -144,14 +144,28 @@ export const BookingModal = ({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             
             {/* Room Details */}
-            {bookingType === 'hotel' && bookingData?.room && (
+            {bookingType === 'hotel' && (
               <div className="space-y-2">
                 <h3 className="font-semibold">Room Details</h3>
                 <div className="text-sm space-y-1">
-                  <p><strong>Room Type:</strong> {bookingData.room.description?.text || 'Standard Room'}</p>
-                  <p><strong>Beds:</strong> {bookingData.room.typeEstimated?.bedType || 'Not specified'}</p>
-                  {bookingData.room.description?.text && (
-                    <p><strong>Features:</strong> {bookingData.room.description.text}</p>
+                  {bookingData?.selectedRoom ? (
+                    <>
+                      <p><strong>Room Type:</strong> {bookingData.selectedRoom.name}</p>
+                      <p><strong>Beds:</strong> {bookingData.selectedRoom.bedType}</p>
+                      <p><strong>Max Guests:</strong> {bookingData.selectedRoom.maxGuests}</p>
+                      <p><strong>Size:</strong> {bookingData.selectedRoom.size}</p>
+                      <p><strong>Amenities:</strong> {bookingData.selectedRoom.amenities.join(', ')}</p>
+                    </>
+                  ) : bookingData?.room ? (
+                    <>
+                      <p><strong>Room Type:</strong> {bookingData.room.description?.text || 'Standard Room'}</p>
+                      <p><strong>Beds:</strong> {bookingData.room.typeEstimated?.bedType || 'Not specified'}</p>
+                      {bookingData.room.description?.text && (
+                        <p><strong>Features:</strong> {bookingData.room.description.text}</p>
+                      )}
+                    </>
+                  ) : (
+                    <p>Room details will be confirmed upon availability</p>
                   )}
                 </div>
                 <Separator />

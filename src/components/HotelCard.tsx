@@ -1,19 +1,22 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Hotel, Star, MapPin } from "lucide-react";
+import { Hotel, Star, MapPin, Eye } from "lucide-react";
 import { useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { DateSelectionModal } from "./DateSelectionModal";
+import { HotelDetailsModal } from "./HotelDetailsModal";
 
 interface HotelCardProps {
   hotel: any;
 }
 
 export const HotelCard = ({ hotel }: HotelCardProps) => {
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedHotelOffer, setSelectedHotelOffer] = useState<any>(null);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [bookingDates, setBookingDates] = useState<{ checkIn: string; checkOut: string; adults: number } | null>(null);
   
   const hotelData = hotel.hotel;
@@ -74,14 +77,35 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
             </div>
           )}
 
-          <Button 
-            onClick={() => setShowDateModal(true)}
-            className="w-full"
-          >
-            Check Availability
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={() => setShowDetailsModal(true)}
+              variant="outline"
+              className="flex-1"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              View Details
+            </Button>
+            <Button 
+              onClick={() => setShowDateModal(true)}
+              className="flex-1"
+            >
+              Check Availability
+            </Button>
+          </div>
         </div>
       </Card>
+
+      <HotelDetailsModal
+        open={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        hotel={hotel}
+        onSelectRoom={(room) => {
+          setSelectedRoom(room);
+          setShowDetailsModal(false);
+          setShowDateModal(true);
+        }}
+      />
 
       <DateSelectionModal
         open={showDateModal}
@@ -102,11 +126,12 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
           bookingType="hotel"
           bookingData={{
             ...selectedHotelOffer,
-            checkIn: bookingDates.checkIn,
-            checkOut: bookingDates.checkOut,
+            selectedRoom,
+            checkInDate: bookingDates.checkIn,
+            checkOutDate: bookingDates.checkOut,
             adults: bookingDates.adults
           }}
-          totalPrice={selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : price}
+          totalPrice={selectedRoom?.price || (selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : price)}
           currency={selectedHotelOffer.offers?.[0]?.price?.currency || currency}
         />
       )}

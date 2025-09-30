@@ -1,9 +1,10 @@
-import { Heart, Star, MapPin } from "lucide-react";
+import { Heart, Star, MapPin, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { DateSelectionModal } from "./DateSelectionModal";
+import { HotelDetailsModal } from "./HotelDetailsModal";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -11,9 +12,11 @@ interface SimplePropertyCardProps {
 }
 
 export const SimplePropertyCard = ({ property, type = "hotels" }: SimplePropertyCardProps) => {
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedHotelOffer, setSelectedHotelOffer] = useState<any>(null);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [bookingDates, setBookingDates] = useState<{ checkIn: string; checkOut: string; adults: number } | null>(null);
   
   // Parse Booking.com API data properly
@@ -167,9 +170,10 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
                     size="sm" 
                     variant="outline" 
                     className="text-xs h-8"
-                    onClick={handleViewClick}
+                    onClick={() => setShowDetailsModal(true)}
                   >
-                    View
+                    <Eye className="h-3 w-3 mr-1" />
+                    Details
                   </Button>
                   <Button 
                     size="sm" 
@@ -184,6 +188,17 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
           )}
         </div>
       </div>
+
+      <HotelDetailsModal
+        open={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        hotel={{ hotel: property, property }}
+        onSelectRoom={(room) => {
+          setSelectedRoom(room);
+          setShowDetailsModal(false);
+          setShowDateModal(true);
+        }}
+      />
 
       <DateSelectionModal
         open={showDateModal}
@@ -204,11 +219,12 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
           bookingType="hotel"
           bookingData={{
             ...selectedHotelOffer,
-            checkIn: bookingDates.checkIn,
-            checkOut: bookingDates.checkOut,
+            selectedRoom,
+            checkInDate: bookingDates.checkIn,
+            checkOutDate: bookingDates.checkOut,
             adults: bookingDates.adults
           }}
-          totalPrice={selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : displayPrice}
+          totalPrice={selectedRoom?.price || (selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : displayPrice)}
           currency={selectedHotelOffer.offers?.[0]?.price?.currency || currency}
         />
       )}
