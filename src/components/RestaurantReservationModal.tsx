@@ -66,12 +66,16 @@ export const RestaurantReservationModal = ({
 
       if (guestError) throw guestError;
 
+      // Generate booking reference
+      const bookingReference = `REST-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+
       // Create booking record
       const { error: bookingError } = await supabase
         .from('bookings')
         .insert({
           guest_id: guestData.id,
           booking_type: 'restaurant',
+          booking_reference: bookingReference,
           booking_data: {
             restaurant_id: restaurant.id,
             restaurant_name: restaurant.name,
@@ -86,9 +90,37 @@ export const RestaurantReservationModal = ({
 
       if (bookingError) throw bookingError;
 
+      // Send confirmation email
+      try {
+        await supabase.functions.invoke('send-confirmation-email', {
+          body: {
+            guestInfo: {
+              firstName,
+              lastName,
+              email,
+              phone
+            },
+            bookingType: 'restaurant',
+            bookingData: {
+              restaurantName: restaurant.name,
+              restaurantAddress: restaurant.address,
+              date: format(date, 'PPP'),
+              time: time,
+              guests: guests
+            },
+            bookingReference,
+            totalPrice: 0,
+            currency: 'USD'
+          }
+        });
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError);
+        // Don't fail the booking if email fails
+      }
+
       toast({
         title: "Reservation confirmed!",
-        description: `Your table for ${guests} at ${restaurant.name} on ${format(date, 'PPP')} at ${time} has been confirmed.`
+        description: `Your table for ${guests} at ${restaurant.name} on ${format(date, 'PPP')} at ${time} has been confirmed. Check your email for details.`
       });
 
       onClose();

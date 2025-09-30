@@ -8,8 +8,14 @@ const corsHeaders = {
 };
 
 interface ConfirmationEmailRequest {
-  guestEmail: string;
-  guestName: string;
+  guestEmail?: string;
+  guestName?: string;
+  guestInfo?: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
   bookingReference: string;
   bookingType: string;
   bookingData: any;
@@ -27,8 +33,9 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const {
-      guestEmail,
-      guestName,
+      guestEmail: legacyGuestEmail,
+      guestName: legacyGuestName,
+      guestInfo,
       bookingReference,
       bookingType,
       bookingData,
@@ -38,6 +45,10 @@ const handler = async (req: Request): Promise<Response> => {
       currency,
       specialRequests
     }: ConfirmationEmailRequest = await req.json();
+
+    // Support both old and new format
+    const guestEmail = guestInfo?.email || legacyGuestEmail;
+    const guestName = guestInfo ? `${guestInfo.firstName} ${guestInfo.lastName}` : legacyGuestName;
 
     console.log('Sending confirmation email to:', guestEmail);
 
@@ -60,6 +71,21 @@ const handler = async (req: Request): Promise<Response> => {
         <p><strong>Bed Type:</strong> ${bedType}</p>
         <p><strong>Check-in:</strong> ${checkInDate || 'TBD'}</p>
         <p><strong>Check-out:</strong> ${checkOutDate || 'TBD'}</p>
+      `;
+    } else if (bookingType === 'restaurant') {
+      const restaurantName = bookingData.restaurantName || 'Restaurant';
+      const restaurantAddress = bookingData.restaurantAddress || '';
+      const date = bookingData.date || 'TBD';
+      const time = bookingData.time || 'TBD';
+      const guests = bookingData.guests || 1;
+      
+      propertyDetails = `
+        <h2 style="color: #C9A55B; margin-top: 20px;">Restaurant Reservation</h2>
+        <p><strong>Restaurant:</strong> ${restaurantName}</p>
+        <p><strong>Location:</strong> ${restaurantAddress}</p>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Time:</strong> ${time}</p>
+        <p><strong>Party Size:</strong> ${guests} ${guests === 1 ? 'guest' : 'guests'}</p>
       `;
     }
 
@@ -274,23 +300,25 @@ const handler = async (req: Request): Promise<Response> => {
                   <p class="info-text">${specialRequests}</p>
                 ` : ''}
                 
-                <h2 class="section-title">Investment Summary</h2>
-                <div class="price-row">
-                  <span class="detail-label">Accommodation</span>
-                  <span class="detail-value">${currency} ${subtotal.toFixed(2)}</span>
-                </div>
-                <div class="price-row">
-                  <span class="detail-label">Tax & VAT</span>
-                  <span class="detail-value">${currency} ${tax.toFixed(2)}</span>
-                </div>
-                <div class="price-row">
-                  <span class="detail-label">Service Excellence Fee</span>
-                  <span class="detail-value">${currency} ${serviceFee.toFixed(2)}</span>
-                </div>
-                <div class="price-row total">
-                  <span>Total Investment</span>
-                  <span>${currency} ${totalPrice.toFixed(2)}</span>
-                </div>
+                ${totalPrice > 0 ? `
+                  <h2 class="section-title">Investment Summary</h2>
+                  <div class="price-row">
+                    <span class="detail-label">Accommodation</span>
+                    <span class="detail-value">${currency} ${subtotal.toFixed(2)}</span>
+                  </div>
+                  <div class="price-row">
+                    <span class="detail-label">Tax & VAT</span>
+                    <span class="detail-value">${currency} ${tax.toFixed(2)}</span>
+                  </div>
+                  <div class="price-row">
+                    <span class="detail-label">Service Excellence Fee</span>
+                    <span class="detail-value">${currency} ${serviceFee.toFixed(2)}</span>
+                  </div>
+                  <div class="price-row total">
+                    <span>Total Investment</span>
+                    <span>${currency} ${totalPrice.toFixed(2)}</span>
+                  </div>
+                ` : ''}
               </div>
               
               <div class="info-box">
