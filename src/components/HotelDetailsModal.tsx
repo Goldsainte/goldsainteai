@@ -46,13 +46,20 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const reviewCount = propertyData?.reviewCount || 0;
   const hotelId = propertyData?.id || hotelData.hotel_id || 0;
 
-  // Get actual hotel photos
-  const hotelPhotos = propertyData?.photoUrls || [];
-  
+  // Get actual hotel photos from multiple possible fields and dedupe
+  const hotelPhotos = useMemo(() => {
+    const urls: string[] = [
+      ...(propertyData?.photoUrls || []),
+      ...(hotelData?.media?.map((m: any) => m?.uri).filter(Boolean) || []),
+      ...((hotel?.images as string[]) || []),
+    ].filter(Boolean) as string[];
+    return Array.from(new Set(urls));
+  }, [propertyData, hotelData, hotel]);
+
   // Get room photos - distribute hotel photos across rooms
   const getRoomPhotos = (roomIndex: number) => {
     if (hotelPhotos.length === 0) return ["/placeholder.svg"];
-    const photosPerRoom = Math.floor(hotelPhotos.length / 3) || 1;
+    const photosPerRoom = Math.max(1, Math.floor(hotelPhotos.length / 3));
     const startIdx = roomIndex * photosPerRoom;
     return hotelPhotos.slice(startIdx, startIdx + 3);
   };
@@ -209,15 +216,10 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     }
   ];
 
-  // Customer photos
-  const customerPhotos = hotelPhotos.length > 0 ? hotelPhotos.slice(0, 9) : [
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg"
-  ];
+  // Photos tab: prefer dedicated guest photos if available; otherwise use property photos
+  const customerPhotos = (propertyData?.guestPhotoUrls && propertyData.guestPhotoUrls.length > 0)
+    ? propertyData.guestPhotoUrls
+    : hotelPhotos.slice(0, 12);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -243,7 +245,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="rooms">Room Options</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({allReviews.length})</TabsTrigger>
-            <TabsTrigger value="photos">Guest Photos</TabsTrigger>
+            <TabsTrigger value="photos">Photos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="rooms" className="space-y-4 mt-4">
@@ -277,7 +279,8 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <div className="w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
                     <img 
                       src={room.images[0]} 
-                      alt={room.name}
+                      alt={`${room.name} - room photo`}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -390,7 +393,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <div className="flex gap-2">
                       {review.photos.map((photo, idx) => (
                         <div key={idx} className="w-20 h-20 rounded overflow-hidden">
-                          <img src={photo} alt="Review photo" className="w-full h-full object-cover" />
+                          <img src={photo} alt={`Guest photo of ${hotelName}`} loading="lazy" className="w-full h-full object-cover" />
                         </div>
                       ))}
                     </div>
@@ -410,7 +413,8 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                 <div key={idx} className="aspect-square rounded-lg overflow-hidden">
                   <img 
                     src={photo} 
-                    alt={`Guest photo ${idx + 1}`}
+                    alt={`${hotelName} photo ${idx + 1}`}
+                    loading="lazy"
                     className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
                   />
                 </div>
