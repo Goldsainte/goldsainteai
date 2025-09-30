@@ -46,14 +46,28 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const reviewCount = propertyData?.reviewCount || 0;
   const hotelId = propertyData?.id || hotelData.hotel_id || 0;
 
-  // Get actual hotel photos from multiple possible fields and dedupe
+  // Get actual hotel photos from multiple possible fields and dedupe by base image id (prefer highest resolution)
   const hotelPhotos = useMemo(() => {
     const urls: string[] = [
       ...(propertyData?.photoUrls || []),
       ...(hotelData?.media?.map((m: any) => m?.uri).filter(Boolean) || []),
       ...((hotel?.images as string[]) || []),
     ].filter(Boolean) as string[];
-    return Array.from(new Set(urls));
+
+    // Group by image id in URL (e.g., .../square500/581512145.jpg -> id 581512145)
+    const byId = new Map<string, { url: string; size: number }>();
+    for (const u of urls) {
+      const idMatch = u.match(/\/(\d+)\.jpg/);
+      const id = idMatch?.[1] || u; // fallback to full URL if no id
+      const sizeMatch = u.match(/square(\d+)/);
+      const size = sizeMatch ? parseInt(sizeMatch[1], 10) : 0;
+      const existing = byId.get(id);
+      if (!existing || size > existing.size) {
+        byId.set(id, { url: u, size });
+      }
+    }
+
+    return Array.from(byId.values()).map(v => v.url);
   }, [propertyData, hotelData, hotel]);
 
   // Get room photos - distribute hotel photos across rooms
