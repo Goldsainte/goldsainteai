@@ -319,7 +319,7 @@ const Index = () => {
                   Goldsainte: Your AI Travel Concierge
                 </h1>
                 <p className="text-muted-foreground text-center max-w-2xl leading-relaxed">
-                  <span className="font-semibold text-foreground font-chiffon">AI-powered efficiency. Human-powered access.</span>
+                  <span className="font-semibold text-foreground">AI-powered efficiency. Human-powered access.</span>
                   <br />
                   Our cutting-edge AI handles quick requests with speed and precision— while our licensed travel experts' step in to unlock contract-only rates, navigate complex ticketing, and deliver exclusive perks you won't find on public sites.
                 </p>
@@ -383,7 +383,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Hotels</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight">Hotels</span>
                         <p className="text-xs text-muted-foreground">Luxury stays</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -408,7 +408,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Flights</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight">Flights</span>
                         <p className="text-xs text-muted-foreground">Premium travel</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
@@ -429,7 +429,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Destinations</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight">Destinations</span>
                         <p className="text-xs text-muted-foreground">Dream places</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent transition-all duration-500 group-hover:w-full" />
@@ -450,7 +450,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
-                        <span className="text-lg font-bold text-foreground tracking-tight font-chiffon">Restaurants</span>
+                        <span className="text-lg font-bold text-foreground tracking-tight">Restaurants</span>
                         <p className="text-xs text-muted-foreground">Fine dining</p>
                       </div>
                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-transparent via-accent to-transparent transition-all duration-500 group-hover:w-full" />
