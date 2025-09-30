@@ -13,7 +13,7 @@ import { FlightCard } from "@/components/FlightCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
-import logomark from "@/assets/primary-vertical-logo-gold-2.png";
+import logomark from "@/assets/logomark-seal-gold.png";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
 import property3 from "@/assets/property3.jpg";
@@ -317,7 +317,7 @@ const Index = () => {
               <div className="flex flex-col items-center space-y-4 mb-8">
                 <div className="relative">
                   <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                  <img src={logomark} alt="Goldsainte" className="h-32 w-auto relative z-10" />
+                  <img src={logomark} alt="Goldsainte" className="h-24 w-24 relative z-10" />
                 </div>
                 <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                   Your AI Travel Concierge
