@@ -41,6 +41,29 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Get user's current location on mount
+  const getUserLocation = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast({
+            title: "Location access denied",
+            description: "Using default location. Please enable location access for better results.",
+            variant: "destructive",
+          });
+        }
+      );
+    }
+  };
 
   const inspirationDestinations = [
     {
@@ -120,12 +143,24 @@ const Index = () => {
     }
   };
 
-  const handleQuickAction = (action: string) => {
+  const handleQuickAction = async (action: string) => {
+    // For location-based searches, get location first
+    if (['hotels', 'flights', 'restaurants'].includes(action) && !userLocation) {
+      getUserLocation();
+      
+      // Wait a bit for location to be fetched
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    const locationInfo = userLocation 
+      ? `near my current location (${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)})`
+      : "near me";
+
     const queries = {
-      hotels: "Show me popular hotels",
-      flights: "I need to find flights",
+      hotels: `Show me popular hotels ${locationInfo}`,
+      flights: `I need to find flights from ${locationInfo}`,
       destinations: "What are some popular travel destinations?",
-      restaurants: "Show me popular restaurants near me"
+      restaurants: `Show me popular restaurants ${locationInfo}`
     };
     handleSearch(queries[action as keyof typeof queries]);
   };
