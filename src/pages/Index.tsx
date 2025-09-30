@@ -407,8 +407,8 @@ const Index = () => {
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
                         <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
-                        <div className="relative h-16 w-16 rounded-2xl bg-gradient-to-br from-accent/30 via-accent/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
-                          <Plane className="h-8 w-8 text-accent drop-shadow-lg" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg">
+                          <img src={luxuryFlights} alt="Luxury Flights" className="w-full h-full object-cover" />
                         </div>
                       </div>
                       <div className="space-y-1 text-center">
