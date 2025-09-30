@@ -2,8 +2,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check } from "lucide-react";
-import { useState } from "react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown } from "lucide-react";
+import { useState, useMemo } from "react";
 
 interface RoomOption {
   id: string;
@@ -34,6 +35,7 @@ interface HotelDetailsModalProps {
 
 export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelDetailsModalProps) => {
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [reviewSort, setReviewSort] = useState<"newest" | "oldest" | "highest" | "lowest">("newest");
   
   const hotelData = hotel.hotel || hotel;
   const propertyData = hotelData.property || hotel.property;
@@ -42,22 +44,138 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const hotelRating = propertyData?.reviewScore || hotelData.rating || 8.5;
   const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || "Location";
   const reviewCount = propertyData?.reviewCount || 0;
+  const hotelId = propertyData?.id || hotelData.hotel_id || 0;
 
-  // Get actual hotel photos - they are nested at property.photoUrls
+  // Get actual hotel photos
   const hotelPhotos = propertyData?.photoUrls || [];
   
-  console.log('Hotel photos loaded:', hotelPhotos.length);
-  
-  // Extract room photos - use hotel photos for different room types
+  // Get room photos - distribute hotel photos across rooms
   const getRoomPhotos = (roomIndex: number) => {
     if (hotelPhotos.length === 0) return ["/placeholder.svg"];
-    // Distribute photos across rooms
     const photosPerRoom = Math.floor(hotelPhotos.length / 3) || 1;
     const startIdx = roomIndex * photosPerRoom;
     return hotelPhotos.slice(startIdx, startIdx + 3);
   };
 
-  // Sample room options with real photos
+  // Generate unique reviews based on hotel ID
+  const generateReviews = (hotelId: number, avgRating: number): Review[] => {
+    const comments = {
+      excellent: [
+        "Absolutely stunning property! The attention to detail was impeccable. Staff went above and beyond to make our stay memorable. The room was spotless and beautifully appointed.",
+        "Outstanding hotel in every way. From the moment we arrived, we felt like VIPs. The spa facilities were world-class and the restaurant exceeded our expectations.",
+        "Exceptional service throughout our stay. The concierge helped us plan perfect day trips. Room was luxurious with breathtaking views. Can't wait to return!",
+        "Five-star experience from check-in to check-out. The breakfast buffet was incredible with endless fresh options. Pool area was immaculate. Highly recommend!",
+        "Perfect in every way! The staff remembered our names and preferences. Room was upgraded as a lovely surprise. Best hotel experience we've ever had.",
+        "Incredible attention to every detail. The turn-down service with chocolates was a lovely touch. Bathroom amenities were top-notch. Would stay again in a heartbeat!",
+        "Exceeded all expectations! The rooftop bar had stunning views. Staff was knowledgeable about local attractions. Room was spotlessly clean and beautifully decorated."
+      ],
+      good: [
+        "Great location with easy access to main attractions. Rooms were clean and comfortable. Staff was friendly and helpful throughout our stay.",
+        "Really enjoyed our time here. The hotel offered good value for money. Breakfast had plenty of options. Would definitely stay again.",
+        "Solid choice for the price. Room was spacious and well-maintained. The gym facilities were better than expected. Staff was accommodating.",
+        "Pleasant stay overall. The rooftop bar had amazing views. Room service was prompt. Minor issue with AC was quickly resolved.",
+        "Good hotel with professional service. Location was convenient for business meetings. The business center had everything we needed.",
+        "Comfortable and clean. Staff was polite and helpful. The pool was nice. Some minor wear and tear but overall a good experience.",
+        "Nice hotel in a great location. Breakfast was decent with good variety. Room was comfortable. Wi-Fi worked well. Good value overall."
+      ],
+      average: [
+        "Decent hotel for the price. Room was clean but could use some updating. Staff was polite. Location worked well for our needs.",
+        "Okay experience. The hotel is showing its age in some areas. Breakfast was basic but adequate. Would consider other options next time.",
+        "Mixed feelings about this stay. Some aspects were great (location, cleanliness) while others need improvement (wifi speed, noise insulation).",
+        "Fair value. Room met our basic needs. The pool area could be better maintained. Staff tried their best despite being understaffed.",
+        "Average hotel with standard amenities. Nothing particularly stood out, but nothing was terrible either. Served its purpose for a short stay.",
+        "Met expectations for the price point. Room was small but functional. Location was the main selling point. Service could be more attentive.",
+        "Basic accommodation that does the job. Some noise from neighboring rooms. Breakfast options were limited. Check-in process was slow."
+      ]
+    };
+
+    const getRatingCategory = (rating: number) => {
+      if (rating >= 8.5) return "excellent";
+      if (rating >= 7) return "good";
+      return "average";
+    };
+
+    const category = getRatingCategory(avgRating);
+    const reviewList = comments[category];
+    
+    // Generate 20-30 reviews per hotel
+    const numReviews = 20 + (hotelId % 11);
+    const reviews: Review[] = [];
+    
+    const names = ["Sarah M.", "James T.", "Emma L.", "Michael R.", "Lisa K.", "David P.", "Anna S.", "Chris B.", "Maria G.", "John D.", 
+                   "Sophie W.", "Robert H.", "Elena C.", "Thomas M.", "Julia F.", "Daniel S.", "Isabel R.", "Mark L.", "Nina P.", "Alex K.",
+                   "Rachel B.", "Peter S.", "Laura W.", "Steven K.", "Hannah M.", "Brian C.", "Olivia T.", "Matthew D.", "Grace H.", "Andrew P."];
+    
+    for (let i = 0; i < numReviews; i++) {
+      const seed = hotelId * 1000 + i;
+      const variation = ((seed % 10) - 5) / 10;
+      const reviewRating = Math.max(6, Math.min(10, avgRating + variation));
+      
+      const daysAgo = Math.floor((seed % 90) + 1);
+      const dateText = daysAgo === 1 ? "1 day ago" : 
+                      daysAgo < 7 ? `${daysAgo} days ago` :
+                      daysAgo < 30 ? `${Math.floor(daysAgo / 7)} weeks ago` :
+                      `${Math.floor(daysAgo / 30)} months ago`;
+      
+      const commentIndex = (seed + i) % reviewList.length;
+      const nameIndex = (seed + i * 7) % names.length;
+      
+      // Some reviews have photos
+      const hasPhotos = (seed + i) % 3 === 0 && hotelPhotos.length > 0;
+      const photoCount = hasPhotos ? 1 + ((seed + i) % 3) : 0;
+      const photoStartIdx = (seed + i * 3) % Math.max(1, hotelPhotos.length);
+      
+      reviews.push({
+        id: `${hotelId}-${i}`,
+        author: names[nameIndex],
+        rating: Math.round(reviewRating * 10) / 10,
+        date: dateText,
+        comment: reviewList[commentIndex],
+        photos: hasPhotos ? hotelPhotos.slice(photoStartIdx, photoStartIdx + photoCount) : undefined
+      });
+    }
+    
+    return reviews;
+  };
+
+  const allReviews = useMemo(() => generateReviews(hotelId, hotelRating), [hotelId, hotelRating]);
+
+  // Sort reviews based on selected filter
+  const sortedReviews = useMemo(() => {
+    const reviews = [...allReviews];
+    const getDays = (str: string) => {
+      const match = str.match(/(\d+)/);
+      if (!match) return 0;
+      const num = parseInt(match[1]);
+      if (str.includes("day")) return num;
+      if (str.includes("week")) return num * 7;
+      if (str.includes("month")) return num * 30;
+      return num;
+    };
+
+    switch (reviewSort) {
+      case "newest":
+        return reviews.sort((a, b) => getDays(a.date) - getDays(b.date));
+      case "oldest":
+        return reviews.sort((a, b) => getDays(b.date) - getDays(a.date));
+      case "highest":
+        return reviews.sort((a, b) => b.rating - a.rating);
+      case "lowest":
+        return reviews.sort((a, b) => a.rating - b.rating);
+      default:
+        return reviews;
+    }
+  }, [allReviews, reviewSort]);
+
+  const getRatingText = (score: number) => {
+    if (score >= 9) return "Exceptional";
+    if (score >= 8.5) return "Excellent";
+    if (score >= 8) return "Very Good";
+    if (score >= 7) return "Good";
+    return "Pleasant";
+  };
+
+  // Room options
   const roomOptions: RoomOption[] = [
     {
       id: "deluxe-king",
@@ -91,42 +209,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     }
   ];
 
-  // Generate sample reviews based on actual rating
-  const getRatingText = (score: number) => {
-    if (score >= 9) return "Exceptional";
-    if (score >= 8.5) return "Excellent";
-    if (score >= 8) return "Very Good";
-    if (score >= 7) return "Good";
-    return "Pleasant";
-  };
-
-  const reviews: Review[] = [
-    {
-      id: "1",
-      author: "Sarah M.",
-      rating: Math.min(10, hotelRating + 0.5),
-      date: "3 days ago",
-      comment: "Absolutely stunning property! The attention to detail was impeccable. Staff went above and beyond to make our stay memorable. The room was spotless and beautifully appointed.",
-      photos: hotelPhotos.slice(0, 2)
-    },
-    {
-      id: "2",
-      author: "James T.",
-      rating: hotelRating,
-      date: "1 week ago",
-      comment: "Great location, luxurious rooms, and exceptional service. The breakfast was outstanding with plenty of options. Would definitely stay here again!",
-      photos: hotelPhotos.slice(2, 3)
-    },
-    {
-      id: "3",
-      author: "Emma L.",
-      rating: Math.max(6, hotelRating - 0.5),
-      date: "2 weeks ago",
-      comment: "Beautiful hotel with elegant decor. The spa facilities were amazing. Only minor issue was the wifi speed, but everything else was perfect.",
-    }
-  ];
-
-  // Use actual hotel photos for customer photos section
+  // Customer photos
   const customerPhotos = hotelPhotos.length > 0 ? hotelPhotos.slice(0, 9) : [
     "/placeholder.svg",
     "/placeholder.svg",
@@ -146,7 +229,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-primary text-primary" />
                 <span className="font-semibold">{hotelRating.toFixed(1)}</span>
-                <span className="text-muted-foreground">({reviewCount > 0 ? reviewCount.toLocaleString() : reviews.length} reviews)</span>
+                <span className="text-muted-foreground">({reviewCount > 0 ? reviewCount.toLocaleString() : allReviews.length} reviews)</span>
               </div>
               <div className="flex items-center gap-1 text-muted-foreground">
                 <MapPin className="h-4 w-4" />
@@ -159,7 +242,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
         <Tabs defaultValue="rooms" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="rooms">Room Options</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews ({allReviews.length})</TabsTrigger>
             <TabsTrigger value="photos">Guest Photos</TabsTrigger>
           </TabsList>
 
@@ -260,42 +343,65 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
           </TabsContent>
 
           <TabsContent value="reviews" className="space-y-4 mt-4">
-            <div className="flex items-center gap-4 pb-4 border-b">
-              <div className="text-4xl font-bold text-primary">{hotelRating.toFixed(1)}</div>
-              <div>
-                <div className="font-semibold text-lg">{getRatingText(hotelRating)}</div>
-                <div className="text-sm text-muted-foreground">
-                  Based on {reviewCount > 0 ? reviewCount.toLocaleString() : reviews.length} verified reviews
+            <div className="flex items-center justify-between pb-4 border-b">
+              <div className="flex items-center gap-4">
+                <div className="text-4xl font-bold text-primary">{hotelRating.toFixed(1)}</div>
+                <div>
+                  <div className="font-semibold text-lg">{getRatingText(hotelRating)}</div>
+                  <div className="text-sm text-muted-foreground">
+                    Based on {reviewCount > 0 ? reviewCount.toLocaleString() : allReviews.length} verified reviews
+                  </div>
                 </div>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                <Select value={reviewSort} onValueChange={(value: any) => setReviewSort(value)}>
+                  <SelectTrigger className="w-[160px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest First</SelectItem>
+                    <SelectItem value="oldest">Oldest First</SelectItem>
+                    <SelectItem value="highest">Highest Rated</SelectItem>
+                    <SelectItem value="lowest">Lowest Rated</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
-            {reviews.map((review) => (
-              <div key={review.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <div className="font-semibold">{review.author}</div>
-                    <div className="text-xs text-muted-foreground">{review.date}</div>
+            <div className="space-y-3 max-h-[500px] overflow-y-auto">
+              {sortedReviews.map((review) => (
+                <div key={review.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="font-semibold">{review.author}</div>
+                      <div className="text-xs text-muted-foreground">{review.date}</div>
+                    </div>
+                    <Badge className="gap-1">
+                      <Star className="h-3 w-3 fill-current" />
+                      {review.rating}
+                    </Badge>
                   </div>
-                  <Badge className="gap-1">
-                    <Star className="h-3 w-3 fill-current" />
-                    {review.rating}
-                  </Badge>
+                  
+                  <p className="text-sm leading-relaxed">{review.comment}</p>
+                  
+                  {review.photos && review.photos.length > 0 && (
+                    <div className="flex gap-2">
+                      {review.photos.map((photo, idx) => (
+                        <div key={idx} className="w-20 h-20 rounded overflow-hidden">
+                          <img src={photo} alt="Review photo" className="w-full h-full object-cover" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                
-                <p className="text-sm leading-relaxed">{review.comment}</p>
-                
-                {review.photos && review.photos.length > 0 && (
-                  <div className="flex gap-2">
-                    {review.photos.map((photo, idx) => (
-                      <div key={idx} className="w-20 h-20 rounded overflow-hidden">
-                        <img src={photo} alt="Review photo" className="w-full h-full object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            <div className="text-center text-sm text-muted-foreground pt-4 border-t">
+              Showing {sortedReviews.length} reviews • Sorted by {reviewSort}
+            </div>
           </TabsContent>
 
           <TabsContent value="photos" className="mt-4">
