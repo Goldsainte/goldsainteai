@@ -3,8 +3,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown, Clock, CreditCard, Calendar, Shield, Baby, Accessibility, Wind, Coffee, Tv, Bath, Phone, Ruler, Info } from "lucide-react";
 import { useState, useMemo } from "react";
+import { HotelMap } from "./HotelMap";
 
 interface RoomOption {
   id: string;
@@ -255,31 +258,165 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
           </div>
         </DialogHeader>
 
-        <Tabs defaultValue="rooms" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="rooms">Room Options</TabsTrigger>
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="rooms">Rooms</TabsTrigger>
+            <TabsTrigger value="amenities">Amenities</TabsTrigger>
+            <TabsTrigger value="location">Location</TabsTrigger>
             <TabsTrigger value="reviews">Reviews ({allReviews.length})</TabsTrigger>
             <TabsTrigger value="photos">Photos</TabsTrigger>
           </TabsList>
 
+          <TabsContent value="overview" className="space-y-6 mt-4">
+            {/* Hotel Description */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">About This Hotel</h3>
+              <p className="text-muted-foreground leading-relaxed">
+                Experience luxury and comfort at {hotelName}. Our property offers world-class amenities, 
+                exceptional service, and perfectly appointed rooms designed for the modern traveler. 
+                Whether you're visiting for business or leisure, you'll find everything you need for a 
+                memorable stay. Located in the heart of {hotelAddress}, our hotel provides easy access 
+                to the city's top attractions, dining, and entertainment venues.
+              </p>
+            </div>
+
+            <Separator />
+
+            {/* Quick Facts */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Quick Facts</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <Clock className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <div className="font-medium">Check-in / Check-out</div>
+                    <div className="text-sm text-muted-foreground">3:00 PM / 11:00 AM</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Bed className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <div className="font-medium">Room Types</div>
+                    <div className="text-sm text-muted-foreground">{roomOptions.length} options available</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CreditCard className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <div className="font-medium">Payment Options</div>
+                    <div className="text-sm text-muted-foreground">Visa, Mastercard, Amex accepted</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Shield className="h-5 w-5 text-primary mt-0.5" />
+                  <div>
+                    <div className="font-medium">Cancellation</div>
+                    <div className="text-sm text-muted-foreground">Free cancellation up to 24h before</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Popular Amenities */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Popular Amenities</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <Wifi className="h-4 w-4 text-primary" />
+                  <span>Free WiFi</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Utensils className="h-4 w-4 text-primary" />
+                  <span>Restaurant</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Dumbbell className="h-4 w-4 text-primary" />
+                  <span>Fitness Center</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <ParkingCircle className="h-4 w-4 text-primary" />
+                  <span>Free Parking</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Coffee className="h-4 w-4 text-primary" />
+                  <span>Breakfast Available</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Wind className="h-4 w-4 text-primary" />
+                  <span>Air Conditioning</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Bath className="h-4 w-4 text-primary" />
+                  <span>Spa Services</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4 text-primary" />
+                  <span>24/7 Front Desk</span>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Policies */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Hotel Policies</h3>
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="checkin">
+                  <AccordionTrigger>Check-in & Check-out</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Check-in:</strong> 3:00 PM onwards</div>
+                      <div><strong>Check-out:</strong> 11:00 AM</div>
+                      <div><strong>Early Check-in:</strong> Subject to availability, may incur additional charges</div>
+                      <div><strong>Late Check-out:</strong> Available upon request, additional fees may apply</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="cancellation">
+                  <AccordionTrigger>Cancellation Policy</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 text-sm">
+                      <div>Free cancellation up to 24 hours before check-in</div>
+                      <div>Cancellations within 24 hours will be charged one night's stay</div>
+                      <div>No-shows will be charged the full amount of the reservation</div>
+                      <div>Non-refundable rates are not eligible for cancellation</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="payment">
+                  <AccordionTrigger>Payment & Deposits</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Accepted:</strong> Visa, Mastercard, American Express, Discover</div>
+                      <div><strong>Deposit:</strong> Credit card hold of $100 per night required at check-in</div>
+                      <div><strong>Incidentals:</strong> Additional charges for room service, minibar, etc.</div>
+                      <div><strong>Currency:</strong> USD accepted, other currencies subject to conversion fees</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="pets">
+                  <AccordionTrigger>Pets & Children</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="space-y-2 text-sm">
+                      <div><strong>Pets:</strong> Small pets allowed with $50/night fee (max 2 pets, 25 lbs each)</div>
+                      <div><strong>Children:</strong> Children of all ages welcome</div>
+                      <div><strong>Cribs:</strong> Available upon request, complimentary</div>
+                      <div><strong>Extra Beds:</strong> $30 per night for guests over 12 years old</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+          </TabsContent>
+
           <TabsContent value="rooms" className="space-y-4 mt-4">
-            <div className="flex gap-3 pb-4 border-b">
-              <div className="flex items-center gap-2 text-sm">
-                <Wifi className="h-4 w-4 text-primary" />
-                <span>Free WiFi</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Utensils className="h-4 w-4 text-primary" />
-                <span>Restaurant</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Dumbbell className="h-4 w-4 text-primary" />
-                <span>Fitness Center</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <ParkingCircle className="h-4 w-4 text-primary" />
-                <span>Free Parking</span>
-              </div>
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold mb-2">Choose Your Room</h3>
+              <p className="text-sm text-muted-foreground">All rooms include complimentary WiFi, daily housekeeping, and access to hotel amenities</p>
             </div>
 
             {roomOptions.map((room) => (
@@ -299,11 +436,11 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     />
                   </div>
                   
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 space-y-3">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-lg">{room.name}</h3>
-                        <div className="flex gap-4 text-sm text-muted-foreground mt-1">
+                        <div className="flex flex-wrap gap-3 text-sm text-muted-foreground mt-1">
                           <div className="flex items-center gap-1">
                             <Bed className="h-4 w-4" />
                             {room.bedType}
@@ -312,7 +449,10 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                             <Users className="h-4 w-4" />
                             Up to {room.maxGuests} guests
                           </div>
-                          <span>{room.size}</span>
+                          <div className="flex items-center gap-1">
+                            <Ruler className="h-4 w-4" />
+                            {room.size}
+                          </div>
                         </div>
                       </div>
                       <div className="text-right">
@@ -323,13 +463,29 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-2">
-                      {room.amenities.map((amenity, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          <Check className="h-3 w-3 mr-1" />
-                          {amenity}
-                        </Badge>
-                      ))}
+                    <div>
+                      <div className="text-xs font-medium text-muted-foreground mb-1">Room Amenities:</div>
+                      <div className="flex flex-wrap gap-2">
+                        {room.amenities.map((amenity, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            <Check className="h-3 w-3 mr-1" />
+                            {amenity}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 border-t">
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        <div className="flex items-center gap-1">
+                          <Check className="h-3 w-3 text-primary" />
+                          <span>Free cancellation up to 24 hours before check-in</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Check className="h-3 w-3 text-primary" />
+                          <span>No prepayment needed - pay at the property</span>
+                        </div>
+                      </div>
                     </div>
 
                     <div className="flex gap-2 pt-2">
@@ -357,6 +513,425 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                 </Button>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="amenities" className="space-y-6 mt-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-4">All Amenities</h3>
+              
+              <div className="space-y-6">
+                {/* Room Features */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Bed className="h-5 w-5 text-primary" />
+                    Room Features
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Air Conditioning</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Flat-screen TV</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Mini Refrigerator</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Safe Deposit Box</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Coffee/Tea Maker</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Iron & Ironing Board</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Work Desk</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Blackout Curtains</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Bathroom */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Bath className="h-5 w-5 text-primary" />
+                    Bathroom
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Private Bathroom</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Bathtub or Shower</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Hairdryer</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Free Toiletries</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Bathrobes & Slippers</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Hot Water</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Services & Facilities */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Phone className="h-5 w-5 text-primary" />
+                    Services & Facilities
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>24-hour Front Desk</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Concierge Service</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Room Service</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Laundry Service</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Luggage Storage</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Express Check-in/out</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Currency Exchange</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Tour Desk</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Dining & Entertainment */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Utensils className="h-5 w-5 text-primary" />
+                    Dining & Entertainment
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>On-site Restaurant</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Bar/Lounge</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Breakfast Available</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Room Service</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Coffee Shop</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Vending Machines</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Recreation */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Dumbbell className="h-5 w-5 text-primary" />
+                    Recreation
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Fitness Center</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Swimming Pool</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Spa & Wellness Center</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Sauna</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Hot Tub</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Massage Services</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Connectivity */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Wifi className="h-5 w-5 text-primary" />
+                    Connectivity
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Free WiFi (all areas)</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Business Center</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Meeting Rooms</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Fax/Photocopying</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Parking & Transportation */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <ParkingCircle className="h-5 w-5 text-primary" />
+                    Parking & Transportation
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Free On-site Parking</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Valet Parking</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Electric Vehicle Charging</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Airport Shuttle (surcharge)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Accessibility */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Accessibility className="h-5 w-5 text-primary" />
+                    Accessibility
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Wheelchair Accessible</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Elevator</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Accessible Parking</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Lowered Sinks</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Family Friendly */}
+                <div>
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <Baby className="h-5 w-5 text-primary" />
+                    Family Friendly
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 pl-7">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Cribs Available</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Children's Menu</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Babysitting Service</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Check className="h-4 w-4 text-primary" />
+                      <span>Family Rooms</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="location" className="space-y-6 mt-4">
+            {/* Map */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Location & Map</h3>
+              <HotelMap
+                latitude={propertyData?.latitude}
+                longitude={propertyData?.longitude}
+                hotelName={hotelName}
+                landmarks={[
+                  { name: "City Center", lat: (propertyData?.latitude || 0) + 0.01, lng: (propertyData?.longitude || 0) + 0.01, distance: "0.5 mi" },
+                  { name: "Main Station", lat: (propertyData?.latitude || 0) - 0.015, lng: (propertyData?.longitude || 0) + 0.02, distance: "0.8 mi" },
+                  { name: "Museum District", lat: (propertyData?.latitude || 0) + 0.02, lng: (propertyData?.longitude || 0) - 0.01, distance: "1.2 mi" },
+                ]}
+              />
+              <p className="text-sm text-muted-foreground mt-2">{hotelAddress}</p>
+            </div>
+
+            <Separator />
+
+            {/* Nearby Attractions */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Nearby Landmarks & Attractions</h3>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg border">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">City Center</div>
+                    <div className="text-sm text-muted-foreground">0.5 miles • 10 min walk</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg border">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">Main Train Station</div>
+                    <div className="text-sm text-muted-foreground">0.8 miles • 5 min drive</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg border">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">Museum District</div>
+                    <div className="text-sm text-muted-foreground">1.2 miles • 15 min walk</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg border">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">Shopping District</div>
+                    <div className="text-sm text-muted-foreground">1.5 miles • 10 min drive</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 rounded-lg border">
+                  <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="font-medium">International Airport</div>
+                    <div className="text-sm text-muted-foreground">12 miles • 25 min drive</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Neighborhood Info */}
+            <div>
+              <h3 className="text-lg font-semibold mb-3">About the Neighborhood</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                Located in the vibrant heart of the city, this hotel offers unparalleled access to the area's 
+                best attractions, restaurants, and entertainment venues. The neighborhood is known for its 
+                charming streets, rich cultural heritage, and diverse dining scene. Within walking distance, 
+                you'll find trendy cafes, boutique shops, and world-class museums.
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Public transportation is readily available, with the nearest metro station just a 5-minute walk away. 
+                The area is safe and well-lit, making it perfect for evening strolls. Local markets, parks, and 
+                historic landmarks are all easily accessible, ensuring you'll never run out of things to explore.
+              </p>
+            </div>
+
+            <Separator />
+
+            {/* Getting Around */}
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Getting Around</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg border">
+                  <div className="font-medium mb-2">Public Transportation</div>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <div>Metro Station - 0.3 mi</div>
+                    <div>Bus Stop - 0.1 mi</div>
+                    <div>Tram Station - 0.4 mi</div>
+                  </div>
+                </div>
+                <div className="p-4 rounded-lg border">
+                  <div className="font-medium mb-2">Transportation Services</div>
+                  <div className="text-sm text-muted-foreground space-y-1">
+                    <div>Airport Shuttle Available</div>
+                    <div>Taxi Stand Nearby</div>
+                    <div>Bike Rental - 0.2 mi</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="reviews" className="space-y-4 mt-4">
