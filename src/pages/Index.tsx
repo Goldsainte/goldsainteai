@@ -26,6 +26,8 @@ import restaurant3 from "@/assets/restaurant3.jpg";
 import flight1 from "@/assets/flight1.jpg";
 import flight2 from "@/assets/flight2.jpg";
 import flight3 from "@/assets/flight3.jpg";
+import destination7 from "@/assets/destination7.jpg";
+import destination8 from "@/assets/destination8.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -117,6 +119,18 @@ const Index = () => {
       title: "Coastal Charm",
       location: "Amalfi Coast, Italy",
       description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
+    },
+    {
+      image: destination7,
+      title: "Northern Lights",
+      location: "Iceland",
+      description: "Witness the magical aurora borealis in a winter wonderland of natural beauty."
+    },
+    {
+      image: destination8,
+      title: "Bali Serenity",
+      location: "Bali, Indonesia",
+      description: "Find peace in lush rice terraces and traditional temples with world-class hospitality."
     }
   ];
 
@@ -454,7 +468,7 @@ const Index = () => {
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   {inspirationDestinations.map((destination, idx) => (
                     <InspirationCard
                       key={idx}

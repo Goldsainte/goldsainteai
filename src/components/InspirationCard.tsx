@@ -10,7 +10,7 @@ interface InspirationCardProps {
 
 export const InspirationCard = ({ image, title, location, description }: InspirationCardProps) => {
   return (
-    <Card className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl border-0 h-[400px]">
+    <Card className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl border-0 h-64">
       {/* Image with overlay */}
       <div className="absolute inset-0">
         <img 
