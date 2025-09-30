@@ -11,16 +11,46 @@ serve(async (req) => {
   }
 
   try {
-    const { hotelName, latitude, longitude } = await req.json();
+    const body = await req.json();
+    const { hotelName, latitude, longitude, query } = body;
     
-    console.log('Fetching Google Places data for:', hotelName);
+    console.log('Fetching Google Places data for:', query || hotelName);
 
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
       throw new Error('GOOGLE_PLACES_API_KEY not configured');
     }
 
-    // Step 1: Find the place using Text Search
+    // Handle general location search (for cities, destinations)
+    if (query) {
+      const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&key=${apiKey}`;
+      
+      const searchResponse = await fetch(searchUrl);
+      const searchData = await searchResponse.json();
+
+      if (!searchData.results || searchData.results.length === 0) {
+        console.log('No place found for query:', query);
+        return new Response(JSON.stringify({ 
+          success: false,
+          message: 'Location not found',
+          results: []
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+
+      // Return results for location search
+      return new Response(JSON.stringify({ 
+        success: true,
+        results: searchData.results
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
+    // Handle hotel details search (existing functionality)
     const searchQuery = `${hotelName} hotel`;
     const searchUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&location=${latitude},${longitude}&radius=500&type=lodging&key=${apiKey}`;
     
