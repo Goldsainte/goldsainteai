@@ -1,4 +1,4 @@
-import { Heart, Star } from "lucide-react";
+import { Heart, Star, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -8,16 +8,52 @@ interface SimplePropertyCardProps {
 }
 
 export const SimplePropertyCard = ({ property, type = "hotels" }: SimplePropertyCardProps) => {
-  // Handle both custom property format and Booking.com API format
-  const image = property.image || property.property?.photoUrls?.[0] || "/placeholder.svg";
-  const title = property.title || property.property?.name || property.label || "Property";
-  const location = property.location || property.region || property.accessibilityLabel || "";
-  const rating = property.rating || property.property?.reviewScore || 0;
-  const reviews = property.reviews || property.property?.reviewCount || 0;
-  const priceValue = property.price || property.priceBreakdown?.grossPrice?.value || 0;
+  // Parse Booking.com API data properly
+  const image = property.property?.photoUrls?.[0] || property.image || "/placeholder.svg";
+  const title = property.property?.name || property.title || property.label || "Hotel";
+  
+  // Extract clean location from accessibilityLabel
+  const getCleanLocation = () => {
+    if (property.location) return property.location;
+    if (property.region) return property.region;
+    
+    // Parse accessibilityLabel to get just the district and distance
+    const label = property.accessibilityLabel || "";
+    const districtMatch = label.match(/(\d+(?:st|nd|rd|th) arr\.)/);
+    const distanceMatch = label.match(/(\d+\.?\d* km from downtown)/);
+    
+    if (districtMatch && distanceMatch) {
+      return `${districtMatch[1]} • ${distanceMatch[1]}`;
+    }
+    if (districtMatch) return districtMatch[1];
+    
+    return label.split('.')[0] || "Location";
+  };
+  
+  const location = getCleanLocation();
+  const rating = property.property?.reviewScore || property.rating || 0;
+  const reviews = property.property?.reviewCount || property.reviews || 0;
+  
+  // Extract clean price
+  const getCleanPrice = () => {
+    if (property.price) return property.price;
+    if (property.priceBreakdown?.grossPrice?.value) {
+      return property.priceBreakdown.grossPrice.value;
+    }
+    
+    // Try to parse from accessibilityLabel
+    const label = property.accessibilityLabel || "";
+    const priceMatch = label.match(/Current price (\d+) USD/);
+    if (priceMatch) return parseInt(priceMatch[1]);
+    
+    const singlePriceMatch = label.match(/(\d+) USD/);
+    if (singlePriceMatch) return parseInt(singlePriceMatch[1]);
+    
+    return 0;
+  };
+  
+  const displayPrice = getCleanPrice();
   const currency = property.priceBreakdown?.grossPrice?.currency || "USD";
-  const displayPrice = property.originalPrice || priceValue;
-  const originalPrice = property.originalPrice;
 
   // Get rating descriptor
   const getRatingText = (score: number) => {
@@ -63,14 +99,15 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
             {title}
           </h3>
           <p className="text-sm text-muted-foreground flex items-center gap-1">
-            📍 {location}
+            <MapPin className="h-3 w-3" />
+            {location}
           </p>
         </div>
 
         {rating > 0 && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Badge variant="secondary" className="gap-1 font-semibold">
-              <Star className="h-3 w-3 fill-current text-yellow-500" />
+              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
               {rating.toFixed(1)}
             </Badge>
             <span className="text-sm font-medium text-foreground">
@@ -78,7 +115,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
             </span>
             {reviews > 0 && (
               <span className="text-xs text-muted-foreground">
-                • {reviews.toLocaleString()} guest reviews
+                ({reviews.toLocaleString()} reviews)
               </span>
             )}
           </div>
@@ -92,16 +129,11 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
                   <span className="text-2xl font-bold text-foreground">
                     {getCurrencySymbol(currency)}{Math.round(displayPrice)}
                   </span>
-                  {originalPrice && originalPrice !== displayPrice && (
-                    <span className="text-sm text-muted-foreground line-through">
-                      {getCurrencySymbol(currency)}{Math.round(originalPrice)}
-                    </span>
-                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">per night</p>
               </div>
-              <Button size="sm" className="text-xs">
-                View Details
+              <Button size="sm" className="text-xs h-8">
+                View
               </Button>
             </div>
           </div>
