@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export interface Favorite {
   id: string;
@@ -14,6 +15,7 @@ export interface Favorite {
 export const useFavorites = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -49,9 +51,9 @@ export const useFavorites = () => {
     if (!user) {
       toast({
         title: "Sign in required",
-        description: "Please sign in to save favorites.",
-        variant: "destructive",
+        description: "Redirecting to sign in page...",
       });
+      setTimeout(() => navigate('/auth'), 1000);
       return false;
     }
 
