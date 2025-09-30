@@ -111,13 +111,6 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     "/placeholder.svg"
   ];
 
-  const hotelAmenities = [
-    { icon: Wifi, label: "Free WiFi" },
-    { icon: Utensils, label: "Restaurant" },
-    { icon: Dumbbell, label: "Fitness Center" },
-    { icon: ParkingCircle, label: "Free Parking" }
-  ];
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
@@ -147,12 +140,22 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
           <TabsContent value="rooms" className="space-y-4 mt-4">
             <div className="flex gap-3 pb-4 border-b">
-              {hotelAmenities.map((amenity, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-sm">
-                  <amenity.icon className="h-4 w-4 text-primary" />
-                  <span>{amenity.label}</span>
-                </div>
-              ))}
+              <div className="flex items-center gap-2 text-sm">
+                <Wifi className="h-4 w-4 text-primary" />
+                <span>Free WiFi</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Utensils className="h-4 w-4 text-primary" />
+                <span>Restaurant</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Dumbbell className="h-4 w-4 text-primary" />
+                <span>Fitness Center</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <ParkingCircle className="h-4 w-4 text-primary" />
+                <span>Free Parking</span>
+              </div>
             </div>
 
             {roomOptions.map((room) => (
