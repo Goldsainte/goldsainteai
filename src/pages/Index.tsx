@@ -319,8 +319,8 @@ const Index = () => {
                   <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
                   <img src={logomark} alt="Sainté Voyage AI" className="h-24 w-24 relative z-10" />
                 </div>
-                <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
-                  Sainté Voyage Ai
+                <h1 className="text-5xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
+                  Sainté Voyage AI
                 </h1>
                 <p className="text-sm text-muted-foreground text-center">(A Goldsainte Company)</p>
                 <p className="text-muted-foreground text-center max-w-2xl leading-relaxed">
