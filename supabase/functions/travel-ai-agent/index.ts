@@ -217,8 +217,10 @@ Always be helpful, friendly, and provide detailed information when available.`
 async function searchHotels(args: any, apiKey: string) {
   try {
     const { location, checkIn, checkOut, guests = 2 } = args;
+    console.log('searchHotels called with:', { location, checkIn, checkOut, guests });
 
     // Search for location first
+    console.log('Searching for location:', location);
     const locationResponse = await fetch(
       `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
       {
@@ -230,17 +232,24 @@ async function searchHotels(args: any, apiKey: string) {
       }
     );
 
+    console.log('Location API response status:', locationResponse.status);
+    
     if (!locationResponse.ok) {
-      return { error: 'Failed to find location', results: [] };
+      const errorText = await locationResponse.text();
+      console.error('Location API error:', errorText);
+      return { error: `Failed to find location: ${locationResponse.status}`, results: [] };
     }
 
     const locationData = await locationResponse.json();
+    console.log('Location API response:', JSON.stringify(locationData).slice(0, 500));
     
     if (!locationData.data || locationData.data.length === 0) {
+      console.log('No location data found');
       return { error: 'Location not found', results: [] };
     }
 
     const destId = locationData.data[0].dest_id;
+    console.log('Found destination ID:', destId);
 
     // Get default dates if not provided
     const today = new Date();
@@ -249,35 +258,47 @@ async function searchHotels(args: any, apiKey: string) {
     const defaultCheckIn = checkIn || today.toISOString().split('T')[0];
     const defaultCheckOut = checkOut || tomorrow.toISOString().split('T')[0];
 
+    console.log('Searching hotels with:', { destId, defaultCheckIn, defaultCheckOut, guests });
+
     // Search for hotels
-    const hotelsResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=${destId}&search_type=CITY&arrival_date=${defaultCheckIn}&departure_date=${defaultCheckOut}&adults=${guests}&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=USD`,
-      {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
+    const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?dest_id=${destId}&search_type=CITY&arrival_date=${defaultCheckIn}&departure_date=${defaultCheckOut}&adults=${guests}&room_qty=1&page_number=1&units=metric&temperature_unit=c&languagecode=en-us&currency_code=USD`;
+    console.log('Hotels API URL:', hotelsUrl);
+    
+    const hotelsResponse = await fetch(hotelsUrl, {
+      method: 'GET',
+      headers: {
+        'x-rapidapi-key': apiKey,
+        'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
       }
-    );
+    });
+
+    console.log('Hotels API response status:', hotelsResponse.status);
 
     if (!hotelsResponse.ok) {
-      return { error: 'Failed to search hotels', results: [] };
+      const errorText = await hotelsResponse.text();
+      console.error('Hotels API error:', errorText);
+      return { error: `Failed to search hotels: ${hotelsResponse.status}`, results: [] };
     }
 
     const hotelsData = await hotelsResponse.json();
+    console.log('Hotels API response keys:', Object.keys(hotelsData));
+    console.log('Hotels data structure:', JSON.stringify(hotelsData).slice(0, 1000));
+    
+    const hotels = hotelsData.data?.hotels || [];
+    console.log('Number of hotels found:', hotels.length);
     
     return {
       type: 'hotels',
       location: locationData.data[0],
-      results: (hotelsData.data?.hotels || []).slice(0, 6),
+      results: hotels.slice(0, 6),
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
       guests
     };
   } catch (error) {
-    console.error('Error searching hotels:', error);
+    console.error('Error in searchHotels:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Error details:', errorMessage);
     return { error: errorMessage, results: [] };
   }
 }
