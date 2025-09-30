@@ -52,14 +52,15 @@ const Index = () => {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
+          toast({
+            title: "Location detected",
+            description: "Using your current location for better search results.",
+          });
         },
         (error) => {
           console.error("Error getting location:", error);
-          toast({
-            title: "Location access denied",
-            description: "Using default location. Please enable location access for better results.",
-            variant: "destructive",
-          });
+          // Silently fall back to default behavior without showing error
+          // User can still search without location
         }
       );
     }
