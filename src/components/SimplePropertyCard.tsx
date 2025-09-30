@@ -3,24 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
 interface SimplePropertyCardProps {
-  image: string;
-  title: string;
-  location: string;
-  rating: number;
-  reviews: number;
-  price: number;
-  originalPrice?: number;
+  property: any;
+  type?: string;
 }
 
-export const SimplePropertyCard = ({
-  image,
-  title,
-  location,
-  rating,
-  reviews,
-  price,
-  originalPrice,
-}: SimplePropertyCardProps) => {
+export const SimplePropertyCard = ({ property, type = "hotels" }: SimplePropertyCardProps) => {
+  // Handle both custom property format and Booking.com API format
+  const image = property.image || property.property?.photoUrls?.[0] || "/placeholder.svg";
+  const title = property.title || property.property?.name || property.label || "Property";
+  const location = property.location || property.region || property.accessibilityLabel || "";
+  const rating = property.rating || property.property?.reviewScore || 0;
+  const reviews = property.reviews || property.property?.reviewCount || 0;
+  const priceValue = property.price || property.priceBreakdown?.grossPrice?.value || 0;
+  const currency = property.priceBreakdown?.grossPrice?.currency || "USD";
+  const displayPrice = property.originalPrice || priceValue;
+  const originalPrice = property.originalPrice;
   return (
     <div className="group bg-card border border-border rounded-xl overflow-hidden hover:shadow-md transition-all duration-300">
       <div className="relative aspect-[4/3] overflow-hidden">
@@ -48,17 +45,21 @@ export const SimplePropertyCard = ({
         </div>
 
         <p className="text-sm text-muted-foreground mb-1">{location}</p>
-        <p className="text-xs text-muted-foreground mb-3">{reviews.toLocaleString()} reviews</p>
+        {reviews > 0 && (
+          <p className="text-xs text-muted-foreground mb-3">{reviews.toLocaleString()} reviews</p>
+        )}
 
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold">${price}</span>
-          {originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
-              ${originalPrice}
-            </span>
-          )}
-          <span className="text-sm text-muted-foreground ml-auto">per night</span>
-        </div>
+        {displayPrice > 0 && (
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">{currency} {displayPrice}</span>
+            {originalPrice && originalPrice !== displayPrice && (
+              <span className="text-sm text-muted-foreground line-through">
+                {currency} {originalPrice}
+              </span>
+            )}
+            <span className="text-sm text-muted-foreground ml-auto">per night</span>
+          </div>
+        )}
       </div>
     </div>
   );

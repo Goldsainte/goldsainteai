@@ -1,1 +1,7 @@
 project_id = "iwdevxltjuedijrcdejs"
+
+[functions.search-hotels]
+verify_jwt = false
+
+[functions.search-destinations]
+verify_jwt = false
