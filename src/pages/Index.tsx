@@ -7,7 +7,14 @@ import { Card } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
+import { InspirationCard } from "@/components/InspirationCard";
 import logomark from "@/assets/logomark-gold.png";
+import property1 from "@/assets/property1.jpg";
+import property2 from "@/assets/property2.jpg";
+import property3 from "@/assets/property3.jpg";
+import property4 from "@/assets/property4.jpg";
+import property5 from "@/assets/property5.jpg";
+import property6 from "@/assets/property6.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -34,6 +41,45 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
+
+  const inspirationDestinations = [
+    {
+      image: property1,
+      title: "Santorini Paradise",
+      location: "Greece",
+      description: "Experience breathtaking sunsets and pristine white architecture overlooking the Aegean Sea."
+    },
+    {
+      image: property2,
+      title: "Alpine Luxury",
+      location: "Swiss Alps",
+      description: "Discover world-class skiing and cozy mountain retreats in the heart of the Alps."
+    },
+    {
+      image: property3,
+      title: "Tropical Escape",
+      location: "Maldives",
+      description: "Unwind in overwater bungalows surrounded by crystal-clear turquoise waters."
+    },
+    {
+      image: property4,
+      title: "Urban Elegance",
+      location: "Paris, France",
+      description: "Immerse yourself in art, culture, and world-renowned cuisine in the City of Light."
+    },
+    {
+      image: property5,
+      title: "Desert Oasis",
+      location: "Dubai, UAE",
+      description: "Experience luxury redefined with stunning architecture and endless entertainment."
+    },
+    {
+      image: property6,
+      title: "Coastal Charm",
+      location: "Amalfi Coast, Italy",
+      description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
+    }
+  ];
 
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
@@ -189,6 +235,30 @@ const Index = () => {
                     <Compass className="h-6 w-6 text-primary" />
                     <span className="text-sm font-medium">Explore</span>
                   </Button>
+                </div>
+              </div>
+
+              {/* Get Inspired Section */}
+              <div className="space-y-6 pt-12">
+                <div className="text-center space-y-2">
+                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+                    Get Inspired
+                  </h2>
+                  <p className="text-muted-foreground">
+                    Discover your next dream destination
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {inspirationDestinations.map((destination, idx) => (
+                    <InspirationCard
+                      key={idx}
+                      image={destination.image}
+                      title={destination.title}
+                      location={destination.location}
+                      description={destination.description}
+                    />
+                  ))}
                 </div>
               </div>
 
