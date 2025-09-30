@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
+import { FlightCard } from "@/components/FlightCard";
 import { HotelFilters } from "@/components/HotelFilters";
 import logomark from "@/assets/logomark-gold.png";
 import property1 from "@/assets/property1.jpg";
@@ -33,6 +34,12 @@ interface SearchResult {
   checkOut?: string;
   guests?: number;
   filters?: any;
+  origin?: { code: string; name: string };
+  destination?: { code: string; name: string };
+  departureDate?: string;
+  returnDate?: string;
+  dictionaries?: any;
+  meta?: any;
 }
 
 const Index = () => {
@@ -447,6 +454,28 @@ const Index = () => {
                               address={restaurant.address}
                               photoUrl={restaurant.photoUrl}
                               openNow={restaurant.openNow}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {result.type === 'flights' && result.results.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl font-semibold text-foreground">
+                            ✈️ Flights from {result.origin?.name} to {result.destination?.name}
+                          </h3>
+                          <span className="text-sm text-muted-foreground">
+                            {result.results.length} flight{result.results.length !== 1 ? 's' : ''} found
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {result.results.map((flight: any, flightIdx: number) => (
+                            <FlightCard
+                              key={flight.id || flightIdx}
+                              flight={flight}
+                              dictionaries={result.dictionaries}
                             />
                           ))}
                         </div>

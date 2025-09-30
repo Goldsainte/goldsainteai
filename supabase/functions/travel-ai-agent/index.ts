@@ -125,6 +125,48 @@ serve(async (req) => {
             required: []
           }
         }
+      },
+      {
+        type: "function",
+        function: {
+          name: "search_flights",
+          description: "Search for flights between two cities. Use this when users ask about flights, airfare, or flying from one place to another. You can specify one-way or round-trip, cabin class, and whether direct flights only.",
+          parameters: {
+            type: "object",
+            properties: {
+              origin: {
+                type: "string",
+                description: "Origin city or airport (e.g., 'New York', 'JFK', 'London')"
+              },
+              destination: {
+                type: "string",
+                description: "Destination city or airport (e.g., 'Paris', 'CDG', 'Tokyo')"
+              },
+              departureDate: {
+                type: "string",
+                description: "Departure date in YYYY-MM-DD format"
+              },
+              returnDate: {
+                type: "string",
+                description: "Return date in YYYY-MM-DD format (optional, only for round-trip flights)"
+              },
+              adults: {
+                type: "number",
+                description: "Number of adult passengers (default 1)"
+              },
+              travelClass: {
+                type: "string",
+                enum: ["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"],
+                description: "Cabin class (default ECONOMY)"
+              },
+              nonStop: {
+                type: "boolean",
+                description: "Whether to show only direct flights (default false)"
+              }
+            },
+            required: ["origin", "destination", "departureDate"]
+          }
+        }
       }
     ];
 
@@ -135,18 +177,21 @@ serve(async (req) => {
     const messages = [
       {
         role: "system",
-        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, and answer travel-related questions.${locationInfo}
+        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, and answer travel-related questions.${locationInfo}
 
-IMPORTANT: Be action-oriented and helpful. When users ask about hotels, destinations, or restaurants, IMMEDIATELY use the search tools with smart defaults.
+IMPORTANT: Be action-oriented and helpful. When users ask about hotels, destinations, restaurants, or flights, IMMEDIATELY use the search tools with smart defaults.
 
 Smart Defaults:
-- If no dates mentioned: use today and tomorrow
+- If no dates mentioned for hotels: use today and tomorrow
+- If no dates mentioned for flights: use tomorrow
 - If no rating preference: use sortBy "review_score" or "popularity"
 - If they say "best" or "top": use sortBy "review_score" with minRating 8
 - If they say "popular": use sortBy "popularity"
 - If they say "cheap" or "budget": use sortBy "price"
 - If no guest count: assume 2 guests
+- If no passenger count for flights: assume 1 adult
 - For restaurants: if user provides coordinates, use those; otherwise try to use major city coordinates (NYC: 40.7128, -74.0060; Paris: 48.8566, 2.3522; London: 51.5074, -0.1278; Tokyo: 35.6762, 139.6503)
+- For flights: if they say "direct" or "nonstop", set nonStop to true
 
 CRITICAL: When you use search tools and get results, DO NOT list out all the details in text. The interface will show beautiful visual cards automatically. Instead, give a brief, friendly response like:
 
@@ -156,7 +201,11 @@ OR
 
 "Here are amazing restaurants nearby - check out these top-rated places!"
 
-Then ask if they'd like to refine by budget, rating, amenities, dates, or other criteria.
+OR
+
+"Great! I found some excellent flight options for you. See the details below!"
+
+Then ask if they'd like to refine by budget, rating, amenities, dates, cabin class, or other criteria.
 
 Always show results first with minimal text, ask questions later. Be conversational but let the visual interface do the heavy lifting.`
       },
@@ -214,6 +263,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
           toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
         } else if (functionName === 'search_restaurants') {
           toolResult = await searchRestaurants(functionArgs);
+        } else if (functionName === 'search_flights') {
+          toolResult = await searchFlights(functionArgs);
         }
         
         toolResults.push({
@@ -633,5 +684,115 @@ async function searchRestaurants(args: any) {
     console.error('Error searching restaurants:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return { error: errorMessage, results: [] };
+  }
+}
+
+// Search flights using Amadeus API
+async function searchFlights(args: any) {
+  try {
+    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false } = args;
+    console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop });
+
+    // Get Amadeus credentials
+    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
+    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
+    if (!amadeusKey || !amadeusSecret) {
+      return { error: 'Amadeus credentials not configured', results: [] };
+    }
+
+    // Get Amadeus token
+    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
+    });
+
+    if (!tokenResponse.ok) {
+      return { error: 'Failed to authenticate with Amadeus', results: [] };
+    }
+
+    const tokenData = await tokenResponse.json();
+    const token = tokenData.access_token;
+
+    // Convert city names to airport codes if needed
+    const getAirportCode = async (location: string) => {
+      // If already looks like an airport code (3 letters), use it
+      if (/^[A-Z]{3}$/i.test(location.trim())) {
+        return location.toUpperCase();
+      }
+
+      // Search for airport code
+      const searchParams = new URLSearchParams({
+        keyword: location,
+        subType: 'AIRPORT,CITY',
+        'page[limit]': '1'
+      });
+
+      const resp = await fetch(
+        `https://test.api.amadeus.com/v1/reference-data/locations?${searchParams}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (resp.ok) {
+        const data = await resp.json();
+        if (data.data && data.data.length > 0) {
+          return data.data[0].iataCode;
+        }
+      }
+
+      return location.toUpperCase();
+    };
+
+    const originCode = await getAirportCode(origin);
+    const destinationCode = await getAirportCode(destination);
+
+    console.log('Airport codes:', { originCode, destinationCode });
+
+    // Build flight search params
+    const flightParams = new URLSearchParams({
+      originLocationCode: originCode,
+      destinationLocationCode: destinationCode,
+      departureDate,
+      adults: adults.toString(),
+      travelClass,
+      nonStop: nonStop ? 'true' : 'false',
+      currencyCode: 'USD',
+      max: '20'
+    });
+
+    if (returnDate) {
+      flightParams.append('returnDate', returnDate);
+    }
+
+    const flightResponse = await fetch(
+      `https://test.api.amadeus.com/v2/shopping/flight-offers?${flightParams}`,
+      { headers: { 'Authorization': `Bearer ${token}` } }
+    );
+
+    if (!flightResponse.ok) {
+      console.error('Flight search failed:', flightResponse.status);
+      return { 
+        error: `Could not find flights from ${origin} to ${destination}. Try different dates or cities.`,
+        results: [] 
+      };
+    }
+
+    const flightData = await flightResponse.json();
+    console.log('Flights found:', flightData.data?.length || 0);
+
+    return {
+      type: 'flights',
+      origin: { code: originCode, name: origin },
+      destination: { code: destinationCode, name: destination },
+      departureDate,
+      returnDate,
+      results: flightData.data || [],
+      dictionaries: flightData.dictionaries,
+      meta: flightData.meta
+    };
+
+  } catch (error) {
+    console.error('Error in searchFlights:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
   }
 }
