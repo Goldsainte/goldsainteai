@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
+import { HotelFilters } from "@/components/HotelFilters";
 import logomark from "@/assets/logomark-gold.png";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
@@ -387,21 +388,20 @@ const Index = () => {
                   <div key={`result-${idx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
                     {result.type === 'hotels' && result.results.length > 0 && (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-semibold text-foreground">
-                            {result.results.length} properties in {result.location?.name || 'this area'}
-                          </h3>
-                          {result.filters && (
-                            <div className="flex gap-2">
-                              {result.filters.minRating && (
-                                <Badge variant="secondary">⭐ {result.filters.minRating}+</Badge>
-                              )}
-                              {result.filters.maxPrice && (
-                                <Badge variant="secondary">≤ ${result.filters.maxPrice}</Badge>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                        <HotelFilters
+                          resultsCount={result.results.length}
+                          currentSort={result.filters?.sortBy}
+                          currentMinRating={result.filters?.minRating}
+                          onSortChange={(sortBy) => {
+                            handleSearch(`Show me hotels sorted by ${sortBy === 'price' ? 'lowest price' : sortBy === 'review_score' ? 'highest rating' : 'popularity'} in ${result.location?.name}`);
+                          }}
+                          onMinRatingChange={(rating) => {
+                            const baseQuery = `Show me hotels in ${result.location?.name}`;
+                            const sortQuery = result.filters?.sortBy ? ` sorted by ${result.filters.sortBy}` : '';
+                            const ratingQuery = rating ? ` with minimum rating ${rating}` : '';
+                            handleSearch(baseQuery + sortQuery + ratingQuery);
+                          }}
+                        />
                         <div className="space-y-4">
                           {result.results.map((hotel: any, hotelIdx: number) => (
                             <SimplePropertyCard
