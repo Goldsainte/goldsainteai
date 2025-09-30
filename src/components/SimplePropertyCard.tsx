@@ -5,6 +5,7 @@ import { useState } from "react";
 import { BookingModal } from "./BookingModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { HotelDetailsModal } from "./HotelDetailsModal";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -18,6 +19,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   const [selectedHotelOffer, setSelectedHotelOffer] = useState<any>(null);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [bookingDates, setBookingDates] = useState<{ checkIn: string; checkOut: string; adults: number } | null>(null);
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   // Parse Booking.com API data properly
   const image = property.property?.photoUrls?.[0] || property.image || "/placeholder.svg";
@@ -107,6 +109,16 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
     setShowBookingModal(true);
   };
 
+  const favoriteId = isFavorite('hotel', property);
+  
+  const handleToggleFavorite = async () => {
+    if (favoriteId) {
+      await removeFavorite(favoriteId);
+    } else {
+      await addFavorite('hotel', property);
+    }
+  };
+
   return (
     <>
       <div className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row">
@@ -119,9 +131,10 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm hover:bg-background hover:text-destructive transition-colors"
+            className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm hover:bg-background transition-colors"
+            onClick={handleToggleFavorite}
           >
-            <Heart className="h-5 w-5" />
+            <Heart className={`h-5 w-5 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
           </Button>
         </div>
 

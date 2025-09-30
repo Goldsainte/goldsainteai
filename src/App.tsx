@@ -6,9 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { SimpleHeader } from "@/components/SimpleHeader";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import BookingConfirmation from "./pages/BookingConfirmation";
+import Auth from "./pages/Auth";
+import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,21 +23,25 @@ function App() {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <SidebarProvider>
-            <div className="flex min-h-screen w-full">
-              <AppSidebar />
-              <div className="flex-1 flex flex-col w-full">
-                <SimpleHeader />
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/search" element={<SearchResults />} />
-                  <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+          <AuthProvider>
+            <SidebarProvider>
+              <div className="flex min-h-screen w-full">
+                <AppSidebar />
+                <div className="flex-1 flex flex-col w-full">
+                  <SimpleHeader />
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<Auth />} />
+                    <Route path="/favorites" element={<Favorites />} />
+                    <Route path="/search" element={<SearchResults />} />
+                    <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </div>
               </div>
-            </div>
-          </SidebarProvider>
+            </SidebarProvider>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

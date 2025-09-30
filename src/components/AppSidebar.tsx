@@ -1,6 +1,8 @@
-import { Home, Search, Heart, User, Settings, MessageSquare } from "lucide-react";
+import { Home, Search, Heart, User, Settings, MessageSquare, LogIn, LogOut } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -22,11 +24,11 @@ const items = [
 
 const bottomItems = [
   { title: "Profile", url: "/profile", icon: User },
-  { title: "Settings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
   const { open } = useSidebar();
+  const { user, signOut } = useAuth();
 
   return (
     <Sidebar className="border-r border-border">
@@ -70,23 +72,53 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {bottomItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {user ? (
+                <>
+                  {bottomItems.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <NavLink
+                          to={item.url}
+                          className={({ isActive }) =>
+                            isActive
+                              ? "bg-accent/10 text-accent font-medium"
+                              : "hover:bg-muted/50"
+                          }
+                        >
+                          <item.icon className="h-5 w-5" />
+                          {open && <span>{item.title}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
+                  <SidebarMenuItem>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start px-2 h-9 hover:bg-muted/50"
+                      onClick={signOut}
+                    >
+                      <LogOut className="h-5 w-5" />
+                      {open && <span className="ml-2">Sign Out</span>}
+                    </Button>
+                  </SidebarMenuItem>
+                </>
+              ) : (
+                <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <NavLink
-                      to={item.url}
+                      to="/auth"
                       className={({ isActive }) =>
                         isActive
                           ? "bg-accent/10 text-accent font-medium"
                           : "hover:bg-muted/50"
                       }
                     >
-                      <item.icon className="h-5 w-5" />
-                      {open && <span>{item.title}</span>}
+                      <LogIn className="h-5 w-5" />
+                      {open && <span>Sign In</span>}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              ))}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

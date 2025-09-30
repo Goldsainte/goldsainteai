@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, MapPin, DollarSign, Calendar } from "lucide-react";
+import { Star, MapPin, DollarSign, Calendar, Heart } from "lucide-react";
 import { RestaurantReservationModal } from "./RestaurantReservationModal";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface RestaurantCardProps {
   id: string;
@@ -27,6 +28,19 @@ export const RestaurantCard = ({
   openNow 
 }: RestaurantCardProps) => {
   const [showReservationModal, setShowReservationModal] = useState(false);
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+
+  const restaurantData = { id, name, rating, userRatingsTotal, priceLevel, address, photoUrl, openNow };
+  const favoriteId = isFavorite('restaurant', restaurantData);
+  
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (favoriteId) {
+      await removeFavorite(favoriteId);
+    } else {
+      await addFavorite('restaurant', restaurantData);
+    }
+  };
 
   const getPriceLevelSymbol = (level?: number) => {
     if (!level) return '';
@@ -54,15 +68,25 @@ export const RestaurantCard = ({
 
       {/* Content */}
       <div className="relative h-full flex flex-col justify-end p-6 text-white">
-        {/* Status Badge */}
-        {openNow !== undefined && (
-          <Badge 
-            className="absolute top-4 right-4 bg-background/90 hover:bg-background"
-            variant={openNow ? "default" : "secondary"}
+        {/* Status and Favorite */}
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          {openNow !== undefined && (
+            <Badge 
+              className="bg-background/90 hover:bg-background"
+              variant={openNow ? "default" : "secondary"}
+            >
+              {openNow ? "Open Now" : "Closed"}
+            </Badge>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="bg-background/90 backdrop-blur-sm hover:bg-background"
+            onClick={handleToggleFavorite}
           >
-            {openNow ? "Open Now" : "Closed"}
-          </Badge>
-        )}
+            <Heart className={`h-5 w-5 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+          </Button>
+        </div>
 
         <div className="transform transition-all duration-500 group-hover:translate-y-0 translate-y-2">
           {/* Rating and Price */}

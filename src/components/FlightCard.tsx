@@ -1,7 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Clock, Calendar, ExternalLink } from "lucide-react";
+import { Plane, Clock, Calendar, ExternalLink, Heart } from "lucide-react";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface FlightCardProps {
   flight: any;
@@ -9,6 +10,7 @@ interface FlightCardProps {
 }
 
 export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
@@ -35,6 +37,16 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
 
   const getAirlineName = (code: string) => {
     return dictionaries?.carriers?.[code] || code;
+  };
+
+  const favoriteId = isFavorite('flight', { flight, dictionaries });
+  
+  const handleToggleFavorite = async () => {
+    if (favoriteId) {
+      await removeFavorite(favoriteId);
+    } else {
+      await addFavorite('flight', { flight, dictionaries });
+    }
   };
 
   const getAirlineBookingUrl = () => {
@@ -81,7 +93,7 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between">
-            <div>
+            <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <Plane className="h-5 w-5 text-primary" />
                 <span className="font-semibold text-lg">
@@ -92,9 +104,19 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
                 {getAirlineName(firstSegment.carrierCode)}
               </p>
             </div>
-            <Badge variant="secondary" className="text-lg">
-              {currency} {price.toFixed(2)}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-lg">
+                {currency} {price.toFixed(2)}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggleFavorite}
+                className="hover:bg-primary/10"
+              >
+                <Heart className={`h-5 w-5 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+              </Button>
+            </div>
           </div>
 
           {/* Flight Details */}
