@@ -46,8 +46,20 @@ serve(async (req) => {
       });
     }
 
-    const destId = locationData.data[0].dest_id;
-    const searchType = (locationData.data[0].search_type || 'CITY').toUpperCase();
+    // Build destination candidates with preference order
+    const rawResults = Array.isArray(locationData.data) ? locationData.data : [];
+    const preference = ['city', 'district', 'region', 'landmark'];
+    const candidates = rawResults
+      .filter((d: any) => d?.dest_id && d?.search_type)
+      .sort((a: any, b: any) => preference.indexOf(a.search_type?.toLowerCase()) - preference.indexOf(b.search_type?.toLowerCase()))
+      .map((d: any) => ({ dest_id: String(d.dest_id), search_type: String(d.search_type).toUpperCase(), raw: d }));
+
+    if (candidates.length === 0) {
+      return new Response(JSON.stringify({ results: [], error: 'No valid destinations found' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
 
     // Fallback dates if not provided
     const today = new Date();
@@ -56,50 +68,60 @@ serve(async (req) => {
     const arrival = checkIn && String(checkIn).trim() !== '' ? checkIn : today.toISOString().split('T')[0];
     const departure = checkOut && String(checkOut).trim() !== '' ? checkOut : tomorrow.toISOString().split('T')[0];
 
-    // Build URL with proper params
-    const params = new URLSearchParams({
-      dest_id: String(destId),
-      search_type: searchType,
-      arrival_date: arrival,
-      departure_date: departure,
-      adults: String(guests || 2),
-      room_qty: '1',
-      page_number: '1',
-      units: 'metric',
-      temperature_unit: 'c',
-      languagecode: 'en-us',
-      currency_code: 'USD'
-    });
+    let chosen: any = null;
+    let hotels: any[] = [];
+    let lastError: string | null = null;
 
-    const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
-    console.log('Hotels URL:', hotelsUrl);
+    for (const c of candidates) {
+      const params = new URLSearchParams({
+        dest_id: c.dest_id,
+        search_type: c.search_type,
+        arrival_date: arrival,
+        departure_date: departure,
+        adults: String(guests || 2),
+        room_qty: '1',
+        page_number: '1',
+        units: 'metric',
+        temperature_unit: 'c',
+        languagecode: 'en-us',
+        currency_code: 'USD'
+      });
+      const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
+      console.log('Trying destination', { dest_id: c.dest_id, search_type: c.search_type, hotelsUrl });
 
-    // Search for hotels
-    const hotelsResponse = await fetch(
-      hotelsUrl,
-      {
+      const hotelsResponse = await fetch(hotelsUrl, {
         method: 'GET',
         headers: {
           'x-rapidapi-key': apiKey,
           'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
         }
-      }
-    );
+      });
 
-    if (!hotelsResponse.ok) {
-      throw new Error(`Hotels search failed: ${hotelsResponse.statusText}`);
+      if (!hotelsResponse.ok) {
+        lastError = `Hotels search failed: ${hotelsResponse.status} ${hotelsResponse.statusText}`;
+        continue;
+      }
+
+      const hotelsData = await hotelsResponse.json();
+      const count = hotelsData?.data?.hotels?.length || 0;
+      console.log(`Hotels found for ${c.search_type} ${c.dest_id}:`, count);
+
+      if (count > 0) {
+        chosen = c;
+        hotels = hotelsData.data.hotels;
+        break;
+      }
     }
 
-    const hotelsData = await hotelsResponse.json();
-    console.log('Hotels found:', hotelsData.data?.hotels?.length || 0);
-
     return new Response(JSON.stringify({ 
-      results: hotelsData.data?.hotels || [],
-      location: locationData.data[0]
+      results: hotels,
+      location: chosen?.raw || rawResults[0] || null,
+      debug: { tried: candidates.map((cand: any) => ({ dest_id: cand.dest_id, search_type: cand.search_type })), lastError }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
+
 
   } catch (error) {
     console.error('Error in search-hotels:', error);

@@ -319,9 +319,13 @@ async function searchHotels(args: any, apiKey: string) {
       return { error: 'Location not found', results: [] };
     }
 
-    const destId = locationData.data[0].dest_id;
-    const searchType = locationData.data[0].search_type || 'CITY';
-    console.log('Found destination ID:', destId, 'Search type:', searchType);
+    // Build destination candidates (prefer city > district > region > landmark)
+    const rawResults = Array.isArray(locationData.data) ? locationData.data : [];
+    const preference = ['city', 'district', 'region', 'landmark'];
+    const candidates = rawResults
+      .filter((d: any) => d?.dest_id && d?.search_type)
+      .sort((a: any, b: any) => preference.indexOf(a.search_type?.toLowerCase()) - preference.indexOf(b.search_type?.toLowerCase()))
+      .map((d: any) => ({ dest_id: String(d.dest_id), search_type: String(d.search_type).toUpperCase(), raw: d }));
 
     // Get default dates if not provided
     const today = new Date();
@@ -330,84 +334,75 @@ async function searchHotels(args: any, apiKey: string) {
     const defaultCheckIn = checkIn || today.toISOString().split('T')[0];
     const defaultCheckOut = checkOut || tomorrow.toISOString().split('T')[0];
 
-    // Build URL with filters
-    const params = new URLSearchParams({
-      dest_id: destId.toString(),
-      search_type: searchType.toUpperCase(),
-      arrival_date: defaultCheckIn,
-      departure_date: defaultCheckOut,
-      adults: guests.toString(),
-      room_qty: '1',
-      page_number: '1',
-      units: 'metric',
-      temperature_unit: 'c',
-      languagecode: 'en-us',
-      currency_code: 'USD'
-    });
+    let chosen: any = null;
+    let hotels: any[] = [];
 
-    // Add sorting
-    if (sortBy) {
-      const sortMap: { [key: string]: string } = {
-        'popularity': 'popularity',
-        'price': 'price',
-        'distance': 'distance',
-        'review_score': 'review_score'
-      };
-      if (sortMap[sortBy]) {
-        params.append('order_by', sortMap[sortBy]);
-      }
-    }
-
-    // Add price filter
-    if (maxPrice) {
-      params.append('price_max', maxPrice.toString());
-    }
-
-    console.log('Searching hotels with filters:', { destId, defaultCheckIn, defaultCheckOut, guests, sortBy, minRating, maxPrice });
-
-    const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
-    console.log('Hotels API URL:', hotelsUrl);
-    
-    const hotelsResponse = await fetch(hotelsUrl, {
-      method: 'GET',
-      headers: {
-        'x-rapidapi-key': apiKey,
-        'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-      }
-    });
-
-    console.log('Hotels API response status:', hotelsResponse.status);
-
-    if (!hotelsResponse.ok) {
-      const errorText = await hotelsResponse.text();
-      console.error('Hotels API error:', errorText);
-      return { error: `Failed to search hotels: ${hotelsResponse.status}`, results: [] };
-    }
-
-    const hotelsData = await hotelsResponse.json();
-    console.log('Hotels API response keys:', Object.keys(hotelsData));
-    
-    let hotels = hotelsData.data?.hotels || [];
-    console.log('Number of hotels found:', hotels.length);
-    
-    // Apply client-side filters for features not in API
-    if (minRating) {
-      hotels = hotels.filter((h: any) => {
-        const rating = h.property?.reviewScore || 0;
-        return rating >= minRating;
+    for (const c of candidates) {
+      const params = new URLSearchParams({
+        dest_id: c.dest_id,
+        search_type: c.search_type,
+        arrival_date: defaultCheckIn,
+        departure_date: defaultCheckOut,
+        adults: guests.toString(),
+        room_qty: '1',
+        page_number: '1',
+        units: 'metric',
+        temperature_unit: 'c',
+        languagecode: 'en-us',
+        currency_code: 'USD'
       });
-      console.log(`After minRating filter (${minRating}):`, hotels.length);
+
+      // Sorting
+      if (sortBy) {
+        const sortMap: { [key: string]: string } = {
+          'popularity': 'popularity',
+          'price': 'price',
+          'distance': 'distance',
+          'review_score': 'review_score'
+        };
+        if (sortMap[sortBy]) {
+          params.append('order_by', sortMap[sortBy]);
+        }
+      }
+      // Price filter
+      if (maxPrice) params.append('price_max', maxPrice.toString());
+
+      const hotelsUrl = `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels?${params.toString()}`;
+      console.log('Trying hotels with', { dest_id: c.dest_id, search_type: c.search_type, hotelsUrl });
+
+      const hotelsResponse = await fetch(hotelsUrl, {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': apiKey,
+          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
+        }
+      });
+
+      console.log('Hotels API response status:', hotelsResponse.status);
+
+      if (!hotelsResponse.ok) {
+        continue;
+      }
+
+      const hotelsData = await hotelsResponse.json();
+      let list = hotelsData?.data?.hotels || [];
+      console.log(`Found ${list.length} hotels for`, { dest_id: c.dest_id, search_type: c.search_type });
+
+      // Apply client-side filters
+      if (minRating) {
+        list = list.filter((h: any) => (h.property?.reviewScore || 0) >= minRating);
+      }
+
+      if (list.length > 0) {
+        chosen = c;
+        hotels = list;
+        break;
+      }
     }
 
-    if (amenities && amenities.length > 0) {
-      // Note: Amenities filtering would require more detailed hotel data
-      // This is a simplified version
-      console.log('Amenities filter requested:', amenities);
-    }
-    
     return {
       type: 'hotels',
-      location: locationData.data[0],
+      location: chosen?.raw || rawResults[0],
       results: hotels.slice(0, 6),
       checkIn: defaultCheckIn,
       checkOut: defaultCheckOut,
