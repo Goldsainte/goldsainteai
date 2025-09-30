@@ -7,12 +7,9 @@ const Index = () => {
   return (
     <main className="flex-1 flex items-center justify-center">
       <div className="w-full max-w-3xl mx-auto px-6 py-12 flex flex-col items-center justify-center min-h-[calc(100vh-3.5rem)]">
-        {/* Logo and Title */}
-        <div className="flex flex-col items-center gap-4 mb-12">
+        {/* Logo */}
+        <div className="flex flex-col items-center mb-12">
           <img src={logomark} alt="Goldsainte" className="h-16 w-16" />
-          <h1 className="text-4xl md:text-5xl font-primary font-bold text-center">
-            Goldsainte AI
-          </h1>
         </div>
 
         {/* Main Search Input */}
