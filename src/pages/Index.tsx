@@ -596,7 +596,7 @@ const Index = () => {
                   {featuredRestaurants.map((restaurant, idx) => (
                     <Card
                       key={idx}
-                      className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border border-accent/20 h-[400px]"
+                      className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border border-accent/20"
                     >
                       <div className="relative h-64 overflow-hidden">
                         <img

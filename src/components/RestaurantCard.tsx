@@ -53,9 +53,9 @@ export const RestaurantCard = ({
   };
 
   return (
-    <Card className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border-0 h-[400px]">
+    <Card className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border-0">
       {/* Image with overlay */}
-      <div className="absolute inset-0">
+      <div className="relative h-64 overflow-hidden">
         {photoUrl ? (
           <img 
             src={photoUrl} 
@@ -68,10 +68,7 @@ export const RestaurantCard = ({
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-      </div>
-
-      {/* Content */}
-      <div className="relative h-full flex flex-col justify-end p-6 text-white">
+        
         {/* Status and Favorite */}
         <div className="absolute top-4 right-4 flex items-center gap-2">
           {openNow !== undefined && (
@@ -91,6 +88,10 @@ export const RestaurantCard = ({
             <Heart className={`h-5 w-5 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
           </Button>
         </div>
+      </div>
+
+      {/* Content */}
+      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
 
         <div className="transform transition-all duration-500 group-hover:translate-y-0 translate-y-2">
           {/* Rating and Price */}
