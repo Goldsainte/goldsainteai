@@ -408,6 +408,35 @@ async function searchHotels(args: any, apiKey: string) {
     let hotels = offersData.data || [];
     console.log('Amadeus hotels found:', hotels.length);
 
+    // Fallback retry: if no offers for default dates, try +30 days
+    if (!hotels.length) {
+      const baseIn = new Date(defaultCheckIn);
+      const altIn = new Date(baseIn);
+      altIn.setDate(baseIn.getDate() + 30);
+      const altOut = new Date(altIn);
+      altOut.setDate(altIn.getDate() + 1);
+
+      const retryParams = new URLSearchParams({
+        hotelIds,
+        checkInDate: altIn.toISOString().split('T')[0],
+        checkOutDate: altOut.toISOString().split('T')[0],
+        adults: guests.toString(),
+        currency: 'USD',
+        roomQuantity: '1',
+        bestRateOnly: 'false'
+      });
+
+      const retryResp = await fetch(
+        `https://test.api.amadeus.com/v3/shopping/hotel-offers?${retryParams}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      if (retryResp.ok) {
+        const retryData = await retryResp.json();
+        hotels = retryData.data || [];
+        console.log('Retry (+30 days) hotels found:', hotels.length);
+      }
+    }
+
     // Transform to expected format with Google Places enrichment
     let transformedHotels = await Promise.all(hotels.map(async (offer: any) => {
       const hotel = offer.hotel;
