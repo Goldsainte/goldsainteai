@@ -896,51 +896,64 @@ async function checkVisaRequirements(args: any) {
     const { fromCountry, toCountry } = args;
     console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
 
-    const RAPIDAPI_KEY = Deno.env.get('RAPIDAPI_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
-    if (!RAPIDAPI_KEY) {
+    if (!LOVABLE_API_KEY) {
       return { 
         error: 'Visa check service not configured',
         requirement: 'unknown'
       };
     }
 
-    const response = await fetch(
-      `https://visa-requirements.p.rapidapi.com/visa-requirements`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-RapidAPI-Key': RAPIDAPI_KEY,
-          'X-RapidAPI-Host': 'visa-requirements.p.rapidapi.com'
-        },
-        body: JSON.stringify({
-          from: fromCountry,
-          to: toCountry
-        })
-      }
-    );
+    // Use Lovable AI to get accurate visa information
+    const prompt = `Provide accurate and up-to-date visa requirements for a traveler from ${fromCountry} visiting ${toCountry}. Include:
+    
+1. Visa requirement status (visa required, visa-free, visa on arrival, eVisa available, etc.)
+2. Maximum stay duration if visa-free or visa on arrival
+3. Passport validity requirements
+4. Any special conditions or requirements
+5. Official embassy/government website link if available
+
+Be specific and factual. If you're not certain, indicate that the traveler should verify with official sources.`;
+
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'google/gemini-2.5-flash',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1000
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Visa API error:', response.status, errorText);
+      console.error('Lovable AI error:', response.status, errorText);
       return { 
-        error: `Visa check failed: ${response.statusText}`,
+        error: `Visa information lookup failed: ${response.statusText}`,
         requirement: 'unknown'
       };
     }
 
     const data = await response.json();
-    console.log('Visa requirement result:', data);
+    const aiResponse = data.choices[0].message.content;
+    console.log('Visa requirement AI response:', aiResponse);
 
     return {
       type: 'visa',
       fromCountry,
       toCountry,
-      requirement: data.requirement || data.status || 'unknown',
-      details: data.details || data.message || '',
-      duration: data.duration || data.max_stay || '',
-      notes: data.notes || data.additional_info || ''
+      information: aiResponse,
+      source: 'AI-powered visa information'
     };
 
   } catch (error) {
