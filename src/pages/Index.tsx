@@ -316,7 +316,7 @@ const Index = () => {
                   <img src={logomark} alt="Goldsainte" className="h-20 w-20 relative z-10" />
                 </div>
                 <h1 className="text-4xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-                  Goldsainte AI Travel Assistant
+                  Goldsainte: Your AI Travel Concierge
                 </h1>
                 <p className="text-muted-foreground text-center max-w-md">
                   Your intelligent travel companion powered by AI. Find hotels, destinations, and plan your perfect trip.
