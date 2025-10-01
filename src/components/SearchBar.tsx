@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useSearchTracking } from "@/hooks/useSearchTracking";
 
 export const SearchBar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { addSearch } = useSearchHistory();
+  const { addSearch } = useSearchHistory(); // localStorage for sidebar
+  const { trackSearch } = useSearchTracking(); // database for authenticated users
   const [searchType, setSearchType] = useState(searchParams.get("type") || "hotels");
   const [location, setLocation] = useState(searchParams.get("location") || "");
   const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
@@ -27,13 +29,23 @@ export const SearchBar = () => {
   const handleSearch = () => {
     if (!location.trim()) return;
     
-    // Save to search history
-    addSearch({
+    const searchData = {
       type: searchType,
       location,
       ...(searchType === "hotels" && { checkIn, checkOut, guests }),
       ...(searchType === "flights" && { checkIn }),
       ...(searchType === "events" && { checkIn })
+    };
+    
+    // Save to localStorage for sidebar (immediate)
+    addSearch(searchData);
+    
+    // Save to database for authenticated users (async)
+    trackSearch(searchType as any, {
+      location,
+      checkIn: checkIn || null,
+      checkOut: checkOut || null,
+      guests: guests || null
     });
     
     const params = new URLSearchParams({
