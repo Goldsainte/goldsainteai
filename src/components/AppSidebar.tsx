@@ -1,6 +1,12 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, MapPin, FileCheck } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
+import luxuryHotels from "@/assets/luxury-hotels.jpg";
+import luxuryFlights from "@/assets/luxury-flights.jpg";
+import luxuryDestinations from "@/assets/luxury-destinations.jpg";
+import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
+import luxuryVisa from "@/assets/luxury-visa.jpg";
+import luxuryEvents from "@/assets/luxury-events.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +31,15 @@ const items = [
 
 const bottomItems = [
   { title: "Profile", url: "/profile", icon: User },
+];
+
+const quickLinks = [
+  { title: "Hotels", icon: Hotel, image: luxuryHotels, path: "/search?type=hotels" },
+  { title: "Flights", icon: Plane, image: luxuryFlights, path: "/search?type=flights" },
+  { title: "Destinations", icon: MapPin, image: luxuryDestinations, path: "/search?type=destinations" },
+  { title: "Restaurants", icon: UtensilsCrossed, image: luxuryRestaurants, path: "/search?type=restaurants" },
+  { title: "Visa", icon: FileCheck, image: luxuryVisa, path: "/search?type=visa" },
+  { title: "Events", icon: Ticket, image: luxuryEvents, path: "/search?type=events" },
 ];
 
 export function AppSidebar() {
@@ -84,6 +99,55 @@ export function AppSidebar() {
                     >
                       <item.icon className="h-5 w-5" />
                       {open && <span>{item.title}</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Quick Links */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-xs font-semibold tracking-wider uppercase text-primary">
+            Quick Access
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {quickLinks.map((link) => (
+                <SidebarMenuItem key={link.title}>
+                  <SidebarMenuButton 
+                    asChild
+                    className="group relative overflow-hidden h-auto p-0 hover:bg-transparent"
+                  >
+                    <NavLink
+                      to={link.path}
+                      className="relative flex items-center gap-3 p-2 rounded-lg transition-all duration-300 hover:shadow-lg border border-transparent hover:border-primary/20"
+                    >
+                      {open ? (
+                        <>
+                          <div className="relative h-12 w-12 rounded-lg overflow-hidden border border-primary/20 group-hover:border-accent/40 transition-all duration-300 flex-shrink-0">
+                            <img 
+                              src={link.image} 
+                              alt={link.title} 
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          </div>
+                          <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors duration-300 font-chiffon">
+                            {link.title}
+                          </span>
+                        </>
+                      ) : (
+                        <div className="relative h-10 w-10 rounded-lg overflow-hidden border border-primary/20 group-hover:border-accent/40 transition-all duration-300">
+                          <img 
+                            src={link.image} 
+                            alt={link.title} 
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+                      )}
                     </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
