@@ -669,8 +669,8 @@ const Index = () => {
                   }`}>
                     {msg.role === 'assistant' && (
                       <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Sparkles className="h-4 w-4 text-primary" />
+                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center p-1">
+                          <img src={logomark} alt="Goldsainte" className="h-full w-full object-contain" />
                         </div>
                       </div>
                     )}
