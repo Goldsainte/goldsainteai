@@ -26,6 +26,7 @@ export type Database = {
           status: string
           total_price: number
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           booking_data: Json
@@ -38,6 +39,7 @@ export type Database = {
           status?: string
           total_price: number
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           booking_data?: Json
@@ -50,6 +52,7 @@ export type Database = {
           status?: string
           total_price?: number
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -176,24 +179,60 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          country: string | null
           created_at: string
           id: string
+          phone: string | null
+          preferences: Json | null
           updated_at: string
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
           created_at?: string
           id: string
+          phone?: string | null
+          preferences?: Json | null
           updated_at?: string
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          country?: string | null
           created_at?: string
           id?: string
+          phone?: string | null
+          preferences?: Json | null
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      search_history: {
+        Row: {
+          created_at: string
+          id: string
+          search_params: Json
+          search_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          search_params: Json
+          search_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          search_params?: Json
+          search_type?: string
+          user_id?: string
         }
         Relationships: []
       }

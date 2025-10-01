@@ -53,6 +53,20 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Try to get authenticated user from token
+    let userId = null;
+    try {
+      const authHeader = req.headers.get('Authorization');
+      if (authHeader) {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user } } = await supabaseClient.auth.getUser(token);
+        userId = user?.id || null;
+        console.log('Authenticated user:', userId);
+      }
+    } catch (error) {
+      console.log('No authenticated user, proceeding as guest checkout');
+    }
+
     // Create guest record
     const { data: guest, error: guestError } = await supabaseClient
       .from('guests')
@@ -86,7 +100,8 @@ serve(async (req) => {
         total_price: totalPrice,
         currency: currency,
         booking_data: bookingData,
-        guest_id: guest.id
+        guest_id: guest.id,
+        user_id: userId // Link to authenticated user if available
       })
       .select()
       .single();

@@ -13,6 +13,7 @@ import HotelBooking from "./pages/HotelBooking";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ function App() {
                   <Routes>
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
+                    <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/favorites" element={<Favorites />} />
                     <Route path="/search" element={<SearchResults />} />
                     <Route path="/hotel-booking" element={<HotelBooking />} />
