@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory = [], userLocation, isQuickLink = false, quickLinkType } = await req.json();
+    const { message, conversationHistory = [], userLocation, isQuickLink = false, quickLinkType, usePreferences = true } = await req.json();
     
     console.log('=== AI AGENT REQUEST ===');
     console.log('User message:', message);
@@ -58,7 +58,10 @@ serve(async (req) => {
             
           if (data) {
             userPreferences = data;
-            userContext = `\n\n=== STRICT USER PREFERENCES - ENFORCE THESE AS HARD FILTERS ===
+            
+            // Only include strict preferences if the user has them enabled
+            if (usePreferences && data.use_preferences_in_search !== false) {
+              userContext = `\n\n=== STRICT USER PREFERENCES - ENFORCE THESE AS HARD FILTERS ===
 
 🏨 HOTEL PREFERENCES (Apply to ALL hotel searches):
 - Min Star Rating: ${data.preferred_hotel_rating || 'Any'} stars
@@ -124,6 +127,11 @@ serve(async (req) => {
 ${data.special_requests ? `⚠️ SPECIAL REQUESTS: ${data.special_requests}` : ''}
 
 CRITICAL: These are MANDATORY filters. Do NOT show results that violate these preferences unless the user explicitly asks to ignore them.`;
+            } else {
+              userContext = `\n\n=== USER PREFERENCES AVAILABLE BUT NOT APPLIED ===
+The user has saved preferences but has chosen to search without strict filtering. Show all available results regardless of their saved preferences.
+===`;
+            }
             
             console.log('User preferences loaded:', userPreferences);
           }

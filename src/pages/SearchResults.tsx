@@ -57,16 +57,19 @@ const SearchResults = () => {
         if (data) {
           setUserPreferences(data);
           
-          // Apply more preferences to filters from user profile
-          if (data.price_range_min !== null && data.price_range_min !== undefined) {
-            setPriceRange([data.price_range_min, data.price_range_max || 1000]);
-          }
-          if (data.min_review_score) {
-            setMinRating(data.min_review_score);
-          }
-          if (data.cuisine_types && data.cuisine_types.length > 0) {
-            // Store cuisine types for restaurant filtering
-            setUserPreferences((prev: any) => ({ ...prev, cuisine_types: data.cuisine_types }));
+          // Only apply preferences if user has them enabled
+          if (data.use_preferences_in_search !== false) {
+            // Apply more preferences to filters from user profile
+            if (data.price_range_min !== null && data.price_range_min !== undefined) {
+              setPriceRange([data.price_range_min, data.price_range_max || 1000]);
+            }
+            if (data.min_review_score) {
+              setMinRating(data.min_review_score);
+            }
+            if (data.cuisine_types && data.cuisine_types.length > 0) {
+              // Store cuisine types for restaurant filtering
+              setUserPreferences((prev: any) => ({ ...prev, cuisine_types: data.cuisine_types }));
+            }
           }
         }
       } catch (error) {

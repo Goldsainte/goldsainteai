@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
@@ -64,6 +67,7 @@ interface SearchResult {
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -85,6 +89,7 @@ const Index = () => {
   });
   const [showPriceSlider, setShowPriceSlider] = useState<{ type: "hotel" | "flight" | "restaurant" | "car" } | null>(null);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
+  const [usePreferences, setUsePreferences] = useState(true);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -104,6 +109,56 @@ const Index = () => {
       );
     }
   }, []);
+
+  // Fetch user's preference setting
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('user_booking_preferences')
+        .select('use_preferences_in_search')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setUsePreferences(data.use_preferences_in_search ?? true);
+      }
+    };
+    
+    fetchPreferences();
+  }, [user]);
+
+  const togglePreferences = async (checked: boolean) => {
+    setUsePreferences(checked);
+    
+    if (!user) return;
+    
+    const { error } = await supabase
+      .from('user_booking_preferences')
+      .upsert({
+        user_id: user.id,
+        use_preferences_in_search: checked
+      }, {
+        onConflict: 'user_id'
+      });
+    
+    if (error) {
+      console.error('Error updating preference:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save preference",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: checked ? "Preferences enabled" : "Preferences disabled",
+        description: checked 
+          ? "Search results will match your saved preferences" 
+          : "Search results will show all available options",
+      });
+    }
+  };
 
   const inspirationDestinations = [
     {
@@ -234,6 +289,7 @@ const Index = () => {
           conversationHistory,
           isQuickLink: !!activeQuickLink,
           quickLinkType: activeQuickLink || undefined,
+          usePreferences,
           userLocation: userLocation ? {
             latitude: userLocation.lat,
             longitude: userLocation.lng
@@ -376,6 +432,7 @@ const Index = () => {
           conversationHistory: [],
           isQuickLink: true, // Flag to indicate this is from a quick link
           quickLinkType: action,
+          usePreferences,
           userLocation: userLocation ? {
             latitude: userLocation.lat,
             longitude: userLocation.lng
@@ -430,6 +487,24 @@ const Index = () => {
   return (
     <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
       <div className="w-full h-full flex flex-col">
+        {/* Preferences Toggle - Upper Right Corner */}
+        {user && (
+          <div className="absolute top-4 right-4 z-50">
+            <Card className="p-3 shadow-lg border-primary/20">
+              <div className="flex items-center gap-3">
+                <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer">
+                  Use My Preferences
+                </Label>
+                <Switch
+                  id="preferences-toggle"
+                  checked={usePreferences}
+                  onCheckedChange={togglePreferences}
+                />
+              </div>
+            </Card>
+          </div>
+        )}
+        
         {!showChat ? (
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">

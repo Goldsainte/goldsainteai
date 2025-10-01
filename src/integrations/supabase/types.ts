@@ -676,6 +676,7 @@ export type Database = {
           travel_insurance: string | null
           unlimited_mileage: boolean | null
           updated_at: string
+          use_preferences_in_search: boolean | null
           user_id: string
           visa_assistance_needed: boolean | null
           visa_required_countries: string[] | null
@@ -776,6 +777,7 @@ export type Database = {
           travel_insurance?: string | null
           unlimited_mileage?: boolean | null
           updated_at?: string
+          use_preferences_in_search?: boolean | null
           user_id: string
           visa_assistance_needed?: boolean | null
           visa_required_countries?: string[] | null
@@ -876,6 +878,7 @@ export type Database = {
           travel_insurance?: string | null
           unlimited_mileage?: boolean | null
           updated_at?: string
+          use_preferences_in_search?: boolean | null
           user_id?: string
           visa_assistance_needed?: boolean | null
           visa_required_countries?: string[] | null
