@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { useAuth } from "@/contexts/AuthContext";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -54,7 +55,9 @@ export const BookingModal = ({
   currency 
 }: BookingModalProps) => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
   
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),
@@ -76,6 +79,37 @@ export const BookingModal = ({
       needCrib: false,
     },
   });
+
+  // Auto-populate user details from account
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          setUserProfile(profile);
+          
+          // Auto-populate form with user data
+          const nameParts = profile.username?.split(' ') || [];
+          form.setValue('firstName', nameParts[0] || '');
+          form.setValue('lastName', nameParts.slice(1).join(' ') || '');
+          form.setValue('email', user.email || '');
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+      }
+    };
+
+    if (open) {
+      loadUserProfile();
+    }
+  }, [user, open, form]);
 
   const bookingFor = form.watch('bookingFor');
   
