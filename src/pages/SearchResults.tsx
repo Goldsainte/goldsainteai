@@ -72,6 +72,27 @@ const SearchResults = () => {
           const destResults = data.results || [];
           setResults(destResults);
           setFilteredResults(destResults);
+        } else if (searchType === "packages") {
+          // Fetch hotels, flights, and restaurants in parallel
+          const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
+            supabase.functions.invoke('search-hotels', {
+              body: { location, checkIn, checkOut, guests: parseInt(guests) }
+            }),
+            supabase.functions.invoke('amadeus-search-flights', {
+              body: { origin: 'JFK', destination: location, departureDate: checkIn, adults: parseInt(guests) }
+            }).catch(() => ({ data: { results: [] }, error: null })),
+            supabase.functions.invoke('fetch-restaurants', {
+              body: { location, limit: 5 }
+            }).catch(() => ({ data: { results: [] }, error: null }))
+          ]);
+
+          const packageResults = [
+            ...(hotelsRes.data?.results || []).slice(0, 3).map((r: any) => ({ ...r, packageType: 'hotel' })),
+            ...(flightsRes.data?.results || []).slice(0, 3).map((r: any) => ({ ...r, packageType: 'flight' })),
+            ...(restaurantsRes.data?.results || []).slice(0, 3).map((r: any) => ({ ...r, packageType: 'restaurant' }))
+          ];
+          setResults(packageResults);
+          setFilteredResults(packageResults);
         } else {
           setResults([]);
           setFilteredResults([]);
@@ -155,7 +176,7 @@ const SearchResults = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  {filteredResults.length} {searchType === "hotels" ? "properties" : "destinations"} in {location}
+                  {filteredResults.length} {searchType === "hotels" ? "properties" : searchType === "packages" ? "package options" : "destinations"} in {location}
                 </h2>
                 {searchType === "hotels" && checkIn && (
                   <p className="text-sm text-muted-foreground mt-1">

@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, MapPin } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, Package } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
 import luxuryHotels from "@/assets/luxury-hotels.jpg";
@@ -35,7 +35,7 @@ const bottomItems = [
 const quickLinks = [
   { title: "Hotels", icon: Hotel, image: luxuryHotels, path: "/search?type=hotels" },
   { title: "Flights", icon: Plane, image: luxuryFlights, path: "/search?type=flights" },
-  { title: "Destinations", icon: MapPin, image: luxuryDestinations, path: "/search?type=destinations" },
+  { title: "Packages", icon: Package, image: luxuryDestinations, path: "/search?type=packages" },
   { title: "Restaurants", icon: UtensilsCrossed, image: luxuryRestaurants, path: "/search?type=restaurants" },
   { title: "Events", icon: Ticket, image: luxuryEvents, path: "/search?type=events" },
 ];
