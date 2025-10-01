@@ -510,8 +510,12 @@ async function searchHotels(args: any, apiKey: string) {
     }
 
     const locationData = await locationResponse.json();
-    const cityCode = locationData.data[0].iataCode;
-    console.log(`Found city code for "${location}": ${cityCode}`);
+    const cityInfo = locationData.data[0];
+    const cityCode = cityInfo.iataCode;
+    const countryCode = cityInfo.address?.countryCode || cityInfo.iataCode?.slice(0, 2);
+    const currencyMap: Record<string, string> = { US:'USD', FR:'EUR', GB:'GBP', DE:'EUR', ES:'EUR', IT:'EUR', NL:'EUR', BE:'EUR', PT:'EUR', IE:'EUR', CH:'CHF', JP:'JPY', AU:'AUD', CA:'CAD', AE:'AED', SG:'SGD', IN:'INR', ID:'IDR', TH:'THB', MY:'MYR', MX:'MXN', BR:'BRL', ZA:'ZAR', SA:'SAR', TR:'TRY', KR:'KRW', HK:'HKD' };
+    const localCurrency = currencyMap[countryCode] || 'USD';
+    console.log(`Found city code for "${location}": ${cityCode} (${countryCode}), currency: ${localCurrency}`);
 
     // Default dates
     const today = new Date();
@@ -548,7 +552,7 @@ async function searchHotels(args: any, apiKey: string) {
         checkInDate,
         checkOutDate,
         adults: guests.toString(),
-        currency: 'USD',
+        currency: localCurrency,
         roomQuantity: '1',
         bestRateOnly: bestRateOnly ? 'true' : 'false',
       });
@@ -606,10 +610,10 @@ async function searchHotels(args: any, apiKey: string) {
 
       const item: any = {
         hotel_id: hotel.hotelId,
-        property: {
+         property: {
           name: hotel.name,
           photoUrls: [`https://placehold.co/800x600/1a1a1a/d4af37?text=${encodeURIComponent(hotel.name.substring(0, 30))}&font=roboto`],
-          reviewScore: hotel.rating ? parseFloat(hotel.rating) : 0,
+          reviewScore: 0,
           reviewCount: 0,
           externalUrls: { default: `https://www.amadeus.com/hotel/${hotel.hotelId}` }
         },
@@ -624,21 +628,41 @@ async function searchHotels(args: any, apiKey: string) {
         amadeusOffer: offer
       };
 
-      try {
+       try {
         const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY') || Deno.env.get('GOOGLE_PLACES_API_KEY_2');
         if (apiKey) {
-          const q = `${hotel.name} ${hotel.address?.cityName || location}`;
-          const resp = await fetch(`https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&type=lodging&key=${apiKey}`);
-          if (resp.ok) {
-            const data = await resp.json();
-            const place = data.results?.[0];
-            if (place) {
-              if (typeof place.rating === 'number') item.property.reviewScore = place.rating;
-              if (typeof place.user_ratings_total === 'number') item.property.reviewCount = place.user_ratings_total;
-              const ref = place.photos?.[0]?.photo_reference;
-              if (ref) {
-                item.property.photoUrls = [`https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${ref}&key=${apiKey}`];
-              }
+          let place: any | undefined;
+
+          // Prefer Nearby Search using precise coordinates to get the exact property
+          if (hotel.latitude && hotel.longitude) {
+            const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${hotel.latitude},${hotel.longitude}&radius=400&keyword=${encodeURIComponent(hotel.name)}&type=lodging&key=${apiKey}`;
+            const nearbyResp = await fetch(nearbyUrl);
+            if (nearbyResp.ok) {
+              const nearbyData = await nearbyResp.json();
+              place = nearbyData.results?.[0];
+            }
+          }
+
+          // Fallback to Text Search if nearby did not yield a result
+          if (!place) {
+            const q = `${hotel.name} ${hotel.address?.cityName || location}`;
+            const textUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&type=lodging&key=${apiKey}`;
+            const textResp = await fetch(textUrl);
+            if (textResp.ok) {
+              const textData = await textResp.json();
+              place = textData.results?.[0];
+            }
+          }
+
+          if (place) {
+            if (typeof place.rating === 'number') item.property.reviewScore = place.rating;
+            if (typeof place.user_ratings_total === 'number') item.property.reviewCount = place.user_ratings_total;
+            const ref = place.photos?.[0]?.photo_reference;
+            if (ref) {
+              item.property.photoUrls = [`https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${ref}&key=${apiKey}`];
+            }
+            if (place.place_id) {
+              item.property.externalUrls.google = `https://www.google.com/maps/place/?q=place_id:${place.place_id}`;
             }
           }
         }
@@ -648,10 +672,11 @@ async function searchHotels(args: any, apiKey: string) {
     }));
 
     // Apply filters
-    if (minRating) {
-      transformedHotels = transformedHotels.filter((h: any) => h.property.reviewScore >= minRating);
+    const minRatingNormalized = typeof minRating === 'number' ? (minRating > 5 ? minRating / 2 : minRating) : undefined;
+    if (typeof minRatingNormalized === 'number') {
+      transformedHotels = transformedHotels.filter((h: any) => h.property.reviewScore >= minRatingNormalized);
     }
-    if (maxPrice) {
+    if (typeof maxPrice === 'number') {
       transformedHotels = transformedHotels.filter((h: any) => h.price <= maxPrice);
     }
     if (sortBy === 'price') {
