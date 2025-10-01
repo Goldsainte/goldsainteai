@@ -462,6 +462,7 @@ export type Database = {
           created_at: string
           destinations: string[] | null
           email: string | null
+          email_notifications_enabled: boolean | null
           experience_years: number | null
           id: string
           inventory_management: string | null
@@ -477,6 +478,7 @@ export type Database = {
           profile_image_url: string | null
           rating: number | null
           service_types: string[] | null
+          sms_notifications_enabled: boolean | null
           social_media: string | null
           specializations: string[] | null
           tax_id: string | null
@@ -485,6 +487,7 @@ export type Database = {
           updated_at: string
           user_id: string
           website: string | null
+          whatsapp_notifications_enabled: boolean | null
           whatsapp_number: string | null
         }
         Insert: {
@@ -504,6 +507,7 @@ export type Database = {
           created_at?: string
           destinations?: string[] | null
           email?: string | null
+          email_notifications_enabled?: boolean | null
           experience_years?: number | null
           id?: string
           inventory_management?: string | null
@@ -519,6 +523,7 @@ export type Database = {
           profile_image_url?: string | null
           rating?: number | null
           service_types?: string[] | null
+          sms_notifications_enabled?: boolean | null
           social_media?: string | null
           specializations?: string[] | null
           tax_id?: string | null
@@ -527,6 +532,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           website?: string | null
+          whatsapp_notifications_enabled?: boolean | null
           whatsapp_number?: string | null
         }
         Update: {
@@ -546,6 +552,7 @@ export type Database = {
           created_at?: string
           destinations?: string[] | null
           email?: string | null
+          email_notifications_enabled?: boolean | null
           experience_years?: number | null
           id?: string
           inventory_management?: string | null
@@ -561,6 +568,7 @@ export type Database = {
           profile_image_url?: string | null
           rating?: number | null
           service_types?: string[] | null
+          sms_notifications_enabled?: boolean | null
           social_media?: string | null
           specializations?: string[] | null
           tax_id?: string | null
@@ -569,6 +577,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website?: string | null
+          whatsapp_notifications_enabled?: boolean | null
           whatsapp_number?: string | null
         }
         Relationships: []

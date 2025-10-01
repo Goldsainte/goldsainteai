@@ -30,7 +30,7 @@ serve(async (req) => {
     // Get all active and verified travel agents
     const { data: agents, error: agentsError } = await supabaseClient
       .from('travel_agents')
-      .select('id, email, phone, whatsapp_number, agency_name, primary_contact_name')
+      .select('id, email, phone, whatsapp_number, agency_name, primary_contact_name, email_notifications_enabled, sms_notifications_enabled, whatsapp_notifications_enabled')
       .eq('is_active', true)
       .eq('is_verified', true);
 
@@ -52,8 +52,8 @@ serve(async (req) => {
     for (const agent of agents) {
       const message = `New job posted on the marketplace!\n\nTitle: ${jobTitle}\nDestination: ${destination}\nBudget: $${budgetMin} - $${budgetMax}\n\nLog in to view details and place your bid!`;
 
-      // Send Email via Resend
-      if (agent.email && resendApiKey) {
+      // Send Email via Resend (only if opted in)
+      if (agent.email && resendApiKey && agent.email_notifications_enabled) {
         notificationPromises.push(
           fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -92,8 +92,8 @@ serve(async (req) => {
         );
       }
 
-      // Send SMS via Twilio
-      if (agent.phone && twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
+      // Send SMS via Twilio (only if opted in)
+      if (agent.phone && twilioAccountSid && twilioAuthToken && twilioPhoneNumber && agent.sms_notifications_enabled) {
         const smsUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
         notificationPromises.push(
           fetch(smsUrl, {
@@ -120,8 +120,8 @@ serve(async (req) => {
         );
       }
 
-      // Send WhatsApp message via Twilio
-      if (agent.whatsapp_number && twilioAccountSid && twilioAuthToken && twilioPhoneNumber) {
+      // Send WhatsApp message via Twilio (only if opted in)
+      if (agent.whatsapp_number && twilioAccountSid && twilioAuthToken && twilioPhoneNumber && agent.whatsapp_notifications_enabled) {
         const whatsappUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilioAccountSid}/Messages.json`;
         notificationPromises.push(
           fetch(whatsappUrl, {

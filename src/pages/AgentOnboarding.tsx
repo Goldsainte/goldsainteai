@@ -23,6 +23,9 @@ export default function AgentOnboarding() {
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [acceptedVendor, setAcceptedVendor] = useState(false);
   const [acceptedGDPR, setAcceptedGDPR] = useState(false);
+  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [smsNotifications, setSmsNotifications] = useState(false);
+  const [whatsappNotifications, setWhatsappNotifications] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -85,7 +88,12 @@ export default function AgentOnboarding() {
         accepted_terms: acceptedTerms,
         accepted_privacy: acceptedPrivacy,
         accepted_vendor: acceptedVendor,
-        accepted_gdpr: acceptedGDPR
+        accepted_gdpr: acceptedGDPR,
+        
+        // Communication preferences
+        email_notifications_enabled: emailNotifications,
+        sms_notifications_enabled: smsNotifications,
+        whatsapp_notifications_enabled: whatsappNotifications
       };
 
       const { error } = await supabase
@@ -373,9 +381,54 @@ export default function AgentOnboarding() {
                 </div>
               </div>
 
-              {/* Section 6: Legal Agreements & Compliance */}
+              {/* Section 6: Communication Preferences */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">6. Legal Agreements & Compliance</h3>
+                <h3 className="text-lg font-semibold">6. Communication Preferences</h3>
+                <Separator />
+                
+                <p className="text-sm text-muted-foreground">
+                  Choose how you'd like to receive notifications about new job opportunities
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="email_notifications" 
+                      checked={emailNotifications} 
+                      onCheckedChange={(checked) => setEmailNotifications(checked as boolean)}
+                    />
+                    <label htmlFor="email_notifications" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      I consent to receive job notifications via email
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="sms_notifications" 
+                      checked={smsNotifications} 
+                      onCheckedChange={(checked) => setSmsNotifications(checked as boolean)}
+                    />
+                    <label htmlFor="sms_notifications" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      I consent to receive job notifications via SMS text messages
+                    </label>
+                  </div>
+                  
+                  <div className="flex items-start space-x-2">
+                    <Checkbox 
+                      id="whatsapp_notifications" 
+                      checked={whatsappNotifications} 
+                      onCheckedChange={(checked) => setWhatsappNotifications(checked as boolean)}
+                    />
+                    <label htmlFor="whatsapp_notifications" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      I consent to receive job notifications via WhatsApp
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Section 7: Legal Agreements & Compliance */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">7. Legal Agreements & Compliance</h3>
                 <Separator />
                 
                 <div className="space-y-3">
@@ -449,9 +502,9 @@ export default function AgentOnboarding() {
                 </div>
               </div>
 
-              {/* Section 7: Verification Documents */}
+              {/* Section 8: Verification Documents */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">7. Verification Documents</h3>
+                <h3 className="text-lg font-semibold">8. Verification Documents</h3>
                 <Separator />
                 
                 <div className="space-y-4">
