@@ -15,11 +15,13 @@ serve(async (req) => {
   try {
     const { message, conversationHistory = [], userLocation } = await req.json();
     
-    console.log('AI Agent request:', { 
-      message, 
-      historyLength: conversationHistory.length,
-      hasLocation: !!userLocation 
-    });
+    console.log('=== AI AGENT REQUEST ===');
+    console.log('User message:', message);
+    console.log('History length:', conversationHistory.length);
+    if (conversationHistory.length > 0) {
+      console.log('Last message:', conversationHistory[conversationHistory.length - 1]);
+    }
+    console.log('Has location:', !!userLocation);
 
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
@@ -101,28 +103,24 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "search_restaurants",
-          description: "Search for restaurants near a specific location or coordinates. Use this when users ask about restaurants, dining, food, or places to eat. If the user provides coordinates (latitude, longitude), use those. Otherwise, use a city name and it will find restaurants in that area.",
+          description: "Search for restaurants in a specific city or location. Use this when users ask about restaurants, dining, food, or places to eat. Always provide the location (city name).",
           parameters: {
             type: "object",
             properties: {
               location: {
                 type: "string",
-                description: "The city or area to search for restaurants (e.g., 'New York', 'Paris')"
+                description: "The city or area to search for restaurants (e.g., 'New York', 'Paris', 'London')"
               },
-              latitude: {
-                type: "number",
-                description: "Latitude coordinate if user provided specific location"
+              cuisine: {
+                type: "string",
+                description: "Type of cuisine if specified (e.g., 'Italian', 'Japanese', 'Mexican')"
               },
-              longitude: {
-                type: "number",
-                description: "Longitude coordinate if user provided specific location"
-              },
-              radius: {
-                type: "number",
-                description: "Search radius in meters (default 5000)"
+              priceRange: {
+                type: "string",
+                description: "Price range filter: '$' (budget), '$$ - $$$' (moderate), or '$$$$' (expensive)"
               }
             },
-            required: []
+            required: ["location"]
           }
         }
       },
@@ -241,6 +239,8 @@ serve(async (req) => {
 
 CRITICAL BEHAVIOR: Be action-oriented and proactive. When users mention travel needs (hotels, flights, restaurants), IMMEDIATELY use the search tools with smart defaults. DO NOT ask clarifying questions first - show results, then offer to refine.
 
+CONTEXT AWARENESS: When you've just asked "What city are you in?" and the user responds with ONLY a city name (like "New York", "Paris", "London"), IMMEDIATELY call the appropriate search tool (search_hotels or search_restaurants) with that city. Don't ask for confirmation - just search!
+
 LOCATION RULES:
 - NEVER ask users for latitude, longitude, GPS coordinates, or precise location data
 - ALWAYS ask for city names instead (e.g., "What city are you in?" not "What's your latitude and longitude?")
@@ -290,6 +290,13 @@ YOU: *Immediately call search_hotels with location="Tokyo", checkIn="2025-09-30"
 
 User: "Show me restaurants near me"
 YOU: "What city are you in? I'll find the best restaurants for you!"
+User: "New York"
+YOU: *Immediately call search_restaurants with location="New York"*
+
+User: "Find hotels near my location"
+YOU: "What city are you in? I'll search for hotels there!"
+User: "Paris"
+YOU: *Immediately call search_hotels with location="Paris", checkIn=today, checkOut=tomorrow, guests=2*
 
 CRITICAL: When you use search tools and get results, DO NOT list out all the details in text. The interface will show beautiful visual cards automatically. Instead, give a brief, friendly response like:
 
@@ -488,7 +495,9 @@ async function searchHotels(args: any, apiKey: string) {
     );
 
     if (!searchResponse.ok) {
-      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
+      const errorText = await searchResponse.text();
+      console.error('TripAdvisor hotels search error:', searchResponse.status, errorText);
+      return { error: `Could not find hotels in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
     }
 
     const searchData = await searchResponse.json();
@@ -667,7 +676,9 @@ async function searchRestaurants(args: any) {
     );
 
     if (!searchResponse.ok) {
-      return { error: `Could not find restaurants in "${location}". Please try a different location.`, results: [] };
+      const errorText = await searchResponse.text();
+      console.error('TripAdvisor search error:', searchResponse.status, errorText);
+      return { error: `Could not find restaurants in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
     }
 
     const searchData = await searchResponse.json();
