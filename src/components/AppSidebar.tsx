@@ -1,11 +1,10 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, MapPin, FileCheck } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, MapPin } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
 import luxuryHotels from "@/assets/luxury-hotels.jpg";
 import luxuryFlights from "@/assets/luxury-flights.jpg";
 import luxuryDestinations from "@/assets/luxury-destinations.jpg";
 import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
-import luxuryVisa from "@/assets/luxury-visa.jpg";
 import luxuryEvents from "@/assets/luxury-events.jpg";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -38,7 +37,6 @@ const quickLinks = [
   { title: "Flights", icon: Plane, image: luxuryFlights, path: "/search?type=flights" },
   { title: "Destinations", icon: MapPin, image: luxuryDestinations, path: "/search?type=destinations" },
   { title: "Restaurants", icon: UtensilsCrossed, image: luxuryRestaurants, path: "/search?type=restaurants" },
-  { title: "Visa", icon: FileCheck, image: luxuryVisa, path: "/search?type=visa" },
   { title: "Events", icon: Ticket, image: luxuryEvents, path: "/search?type=events" },
 ];
 
