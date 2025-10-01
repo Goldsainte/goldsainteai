@@ -18,8 +18,8 @@ serve(async (req) => {
     
     console.log('Expedia hotel search:', { location, checkIn, checkOut, guests, rooms });
 
-    if (!EXPEDIA_API_KEY) {
-      throw new Error("EXPEDIA_API_KEY is not configured");
+    if (!EXPEDIA_API_KEY || !EXPEDIA_API_SECRET) {
+      throw new Error("EXPEDIA_API_KEY and EXPEDIA_API_SECRET must be configured");
     }
 
     // Expedia Rapid API endpoint for property availability
@@ -34,10 +34,33 @@ serve(async (req) => {
 
     console.log('Calling Expedia API:', url.toString());
 
+    // Generate signature for Expedia Rapid API authentication
+    const timestamp = Math.floor(Date.now() / 1000).toString();
+    
+    // Create the string to sign: apikey + secret + timestamp
+    const stringToSign = EXPEDIA_API_KEY + EXPEDIA_API_SECRET + timestamp;
+    
+    // Generate HMAC-SHA256 signature
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(EXPEDIA_API_SECRET);
+    const messageData = encoder.encode(stringToSign);
+    
+    const cryptoKey = await crypto.subtle.importKey(
+      "raw",
+      keyData,
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
+    
+    const signatureBuffer = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
+    const signatureArray = Array.from(new Uint8Array(signatureBuffer));
+    const signature = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
     const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${EXPEDIA_API_KEY}`,
+        "Authorization": `EAN apikey=${EXPEDIA_API_KEY},signature=${signature},timestamp=${timestamp}`,
         "Content-Type": "application/json",
         "Accept": "application/json",
       },
