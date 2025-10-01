@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase, Bot, Users } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,7 +15,6 @@ import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
-import { LuxuryServiceCard } from "@/components/LuxuryServiceCard";
 import logomark from "@/assets/logomark-seal-gold.png";
 import property1 from "@/assets/property1.jpg";
 import property2 from "@/assets/property2.jpg";
@@ -368,27 +367,18 @@ const Index = () => {
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
             {/* Centered Search Area */}
-            {/* Hero Section */}
-            <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
-              <div className="w-full max-w-4xl space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="min-h-screen flex items-center justify-center px-4 py-8">
+              <div className="w-full max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
-                <div className="flex flex-col items-center space-y-6 text-center">
-                  <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 animate-in zoom-in duration-500" />
-                  <div className="space-y-4">
-                    <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon leading-tight">
-                      Luxury Travel Redefined
-                    </h1>
-                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                      The world's first platform combining AI intelligence with expert human touch
-                    </p>
-                  </div>
+                <div className="flex flex-col items-center space-y-3">
+                  <img src={logomark} alt="Goldsainte.Ai" className="h-16 w-16" />
                 </div>
 
                 {/* Main Search */}
-                <div className="relative max-w-2xl mx-auto">
+                <div className="relative">
                   <Input
                     placeholder="Where would you like to go?"
-                    className="w-full h-16 px-6 pr-16 text-lg rounded-3xl border-2 border-primary/20 shadow-lg shadow-primary/5 focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-primary transition-all"
+                    className="w-full h-14 px-4 pr-14 text-base rounded-3xl border-border shadow-sm focus-visible:ring-1 focus-visible:ring-primary"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -398,106 +388,77 @@ const Index = () => {
                     onClick={() => handleSearch()}
                     size="icon"
                     variant="ghost"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full hover:bg-muted"
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <Send className="h-6 w-6" />
+                      <Send className="h-5 w-5" />
                     )}
                   </Button>
                 </div>
 
-                {/* Value Proposition */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto pt-8">
-                  <Card className="p-6 bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-primary/10 rounded-full">
-                        <Bot className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-1">AI-Powered Intelligence</h3>
-                        <p className="text-sm text-muted-foreground">Instant search across millions of options worldwide</p>
-                      </div>
-                    </div>
-                  </Card>
-                  <Card className="p-6 bg-gradient-to-br from-accent/5 to-primary/5 border-accent/20">
-                    <div className="flex items-start gap-4">
-                      <div className="p-3 bg-accent/10 rounded-full">
-                        <Users className="h-6 w-6 text-accent" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg mb-1">Expert Human Touch</h3>
-                        <p className="text-sm text-muted-foreground">Verified agents to perfect every detail</p>
-                      </div>
-                    </div>
-                  </Card>
-                </div>
-              </div>
-            </div>
-
-            {/* Premium Services Showcase */}
-            <div className="px-6 pb-12">
-              <div className="w-full max-w-7xl mx-auto space-y-12">
-                <div className="text-center space-y-4">
-                  <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
-                    Curated Luxury Services
-                  </h2>
-                  <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                    Every journey begins with the perfect choice. Explore our premium services designed for discerning travelers.
-                  </p>
-                </div>
-
-                {/* Service Cards Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  <LuxuryServiceCard
-                    title="Luxury Hotels"
-                    description="Experience world-class accommodations handpicked for exceptional comfort and service"
-                    image={luxuryHotels}
-                    icon={Hotel}
+                {/* Quick Actions */}
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleQuickAction('hotels')}
-                  />
-                  <LuxuryServiceCard
-                    title="Premium Flights"
-                    description="Travel in unparalleled comfort with our exclusive first-class and business-class options"
-                    image={luxuryFlights}
-                    icon={Plane}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Hotel className="h-4 w-4" />
+                    Hotels
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleQuickAction('flights')}
-                  />
-                  <LuxuryServiceCard
-                    title="Fine Dining"
-                    description="Reserve tables at Michelin-starred restaurants and hidden culinary gems worldwide"
-                    image={luxuryRestaurants}
-                    icon={UtensilsCrossed}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Plane className="h-4 w-4" />
+                    Flights
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleQuickAction('restaurants')}
-                  />
-                  <LuxuryServiceCard
-                    title="Exclusive Events"
-                    description="Access VIP experiences, galas, and cultural events across the globe"
-                    image={luxuryEvents}
-                    icon={Ticket}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <UtensilsCrossed className="h-4 w-4" />
+                    Restaurants
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleQuickAction('events')}
-                  />
-                  <LuxuryServiceCard
-                    title="Luxury Car Rentals"
-                    description="Arrive in style with premium and exotic vehicle options at every destination"
-                    image={property4}
-                    icon={Car}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Ticket className="h-4 w-4" />
+                    Events
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => handleQuickAction('cars')}
-                  />
-                  <LuxuryServiceCard
-                    title="Visa Services"
-                    description="Seamless visa processing and documentation assistance for stress-free travel"
-                    image={luxuryVisa}
-                    icon={FileCheck}
-                    onClick={() => handleSearch("I need help with visa requirements")}
-                  />
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Car className="h-4 w-4" />
+                    Car Rentals
+                  </Button>
                 </div>
+
+                {/* Footer */}
+                <p className="text-xs text-muted-foreground text-center pt-4">
+                  By using Goldsainte.Ai, you agree to our{" "}
+                  <a href="#" className="underline hover:text-foreground">Terms</a>
+                  {" "}and{" "}
+                  <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
+                </p>
               </div>
             </div>
 
-            {/* Inspiration Content */}
+            {/* Inspiration Content - Far below the fold */}
             <div className="px-6 pb-12 pt-20">
               <div className="w-full max-w-7xl mx-auto space-y-6">
                 <div className="text-center space-y-2">
