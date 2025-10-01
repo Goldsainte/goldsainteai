@@ -21,11 +21,10 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   const [showDateModal, setShowDateModal] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
-  // Parse Booking.com API data properly
-  const title = property.property?.name || property.title || property.label || "Hotel";
-  const imageUrl = property.property?.photoUrls?.[0] || property.image;
-  const image = getHotelImage(imageUrl, property.hotel_id || property.property?.name || title);
-  const propertyUrl = property.property?.externalUrls?.default || property.url || "#";
+  const title = property.property?.name || property.name || property.title || property.label || "Hotel";
+  const imageUrl = property.property?.photoUrls?.[0] || property.photos?.[0]?.url || property.image;
+  const image = getHotelImage(imageUrl, property.hotel_id || property.property?.name || property.name || title);
+  const propertyUrl = property.property?.externalUrls?.default || property.web_url || property.url || "#";
   
   // Extract city code for Amadeus (would need proper mapping in production)
   const getCityCode = () => {
@@ -35,9 +34,13 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
     return property.cityCode || "PAR"; // Default to Paris for demo
   };
   
-  // Extract clean location from accessibilityLabel
+  // Extract clean location from data
   const getCleanLocation = () => {
     if (property.location) return property.location;
+    if (property.address) return property.address;
+    if (property.city || property.country) {
+      return [property.city, property.country].filter(Boolean).join(', ');
+    }
     if (property.region) return property.region;
     
     // Parse accessibilityLabel to get just the district and distance
@@ -54,12 +57,13 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   };
   
   const location = getCleanLocation();
-  const rating = Number(property.property?.reviewScore || property.rating || 0);
-  const reviews = Number(property.property?.reviewCount || property.reviews || 0);
+  const rating = Number(property.property?.reviewScore ?? (property.rating ? Number(property.rating) * 2 : 0));
+  const reviews = Number(property.property?.reviewCount ?? property.num_reviews ?? property.reviews ?? 0);
   
   // Extract clean price
   const getCleanPrice = () => {
     if (property.price) return property.price;
+    if (property.estimated_price) return property.estimated_price;
     if (property.priceBreakdown?.grossPrice?.value) {
       return property.priceBreakdown.grossPrice.value;
     }
@@ -76,7 +80,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   };
   
   const displayPrice = getCleanPrice();
-  const currency = property.priceBreakdown?.grossPrice?.currency || "USD";
+  const currency = property.currency || property.priceBreakdown?.grossPrice?.currency || "USD";
 
   // Get rating descriptor
   const getRatingText = (score: number) => {

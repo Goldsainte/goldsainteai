@@ -172,14 +172,14 @@ const SearchResults = () => {
 
     // Apply price filter
     filtered = filtered.filter((item) => {
-      const price = item.price || 0;
+      const price = item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0;
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
     // Apply rating filter
     if (minRating) {
       filtered = filtered.filter((item) => {
-        const rating = item.property?.reviewScore || 0;
+        const rating = (item.property?.reviewScore ?? (item.rating ? Number(item.rating) * 2 : 0));
         return rating >= minRating;
       });
     }
@@ -203,7 +203,11 @@ const SearchResults = () => {
         filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
         break;
       case "review_score":
-        filtered.sort((a, b) => (b.property?.reviewScore || 0) - (a.property?.reviewScore || 0));
+        filtered.sort((a, b) => {
+          const ra = a.property?.reviewScore ?? (a.rating ? Number(a.rating) * 2 : 0);
+          const rb = b.property?.reviewScore ?? (b.rating ? Number(b.rating) * 2 : 0);
+          return rb - ra;
+        });
         break;
       default:
         // Keep recommended order (popularity)
