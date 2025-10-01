@@ -21,6 +21,7 @@ import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import BookingPreferences from "./pages/BookingPreferences";
 import CommissionDashboard from "./pages/CommissionDashboard";
+import EmailPreview from "./pages/EmailPreview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ function App() {
               <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
               <Route path="/booking-preferences" element={<BookingPreferences />} />
               <Route path="/commission-dashboard" element={<CommissionDashboard />} />
+              <Route path="/email-preview" element={<EmailPreview />} />
               <Route path="/favorites" element={<Favorites />} />
                     <Route path="/search" element={<SearchResults />} />
                     <Route path="/hotel-booking" element={<HotelBooking />} />
