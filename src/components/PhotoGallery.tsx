@@ -77,6 +77,12 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
         ))}
       </div>
 
+      <div className="flex justify-end mt-2">
+        <Button variant="outline" onClick={() => { setShowGrid(true); setIsOpen(true); }}>
+          View all {images.length} photos
+        </Button>
+      </div>
+
       {/* Full Screen Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black">
@@ -164,7 +170,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
 
                 {/* Thumbnail Strip */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/60 p-2 rounded-lg max-w-[90vw] overflow-x-auto">
-                  {images.slice(0, 10).map((img, idx) => (
+                  {images.slice(0, 30).map((img, idx) => (
                     <div
                       key={idx}
                       className={cn(

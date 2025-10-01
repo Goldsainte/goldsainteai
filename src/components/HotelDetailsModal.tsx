@@ -74,7 +74,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     const uniqueUrls = Array.from(byId.values()).map(v => v.url);
     
     // Use image helper to add fallbacks if needed
-    return getHotelImages(uniqueUrls, hotelId?.toString(), 12);
+    return getHotelImages(uniqueUrls, hotelId?.toString(), 60);
   }, [propertyData, hotelData, hotel, hotelId]);
 
   // Get room photos - use helper with fallbacks
@@ -174,7 +174,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   // Photos tab: prefer dedicated guest photos if available; otherwise use property photos
   const customerPhotos = (propertyData?.guestPhotoUrls && propertyData.guestPhotoUrls.length > 0)
     ? propertyData.guestPhotoUrls
-    : hotelPhotos.slice(0, 12);
+    : hotelPhotos.slice(0, 60);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>

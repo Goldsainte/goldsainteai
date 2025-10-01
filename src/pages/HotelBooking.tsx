@@ -378,7 +378,8 @@ export default function HotelBooking() {
                   <div className="text-3xl font-bold">
                     {bookingData.currency || 'USD'} {Number(bookingData.totalPrice || 200).toFixed(2)}
                   </div>
-                  <div className="text-sm text-muted-foreground">per night</div>
+                  <div className="text-sm text-muted-foreground">total for {nights} night{nights > 1 ? 's' : ''}</div>
+                  <div className="text-xs text-muted-foreground">~ {(Number(bookingData.totalPrice || 200) / Math.max(1, nights)).toFixed(2)} {bookingData.currency || 'USD'} per night</div>
                 </div>
 
                 <div className="pt-4 border-t space-y-2 text-sm">

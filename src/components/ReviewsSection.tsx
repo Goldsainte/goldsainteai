@@ -79,7 +79,7 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
     return sorted;
   }, [reviews, sortBy]);
 
-  const displayedReviews = showAll ? sortedReviews : sortedReviews.slice(0, 10);
+  const displayedReviews = showAll ? sortedReviews : sortedReviews.slice(0, 20);
 
   // Calculate rating distribution
   const ratingDistribution = useMemo(() => {
