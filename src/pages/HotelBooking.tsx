@@ -125,20 +125,11 @@ export default function HotelBooking() {
         <div className="container mx-auto px-4 py-4">
           <Button
             variant="ghost"
-            onClick={() => {
-              const params = new URLSearchParams({
-                type: 'hotels',
-                location: bookingData.cityCode || bookingData.region || 'NYC',
-                checkIn: checkIn || '',
-                checkOut: checkOut || '',
-                guests: String(guests || 2),
-              });
-              navigate(`/search?${params.toString()}`);
-            }}
+            onClick={() => navigate(-1)}
             className="gap-2 mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
-            See all properties
+            Back to search results
           </Button>
           
           {/* Search modification bar */}
