@@ -362,64 +362,67 @@ const Index = () => {
       <div className="w-full h-full flex flex-col">
         {!showChat ? (
           // Initial search view - centered
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-            <div className="w-full max-w-3xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              {/* Logo and Title */}
-              <div className="flex flex-col items-center space-y-4 mb-8">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                  <img src={logomark} alt="Sainté Voyage AI" className="h-24 w-24 relative z-10" />
-                </div>
-                <h1 className="text-4xl font-semibold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
-                  Goldsainte.Ai
-                </h1>
-                <p className="text-xs text-muted-foreground text-center max-w-2xl leading-relaxed">
-                  <span className="font-semibold text-foreground">AI Efficiency. Human Touch. Your Personal Travel Concierge.</span>
-                  <br />
-                  Our cutting-edge AI handles quick requests with speed and precision— while our licensed travel experts' step in to unlock contract-only rates, navigate complex ticketing, and deliver exclusive perks you won't find on public sites.
-                </p>
-                {userLocation && (
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <MapPinned className="h-3 w-3 text-primary" />
-                    <span>Location detected - showing nearby results</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Main Search */}
-              <Card className="relative overflow-hidden border-2 shadow-lg">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
-                <div className="relative p-2">
+          <div className="flex-1 flex flex-col">
+            {/* Centered Search Area */}
+            <div className="min-h-screen flex items-center justify-center px-6">
+              <div className="w-full max-w-3xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                {/* Logo and Title */}
+                <div className="flex flex-col items-center space-y-4 mb-8">
                   <div className="relative">
-                    <img src={logomark} alt="Sainté Voyage" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 object-contain" />
-                    <Input
-                      placeholder="Where would you like to go? Ask me anything..."
-                      className="w-full h-14 pl-12 pr-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      disabled={isLoading}
-                    />
-                    <Button
-                      onClick={() => handleSearch()}
-                      size="icon"
-                      className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-xl"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                      ) : (
-                        <Search className="h-5 w-5" />
-                      )}
-                    </Button>
+                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
+                    <img src={logomark} alt="Sainté Voyage AI" className="h-24 w-24 relative z-10" />
                   </div>
+                  <h1 className="text-4xl font-semibold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
+                    Goldsainte.Ai
+                  </h1>
+                  <p className="text-xs text-muted-foreground text-center max-w-2xl leading-relaxed">
+                    <span className="font-semibold text-foreground">AI Efficiency. Human Touch. Your Personal Travel Concierge.</span>
+                    <br />
+                    Our cutting-edge AI handles quick requests with speed and precision— while our licensed travel experts' step in to unlock contract-only rates, navigate complex ticketing, and deliver exclusive perks you won't find on public sites.
+                  </p>
+                  {userLocation && (
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <MapPinned className="h-3 w-3 text-primary" />
+                      <span>Location detected - showing nearby results</span>
+                    </div>
+                  )}
                 </div>
-              </Card>
 
-              {/* Quick Actions - Removed, now in sidebar */}
+                {/* Main Search */}
+                <Card className="relative overflow-hidden border-2 shadow-lg">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
+                  <div className="relative p-2">
+                    <div className="relative">
+                      <img src={logomark} alt="Sainté Voyage" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 object-contain" />
+                      <Input
+                        placeholder="Where would you like to go? Ask me anything..."
+                        className="w-full h-14 pl-12 pr-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        disabled={isLoading}
+                      />
+                      <Button
+                        onClick={() => handleSearch()}
+                        size="icon"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-xl"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Search className="h-5 w-5" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+            </div>
 
-              {/* Get Inspired Section */}
-              <div className="space-y-6 pt-40">
+            {/* Get Inspired Section - Below the fold */}
+            <div className="px-6 pb-12">
+              <div className="w-full max-w-7xl mx-auto space-y-6">
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
