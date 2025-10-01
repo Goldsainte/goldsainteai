@@ -9,15 +9,15 @@ const corsHeaders = {
 
 // Input validation schema
 const bookingSchema = z.object({
-  bookingType: z.enum(['hotel', 'flight', 'car', 'package']),
+  bookingType: z.enum(['hotel', 'flight', 'car', 'package', 'restaurant', 'event']),
   bookingData: z.record(z.unknown()),
   totalPrice: z.number().positive().max(1000000),
-  currency: z.string().length(3).regex(/^[A-Z]{3}$/),
+  currency: z.string().length(3),
   guestInfo: z.object({
     email: z.string().email().max(255),
     firstName: z.string().trim().min(1).max(100),
     lastName: z.string().trim().min(1).max(100),
-    phone: z.string().trim().max(50).optional(),
+    phone: z.string().trim().max(20).optional(),
     country: z.string().max(100).optional(),
     specialRequests: z.string().max(1000).optional(),
   }),

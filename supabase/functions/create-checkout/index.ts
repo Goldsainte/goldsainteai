@@ -12,7 +12,7 @@ const corsHeaders = {
 const checkoutSchema = z.object({
   bookingId: z.string().uuid(),
   amount: z.number().positive().max(1000000),
-  currency: z.string().length(3).regex(/^[A-Z]{3}$/).default('USD'),
+  currency: z.string().length(3).default('USD'),
   guestEmail: z.string().email().max(255),
 });
 
