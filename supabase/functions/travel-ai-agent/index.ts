@@ -1213,21 +1213,27 @@ async function searchHotels(args: any, apiKey: string) {
     let hotels = data.results || [];
     
     console.log(`Amadeus returned ${hotels.length} hotels`);
+    console.log('Sample hotel structure:', hotels[0] ? JSON.stringify(hotels[0]).substring(0, 500) : 'No hotels');
 
 
     // Apply filters on Amadeus data
     if (typeof minRating === 'number') {
       const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
+      const beforeFilter = hotels.length;
       hotels = hotels.filter((h: any) => {
         const rating = h.hotel?.rating || 0;
         return rating >= minRatingNormalized;
       });
+      console.log(`Rating filter: ${beforeFilter} → ${hotels.length} hotels`);
     }
     if (typeof maxPrice === 'number') {
+      const beforeFilter = hotels.length;
       hotels = hotels.filter((h: any) => {
         const price = h.offers?.[0]?.price?.total ? parseFloat(h.offers[0].price.total) : 0;
+        console.log(`Hotel price: ${price}, max: ${maxPrice}, passes: ${price <= maxPrice}`);
         return price <= maxPrice;
       });
+      console.log(`Price filter (max $${maxPrice}): ${beforeFilter} → ${hotels.length} hotels`);
     }
     if (sortBy === 'price') {
       hotels.sort((a: any, b: any) => {
@@ -1242,6 +1248,8 @@ async function searchHotels(args: any, apiKey: string) {
         return ratingB - ratingA;
       });
     }
+
+    console.log(`After all filters: ${hotels.length} hotels`);
 
     // Transform Amadeus data to match expected format
     const transformedHotels = hotels.map((hotel: any) => {
