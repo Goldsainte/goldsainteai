@@ -1,8 +1,14 @@
-import { Heart, User } from "lucide-react";
+import { Heart, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import logomark from "@/assets/logomark-seal-gold.png";
 
 export const Header = () => {
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
   return (
     <header className="bg-primary text-primary-foreground shadow-md">
       <div className="container mx-auto px-4">
@@ -35,12 +41,45 @@ export const Header = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" className="text-primary-foreground hover:text-accent hover:bg-primary/90">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-primary-foreground hover:text-accent hover:bg-primary/90"
+              onClick={() => navigate('/favorites')}
+            >
               <Heart className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-primary-foreground hover:text-accent hover:bg-primary/90">
-              <User className="h-5 w-5" />
-            </Button>
+            
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="text-primary-foreground hover:text-accent hover:bg-primary/90">
+                  <User className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {user ? (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="gap-2">
+                      <Settings className="h-4 w-4" />
+                      Booking Preferences
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/favorites')}>
+                      Favorites
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={signOut}>
+                      Sign Out
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <DropdownMenuItem onClick={() => navigate('/auth')}>
+                    Sign In
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
