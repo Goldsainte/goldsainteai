@@ -3,8 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ComprehensivePreferencesForm } from "@/components/ComprehensivePreferencesForm";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
 
 export default function Onboarding() {
@@ -50,6 +52,15 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-12 px-4">
       <div className="container mx-auto max-w-5xl">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <div className="flex flex-col items-center mb-8">
           <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
           <h1 className="text-4xl font-chiffon text-primary mb-2">Welcome to Goldsainte AI</h1>

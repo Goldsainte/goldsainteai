@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AgentDashboard() {
@@ -136,6 +136,15 @@ export default function AgentDashboard() {
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <div className="mb-8">
           <h1 className="text-4xl font-chiffon text-primary mb-2">Agent Dashboard</h1>
           <p className="text-muted-foreground">{agent.agency_name} • Rating: {agent.rating}/5 ({agent.total_reviews} reviews)</p>

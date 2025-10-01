@@ -6,7 +6,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { HotelFilters } from "@/components/HotelFilters";
 import { Button } from "@/components/ui/button";
-import { Loader2, SlidersHorizontal, Map, List } from "lucide-react";
+import { Loader2, SlidersHorizontal, Map, List, ArrowLeft } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -216,6 +216,15 @@ const SearchResults = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Search
+        </Button>
+        
         <div className="mb-6">
           <SearchBar />
         </div>

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Briefcase, Plus, MapPin, DollarSign, Clock } from "lucide-react";
+import { Briefcase, Plus, MapPin, DollarSign, Clock, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
 
@@ -187,6 +187,15 @@ export default function Marketplace() {
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-chiffon text-primary mb-2">Travel Agent Marketplace</h1>

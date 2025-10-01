@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { MessageSquare, Send, Settings } from "lucide-react";
+import { MessageSquare, Send, Settings, ArrowLeft } from "lucide-react";
 import { ComprehensivePreferencesForm } from "@/components/ComprehensivePreferencesForm";
 
 type Message = { role: "user" | "assistant"; content: string };
@@ -143,6 +143,15 @@ export default function BookingPreferences() {
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-chiffon text-primary mb-2">Booking Preferences</h1>

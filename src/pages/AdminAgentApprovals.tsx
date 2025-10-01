@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, Building2 } from "lucide-react";
+import { CheckCircle, XCircle, Clock, Building2, ArrowLeft } from "lucide-react";
 
 interface PendingAgent {
   id: string;
@@ -132,6 +132,15 @@ export default function AdminAgentApprovals() {
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/dashboard')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        
         <div className="mb-6">
           <h1 className="text-4xl font-chiffon text-primary mb-2">Agent Application Review</h1>
           <p className="text-muted-foreground">Review and approve travel agent applications</p>

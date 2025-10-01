@@ -8,7 +8,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, DollarSign, Clock, User, Search, Heart, CreditCard, Settings, Briefcase } from "lucide-react";
+import { Calendar, MapPin, DollarSign, Clock, User, Search, Heart, CreditCard, Settings, Briefcase, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
 interface Booking {
@@ -119,6 +119,15 @@ export default function Dashboard() {
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <div className="mb-8">
           <h1 className="text-4xl font-chiffon text-primary mb-2">My Dashboard</h1>
           <p className="text-muted-foreground">Manage your bookings and preferences</p>

@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavorites } from '@/hooks/useFavorites';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FlightCard } from '@/components/FlightCard';
 import { SimplePropertyCard } from '@/components/SimplePropertyCard';
 import { RestaurantCard } from '@/components/RestaurantCard';
-import { Loader2, Heart } from 'lucide-react';
+import { Loader2, Heart, ArrowLeft } from 'lucide-react';
 
 const Favorites = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -35,6 +36,15 @@ const Favorites = () => {
   return (
     <main className="flex-1 bg-gradient-to-br from-background via-background to-muted/20 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <div className="flex items-center gap-3">
           <Heart className="h-8 w-8 text-primary" />
           <h1 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">

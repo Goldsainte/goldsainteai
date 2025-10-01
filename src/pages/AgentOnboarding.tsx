@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Briefcase, Upload } from "lucide-react";
+import { Briefcase, Upload, ArrowLeft } from "lucide-react";
 import { TermsDialog, PrivacyDialog, VendorDialog, InsuranceDialog } from "@/components/AgentLegalDocuments";
 
 export default function AgentOnboarding() {
@@ -117,6 +117,15 @@ export default function AgentOnboarding() {
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/')}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Home
+        </Button>
+        
         <Card>
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
