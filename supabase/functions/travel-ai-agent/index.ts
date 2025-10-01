@@ -1246,13 +1246,37 @@ async function searchHotels(args: any, apiKey: string) {
     const normalizeLocation = (loc: string) => 
       (loc || '').toLowerCase().replace(/\s+city\s*/gi, '').trim();
     
+    // Map common abbreviations to full names
+    const cityAbbreviations: { [key: string]: string[] } = {
+      'nyc': ['new york', 'ny'],
+      'la': ['los angeles'],
+      'sf': ['san francisco'],
+      'dc': ['washington'],
+      'philly': ['philadelphia'],
+      'vegas': ['las vegas']
+    };
+    
     const searchLocation = normalizeLocation(location);
+    
+    // Get all possible variations for the search location
+    const searchVariations = [searchLocation];
+    if (cityAbbreviations[searchLocation]) {
+      searchVariations.push(...cityAbbreviations[searchLocation]);
+    }
+    // Also check if the search is a full name that matches an abbreviation
+    for (const [abbrev, fullNames] of Object.entries(cityAbbreviations)) {
+      if (fullNames.some(name => searchLocation.includes(name))) {
+        searchVariations.push(abbrev, ...fullNames);
+      }
+    }
     
     // Filter hotels to only those in the searched city
     transformedHotels = transformedHotels.filter((hotel: any) => {
       const hotelCity = normalizeLocation(hotel.city || hotel.location || '');
-      // Check if hotel city matches search location or if search location is part of hotel city
-      const isMatch = hotelCity.includes(searchLocation) || searchLocation.includes(hotelCity);
+      // Check if hotel city matches any search location variation
+      const isMatch = searchVariations.some(variation => 
+        hotelCity.includes(variation) || variation.includes(hotelCity)
+      );
       if (!isMatch) {
         console.log(`Filtered out: ${hotel.name} (City: ${hotel.city}) - doesn't match search: ${location}`);
       }
