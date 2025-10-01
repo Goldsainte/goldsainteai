@@ -369,11 +369,13 @@ const Index = () => {
     setMessages([{ role: 'user', content: query }]);
 
     try {
+      setActiveQuickLink(action as "hotels" | "flights" | "restaurants" | "events" | "cars");
       const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
         body: { 
           message: query,
           conversationHistory: [],
           isQuickLink: true, // Flag to indicate this is from a quick link
+          quickLinkType: action,
           userLocation: userLocation ? {
             latitude: userLocation.lat,
             longitude: userLocation.lng

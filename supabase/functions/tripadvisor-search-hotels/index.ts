@@ -88,8 +88,8 @@ serve(async (req) => {
             reviewsResponse.ok ? reviewsResponse.json() : Promise.resolve({ data: [] })
           ]);
 
-          const photos = (photosData.data || []).slice(0, 5);
-          const reviews = (reviewsData.data || []).slice(0, 3);
+          const photos = (photosData.data || []).slice(0, 30);
+          const reviews = (reviewsData.data || []).slice(0, 50);
 
           return {
             id: hotel.location_id,
