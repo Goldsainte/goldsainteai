@@ -65,9 +65,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string, username?: string) => {
     try {
-      const redirectUrl = `${window.location.origin}/`;
+      const redirectUrl = `${window.location.origin}/onboarding`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -80,12 +80,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) throw error;
       
-      toast({
-        title: "Account created!",
-        description: "Welcome to Goldsainte AI!",
-      });
+      if (data.user) {
+        setUser(data.user);
+        setSession(data.session);
+      }
       
-      navigate('/');
       return { error: null };
     } catch (error: any) {
       return { error };

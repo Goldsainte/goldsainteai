@@ -585,54 +585,282 @@ export type Database = {
       user_booking_preferences: {
         Row: {
           accessibility_needs: string[] | null
+          accessible_rooms: boolean | null
+          airport_shuttle: boolean | null
           auto_booking_enabled: boolean | null
+          baggage_carry_on: boolean | null
+          baggage_checked: number | null
+          bed_type: string | null
+          breakfast_included: boolean | null
+          cabin_class: string | null
+          car_budget_max: number | null
+          car_budget_min: number | null
+          car_features: string[] | null
+          car_type: string | null
           created_at: string
+          cuisine_types: string[] | null
+          currency: string | null
+          departure_airport: string | null
+          destination: string | null
+          destination_airport: string | null
           dietary_restrictions: string[] | null
+          digital_tickets: boolean | null
+          dining_time_flexible: boolean | null
+          direct_flights_only: boolean | null
+          distance_from_airport: number | null
+          distance_from_center: number | null
+          dropoff_location: string | null
+          event_accessibility: boolean | null
+          event_budget_max: number | null
+          event_budget_min: number | null
+          event_location: string | null
+          event_time_preference: string | null
+          event_types: string[] | null
+          excluded_airlines: string[] | null
+          flexible_fare: boolean | null
+          flight_type: string | null
+          free_cancellation: boolean | null
+          free_wifi: boolean | null
+          fuel_policy: string | null
+          group_friendly: boolean | null
+          gym: boolean | null
           id: string
+          include_nearby_airports: boolean | null
+          include_taxes_fees: boolean | null
+          insurance_included: boolean | null
+          max_duration_hours: number | null
+          max_layover_hours: number | null
           max_price_per_night: number | null
+          max_price_per_passenger: number | null
+          max_stops: number | null
           meal_preference: string | null
+          min_review_score: number | null
+          minimum_driver_age: number | null
+          near_accommodation: boolean | null
+          near_hotel: boolean | null
+          neighborhood: string | null
           notification_preferences: Json | null
+          number_of_adults: number | null
+          number_of_children: number | null
+          number_of_infants: number | null
+          parking: boolean | null
+          pay_at_property: boolean | null
+          pet_friendly: boolean | null
+          pickup_location: string | null
+          pool: boolean | null
           preferred_airlines: string[] | null
+          preferred_alliance: string | null
           preferred_amenities: string[] | null
+          preferred_arrival_time: string | null
+          preferred_departure_time: string | null
+          preferred_dining_time: string | null
           preferred_hotel_rating: number | null
+          price_range_max: number | null
+          price_range_min: number | null
+          private_dining: boolean | null
+          property_types: string[] | null
+          refundable_ticket: boolean | null
+          restaurant_experience_type: string[] | null
+          restaurant_price_range: string | null
+          room_type: string | null
           seat_preference: string | null
+          seating_preference: string | null
+          seating_type: string | null
           special_requests: string | null
+          ticket_type: string | null
+          transmission_type: string | null
+          unlimited_mileage: boolean | null
           updated_at: string
           user_id: string
+          walkable_distance: boolean | null
+          wheelchair_assistance: boolean | null
+          young_driver_accepted: boolean | null
         }
         Insert: {
           accessibility_needs?: string[] | null
+          accessible_rooms?: boolean | null
+          airport_shuttle?: boolean | null
           auto_booking_enabled?: boolean | null
+          baggage_carry_on?: boolean | null
+          baggage_checked?: number | null
+          bed_type?: string | null
+          breakfast_included?: boolean | null
+          cabin_class?: string | null
+          car_budget_max?: number | null
+          car_budget_min?: number | null
+          car_features?: string[] | null
+          car_type?: string | null
           created_at?: string
+          cuisine_types?: string[] | null
+          currency?: string | null
+          departure_airport?: string | null
+          destination?: string | null
+          destination_airport?: string | null
           dietary_restrictions?: string[] | null
+          digital_tickets?: boolean | null
+          dining_time_flexible?: boolean | null
+          direct_flights_only?: boolean | null
+          distance_from_airport?: number | null
+          distance_from_center?: number | null
+          dropoff_location?: string | null
+          event_accessibility?: boolean | null
+          event_budget_max?: number | null
+          event_budget_min?: number | null
+          event_location?: string | null
+          event_time_preference?: string | null
+          event_types?: string[] | null
+          excluded_airlines?: string[] | null
+          flexible_fare?: boolean | null
+          flight_type?: string | null
+          free_cancellation?: boolean | null
+          free_wifi?: boolean | null
+          fuel_policy?: string | null
+          group_friendly?: boolean | null
+          gym?: boolean | null
           id?: string
+          include_nearby_airports?: boolean | null
+          include_taxes_fees?: boolean | null
+          insurance_included?: boolean | null
+          max_duration_hours?: number | null
+          max_layover_hours?: number | null
           max_price_per_night?: number | null
+          max_price_per_passenger?: number | null
+          max_stops?: number | null
           meal_preference?: string | null
+          min_review_score?: number | null
+          minimum_driver_age?: number | null
+          near_accommodation?: boolean | null
+          near_hotel?: boolean | null
+          neighborhood?: string | null
           notification_preferences?: Json | null
+          number_of_adults?: number | null
+          number_of_children?: number | null
+          number_of_infants?: number | null
+          parking?: boolean | null
+          pay_at_property?: boolean | null
+          pet_friendly?: boolean | null
+          pickup_location?: string | null
+          pool?: boolean | null
           preferred_airlines?: string[] | null
+          preferred_alliance?: string | null
           preferred_amenities?: string[] | null
+          preferred_arrival_time?: string | null
+          preferred_departure_time?: string | null
+          preferred_dining_time?: string | null
           preferred_hotel_rating?: number | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          private_dining?: boolean | null
+          property_types?: string[] | null
+          refundable_ticket?: boolean | null
+          restaurant_experience_type?: string[] | null
+          restaurant_price_range?: string | null
+          room_type?: string | null
           seat_preference?: string | null
+          seating_preference?: string | null
+          seating_type?: string | null
           special_requests?: string | null
+          ticket_type?: string | null
+          transmission_type?: string | null
+          unlimited_mileage?: boolean | null
           updated_at?: string
           user_id: string
+          walkable_distance?: boolean | null
+          wheelchair_assistance?: boolean | null
+          young_driver_accepted?: boolean | null
         }
         Update: {
           accessibility_needs?: string[] | null
+          accessible_rooms?: boolean | null
+          airport_shuttle?: boolean | null
           auto_booking_enabled?: boolean | null
+          baggage_carry_on?: boolean | null
+          baggage_checked?: number | null
+          bed_type?: string | null
+          breakfast_included?: boolean | null
+          cabin_class?: string | null
+          car_budget_max?: number | null
+          car_budget_min?: number | null
+          car_features?: string[] | null
+          car_type?: string | null
           created_at?: string
+          cuisine_types?: string[] | null
+          currency?: string | null
+          departure_airport?: string | null
+          destination?: string | null
+          destination_airport?: string | null
           dietary_restrictions?: string[] | null
+          digital_tickets?: boolean | null
+          dining_time_flexible?: boolean | null
+          direct_flights_only?: boolean | null
+          distance_from_airport?: number | null
+          distance_from_center?: number | null
+          dropoff_location?: string | null
+          event_accessibility?: boolean | null
+          event_budget_max?: number | null
+          event_budget_min?: number | null
+          event_location?: string | null
+          event_time_preference?: string | null
+          event_types?: string[] | null
+          excluded_airlines?: string[] | null
+          flexible_fare?: boolean | null
+          flight_type?: string | null
+          free_cancellation?: boolean | null
+          free_wifi?: boolean | null
+          fuel_policy?: string | null
+          group_friendly?: boolean | null
+          gym?: boolean | null
           id?: string
+          include_nearby_airports?: boolean | null
+          include_taxes_fees?: boolean | null
+          insurance_included?: boolean | null
+          max_duration_hours?: number | null
+          max_layover_hours?: number | null
           max_price_per_night?: number | null
+          max_price_per_passenger?: number | null
+          max_stops?: number | null
           meal_preference?: string | null
+          min_review_score?: number | null
+          minimum_driver_age?: number | null
+          near_accommodation?: boolean | null
+          near_hotel?: boolean | null
+          neighborhood?: string | null
           notification_preferences?: Json | null
+          number_of_adults?: number | null
+          number_of_children?: number | null
+          number_of_infants?: number | null
+          parking?: boolean | null
+          pay_at_property?: boolean | null
+          pet_friendly?: boolean | null
+          pickup_location?: string | null
+          pool?: boolean | null
           preferred_airlines?: string[] | null
+          preferred_alliance?: string | null
           preferred_amenities?: string[] | null
+          preferred_arrival_time?: string | null
+          preferred_departure_time?: string | null
+          preferred_dining_time?: string | null
           preferred_hotel_rating?: number | null
+          price_range_max?: number | null
+          price_range_min?: number | null
+          private_dining?: boolean | null
+          property_types?: string[] | null
+          refundable_ticket?: boolean | null
+          restaurant_experience_type?: string[] | null
+          restaurant_price_range?: string | null
+          room_type?: string | null
           seat_preference?: string | null
+          seating_preference?: string | null
+          seating_type?: string | null
           special_requests?: string | null
+          ticket_type?: string | null
+          transmission_type?: string | null
+          unlimited_mileage?: boolean | null
           updated_at?: string
           user_id?: string
+          walkable_distance?: boolean | null
+          wheelchair_assistance?: boolean | null
+          young_driver_accepted?: boolean | null
         }
         Relationships: []
       }

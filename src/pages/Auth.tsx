@@ -10,6 +10,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
+import { supabase } from '@/integrations/supabase/client';
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -30,7 +31,21 @@ const Auth = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      navigate('/');
+      // Check if user has preferences set
+      const checkPreferences = async () => {
+        const { data } = await supabase
+          .from('user_booking_preferences')
+          .select('id')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (data) {
+          navigate('/');
+        } else {
+          navigate('/onboarding');
+        }
+      };
+      checkPreferences();
     }
   }, [user, navigate]);
 
@@ -76,6 +91,12 @@ const Auth = () => {
         description: error.message || "Please try again.",
         variant: "destructive",
       });
+    } else {
+      toast({
+        title: "Account created!",
+        description: "Let's set up your travel preferences.",
+      });
+      navigate('/onboarding');
     }
     
     setIsLoading(false);

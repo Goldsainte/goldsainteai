@@ -7,13 +7,10 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { MessageSquare, Send, Settings } from "lucide-react";
+import { ComprehensivePreferencesForm } from "@/components/ComprehensivePreferencesForm";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -50,25 +47,10 @@ export default function BookingPreferences() {
     }
   };
 
-  const handleSavePreferences = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    const preferredAmenities = (formData.get('preferred_amenities') as string).split(',').map(s => s.trim()).filter(Boolean);
-    const dietaryRestrictions = (formData.get('dietary_restrictions') as string).split(',').map(s => s.trim()).filter(Boolean);
-    const preferredAirlines = (formData.get('preferred_airlines') as string).split(',').map(s => s.trim()).filter(Boolean);
-
+  const handleSavePreferences = async (formData: any) => {
     const prefsData = {
       user_id: user?.id,
-      preferred_hotel_rating: parseInt(formData.get('preferred_hotel_rating') as string),
-      max_price_per_night: parseFloat(formData.get('max_price_per_night') as string),
-      preferred_amenities: preferredAmenities,
-      dietary_restrictions: dietaryRestrictions,
-      preferred_airlines: preferredAirlines,
-      seat_preference: formData.get('seat_preference') as string,
-      meal_preference: formData.get('meal_preference') as string,
-      special_requests: formData.get('special_requests') as string,
-      auto_booking_enabled: formData.get('auto_booking_enabled') === 'on'
+      ...formData
     };
 
     try {
@@ -233,118 +215,10 @@ export default function BookingPreferences() {
               <CardDescription>Set your travel preferences using the form</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSavePreferences} className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="preferred_hotel_rating">Preferred Hotel Rating</Label>
-                    <Input 
-                      id="preferred_hotel_rating" 
-                      name="preferred_hotel_rating" 
-                      type="number" 
-                      min="1" 
-                      max="5" 
-                      defaultValue={preferences?.preferred_hotel_rating || 4}
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="max_price_per_night">Max Price Per Night ($)</Label>
-                    <Input 
-                      id="max_price_per_night" 
-                      name="max_price_per_night" 
-                      type="number" 
-                      step="0.01"
-                      defaultValue={preferences?.max_price_per_night || ""}
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="preferred_amenities">Preferred Amenities</Label>
-                  <Input 
-                    id="preferred_amenities" 
-                    name="preferred_amenities" 
-                    placeholder="Pool, Spa, Gym, WiFi (comma-separated)"
-                    defaultValue={preferences?.preferred_amenities?.join(', ') || ""}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="dietary_restrictions">Dietary Restrictions</Label>
-                  <Input 
-                    id="dietary_restrictions" 
-                    name="dietary_restrictions" 
-                    placeholder="Vegetarian, Gluten-free, Halal (comma-separated)"
-                    defaultValue={preferences?.dietary_restrictions?.join(', ') || ""}
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="seat_preference">Seat Preference</Label>
-                    <select 
-                      id="seat_preference" 
-                      name="seat_preference" 
-                      defaultValue={preferences?.seat_preference || "window"}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-background"
-                    >
-                      <option value="window">Window</option>
-                      <option value="aisle">Aisle</option>
-                      <option value="middle">Middle</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="meal_preference">Meal Preference</Label>
-                    <select 
-                      id="meal_preference" 
-                      name="meal_preference" 
-                      defaultValue={preferences?.meal_preference || "regular"}
-                      className="w-full h-10 px-3 rounded-md border border-input bg-background"
-                    >
-                      <option value="regular">Regular</option>
-                      <option value="vegetarian">Vegetarian</option>
-                      <option value="vegan">Vegan</option>
-                      <option value="kosher">Kosher</option>
-                      <option value="halal">Halal</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="preferred_airlines">Preferred Airlines</Label>
-                  <Input 
-                    id="preferred_airlines" 
-                    name="preferred_airlines" 
-                    placeholder="Emirates, Qatar Airways (comma-separated)"
-                    defaultValue={preferences?.preferred_airlines?.join(', ') || ""}
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="special_requests">Special Requests</Label>
-                  <Textarea 
-                    id="special_requests" 
-                    name="special_requests" 
-                    placeholder="Any special requests or requirements..."
-                    defaultValue={preferences?.special_requests || ""}
-                    rows={3}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch 
-                    id="auto_booking_enabled" 
-                    name="auto_booking_enabled"
-                    defaultChecked={preferences?.auto_booking_enabled || false}
-                  />
-                  <Label htmlFor="auto_booking_enabled">
-                    Enable Auto-Booking <Badge variant="secondary" className="ml-2">Beta</Badge>
-                  </Label>
-                </div>
-
-                <Button type="submit" className="w-full">Save Preferences</Button>
-              </form>
+            <ComprehensivePreferencesForm 
+              onSubmit={handleSavePreferences}
+              initialData={preferences}
+            />
             </CardContent>
           </Card>
         )}
