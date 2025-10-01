@@ -8,7 +8,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           <div>
           <div className="flex items-center mb-4">
-              <img src={verticalLogo} alt="Sainté Voyage AI" className="h-24 w-auto" />
+              <img src={verticalLogo} alt="Logo" className="h-24 w-auto" />
             </div>
             <p className="text-sm text-muted-foreground">
               Your trusted partner for exceptional travel experiences worldwide.
@@ -53,7 +53,7 @@ export const Footer = () => {
 
         <div className="border-t border-border pt-8">
           <p className="text-center text-sm text-muted-foreground">
-            © 2025 Sainté Voyage AI. All rights reserved. | Privacy Policy | Terms of Service
+            © 2025 Goldsainte.Ai. All rights reserved. | Privacy Policy | Terms of Service
           </p>
         </div>
       </div>

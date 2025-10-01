@@ -9,8 +9,8 @@ export const Header = () => {
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-8">
             <a href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <img src={logomark} alt="Sainté Voyage AI Logo" className="h-10 w-10" />
-              <span className="text-xl font-bold hidden sm:block font-chiffon">Sainté Voyage AI</span>
+              <img src={logomark} alt="Logo" className="h-10 w-10" />
+              <span className="text-xl font-bold hidden sm:block font-chiffon">Goldsainte.Ai</span>
             </a>
             
             <nav className="hidden md:flex items-center gap-6">

@@ -85,7 +85,7 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
       <Card className="w-full max-w-md p-8">
         <div className="flex flex-col items-center mb-8">
-          <img src={logomark} alt="Sainté Voyage AI" className="h-16 w-16 mb-4" />
+          <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
           <h1 className="text-2xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Welcome to Goldsainte AI
           </h1>

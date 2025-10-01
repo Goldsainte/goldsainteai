@@ -655,16 +655,8 @@ const Index = () => {
                   >
                     <ArrowLeft className="h-5 w-5" />
                   </Button>
-                  <img src={logomark} alt="Sainté Voyage AI" className="h-8 w-8" />
-                  <div>
-                    <h1 className="text-lg font-semibold text-foreground">Sainté Voyage AI</h1>
-                    <p className="text-xs text-muted-foreground">Your travel assistant</p>
-                  </div>
+                  <img src={logomark} alt="Logo" className="h-8 w-8" />
                 </div>
-                <Badge variant="secondary" className="gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  AI Powered
-                </Badge>
               </div>
             </div>
 
