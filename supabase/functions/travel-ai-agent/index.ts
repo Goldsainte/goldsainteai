@@ -58,15 +58,72 @@ serve(async (req) => {
             
           if (data) {
             userPreferences = data;
-            userContext = `\n\nUSER PREFERENCES (Apply these automatically to searches):
-- Preferred hotel rating: ${data.preferred_hotel_rating || 'Not set'} stars minimum
-- Max price per night: $${data.max_price_per_night || 'No limit'}
-- Preferred amenities: ${data.preferred_amenities?.join(', ') || 'None specified'}
-- Dietary restrictions: ${data.dietary_restrictions?.join(', ') || 'None'}
-- Seat preference: ${data.seat_preference || 'Not specified'}
-- Meal preference: ${data.meal_preference || 'Not specified'}
-- Preferred airlines: ${data.preferred_airlines?.join(', ') || 'None specified'}
-${data.special_requests ? `- Special requests: ${data.special_requests}` : ''}`;
+            userContext = `\n\n=== STRICT USER PREFERENCES - ENFORCE THESE AS HARD FILTERS ===
+
+🏨 HOTEL PREFERENCES (Apply to ALL hotel searches):
+- Min Star Rating: ${data.preferred_hotel_rating || 'Any'} stars
+- Price Range: $${data.price_range_min || 20} - $${data.price_range_max || 1000} per night
+- Distance from Center: Max ${data.distance_from_center || 'Any'} miles
+- Distance from Airport: Max ${data.distance_from_airport || 'Any'} miles
+- Room Type: ${data.room_type || 'Any'}
+- Bed Type: ${data.bed_type || 'Any'}
+- Property Types: ${data.property_types?.join(', ') || 'Any'}
+- Required Amenities: ${data.preferred_amenities?.join(', ') || 'None'}
+- Min Review Score: ${data.min_review_score || 'Any'}/10
+- Must Have: ${[
+  data.free_wifi && 'WiFi',
+  data.breakfast_included && 'Breakfast',
+  data.pool && 'Pool',
+  data.gym && 'Gym',
+  data.parking && 'Parking',
+  data.pet_friendly && 'Pet-Friendly',
+  data.airport_shuttle && 'Airport Shuttle',
+  data.accessible_rooms && 'Accessible Rooms'
+].filter(Boolean).join(', ') || 'No specific requirements'}
+
+✈️ FLIGHT PREFERENCES (Apply to ALL flight searches):
+- Cabin Class: ${data.cabin_class || 'Economy'}
+- Max Price per Passenger: $${data.max_price_per_passenger || 1000}
+- Max Duration: ${data.max_duration_hours || 'Any'} hours
+- Max Layover: ${data.max_layover_hours || 'Any'} hours
+- Max Stops: ${data.max_stops ?? 'Any'}
+- Direct Flights Only: ${data.direct_flights_only ? 'YES' : 'No'}
+- Preferred Airlines: ${data.preferred_airlines?.join(', ') || 'Any'}
+- Excluded Airlines: ${data.excluded_airlines?.join(', ') || 'None'}
+- Seat Preference: ${data.seat_preference || 'Any'}
+- Meal Preference: ${data.meal_preference || 'Regular'}
+- Baggage: ${data.baggage_carry_on ? 'Carry-on' : ''} ${data.baggage_checked ? `+ ${data.baggage_checked} checked` : ''}
+
+🍽️ RESTAURANT PREFERENCES (Apply to ALL restaurant searches):
+- Cuisine Types: ${data.cuisine_types?.join(', ') || 'Any'}
+- Dietary Restrictions: ${data.dietary_restrictions?.join(', ') || 'None'}
+- Price Range: ${data.restaurant_price_range || 'Any'}
+- Seating: ${data.seating_preference || 'Any'}
+- Experience Type: ${data.restaurant_experience_type?.join(', ') || 'Any'}
+- Preferred Dining Time: ${data.preferred_dining_time || 'Any'}
+
+🚗 CAR RENTAL PREFERENCES (Apply to ALL car searches):
+- Car Type: ${data.car_type || 'Any'}
+- Transmission: ${data.transmission_type || 'Automatic'}
+- Budget: $${data.car_budget_min || 20} - $${data.car_budget_max || 500} per day
+- Features: ${data.car_features?.join(', ') || 'None specified'}
+- Fuel Policy: ${data.fuel_policy || 'Full-to-full'}
+- Unlimited Mileage: ${data.unlimited_mileage ? 'YES' : 'No'}
+
+🎟️ EVENT PREFERENCES (Apply to ALL event searches):
+- Event Types: ${data.event_types?.join(', ') || 'Any'}
+- Budget: $${data.event_budget_min || 20} - $${data.event_budget_max || 500} per ticket
+- Ticket Type: ${data.ticket_type || 'Any'}
+- Time Preference: ${data.event_time_preference || 'Any'}
+
+🛂 TRAVEL DOCUMENTS:
+- Passport: ${data.passport_number ? 'On file' : 'Not provided'}
+- Nationality: ${data.nationality || 'Not specified'}
+- Visa Assistance Needed: ${data.visa_assistance_needed ? 'YES' : 'No'}
+
+${data.special_requests ? `⚠️ SPECIAL REQUESTS: ${data.special_requests}` : ''}
+
+CRITICAL: These are MANDATORY filters. Do NOT show results that violate these preferences unless the user explicitly asks to ignore them.`;
             
             console.log('User preferences loaded:', userPreferences);
           }
@@ -158,14 +215,24 @@ ${data.special_requests ? `- Special requests: ${data.special_requests}` : ''}`;
       }
 
       // We have all required info - perform the hotel search with strict real data rules
-      const result = await searchHotels({
+      // Apply user preferences to hotel search if available
+      const searchParams: any = {
         location: city,
         checkIn: dates.checkIn,
         checkOut: dates.checkOut,
-        guests: 2,
-        maxPrice: budget,
+        guests: userPreferences?.number_of_adults || 2,
+        maxPrice: Math.min(budget, userPreferences?.price_range_max || budget),
         sortBy: 'review_score'
-      }, BOOKING_API_KEY);
+      };
+      
+      if (userPreferences?.preferred_hotel_rating) {
+        searchParams.minRating = userPreferences.preferred_hotel_rating;
+      }
+      if (userPreferences?.preferred_amenities?.length > 0) {
+        searchParams.amenities = userPreferences.preferred_amenities;
+      }
+      
+      const result = await searchHotels(searchParams, BOOKING_API_KEY);
 
       const finalMessage = `Perfect! I found some great hotels in ${city}. Check out the options below!`;
       return new Response(JSON.stringify({
@@ -429,6 +496,15 @@ CRITICAL BEHAVIOR: Be action-oriented and proactive. When users mention travel n
         role: "system",
         content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}${userContext}
 ${quickLinkBehavior}
+
+⚠️ CRITICAL PREFERENCE ENFORCEMENT:
+If the user has set booking preferences (shown above), you MUST strictly apply them to ALL search tool calls:
+- ONLY call search_hotels with their price range, star rating, amenities, property types, and distance requirements
+- ONLY call search_flights with their cabin class, max price, airline preferences, and baggage requirements
+- ONLY call search_restaurants matching their cuisine types, dietary restrictions, and price range
+- ONLY call search_events matching their preferred event types and budget
+- DO NOT show results that violate their preferences unless they explicitly ask to "ignore preferences" or "see all options"
+- When showing results, mention that they match their saved preferences
 
 CONTEXT AWARENESS: When you've just asked "What city are you in?" and the user responds with ONLY a city name (like "New York", "Paris", "London"), IMMEDIATELY call the appropriate search tool (search_hotels or search_restaurants) with that city. Don't ask for confirmation - just search!
 

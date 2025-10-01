@@ -57,15 +57,16 @@ const SearchResults = () => {
         if (data) {
           setUserPreferences(data);
           
-          // Apply preferences to filters automatically
-          if (data.preferred_hotel_rating) {
-            setMinRating(data.preferred_hotel_rating);
+          // Apply more preferences to filters from user profile
+          if (data.price_range_min !== null && data.price_range_min !== undefined) {
+            setPriceRange([data.price_range_min, data.price_range_max || 1000]);
           }
-          if (data.max_price_per_night) {
-            setPriceRange([0, data.max_price_per_night]);
+          if (data.min_review_score) {
+            setMinRating(data.min_review_score);
           }
-          if (data.preferred_amenities && data.preferred_amenities.length > 0) {
-            setSelectedAmenities(data.preferred_amenities);
+          if (data.cuisine_types && data.cuisine_types.length > 0) {
+            // Store cuisine types for restaurant filtering
+            setUserPreferences((prev: any) => ({ ...prev, cuisine_types: data.cuisine_types }));
           }
         }
       } catch (error) {
@@ -237,10 +238,19 @@ const SearchResults = () => {
                   {filteredResults.length} {searchType === "hotels" ? "properties" : searchType === "packages" ? "package options" : "destinations"} in {location}
                 </h2>
                 {searchType === "hotels" && checkIn && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {checkIn} to {checkOut} • {guests} guests
-                    {userPreferences && " • Using your saved preferences"}
-                  </p>
+                  <div className="mt-1 space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      {checkIn} to {checkOut} • {guests} guests
+                    </p>
+                    {userPreferences && (
+                      <div className="flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                        <p className="text-xs font-medium text-primary">
+                          Filtering with your saved preferences (${userPreferences.price_range_min || 20}-${userPreferences.price_range_max || 1000}/night, {userPreferences.preferred_hotel_rating || 'any'} stars min)
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
               
