@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useUserRole } from "@/hooks/useUserRole";
 import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +37,7 @@ interface SearchHistory {
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { isAgent, loading: roleLoading } = useUserRole();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -299,10 +301,12 @@ export default function Dashboard() {
                       <Briefcase className="h-4 w-4" />
                       Post Complex Booking Job
                     </Button>
-                    <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      Become a Travel Agent
-                    </Button>
+                    {!isAgent && !roleLoading && (
+                      <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
+                        <Briefcase className="h-4 w-4" />
+                        Become a Travel Agent
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardContent>
