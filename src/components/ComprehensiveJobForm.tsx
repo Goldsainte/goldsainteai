@@ -109,9 +109,9 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-full space-y-4">
       {/* Progress Indicator */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex-1 flex gap-2">
           {Array.from({ length: totalSteps }).map((_, i) => (
             <div
@@ -122,12 +122,12 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
             />
           ))}
         </div>
-        <span className="ml-4 text-sm text-muted-foreground">
+        <span className="ml-4 text-sm text-muted-foreground whitespace-nowrap">
           Step {step} of {totalSteps}
         </span>
       </div>
 
-      <ScrollArea className="h-[60vh] pr-4">
+      <ScrollArea className="flex-1 pr-4">
         {/* Step 1: Basic Overview */}
         {step === 1 && (
           <div className="space-y-4">
@@ -699,7 +699,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
       </ScrollArea>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between pt-4 border-t">
+      <div className="flex justify-between pt-4 border-t flex-shrink-0">
         <Button
           type="button"
           variant="outline"

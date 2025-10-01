@@ -200,18 +200,20 @@ export default function Marketplace() {
                 Post a Job
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh]">
-              <DialogHeader>
+            <DialogContent className="max-w-5xl max-h-[95vh] overflow-hidden flex flex-col">
+              <DialogHeader className="flex-shrink-0">
                 <DialogTitle className="font-chiffon text-2xl">Post a Comprehensive Travel Job</DialogTitle>
                 <DialogDescription>
                   Provide detailed information about your travel needs and get bids from qualified agents
                 </DialogDescription>
               </DialogHeader>
               
-              <ComprehensiveJobForm 
-                onSubmit={handleCreateJob}
-                onCancel={() => setIsCreateDialogOpen(false)}
-              />
+              <div className="flex-1 overflow-hidden">
+                <ComprehensiveJobForm 
+                  onSubmit={handleCreateJob}
+                  onCancel={() => setIsCreateDialogOpen(false)}
+                />
+              </div>
             </DialogContent>
           </Dialog>
         </div>
