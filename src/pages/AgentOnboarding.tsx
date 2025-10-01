@@ -113,12 +113,18 @@ export default function AgentOnboarding() {
               <Briefcase className="h-8 w-8 text-primary" />
               <CardTitle className="text-3xl font-chiffon">Travel Agent Application</CardTitle>
             </div>
+            <CardDescription>
+              Complete this comprehensive application to join our marketplace
+            </CardDescription>
           </CardHeader>
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Section 1: Business & Contact Information */}
               <div className="space-y-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2">
+                  1. Business & Contact Information
+                </h3>
                 <Separator />
                 
                 <div className="grid grid-cols-2 gap-4">
