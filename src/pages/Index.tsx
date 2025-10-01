@@ -361,67 +361,95 @@ const Index = () => {
     <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
       <div className="w-full h-full flex flex-col">
         {!showChat ? (
-          // Initial search view - centered
+          // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
             {/* Centered Search Area */}
-            <div className="min-h-screen flex items-center justify-center px-6">
-              <div className="w-full max-w-3xl space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="min-h-screen flex items-center justify-center px-4 py-8">
+              <div className="w-full max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
-                <div className="flex flex-col items-center space-y-4 mb-8">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full" />
-                    <img src={logomark} alt="Sainté Voyage AI" className="h-24 w-24 relative z-10" />
-                  </div>
-                  <h1 className="text-4xl font-semibold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
+                <div className="flex flex-col items-center space-y-3">
+                  <h1 className="text-5xl font-bold text-foreground font-secondary tracking-tight">
                     Goldsainte.Ai
                   </h1>
-                  <p className="text-xs text-muted-foreground text-center max-w-2xl leading-relaxed">
-                    <span className="font-semibold text-foreground">AI Efficiency. Human Touch. Your Personal Travel Concierge.</span>
-                    <br />
-                    Our cutting-edge AI handles quick requests with speed and precision— while our licensed travel experts' step in to unlock contract-only rates, navigate complex ticketing, and deliver exclusive perks you won't find on public sites.
-                  </p>
-                  {userLocation && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <MapPinned className="h-3 w-3 text-primary" />
-                      <span>Location detected - showing nearby results</span>
-                    </div>
-                  )}
                 </div>
 
                 {/* Main Search */}
-                <Card className="relative overflow-hidden border-2 shadow-lg">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
-                  <div className="relative p-2">
-                    <div className="relative">
-                      <img src={logomark} alt="Sainté Voyage" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 object-contain" />
-                      <Input
-                        placeholder="Where would you like to go? Ask me anything..."
-                        className="w-full h-14 pl-12 pr-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyPress={handleKeyPress}
-                        disabled={isLoading}
-                      />
-                      <Button
-                        onClick={() => handleSearch()}
-                        size="icon"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-xl"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? (
-                          <Loader2 className="h-5 w-5 animate-spin" />
-                        ) : (
-                          <Search className="h-5 w-5" />
-                        )}
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
+                <div className="relative">
+                  <Input
+                    placeholder="Where would you like to go?"
+                    className="w-full h-14 px-4 pr-14 text-base rounded-3xl border-border shadow-sm focus-visible:ring-1 focus-visible:ring-primary"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={isLoading}
+                  />
+                  <Button
+                    onClick={() => handleSearch()}
+                    size="icon"
+                    variant="ghost"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full hover:bg-muted"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send className="h-5 w-5" />
+                    )}
+                  </Button>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAction('hotels')}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Hotel className="h-4 w-4" />
+                    Hotels
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAction('flights')}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Plane className="h-4 w-4" />
+                    Flights
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAction('restaurants')}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <UtensilsCrossed className="h-4 w-4" />
+                    Restaurants
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAction('events')}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Ticket className="h-4 w-4" />
+                    Events
+                  </Button>
+                </div>
+
+                {/* Footer */}
+                <p className="text-xs text-muted-foreground text-center pt-4">
+                  By using Goldsainte.Ai, you agree to our{" "}
+                  <a href="#" className="underline hover:text-foreground">Terms</a>
+                  {" "}and{" "}
+                  <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
+                </p>
               </div>
             </div>
 
-            {/* Get Inspired Section - Below the fold */}
-            <div className="px-6 pb-12">
+            {/* Inspiration Content - Far below the fold */}
+            <div className="px-6 pb-12 pt-20">
               <div className="w-full max-w-7xl mx-auto space-y-6">
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
@@ -548,14 +576,6 @@ const Index = () => {
                   />
                 </div>
               )}
-
-              {/* Footer */}
-              <p className="text-xs text-muted-foreground text-center pt-8">
-                By using Sainté Voyage AI, you agree to our{" "}
-                <a href="#" className="underline hover:text-foreground">Terms</a>
-                {" "}and{" "}
-                <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
-              </p>
             </div>
           </div>
         ) : (
