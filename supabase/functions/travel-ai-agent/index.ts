@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,6 +32,48 @@ serve(async (req) => {
     }
     if (!BOOKING_API_KEY) {
       throw new Error('BOOKING_API_KEY not configured');
+    }
+
+    // Get user preferences if authenticated
+    const authHeader = req.headers.get('authorization');
+    let userPreferences = null;
+    let userContext = '';
+    
+    if (authHeader) {
+      try {
+        const supabaseClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+          { global: { headers: { Authorization: authHeader } } }
+        );
+        
+        const { data: { user } } = await supabaseClient.auth.getUser();
+        
+        if (user) {
+          const { data } = await supabaseClient
+            .from('user_booking_preferences')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle();
+            
+          if (data) {
+            userPreferences = data;
+            userContext = `\n\nUSER PREFERENCES (Apply these automatically to searches):
+- Preferred hotel rating: ${data.preferred_hotel_rating || 'Not set'} stars minimum
+- Max price per night: $${data.max_price_per_night || 'No limit'}
+- Preferred amenities: ${data.preferred_amenities?.join(', ') || 'None specified'}
+- Dietary restrictions: ${data.dietary_restrictions?.join(', ') || 'None'}
+- Seat preference: ${data.seat_preference || 'Not specified'}
+- Meal preference: ${data.meal_preference || 'Not specified'}
+- Preferred airlines: ${data.preferred_airlines?.join(', ') || 'None specified'}
+${data.special_requests ? `- Special requests: ${data.special_requests}` : ''}`;
+            
+            console.log('User preferences loaded:', userPreferences);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user preferences:', error);
+      }
     }
 
     // QUICK LINK STATE MACHINE (hotels): enforce one-question-at-a-time flow
@@ -384,7 +427,7 @@ CRITICAL BEHAVIOR: Be action-oriented and proactive. When users mention travel n
     const messages = [
       {
         role: "system",
-        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}
+        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}${userContext}
 ${quickLinkBehavior}
 
 CONTEXT AWARENESS: When you've just asked "What city are you in?" and the user responds with ONLY a city name (like "New York", "Paris", "London"), IMMEDIATELY call the appropriate search tool (search_hotels or search_restaurants) with that city. Don't ask for confirmation - just search!

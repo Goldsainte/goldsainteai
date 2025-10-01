@@ -16,11 +16,13 @@ import {
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addSearch } = useSearchHistory();
+  const { user } = useAuth();
   const [results, setResults] = useState<any[]>([]);
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,12 +32,49 @@ const SearchResults = () => {
   const [minRating, setMinRating] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [userPreferences, setUserPreferences] = useState<any>(null);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
   const checkIn = searchParams.get("checkIn") || "";
   const checkOut = searchParams.get("checkOut") || "";
   const guests = searchParams.get("guests") || "2";
+
+  // Load user preferences on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_booking_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        
+        if (data) {
+          setUserPreferences(data);
+          
+          // Apply preferences to filters automatically
+          if (data.preferred_hotel_rating) {
+            setMinRating(data.preferred_hotel_rating);
+          }
+          if (data.max_price_per_night) {
+            setPriceRange([0, data.max_price_per_night]);
+          }
+          if (data.preferred_amenities && data.preferred_amenities.length > 0) {
+            setSelectedAmenities(data.preferred_amenities);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      }
+    };
+
+    loadPreferences();
+  }, [user]);
 
   useEffect(() => {
     const performSearch = async () => {
@@ -141,6 +180,16 @@ const SearchResults = () => {
       });
     }
 
+    // Apply amenities filter (user preferences)
+    if (selectedAmenities.length > 0) {
+      filtered = filtered.filter((item) => {
+        const itemAmenities = item.property?.amenities || [];
+        return selectedAmenities.some(amenity => 
+          itemAmenities.some((a: string) => a.toLowerCase().includes(amenity.toLowerCase()))
+        );
+      });
+    }
+
     // Apply sorting
     switch (sortBy) {
       case "price":
@@ -190,6 +239,7 @@ const SearchResults = () => {
                 {searchType === "hotels" && checkIn && (
                   <p className="text-sm text-muted-foreground mt-1">
                     {checkIn} to {checkOut} • {guests} guests
+                    {userPreferences && " • Using your saved preferences"}
                   </p>
                 )}
               </div>
