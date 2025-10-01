@@ -9,11 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { Briefcase, Plus, MapPin, DollarSign, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
 
 export default function Marketplace() {
   const { user } = useAuth();
@@ -62,23 +60,77 @@ export default function Marketplace() {
     }
   };
 
-  const handleCreateJob = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
+  const handleCreateJob = async (jobData: any) => {
     try {
       const { error } = await supabase
         .from('marketplace_jobs')
         .insert({
           user_id: user?.id!,
-          title: formData.get('title') as string,
-          description: formData.get('description') as string,
-          booking_type: formData.get('booking_type') as string,
-          requirements: {},
-          budget_min: parseFloat(formData.get('budget_min') as string),
-          budget_max: parseFloat(formData.get('budget_max') as string),
-          destination: formData.get('destination') as string,
-          number_of_travelers: parseInt(formData.get('travelers') as string)
+          title: jobData.title,
+          description: jobData.description,
+          booking_type: jobData.jobCategory,
+          requirements: {
+            clientInfo: {
+              name: jobData.clientName,
+              contactMethod: jobData.contactMethod,
+              timeZone: jobData.timeZone,
+              preferredContactHours: jobData.preferredContactHours,
+            },
+            transportation: {
+              departureCity: jobData.departureCity,
+              destinationCity: jobData.destinationCity,
+              departureDate: jobData.departureDate,
+              returnDate: jobData.returnDate,
+              numberOfTravelers: jobData.numberOfTravelers,
+              ageGroups: jobData.ageGroups,
+              classPreference: jobData.classPreference,
+              airlinePreferences: jobData.airlinePreferences,
+              baggageRequirements: jobData.baggageRequirements,
+              visaRequired: jobData.visaRequired,
+            },
+            accommodation: {
+              destination: jobData.hotelDestination,
+              checkInDate: jobData.checkInDate,
+              checkOutDate: jobData.checkOutDate,
+              hotelStars: jobData.hotelStars,
+              hotelBrand: jobData.hotelBrand,
+              roomRequirements: jobData.roomRequirements,
+              budgetPerNight: jobData.budgetPerNight,
+              specialNeeds: jobData.specialNeeds,
+            },
+            itinerary: {
+              destinations: jobData.destinations,
+              tripDuration: jobData.tripDuration,
+              tripType: jobData.tripType,
+              preferredActivities: jobData.preferredActivities,
+              includedServices: jobData.includedServices,
+            },
+            payment: {
+              paymentMethod: jobData.paymentMethod,
+              commissionTerms: jobData.commissionTerms,
+            },
+            timeline: {
+              quoteDeadline: jobData.quoteDeadline,
+              jobStartDate: jobData.jobStartDate,
+              tripDate: jobData.tripDate,
+              urgencyLevel: jobData.urgencyLevel,
+            },
+            agentRequirements: {
+              languages: jobData.languagesRequired,
+              experience: jobData.experienceRequired,
+              accreditation: jobData.accreditationRequired,
+            },
+            deliverables: jobData.expectedDeliverables,
+          },
+          budget_min: jobData.budgetMin,
+          budget_max: jobData.budgetMax,
+          currency: jobData.currency,
+          destination: jobData.destinationCity || jobData.hotelDestination || jobData.destinations,
+          number_of_travelers: jobData.numberOfTravelers,
+          travel_dates: jobData.departureDate || jobData.checkInDate || jobData.tripDate ? {
+            start: jobData.departureDate || jobData.checkInDate || jobData.tripDate,
+            end: jobData.returnDate || jobData.checkOutDate,
+          } : null,
         } as any);
 
       if (error) throw error;
@@ -121,61 +173,18 @@ export default function Marketplace() {
                 Post a Job
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-4xl max-h-[90vh]">
               <DialogHeader>
-                <DialogTitle>Post a Travel Job</DialogTitle>
+                <DialogTitle className="font-chiffon text-2xl">Post a Comprehensive Travel Job</DialogTitle>
                 <DialogDescription>
-                  Describe your travel needs and agents will bid on your job
+                  Provide detailed information about your travel needs and get bids from qualified agents
                 </DialogDescription>
               </DialogHeader>
               
-              <form onSubmit={handleCreateJob} className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Job Title</Label>
-                  <Input id="title" name="title" required placeholder="e.g., Luxury European Tour Package" />
-                </div>
-                
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea id="description" name="description" required placeholder="Describe your travel requirements in detail..." rows={4} />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="booking_type">Booking Type</Label>
-                    <select id="booking_type" name="booking_type" required className="w-full h-10 px-3 rounded-md border border-input bg-background">
-                      <option value="package">Package</option>
-                      <option value="hotel">Hotel</option>
-                      <option value="flight">Flight</option>
-                      <option value="custom">Custom</option>
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="destination">Destination</Label>
-                    <Input id="destination" name="destination" required placeholder="Paris, France" />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="budget_min">Min Budget ($)</Label>
-                    <Input id="budget_min" name="budget_min" type="number" required />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="budget_max">Max Budget ($)</Label>
-                    <Input id="budget_max" name="budget_max" type="number" required />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="travelers">Travelers</Label>
-                    <Input id="travelers" name="travelers" type="number" required defaultValue="2" />
-                  </div>
-                </div>
-                
-                <Button type="submit" className="w-full">Post Job</Button>
-              </form>
+              <ComprehensiveJobForm 
+                onSubmit={handleCreateJob}
+                onCancel={() => setIsCreateDialogOpen(false)}
+              />
             </DialogContent>
           </Dialog>
         </div>
