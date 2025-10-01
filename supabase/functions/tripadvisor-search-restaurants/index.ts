@@ -57,77 +57,49 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     console.log('Restaurants found:', searchData.data?.length || 0);
 
-    // Get detailed information for each restaurant
+    // Get detailed information for each restaurant (optimized: fewer items + parallel sub-requests)
     const restaurantDetails = await Promise.all(
-      (searchData.data || []).slice(0, 30).map(async (restaurant: any) => {
+      (searchData.data || []).slice(0, 12).map(async (restaurant: any) => {
         try {
           const detailsParams = new URLSearchParams({
             key: apiKey,
             language: 'en'
           });
 
-          const detailsResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
-            {
-              headers: {
-                'Accept': 'application/json'
-              }
-            }
-          );
+          // Fetch details, photos, and reviews in parallel
+          const [detailsResponse, photosResponse, reviewsResponse] = await Promise.all([
+            fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            ),
+            fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${detailsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            ),
+            fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${detailsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            )
+          ]);
 
           if (!detailsResponse.ok) {
             console.error(`Failed to fetch details for ${restaurant.location_id}`);
             return null;
           }
 
-          const details = await detailsResponse.json();
-
-          // Get photos
-          const photosParams = new URLSearchParams({
-            key: apiKey,
-            language: 'en'
-          });
-
-          const photosResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${photosParams}`,
-            {
-              headers: {
-                'Accept': 'application/json'
-              }
-            }
-          );
-
-          let photos = [];
-          if (photosResponse.ok) {
-            const photosData = await photosResponse.json();
-            photos = photosData.data || [];
-          }
-
-          // Get reviews
-          const reviewsParams = new URLSearchParams({
-            key: apiKey,
-            language: 'en'
-          });
-
-          const reviewsResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${reviewsParams}`,
-            {
-              headers: {
-                'Accept': 'application/json'
-              }
-            }
-          );
-
-          let reviews = [];
-          if (reviewsResponse.ok) {
-            const reviewsData = await reviewsResponse.json();
-            reviews = reviewsData.data || [];
-          }
+          const [details, photosData, reviewsData] = await Promise.all([
+            detailsResponse.json(),
+            photosResponse.ok ? photosResponse.json() : Promise.resolve({ data: [] }),
+            reviewsResponse.ok ? reviewsResponse.json() : Promise.resolve({ data: [] })
+          ]);
 
           // Filter by price range if specified
           if (priceRange && details.price_level && details.price_level !== priceRange) {
             return null;
           }
+
+          const photos = (photosData.data || []).slice(0, 5);
+          const reviews = (reviewsData.data || []).slice(0, 3);
 
           return {
             id: restaurant.location_id,
@@ -140,11 +112,11 @@ serve(async (req) => {
             price_level: details.price_level || '',
             cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
             description: details.description || '',
-            photos: photos.slice(0, 5).map((photo: any) => ({
+            photos: photos.map((photo: any) => ({
               url: photo.images?.large?.url || photo.images?.original?.url,
               caption: photo.caption || ''
             })),
-            reviews: reviews.slice(0, 3).map((review: any) => ({
+            reviews: reviews.map((review: any) => ({
               rating: review.rating || 0,
               text: review.text || '',
               published_date: review.published_date || '',
