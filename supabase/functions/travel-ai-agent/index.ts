@@ -540,7 +540,7 @@ async function searchHotels(args: any, apiKey: string) {
     }
 
     // Build hotel id list and fetch offers in batches to avoid URL limits
-    const hotelIdList: string[] = hotelListData.data.slice(0, 100).map((h: any) => h.hotelId);
+    const hotelIdList: string[] = hotelListData.data.slice(0, 40).map((h: any) => h.hotelId);
     const chunk = (arr: string[], size: number) => arr.reduce<string[][]>((acc, _, i) => {
       if (i % size === 0) acc.push(arr.slice(i, i + size));
       return acc;
@@ -571,10 +571,13 @@ async function searchHotels(args: any, apiKey: string) {
     const idBatches = chunk(hotelIdList, 20); // Amadeus works reliably with <=20 IDs per request
     let hotels: any[] = [];
 
-    // Fetch all batches sequentially to be gentle with API rate limits
-    for (const batch of idBatches) {
-      const batchHotels = await fetchOffersForIds(batch, defaultCheckIn, defaultCheckOut, true);
-      console.log('Batch offers found:', batchHotels.length, 'for', batch.length, 'ids');
+    // Fetch batches in parallel for speed
+    const batchPromises = idBatches.map((batch) =>
+      fetchOffersForIds(batch, defaultCheckIn, defaultCheckOut, true)
+    );
+    const batchResults = await Promise.all(batchPromises);
+    for (const batchHotels of batchResults) {
+      console.log('Batch offers found:', batchHotels.length);
       hotels.push(...batchHotels);
     }
 
@@ -588,13 +591,16 @@ async function searchHotels(args: any, apiKey: string) {
       const altOut = new Date(altIn);
       altOut.setDate(altIn.getDate() + 1);
 
-      for (const batch of idBatches) {
-        const retryHotels = await fetchOffersForIds(
+      const retryPromises = idBatches.map((batch) =>
+        fetchOffersForIds(
           batch,
           altIn.toISOString().split('T')[0],
           altOut.toISOString().split('T')[0],
           false
-        );
+        )
+      );
+      const retryResults = await Promise.all(retryPromises);
+      for (const retryHotels of retryResults) {
         console.log('Retry batch (+30 days) offers:', retryHotels.length);
         hotels.push(...retryHotels);
       }
@@ -603,7 +609,7 @@ async function searchHotels(args: any, apiKey: string) {
     }
 
     // Transform to expected format with Google Places enrichment
-    let transformedHotels = await Promise.all(hotels.map(async (offer: any) => {
+    let transformedHotels = await Promise.all(hotels.map(async (offer: any, idx: number) => {
       const hotel = offer.hotel;
       const firstOffer = offer.offers?.[0];
       const price = firstOffer?.price;
@@ -628,7 +634,7 @@ async function searchHotels(args: any, apiKey: string) {
         amadeusOffer: offer
       };
 
-       try {
+       try { if (idx < 12) {
         const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY') || Deno.env.get('GOOGLE_PLACES_API_KEY_2');
         if (apiKey) {
           let place: any | undefined;
@@ -665,6 +671,7 @@ async function searchHotels(args: any, apiKey: string) {
               item.property.externalUrls.google = `https://www.google.com/maps/place/?q=place_id:${place.place_id}`;
             }
           }
+        }
         }
       } catch (_) { /* ignore enrichment errors */ }
 
