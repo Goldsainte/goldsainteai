@@ -1257,6 +1257,80 @@ async function searchHotels(args: any, apiKey: string) {
 
     console.log(`After all filters: ${hotels.length} hotels`);
 
+    // Enrich hotels with TripAdvisor photos and reviews
+    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
+    if (tripAdvisorKey && hotels.length > 0) {
+      console.log('Enriching hotels with TripAdvisor data...');
+      
+      // Process hotels in parallel but limit to top 10 to avoid rate limits
+      const hotelsToEnrich = hotels.slice(0, 10);
+      
+      await Promise.all(
+        hotelsToEnrich.map(async (hotel: any) => {
+          try {
+            const hotelName = hotel.hotel?.name || '';
+            const hotelCity = hotel.hotel?.address?.cityName || location;
+            
+            // Search TripAdvisor for this hotel
+            const searchParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              searchQuery: `${hotelName} ${hotelCity}`,
+              category: 'hotels',
+              language: 'en'
+            });
+            
+            const searchResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            
+            if (!searchResponse.ok) return;
+            
+            const searchData = await searchResponse.json();
+            const tripAdvisorLocation = searchData.data?.[0];
+            
+            if (!tripAdvisorLocation) return;
+            
+            // Get photos
+            const photosParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+            
+            const photosResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${tripAdvisorLocation.location_id}/photos?${photosParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            
+            if (photosResponse.ok) {
+              const photosData = await photosResponse.json();
+              hotel.tripAdvisorPhotos = photosData.data?.slice(0, 5) || [];
+            }
+            
+            // Get reviews
+            const reviewsParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+            
+            const reviewsResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${tripAdvisorLocation.location_id}/reviews?${reviewsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+            
+            if (reviewsResponse.ok) {
+              const reviewsData = await reviewsResponse.json();
+              hotel.tripAdvisorReviews = reviewsData.data?.slice(0, 5) || [];
+            }
+            
+            console.log(`Enriched ${hotelName} with TripAdvisor data`);
+          } catch (error) {
+            console.error(`Failed to enrich hotel with TripAdvisor:`, error);
+          }
+        })
+      );
+    }
+
     // Transform Amadeus data to match expected format
     const transformedHotels = hotels.map((hotel: any) => {
       const hotelInfo = hotel.hotel || {};
@@ -1264,6 +1338,23 @@ async function searchHotels(args: any, apiKey: string) {
       const totalPrice = offer.price?.total ? parseFloat(offer.price.total) : 0;
       const pricePerNight = totalPrice / nights;
       const currency = offer.price?.currency || 'USD';
+      
+      // Get TripAdvisor photos and reviews if available
+      const tripAdvisorPhotos = hotel.tripAdvisorPhotos || [];
+      const tripAdvisorReviews = hotel.tripAdvisorReviews || [];
+      
+      const photoUrls = tripAdvisorPhotos.map((photo: any) => ({
+        url: photo.images?.large?.url || photo.images?.medium?.url || photo.images?.small?.url,
+        caption: photo.caption || hotelInfo.name
+      })).filter((p: any) => p.url);
+      
+      const reviews = tripAdvisorReviews.map((review: any) => ({
+        author: review.user?.username || 'Anonymous',
+        rating: review.rating || 0,
+        text: review.text || '',
+        date: review.published_date || '',
+        title: review.title || ''
+      }));
 
       return {
         hotel_id: hotel.id || hotelInfo.hotelId,
@@ -1272,13 +1363,13 @@ async function searchHotels(args: any, apiKey: string) {
         city: hotelInfo.address?.cityName || location,
         country: hotelInfo.address?.countryCode || '',
         rating: hotelInfo.rating || 0,
-        num_reviews: 0,
+        num_reviews: reviews.length || 0,
         property: {
           name: hotelInfo.name || 'Hotel',
-          photoUrls: [],
-          reviews: [],
+          photoUrls: photoUrls,
+          reviews: reviews,
           reviewScore: hotelInfo.rating || 0,
-          reviewCount: 0,
+          reviewCount: reviews.length || 0,
           externalUrls: {
             amadeus: hotel.self || '',
             default: hotel.self || ''
@@ -1294,8 +1385,8 @@ async function searchHotels(args: any, apiKey: string) {
         accessibilityLabel: `${hotelInfo.name}. ${hotelInfo.address?.cityName || location}. Price ${pricePerNight.toFixed(2)} ${currency} per night`,
         description: offer.room?.description?.text || '',
         amenities: hotelInfo.amenities || [],
-        photos: [],
-        reviews: [],
+        photos: photoUrls,
+        reviews: reviews,
         amadeusData: {
           offerId: offer.id,
           hotelId: hotel.id || hotelInfo.hotelId,
