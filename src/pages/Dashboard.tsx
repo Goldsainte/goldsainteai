@@ -257,13 +257,40 @@ export default function Dashboard() {
                     <label className="text-sm font-medium">Email</label>
                     <p className="text-muted-foreground">{user?.email}</p>
                   </div>
-                  <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full">
-                    <Heart className="mr-2 h-4 w-4" />
-                    View Favorites
-                  </Button>
-                  <Button onClick={() => navigate('/profile')} className="w-full">
-                    Edit Profile
-                  </Button>
+                  
+                  <div className="pt-4 border-t space-y-3">
+                    <h3 className="font-semibold">Payment Methods</h3>
+                    <Button 
+                      onClick={async () => {
+                        try {
+                          const { data, error } = await supabase.functions.invoke('customer-portal');
+                          if (error) throw error;
+                          if (data?.url) {
+                            window.open(data.url, '_blank');
+                          }
+                        } catch (error: any) {
+                          toast.error('Failed to open payment portal');
+                        }
+                      }}
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      Manage Payment Methods
+                    </Button>
+                  </div>
+
+                  <div className="pt-4 border-t space-y-3">
+                    <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full">
+                      <Heart className="mr-2 h-4 w-4" />
+                      View Favorites
+                    </Button>
+                    <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full">
+                      Post Complex Booking Job
+                    </Button>
+                    <Button onClick={() => navigate('/profile')} className="w-full">
+                      Edit Profile
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>

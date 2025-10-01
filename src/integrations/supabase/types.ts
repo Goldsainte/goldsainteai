@@ -14,6 +14,105 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_bids: {
+        Row: {
+          agent_id: string
+          created_at: string
+          currency: string
+          estimated_completion_days: number | null
+          id: string
+          job_id: string
+          proposal_details: string
+          proposed_price: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          currency?: string
+          estimated_completion_days?: number | null
+          id?: string
+          job_id: string
+          proposal_details: string
+          proposed_price: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          currency?: string
+          estimated_completion_days?: number | null
+          id?: string
+          job_id?: string
+          proposal_details?: string
+          proposed_price?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_bids_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_bids_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_reviews: {
+        Row: {
+          agent_id: string
+          created_at: string
+          id: string
+          job_id: string
+          rating: number
+          review_text: string | null
+          user_id: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          id?: string
+          job_id: string
+          rating: number
+          review_text?: string | null
+          user_id: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          rating?: number
+          review_text?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_reviews_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_reviews_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           booking_data: Json
@@ -129,6 +228,115 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_jobs: {
+        Row: {
+          assigned_agent_id: string | null
+          booking_type: string
+          budget_max: number | null
+          budget_min: number | null
+          created_at: string
+          currency: string
+          description: string
+          destination: string | null
+          expires_at: string
+          id: string
+          number_of_travelers: number | null
+          requirements: Json
+          status: string
+          title: string
+          travel_dates: Json | null
+          updated_at: string
+          user_id: string
+          winning_bid_id: string | null
+        }
+        Insert: {
+          assigned_agent_id?: string | null
+          booking_type: string
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          currency?: string
+          description: string
+          destination?: string | null
+          expires_at?: string
+          id?: string
+          number_of_travelers?: number | null
+          requirements: Json
+          status?: string
+          title: string
+          travel_dates?: Json | null
+          updated_at?: string
+          user_id: string
+          winning_bid_id?: string | null
+        }
+        Update: {
+          assigned_agent_id?: string | null
+          booking_type?: string
+          budget_max?: number | null
+          budget_min?: number | null
+          created_at?: string
+          currency?: string
+          description?: string
+          destination?: string | null
+          expires_at?: string
+          id?: string
+          number_of_travelers?: number | null
+          requirements?: Json
+          status?: string
+          title?: string
+          travel_dates?: Json | null
+          updated_at?: string
+          user_id?: string
+          winning_bid_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_jobs_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          job_id: string
+          message_text: string
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          job_id: string
+          message_text: string
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          job_id?: string
+          message_text?: string
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           amount: number
@@ -232,6 +440,63 @@ export type Database = {
           id?: string
           search_params?: Json
           search_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      travel_agents: {
+        Row: {
+          agency_name: string
+          bio: string | null
+          commission_rate: number | null
+          created_at: string
+          experience_years: number | null
+          id: string
+          is_active: boolean | null
+          is_verified: boolean | null
+          languages: string[] | null
+          license_number: string | null
+          profile_image_url: string | null
+          rating: number | null
+          specializations: string[] | null
+          total_reviews: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agency_name: string
+          bio?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          experience_years?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
+          license_number?: string | null
+          profile_image_url?: string | null
+          rating?: number | null
+          specializations?: string[] | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agency_name?: string
+          bio?: string | null
+          commission_rate?: number | null
+          created_at?: string
+          experience_years?: number | null
+          id?: string
+          is_active?: boolean | null
+          is_verified?: boolean | null
+          languages?: string[] | null
+          license_number?: string | null
+          profile_image_url?: string | null
+          rating?: number | null
+          specializations?: string[] | null
+          total_reviews?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
