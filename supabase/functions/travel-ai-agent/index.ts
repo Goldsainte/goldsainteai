@@ -304,7 +304,17 @@ The user has saved preferences but has chosen to search without strict filtering
       
       const result = await searchHotels(searchParams, BOOKING_API_KEY);
 
-      const finalMessage = `Perfect! I found some great hotels in ${city}. Check out the options below!`;
+      // Check if search had an error
+      if (result.error || !result.results || result.results.length === 0) {
+        const errorMessage = result.error || `I couldn't find hotels in ${city} for those dates. Could you try a different city or dates?`;
+        return new Response(JSON.stringify({
+          message: errorMessage,
+          toolResults: [result],
+          conversationHistory: [...hist, { role: 'assistant', content: errorMessage }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      const finalMessage = `Perfect! I found ${result.results.length} great hotel${result.results.length !== 1 ? 's' : ''} in ${city}. Check out the options below!`;
       return new Response(JSON.stringify({
         message: finalMessage,
         toolResults: [result],
