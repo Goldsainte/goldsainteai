@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Hotel, Plane, UtensilsCrossed, Car, Ticket, FileDown, FileText } from "lucide-react";
 import jsPDF from "jspdf";
 
+
 interface PreferencesFormProps {
   onSubmit: (data: any) => void;
   initialData?: any;
