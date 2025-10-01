@@ -8,9 +8,14 @@ export const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           <div className="flex items-center gap-8">
-            <a href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <img src={logomark} alt="Logo" className="h-10 w-10" />
-              <span className="text-xl font-bold hidden sm:block font-chiffon">Goldsainte.Ai</span>
+            <a href="/" className="flex flex-col gap-1 hover:opacity-90 transition-opacity">
+              <div className="flex items-center gap-3">
+                <img src={logomark} alt="Logo" className="h-10 w-10" />
+                <span className="text-xl font-bold hidden sm:block font-chiffon">Goldsainte.Ai</span>
+              </div>
+              <p className="text-sm font-medium hidden sm:block max-w-md">
+                The first travel platform to combine AI precision with human passion — one platform, infinite possibilities.
+              </p>
             </a>
             
             <nav className="hidden md:flex items-center gap-6">
