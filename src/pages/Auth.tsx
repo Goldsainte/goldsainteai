@@ -75,7 +75,7 @@ const Auth = () => {
         <div className="flex flex-col items-center mb-8">
           <img src={logomark} alt="Sainté Voyage AI" className="h-16 w-16 mb-4" />
           <h1 className="text-2xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Welcome to Sainté Voyage AI
+            Welcome to Goldsainte AI
           </h1>
           <p className="text-sm text-muted-foreground text-center mt-2">
             Sign in to save your favorite travel destinations
