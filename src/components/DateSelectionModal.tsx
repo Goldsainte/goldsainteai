@@ -55,13 +55,12 @@ export const DateSelectionModal = ({
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('amadeus-search-hotels', {
+      const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
         body: {
-          cityCode,
-          checkInDate: format(checkInDate, 'yyyy-MM-dd'),
-          checkOutDate: format(checkOutDate, 'yyyy-MM-dd'),
-          adults,
-          currency,
+          location: hotelName,
+          checkIn: format(checkInDate, 'yyyy-MM-dd'),
+          checkOut: format(checkOutDate, 'yyyy-MM-dd'),
+          guests: adults,
         }
       });
 

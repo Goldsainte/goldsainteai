@@ -9,7 +9,10 @@ verify_jwt = false
 [functions.travel-ai-agent]
 verify_jwt = false
 
-[functions.amadeus-search-hotels]
+[functions.tripadvisor-search-hotels]
+verify_jwt = false
+
+[functions.tripadvisor-search-restaurants]
 verify_jwt = false
 
 [functions.amadeus-search-flights]

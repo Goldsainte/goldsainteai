@@ -469,214 +469,112 @@ async function searchHotels(args: any, apiKey: string) {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    // Get Amadeus credentials
-    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
-    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
-    if (!amadeusKey || !amadeusSecret) {
-      return { error: 'Amadeus credentials not configured', results: [] };
+    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
+    if (!tripAdvisorKey) {
+      return { error: 'TripAdvisor API key not configured', results: [] };
     }
 
-    // Get Amadeus token
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
+    // Search for hotels in the location
+    const searchParams = new URLSearchParams({
+      key: tripAdvisorKey,
+      searchQuery: location,
+      category: 'hotels',
+      language: 'en'
     });
 
-    if (!tokenResponse.ok) {
-      return { error: 'Failed to authenticate with Amadeus', results: [] };
-    }
-
-    const tokenData = await tokenResponse.json();
-    const token = tokenData.access_token;
-
-    // Search for city code dynamically
-    const locationParams = new URLSearchParams({
-      keyword: location,
-      subType: 'CITY',
-      'page[limit]': '5'
-    });
-
-    const locationResponse = await fetch(
-      `https://test.api.amadeus.com/v1/reference-data/locations?${locationParams}`,
-      { headers: { 'Authorization': `Bearer ${token}` } }
+    const searchResponse = await fetch(
+      `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+      { headers: { 'Accept': 'application/json' } }
     );
 
-    if (!locationResponse.ok || !(await locationResponse.clone().json()).data?.length) {
-      return { 
-        error: `Could not find city "${location}". Please try a different spelling.`,
-        results: [] 
-      };
+    if (!searchResponse.ok) {
+      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
     }
 
-    const locationData = await locationResponse.json();
-    const cityInfo = locationData.data[0];
-    const cityCode = cityInfo.iataCode;
-    const countryCode = cityInfo.address?.countryCode || cityInfo.iataCode?.slice(0, 2);
-    const currencyMap: Record<string, string> = { US:'USD', FR:'EUR', GB:'GBP', DE:'EUR', ES:'EUR', IT:'EUR', NL:'EUR', BE:'EUR', PT:'EUR', IE:'EUR', CH:'CHF', JP:'JPY', AU:'AUD', CA:'CAD', AE:'AED', SG:'SGD', IN:'INR', ID:'IDR', TH:'THB', MY:'MYR', MX:'MXN', BR:'BRL', ZA:'ZAR', SA:'SAR', TR:'TRY', KR:'KRW', HK:'HKD' };
-    const localCurrency = currencyMap[countryCode] || 'USD';
-    console.log(`Found city code for "${location}": ${cityCode} (${countryCode}), currency: ${localCurrency}`);
+    const searchData = await searchResponse.json();
+    console.log('TripAdvisor hotels found:', searchData.data?.length || 0);
 
-    // Default dates
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const defaultCheckIn = checkIn || today.toISOString().split('T')[0];
-    const defaultCheckOut = checkOut || tomorrow.toISOString().split('T')[0];
+    // Get detailed information for each hotel
+    const hotelDetails = await Promise.all(
+      (searchData.data || []).slice(0, 20).map(async (hotel: any) => {
+        try {
+          const detailsParams = new URLSearchParams({
+            key: tripAdvisorKey,
+            language: 'en'
+          });
 
-    // Step 1: Get hotel IDs
-    const hotelListResponse = await fetch(
-      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}`,
-      { headers: { 'Authorization': `Bearer ${token}` } }
-    );
+          const detailsResponse = await fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/details?${detailsParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
 
-    if (!hotelListResponse.ok) {
-      return { error: 'Failed to fetch hotel list', results: [] };
-    }
-
-    const hotelListData = await hotelListResponse.json();
-    if (!hotelListData.data || hotelListData.data.length === 0) {
-      return { error: 'No hotels found in this city', results: [] };
-    }
-
-    // Build hotel id list and fetch offers in batches to avoid URL limits
-    const hotelIdList: string[] = hotelListData.data.slice(0, 40).map((h: any) => h.hotelId);
-    const chunk = (arr: string[], size: number) => arr.reduce<string[][]>((acc, _, i) => {
-      if (i % size === 0) acc.push(arr.slice(i, i + size));
-      return acc;
-    }, []);
-
-    const fetchOffersForIds = async (ids: string[], checkInDate: string, checkOutDate: string, bestRateOnly: boolean) => {
-      const offerParams = new URLSearchParams({
-        hotelIds: ids.join(','),
-        checkInDate,
-        checkOutDate,
-        adults: guests.toString(),
-        currency: localCurrency,
-        roomQuantity: '1',
-        bestRateOnly: bestRateOnly ? 'true' : 'false',
-      });
-      const resp = await fetch(
-        `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-      if (!resp.ok) {
-        console.warn('Offers fetch failed for batch:', ids.length, 'status:', resp.status);
-        return [] as any[];
-      }
-      const data = await resp.json();
-      return (data.data || []) as any[];
-    };
-
-    const idBatches = chunk(hotelIdList, 20); // Amadeus works reliably with <=20 IDs per request
-    let hotels: any[] = [];
-
-    // Fetch batches in parallel for speed
-    const batchPromises = idBatches.map((batch) =>
-      fetchOffersForIds(batch, defaultCheckIn, defaultCheckOut, true)
-    );
-    const batchResults = await Promise.all(batchPromises);
-    for (const batchHotels of batchResults) {
-      console.log('Batch offers found:', batchHotels.length);
-      hotels.push(...batchHotels);
-    }
-
-    console.log('Total Amadeus hotels found:', hotels.length);
-
-    // Fallback retry: if no offers for default dates, try +30 days and disable bestRateOnly
-    if (!hotels.length) {
-      const baseIn = new Date(defaultCheckIn);
-      const altIn = new Date(baseIn);
-      altIn.setDate(baseIn.getDate() + 30);
-      const altOut = new Date(altIn);
-      altOut.setDate(altIn.getDate() + 1);
-
-      const retryPromises = idBatches.map((batch) =>
-        fetchOffersForIds(
-          batch,
-          altIn.toISOString().split('T')[0],
-          altOut.toISOString().split('T')[0],
-          false
-        )
-      );
-      const retryResults = await Promise.all(retryPromises);
-      for (const retryHotels of retryResults) {
-        console.log('Retry batch (+30 days) offers:', retryHotels.length);
-        hotels.push(...retryHotels);
-      }
-
-      console.log('Total hotels after retry:', hotels.length);
-    }
-
-    // Transform to expected format with Google Places enrichment
-    let transformedHotels = await Promise.all(hotels.map(async (offer: any, idx: number) => {
-      const hotel = offer.hotel;
-      const firstOffer = offer.offers?.[0];
-      const price = firstOffer?.price;
-
-      const item: any = {
-        hotel_id: hotel.hotelId,
-         property: {
-          name: hotel.name,
-          photoUrls: [`https://placehold.co/800x600/1a1a1a/d4af37?text=${encodeURIComponent(hotel.name.substring(0, 30))}&font=roboto`],
-          reviewScore: 0,
-          reviewCount: 0,
-          externalUrls: { default: `https://www.amadeus.com/hotel/${hotel.hotelId}` }
-        },
-        location: hotel.cityCode,
-        region: hotel.address?.cityName || location,
-        cityCode: hotel.cityCode,
-        price: price?.total ? parseFloat(price.total) : 0,
-        priceBreakdown: {
-          grossPrice: { value: price?.total ? parseFloat(price.total) : 0, currency: price?.currency || 'USD' }
-        },
-        accessibilityLabel: `${hotel.name}. ${hotel.address?.cityName || ''}. Current price ${price?.total || 0} ${price?.currency || 'USD'}`,
-        amadeusOffer: offer
-      };
-
-       try { if (idx < 12) {
-        const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY') || Deno.env.get('GOOGLE_PLACES_API_KEY_2');
-        if (apiKey) {
-          let place: any | undefined;
-
-          // Prefer Nearby Search using precise coordinates to get the exact property
-          if (hotel.latitude && hotel.longitude) {
-            const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${hotel.latitude},${hotel.longitude}&radius=400&keyword=${encodeURIComponent(hotel.name)}&type=lodging&key=${apiKey}`;
-            const nearbyResp = await fetch(nearbyUrl);
-            if (nearbyResp.ok) {
-              const nearbyData = await nearbyResp.json();
-              place = nearbyData.results?.[0];
-            }
+          if (!detailsResponse.ok) {
+            return null;
           }
 
-          // Fallback to Text Search if nearby did not yield a result
-          if (!place) {
-            const q = `${hotel.name} ${hotel.address?.cityName || location}`;
-            const textUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(q)}&type=lodging&key=${apiKey}`;
-            const textResp = await fetch(textUrl);
-            if (textResp.ok) {
-              const textData = await textResp.json();
-              place = textData.results?.[0];
-            }
+          const details = await detailsResponse.json();
+
+          // Get photos
+          const photosParams = new URLSearchParams({
+            key: tripAdvisorKey,
+            language: 'en'
+          });
+
+          const photosResponse = await fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/photos?${photosParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+
+          let photos = [];
+          if (photosResponse.ok) {
+            const photosData = await photosResponse.json();
+            photos = photosData.data || [];
           }
 
-          if (place) {
-            if (typeof place.rating === 'number') item.property.reviewScore = place.rating;
-            if (typeof place.user_ratings_total === 'number') item.property.reviewCount = place.user_ratings_total;
-            const ref = place.photos?.[0]?.photo_reference;
-            if (ref) {
-              item.property.photoUrls = [`https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${ref}&key=${apiKey}`];
-            }
-            if (place.place_id) {
-              item.property.externalUrls.google = `https://www.google.com/maps/place/?q=place_id:${place.place_id}`;
-            }
-          }
+          // Calculate estimated price based on price level
+          const basePrices: { [key: string]: number } = {
+            '$': 80,
+            '$$ - $$$': 150,
+            '$$$$': 300
+          };
+          const basePrice = basePrices[details.price_level || ''] || 120;
+          const estimatedPrice = basePrice * Math.ceil(guests / 2);
+
+          return {
+            hotel_id: hotel.location_id,
+            property: {
+              name: details.name || hotel.name,
+              photoUrls: photos.slice(0, 5).map((photo: any) => 
+                photo.images?.large?.url || photo.images?.original?.url || ''
+              ).filter(Boolean),
+              reviewScore: details.rating || 0,
+              reviewCount: details.num_reviews || 0,
+              externalUrls: { 
+                tripadvisor: details.web_url || '',
+                default: details.web_url || ''
+              }
+            },
+            location: details.address_obj?.city || location,
+            region: details.address_obj?.country || '',
+            price: estimatedPrice,
+            priceBreakdown: {
+              grossPrice: { value: estimatedPrice, currency: 'USD' }
+            },
+            price_level: details.price_level || '',
+            accessibilityLabel: `${details.name}. ${details.address_obj?.city || ''}. Estimated price ${estimatedPrice} USD`,
+            description: details.description || '',
+            amenities: details.amenities || [],
+            latitude: details.latitude,
+            longitude: details.longitude
+          };
+        } catch (error) {
+          console.error(`Error fetching details for hotel ${hotel.location_id}:`, error);
+          return null;
         }
-        }
-      } catch (_) { /* ignore enrichment errors */ }
+      })
+    );
 
-      return item;
-    }));
+    let transformedHotels = hotelDetails.filter(hotel => hotel !== null);
 
     // Apply filters
     const minRatingNormalized = typeof minRating === 'number' ? (minRating > 5 ? minRating / 2 : minRating) : undefined;
@@ -694,10 +592,10 @@ async function searchHotels(args: any, apiKey: string) {
 
     return {
       type: 'hotels',
-      location: { name: location, dest_id: cityCode },
+      location: { name: location, dest_id: location },
       results: transformedHotels,
-      checkIn: defaultCheckIn,
-      checkOut: defaultCheckOut,
+      checkIn: checkIn || new Date().toISOString().split('T')[0],
+      checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
       guests,
       filters: { sortBy, minRating, maxPrice, amenities }
     };
@@ -741,78 +639,117 @@ async function searchDestinations(args: any, apiKey: string) {
 
 async function searchRestaurants(args: any) {
   try {
-    const { location, latitude, longitude, radius = 5000 } = args;
-    console.log('searchRestaurants called with:', { location, latitude, longitude, radius });
+    const { location, cuisine, priceRange } = args;
+    console.log('searchRestaurants called with:', { location, cuisine, priceRange });
 
-    // City coordinates lookup
-    const cityCoordinates: { [key: string]: { lat: number; lng: number } } = {
-      'new york': { lat: 40.7128, lng: -74.0060 },
-      'nyc': { lat: 40.7128, lng: -74.0060 },
-      'paris': { lat: 48.8566, lng: 2.3522 },
-      'london': { lat: 51.5074, lng: -0.1278 },
-      'tokyo': { lat: 35.6762, lng: 139.6503 },
-      'dubai': { lat: 25.2048, lng: 55.2708 },
-      'los angeles': { lat: 34.0522, lng: -118.2437 },
-      'san francisco': { lat: 37.7749, lng: -122.4194 },
-      'chicago': { lat: 41.8781, lng: -87.6298 },
-      'miami': { lat: 25.7617, lng: -80.1918 },
-      'rome': { lat: 41.9028, lng: 12.4964 },
-      'barcelona': { lat: 41.3851, lng: 2.1734 },
-    };
-
-    let searchLat = latitude;
-    let searchLng = longitude;
-
-    // If no coordinates provided, try to look up city
-    if (!searchLat || !searchLng) {
-      if (location) {
-        const normalizedLocation = location.toLowerCase().trim();
-        const coords = cityCoordinates[normalizedLocation];
-        if (coords) {
-          searchLat = coords.lat;
-          searchLng = coords.lng;
-          console.log(`Using coordinates for ${location}:`, coords);
-        }
-      }
-      
-      // Default to NYC if still no coordinates
-      if (!searchLat || !searchLng) {
-        searchLat = 40.7128;
-        searchLng = -74.0060;
-        console.log('Using default NYC coordinates');
-      }
+    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
+    if (!tripAdvisorKey) {
+      return { error: 'TripAdvisor API key not configured', results: [] };
     }
 
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+    // Build search query
+    let searchQuery = location;
+    if (cuisine) {
+      searchQuery += ` ${cuisine}`;
+    }
 
-    const response = await fetch(`${SUPABASE_URL}/functions/v1/fetch-restaurants`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'apikey': SUPABASE_ANON_KEY || '',
-      },
-      body: JSON.stringify({
-        latitude: searchLat,
-        longitude: searchLng,
-        radius
-      })
+    // Search for restaurants in the location
+    const searchParams = new URLSearchParams({
+      key: tripAdvisorKey,
+      searchQuery: searchQuery,
+      category: 'restaurants',
+      language: 'en'
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Restaurant search error:', errorText);
-      return { error: 'Failed to search restaurants', results: [] };
+    const searchResponse = await fetch(
+      `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+      { headers: { 'Accept': 'application/json' } }
+    );
+
+    if (!searchResponse.ok) {
+      return { error: `Could not find restaurants in "${location}". Please try a different location.`, results: [] };
     }
 
-    const data = await response.json();
-    console.log('Restaurants found:', data.restaurants?.length || 0);
+    const searchData = await searchResponse.json();
+    console.log('TripAdvisor restaurants found:', searchData.data?.length || 0);
+
+    // Get detailed information for each restaurant
+    const restaurantDetails = await Promise.all(
+      (searchData.data || []).slice(0, 30).map(async (restaurant: any) => {
+        try {
+          const detailsParams = new URLSearchParams({
+            key: tripAdvisorKey,
+            language: 'en'
+          });
+
+          const detailsResponse = await fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+
+          if (!detailsResponse.ok) {
+            return null;
+          }
+
+          const details = await detailsResponse.json();
+
+          // Get photos
+          const photosParams = new URLSearchParams({
+            key: tripAdvisorKey,
+            language: 'en'
+          });
+
+          const photosResponse = await fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${photosParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+
+          let photos = [];
+          if (photosResponse.ok) {
+            const photosData = await photosResponse.json();
+            photos = photosData.data || [];
+          }
+
+          // Filter by price range if specified
+          if (priceRange && details.price_level && details.price_level !== priceRange) {
+            return null;
+          }
+
+          return {
+            id: restaurant.location_id,
+            name: details.name || restaurant.name,
+            address: details.address_obj?.address_string || '',
+            city: details.address_obj?.city || '',
+            country: details.address_obj?.country || '',
+            rating: details.rating || 0,
+            num_reviews: details.num_reviews || 0,
+            price_level: details.price_level || '',
+            cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
+            description: details.description || '',
+            photos: photos.slice(0, 5).map((photo: any) => ({
+              url: photo.images?.large?.url || photo.images?.original?.url,
+              caption: photo.caption || ''
+            })),
+            web_url: details.web_url || '',
+            phone: details.phone || '',
+            website: details.website || '',
+            hours: details.hours || {},
+            latitude: details.latitude,
+            longitude: details.longitude
+          };
+        } catch (error) {
+          console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
+          return null;
+        }
+      })
+    );
+
+    const validRestaurants = restaurantDetails.filter(restaurant => restaurant !== null);
     
     return {
       type: 'restaurants',
-      results: data.restaurants || [],
-      location: { latitude: searchLat, longitude: searchLng }
+      results: validRestaurants,
+      location: location
     };
   } catch (error) {
     console.error('Error searching restaurants:', error);

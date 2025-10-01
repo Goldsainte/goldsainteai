@@ -55,7 +55,7 @@ const SearchResults = () => {
 
       try {
         if (searchType === "hotels") {
-          const { data, error } = await supabase.functions.invoke('search-hotels', {
+          const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
             body: { location, checkIn, checkOut, guests: parseInt(guests) }
           });
 
@@ -72,17 +72,26 @@ const SearchResults = () => {
           const destResults = data.results || [];
           setResults(destResults);
           setFilteredResults(destResults);
+        } else if (searchType === "restaurants") {
+          const { data, error } = await supabase.functions.invoke('tripadvisor-search-restaurants', {
+            body: { location }
+          });
+
+          if (error) throw error;
+          const restaurantResults = data.results || [];
+          setResults(restaurantResults);
+          setFilteredResults(restaurantResults);
         } else if (searchType === "packages") {
           // Fetch hotels, flights, and restaurants in parallel
           const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
-            supabase.functions.invoke('search-hotels', {
+            supabase.functions.invoke('tripadvisor-search-hotels', {
               body: { location, checkIn, checkOut, guests: parseInt(guests) }
             }),
             supabase.functions.invoke('amadeus-search-flights', {
               body: { origin: 'JFK', destination: location, departureDate: checkIn, adults: parseInt(guests) }
             }).catch(() => ({ data: { results: [] }, error: null })),
-            supabase.functions.invoke('fetch-restaurants', {
-              body: { location, limit: 5 }
+            supabase.functions.invoke('tripadvisor-search-restaurants', {
+              body: { location }
             }).catch(() => ({ data: { results: [] }, error: null }))
           ]);
 
