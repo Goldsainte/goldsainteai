@@ -26,6 +26,27 @@ interface ConfirmationEmailRequest {
   specialRequests?: string;
 }
 
+const formatTime = (dateTime: string) => {
+  return new Date(dateTime).toLocaleTimeString('en-US', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
+const formatDate = (dateTime: string) => {
+  return new Date(dateTime).toLocaleDateString('en-US', { 
+    weekday: 'short',
+    month: 'short', 
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+const getDuration = (duration: string) => {
+  return duration.replace('PT', '').replace('H', 'h ').replace('M', 'm');
+};
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -50,28 +71,173 @@ const handler = async (req: Request): Promise<Response> => {
     const guestEmail = guestInfo?.email || legacyGuestEmail;
     const guestName = guestInfo ? `${guestInfo.firstName} ${guestInfo.lastName}` : legacyGuestName;
 
-    console.log('Sending confirmation email to:', guestEmail);
+    console.log('Sending confirmation email to:', guestEmail, 'Type:', bookingType);
 
-    // Calculate breakdown
-    const subtotal = totalPrice / 1.15; // Reverse calculate from total
-    const tax = subtotal * 0.10;
-    const serviceFee = subtotal * 0.05;
-
-    // Build hotel/property details
-    let propertyDetails = '';
+    // Build booking details based on type
+    let bookingDetails = '';
+    let emailSubject = '';
+    
     if (bookingType === 'hotel') {
-      const hotelName = bookingData.hotel?.name || 'Hotel';
-      const roomType = bookingData.room?.description?.text || 'Standard Room';
-      const bedType = bookingData.room?.typeEstimated?.bedType || 'Not specified';
+      const hotelName = bookingData.hotel?.name || bookingData.hotelName || 'Hotel';
+      const roomType = bookingData.room?.description?.text || bookingData.roomType || 'Standard Room';
+      const bedType = bookingData.room?.typeEstimated?.bedType || bookingData.bedType || 'Not specified';
       
-      propertyDetails = `
-        <h2 style="color: #C9A55B; margin-top: 20px;">Hotel Details</h2>
-        <p><strong>Property:</strong> ${hotelName}</p>
-        <p><strong>Room Type:</strong> ${roomType}</p>
-        <p><strong>Bed Type:</strong> ${bedType}</p>
-        <p><strong>Check-in:</strong> ${checkInDate || 'TBD'}</p>
-        <p><strong>Check-out:</strong> ${checkOutDate || 'TBD'}</p>
+      emailSubject = `Hotel Booking Confirmed - ${hotelName}`;
+      
+      bookingDetails = `
+        <div class="section-title">Hotel Details</div>
+        <div class="detail-item">
+          <span class="detail-label">Property</span>
+          <span class="detail-value">${hotelName}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Room Type</span>
+          <span class="detail-value">${roomType}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Bed Type</span>
+          <span class="detail-value">${bedType}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Check-in</span>
+          <span class="detail-value">${checkInDate || 'TBD'}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Check-out</span>
+          <span class="detail-value">${checkOutDate || 'TBD'}</span>
+        </div>
       `;
+    } else if (bookingType === 'flight') {
+      const flightOffer = bookingData.flight_offer || bookingData.flightOffer;
+      const passengers = bookingData.passengers || [];
+      
+      if (flightOffer) {
+        const firstSegment = flightOffer.itineraries?.[0]?.segments?.[0];
+        const lastSegment = flightOffer.itineraries?.[0]?.segments?.slice(-1)[0];
+        const returnItinerary = flightOffer.itineraries?.[1];
+        
+        const origin = firstSegment?.departure?.iataCode || 'N/A';
+        const destination = lastSegment?.arrival?.iataCode || 'N/A';
+        const departureTime = firstSegment?.departure?.at;
+        const arrivalTime = lastSegment?.arrival?.at;
+        const duration = flightOffer.itineraries?.[0]?.duration || 'N/A';
+        const stops = flightOffer.itineraries?.[0]?.segments?.length - 1 || 0;
+        const airline = firstSegment?.carrierCode || 'N/A';
+        
+        emailSubject = `Flight Confirmed - ${origin} to ${destination}`;
+        
+        // Build outbound flight details
+        let outboundSegments = '';
+        flightOffer.itineraries[0].segments.forEach((segment: any, index: number) => {
+          outboundSegments += `
+            <div style="background: #F8F6F0; padding: 15px; margin: 10px 0; border-radius: 6px; border-left: 3px solid #C9A55B;">
+              <div style="font-weight: 600; color: #C9A55B; margin-bottom: 8px;">
+                ${index === 0 ? '✈ Departure' : `Connection ${index}`}
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                <div>
+                  <div style="color: #5A5A5A; font-size: 12px;">From</div>
+                  <div style="font-weight: 600;">${segment.departure.iataCode}</div>
+                  <div style="font-size: 13px;">${formatDate(segment.departure.at)}</div>
+                  <div style="font-size: 13px; color: #C9A55B;">${formatTime(segment.departure.at)}</div>
+                </div>
+                <div>
+                  <div style="color: #5A5A5A; font-size: 12px;">To</div>
+                  <div style="font-weight: 600;">${segment.arrival.iataCode}</div>
+                  <div style="font-size: 13px;">${formatDate(segment.arrival.at)}</div>
+                  <div style="font-size: 13px; color: #C9A55B;">${formatTime(segment.arrival.at)}</div>
+                </div>
+              </div>
+              <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #E5E5E0; font-size: 13px; color: #5A5A5A;">
+                Flight ${segment.carrierCode}${segment.number} • Aircraft ${segment.aircraft?.code || 'N/A'} • Duration ${getDuration(segment.duration)}
+              </div>
+            </div>
+          `;
+        });
+        
+        // Build return flight details if exists
+        let returnSegments = '';
+        if (returnItinerary) {
+          returnItinerary.segments.forEach((segment: any, index: number) => {
+            returnSegments += `
+              <div style="background: #F8F6F0; padding: 15px; margin: 10px 0; border-radius: 6px; border-left: 3px solid #C9A55B;">
+                <div style="font-weight: 600; color: #C9A55B; margin-bottom: 8px;">
+                  ${index === 0 ? '✈ Return Departure' : `Connection ${index}`}
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 14px;">
+                  <div>
+                    <div style="color: #5A5A5A; font-size: 12px;">From</div>
+                    <div style="font-weight: 600;">${segment.departure.iataCode}</div>
+                    <div style="font-size: 13px;">${formatDate(segment.departure.at)}</div>
+                    <div style="font-size: 13px; color: #C9A55B;">${formatTime(segment.departure.at)}</div>
+                  </div>
+                  <div>
+                    <div style="color: #5A5A5A; font-size: 12px;">To</div>
+                    <div style="font-weight: 600;">${segment.arrival.iataCode}</div>
+                    <div style="font-size: 13px;">${formatDate(segment.arrival.at)}</div>
+                    <div style="font-size: 13px; color: #C9A55B;">${formatTime(segment.arrival.at)}</div>
+                  </div>
+                </div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #E5E5E0; font-size: 13px; color: #5A5A5A;">
+                  Flight ${segment.carrierCode}${segment.number} • Aircraft ${segment.aircraft?.code || 'N/A'} • Duration ${getDuration(segment.duration)}
+                </div>
+              </div>
+            `;
+          });
+        }
+        
+        // Build passenger list
+        let passengerList = '';
+        passengers.forEach((passenger: any, index: number) => {
+          passengerList += `
+            <div class="detail-item">
+              <span class="detail-label">Passenger ${index + 1}</span>
+              <span class="detail-value">${passenger.firstName} ${passenger.lastName}</span>
+            </div>
+          `;
+        });
+        
+        bookingDetails = `
+          <div class="section-title">Flight Itinerary</div>
+          <div class="detail-item">
+            <span class="detail-label">Route</span>
+            <span class="detail-value" style="font-weight: 600; color: #C9A55B;">${origin} → ${destination}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Airline</span>
+            <span class="detail-value">${airline}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Total Duration</span>
+            <span class="detail-value">${getDuration(duration)}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Stops</span>
+            <span class="detail-value">${stops === 0 ? 'Direct Flight' : `${stops} stop(s)`}</span>
+          </div>
+          
+          <div style="margin-top: 25px;">
+            <div style="font-family: 'Playfair Display', serif; color: #1A1F2C; font-size: 18px; font-weight: 600; margin-bottom: 15px;">
+              Outbound Journey
+            </div>
+            ${outboundSegments}
+          </div>
+          
+          ${returnSegments ? `
+            <div style="margin-top: 25px;">
+              <div style="font-family: 'Playfair Display', serif; color: #1A1F2C; font-size: 18px; font-weight: 600; margin-bottom: 15px;">
+                Return Journey
+              </div>
+              ${returnSegments}
+            </div>
+          ` : ''}
+          
+          <div style="margin-top: 25px;">
+            <div class="section-title">Travelers</div>
+            ${passengerList}
+          </div>
+        `;
+      }
     } else if (bookingType === 'restaurant') {
       const restaurantName = bookingData.restaurantName || 'Restaurant';
       const restaurantAddress = bookingData.restaurantAddress || '';
@@ -79,13 +245,30 @@ const handler = async (req: Request): Promise<Response> => {
       const time = bookingData.time || 'TBD';
       const guests = bookingData.guests || 1;
       
-      propertyDetails = `
-        <h2 style="color: #C9A55B; margin-top: 20px;">Restaurant Reservation</h2>
-        <p><strong>Restaurant:</strong> ${restaurantName}</p>
-        <p><strong>Location:</strong> ${restaurantAddress}</p>
-        <p><strong>Date:</strong> ${date}</p>
-        <p><strong>Time:</strong> ${time}</p>
-        <p><strong>Party Size:</strong> ${guests} ${guests === 1 ? 'guest' : 'guests'}</p>
+      emailSubject = `Reservation Confirmed - ${restaurantName}`;
+      
+      bookingDetails = `
+        <div class="section-title">Restaurant Reservation</div>
+        <div class="detail-item">
+          <span class="detail-label">Restaurant</span>
+          <span class="detail-value">${restaurantName}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">${restaurantAddress}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">${date}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">${time}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Party Size</span>
+          <span class="detail-value">${guests} ${guests === 1 ? 'guest' : 'guests'}</span>
+        </div>
       `;
     }
 
@@ -211,22 +394,26 @@ const handler = async (req: Request): Promise<Response> => {
             .detail-value {
               color: #2C2C2C;
               font-weight: 400;
+              text-align: right;
             }
-            .price-row { 
-              display: flex; 
-              justify-content: space-between; 
-              padding: 15px 0;
-              border-bottom: 1px solid #E5E5E0;
-              font-size: 15px;
-            }
-            .total { 
-              font-size: 22px; 
-              font-weight: 600;
+            .total-price { 
+              font-size: 28px; 
+              font-weight: 700;
               color: #C9A55B;
-              padding: 20px 0 10px 0;
-              border-top: 2px solid #C9A55B;
-              margin-top: 10px;
+              text-align: center;
+              padding: 30px;
+              margin: 30px 0;
+              background: linear-gradient(135deg, #F8F6F0 0%, #FAF8F2 100%);
+              border-radius: 8px;
+              border: 2px solid #C9A55B;
               font-family: 'Playfair Display', serif;
+            }
+            .total-label {
+              font-size: 14px;
+              letter-spacing: 2px;
+              color: #5A5A5A;
+              margin-bottom: 10px;
+              text-transform: uppercase;
             }
             .info-box {
               background: linear-gradient(135deg, #F8F6F0 0%, #FAF8F2 100%);
@@ -274,17 +461,16 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="header">
               <div class="logo-container">
                 <h1 class="logo">Goldstone</h1>
-                <div class="tagline">Luxury Accommodations</div>
+                <div class="tagline">Luxury Travel</div>
               </div>
-              <div class="header-subtitle">Reservation Confirmation</div>
+              <div class="header-subtitle">Booking Confirmation</div>
             </div>
             
             <div class="content">
               <h1 class="greeting">Welcome, ${guestName}</h1>
               <p class="intro-text">
                 Thank you for choosing Goldstone. We are delighted to confirm your reservation 
-                and look forward to providing you with an exceptional experience of refined luxury 
-                and impeccable service.
+                and look forward to providing you with an exceptional travel experience.
               </p>
               
               <div class="booking-ref">
@@ -293,46 +479,33 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <div class="details">
-                ${propertyDetails}
+                ${bookingDetails}
                 
                 ${specialRequests ? `
-                  <h2 class="section-title">Your Special Requests</h2>
+                  <div class="section-title">Your Special Requests</div>
                   <p class="info-text">${specialRequests}</p>
-                ` : ''}
-                
-                ${totalPrice > 0 ? `
-                  <h2 class="section-title">Investment Summary</h2>
-                  <div class="price-row">
-                    <span class="detail-label">Accommodation</span>
-                    <span class="detail-value">${currency} ${subtotal.toFixed(2)}</span>
-                  </div>
-                  <div class="price-row">
-                    <span class="detail-label">Tax & VAT</span>
-                    <span class="detail-value">${currency} ${tax.toFixed(2)}</span>
-                  </div>
-                  <div class="price-row">
-                    <span class="detail-label">Service Excellence Fee</span>
-                    <span class="detail-value">${currency} ${serviceFee.toFixed(2)}</span>
-                  </div>
-                  <div class="price-row total">
-                    <span>Total Investment</span>
-                    <span>${currency} ${totalPrice.toFixed(2)}</span>
-                  </div>
                 ` : ''}
               </div>
               
+              ${totalPrice > 0 ? `
+                <div class="total-price">
+                  <div class="total-label">Total Amount</div>
+                  ${currency} ${totalPrice.toFixed(2)}
+                </div>
+              ` : ''}
+              
               <div class="info-box">
-                <div class="info-title">Essential Information</div>
-                <div class="info-text">• Please present a valid identification document and this confirmation upon arrival</div>
-                <div class="info-text">• Check-in: 3:00 PM | Check-out: 11:00 AM</div>
-                <div class="info-text">• Early check-in and late check-out available upon request</div>
-                <div class="info-text">• For modifications or inquiries, reference your confirmation code</div>
-                <div class="info-text">• Complimentary concierge services available 24/7</div>
+                <div class="info-title">Important Information</div>
+                <div class="info-text">• Please keep this confirmation code for your records</div>
+                <div class="info-text">• Present this confirmation upon arrival or check-in</div>
+                <div class="info-text">• For any changes or inquiries, reference your confirmation code</div>
+                <div class="info-text">• Our concierge team is available 24/7 to assist you</div>
+                <div class="info-text">• Ensure all travel documents are valid and up to date</div>
               </div>
               
               <p class="intro-text">
-                Should you require any assistance or have special arrangements in mind, 
-                our dedicated concierge team is at your service around the clock.
+                Should you require any assistance, our dedicated team is at your service.
+                We look forward to making your journey unforgettable.
               </p>
               
               <p class="signature">
@@ -342,10 +515,10 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             
             <div class="footer">
-              <p style="margin: 0; color: #E5D5B7;">GOLDSTONE LUXURY ACCOMMODATIONS</p>
+              <p style="margin: 0; color: #E5D5B7;">GOLDSTONE LUXURY TRAVEL</p>
               <div class="footer-divider"></div>
               <p style="margin: 5px 0;">This is an automated confirmation. Please retain for your records.</p>
-              <p style="margin: 20px 0 0 0; font-size: 11px;">&copy; 2025 Goldstone Suites. All rights reserved.</p>
+              <p style="margin: 20px 0 0 0; font-size: 11px;">&copy; 2025 Goldstone. All rights reserved.</p>
             </div>
           </div>
         </body>
@@ -359,9 +532,9 @@ const handler = async (req: Request): Promise<Response> => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: "Goldstone Suites <onboarding@resend.dev>",
+        from: "Goldstone Travel <onboarding@resend.dev>",
         to: [guestEmail],
-        subject: `Booking Confirmed - ${bookingReference}`,
+        subject: emailSubject || `Booking Confirmed - ${bookingReference}`,
         html: emailHtml,
       }),
     });
