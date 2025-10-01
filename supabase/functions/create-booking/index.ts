@@ -1,10 +1,27 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const bookingSchema = z.object({
+  bookingType: z.enum(['hotel', 'flight', 'car', 'package']),
+  bookingData: z.record(z.unknown()),
+  totalPrice: z.number().positive().max(1000000),
+  currency: z.string().length(3).regex(/^[A-Z]{3}$/),
+  guestInfo: z.object({
+    email: z.string().email().max(255),
+    firstName: z.string().trim().min(1).max(100),
+    lastName: z.string().trim().min(1).max(100),
+    phone: z.string().trim().max(50).optional(),
+    country: z.string().max(100).optional(),
+    specialRequests: z.string().max(1000).optional(),
+  }),
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,7 +29,22 @@ serve(async (req) => {
   }
 
   try {
-    const { bookingType, bookingData, totalPrice, currency, guestInfo } = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = bookingSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid input data',
+        details: validationResult.error.issues 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+    
+    const { bookingType, bookingData, totalPrice, currency, guestInfo } = validationResult.data;
     
     console.log('Creating booking:', { bookingType, totalPrice, currency });
 

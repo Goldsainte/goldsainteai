@@ -1,10 +1,23 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Input validation schema
+const visaRequestSchema = z.object({
+  userEmail: z.string().email().max(255),
+  userName: z.string().trim().max(200).optional(),
+  userPhone: z.string().trim().max(50).optional(),
+  fromCountry: z.string().trim().min(1).max(100),
+  toCountry: z.string().trim().min(1).max(100),
+  visaInformation: z.record(z.unknown()).optional(),
+  travelDates: z.record(z.unknown()).optional(),
+  additionalNotes: z.string().max(2000).optional(),
+});
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -12,6 +25,24 @@ serve(async (req) => {
   }
 
   try {
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = visaRequestSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid input data',
+          details: validationResult.error.issues 
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+    
     const { 
       userEmail, 
       userName, 
@@ -21,20 +52,9 @@ serve(async (req) => {
       visaInformation,
       travelDates,
       additionalNotes 
-    } = await req.json();
+    } = validationResult.data;
 
     console.log('Visa service request:', { userEmail, fromCountry, toCountry });
-
-    // Validate required fields
-    if (!userEmail || !fromCountry || !toCountry) {
-      return new Response(
-        JSON.stringify({ error: 'Missing required fields: userEmail, fromCountry, toCountry' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 400 
-        }
-      );
-    }
 
     // Create Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;

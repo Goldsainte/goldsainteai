@@ -1,11 +1,20 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
+
+// Input validation schema
+const checkoutSchema = z.object({
+  bookingId: z.string().uuid(),
+  amount: z.number().positive().max(1000000),
+  currency: z.string().length(3).regex(/^[A-Z]{3}$/).default('USD'),
+  guestEmail: z.string().email().max(255),
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -13,7 +22,22 @@ serve(async (req) => {
   }
 
   try {
-    const { bookingId, amount, currency = 'USD', guestEmail } = await req.json();
+    const body = await req.json();
+    
+    // Validate input
+    const validationResult = checkoutSchema.safeParse(body);
+    if (!validationResult.success) {
+      console.error('Validation error:', validationResult.error);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid input data',
+        details: validationResult.error.issues 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+    
+    const { bookingId, amount, currency, guestEmail } = validationResult.data;
 
     console.log('Creating checkout session for booking:', bookingId);
 
