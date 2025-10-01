@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
@@ -574,6 +574,58 @@ const Index = () => {
                     </Card>
                   ))}
                 </div>
+              </div>
+
+              {/* Become a Travel Agent CTA */}
+              <div className="space-y-6 pt-16 pb-12">
+                <Card className="relative overflow-hidden border-2 border-accent/50 bg-gradient-to-br from-accent/5 via-primary/5 to-accent/5">
+                  <CardContent className="p-12">
+                    <div className="max-w-3xl mx-auto text-center space-y-6">
+                      <div className="inline-block p-3 bg-accent/10 rounded-full mb-4">
+                        <Briefcase className="h-12 w-12 text-accent" />
+                      </div>
+                      <h2 className="text-4xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
+                        Become a Goldsainte AI Travel Agent
+                      </h2>
+                      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Join our exclusive network of verified travel professionals and connect with clients seeking luxury travel experiences worldwide. Earn commissions on bookings and grow your business with our AI-powered platform.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                        <Button 
+                          size="lg" 
+                          className="gap-2 text-lg px-8 py-6"
+                          onClick={() => navigate('/auth?redirect=/agent-onboarding')}
+                        >
+                          <Briefcase className="h-5 w-5" />
+                          Apply Now
+                        </Button>
+                        <Button 
+                          size="lg" 
+                          variant="outline"
+                          className="gap-2 text-lg px-8 py-6"
+                          onClick={() => navigate('/marketplace')}
+                        >
+                          <MapPinned className="h-5 w-5" />
+                          View Marketplace
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold text-accent">10%+</div>
+                          <p className="text-sm text-muted-foreground">Commission Rates</p>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold text-accent">24/7</div>
+                          <p className="text-sm text-muted-foreground">Platform Support</p>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold text-accent">Global</div>
+                          <p className="text-sm text-muted-foreground">Client Network</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               {/* Date Picker - Initial View */}
