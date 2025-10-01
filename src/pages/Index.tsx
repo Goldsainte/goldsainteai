@@ -12,6 +12,7 @@ import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
 import { EventCard } from "@/components/EventCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
+import { PriceSlider } from "@/components/PriceSlider";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
@@ -82,6 +83,7 @@ const Index = () => {
     toCountry: "", 
     visaInformation: null 
   });
+  const [showPriceSlider, setShowPriceSlider] = useState<{ type: "hotel" | "flight" | "restaurant" | "car" } | null>(null);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -275,6 +277,30 @@ const Index = () => {
       if (data.conversationHistory) {
         setConversationHistory(data.conversationHistory);
       }
+
+      // Check if AI is asking about dates and show date picker
+      const aiMessage = data.message.toLowerCase();
+      if (aiMessage.includes('when are you planning to stay') || 
+          aiMessage.includes('when are you planning to travel') ||
+          aiMessage.includes('when do you need the car')) {
+        const type = aiMessage.includes('stay') ? 'hotel' : 'flight';
+        setTimeout(() => setShowDatePicker({ type, context: 'quicklink' }), 500);
+      }
+
+      // Check if AI is asking about budget and show price slider
+      if (aiMessage.includes('what\'s your budget per night') || 
+          aiMessage.includes('what is your budget per night')) {
+        setTimeout(() => setShowPriceSlider({ type: 'hotel' }), 500);
+      } else if (aiMessage.includes('what\'s your budget for the flight') ||
+                 aiMessage.includes('what is your budget for the flight')) {
+        setTimeout(() => setShowPriceSlider({ type: 'flight' }), 500);
+      } else if (aiMessage.includes('what\'s your budget per person') ||
+                 aiMessage.includes('what is your budget per person')) {
+        setTimeout(() => setShowPriceSlider({ type: 'restaurant' }), 500);
+      } else if (aiMessage.includes('what\'s your budget per day') ||
+                 aiMessage.includes('what is your budget per day')) {
+        setTimeout(() => setShowPriceSlider({ type: 'car' }), 500);
+      }
     } catch (err: any) {
       console.error('AI Agent error:', err);
       toast({
@@ -384,6 +410,13 @@ const Index = () => {
     setSearchResults([]);
     setConversationHistory([]);
     setPendingFlightDates(null);
+    setShowDatePicker(null);
+    setShowPriceSlider(null);
+  };
+
+  const handlePriceSelected = (price: number) => {
+    setShowPriceSlider(null);
+    handleSearch(`$${price}`);
   };
 
   const showChat = messages.length > 0;
@@ -669,6 +702,20 @@ const Index = () => {
                   />
                 </div>
               )}
+
+              {/* Price Slider - Initial View */}
+              {showPriceSlider && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
+                  <PriceSlider
+                    type={showPriceSlider.type}
+                    onPriceSelected={handlePriceSelected}
+                    onCancel={() => setShowPriceSlider(null)}
+                    min={showPriceSlider.type === 'restaurant' ? 10 : 50}
+                    max={showPriceSlider.type === 'flight' ? 2000 : showPriceSlider.type === 'restaurant' ? 200 : 1000}
+                    defaultValue={showPriceSlider.type === 'flight' ? 500 : showPriceSlider.type === 'restaurant' ? 50 : 200}
+                  />
+                </div>
+              )}
             </div>
           </div>
         ) : (
@@ -724,6 +771,20 @@ const Index = () => {
                       type={showDatePicker.type}
                       onDatesSelected={handleDatesSelected}
                       onCancel={() => setShowDatePicker(null)}
+                    />
+                  </div>
+                )}
+
+                {/* Price Slider */}
+                {showPriceSlider && (
+                  <div className="animate-in fade-in slide-in-from-bottom-4">
+                    <PriceSlider
+                      type={showPriceSlider.type}
+                      onPriceSelected={handlePriceSelected}
+                      onCancel={() => setShowPriceSlider(null)}
+                      min={showPriceSlider.type === 'restaurant' ? 10 : 50}
+                      max={showPriceSlider.type === 'flight' ? 2000 : showPriceSlider.type === 'restaurant' ? 200 : 1000}
+                      defaultValue={showPriceSlider.type === 'flight' ? 500 : showPriceSlider.type === 'restaurant' ? 50 : 200}
                     />
                   </div>
                 )}
