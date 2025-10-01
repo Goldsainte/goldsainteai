@@ -352,7 +352,11 @@ Always show results first with minimal text, ask questions later. Be conversatio
     if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
       console.log('AI requested tool calls:', assistantMessage.tool_calls.length);
       
-      const toolResults = [];
+      const toolResults: Array<{
+        tool_call_id: string;
+        function_name: string;
+        result: any;
+      }> = [];
       
       for (const toolCall of assistantMessage.tool_calls) {
         const functionName = toolCall.function.name;
@@ -403,22 +407,92 @@ Always show results first with minimal text, ask questions later. Be conversatio
         body: JSON.stringify({
           model: 'gpt-5-2025-08-07',
           messages: finalMessages,
+          stream: true,
         }),
       });
 
-      const finalData = await finalResponse.json();
-      const finalMessage = finalData.choices[0].message.content;
+      if (!finalResponse.ok) {
+        const errorText = await finalResponse.text();
+        console.error('Final AI response error:', finalResponse.status, errorText);
+        throw new Error(`AI Gateway error: ${finalResponse.status}`);
+      }
 
-      return new Response(JSON.stringify({
-        message: finalMessage,
-        toolResults: toolResults.map(tr => tr.result),
-        conversationHistory: [...conversationHistory, 
-          { role: 'user', content: message },
-          { role: 'assistant', content: finalMessage }
-        ]
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
+      // Stream the response back to client
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        async start(controller) {
+          // Send initial metadata with tool results
+          const metadata = {
+            type: 'metadata',
+            toolResults: toolResults.map(tr => tr.result),
+            conversationHistory: [...conversationHistory, { role: 'user', content: message }]
+          };
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify(metadata)}\n\n`));
+
+          // Stream AI response
+          const reader = finalResponse.body?.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          let fullMessage = '';
+
+          if (!reader) {
+            controller.close();
+            return;
+          }
+
+          try {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                if (!line.trim() || line.startsWith(':')) continue;
+                if (!line.startsWith('data: ')) continue;
+
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices?.[0]?.delta?.content;
+                  if (content) {
+                    fullMessage += content;
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'content', content })}\n\n`));
+                  }
+                } catch (e) {
+                  console.error('Error parsing SSE:', e);
+                }
+              }
+            }
+
+            // Send done signal with full message for history
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+              type: 'done', 
+              fullMessage,
+              conversationHistory: [...conversationHistory, 
+                { role: 'user', content: message },
+                { role: 'assistant', content: fullMessage }
+              ]
+            })}\n\n`));
+          } catch (error) {
+            console.error('Stream error:', error);
+          } finally {
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(stream, {
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'text/event-stream',
+          'Cache-Control': 'no-cache',
+          'Connection': 'keep-alive'
+        },
       });
     }
 

@@ -225,41 +225,106 @@ const Index = () => {
     setSearchQuery("");
 
     try {
-      const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
-        body: { 
-          message: finalQuery,
-          conversationHistory,
-          userLocation: userLocation ? {
-            latitude: userLocation.lat,
-            longitude: userLocation.lng
-          } : undefined
+      // Add temporary assistant message for streaming
+      const tempMessageIndex = messages.length + 1;
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/travel-ai-agent`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+          body: JSON.stringify({
+            message: finalQuery,
+            conversationHistory,
+            userLocation: userLocation ? {
+              latitude: userLocation.lat,
+              longitude: userLocation.lng
+            } : undefined
+          })
         }
-      });
+      );
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
-      
-      if (data.toolResults && data.toolResults.length > 0) {
-        setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      let toolResults: any[] = [];
+      let streamedMessage = '';
+
+      if (!reader) {
+        throw new Error('No response body');
+      }
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (!line.trim() || line.startsWith(':')) continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const data = line.slice(6);
+          try {
+            const parsed = JSON.parse(data);
+
+            if (parsed.type === 'metadata') {
+              // Store tool results and update conversation history
+              toolResults = parsed.toolResults || [];
+              if (parsed.conversationHistory) {
+                setConversationHistory(parsed.conversationHistory);
+              }
+            } else if (parsed.type === 'content') {
+              // Update the assistant message with new content
+              streamedMessage += parsed.content;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[tempMessageIndex] = { 
+                  role: 'assistant', 
+                  content: streamedMessage 
+                };
+                return newMessages;
+              });
+            } else if (parsed.type === 'done') {
+              // Final update
+              if (parsed.conversationHistory) {
+                setConversationHistory(parsed.conversationHistory);
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing SSE:', e);
+          }
+        }
+      }
+
+      // Process tool results after streaming is done
+      if (toolResults.length > 0) {
+        setSearchResults(toolResults.filter((r: any) => r.results && r.results.length > 0));
         
         // Check for visa results
-        const visaResult = data.toolResults.find((r: any) => r.type === 'visa');
+        const visaResult = toolResults.find((r: any) => r.type === 'visa');
         if (visaResult && visaResult.fromCountry && visaResult.toCountry) {
-          // Store visa data for potential service request
           const isVisaRequired = visaResult.information && 
             (visaResult.information.toLowerCase().includes('visa required') || 
              visaResult.information.toLowerCase().includes('visa is required') ||
              visaResult.information.toLowerCase().includes('must obtain'));
           
-          // Check if AI suggests visa assistance or user asks for help
           const userWantsHelp = queryToSend.toLowerCase().includes('help') || 
                                queryToSend.toLowerCase().includes('assist') ||
                                queryToSend.toLowerCase().includes('yes') ||
-                               data.message.toLowerCase().includes('assist you with your visa');
+                               streamedMessage.toLowerCase().includes('assist you with your visa');
           
           if (isVisaRequired && userWantsHelp) {
-            // Show the visa service modal
             setTimeout(() => {
               setVisaModalData({
                 open: true,
@@ -267,13 +332,9 @@ const Index = () => {
                 toCountry: visaResult.toCountry,
                 visaInformation: visaResult
               });
-            }, 1000); // Small delay so user can read the AI message first
+            }, 1000);
           }
         }
-      }
-
-      if (data.conversationHistory) {
-        setConversationHistory(data.conversationHistory);
       }
     } catch (err: any) {
       console.error('AI Agent error:', err);
