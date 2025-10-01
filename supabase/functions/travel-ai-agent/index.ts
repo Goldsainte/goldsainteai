@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory = [], userLocation } = await req.json();
+    const { message, conversationHistory = [], userLocation, isQuickLink = false } = await req.json();
     
     console.log('=== AI AGENT REQUEST ===');
     console.log('User message:', message);
@@ -232,12 +232,56 @@ serve(async (req) => {
       ? `\n\nIMPORTANT: The user's current location is available. When they ask for restaurants, hotels, or things "near me" or "near my current location", ask them to specify their city or use context clues to determine their city. NEVER ask for or mention latitude, longitude, or GPS coordinates - only use city names.`
       : '';
 
+    const quickLinkBehavior = isQuickLink 
+      ? `
+
+CRITICAL BEHAVIOR FOR QUICK LINKS: When a user uses a quick link (hotels, flights, restaurants, events, cars), you MUST gather their preferences FIRST before searching. Ask about:
+
+FOR HOTELS:
+- Budget range (e.g., "What's your budget per night?")
+- Travel dates (suggest they use the date picker: "When are you planning to stay?")
+- Star rating preference (1-5 stars)
+- Neighborhood/area preference
+- Required amenities (pool, pet-friendly, gym, spa, parking, etc.)
+- Number of guests
+
+FOR FLIGHTS:
+- Origin city (where flying from)
+- Destination (where flying to)
+- Travel dates (suggest date picker for departure and return)
+- Trip type (one-way or round-trip)
+- Cabin class (economy, business, first)
+- Number of passengers
+- Direct flights only or connections OK
+
+FOR RESTAURANTS:
+- City/location
+- Cuisine preference
+- Price range
+- Dietary restrictions
+- Occasion (casual, romantic, business, etc.)
+
+FOR EVENTS:
+- City/location
+- Event type (music, sports, arts, etc.)
+- Date range
+- Budget
+
+FOR CARS:
+- Pickup location
+- Pickup and dropoff dates
+- Car type preference (economy, SUV, luxury, etc.)
+
+Ask these questions in a friendly, conversational way - not all at once! Start with 2-3 key questions, then gather more details as needed. Only AFTER you have enough information should you call the search tools.`
+      : `
+
+CRITICAL BEHAVIOR: Be action-oriented and proactive. When users mention travel needs (hotels, flights, restaurants), IMMEDIATELY use the search tools with smart defaults. DO NOT ask clarifying questions first - show results, then offer to refine.`;
+
     const messages = [
       {
         role: "system",
         content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}
-
-CRITICAL BEHAVIOR: Be action-oriented and proactive. When users mention travel needs (hotels, flights, restaurants), IMMEDIATELY use the search tools with smart defaults. DO NOT ask clarifying questions first - show results, then offer to refine.
+${quickLinkBehavior}
 
 CONTEXT AWARENESS: When you've just asked "What city are you in?" and the user responds with ONLY a city name (like "New York", "Paris", "London"), IMMEDIATELY call the appropriate search tool (search_hotels or search_restaurants) with that city. Don't ask for confirmation - just search!
 

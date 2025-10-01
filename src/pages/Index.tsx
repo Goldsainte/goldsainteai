@@ -323,26 +323,54 @@ const Index = () => {
 
   const handleQuickAction = async (action: string) => {
     const queries = {
-      hotels: userLocation 
-        ? `Show me popular hotels near my current location`
-        : "Show me popular hotels near me",
-      flights: userLocation
-        ? `I need to find flights from my current location`
-        : "I need to find flights",
+      hotels: "I'm looking for hotels",
+      flights: "I need to find flights",
       destinations: "What are some popular travel destinations?",
-      restaurants: userLocation
-        ? `Show me popular restaurants near my current location`
-        : "Show me popular restaurants near me",
+      restaurants: "I'm looking for restaurants",
       visa: "What are visa requirements for traveling abroad?",
-      events: "Show me upcoming events and concerts near me",
-      cars: userLocation
-        ? `Show me car rental options near my current location`
-        : "Show me car rental options"
+      events: "I'm looking for events",
+      cars: "I need a car rental"
     };
     const query = queries[action as keyof typeof queries];
     console.log('Quick action selected:', action, '->', query);
-    toast({ title: "Searching", description: query });
-    await handleSearch(query);
+    
+    setIsLoading(true);
+    setSearchResults([]);
+    setMessages([{ role: 'user', content: query }]);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
+        body: { 
+          message: query,
+          conversationHistory: [],
+          isQuickLink: true, // Flag to indicate this is from a quick link
+          userLocation: userLocation ? {
+            latitude: userLocation.lat,
+            longitude: userLocation.lng
+          } : undefined
+        }
+      });
+
+      if (error) throw error;
+
+      setMessages([
+        { role: 'user', content: query },
+        { role: 'assistant', content: data.message }
+      ]);
+      
+      if (data.conversationHistory) {
+        setConversationHistory(data.conversationHistory);
+      }
+    } catch (err: any) {
+      console.error('AI Agent error:', err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to process your request",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
