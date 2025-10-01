@@ -371,9 +371,8 @@ const Index = () => {
                   <img src={logomark} alt="Sainté Voyage AI" className="h-24 w-24 relative z-10" />
                 </div>
                 <h1 className="text-5xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
-                  Sainté Voyage AI
+                  Goldsainte.Ai
                 </h1>
-                <p className="text-sm text-muted-foreground text-center">(A Goldsainte Brand)</p>
                 <p className="text-xs text-muted-foreground text-center max-w-2xl leading-relaxed">
                   <span className="font-semibold text-foreground">AI-powered efficiency. Human-powered access.</span>
                   <br />
