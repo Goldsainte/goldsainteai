@@ -292,9 +292,21 @@ The user has saved preferences but has chosen to search without strict filtering
         return null;
       };
 
+      const extractBudget = (): number | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const budgetMatch = (m || '').match(/budget[:\s]*\$?(\d+)/i);
+          if (budgetMatch) return Number(budgetMatch[1]);
+          const dollar = (m || '').match(/\$(\d{1,6})/);
+          if (dollar) return Number(dollar[1]);
+        }
+        return null;
+      };
+
       const origin = extractOrigin();
       const destination = extractDestination();
       const departureDate = extractDate();
+      const budget = extractBudget();
 
       if (!origin) {
         const assistant = 'Where are you flying from?';
@@ -314,6 +326,14 @@ The user has saved preferences but has chosen to search without strict filtering
       }
       if (!departureDate) {
         const assistant = 'When would you like to depart? (Please provide date as YYYY-MM-DD)';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (budget == null) {
+        const assistant = "What's your budget per passenger?";
         return new Response(JSON.stringify({
           message: assistant,
           toolResults: [],
@@ -360,10 +380,30 @@ The user has saved preferences but has chosen to search without strict filtering
         return null;
       };
 
+      const extractBudget = (): number | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const budgetMatch = (m || '').match(/budget[:\s]*\$?(\d+)/i);
+          if (budgetMatch) return Number(budgetMatch[1]);
+          const dollar = (m || '').match(/\$(\d{1,6})/);
+          if (dollar) return Number(dollar[1]);
+        }
+        return null;
+      };
+
       const city = extractCity();
+      const budget = extractBudget();
 
       if (!city) {
         const assistant = 'Which city are you looking for restaurants in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (budget == null) {
+        const assistant = "What's your budget per person for dining?";
         return new Response(JSON.stringify({
           message: assistant,
           toolResults: [],
@@ -402,10 +442,30 @@ The user has saved preferences but has chosen to search without strict filtering
         return null;
       };
 
+      const extractBudget = (): number | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const budgetMatch = (m || '').match(/budget[:\s]*\$?(\d+)/i);
+          if (budgetMatch) return Number(budgetMatch[1]);
+          const dollar = (m || '').match(/\$(\d{1,6})/);
+          if (dollar) return Number(dollar[1]);
+        }
+        return null;
+      };
+
       const city = extractCity();
+      const budget = extractBudget();
 
       if (!city) {
         const assistant = 'Which city would you like to find events in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (budget == null) {
+        const assistant = "What's your budget per ticket for events?";
         return new Response(JSON.stringify({
           message: assistant,
           toolResults: [],
@@ -456,8 +516,20 @@ The user has saved preferences but has chosen to search without strict filtering
         return null;
       };
 
+      const extractBudget = (): number | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const budgetMatch = (m || '').match(/budget[:\s]*\$?(\d+)/i);
+          if (budgetMatch) return Number(budgetMatch[1]);
+          const dollar = (m || '').match(/\$(\d{1,6})/);
+          if (dollar) return Number(dollar[1]);
+        }
+        return null;
+      };
+
       const city = extractCity();
       const dates = extractDates();
+      const budget = extractBudget();
 
       if (!city) {
         const assistant = 'Which city do you need a car rental in?';
@@ -475,14 +547,17 @@ The user has saved preferences but has chosen to search without strict filtering
           conversationHistory: [...hist, { role: 'assistant', content: assistant }]
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
       }
+      if (budget == null) {
+        const assistant = "What's your daily budget for the car rental?";
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
 
       // For now, tell user car rentals require more specific dates
-      const finalMessage = `I'd love to help you find a car rental in ${city}! To search for car rentals, please let me know:
-1. Your pickup date (YYYY-MM-DD format)
-2. Your return date (YYYY-MM-DD format)
-3. Any specific car preferences (size, type, etc.)
-
-Then I can search for the best options for you!`;
+      const finalMessage = `Great! I'm searching for car rentals in ${city} from ${dates.pickupDate} to ${dates.dropoffDate} within your budget of $${budget} per day. The car rental search integration is coming soon!`;
       return new Response(JSON.stringify({
         message: finalMessage,
         toolResults: [],
