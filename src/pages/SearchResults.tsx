@@ -15,10 +15,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { addSearch } = useSearchHistory();
   const [results, setResults] = useState<any[]>([]);
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,16 @@ const SearchResults = () => {
 
   useEffect(() => {
     const performSearch = async () => {
+      // Save search to history when performing a search
+      if (location) {
+        addSearch({
+          type: searchType,
+          location,
+          ...(searchType === "hotels" && checkIn && checkOut && { checkIn, checkOut, guests }),
+          ...(searchType === "flights" && checkIn && { checkIn }),
+          ...(searchType === "events" && checkIn && { checkIn })
+        });
+      }
       setLoading(true);
       setError(null);
       setResults([]); // Clear previous results immediately

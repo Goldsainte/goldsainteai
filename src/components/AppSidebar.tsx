@@ -101,7 +101,7 @@ export function AppSidebar() {
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {history.slice(0, 5).map((item) => {
+                {history.slice(0, 15).map((item) => {
                   const Icon = getSearchIcon(item.type);
                   return (
                     <SidebarMenuItem key={item.id}>

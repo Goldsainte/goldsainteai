@@ -11,7 +11,7 @@ export interface SearchHistoryItem {
 }
 
 const STORAGE_KEY = 'sainte-voyage-search-history';
-const MAX_HISTORY_ITEMS = 10;
+const MAX_HISTORY_ITEMS = 20;
 
 export const useSearchHistory = () => {
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
