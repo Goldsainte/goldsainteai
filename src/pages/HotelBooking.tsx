@@ -2,13 +2,17 @@ import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Star, Check, MapPin, Wifi, Car, ParkingCircle, Utensils, Dumbbell, Wind, Coffee, Waves, Clock } from "lucide-react";
+import { ArrowLeft, Star, Check, MapPin, Wifi, Car, ParkingCircle, Utensils, Dumbbell, Wind, Coffee, Waves, Clock, Bed } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getHotelImage, getRoomImage } from "@/lib/imageHelpers";
+import { getHotelImage, getRoomImage, getHotelImages } from "@/lib/imageHelpers";
 import { decodeData } from "@/lib/utils";
 import { BookingModal } from "@/components/BookingModal";
+import { PhotoGallery } from "@/components/PhotoGallery";
+import { ReviewsSection } from "@/components/ReviewsSection";
+import { ExploreArea } from "@/components/ExploreArea";
+import { PriceCalendar } from "@/components/PriceCalendar";
 
 export default function HotelBooking() {
   const [searchParams] = useSearchParams();
@@ -45,18 +49,15 @@ export default function HotelBooking() {
   const nights = bookingData.nights || 1;
   const guests = bookingData.guests || 2;
 
-  // Generate image URLs for gallery
-  const mainImage = getHotelImage(
-    bookingData.hotel?.image || bookingData.hotelImage || bookingData.hotel?.property?.photoUrls?.[0],
-    bookingData.hotel?.hotelId || bookingData.hotel?.name || hotelName
+  // Generate comprehensive image gallery
+  const galleryImages = getHotelImages(
+    bookingData.hotel?.property?.photoUrls || [
+      bookingData.hotel?.image,
+      bookingData.hotelImage
+    ].filter(Boolean),
+    bookingData.hotel?.hotelId || hotelName,
+    20 // Get 20 images for full gallery
   );
-
-  const galleryImages = [
-    mainImage,
-    getRoomImage(undefined, 'room-1'),
-    getRoomImage(undefined, 'room-2'),
-    getRoomImage(undefined, 'room-3'),
-  ];
 
   const amenities = [
     { icon: Waves, label: "Outdoor pool" },
@@ -150,33 +151,7 @@ export default function HotelBooking() {
           {/* Main Content */}
           <div className="space-y-6">
             {/* Photo Gallery */}
-            <div className="grid grid-cols-2 gap-2 h-[400px]">
-              <div className="col-span-1 row-span-2 relative rounded-lg overflow-hidden">
-                <img 
-                  src={galleryImages[0]} 
-                  alt={hotelName}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {galleryImages.slice(1, 4).map((img, idx) => (
-                <div key={idx} className="relative rounded-lg overflow-hidden">
-                  <img 
-                    src={img} 
-                    alt={`${hotelName} - ${idx + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-              {galleryImages.length > 4 && (
-                <Button 
-                  variant="secondary" 
-                  className="absolute bottom-4 right-4"
-                  size="sm"
-                >
-                  +{galleryImages.length - 4} photos
-                </Button>
-              )}
-            </div>
+            <PhotoGallery images={galleryImages} hotelName={hotelName} />
 
             {/* Tabs Navigation */}
             <Tabs defaultValue="overview" className="w-full">
@@ -192,6 +167,9 @@ export default function HotelBooking() {
                 </TabsTrigger>
                 <TabsTrigger value="policies" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
                   Policies
+                </TabsTrigger>
+                <TabsTrigger value="reviews" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                  Reviews ({reviewCount})
                 </TabsTrigger>
               </TabsList>
 
@@ -255,47 +233,67 @@ export default function HotelBooking() {
               </TabsContent>
 
               <TabsContent value="rooms" className="space-y-6 mt-6">
-                <h2 className="text-2xl font-semibold mb-4">Choose your room</h2>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-2xl font-semibold">Choose your room</h2>
+                  <div className="text-sm text-muted-foreground">
+                    {availableRooms.length} room type{availableRooms.length > 1 ? 's' : ''} available
+                  </div>
+                </div>
                 
-                <div className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-6">
                   {availableRooms.map((room) => (
-                    <Card key={room.id} className="overflow-hidden">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-64 h-48 md:h-auto">
-                          <img 
-                            src={room.image} 
-                            alt={room.name}
-                            className="w-full h-full object-cover"
-                          />
+                    <Card key={room.id} className="overflow-hidden group hover:shadow-lg transition-all">
+                      <div className="aspect-[4/3] relative overflow-hidden">
+                        <img 
+                          src={room.image} 
+                          alt={room.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {room.cancellation.includes('Free') && (
+                          <Badge className="absolute top-3 right-3 bg-green-600">
+                            Free cancellation
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="p-6 space-y-4">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-2">{room.name}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {room.description}
+                          </p>
                         </div>
-                        <div className="flex-1 p-6 flex flex-col">
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold mb-2">{room.name}</h3>
-                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-                              {room.description}
-                            </p>
-                            <div className="flex flex-wrap gap-2 mb-3">
-                              <Badge variant="outline">{room.beds} {room.bedType} bed{room.beds > 1 ? 's' : ''}</Badge>
-                              {room.amenities.slice(0, 3).map((amenity, idx) => (
-                                <Badge key={idx} variant="secondary">{amenity}</Badge>
-                              ))}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-green-600">
-                              <Check className="h-4 w-4" />
-                              <span>{room.cancellation}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-end justify-between mt-4 pt-4 border-t">
+
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant="outline" className="gap-1">
+                            <Bed className="h-3 w-3" />
+                            {room.beds} {room.bedType}
+                          </Badge>
+                          {room.amenities.slice(0, 2).map((amenity, idx) => (
+                            <Badge key={idx} variant="secondary">{amenity}</Badge>
+                          ))}
+                        </div>
+
+                        <div className="pt-4 border-t space-y-3">
+                          <div className="flex items-baseline justify-between">
                             <div>
-                              <div className="text-sm text-muted-foreground">Total for {nights} night{nights > 1 ? 's' : ''}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {nights} night{nights > 1 ? 's' : ''}
+                              </div>
                               <div className="text-2xl font-bold">
                                 {room.currency} {room.price.toFixed(2)}
                               </div>
+                              <div className="text-xs text-muted-foreground">
+                                +taxes & fees
+                              </div>
                             </div>
-                            <Button onClick={() => handleSelectRoom(room)}>
-                              Reserve
-                            </Button>
                           </div>
+                          <Button 
+                            onClick={() => handleSelectRoom(room)}
+                            className="w-full"
+                            size="lg"
+                          >
+                            Reserve this room
+                          </Button>
                         </div>
                       </div>
                     </Card>
@@ -343,6 +341,16 @@ export default function HotelBooking() {
                     See all policies →
                   </Button>
                 </Card>
+              </TabsContent>
+
+              {/* Reviews Tab */}
+              <TabsContent value="reviews" className="space-y-6 mt-6">
+                <ReviewsSection 
+                  hotelId={bookingData.hotel?.hotelId || hotelName}
+                  hotelName={hotelName}
+                  averageRating={rating}
+                  totalReviews={reviewCount}
+                />
               </TabsContent>
             </Tabs>
           </div>
@@ -393,21 +401,16 @@ export default function HotelBooking() {
               </div>
             </Card>
 
-            {/* Location Map Card */}
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4">Explore the area</h3>
-              <div className="aspect-video bg-muted rounded-lg mb-4 flex items-center justify-center">
-                <MapPin className="h-12 w-12 text-muted-foreground" />
-              </div>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between">
-                  <span>{hotelAddress}</span>
-                  <Button variant="link" size="sm" className="h-auto p-0 text-primary">
-                    View in map →
-                  </Button>
-                </div>
-              </div>
-            </Card>
+            {/* Price Calendar */}
+            <PriceCalendar 
+              basePrice={bookingData.totalPrice || 200}
+              currency={bookingData.currency || 'USD'}
+              checkIn={checkIn}
+              checkOut={checkOut}
+            />
+
+            {/* Explore Area */}
+            <ExploreArea cityName={hotelAddress} />
           </div>
         </div>
       </div>
