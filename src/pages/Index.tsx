@@ -419,7 +419,7 @@ const Index = () => {
               {/* Quick Actions - Removed, now in sidebar */}
 
               {/* Get Inspired Section */}
-              <div className="space-y-6 pt-12">
+              <div className="space-y-6 pt-40">
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
