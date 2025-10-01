@@ -544,6 +544,28 @@ async function searchHotels(args: any, apiKey: string) {
             photos = photosData.data || [];
           }
 
+          // Get reviews
+          const reviewsParams = new URLSearchParams({
+            key: tripAdvisorKey,
+            language: 'en'
+          });
+
+          const reviewsResponse = await fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/reviews?${reviewsParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          );
+
+          let reviews = [];
+          if (reviewsResponse.ok) {
+            const reviewsData = await reviewsResponse.json();
+            reviews = (reviewsData.data || []).slice(0, 5).map((review: any) => ({
+              rating: review.rating || 0,
+              text: review.text || '',
+              published_date: review.published_date || '',
+              user: review.user?.username || 'Guest'
+            }));
+          }
+
           // Calculate estimated price based on price level
           const basePrices: { [key: string]: number } = {
             '$': 80,
@@ -555,11 +577,18 @@ async function searchHotels(args: any, apiKey: string) {
 
           return {
             hotel_id: hotel.location_id,
+            name: details.name || hotel.name,
+            address: details.address || '',
+            city: details.address_obj?.city || '',
+            country: details.address_obj?.country || '',
+            rating: details.rating || 0,
+            num_reviews: details.num_reviews || 0,
             property: {
               name: details.name || hotel.name,
               photoUrls: photos.slice(0, 5).map((photo: any) => 
                 photo.images?.large?.url || photo.images?.original?.url || ''
               ).filter(Boolean),
+              reviews: reviews,
               reviewScore: details.rating || 0,
               reviewCount: details.num_reviews || 0,
               externalUrls: { 
@@ -578,7 +607,12 @@ async function searchHotels(args: any, apiKey: string) {
             description: details.description || '',
             amenities: details.amenities || [],
             latitude: details.latitude,
-            longitude: details.longitude
+            longitude: details.longitude,
+            photos: photos.slice(0, 20).map((photo: any) => ({
+              url: photo.images?.large?.url || photo.images?.original?.url || '',
+              caption: photo.caption || ''
+            })).filter((p: any) => p.url),
+            reviews: reviews
           };
         } catch (error) {
           console.error(`Error fetching details for hotel ${hotel.location_id}:`, error);
@@ -588,6 +622,26 @@ async function searchHotels(args: any, apiKey: string) {
     );
 
     let transformedHotels = hotelDetails.filter(hotel => hotel !== null);
+
+    // CRITICAL: Filter by actual city location to prevent geographical mismatches
+    // Normalize location names for comparison (remove "city", lowercase, trim)
+    const normalizeLocation = (loc: string) => 
+      (loc || '').toLowerCase().replace(/\s+city\s*/gi, '').trim();
+    
+    const searchLocation = normalizeLocation(location);
+    
+    // Filter hotels to only those in the searched city
+    transformedHotels = transformedHotels.filter((hotel: any) => {
+      const hotelCity = normalizeLocation(hotel.city || hotel.location || '');
+      // Check if hotel city matches search location or if search location is part of hotel city
+      const isMatch = hotelCity.includes(searchLocation) || searchLocation.includes(hotelCity);
+      if (!isMatch) {
+        console.log(`Filtered out: ${hotel.name} (City: ${hotel.city}) - doesn't match search: ${location}`);
+      }
+      return isMatch;
+    });
+
+    console.log(`Filtered to ${transformedHotels.length} hotels in ${location}`);
 
     // Apply filters
     const minRatingNormalized = typeof minRating === 'number' ? (minRating > 5 ? minRating / 2 : minRating) : undefined;
