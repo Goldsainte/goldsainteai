@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2, Star, MapPin, Wifi, Car, ParkingCircle, Utensils, Info } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { getHotelImage } from "@/lib/imageHelpers";
 
 const bookingFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(100),
@@ -139,9 +140,18 @@ export default function HotelBooking() {
             {/* Hotel Image */}
             <Card className="overflow-hidden border-accent/20">
               <img
-                src={bookingData.hotel?.image || bookingData.hotelImage || '/placeholder.svg'}
-                alt={bookingData.hotel?.name || 'Hotel'}
+                src={getHotelImage(
+                  bookingData.hotel?.image || bookingData.hotelImage,
+                  bookingData.hotel?.hotelId || bookingData.hotel?.name || bookingData.hotelName
+                )}
+                alt={bookingData.hotel?.name || bookingData.hotelName || 'Hotel'}
                 className="w-full h-48 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = getHotelImage(
+                    undefined,
+                    bookingData.hotel?.hotelId || bookingData.hotel?.name || bookingData.hotelName
+                  );
+                }}
               />
               <div className="p-4 space-y-3">
                 <div>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Hotel, Star, MapPin, Eye } from "lucide-react";
 import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
+import { getHotelImage } from "@/lib/imageHelpers";
 
 interface HotelCardProps {
   hotel: any;
@@ -47,17 +48,14 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
     <>
       <Card className="overflow-hidden hover:shadow-lg transition-all border-2 hover:border-primary">
         <div className="aspect-video relative overflow-hidden bg-muted">
-          {hotelData.media?.[0]?.uri ? (
-            <img 
-              src={hotelData.media[0].uri} 
-              alt={hotelData.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Hotel className="h-12 w-12 text-muted-foreground" />
-            </div>
-          )}
+          <img 
+            src={getHotelImage(hotelData.media?.[0]?.uri, hotelData.hotelId || hotelData.name)} 
+            alt={hotelData.name}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              e.currentTarget.src = getHotelImage(undefined, hotelData.hotelId || hotelData.name);
+            }}
+          />
           <Badge className="absolute top-2 right-2" variant="secondary">
             {currency} {price.toFixed(2)}
           </Badge>

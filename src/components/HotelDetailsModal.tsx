@@ -8,6 +8,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown, Clock, CreditCard, Calendar, Shield, Baby, Accessibility, Wind, Coffee, Tv, Bath, Phone, Ruler, Info } from "lucide-react";
 import { useState, useMemo } from "react";
 import { HotelMap } from "./HotelMap";
+import { getHotelImages, getRoomImages } from "@/lib/imageHelpers";
 
 interface RoomOption {
   id: string;
@@ -70,15 +71,18 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
       }
     }
 
-    return Array.from(byId.values()).map(v => v.url);
-  }, [propertyData, hotelData, hotel]);
+    const uniqueUrls = Array.from(byId.values()).map(v => v.url);
+    
+    // Use image helper to add fallbacks if needed
+    return getHotelImages(uniqueUrls, hotelId?.toString(), 12);
+  }, [propertyData, hotelData, hotel, hotelId]);
 
-  // Get room photos - distribute hotel photos across rooms
+  // Get room photos - use helper with fallbacks
   const getRoomPhotos = (roomIndex: number) => {
-    if (hotelPhotos.length === 0) return ["/placeholder.svg"];
     const photosPerRoom = Math.max(1, Math.floor(hotelPhotos.length / 3));
     const startIdx = roomIndex * photosPerRoom;
-    return hotelPhotos.slice(startIdx, startIdx + 3);
+    const roomPhotos = hotelPhotos.slice(startIdx, startIdx + 3);
+    return getRoomImages(roomPhotos, `room-${roomIndex}`, 3);
   };
 
   // Generate unique reviews based on hotel ID

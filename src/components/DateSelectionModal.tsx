@@ -1,15 +1,14 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { CalendarIcon, Loader2, Users, Minus, Plus } from "lucide-react";
+import { format, differenceInDays } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { Card } from "@/components/ui/card";
 
 interface DateSelectionModalProps {
   open: boolean;
@@ -104,90 +103,97 @@ export const DateSelectionModal = ({
     }
   };
 
+  const nights = checkInDate && checkOutDate ? differenceInDays(checkOutDate, checkInDate) : 0;
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Select Your Dates</DialogTitle>
-          <p className="text-sm text-muted-foreground">{hotelName}</p>
+          <DialogTitle className="text-2xl">Select Your Stay</DialogTitle>
+          <DialogDescription className="text-base">{hotelName}</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Check-in Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !checkInDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {checkInDate ? format(checkInDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={checkInDate}
-                  onSelect={setCheckInDate}
-                  disabled={(date) => date < new Date()}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Check-out Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !checkOutDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {checkOutDate ? format(checkOutDate, "PPP") : "Pick a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={checkOutDate}
-                  onSelect={setCheckOutDate}
-                  disabled={(date) => date < new Date() || (checkInDate ? date <= checkInDate : false)}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="adults">Number of Adults</Label>
-            <Input
-              id="adults"
-              type="number"
-              min="1"
-              max="10"
-              value={adults}
-              onChange={(e) => setAdults(parseInt(e.target.value) || 1)}
+        
+        <div className="space-y-6">
+          {/* Date Range Selection */}
+          <Card className="p-4 border-accent/20">
+            <Label className="text-sm font-medium mb-3 block">Select Dates</Label>
+            <Calendar
+              mode="range"
+              selected={{
+                from: checkInDate,
+                to: checkOutDate,
+              }}
+              onSelect={(range) => {
+                setCheckInDate(range?.from);
+                setCheckOutDate(range?.to);
+              }}
+              disabled={(date) => date < new Date()}
+              numberOfMonths={2}
+              className="pointer-events-auto rounded-md border"
             />
-          </div>
+            
+            {/* Date Summary */}
+            {checkInDate && checkOutDate && (
+              <div className="mt-4 p-3 bg-muted rounded-lg">
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <div className="text-muted-foreground text-xs mb-1">Check-in</div>
+                    <div className="font-semibold">{format(checkInDate, "EEE, MMM dd")}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground text-xs mb-1">Check-out</div>
+                    <div className="font-semibold">{format(checkOutDate, "EEE, MMM dd")}</div>
+                  </div>
+                  <div>
+                    <div className="text-muted-foreground text-xs mb-1">Duration</div>
+                    <div className="font-semibold">{nights} {nights === 1 ? 'night' : 'nights'}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </Card>
+
+          {/* Guests Selection */}
+          <Card className="p-4 border-accent/20">
+            <Label className="text-sm font-medium mb-3 block">
+              <Users className="h-4 w-4 inline mr-2" />
+              Number of Guests
+            </Label>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">Adults</div>
+                <div className="text-sm text-muted-foreground">Age 18+</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setAdults(Math.max(1, adults - 1))}
+                  disabled={adults <= 1}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <span className="w-12 text-center font-semibold text-lg">{adults}</span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setAdults(Math.min(10, adults + 1))}
+                  disabled={adults >= 10}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </Card>
 
           <Button 
             onClick={handleCheckAvailability} 
-            className="w-full"
+            className="w-full h-12 text-base"
             disabled={loading || !checkInDate || !checkOutDate}
           >
             {loading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 Checking Availability...
               </>
             ) : (

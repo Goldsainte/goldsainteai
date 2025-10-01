@@ -7,6 +7,7 @@ import { MapPin, Star, Heart, Bed, Users, Home, Eye } from "lucide-react";
 import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { useFavorites } from "@/hooks/useFavorites";
+import { getHotelImage } from "@/lib/imageHelpers";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -20,8 +21,9 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   // Parse Booking.com API data properly
-  const image = property.property?.photoUrls?.[0] || property.image || "/placeholder.svg";
   const title = property.property?.name || property.title || property.label || "Hotel";
+  const imageUrl = property.property?.photoUrls?.[0] || property.image;
+  const image = getHotelImage(imageUrl, property.hotel_id || property.property?.name || title);
   const propertyUrl = property.property?.externalUrls?.default || property.url || "#";
   
   // Extract city code for Amadeus (would need proper mapping in production)
