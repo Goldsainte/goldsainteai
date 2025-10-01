@@ -1171,23 +1171,69 @@ async function searchHotels(args: any, apiKey: string) {
       return { error: 'Amadeus API credentials not configured', results: [] };
     }
 
-    // Convert city name to IATA code if needed
+    // Get Amadeus token for Location API lookup
+    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
+    });
+
+    if (!tokenResponse.ok) {
+      console.error('Failed to get Amadeus token');
+      return { error: 'Authentication failed', results: [] };
+    }
+
+    const tokenData = await tokenResponse.json();
+    const token = tokenData.access_token;
+
+    // Convert city name to IATA code using Amadeus Location API
     let cityCode = location.toUpperCase();
     
-    // Check if it's already a 3-letter code
-    if (cityCode.length !== 3) {
-      // Try to get the city code from variations
-      const variations = getCityVariations(location);
-      const possibleCode = variations.find(v => v.length === 3);
-      if (possibleCode) {
-        cityCode = possibleCode.toUpperCase();
+    // If not already a 3-letter code, use Amadeus Location API
+    if (!/^[A-Z]{3}$/.test(cityCode)) {
+      console.log(`Looking up city code for: ${location}`);
+      
+      const searchParams = new URLSearchParams({
+        keyword: location,
+        subType: 'CITY',
+        'page[limit]': '1'
+      });
+
+      const locationResponse = await fetch(
+        `https://test.api.amadeus.com/v1/reference-data/locations?${searchParams}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+
+      if (locationResponse.ok) {
+        const locationData = await locationResponse.json();
+        if (locationData.data && locationData.data.length > 0) {
+          cityCode = locationData.data[0].iataCode;
+          console.log(`Amadeus Location API: "${location}" → ${cityCode}`);
+        } else {
+          console.warn(`No IATA code found for "${location}", trying fallback...`);
+          // Fallback to manual mapping
+          const variations = getCityVariations(location);
+          const possibleCode = variations.find(v => v.length === 3);
+          if (possibleCode) {
+            cityCode = possibleCode.toUpperCase();
+          } else {
+            cityCode = location.replace(/\s+/g, '').substring(0, 3).toUpperCase();
+          }
+          console.log(`Using fallback city code: ${cityCode}`);
+        }
       } else {
-        // If we can't find a code, try the first 3 letters as a fallback
-        cityCode = location.replace(/\s+/g, '').substring(0, 3).toUpperCase();
+        console.warn(`Location API failed, using fallback for "${location}"`);
+        const variations = getCityVariations(location);
+        const possibleCode = variations.find(v => v.length === 3);
+        if (possibleCode) {
+          cityCode = possibleCode.toUpperCase();
+        } else {
+          cityCode = location.replace(/\s+/g, '').substring(0, 3).toUpperCase();
+        }
       }
     }
     
-    console.log(`Converting "${location}" to city code: ${cityCode}`);
+    console.log(`Final city code for hotel search: ${cityCode}`);
 
     // Call our Amadeus search edge function
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
