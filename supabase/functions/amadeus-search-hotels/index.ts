@@ -78,9 +78,9 @@ serve(async (req) => {
       });
     }
 
-    // Get first 10 hotel IDs
-    const hotelIds = hotelListData.data.slice(0, 10).map((hotel: any) => hotel.hotelId).join(',');
-    console.log('Fetching offers for hotel IDs:', hotelIds);
+    // Get first 50 hotel IDs (increased from 10)
+    const hotelIds = hotelListData.data.slice(0, 50).map((hotel: any) => hotel.hotelId).join(',');
+    console.log('Fetching offers for hotel IDs');
 
     // Step 2: Get hotel offers with prices
     const offerParams = new URLSearchParams({

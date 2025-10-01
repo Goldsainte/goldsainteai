@@ -8,17 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Star, ThumbsUp, User } from "lucide-react";
 
 interface Review {
-  id: string;
+  id?: string;
   author: string;
   avatar?: string;
   rating: number;
-  title: string;
+  title?: string;
   content: string;
+  text?: string; // alias for content
   date: string;
-  helpful: number;
-  verified: boolean;
+  helpful?: number;
+  verified?: boolean;
   photos?: string[];
-  tripType: string;
+  profileImage?: string; // from Google Places
+  tripType?: string;
 }
 
 interface ReviewsSectionProps {
@@ -26,14 +28,33 @@ interface ReviewsSectionProps {
   hotelName: string;
   averageRating: number;
   totalReviews: number;
+  realReviews?: Review[]; // Real reviews from Google Places API
 }
 
-export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews }: ReviewsSectionProps) => {
+export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews, realReviews }: ReviewsSectionProps) => {
   const [sortBy, setSortBy] = useState("most_recent");
   const [showAll, setShowAll] = useState(false);
 
-  // Generate realistic reviews
-  const generateReviews = useMemo((): Review[] => {
+  // Use real reviews if available, otherwise generate mock reviews
+  const reviews = useMemo((): Review[] => {
+    if (realReviews && realReviews.length > 0) {
+      // Use real reviews from Google Places
+      return realReviews.map((review, i) => ({
+        id: review.id || `review-${i}`,
+        author: review.author,
+        avatar: review.profileImage || review.avatar,
+        rating: review.rating,
+        title: review.title || "Great stay",
+        content: review.content || review.text || "",
+        date: review.date,
+        helpful: review.helpful || 0,
+        verified: review.verified !== undefined ? review.verified : true,
+        photos: review.photos,
+        tripType: review.tripType || "Traveler",
+      }));
+    }
+
+    // Generate realistic mock reviews only as fallback
     const names = [
       "Sarah Johnson", "Michael Chen", "Emma Williams", "James Anderson", 
       "Olivia Martinez", "David Lee", "Sophia Brown", "Robert Taylor",
@@ -56,7 +77,7 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
       "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=400",
     ];
 
-    return Array.from({ length: totalReviews || 50 }, (_, i) => {
+    return Array.from({ length: Math.min(totalReviews || 50, 50) }, (_, i) => {
       const rating = Math.max(6, Math.min(10, averageRating + (Math.random() - 0.5) * 2));
       const hasPhotos = Math.random() > 0.7;
       
@@ -77,10 +98,10 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
         tripType: tripTypes[Math.floor(Math.random() * tripTypes.length)],
       };
     });
-  }, [hotelId, hotelName, averageRating, totalReviews]);
+  }, [hotelId, hotelName, averageRating, totalReviews, realReviews]);
 
   const sortedReviews = useMemo(() => {
-    let sorted = [...generateReviews];
+    let sorted = [...reviews];
     
     switch (sortBy) {
       case "highest_rated":
@@ -90,7 +111,7 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
         sorted.sort((a, b) => a.rating - b.rating);
         break;
       case "most_helpful":
-        sorted.sort((a, b) => b.helpful - a.helpful);
+        sorted.sort((a, b) => (b.helpful || 0) - (a.helpful || 0));
         break;
       default: // most_recent
         // Already sorted by date in generation
@@ -98,21 +119,21 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
     }
     
     return sorted;
-  }, [generateReviews, sortBy]);
+  }, [reviews, sortBy]);
 
   const displayedReviews = showAll ? sortedReviews : sortedReviews.slice(0, 10);
 
   // Calculate rating distribution
   const ratingDistribution = useMemo(() => {
     const dist = { 10: 0, 9: 0, 8: 0, 7: 0, 6: 0 };
-    generateReviews.forEach(review => {
+    reviews.forEach(review => {
       const roundedRating = Math.floor(review.rating);
       if (roundedRating >= 6) {
         dist[roundedRating as keyof typeof dist]++;
       }
     });
     return dist;
-  }, [generateReviews]);
+  }, [reviews]);
 
   const getRatingText = (score: number) => {
     if (score >= 9) return "Wonderful";
@@ -215,7 +236,7 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
 
                 {/* Content */}
                 <div>
-                  <h4 className="font-semibold mb-1">{review.title}</h4>
+                  {review.title && <h4 className="font-semibold mb-1">{review.title}</h4>}
                   <p className="text-sm text-muted-foreground">{review.content}</p>
                 </div>
 
@@ -235,12 +256,14 @@ export const ReviewsSection = ({ hotelId, hotelName, averageRating, totalReviews
                 )}
 
                 {/* Footer */}
-                <div className="flex items-center gap-4 pt-2">
-                  <Button variant="ghost" size="sm" className="gap-2">
-                    <ThumbsUp className="h-4 w-4" />
-                    Helpful ({review.helpful})
-                  </Button>
-                </div>
+                {review.helpful !== undefined && review.helpful > 0 && (
+                  <div className="flex items-center gap-4 pt-2">
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <ThumbsUp className="h-4 w-4" />
+                      Helpful ({review.helpful})
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           </Card>

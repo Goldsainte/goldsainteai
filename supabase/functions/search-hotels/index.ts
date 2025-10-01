@@ -130,8 +130,8 @@ serve(async (req) => {
       });
     }
 
-    // Get first 15 hotel IDs
-    const hotelIds = hotelListData.data.slice(0, 15).map((hotel: any) => hotel.hotelId).join(',');
+    // Get first 50 hotel IDs (increased from 15)
+    const hotelIds = hotelListData.data.slice(0, 50).map((hotel: any) => hotel.hotelId).join(',');
     console.log('Fetching offers for hotel IDs');
 
     // Step 2: Get hotel offers with prices
@@ -212,9 +212,29 @@ serve(async (req) => {
             if (place) {
               if (typeof place.rating === 'number') item.property.reviewScore = place.rating;
               if (typeof place.user_ratings_total === 'number') item.property.reviewCount = place.user_ratings_total;
-              const photoRef = place.photos?.[0]?.photo_reference;
-              if (photoRef) {
-                item.property.photoUrls = [`https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${photoRef}&key=${apiKey}`];
+              
+              // Get multiple photos if available
+              if (place.photos && place.photos.length > 0) {
+                item.property.photoUrls = place.photos.slice(0, 5).map((photo: any) => 
+                  `https://maps.googleapis.com/maps/api/place/photo?maxwidth=1200&photoreference=${photo.photo_reference}&key=${apiKey}`
+                );
+              }
+              
+              // Get place details for reviews
+              if (place.place_id) {
+                const detailsResp = await fetch(`https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=reviews&key=${apiKey}`);
+                if (detailsResp.ok) {
+                  const detailsData = await detailsResp.json();
+                  if (detailsData.result?.reviews) {
+                    item.property.reviews = detailsData.result.reviews.map((review: any) => ({
+                      author: review.author_name,
+                      rating: review.rating,
+                      date: review.relative_time_description,
+                      text: review.text,
+                      profileImage: review.profile_photo_url
+                    }));
+                  }
+                }
               }
             }
           }

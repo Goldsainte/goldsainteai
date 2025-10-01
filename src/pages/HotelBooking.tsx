@@ -49,15 +49,18 @@ export default function HotelBooking() {
   const nights = bookingData.nights || 1;
   const guests = bookingData.guests || 2;
 
-  // Generate comprehensive image gallery
-  const galleryImages = getHotelImages(
-    bookingData.hotel?.property?.photoUrls || [
-      bookingData.hotel?.image,
-      bookingData.hotelImage
-    ].filter(Boolean),
-    bookingData.hotel?.hotelId || hotelName,
-    20 // Get 20 images for full gallery
-  );
+  // Generate comprehensive image gallery - use real photos from Google Places
+  const hotelPhotos = bookingData.hotel?.property?.photoUrls || 
+                      bookingData.property?.photoUrls || 
+                      [];
+  
+  const galleryImages = hotelPhotos.length > 0 
+    ? hotelPhotos 
+    : getHotelImages(
+        [bookingData.hotel?.image, bookingData.hotelImage].filter(Boolean),
+        bookingData.hotel?.hotelId || hotelName,
+        20
+      );
 
   const amenities = [
     { icon: Waves, label: "Outdoor pool" },
@@ -359,6 +362,7 @@ export default function HotelBooking() {
                   hotelName={hotelName}
                   averageRating={rating}
                   totalReviews={reviewCount}
+                  realReviews={bookingData.property?.reviews || bookingData.hotel?.property?.reviews}
                 />
               </TabsContent>
             </Tabs>
