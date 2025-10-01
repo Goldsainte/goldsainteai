@@ -159,20 +159,125 @@ export default function HotelBooking() {
       </div>
 
       <div className="container mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+        <div className="grid lg:grid-cols-[1fr_380px] gap-8">
           {/* Main Content */}
-          <div className="space-y-6">
-            {/* Photo Gallery */}
-            <PhotoGallery images={galleryImages} hotelName={hotelName} />
+          <div className="space-y-8">
+            {/* Hotel Header with Photo Gallery */}
+            <div className="space-y-4">
+              <div>
+                <h1 className="text-3xl font-bold mb-2">{hotelName}</h1>
+                <div className="flex items-center gap-2 mb-3">
+                  {[1, 2, 3, 4].map((star) => (
+                    <Star key={star} className="h-4 w-4 fill-primary text-primary" />
+                  ))}
+                </div>
+                <div className="flex items-center gap-4 flex-wrap mb-4">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">{hotelAddress}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="bg-primary text-primary-foreground px-2 py-1 rounded font-bold text-sm">
+                      {rating.toFixed(1)}
+                    </div>
+                    <span className="text-sm">{getRatingText(rating)}</span>
+                    <span className="text-sm text-muted-foreground">({reviewCount.toLocaleString()} reviews)</span>
+                  </div>
+                </div>
+              </div>
+              
+              <PhotoGallery images={galleryImages} hotelName={hotelName} />
+            </div>
 
-            {/* Tabs Navigation */}
+            {/* PRIORITY: Room Selection (Expedia/Hotels.com style) */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-semibold">Choose your room</h2>
+                <div className="text-sm text-muted-foreground">
+                  {availableRooms.length} room type{availableRooms.length > 1 ? 's' : ''} available
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {availableRooms.map((room) => (
+                  <Card key={room.id} className="overflow-hidden hover:shadow-lg transition-all">
+                    <div className="grid md:grid-cols-[280px_1fr] gap-6 p-6">
+                      {/* Room Image */}
+                      <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
+                        <img 
+                          src={room.image} 
+                          alt={room.name}
+                          className="w-full h-full object-cover"
+                        />
+                        {room.cancellation.includes('Free') && (
+                          <Badge className="absolute top-3 left-3 bg-green-600">
+                            Free cancellation
+                          </Badge>
+                        )}
+                      </div>
+
+                      {/* Room Details */}
+                      <div className="flex flex-col justify-between">
+                        <div className="space-y-3">
+                          <div>
+                            <h3 className="text-xl font-semibold mb-1">{room.name}</h3>
+                            <p className="text-sm text-muted-foreground">
+                              {room.description}
+                            </p>
+                          </div>
+
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline" className="gap-1">
+                              <Bed className="h-3 w-3" />
+                              {room.beds} {room.bedType}
+                            </Badge>
+                            {room.amenities.slice(0, 3).map((amenity, idx) => (
+                              <Badge key={idx} variant="secondary" className="text-xs">{amenity}</Badge>
+                            ))}
+                          </div>
+
+                          <div className="flex items-center gap-2 text-sm">
+                            <Check className="h-4 w-4 text-green-600" />
+                            <span className="text-green-600 font-medium">{room.cancellation}</span>
+                          </div>
+                        </div>
+
+                        {/* Price and Reserve Button */}
+                        <div className="flex items-end justify-between pt-4 border-t mt-4">
+                          <div>
+                            <div className="text-sm text-muted-foreground mb-1">
+                              {nights} night{nights > 1 ? 's' : ''} total
+                            </div>
+                            <div className="text-3xl font-bold text-primary">
+                              {room.currency} {(room.price * nights).toFixed(2)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {room.currency} {room.price.toFixed(2)} per night
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              +taxes & fees
+                            </div>
+                          </div>
+                          <Button 
+                            onClick={() => handleSelectRoom(room)}
+                            size="lg"
+                            className="min-w-[140px]"
+                          >
+                            Reserve
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Secondary Info Tabs */}
             <Tabs defaultValue="overview" className="w-full">
               <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
                 <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
                   Overview
-                </TabsTrigger>
-                <TabsTrigger value="rooms" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
-                  Rooms
                 </TabsTrigger>
                 <TabsTrigger value="amenities" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
                   Amenities
@@ -186,130 +291,22 @@ export default function HotelBooking() {
               </TabsList>
 
               <TabsContent value="overview" className="space-y-6 mt-6">
-                {/* Hotel Header */}
-                <div>
-                  <h1 className="text-3xl font-bold mb-2">{hotelName}</h1>
-                  <div className="flex items-center gap-2 mb-3">
-                    {[1, 2, 3, 4].map((star) => (
-                      <Star key={star} className="h-4 w-4 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm text-green-600 font-medium">Fully refundable</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Check className="h-4 w-4 text-green-600" />
-                      <span className="text-sm text-green-600 font-medium">Reserve now, pay later</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rating */}
-                <Card className="p-4 inline-block">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary text-primary-foreground px-3 py-2 rounded font-bold text-lg">
-                      {rating.toFixed(1)}
-                    </div>
-                    <div>
-                      <div className="font-semibold">{getRatingText(rating)}</div>
-                      <button className="text-sm text-primary hover:underline">
-                        See all {reviewCount.toLocaleString()} reviews
-                      </button>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* About */}
                 <div>
                   <h2 className="text-2xl font-semibold mb-4">About this property</h2>
                   <p className="text-muted-foreground mb-4">
-                    Experience luxury and comfort at {hotelName}. Located in the heart of the destination, 
-                    this property offers world-class amenities and exceptional service to make your stay memorable.
+                    {bookingData.hotel?.description || bookingData.description || 
+                    `Experience luxury and comfort at ${hotelName}. Located in the heart of the destination, 
+                    this property offers world-class amenities and exceptional service to make your stay memorable.`}
                   </p>
                   
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {amenities.slice(0, 6).map((amenity, idx) => (
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
+                    {amenities.map((amenity, idx) => (
                       <div key={idx} className="flex items-center gap-2">
-                        <amenity.icon className="h-5 w-5 text-muted-foreground" />
+                        <amenity.icon className="h-5 w-5 text-primary" />
                         <span className="text-sm">{amenity.label}</span>
                       </div>
                     ))}
                   </div>
-                  
-                  <Button variant="link" className="mt-4 px-0">
-                    See all about this property →
-                  </Button>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="rooms" className="space-y-6 mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-2xl font-semibold">Choose your room</h2>
-                  <div className="text-sm text-muted-foreground">
-                    {availableRooms.length} room type{availableRooms.length > 1 ? 's' : ''} available
-                  </div>
-                </div>
-                
-                <div className="grid md:grid-cols-2 gap-6">
-                  {availableRooms.map((room) => (
-                    <Card key={room.id} className="overflow-hidden group hover:shadow-lg transition-all">
-                      <div className="aspect-[4/3] relative overflow-hidden">
-                        <img 
-                          src={room.image} 
-                          alt={room.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        {room.cancellation.includes('Free') && (
-                          <Badge className="absolute top-3 right-3 bg-green-600">
-                            Free cancellation
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="p-6 space-y-4">
-                        <div>
-                          <h3 className="text-xl font-semibold mb-2">{room.name}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2">
-                            {room.description}
-                          </p>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                          <Badge variant="outline" className="gap-1">
-                            <Bed className="h-3 w-3" />
-                            {room.beds} {room.bedType}
-                          </Badge>
-                          {room.amenities.slice(0, 2).map((amenity, idx) => (
-                            <Badge key={idx} variant="secondary">{amenity}</Badge>
-                          ))}
-                        </div>
-
-                        <div className="pt-4 border-t space-y-3">
-                          <div className="flex items-baseline justify-between">
-                            <div>
-                              <div className="text-sm text-muted-foreground">
-                                {nights} night{nights > 1 ? 's' : ''}
-                              </div>
-                              <div className="text-2xl font-bold">
-                                {room.currency} {room.price.toFixed(2)}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                +taxes & fees
-                              </div>
-                            </div>
-                          </div>
-                          <Button 
-                            onClick={() => handleSelectRoom(room)}
-                            className="w-full"
-                            size="lg"
-                          >
-                            Reserve this room
-                          </Button>
-                        </div>
-                      </div>
-                    </Card>
-                  ))}
                 </div>
               </TabsContent>
 
@@ -348,10 +345,6 @@ export default function HotelBooking() {
                       Cancel before this date and get a full refund. Times are based on the property's local time.
                     </p>
                   </div>
-                  
-                  <Button variant="link" className="px-0">
-                    See all policies →
-                  </Button>
                 </Card>
               </TabsContent>
 
@@ -368,21 +361,34 @@ export default function HotelBooking() {
             </Tabs>
           </div>
 
-          {/* Sidebar */}
+          {/* Sticky Sidebar - Expedia/Hotels.com Style */}
           <div className="space-y-4">
-            {/* Booking Summary Card */}
             <Card className="p-6 sticky top-24">
               <div className="space-y-4">
-                <div>
-                  <div className="text-sm text-muted-foreground mb-1">Member Prices available</div>
-                  <div className="text-3xl font-bold">
-                    {bookingData.currency || 'USD'} {Number(bookingData.totalPrice || 200).toFixed(2)}
+                {/* Selected Room Display */}
+                {selectedRoom ? (
+                  <div className="space-y-3 pb-4 border-b">
+                    <div className="text-sm font-medium text-muted-foreground">Selected Room</div>
+                    <div className="font-semibold">{selectedRoom.name}</div>
+                    <div className="flex gap-2">
+                      <Badge variant="outline" className="gap-1 text-xs">
+                        <Bed className="h-3 w-3" />
+                        {selectedRoom.beds} {selectedRoom.bedType}
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {selectedRoom.cancellation}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="text-sm text-muted-foreground">total for {nights} night{nights > 1 ? 's' : ''}</div>
-                  <div className="text-xs text-muted-foreground">~ {(Number(bookingData.totalPrice || 200) / Math.max(1, nights)).toFixed(2)} {bookingData.currency || 'USD'} per night</div>
-                </div>
+                ) : (
+                  <div className="text-sm text-muted-foreground pb-4 border-b">
+                    Select a room below to see pricing
+                  </div>
+                )}
 
-                <div className="pt-4 border-t space-y-2 text-sm">
+                {/* Trip Summary */}
+                <div className="space-y-2 text-sm pb-4 border-b">
+                  <div className="font-medium mb-2">Trip summary</div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Check-in</span>
                     <span className="font-medium">{checkIn ? formatDate(checkIn) : 'Select date'}</span>
@@ -393,7 +399,46 @@ export default function HotelBooking() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Guests</span>
-                    <span className="font-medium">{guests} travelers, 1 room</span>
+                    <span className="font-medium">{guests} travelers</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Rooms</span>
+                    <span className="font-medium">1 room</span>
+                  </div>
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="space-y-3">
+                  <div className="font-medium">Price details</div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">
+                        {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? selectedRoom.price.toFixed(2) : Number(bookingData.totalPrice || 200).toFixed(2)} x {nights} night{nights > 1 ? 's' : ''}
+                      </span>
+                      <span className="font-medium">
+                        {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? (selectedRoom.price * nights).toFixed(2) : (Number(bookingData.totalPrice || 200) * nights).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Taxes & fees</span>
+                      <span className="font-medium">
+                        {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? ((selectedRoom.price * nights) * 0.15).toFixed(2) : ((Number(bookingData.totalPrice || 200) * nights) * 0.15).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-3 border-t">
+                    <div className="flex justify-between items-baseline">
+                      <span className="font-semibold">Total</span>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">
+                          {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? ((selectedRoom.price * nights) * 1.15).toFixed(2) : ((Number(bookingData.totalPrice || 200) * nights) * 1.15).toFixed(2)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Total includes taxes & fees
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -401,17 +446,27 @@ export default function HotelBooking() {
                   className="w-full" 
                   size="lg"
                   onClick={() => {
-                    if (availableRooms.length > 0) {
+                    if (selectedRoom) {
+                      setShowBookingModal(true);
+                    } else if (availableRooms.length > 0) {
                       handleSelectRoom(availableRooms[0]);
                     }
                   }}
+                  disabled={!selectedRoom}
                 >
-                  Select a room
+                  {selectedRoom ? 'Continue to Book' : 'Select a room to continue'}
                 </Button>
 
-                <p className="text-xs text-center text-muted-foreground">
-                  You won't be charged yet
-                </p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    <span>You won't be charged yet</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    <span>Free cancellation before {checkIn ? formatDate(checkIn) : 'check-in'}</span>
+                  </div>
+                </div>
               </div>
             </Card>
 
@@ -423,12 +478,6 @@ export default function HotelBooking() {
               checkOut={checkOut}
             />
 
-            {/* Explore Area */}
-            <ExploreArea 
-              cityName={hotelAddress}
-              latitude={bookingData.hotel?.latitude || bookingData.amadeusOffer?.hotel?.latitude}
-              longitude={bookingData.hotel?.longitude || bookingData.amadeusOffer?.hotel?.longitude}
-            />
           </div>
         </div>
       </div>
