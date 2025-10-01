@@ -8,6 +8,75 @@ const corsHeaders = {
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
+// Shared helper: Map common city abbreviations and airport codes to full names
+function getCityVariations(location: string): string[] {
+  const normalizeLocation = (loc: string) => 
+    (loc || '').toLowerCase().replace(/\s+city\s*/gi, '').trim();
+  
+  const cityAbbreviations: { [key: string]: string[] } = {
+    'nyc': ['new york', 'ny'],
+    'jfk': ['new york', 'ny', 'nyc'],
+    'lga': ['new york', 'ny', 'nyc'],
+    'ewr': ['new york', 'ny', 'nyc', 'newark'],
+    'la': ['los angeles'],
+    'lax': ['los angeles', 'la'],
+    'sf': ['san francisco'],
+    'sfo': ['san francisco', 'sf'],
+    'dc': ['washington'],
+    'dca': ['washington', 'dc'],
+    'iad': ['washington', 'dc'],
+    'philly': ['philadelphia'],
+    'phl': ['philadelphia', 'philly'],
+    'vegas': ['las vegas'],
+    'las': ['las vegas', 'vegas'],
+    'chi': ['chicago'],
+    'ord': ['chicago', 'chi'],
+    'mdw': ['chicago', 'chi'],
+    'mia': ['miami'],
+    'bos': ['boston'],
+    'sea': ['seattle'],
+    'atl': ['atlanta'],
+    'dfw': ['dallas'],
+    'dal': ['dallas'],
+    'iah': ['houston'],
+    'hou': ['houston'],
+    'phx': ['phoenix'],
+    'den': ['denver'],
+    'mco': ['orlando'],
+    'dtw': ['detroit'],
+    'msp': ['minneapolis'],
+    'pdx': ['portland'],
+    'san': ['san diego'],
+    'aus': ['austin'],
+    'bna': ['nashville'],
+    'slc': ['salt lake city'],
+    'clt': ['charlotte']
+  };
+  
+  const searchLocation = normalizeLocation(location);
+  const searchVariations = [searchLocation];
+  
+  if (cityAbbreviations[searchLocation]) {
+    searchVariations.push(...cityAbbreviations[searchLocation]);
+  }
+  
+  // Also check if the search is a full name that matches an abbreviation
+  for (const [abbrev, fullNames] of Object.entries(cityAbbreviations)) {
+    if (fullNames.some(name => searchLocation.includes(name))) {
+      searchVariations.push(abbrev, ...fullNames);
+    }
+  }
+  
+  return [...new Set(searchVariations)]; // Remove duplicates
+}
+
+// Get the best/full city name from abbreviation or airport code
+function normalizeCityName(location: string): string {
+  const variations = getCityVariations(location);
+  // Return the longest variation (usually the full name)
+  return variations.sort((a, b) => b.length - a.length)[0] || location;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -1380,15 +1449,18 @@ async function searchDestinations(args: any, apiKey: string) {
 async function searchRestaurants(args: any) {
   try {
     const { location, cuisine, priceRange } = args;
-    console.log('searchRestaurants called with:', { location, cuisine, priceRange });
+    
+    // Normalize location using abbreviation mapping
+    const normalizedLocation = normalizeCityName(location);
+    console.log('searchRestaurants called with:', { location, normalizedLocation, cuisine, priceRange });
 
     const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
     if (!tripAdvisorKey) {
       return { error: 'TripAdvisor API key not configured', results: [] };
     }
 
-    // Build search query
-    let searchQuery = location;
+    // Build search query with normalized location
+    let searchQuery = normalizedLocation;
     if (cuisine) {
       searchQuery += ` ${cuisine}`;
     }
@@ -1534,9 +1606,13 @@ async function searchFlights(args: any) {
         return location.toUpperCase();
       }
 
-      // Search for airport code
+      // Try to get variations from our abbreviation map first
+      const variations = getCityVariations(location);
+      const normalizedLocation = variations[variations.length - 1] || location; // Use full name
+
+      // Search for airport code using normalized location
       const searchParams = new URLSearchParams({
-        keyword: location,
+        keyword: normalizedLocation,
         subType: 'AIRPORT,CITY',
         'page[limit]': '1'
       });
@@ -1551,6 +1627,13 @@ async function searchFlights(args: any) {
         if (data.data && data.data.length > 0) {
           return data.data[0].iataCode;
         }
+      }
+
+      // Fallback: if it's a known airport code abbreviation, return it
+      const upperLocation = location.toUpperCase();
+      const airportCodes = ['JFK', 'LGA', 'EWR', 'LAX', 'SFO', 'ORD', 'MDW', 'DCA', 'IAD', 'PHL', 'LAS', 'MIA', 'BOS', 'SEA', 'ATL', 'DFW', 'DAL', 'IAH', 'HOU', 'PHX', 'DEN', 'MCO', 'DTW', 'MSP', 'PDX', 'SAN', 'AUS', 'BNA', 'SLC', 'CLT'];
+      if (airportCodes.includes(upperLocation)) {
+        return upperLocation;
       }
 
       return location.toUpperCase();
@@ -1756,7 +1839,10 @@ Be specific and factual. Always recommend verifying exact fees and requirements 
 async function searchEvents(args: any) {
   try {
     const { city, keyword, startDate, endDate, classificationName } = args;
-    console.log('searchEvents called with:', { city, keyword, startDate, endDate, classificationName });
+    
+    // Normalize city using abbreviation mapping
+    const normalizedCity = normalizeCityName(city);
+    console.log('searchEvents called with:', { city, normalizedCity, keyword, startDate, endDate, classificationName });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -1771,7 +1857,7 @@ async function searchEvents(args: any) {
         'Authorization': `Bearer ${supabaseAnonKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ city, keyword, startDate, endDate, classificationName }),
+      body: JSON.stringify({ city: normalizedCity, keyword, startDate, endDate, classificationName }),
     });
 
     if (!response.ok) {
