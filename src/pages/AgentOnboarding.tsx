@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Briefcase, Upload } from "lucide-react";
+import { TermsDialog, PrivacyDialog, VendorDialog, InsuranceDialog } from "@/components/AgentLegalDocuments";
 
 export default function AgentOnboarding() {
   const { user } = useAuth();
@@ -379,7 +380,13 @@ export default function AgentOnboarding() {
                       onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
                     />
                     <label htmlFor="terms" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      I accept the <span className="font-semibold text-primary">Terms & Conditions</span> *
+                      I accept the{" "}
+                      <TermsDialog>
+                        <span className="font-semibold text-primary cursor-pointer underline hover:text-primary/80">
+                          Goldsainte Terms & Conditions
+                        </span>
+                      </TermsDialog>{" "}
+                      *
                     </label>
                   </div>
                   
@@ -390,7 +397,13 @@ export default function AgentOnboarding() {
                       onCheckedChange={(checked) => setAcceptedPrivacy(checked as boolean)}
                     />
                     <label htmlFor="privacy" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      I accept the <span className="font-semibold text-primary">Privacy Policy</span> *
+                      I accept the{" "}
+                      <PrivacyDialog>
+                        <span className="font-semibold text-primary cursor-pointer underline hover:text-primary/80">
+                          Goldsainte Privacy Policy
+                        </span>
+                      </PrivacyDialog>{" "}
+                      *
                     </label>
                   </div>
                   
@@ -401,7 +414,13 @@ export default function AgentOnboarding() {
                       onCheckedChange={(checked) => setAcceptedVendor(checked as boolean)}
                     />
                     <label htmlFor="vendor" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      I accept the <span className="font-semibold text-primary">Vendor Agreement</span> *
+                      I accept the{" "}
+                      <VendorDialog>
+                        <span className="font-semibold text-primary cursor-pointer underline hover:text-primary/80">
+                          Goldsainte Vendor Agreement
+                        </span>
+                      </VendorDialog>{" "}
+                      *
                     </label>
                   </div>
                   
@@ -412,7 +431,13 @@ export default function AgentOnboarding() {
                       onCheckedChange={(checked) => setAcceptedGDPR(checked as boolean)}
                     />
                     <label htmlFor="gdpr" className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      I confirm GDPR/Data compliance and understand <span className="font-semibold text-primary">Travel Insurance Liability</span> requirements *
+                      I confirm GDPR/Data compliance and understand{" "}
+                      <InsuranceDialog>
+                        <span className="font-semibold text-primary cursor-pointer underline hover:text-primary/80">
+                          Goldsainte Travel Insurance & Liability Requirements
+                        </span>
+                      </InsuranceDialog>{" "}
+                      *
                     </label>
                   </div>
                 </div>
