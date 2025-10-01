@@ -68,11 +68,11 @@ serve(async (req) => {
               { headers: { 'Accept': 'application/json' } }
             ),
             fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/photos?${detailsParams}`,
+              `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/photos?${detailsParams}&limit=200`,
               { headers: { 'Accept': 'application/json' } }
             ),
             fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/reviews?${detailsParams}`,
+              `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/reviews?${detailsParams}&limit=200`,
               { headers: { 'Accept': 'application/json' } }
             )
           ]);

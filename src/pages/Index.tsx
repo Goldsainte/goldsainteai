@@ -84,6 +84,7 @@ const Index = () => {
     visaInformation: null 
   });
   const [showPriceSlider, setShowPriceSlider] = useState<{ type: "hotel" | "flight" | "restaurant" | "car" } | null>(null);
+  const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -231,6 +232,8 @@ const Index = () => {
         body: { 
           message: finalQuery,
           conversationHistory,
+          isQuickLink: !!activeQuickLink,
+          quickLinkType: activeQuickLink || undefined,
           userLocation: userLocation ? {
             latitude: userLocation.lat,
             longitude: userLocation.lng
@@ -244,6 +247,7 @@ const Index = () => {
       
       if (data.toolResults && data.toolResults.length > 0) {
         setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+        setActiveQuickLink(null);
         
         // Check for visa results
         const visaResult = data.toolResults.find((r: any) => r.type === 'visa');
