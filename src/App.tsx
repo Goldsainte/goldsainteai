@@ -17,6 +17,7 @@ import Dashboard from "./pages/Dashboard";
 import Marketplace from "./pages/Marketplace";
 import AgentOnboarding from "./pages/AgentOnboarding";
 import AgentDashboard from "./pages/AgentDashboard";
+import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import BookingPreferences from "./pages/BookingPreferences";
 import NotFound from "./pages/NotFound";
 
@@ -42,6 +43,7 @@ function App() {
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/agent-onboarding" element={<AgentOnboarding />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
+              <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
               <Route path="/booking-preferences" element={<BookingPreferences />} />
               <Route path="/favorites" element={<Favorites />} />
                     <Route path="/search" element={<SearchResults />} />
