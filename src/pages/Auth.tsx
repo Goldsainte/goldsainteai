@@ -9,6 +9,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import logomark from '@/assets/logomark-gold.png';
+import { z } from 'zod';
+
+const passwordSchema = z.string()
+  .min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -46,10 +54,13 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     
-    if (password.length < 6) {
+    // Validate password strength
+    const passwordValidation = passwordSchema.safeParse(password);
+    if (!passwordValidation.success) {
+      const errorMessage = passwordValidation.error.errors[0].message;
       toast({
         title: "Invalid password",
-        description: "Password must be at least 6 characters long.",
+        description: errorMessage,
         variant: "destructive",
       });
       setIsLoading(false);
@@ -162,11 +173,18 @@ const Auth = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
-                  minLength={6}
+                  minLength={8}
                 />
-                <p className="text-xs text-muted-foreground">
-                  Must be at least 6 characters
-                </p>
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p>Password must contain:</p>
+                  <ul className="list-disc list-inside pl-2 space-y-0.5">
+                    <li>At least 8 characters</li>
+                    <li>One uppercase letter (A-Z)</li>
+                    <li>One lowercase letter (a-z)</li>
+                    <li>One number (0-9)</li>
+                    <li>One special character (!@#$%^&*)</li>
+                  </ul>
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? (
