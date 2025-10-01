@@ -1,78 +1,25 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from "@/components/ui/form";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Star, MapPin, Wifi, Car, ParkingCircle, Utensils, Info, ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft, Star, Check, MapPin, Wifi, Car, ParkingCircle, Utensils, Dumbbell, Wind, Coffee, Waves, Clock } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getHotelImage } from "@/lib/imageHelpers";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getHotelImage, getRoomImage } from "@/lib/imageHelpers";
 import { decodeData } from "@/lib/utils";
-
-const bookingFormSchema = z.object({
-  firstName: z.string().trim().min(1, "First name is required").max(100),
-  lastName: z.string().trim().min(1, "Last name is required").max(100),
-  email: z.string().trim().email("Invalid email address").max(255),
-  country: z.string().min(1, "Country/Region is required"),
-  phoneCountryCode: z.string().min(1, "Country code is required"),
-  phone: z.string().trim().min(1, "Phone number is required").max(20),
-  paperlessConfirmation: z.boolean().default(false),
-  bookingFor: z.enum(["self", "someone_else"]),
-  guestName: z.string().trim().max(200).optional(),
-  specialRequests: z.string().max(1000).optional(),
-  // Payment fields
-  cardNumber: z.string().trim().min(13, "Invalid card number").max(19, "Invalid card number"),
-  cardName: z.string().trim().min(1, "Cardholder name is required").max(100),
-  expiryDate: z.string().trim().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Format must be MM/YY"),
-  cvv: z.string().trim().min(3, "CVV must be 3-4 digits").max(4, "CVV must be 3-4 digits"),
-}).refine((data) => {
-  if (data.bookingFor === "someone_else" && !data.guestName) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Guest name is required when booking for someone else",
-  path: ["guestName"],
-});
+import { BookingModal } from "@/components/BookingModal";
 
 export default function HotelBooking() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
 
   // Parse booking data from URL params using safe base64 decoding
   const bookingDataParam = searchParams.get('data');
   const bookingData = bookingDataParam ? decodeData(bookingDataParam) : null;
-
-  const form = useForm<z.infer<typeof bookingFormSchema>>({
-    resolver: zodResolver(bookingFormSchema),
-    defaultValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      country: 'United States',
-      phoneCountryCode: 'US +1',
-      phone: '',
-      paperlessConfirmation: true,
-      bookingFor: 'self',
-      guestName: '',
-      specialRequests: '',
-      cardNumber: '',
-      cardName: '',
-      expiryDate: '',
-      cvv: '',
-    },
-  });
 
   useEffect(() => {
     if (!bookingData) {
@@ -89,564 +36,399 @@ export default function HotelBooking() {
     return null;
   }
 
-  // Calculate pricing
-  const subtotal = bookingData.totalPrice || 0;
-  const tax = subtotal * 0.10;
-  const serviceFee = subtotal * 0.05;
-  const total = subtotal + tax + serviceFee;
+  const hotelName = bookingData.hotel?.name || bookingData.hotelName || 'Hotel';
+  const hotelAddress = bookingData.hotel?.address || bookingData.hotelAddress || 'Address';
+  const rating = bookingData.hotel?.property?.reviewScore || bookingData.hotel?.rating || 8.5;
+  const reviewCount = bookingData.hotel?.property?.reviewCount || 1043;
+  const checkIn = bookingData.checkIn;
+  const checkOut = bookingData.checkOut;
+  const nights = bookingData.nights || 1;
+  const guests = bookingData.guests || 2;
 
-  const onSubmit = async (values: z.infer<typeof bookingFormSchema>) => {
-    setLoading(true);
+  // Generate image URLs for gallery
+  const mainImage = getHotelImage(
+    bookingData.hotel?.image || bookingData.hotelImage || bookingData.hotel?.property?.photoUrls?.[0],
+    bookingData.hotel?.hotelId || bookingData.hotel?.name || hotelName
+  );
 
-    try {
-      const { data: bookingResult, error: bookingError } = await supabase.functions.invoke('create-booking', {
-        body: {
-          bookingType: 'hotel',
-          bookingData,
-          totalPrice: total,
-          currency: bookingData.currency || 'USD',
-          guestInfo: values
-        }
-      });
+  const galleryImages = [
+    mainImage,
+    getRoomImage(undefined, 'room-1'),
+    getRoomImage(undefined, 'room-2'),
+    getRoomImage(undefined, 'room-3'),
+  ];
 
-      if (bookingError) throw bookingError;
+  const amenities = [
+    { icon: Waves, label: "Outdoor pool" },
+    { icon: Wifi, label: "Free WiFi" },
+    { icon: ParkingCircle, label: "Free parking" },
+    { icon: Dumbbell, label: "Fitness center" },
+    { icon: Utensils, label: "Restaurant" },
+    { icon: Coffee, label: "Breakfast available" },
+    { icon: Wind, label: "Air conditioning" },
+    { icon: Car, label: "Airport shuttle" },
+  ];
 
-      const { data: checkoutResult, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          bookingId: bookingResult.booking.id,
-          amount: total,
-          currency: bookingData.currency || 'USD',
-          guestEmail: values.email
-        }
-      });
-
-      if (checkoutError) throw checkoutError;
-
-      if (checkoutResult.url) {
-        window.open(checkoutResult.url, '_blank');
-        toast({
-          title: "Redirecting to payment",
-          description: `Booking reference: ${bookingResult.bookingReference}`,
-        });
-      }
-    } catch (error: any) {
-      console.error('Booking error:', error);
-      toast({
-        title: "Booking failed",
-        description: error.message || "Failed to create booking",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const getRatingText = (score: number) => {
+    if (score >= 9) return "Wonderful";
+    if (score >= 8.5) return "Excellent";
+    if (score >= 8) return "Very Good";
+    if (score >= 7) return "Good";
+    return "Pleasant";
   };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const handleSelectRoom = (room: any) => {
+    setSelectedRoom(room);
+    setShowBookingModal(true);
   };
+
+  // Generate available rooms
+  const availableRooms = bookingData.offers?.map((offer: any, index: number) => ({
+    id: offer.id || `room-${index}`,
+    name: offer.roomInformation?.typeEstimated?.category || offer.room?.typeEstimated?.category || 'Standard Room',
+    description: offer.roomInformation?.description || offer.room?.description?.text || 'Comfortable room with modern amenities',
+    beds: offer.roomInformation?.typeEstimated?.beds || offer.room?.typeEstimated?.beds || 2,
+    bedType: offer.roomInformation?.typeEstimated?.bedType || offer.room?.typeEstimated?.bedType || 'Queen',
+    price: parseFloat(offer.price?.total || bookingData.totalPrice || 200),
+    currency: offer.price?.currency || bookingData.currency || 'USD',
+    image: getRoomImage(undefined, `room-${index}`),
+    amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
+    cancellation: offer.policies?.refundable?.cancellationRefund === 'REFUNDABLE_UP_TO_DEADLINE' ? 'Free cancellation' : 'Non-refundable',
+  })) || [
+    {
+      id: 'default-room',
+      name: 'Standard Room',
+      description: 'Comfortable room with modern amenities',
+      beds: 2,
+      bedType: 'Queen',
+      price: bookingData.totalPrice || 200,
+      currency: bookingData.currency || 'USD',
+      image: getRoomImage(undefined, 'default-room'),
+      amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
+      cancellation: 'Free cancellation',
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-4 gap-2"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to search results
-        </Button>
-        <div className="grid lg:grid-cols-[400px_1fr] gap-8 max-w-7xl mx-auto">
-          {/* Left Sidebar - Hotel Details */}
-          <div className="space-y-4">
-            {/* Hotel Image */}
-            <Card className="overflow-hidden border-accent/20">
-              <img
-                src={getHotelImage(
-                  bookingData.hotel?.image || bookingData.hotelImage,
-                  bookingData.hotel?.hotelId || bookingData.hotel?.name || bookingData.hotelName
-                )}
-                alt={bookingData.hotel?.name || bookingData.hotelName || 'Hotel'}
-                className="w-full h-48 object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = getHotelImage(
-                    undefined,
-                    bookingData.hotel?.hotelId || bookingData.hotel?.name || bookingData.hotelName
-                  );
-                }}
-              />
-              <div className="p-4 space-y-3">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs font-semibold">
-                      {bookingData.hotel?.rating || '4.0'}
-                    </div>
-                  </div>
-                  <h2 className="text-xl font-semibold">
-                    {bookingData.hotel?.name || bookingData.hotelName || 'Hotel Name'}
-                  </h2>
-                  <div className="flex items-start gap-2 text-sm text-muted-foreground mt-1">
-                    <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0" />
-                    <span>{bookingData.hotel?.address || bookingData.hotelAddress || 'Hotel Address'}</span>
-                  </div>
-                </div>
-
-                {/* Amenities */}
-                <div className="flex flex-wrap gap-3 text-sm">
-                  <div className="flex items-center gap-1.5">
-                    <Wifi className="h-4 w-4" />
-                    <span>Free WiFi</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Car className="h-4 w-4" />
-                    <span>Airport shuttle</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <ParkingCircle className="h-4 w-4" />
-                    <span>Parking</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Utensils className="h-4 w-4" />
-                    <span>Restaurant</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Booking Details Card */}
-            <Card className="p-4 space-y-4 border-accent/20">
-              <h3 className="font-semibold text-lg">Your booking details</h3>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <div className="text-sm font-medium mb-1">Check-in</div>
-                  <div className="text-lg font-semibold">
-                    {bookingData.checkIn ? formatDate(bookingData.checkIn) : 'Date TBD'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {bookingData.checkIn ? formatTime(bookingData.checkIn) : '3:00 PM – 12:00 AM'}
-                  </div>
-                </div>
-                <div>
-                  <div className="text-sm font-medium mb-1">Check-out</div>
-                  <div className="text-lg font-semibold">
-                    {bookingData.checkOut ? formatDate(bookingData.checkOut) : 'Date TBD'}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {bookingData.checkOut ? formatTime(bookingData.checkOut) : '6:00 AM – 12:00 PM'}
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm font-medium">Total length of stay:</div>
-                <div className="text-lg font-semibold">{bookingData.nights || 1} nights</div>
-              </div>
-
-              <div className="pt-2 border-t">
-                <div className="text-sm font-medium mb-1">You selected</div>
-                <div className="font-semibold">
-                  {bookingData.rooms || 1} room for {bookingData.guests || 2} adults
-                </div>
-                {bookingData.selectedRoom && (
-                  <div className="text-sm text-muted-foreground mt-1">
-                    {bookingData.selectedRoom.name || 'Standard Room'}
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {/* Price Summary Card */}
-            <Card className="p-4 space-y-3 border-accent/20">
-              <h3 className="font-semibold text-lg">Your price summary</h3>
-              
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Subtotal</span>
-                  <span>{bookingData.currency || 'USD'} {subtotal.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Tax (10%)</span>
-                  <span>{bookingData.currency || 'USD'} {tax.toFixed(2)}</span>
-                </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Service fee (5%)</span>
-                  <span>{bookingData.currency || 'USD'} {serviceFee.toFixed(2)}</span>
-                </div>
-              </div>
-
-              <div className="pt-3 border-t">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold">Total</span>
-                  <span className="text-2xl font-bold">{bookingData.currency || 'USD'} {total.toFixed(2)}</span>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Right Form Section */}
-          <div className="space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold mb-2">Enter your details</h1>
-              
-              <Alert className="border-accent/20">
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  Almost done! Just fill in the <span className="text-destructive">*</span> required info
-                </AlertDescription>
-              </Alert>
+      {/* Header with search bar */}
+      <div className="border-b sticky top-0 bg-background z-40">
+        <div className="container mx-auto px-4 py-4">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+            className="gap-2 mb-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            See all properties
+          </Button>
+          
+          {/* Search modification bar */}
+          <div className="flex gap-4 items-center flex-wrap">
+            <div className="flex items-center gap-2 text-sm">
+              <MapPin className="h-4 w-4" />
+              <span className="font-medium">{hotelAddress}</span>
             </div>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <Card className="p-6 space-y-6 border-accent/20">
-                  {/* Name Fields */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            First name <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Last name <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Email */}
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Email address <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormDescription className="text-xs">
-                          Confirmation email sent to this address
-                        </FormDescription>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Country/Region */}
-                  <FormField
-                    control={form.control}
-                    name="country"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Country/Region <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="United States">United States</SelectItem>
-                            <SelectItem value="United Kingdom">United Kingdom</SelectItem>
-                            <SelectItem value="Canada">Canada</SelectItem>
-                            <SelectItem value="France">France</SelectItem>
-                            <SelectItem value="Germany">Germany</SelectItem>
-                            <SelectItem value="India">India</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Phone Number */}
-                  <div className="grid grid-cols-[140px_1fr] gap-4">
-                    <FormField
-                      control={form.control}
-                      name="phoneCountryCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Phone number <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="US +1">US +1</SelectItem>
-                              <SelectItem value="UK +44">UK +44</SelectItem>
-                              <SelectItem value="CA +1">CA +1</SelectItem>
-                              <SelectItem value="FR +33">FR +33</SelectItem>
-                              <SelectItem value="DE +49">DE +49</SelectItem>
-                              <SelectItem value="IN +91">IN +91</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="invisible">Phone</FormLabel>
-                          <FormControl>
-                            <Input {...field} />
-                          </FormControl>
-                          <FormDescription className="text-xs">
-                            To verify your booking, and for the property to connect if needed
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  {/* Paperless Confirmation */}
-                  <FormField
-                    control={form.control}
-                    name="paperlessConfirmation"
-                    render={({ field }) => (
-                      <FormItem className="flex items-start space-x-3 space-y-0">
-                        <FormControl>
-                          <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                        </FormControl>
-                        <div className="space-y-1">
-                          <FormLabel className="font-normal">
-                            Yes, I want free paperless confirmation (recommended)
-                          </FormLabel>
-                          <FormDescription className="text-xs">
-                            We'll text you a link to download our app
-                          </FormDescription>
-                        </div>
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Who are you booking for */}
-                  <FormField
-                    control={form.control}
-                    name="bookingFor"
-                    render={({ field }) => (
-                      <FormItem className="space-y-3">
-                        <FormLabel>Who are you booking for? (optional)</FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="space-y-2"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="self" id="self" />
-                              <label htmlFor="self" className="font-normal cursor-pointer">
-                                I'm the main guest
-                              </label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="someone_else" id="someone_else" />
-                              <label htmlFor="someone_else" className="font-normal cursor-pointer">
-                                I'm booking for someone else
-                              </label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Guest Name (conditional) */}
-                  {form.watch("bookingFor") === "someone_else" && (
-                    <FormField
-                      control={form.control}
-                      name="guestName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Guest full name <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Enter the guest's full name" />
-                          </FormControl>
-                          <FormDescription className="text-xs">
-                            The name of the person who will be checking in
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-
-                  {/* Special Requests */}
-                  <FormField
-                    control={form.control}
-                    name="specialRequests"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Special requests (optional)</FormLabel>
-                        <FormControl>
-                          <Textarea 
-                            {...field} 
-                            placeholder="Any special requests or notes..."
-                            className="h-24"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </Card>
-
-                {/* Payment Information Section */}
-                <Card className="p-6 space-y-6 border-accent/20">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CreditCard className="h-5 w-5" />
-                    <h3 className="text-xl font-semibold">Payment Information</h3>
-                  </div>
-
-                  {/* Card Number */}
-                  <FormField
-                    control={form.control}
-                    name="cardNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Card number <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="1234 5678 9012 3456"
-                            maxLength={19}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Cardholder Name */}
-                  <FormField
-                    control={form.control}
-                    name="cardName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Cardholder name <span className="text-destructive">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Name on card" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  {/* Expiry and CVV */}
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="expiryDate"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            Expiry date <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              placeholder="MM/YY"
-                              maxLength={5}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="cvv"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>
-                            CVV <span className="text-destructive">*</span>
-                          </FormLabel>
-                          <FormControl>
-                            <Input 
-                              {...field} 
-                              type="password"
-                              placeholder="123"
-                              maxLength={4}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </Card>
-
-                {/* Submit Button */}
-                <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    disabled={loading}
-                    className="min-w-[200px]"
-                  >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      'Complete Booking'
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
+            <div className="flex items-center gap-2 text-sm">
+              <Clock className="h-4 w-4" />
+              <span>{formatDate(checkIn)} - {formatDate(checkOut)}</span>
+            </div>
+            <div className="text-sm">
+              <span>{guests} travelers, 1 room</span>
+            </div>
           </div>
         </div>
       </div>
+
+      <div className="container mx-auto px-4 py-6">
+        <div className="grid lg:grid-cols-[1fr_400px] gap-8">
+          {/* Main Content */}
+          <div className="space-y-6">
+            {/* Photo Gallery */}
+            <div className="grid grid-cols-2 gap-2 h-[400px]">
+              <div className="col-span-1 row-span-2 relative rounded-lg overflow-hidden">
+                <img 
+                  src={galleryImages[0]} 
+                  alt={hotelName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              {galleryImages.slice(1, 4).map((img, idx) => (
+                <div key={idx} className="relative rounded-lg overflow-hidden">
+                  <img 
+                    src={img} 
+                    alt={`${hotelName} - ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+              {galleryImages.length > 4 && (
+                <Button 
+                  variant="secondary" 
+                  className="absolute bottom-4 right-4"
+                  size="sm"
+                >
+                  +{galleryImages.length - 4} photos
+                </Button>
+              )}
+            </div>
+
+            {/* Tabs Navigation */}
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="w-full justify-start border-b rounded-none h-auto p-0 bg-transparent">
+                <TabsTrigger value="overview" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="rooms" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                  Rooms
+                </TabsTrigger>
+                <TabsTrigger value="amenities" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                  Amenities
+                </TabsTrigger>
+                <TabsTrigger value="policies" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent">
+                  Policies
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="overview" className="space-y-6 mt-6">
+                {/* Hotel Header */}
+                <div>
+                  <h1 className="text-3xl font-bold mb-2">{hotelName}</h1>
+                  <div className="flex items-center gap-2 mb-3">
+                    {[1, 2, 3, 4].map((star) => (
+                      <Star key={star} className="h-4 w-4 fill-primary text-primary" />
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-green-600 font-medium">Fully refundable</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <span className="text-sm text-green-600 font-medium">Reserve now, pay later</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rating */}
+                <Card className="p-4 inline-block">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-primary text-primary-foreground px-3 py-2 rounded font-bold text-lg">
+                      {rating.toFixed(1)}
+                    </div>
+                    <div>
+                      <div className="font-semibold">{getRatingText(rating)}</div>
+                      <button className="text-sm text-primary hover:underline">
+                        See all {reviewCount.toLocaleString()} reviews
+                      </button>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* About */}
+                <div>
+                  <h2 className="text-2xl font-semibold mb-4">About this property</h2>
+                  <p className="text-muted-foreground mb-4">
+                    Experience luxury and comfort at {hotelName}. Located in the heart of the destination, 
+                    this property offers world-class amenities and exceptional service to make your stay memorable.
+                  </p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {amenities.slice(0, 6).map((amenity, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <amenity.icon className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm">{amenity.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <Button variant="link" className="mt-4 px-0">
+                    See all about this property →
+                  </Button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="rooms" className="space-y-6 mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Choose your room</h2>
+                
+                <div className="space-y-4">
+                  {availableRooms.map((room) => (
+                    <Card key={room.id} className="overflow-hidden">
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-64 h-48 md:h-auto">
+                          <img 
+                            src={room.image} 
+                            alt={room.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 p-6 flex flex-col">
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold mb-2">{room.name}</h3>
+                            <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+                              {room.description}
+                            </p>
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              <Badge variant="outline">{room.beds} {room.bedType} bed{room.beds > 1 ? 's' : ''}</Badge>
+                              {room.amenities.slice(0, 3).map((amenity, idx) => (
+                                <Badge key={idx} variant="secondary">{amenity}</Badge>
+                              ))}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-green-600">
+                              <Check className="h-4 w-4" />
+                              <span>{room.cancellation}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-end justify-between mt-4 pt-4 border-t">
+                            <div>
+                              <div className="text-sm text-muted-foreground">Total for {nights} night{nights > 1 ? 's' : ''}</div>
+                              <div className="text-2xl font-bold">
+                                {room.currency} {room.price.toFixed(2)}
+                              </div>
+                            </div>
+                            <Button onClick={() => handleSelectRoom(room)}>
+                              Reserve
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="amenities" className="space-y-6 mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Property amenities</h2>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  {amenities.map((amenity, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <amenity.icon className="h-6 w-6 text-primary" />
+                      <span>{amenity.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </TabsContent>
+
+              <TabsContent value="policies" className="space-y-6 mt-6">
+                <h2 className="text-2xl font-semibold mb-4">Policies</h2>
+                
+                <Card className="p-6 space-y-4">
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="font-semibold mb-2">Check-in</h3>
+                      <p className="text-muted-foreground">4:00 PM - 12:00 AM</p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Check-out</h3>
+                      <p className="text-muted-foreground">11:00 AM</p>
+                    </div>
+                  </div>
+                  
+                  <div className="pt-4 border-t">
+                    <h3 className="font-semibold mb-2">Cancellation policy</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Free cancellation before {checkIn ? formatDate(checkIn) : 'check-in date'}. 
+                      Cancel before this date and get a full refund. Times are based on the property's local time.
+                    </p>
+                  </div>
+                  
+                  <Button variant="link" className="px-0">
+                    See all policies →
+                  </Button>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-4">
+            {/* Booking Summary Card */}
+            <Card className="p-6 sticky top-24">
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">Member Prices available</div>
+                  <div className="text-3xl font-bold">
+                    {bookingData.currency || 'USD'} {(bookingData.totalPrice || 200).toFixed(2)}
+                  </div>
+                  <div className="text-sm text-muted-foreground">per night</div>
+                </div>
+
+                <div className="pt-4 border-t space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Check-in</span>
+                    <span className="font-medium">{checkIn ? formatDate(checkIn) : 'Select date'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Check-out</span>
+                    <span className="font-medium">{checkOut ? formatDate(checkOut) : 'Select date'}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Guests</span>
+                    <span className="font-medium">{guests} travelers, 1 room</span>
+                  </div>
+                </div>
+
+                <Button 
+                  className="w-full" 
+                  size="lg"
+                  onClick={() => {
+                    if (availableRooms.length > 0) {
+                      handleSelectRoom(availableRooms[0]);
+                    }
+                  }}
+                >
+                  Select a room
+                </Button>
+
+                <p className="text-xs text-center text-muted-foreground">
+                  You won't be charged yet
+                </p>
+              </div>
+            </Card>
+
+            {/* Location Map Card */}
+            <Card className="p-6">
+              <h3 className="font-semibold mb-4">Explore the area</h3>
+              <div className="aspect-video bg-muted rounded-lg mb-4 flex items-center justify-center">
+                <MapPin className="h-12 w-12 text-muted-foreground" />
+              </div>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center justify-between">
+                  <span>{hotelAddress}</span>
+                  <Button variant="link" size="sm" className="h-auto p-0 text-primary">
+                    View in map →
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </div>
+
+      {/* Booking Modal */}
+      <BookingModal
+        open={showBookingModal}
+        onClose={() => setShowBookingModal(false)}
+        bookingData={{
+          ...bookingData,
+          selectedRoom,
+          hotelName,
+          checkIn,
+          checkOut,
+          nights,
+          guests,
+        }}
+        bookingType="hotel"
+        totalPrice={selectedRoom?.price || bookingData.totalPrice || 200}
+        currency={selectedRoom?.currency || bookingData.currency || 'USD'}
+      />
     </div>
   );
 }
