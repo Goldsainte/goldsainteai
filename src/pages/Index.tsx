@@ -392,7 +392,7 @@ const Index = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5" />
                 <div className="relative p-2">
                   <div className="relative">
-                    <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
+                    <img src={logomark} alt="Sainté Voyage" className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 object-contain" />
                     <Input
                       placeholder="Where would you like to go? Ask me anything..."
                       className="w-full h-14 pl-12 pr-14 text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
