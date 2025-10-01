@@ -523,7 +523,7 @@ const Index = () => {
                 <div className="relative pt-3">
                   <Input
                     placeholder="Where would you like to go?"
-                    className="w-full h-14 px-4 pr-14 text-base rounded-3xl border-[#0C4D47] shadow-sm focus-visible:ring-1 focus-visible:ring-[#0C4D47]"
+                    className="w-full h-14 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72]"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -550,7 +550,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('hotels')}
-                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#0C4D47]"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
                   >
                     <Hotel className="h-4 w-4" />
                     Hotels
@@ -559,7 +559,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('flights')}
-                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#0C4D47]"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
                   >
                     <Plane className="h-4 w-4" />
                     Flights
@@ -568,7 +568,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('restaurants')}
-                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#0C4D47]"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
                   >
                     <UtensilsCrossed className="h-4 w-4" />
                     Restaurants
@@ -577,7 +577,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('events')}
-                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#0C4D47]"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
                   >
                     <Ticket className="h-4 w-4" />
                     Events
@@ -586,7 +586,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('cars')}
-                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#0C4D47]"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
                   >
                     <Car className="h-4 w-4" />
                     Car Rentals
