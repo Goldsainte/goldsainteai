@@ -54,8 +54,8 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   };
   
   const location = getCleanLocation();
-  const rating = property.property?.reviewScore || property.rating || 0;
-  const reviews = property.property?.reviewCount || property.reviews || 0;
+  const rating = Number(property.property?.reviewScore || property.rating || 0);
+  const reviews = Number(property.property?.reviewCount || property.reviews || 0);
   
   // Extract clean price
   const getCleanPrice = () => {
