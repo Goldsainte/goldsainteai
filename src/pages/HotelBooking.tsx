@@ -16,6 +16,7 @@ import { Loader2, Star, MapPin, Wifi, Car, ParkingCircle, Utensils, Info } from 
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getHotelImage } from "@/lib/imageHelpers";
+import { decodeData } from "@/lib/utils";
 
 const bookingFormSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required").max(100),
@@ -35,9 +36,9 @@ export default function HotelBooking() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  // Parse booking data from URL params
+  // Parse booking data from URL params using safe base64 decoding
   const bookingDataParam = searchParams.get('data');
-  const bookingData = bookingDataParam ? JSON.parse(decodeURIComponent(bookingDataParam)) : null;
+  const bookingData = bookingDataParam ? decodeData(bookingDataParam) : null;
 
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),

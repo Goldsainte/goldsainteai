@@ -7,6 +7,7 @@ import { Hotel, Star, MapPin, Eye } from "lucide-react";
 import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { getHotelImage } from "@/lib/imageHelpers";
+import { encodeData } from "@/lib/utils";
 
 interface HotelCardProps {
   hotel: any;
@@ -41,7 +42,7 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
       currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || 'USD',
     };
     
-    navigate(`/hotel-booking?data=${encodeURIComponent(JSON.stringify(bookingData))}`);
+    navigate(`/hotel-booking?data=${encodeData(bookingData)}`);
   };
 
   return (

@@ -8,6 +8,7 @@ import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
+import { encodeData } from "@/lib/utils";
 
 interface SimplePropertyCardProps {
   property: any;
@@ -122,7 +123,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
       currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || currency,
     };
     
-    navigate(`/hotel-booking?data=${encodeURIComponent(JSON.stringify(bookingData))}`);
+    navigate(`/hotel-booking?data=${encodeData(bookingData)}`);
   };
 
   const favoriteId = isFavorite('hotel', property);
