@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -21,11 +21,11 @@ serve(async (req) => {
       hasLocation: !!userLocation 
     });
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured');
     }
     if (!BOOKING_API_KEY) {
       throw new Error('BOOKING_API_KEY not configured');
@@ -314,16 +314,16 @@ Always show results first with minimal text, ask questions later. Be conversatio
       }
     ];
 
-    console.log('Calling Lovable AI with tools...');
+    console.log('Calling OpenAI with tools...');
 
-    const aiResponse = await fetch(LOVABLE_AI_URL, {
+    const aiResponse = await fetch(OPENAI_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-5-2025-08-07',
         messages,
         tools,
         tool_choice: 'auto',
@@ -387,14 +387,14 @@ Always show results first with minimal text, ask questions later. Be conversatio
         }))
       ];
 
-      const finalResponse = await fetch(LOVABLE_AI_URL, {
+      const finalResponse = await fetch(OPENAI_URL, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'google/gemini-2.5-flash',
+          model: 'gpt-5-2025-08-07',
           messages: finalMessages,
         }),
       });
