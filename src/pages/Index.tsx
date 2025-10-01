@@ -368,9 +368,7 @@ const Index = () => {
               <div className="w-full max-w-2xl space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center space-y-3">
-                  <h1 className="text-5xl font-bold text-foreground font-secondary tracking-tight">
-                    Goldsainte.Ai
-                  </h1>
+                  <img src={logomark} alt="Goldsainte.Ai" className="h-16 w-16" />
                 </div>
 
                 {/* Main Search */}
