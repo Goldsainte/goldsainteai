@@ -376,6 +376,7 @@ const Index = () => {
                   <Input
                     placeholder="Where would you like to go?"
                     className="w-full h-14 px-4 pr-14 text-base rounded-3xl border-border shadow-sm focus-visible:ring-1 focus-visible:ring-primary"
+                    style={{ backgroundColor: '#e5dfc6' }}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -403,6 +404,7 @@ const Index = () => {
                     size="sm"
                     onClick={() => handleQuickAction('hotels')}
                     className="rounded-full gap-2 h-9"
+                    style={{ backgroundColor: '#e5dfc6' }}
                   >
                     <Hotel className="h-4 w-4" />
                     Hotels
@@ -412,6 +414,7 @@ const Index = () => {
                     size="sm"
                     onClick={() => handleQuickAction('flights')}
                     className="rounded-full gap-2 h-9"
+                    style={{ backgroundColor: '#e5dfc6' }}
                   >
                     <Plane className="h-4 w-4" />
                     Flights
@@ -421,6 +424,7 @@ const Index = () => {
                     size="sm"
                     onClick={() => handleQuickAction('restaurants')}
                     className="rounded-full gap-2 h-9"
+                    style={{ backgroundColor: '#e5dfc6' }}
                   >
                     <UtensilsCrossed className="h-4 w-4" />
                     Restaurants
@@ -430,6 +434,7 @@ const Index = () => {
                     size="sm"
                     onClick={() => handleQuickAction('events')}
                     className="rounded-full gap-2 h-9"
+                    style={{ backgroundColor: '#e5dfc6' }}
                   >
                     <Ticket className="h-4 w-4" />
                     Events
