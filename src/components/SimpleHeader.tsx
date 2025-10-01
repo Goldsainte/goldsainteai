@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogOut, User } from "lucide-react";
-import logomark from "@/assets/logomark-seal-gold.png";
 
 export const SimpleHeader = () => {
   const navigate = useNavigate();
@@ -11,17 +10,8 @@ export const SimpleHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex items-center px-4 py-2 min-h-20">
+      <div className="flex h-14 items-center px-4">
         <SidebarTrigger className="mr-4" />
-        <a href="/" className="flex flex-col gap-0.5 leading-tight">
-          <div className="flex items-center gap-2">
-            <img src={logomark} alt="Goldsainte logo" className="h-8 w-8" />
-            <span className="font-chiffon text-lg font-bold">Goldsainte.Ai</span>
-          </div>
-          <p className="text-sm font-medium">
-            The first travel platform to combine AI precision with human passion — one platform, infinite possibilities.
-          </p>
-        </a>
         <div className="flex-1" />
         <div className="flex items-center gap-2">
           {user ? (
