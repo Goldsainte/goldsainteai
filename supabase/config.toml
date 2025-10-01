@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.amadeus-search-flights]
 verify_jwt = false
 
+[functions.amadeus-book-flight]
+verify_jwt = true
+
 [functions.amadeus-search-cars]
 verify_jwt = false
 

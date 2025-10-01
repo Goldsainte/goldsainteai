@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Clock, Calendar, ExternalLink, Heart } from "lucide-react";
+import { Plane, Clock, Calendar, Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { FlightBookingModal } from "./FlightBookingModal";
 
 interface FlightCardProps {
   flight: any;
@@ -11,10 +13,12 @@ interface FlightCardProps {
 
 export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
   
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
-  const price = parseFloat(flight.price.total);
+  const basePrice = parseFloat(flight.price.total);
+  const markedUpPrice = (basePrice * 1.15).toFixed(2);
   const currency = flight.price.currency;
 
   const formatTime = (dateTime: string) => {
@@ -49,44 +53,6 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
     }
   };
 
-  const getAirlineBookingUrl = () => {
-    const origin = firstSegment.departure.iataCode;
-    const destination = lastSegment.arrival.iataCode;
-    const departureDate = new Date(firstSegment.departure.at).toISOString().split('T')[0];
-    const returnDate = flight.itineraries[1] ? new Date(flight.itineraries[1].segments[0].departure.at).toISOString().split('T')[0] : '';
-    const airline = firstSegment.carrierCode;
-    
-    // Format dates for URLs (remove hyphens for some airlines)
-    const depDateCompact = departureDate.replace(/-/g, '');
-    const retDateCompact = returnDate.replace(/-/g, '');
-    
-    // Construct airline-specific booking URLs with parameters
-    const airlineUrls: { [key: string]: string } = {
-      // US Airlines
-      'AA': `https://www.aa.com/booking/search?slices=${origin}|${destination}|${departureDate}${returnDate ? `&slices=${destination}|${origin}|${returnDate}` : ''}`,
-      'DL': `https://www.delta.com/flight-search/book-a-flight?origin=${origin}&destination=${destination}&departureDate=${departureDate}${returnDate ? `&returnDate=${returnDate}` : ''}`,
-      'UA': `https://www.united.com/en/us/fsr/choose-flights?f=${origin}&t=${destination}&d=${departureDate}${returnDate ? `&r=${returnDate}` : '&tt=1'}`,
-      'WN': `https://www.southwest.com/air/booking/select.html?originationAirportCode=${origin}&destinationAirportCode=${destination}&returnAirportCode=${returnDate ? origin : ''}&departureDate=${departureDate}&departureTimeOfDay=ALL_DAY${returnDate ? `&returnDate=${returnDate}` : ''}`,
-      'B6': `https://www.jetblue.com/booking/flights?from=${origin}&to=${destination}&depart=${departureDate}${returnDate ? `&return=${returnDate}` : ''}`,
-      'AS': `https://www.alaskaair.com/booking/shopping?from=${origin}&to=${destination}&departure=${departureDate}${returnDate ? `&return=${returnDate}` : ''}`,
-      'F9': `https://www.flyfrontier.com/travel/book/?outboundRouting=${origin}~${destination}~${depDateCompact}${returnDate ? `&returnRouting=${destination}~${origin}~${retDateCompact}` : ''}`,
-      'NK': `https://www.spirit.com/book/flights?airport-origin=${origin}&airport-destination=${destination}&date-departing=${departureDate}${returnDate ? `&date-returning=${returnDate}` : ''}`,
-      
-      // International carriers - many don't support deep linking, using search aggregators
-      'BA': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'LH': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'AF': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'KL': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'EK': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'QR': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'SQ': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-      'AC': `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`,
-    };
-    
-    // Return airline-specific URL or Google Flights as fallback
-    return airlineUrls[airline] || `https://www.google.com/travel/flights?q=Flights%20from%20${origin}%20to%20${destination}%20on%20${departureDate}`;
-  };
-
   return (
     <>
       <Card className="p-6 hover:shadow-lg transition-all border-2 hover:border-primary">
@@ -106,7 +72,7 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-lg">
-                {currency} {price.toFixed(2)}
+                {currency} {markedUpPrice}
               </Badge>
               <Button
                 variant="ghost"
@@ -151,21 +117,20 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
 
           {/* Actions */}
           <Button 
-            asChild
             className="w-full"
+            onClick={() => setBookingModalOpen(true)}
           >
-            <a 
-              href={getAirlineBookingUrl()} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2"
-            >
-              Book on {getAirlineName(firstSegment.carrierCode)}
-              <ExternalLink className="h-4 w-4" />
-            </a>
+            Book Now - {currency} {markedUpPrice}
           </Button>
         </div>
       </Card>
+
+      <FlightBookingModal
+        open={bookingModalOpen}
+        onOpenChange={setBookingModalOpen}
+        flight={flight}
+        dictionaries={dictionaries}
+      />
     </>
   );
 };
