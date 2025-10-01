@@ -138,12 +138,15 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
 
   return (
     <>
-      <div className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row">
+      <div className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col md:flex-row min-h-[280px]">
         <div className="relative w-full md:w-80 h-64 md:h-auto flex-shrink-0 overflow-hidden">
           <img
             src={image}
             alt={title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.currentTarget.src = getHotelImage(undefined, property.hotel_id || title);
+            }}
           />
           <Button
             variant="ghost"
@@ -155,15 +158,15 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
           </Button>
         </div>
 
-        <div className="flex-1 p-5 flex flex-col justify-between">
-          <div className="space-y-3">
+        <div className="flex-1 p-5 flex flex-col justify-between min-h-[200px]">
+          <div className="space-y-3 flex-1">
             <div className="space-y-2">
-              <h3 className="font-semibold text-xl leading-tight group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-xl leading-tight group-hover:text-primary transition-colors line-clamp-2">
                 {title}
               </h3>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {location}
+                <MapPin className="h-4 w-4 flex-shrink-0" />
+                <span className="line-clamp-1">{location}</span>
               </p>
             </div>
 
@@ -187,8 +190,8 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
           </div>
 
           {displayPrice > 0 && (
-            <div className="pt-4 mt-4 border-t border-border">
-              <div className="flex items-end justify-between gap-4">
+            <div className="pt-4 mt-auto border-t border-border">
+              <div className="flex items-end justify-between gap-4 flex-wrap">
                 <div className="space-y-1">
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-bold text-foreground">
@@ -200,7 +203,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
                     Total includes taxes and fees
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-shrink-0">
                   <Button 
                     size="default" 
                     variant="outline"

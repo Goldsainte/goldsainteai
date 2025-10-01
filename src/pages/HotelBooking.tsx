@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Star, MapPin, Wifi, Car, ParkingCircle, Utensils, Info } from "lucide-react";
+import { Loader2, Star, MapPin, Wifi, Car, ParkingCircle, Utensils, Info, ArrowLeft, CreditCard } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { getHotelImage } from "@/lib/imageHelpers";
@@ -27,7 +27,21 @@ const bookingFormSchema = z.object({
   phone: z.string().trim().min(1, "Phone number is required").max(20),
   paperlessConfirmation: z.boolean().default(false),
   bookingFor: z.enum(["self", "someone_else"]),
+  guestName: z.string().trim().max(200).optional(),
   specialRequests: z.string().max(1000).optional(),
+  // Payment fields
+  cardNumber: z.string().trim().min(13, "Invalid card number").max(19, "Invalid card number"),
+  cardName: z.string().trim().min(1, "Cardholder name is required").max(100),
+  expiryDate: z.string().trim().regex(/^(0[1-9]|1[0-2])\/\d{2}$/, "Format must be MM/YY"),
+  cvv: z.string().trim().min(3, "CVV must be 3-4 digits").max(4, "CVV must be 3-4 digits"),
+}).refine((data) => {
+  if (data.bookingFor === "someone_else" && !data.guestName) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Guest name is required when booking for someone else",
+  path: ["guestName"],
 });
 
 export default function HotelBooking() {
@@ -51,7 +65,12 @@ export default function HotelBooking() {
       phone: '',
       paperlessConfirmation: true,
       bookingFor: 'self',
+      guestName: '',
       specialRequests: '',
+      cardNumber: '',
+      cardName: '',
+      expiryDate: '',
+      cvv: '',
     },
   });
 
@@ -135,6 +154,15 @@ export default function HotelBooking() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-4 gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to search results
+        </Button>
         <div className="grid lg:grid-cols-[400px_1fr] gap-8 max-w-7xl mx-auto">
           {/* Left Sidebar - Hotel Details */}
           <div className="space-y-4">
@@ -464,6 +492,28 @@ export default function HotelBooking() {
                     )}
                   />
 
+                  {/* Guest Name (conditional) */}
+                  {form.watch("bookingFor") === "someone_else" && (
+                    <FormField
+                      control={form.control}
+                      name="guestName"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Guest full name <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter the guest's full name" />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            The name of the person who will be checking in
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
                   {/* Special Requests */}
                   <FormField
                     control={form.control}
@@ -482,6 +532,96 @@ export default function HotelBooking() {
                       </FormItem>
                     )}
                   />
+                </Card>
+
+                {/* Payment Information Section */}
+                <Card className="p-6 space-y-6 border-accent/20">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CreditCard className="h-5 w-5" />
+                    <h3 className="text-xl font-semibold">Payment Information</h3>
+                  </div>
+
+                  {/* Card Number */}
+                  <FormField
+                    control={form.control}
+                    name="cardNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Card number <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="1234 5678 9012 3456"
+                            maxLength={19}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Cardholder Name */}
+                  <FormField
+                    control={form.control}
+                    name="cardName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          Cardholder name <span className="text-destructive">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Name on card" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Expiry and CVV */}
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="expiryDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            Expiry date <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              placeholder="MM/YY"
+                              maxLength={5}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="cvv"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>
+                            CVV <span className="text-destructive">*</span>
+                          </FormLabel>
+                          <FormControl>
+                            <Input 
+                              {...field} 
+                              type="password"
+                              placeholder="123"
+                              maxLength={4}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                 </Card>
 
                 {/* Submit Button */}

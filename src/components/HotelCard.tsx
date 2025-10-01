@@ -47,8 +47,8 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
 
   return (
     <>
-      <Card className="overflow-hidden hover:shadow-lg transition-all border-2 hover:border-primary">
-        <div className="aspect-video relative overflow-hidden bg-muted">
+      <Card className="overflow-hidden hover:shadow-lg transition-all border-2 hover:border-primary h-full flex flex-col">
+        <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
           <img 
             src={getHotelImage(hotelData.media?.[0]?.uri, hotelData.hotelId || hotelData.name)} 
             alt={hotelData.name}
@@ -61,8 +61,8 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
             {currency} {price.toFixed(2)}
           </Badge>
         </div>
-        <div className="p-4 space-y-3">
-          <div>
+        <div className="p-4 space-y-3 flex-1 flex flex-col">
+          <div className="flex-1">
             <div className="flex items-start justify-between gap-2 mb-1">
               <h3 className="font-semibold text-lg line-clamp-1">{hotelData.name}</h3>
               {hotelData.rating && (
@@ -82,14 +82,14 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
 
           {offer?.room && (
             <div className="pt-3 border-t">
-              <p className="text-sm font-medium">{offer.room.typeEstimated?.category || 'Room'}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm font-medium line-clamp-1">{offer.room.typeEstimated?.category || 'Room'}</p>
+              <p className="text-xs text-muted-foreground line-clamp-2">
                 {offer.room.description?.text || 'Standard room'}
               </p>
             </div>
           )}
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 mt-auto">
             <Button 
               onClick={() => setShowDetailsModal(true)}
               variant="outline"
