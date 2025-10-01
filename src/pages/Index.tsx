@@ -358,7 +358,7 @@ const Index = () => {
   const showChat = messages.length > 0;
 
   return (
-    <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 dark:from-emerald-950 dark:via-green-950 dark:to-teal-950">
+    <main className="flex-1 flex items-center justify-center" style={{ backgroundColor: '#0c4d47' }}>
       <div className="w-full h-full flex flex-col">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
