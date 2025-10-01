@@ -421,7 +421,7 @@ const Index = () => {
                 <p className="text-sm text-muted-foreground text-center font-medium tracking-wide uppercase">Start Your Journey</p>
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-primary/20 bg-gradient-to-br from-background via-primary/5 to-accent/10 shadow-xl"
                     onClick={() => handleDatePickerRequest("hotel", "Show me hotels near me")}
                     role="button"
                     tabIndex={0}
@@ -429,11 +429,11 @@ const Index = () => {
                     onKeyDown={(e) => { if (e.key === 'Enter') handleDatePickerRequest("hotel", "Show me hotels near me"); }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-primary via-accent to-primary opacity-10 group-hover:opacity-30 blur-2xl transition-opacity duration-500" />
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                        <div className="absolute inset-0 bg-primary/40 blur-2xl rounded-full group-hover:bg-primary/60 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
                           <img src={luxuryHotels} alt="Luxury Hotels" className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -446,7 +446,7 @@ const Index = () => {
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/10 bg-gradient-to-br from-background via-accent/5 to-primary/10"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-accent/20 bg-gradient-to-br from-background via-accent/5 to-primary/10 shadow-xl"
                     onClick={() => handleDatePickerRequest("flight", "Show me flights from my location")}
                     role="button"
                     tabIndex={0}
@@ -454,11 +454,11 @@ const Index = () => {
                     onKeyDown={(e) => { if (e.key === 'Enter') handleDatePickerRequest("flight", "Show me flights from my location"); }}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-accent via-primary to-accent opacity-10 group-hover:opacity-30 blur-2xl transition-opacity duration-500" />
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg">
+                        <div className="absolute inset-0 bg-accent/40 blur-2xl rounded-full group-hover:bg-accent/60 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
                           <img src={luxuryFlights} alt="Luxury Flights" className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -471,15 +471,15 @@ const Index = () => {
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-primary/20 bg-gradient-to-br from-background via-primary/5 to-accent/10 shadow-xl"
                     onClick={() => handleQuickAction('destinations')}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-primary via-accent to-primary opacity-10 group-hover:opacity-30 blur-2xl transition-opacity duration-500" />
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                        <div className="absolute inset-0 bg-primary/40 blur-2xl rounded-full group-hover:bg-primary/60 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
                           <img src={luxuryDestinations} alt="Luxury Destinations" className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -492,15 +492,15 @@ const Index = () => {
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/10 bg-gradient-to-br from-background via-accent/5 to-primary/10"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-accent/20 bg-gradient-to-br from-background via-accent/5 to-primary/10 shadow-xl"
                     onClick={() => handleQuickAction('restaurants')}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-accent via-primary to-accent opacity-10 group-hover:opacity-30 blur-2xl transition-opacity duration-500" />
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg">
+                        <div className="absolute inset-0 bg-accent/40 blur-2xl rounded-full group-hover:bg-accent/60 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
                           <img src={luxuryRestaurants} alt="Luxury Restaurants" className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -513,15 +513,15 @@ const Index = () => {
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/10 bg-gradient-to-br from-background via-primary/5 to-accent/10"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-primary/20 bg-gradient-to-br from-background via-primary/5 to-accent/10 shadow-xl"
                     onClick={() => handleQuickAction('visa')}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary via-accent to-primary opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-primary via-accent to-primary opacity-10 group-hover:opacity-30 blur-2xl transition-opacity duration-500" />
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full group-hover:bg-primary/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-lg">
+                        <div className="absolute inset-0 bg-primary/40 blur-2xl rounded-full group-hover:bg-primary/60 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-primary/30 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
                           <img src={luxuryVisa} alt="Visa Requirements" className="w-full h-full object-cover" />
                         </div>
                       </div>
@@ -534,15 +534,15 @@ const Index = () => {
                   </Card>
 
                   <Card
-                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-accent/10 bg-gradient-to-br from-background via-accent/5 to-primary/10"
+                    className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-3 border-2 border-accent/20 bg-gradient-to-br from-background via-accent/5 to-primary/10 shadow-xl"
                     onClick={() => handleQuickAction('events')}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-accent/20 via-transparent to-primary/20 opacity-0 group-hover:opacity-100 transition-all duration-500" />
-                    <div className="absolute -inset-1 bg-gradient-to-r from-accent via-primary to-accent opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-500" />
+                    <div className="absolute -inset-2 bg-gradient-to-r from-accent via-primary to-accent opacity-10 group-hover:opacity-30 blur-2xl transition-opacity duration-500" />
                     <div className="relative p-8 flex flex-col items-center gap-4">
                       <div className="relative">
-                        <div className="absolute inset-0 bg-accent/30 blur-2xl rounded-full group-hover:bg-accent/50 transition-all duration-500" />
-                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/20 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-lg">
+                        <div className="absolute inset-0 bg-accent/40 blur-2xl rounded-full group-hover:bg-accent/60 transition-all duration-500" />
+                        <div className="relative h-20 w-20 rounded-2xl overflow-hidden border-2 border-accent/30 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500 shadow-xl">
                           <img src={luxuryEvents} alt="Luxury Events" className="w-full h-full object-cover" />
                         </div>
                       </div>
