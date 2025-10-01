@@ -53,18 +53,19 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
             src={getHotelImage(hotelData.media?.[0]?.uri, hotelData.hotelId || hotelData.name)} 
             alt={hotelData.name}
             className="w-full h-full object-cover"
+            loading="lazy"
             onError={(e) => {
               e.currentTarget.src = getHotelImage(undefined, hotelData.hotelId || hotelData.name);
             }}
           />
-          <Badge className="absolute top-2 right-2" variant="secondary">
+          <Badge className="absolute top-2 right-2 text-xs md:text-sm" variant="secondary">
             {currency} {price.toFixed(2)}
           </Badge>
         </div>
-        <div className="p-4 space-y-3 flex-1 flex flex-col">
+        <div className="p-3 md:p-4 space-y-3 flex-1 flex flex-col">
           <div className="flex-1">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="font-semibold text-lg line-clamp-1">{hotelData.name}</h3>
+              <h3 className="font-semibold text-base md:text-lg line-clamp-2 md:line-clamp-1">{hotelData.name}</h3>
               {hotelData.rating && (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Star className="h-4 w-4 fill-primary text-primary" />
@@ -73,8 +74,8 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
               )}
             </div>
             {hotelData.address?.lines?.[0] && (
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <MapPin className="h-3 w-3" />
+              <div className="flex items-center gap-1 text-xs md:text-sm text-muted-foreground">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
                 <span className="line-clamp-1">{hotelData.address.lines[0]}</span>
               </div>
             )}
@@ -93,16 +94,17 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
             <Button 
               onClick={() => setShowDetailsModal(true)}
               variant="outline"
-              className="flex-1"
+              className="flex-1 h-11 text-sm"
             >
-              <Eye className="h-4 w-4 mr-2" />
-              View Details
+              <Eye className="h-4 w-4 md:mr-2" />
+              <span className="hidden md:inline">View Details</span>
             </Button>
             <Button 
               onClick={() => setShowDateModal(true)}
-              className="flex-1"
+              className="flex-1 h-11 text-sm"
             >
-              Check Availability
+              <span className="hidden sm:inline">Check Availability</span>
+              <span className="sm:hidden">Check</span>
             </Button>
           </div>
         </div>

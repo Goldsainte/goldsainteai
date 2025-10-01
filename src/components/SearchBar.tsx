@@ -69,35 +69,35 @@ export const SearchBar = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="bg-card border border-border rounded-2xl shadow-sm p-6">
+    <div className="w-full max-w-4xl mx-auto px-4 md:px-0">
+      <div className="bg-card border border-border rounded-2xl shadow-sm p-4 md:p-6">
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-4">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="hotels" className="gap-2">
-              <Hotel className="h-4 w-4" />
+          <TabsList className="grid w-full grid-cols-4 h-auto">
+            <TabsTrigger value="hotels" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
+              <Hotel className="h-4 w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Hotels</span>
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-2">
-              <Plane className="h-4 w-4" />
+            <TabsTrigger value="flights" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
+              <Plane className="h-4 w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Flights</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-2">
-              <UtensilsCrossed className="h-4 w-4" />
+            <TabsTrigger value="restaurants" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
+              <UtensilsCrossed className="h-4 w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Restaurants</span>
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2">
-              <Ticket className="h-4 w-4" />
+            <TabsTrigger value="events" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
+              <Ticket className="h-4 w-4 flex-shrink-0" />
               <span className="hidden sm:inline">Events</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
           <div className="relative">
-            <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
             <Input
               placeholder={searchType === "flights" ? "From where?" : "Where to?"}
-              className="pl-10 h-11 border-border"
+              className="pl-10 h-12 border-border text-base"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
@@ -106,33 +106,33 @@ export const SearchBar = () => {
           {searchType === "hotels" && (
             <>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
                   type="date"
                   placeholder="Check-in"
-                  className="pl-10 h-11 border-border"
+                  className="pl-10 h-12 border-border text-base"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
                 />
               </div>
 
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
                   type="date"
                   placeholder="Check-out"
-                  className="pl-10 h-11 border-border"
+                  className="pl-10 h-12 border-border text-base"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
                 />
               </div>
 
               <div className="relative">
-                <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Users className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                 <Input
                   type="number"
                   placeholder="2 guests"
-                  className="pl-10 h-11 border-border"
+                  className="pl-10 h-12 border-border text-base"
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
                 />
@@ -142,11 +142,11 @@ export const SearchBar = () => {
 
           {searchType === "flights" && (
             <div className="relative md:col-span-3">
-              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 type="date"
                 placeholder="Departure date"
-                className="pl-10 h-11 border-border"
+                className="pl-10 h-12 border-border text-base"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
               />
@@ -155,11 +155,11 @@ export const SearchBar = () => {
 
           {searchType === "events" && (
             <div className="relative md:col-span-3">
-              <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 type="date"
                 placeholder="Event date"
-                className="pl-10 h-11 border-border"
+                className="pl-10 h-12 border-border text-base"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
               />
@@ -172,10 +172,10 @@ export const SearchBar = () => {
         </div>
 
         <Button 
-          className="w-full mt-4 h-11 bg-primary text-primary-foreground hover:bg-primary/90"
+          className="w-full mt-4 h-12 bg-primary text-primary-foreground hover:bg-primary/90 text-base font-medium"
           onClick={handleSearch}
         >
-          <Search className="h-4 w-4 mr-2" />
+          <Search className="h-5 w-5 mr-2" />
           {getSearchButtonText()}
         </Button>
       </div>
