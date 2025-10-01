@@ -88,6 +88,7 @@ serve(async (req) => {
           // Get the selected room and rate from booking data
           const selectedRoom = booking.booking_data.rooms?.[0];
           const selectedRate = selectedRoom?.rates?.[0];
+          const baseCost = selectedRate?.price || 0; // Expedia's actual cost
           
           if (selectedRoom && selectedRate && booking.booking_data.propertyInfo?.id) {
             const expediaBookingResult = await supabaseClient.functions.invoke('expedia-book-hotel', {
@@ -105,9 +106,30 @@ serve(async (req) => {
                   specialRequests: booking.booking_data.specialRequests || ''
                 },
                 paymentToken: session.payment_intent as string,
-                bookingReference: booking.booking_reference
+                bookingReference: booking.booking_reference,
+                baseCost: baseCost // Pass Expedia's actual cost
               }
             });
+            
+            // Calculate commission if booking succeeded
+            if (!expediaBookingResult.error) {
+              const customerPaid = booking.total_price;
+              const markupAmount = customerPaid - baseCost;
+              const stripeFee = (customerPaid * 0.029) + 0.30; // Stripe's standard fee
+              const netProfit = markupAmount - stripeFee;
+              
+              // Update booking with commission details
+              await supabaseClient
+                .from('bookings')
+                .update({
+                  base_cost: baseCost,
+                  markup_amount: markupAmount,
+                  commission_earned: markupAmount,
+                  stripe_fee: stripeFee,
+                  net_profit: netProfit
+                })
+                .eq('id', bookingId);
+            }
 
             if (expediaBookingResult.error) {
               console.error('Expedia booking error:', expediaBookingResult.error);

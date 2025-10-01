@@ -22,7 +22,8 @@ serve(async (req) => {
       checkOut,
       guestInfo,
       paymentToken, // Stripe payment token
-      bookingReference
+      bookingReference,
+      baseCost // Expedia's actual cost
     } = await req.json();
 
     console.log('Creating Expedia booking:', { 
@@ -93,10 +94,12 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Update booking with Expedia confirmation and base cost
     await supabaseClient
       .from('bookings')
       .update({
         status: 'confirmed',
+        base_cost: baseCost,
         booking_data: {
           ...bookingData,
           expedia_itinerary_id: bookingData.itinerary_id,

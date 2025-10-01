@@ -52,22 +52,32 @@ serve(async (req) => {
     const data = await response.json();
     console.log('Expedia response:', JSON.stringify(data).substring(0, 500));
 
-    // Transform Expedia response to match our format
-    const hotels = (data.properties || []).map((property: any) => ({
-      id: property.property_id,
-      name: property.name,
-      address: property.address?.line_1 || '',
-      city: property.address?.city || '',
-      rating: property.star_rating || 0,
-      reviewScore: property.guest_rating?.overall || 0,
-      reviewCount: property.guest_rating?.count || 0,
-      price: property.rooms?.[0]?.rates?.[0]?.totals?.inclusive?.billable_currency?.value || 0,
-      currency: property.rooms?.[0]?.rates?.[0]?.totals?.inclusive?.billable_currency?.code || 'USD',
-      image: property.images?.[0]?.links?.['1000px']?.href || null,
-      amenities: property.amenities?.map((a: any) => a.name) || [],
-      rooms: property.rooms || [],
-      expediaData: property // Store full Expedia data for booking
-    }));
+    // Apply 15% markup to all prices
+    const MARKUP_PERCENTAGE = 15;
+    
+    // Transform Expedia response to match our format with markup
+    const hotels = (data.properties || []).map((property: any) => {
+      const basePrice = property.rooms?.[0]?.rates?.[0]?.totals?.inclusive?.billable_currency?.value || 0;
+      const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
+      
+      return {
+        id: property.property_id,
+        name: property.name,
+        address: property.address?.line_1 || '',
+        city: property.address?.city || '',
+        rating: property.star_rating || 0,
+        reviewScore: property.guest_rating?.overall || 0,
+        reviewCount: property.guest_rating?.count || 0,
+        price: markedUpPrice, // Display marked up price to customer
+        basePrice: basePrice, // Store original Expedia price
+        markupPercentage: MARKUP_PERCENTAGE,
+        currency: property.rooms?.[0]?.rates?.[0]?.totals?.inclusive?.billable_currency?.code || 'USD',
+        image: property.images?.[0]?.links?.['1000px']?.href || null,
+        amenities: property.amenities?.map((a: any) => a.name) || [],
+        rooms: property.rooms || [],
+        expediaData: property // Store full Expedia data for booking
+      };
+    });
 
     console.log(`Found ${hotels.length} hotels from Expedia`);
 

@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,6 +21,7 @@ import { format } from "date-fns";
 const items = [
   { title: "Home", url: "/", icon: Home },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, authRequired: true },
+  { title: "Commission", url: "/commission-dashboard", icon: DollarSign, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Clipboard, authRequired: true },
   { title: "Search", url: "/search", icon: Search },
   { title: "Favorites", url: "/favorites", icon: Heart },

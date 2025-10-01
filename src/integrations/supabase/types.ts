@@ -115,40 +115,58 @@ export type Database = {
       }
       bookings: {
         Row: {
+          base_cost: number | null
           booking_data: Json
           booking_reference: string | null
           booking_type: string
+          commission_earned: number | null
           created_at: string
           currency: string
           guest_id: string | null
           id: string
+          markup_amount: number | null
+          markup_percentage: number | null
+          net_profit: number | null
           status: string
+          stripe_fee: number | null
           total_price: number
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          base_cost?: number | null
           booking_data: Json
           booking_reference?: string | null
           booking_type: string
+          commission_earned?: number | null
           created_at?: string
           currency?: string
           guest_id?: string | null
           id?: string
+          markup_amount?: number | null
+          markup_percentage?: number | null
+          net_profit?: number | null
           status?: string
+          stripe_fee?: number | null
           total_price: number
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          base_cost?: number | null
           booking_data?: Json
           booking_reference?: string | null
           booking_type?: string
+          commission_earned?: number | null
           created_at?: string
           currency?: string
           guest_id?: string | null
           id?: string
+          markup_amount?: number | null
+          markup_percentage?: number | null
+          net_profit?: number | null
           status?: string
+          stripe_fee?: number | null
           total_price?: number
           updated_at?: string
           user_id?: string | null
