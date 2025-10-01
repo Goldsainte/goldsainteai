@@ -13,7 +13,7 @@ serve(async (req) => {
   }
 
   try {
-    const { message, conversationHistory = [], userLocation, isQuickLink = false } = await req.json();
+    const { message, conversationHistory = [], userLocation, isQuickLink = false, quickLinkType } = await req.json();
     
     console.log('=== AI AGENT REQUEST ===');
     console.log('User message:', message);
@@ -31,6 +31,105 @@ serve(async (req) => {
     }
     if (!BOOKING_API_KEY) {
       throw new Error('BOOKING_API_KEY not configured');
+    }
+
+    // QUICK LINK STATE MACHINE (hotels): enforce one-question-at-a-time flow
+    if (isQuickLink && quickLinkType === 'hotels') {
+      // Combine history with current user message for parsing
+      const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
+      if (message) hist.push({ role: 'user', content: String(message) });
+
+      const getLastUserMessages = () => hist.filter((m: any) => m.role === 'user').map((m: any) => m.content);
+
+      const extractCity = (): string | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const txt = (m || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.startsWith('dates:') || lower.startsWith('budget:')) continue;
+          if (/[0-9$]/.test(lower)) continue;
+          if (lower.includes('looking for') || lower.includes('hotels') || lower.includes('help')) continue;
+          if (txt.split(/\s+/).length <= 6) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
+      const extractDates = (): { checkIn: string; checkOut: string } | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        const dateRegexAll = /\b20\d{2}-\d{2}-\d{2}\b/g;
+        for (const m of msgs) {
+          const matches = (m || '').match(dateRegexAll) || [];
+          if (matches.length >= 2) {
+            return { checkIn: matches[0], checkOut: matches[1] };
+          }
+          const lower = (m || '').toLowerCase();
+          const fromTo = lower.match(/(20\d{2}-\d{2}-\d{2}).*?(20\d{2}-\d{2}-\d{2})/);
+          if (fromTo) {
+            return { checkIn: fromTo[1], checkOut: fromTo[2] };
+          }
+        }
+        return null;
+      };
+
+      const extractBudget = (): number | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const budgetMatch = (m || '').match(/budget[:\s]*\$?(\d+)/i);
+          if (budgetMatch) return Number(budgetMatch[1]);
+          const dollar = (m || '').match(/\$(\d{1,6})/);
+          if (dollar) return Number(dollar[1]);
+        }
+        return null;
+      };
+
+      const city = extractCity();
+      const dates = extractDates();
+      const budget = extractBudget();
+
+      if (!city) {
+        const assistant = 'What city are you looking to stay in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (!dates) {
+        const assistant = 'When are you planning to stay?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (budget == null) {
+        const assistant = "What's your budget per night?";
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      // We have all required info - perform the hotel search with strict real data rules
+      const result = await searchHotels({
+        location: city,
+        checkIn: dates.checkIn,
+        checkOut: dates.checkOut,
+        guests: 2,
+        maxPrice: budget,
+        sortBy: 'review_score'
+      }, BOOKING_API_KEY);
+
+      const finalMessage = `Perfect! I found some great hotels in ${city}. Check out the options below!`;
+      return new Response(JSON.stringify({
+        message: finalMessage,
+        toolResults: [result],
+        conversationHistory: [...hist, { role: 'assistant', content: finalMessage }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
     }
 
     // Define tools for the AI agent
@@ -584,7 +683,8 @@ async function searchHotels(args: any, apiKey: string) {
           // Get photos
           const photosParams = new URLSearchParams({
             key: tripAdvisorKey,
-            language: 'en'
+            language: 'en',
+            limit: '200'
           });
 
           const photosResponse = await fetch(
@@ -601,7 +701,8 @@ async function searchHotels(args: any, apiKey: string) {
           // Get reviews
           const reviewsParams = new URLSearchParams({
             key: tripAdvisorKey,
-            language: 'en'
+            language: 'en',
+            limit: '200'
           });
 
           const reviewsResponse = await fetch(
