@@ -23,6 +23,9 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
@@ -70,6 +73,27 @@ const Auth = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Validate required fields
+    if (!firstName.trim() || !lastName.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter your first and last name.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    if (!phone.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please enter your phone number.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+    
     // Validate password strength
     const passwordValidation = passwordSchema.safeParse(password);
     if (!passwordValidation.success) {
@@ -83,7 +107,7 @@ const Auth = () => {
       return;
     }
     
-    const { error } = await signUp(email, password, username);
+    const { error } = await signUp(email, password, username, firstName, lastName, phone);
     
     if (error) {
       toast({
@@ -162,6 +186,44 @@ const Auth = () => {
 
           <TabsContent value="signup">
             <form onSubmit={handleSignUp} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="signup-firstname">First Name</Label>
+                  <Input
+                    id="signup-firstname"
+                    type="text"
+                    placeholder="John"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="signup-lastname">Last Name</Label>
+                  <Input
+                    id="signup-lastname"
+                    type="text"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="signup-phone">Phone Number</Label>
+                <Input
+                  id="signup-phone"
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                  disabled={isLoading}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-username">Username</Label>
                 <Input

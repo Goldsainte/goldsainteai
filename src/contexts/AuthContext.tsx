@@ -8,7 +8,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, username?: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, username?: string, firstName?: string, lastName?: string, phone?: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   isLoading: boolean;
 }
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const signUp = async (email: string, password: string, username?: string) => {
+  const signUp = async (email: string, password: string, username?: string, firstName?: string, lastName?: string, phone?: string) => {
     try {
       const redirectUrl = `${window.location.origin}/onboarding`;
       
@@ -74,6 +74,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           emailRedirectTo: redirectUrl,
           data: {
             username: username || email.split('@')[0],
+            first_name: firstName,
+            last_name: lastName,
+            phone: phone,
           }
         }
       });
