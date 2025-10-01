@@ -1,7 +1,8 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ const bottomItems = [
 export function AppSidebar() {
   const { open } = useSidebar();
   const { user, signOut } = useAuth();
+  const { isAdmin, isAgent } = useUserRole();
   const { history, removeItem } = useSearchHistory();
   const navigate = useNavigate();
 
@@ -89,6 +91,40 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              {isAgent && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to="/agent-dashboard"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "bg-accent/10 text-accent font-medium"
+                          : "hover:bg-muted/50"
+                      }
+                    >
+                      <Briefcase className="h-5 w-5" />
+                      {open && <span>Agent Dashboard</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
+              {isAdmin && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <NavLink
+                      to="/admin/agent-approvals"
+                      className={({ isActive }) =>
+                        isActive
+                          ? "bg-accent/10 text-accent font-medium"
+                          : "hover:bg-muted/50"
+                      }
+                    >
+                      <ShieldCheck className="h-5 w-5" />
+                      {open && <span>Agent Approvals</span>}
+                    </NavLink>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
