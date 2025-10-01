@@ -1,0 +1,26 @@
+-- Add new columns to travel_agents table for comprehensive onboarding
+
+ALTER TABLE public.travel_agents
+ADD COLUMN IF NOT EXISTS business_registration_number TEXT,
+ADD COLUMN IF NOT EXISTS business_type TEXT,
+ADD COLUMN IF NOT EXISTS primary_contact_name TEXT,
+ADD COLUMN IF NOT EXISTS primary_contact_title TEXT,
+ADD COLUMN IF NOT EXISTS email TEXT,
+ADD COLUMN IF NOT EXISTS phone TEXT,
+ADD COLUMN IF NOT EXISTS business_address TEXT,
+ADD COLUMN IF NOT EXISTS website TEXT,
+ADD COLUMN IF NOT EXISTS social_media TEXT,
+ADD COLUMN IF NOT EXISTS accreditations TEXT,
+ADD COLUMN IF NOT EXISTS preferred_currency TEXT DEFAULT 'USD',
+ADD COLUMN IF NOT EXISTS payment_processor TEXT,
+ADD COLUMN IF NOT EXISTS tax_id TEXT,
+ADD COLUMN IF NOT EXISTS beneficiary_name TEXT,
+ADD COLUMN IF NOT EXISTS service_types TEXT[],
+ADD COLUMN IF NOT EXISTS destinations TEXT[],
+ADD COLUMN IF NOT EXISTS inventory_management TEXT,
+ADD COLUMN IF NOT EXISTS cancellation_policy TEXT,
+ADD COLUMN IF NOT EXISTS time_zone TEXT,
+ADD COLUMN IF NOT EXISTS accepted_terms BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS accepted_privacy BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS accepted_vendor BOOLEAN DEFAULT FALSE,
+ADD COLUMN IF NOT EXISTS accepted_gdpr BOOLEAN DEFAULT FALSE;

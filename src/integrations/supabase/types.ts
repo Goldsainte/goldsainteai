@@ -446,58 +446,127 @@ export type Database = {
       }
       travel_agents: {
         Row: {
+          accepted_gdpr: boolean | null
+          accepted_privacy: boolean | null
+          accepted_terms: boolean | null
+          accepted_vendor: boolean | null
+          accreditations: string | null
           agency_name: string
+          beneficiary_name: string | null
           bio: string | null
+          business_address: string | null
+          business_registration_number: string | null
+          business_type: string | null
+          cancellation_policy: string | null
           commission_rate: number | null
           created_at: string
+          destinations: string[] | null
+          email: string | null
           experience_years: number | null
           id: string
+          inventory_management: string | null
           is_active: boolean | null
           is_verified: boolean | null
           languages: string[] | null
           license_number: string | null
+          payment_processor: string | null
+          phone: string | null
+          preferred_currency: string | null
+          primary_contact_name: string | null
+          primary_contact_title: string | null
           profile_image_url: string | null
           rating: number | null
+          service_types: string[] | null
+          social_media: string | null
           specializations: string[] | null
+          tax_id: string | null
+          time_zone: string | null
           total_reviews: number | null
           updated_at: string
           user_id: string
+          website: string | null
         }
         Insert: {
+          accepted_gdpr?: boolean | null
+          accepted_privacy?: boolean | null
+          accepted_terms?: boolean | null
+          accepted_vendor?: boolean | null
+          accreditations?: string | null
           agency_name: string
+          beneficiary_name?: string | null
           bio?: string | null
+          business_address?: string | null
+          business_registration_number?: string | null
+          business_type?: string | null
+          cancellation_policy?: string | null
           commission_rate?: number | null
           created_at?: string
+          destinations?: string[] | null
+          email?: string | null
           experience_years?: number | null
           id?: string
+          inventory_management?: string | null
           is_active?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
           license_number?: string | null
+          payment_processor?: string | null
+          phone?: string | null
+          preferred_currency?: string | null
+          primary_contact_name?: string | null
+          primary_contact_title?: string | null
           profile_image_url?: string | null
           rating?: number | null
+          service_types?: string[] | null
+          social_media?: string | null
           specializations?: string[] | null
+          tax_id?: string | null
+          time_zone?: string | null
           total_reviews?: number | null
           updated_at?: string
           user_id: string
+          website?: string | null
         }
         Update: {
+          accepted_gdpr?: boolean | null
+          accepted_privacy?: boolean | null
+          accepted_terms?: boolean | null
+          accepted_vendor?: boolean | null
+          accreditations?: string | null
           agency_name?: string
+          beneficiary_name?: string | null
           bio?: string | null
+          business_address?: string | null
+          business_registration_number?: string | null
+          business_type?: string | null
+          cancellation_policy?: string | null
           commission_rate?: number | null
           created_at?: string
+          destinations?: string[] | null
+          email?: string | null
           experience_years?: number | null
           id?: string
+          inventory_management?: string | null
           is_active?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
           license_number?: string | null
+          payment_processor?: string | null
+          phone?: string | null
+          preferred_currency?: string | null
+          primary_contact_name?: string | null
+          primary_contact_title?: string | null
           profile_image_url?: string | null
           rating?: number | null
+          service_types?: string[] | null
+          social_media?: string | null
           specializations?: string[] | null
+          tax_id?: string | null
+          time_zone?: string | null
           total_reviews?: number | null
           updated_at?: string
           user_id?: string
+          website?: string | null
         }
         Relationships: []
       }
