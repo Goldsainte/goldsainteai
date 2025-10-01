@@ -142,7 +142,8 @@ The user has saved preferences but has chosen to search without strict filtering
     }
 
     // QUICK LINK STATE MACHINE (hotels): enforce one-question-at-a-time flow
-    if (isQuickLink && quickLinkType === 'hotels') {
+    // Only use sequential questions if user has NO preferences OR preferences are disabled
+    if (isQuickLink && quickLinkType === 'hotels' && (!userPreferences || !usePreferences)) {
       // Combine history with current user message for parsing
       const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
       if (message) hist.push({ role: 'user', content: String(message) });
@@ -222,23 +223,15 @@ The user has saved preferences but has chosen to search without strict filtering
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
       }
 
-      // We have all required info - perform the hotel search with strict real data rules
-      // Apply user preferences to hotel search if available
+      // We have all required info - perform the hotel search
       const searchParams: any = {
         location: city,
         checkIn: dates.checkIn,
         checkOut: dates.checkOut,
-        guests: userPreferences?.number_of_adults || 2,
-        maxPrice: Math.min(budget, userPreferences?.price_range_max || budget),
+        guests: 2,
+        maxPrice: budget,
         sortBy: 'review_score'
       };
-      
-      if (userPreferences?.preferred_hotel_rating) {
-        searchParams.minRating = userPreferences.preferred_hotel_rating;
-      }
-      if (userPreferences?.preferred_amenities?.length > 0) {
-        searchParams.amenities = userPreferences.preferred_amenities;
-      }
       
       const result = await searchHotels(searchParams, BOOKING_API_KEY);
 
@@ -246,6 +239,253 @@ The user has saved preferences but has chosen to search without strict filtering
       return new Response(JSON.stringify({
         message: finalMessage,
         toolResults: [result],
+        conversationHistory: [...hist, { role: 'assistant', content: finalMessage }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+    }
+
+    // QUICK LINK STATE MACHINE (flights): enforce one-question-at-a-time flow
+    if (isQuickLink && quickLinkType === 'flights' && (!userPreferences || !usePreferences)) {
+      const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
+      if (message) hist.push({ role: 'user', content: String(message) });
+
+      const getLastUserMessages = () => hist.filter((m: any) => m.role === 'user').map((m: any) => m.content);
+
+      const extractOrigin = (): string | null => {
+        const msgs = getLastUserMessages();
+        for (let i = msgs.length - 1; i >= 0; i--) {
+          const txt = (msgs[i] || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.startsWith('from:') || lower.includes('flying from')) {
+            return txt.replace(/^from:\s*/i, '').replace(/flying from\s*/i, '').trim();
+          }
+          if (i === msgs.length - 1 && txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
+      const extractDestination = (): string | null => {
+        const msgs = getLastUserMessages();
+        for (let i = msgs.length - 1; i >= 0; i--) {
+          const txt = (msgs[i] || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.startsWith('to:') || lower.includes('going to')) {
+            return txt.replace(/^to:\s*/i, '').replace(/going to\s*/i, '').trim();
+          }
+          if (i === msgs.length - 1 && msgs.length > 1 && txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
+      const extractDate = (): string | null => {
+        const msgs = getLastUserMessages();
+        const dateRegex = /\b20\d{2}-\d{2}-\d{2}\b/;
+        for (let i = msgs.length - 1; i >= 0; i--) {
+          const match = (msgs[i] || '').match(dateRegex);
+          if (match) return match[0];
+        }
+        return null;
+      };
+
+      const origin = extractOrigin();
+      const destination = extractDestination();
+      const departureDate = extractDate();
+
+      if (!origin) {
+        const assistant = 'Where are you flying from?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (!destination) {
+        const assistant = 'Where would you like to fly to?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (!departureDate) {
+        const assistant = 'When would you like to depart? (Please provide date as YYYY-MM-DD)';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      const result = await searchFlights({
+        origin,
+        destination,
+        departureDate,
+        adults: 1,
+        travelClass: 'ECONOMY',
+        nonStop: false,
+        sortBy: 'price'
+      });
+
+      const finalMessage = `Great! I found flights from ${origin} to ${destination}. Check out the options below!`;
+      return new Response(JSON.stringify({
+        message: finalMessage,
+        toolResults: [result],
+        conversationHistory: [...hist, { role: 'assistant', content: finalMessage }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+    }
+
+    // QUICK LINK STATE MACHINE (restaurants): enforce one-question-at-a-time flow
+    if (isQuickLink && quickLinkType === 'restaurants' && (!userPreferences || !usePreferences)) {
+      const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
+      if (message) hist.push({ role: 'user', content: String(message) });
+
+      const getLastUserMessages = () => hist.filter((m: any) => m.role === 'user').map((m: any) => m.content);
+
+      const extractCity = (): string | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const txt = (m || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.includes('looking for') || lower.includes('restaurants')) continue;
+          if (txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
+      const city = extractCity();
+
+      if (!city) {
+        const assistant = 'Which city are you looking for restaurants in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      const result = await searchRestaurants({ location: city });
+
+      const finalMessage = `Perfect! I found great restaurants in ${city}. Check out the options below!`;
+      return new Response(JSON.stringify({
+        message: finalMessage,
+        toolResults: [result],
+        conversationHistory: [...hist, { role: 'assistant', content: finalMessage }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+    }
+
+    // QUICK LINK STATE MACHINE (events): enforce one-question-at-a-time flow  
+    if (isQuickLink && quickLinkType === 'events' && (!userPreferences || !usePreferences)) {
+      const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
+      if (message) hist.push({ role: 'user', content: String(message) });
+
+      const getLastUserMessages = () => hist.filter((m: any) => m.role === 'user').map((m: any) => m.content);
+
+      const extractCity = (): string | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const txt = (m || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.includes('looking for') || lower.includes('events')) continue;
+          if (txt.split(/\s+/).length <= 4 && !/[0-9]/.test(txt)) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
+      const city = extractCity();
+
+      if (!city) {
+        const assistant = 'Which city would you like to find events in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      const result = await searchEvents({ city });
+
+      const finalMessage = `Awesome! I found upcoming events in ${city}. Check them out below!`;
+      return new Response(JSON.stringify({
+        message: finalMessage,
+        toolResults: [result],
+        conversationHistory: [...hist, { role: 'assistant', content: finalMessage }]
+      }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+    }
+
+    // QUICK LINK STATE MACHINE (cars): enforce one-question-at-a-time flow
+    if (isQuickLink && quickLinkType === 'cars' && (!userPreferences || !usePreferences)) {
+      const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
+      if (message) hist.push({ role: 'user', content: String(message) });
+
+      const getLastUserMessages = () => hist.filter((m: any) => m.role === 'user').map((m: any) => m.content);
+
+      const extractCity = (): string | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const txt = (m || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.includes('looking for') || lower.includes('car') || lower.includes('rental')) continue;
+          if (txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
+      const extractDates = (): { pickupDate: string; dropoffDate: string } | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        const dateRegexAll = /\b20\d{2}-\d{2}-\d{2}\b/g;
+        for (const m of msgs) {
+          const matches = (m || '').match(dateRegexAll) || [];
+          if (matches.length >= 2) {
+            return { pickupDate: matches[0], dropoffDate: matches[1] };
+          }
+        }
+        return null;
+      };
+
+      const city = extractCity();
+      const dates = extractDates();
+
+      if (!city) {
+        const assistant = 'Which city do you need a car rental in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (!dates) {
+        const assistant = 'When do you need the car? (Please provide pickup and return dates as YYYY-MM-DD)';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      // For now, tell user car rentals require more specific dates
+      const finalMessage = `I'd love to help you find a car rental in ${city}! To search for car rentals, please let me know:
+1. Your pickup date (YYYY-MM-DD format)
+2. Your return date (YYYY-MM-DD format)
+3. Any specific car preferences (size, type, etc.)
+
+Then I can search for the best options for you!`;
+      return new Response(JSON.stringify({
+        message: finalMessage,
+        toolResults: [],
         conversationHistory: [...hist, { role: 'assistant', content: finalMessage }]
       }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
     }
