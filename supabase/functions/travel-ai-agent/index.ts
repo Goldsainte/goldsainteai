@@ -1155,93 +1155,139 @@ Always show results first with minimal text, ask questions later. Be conversatio
 });
 
 async function searchHotels(args: any, apiKey: string) {
-  // Using Expedia Rapid API for real hotel bookings
+  // Using Amadeus Hotel Search API for real hotel bookings
   try {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
-    console.log('searchHotels called with Expedia:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
+    console.log('searchHotels called with Amadeus:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    const expediaKey = Deno.env.get('EXPEDIA_API_KEY');
-    if (!expediaKey) {
-      return { error: 'Expedia API key not configured', results: [] };
+    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
+    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
+    if (!amadeusKey || !amadeusSecret) {
+      return { error: 'Amadeus API credentials not configured', results: [] };
     }
 
-    // Call our Expedia search edge function
+    // Convert city name to IATA code if needed
+    let cityCode = location.toUpperCase();
+    
+    // Check if it's already a 3-letter code
+    if (cityCode.length !== 3) {
+      // Try to get the city code from variations
+      const variations = getCityVariations(location);
+      const possibleCode = variations.find(v => v.length === 3);
+      if (possibleCode) {
+        cityCode = possibleCode.toUpperCase();
+      } else {
+        // If we can't find a code, try the first 3 letters as a fallback
+        cityCode = location.replace(/\s+/g, '').substring(0, 3).toUpperCase();
+      }
+    }
+    
+    console.log(`Converting "${location}" to city code: ${cityCode}`);
+
+    // Call our Amadeus search edge function
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
     
-    const response = await fetch(`${supabaseUrl}/functions/v1/expedia-search-hotels`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/amadeus-search-hotels`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${supabaseAnonKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        location,
-        checkIn: checkIn || new Date().toISOString().split('T')[0],
-        checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        guests,
-        rooms: 1
+        cityCode: cityCode,
+        checkInDate: checkIn || new Date().toISOString().split('T')[0],
+        checkOutDate: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        adults: guests || 2,
+        currency: 'USD'
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Expedia search error:', response.status, errorText);
-      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
+      console.error('Amadeus search error:', response.status, errorText);
+      return { error: `Could not find hotels in "${location}" (tried city code: ${cityCode}). Please try a different location or use a 3-letter city code (e.g., NYC, LAX, DET).`, results: [] };
     }
 
     const data = await response.json();
-    let hotels = data.hotels || [];
+    let hotels = data.results || [];
     
-    console.log(`Expedia returned ${hotels.length} hotels`);
+    console.log(`Amadeus returned ${hotels.length} hotels`);
 
-    // Apply filters
+
+    // Apply filters on Amadeus data
     if (typeof minRating === 'number') {
       const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
-      hotels = hotels.filter((h: any) => h.rating >= minRatingNormalized);
+      hotels = hotels.filter((h: any) => {
+        const rating = h.hotel?.rating || 0;
+        return rating >= minRatingNormalized;
+      });
     }
     if (typeof maxPrice === 'number') {
-      hotels = hotels.filter((h: any) => h.price <= maxPrice);
+      hotels = hotels.filter((h: any) => {
+        const price = h.offers?.[0]?.price?.total ? parseFloat(h.offers[0].price.total) : 0;
+        return price <= maxPrice;
+      });
     }
     if (sortBy === 'price') {
-      hotels.sort((a: any, b: any) => a.price - b.price);
+      hotels.sort((a: any, b: any) => {
+        const priceA = a.offers?.[0]?.price?.total ? parseFloat(a.offers[0].price.total) : 0;
+        const priceB = b.offers?.[0]?.price?.total ? parseFloat(b.offers[0].price.total) : 0;
+        return priceA - priceB;
+      });
     } else if (sortBy === 'review_score') {
-      hotels.sort((a: any, b: any) => b.reviewScore - a.reviewScore);
+      hotels.sort((a: any, b: any) => {
+        const ratingA = a.hotel?.rating || 0;
+        const ratingB = b.hotel?.rating || 0;
+        return ratingB - ratingA;
+      });
     }
 
-    // Transform to match expected format
-    const transformedHotels = hotels.map((hotel: any) => ({
-      hotel_id: hotel.id,
-      name: hotel.name,
-      address: hotel.address,
-      city: hotel.city,
-      country: '',
-      rating: hotel.rating,
-      num_reviews: hotel.reviewCount,
-      property: {
-        name: hotel.name,
-        photoUrls: [hotel.image].filter(Boolean),
+    // Transform Amadeus data to match expected format
+    const transformedHotels = hotels.map((hotel: any) => {
+      const hotelInfo = hotel.hotel || {};
+      const offer = hotel.offers?.[0] || {};
+      const price = offer.price?.total ? parseFloat(offer.price.total) : 0;
+      const currency = offer.price?.currency || 'USD';
+
+      return {
+        hotel_id: hotel.id || hotelInfo.hotelId,
+        name: hotelInfo.name || 'Hotel',
+        address: hotelInfo.address?.lines?.[0] || '',
+        city: hotelInfo.address?.cityName || location,
+        country: hotelInfo.address?.countryCode || '',
+        rating: hotelInfo.rating || 0,
+        num_reviews: 0,
+        property: {
+          name: hotelInfo.name || 'Hotel',
+          photoUrls: [],
+          reviews: [],
+          reviewScore: hotelInfo.rating || 0,
+          reviewCount: 0,
+          externalUrls: {
+            amadeus: hotel.self || '',
+            default: hotel.self || ''
+          }
+        },
+        location: hotelInfo.address?.cityName || location,
+        region: '',
+        price: price,
+        priceBreakdown: {
+          grossPrice: { value: price, currency: currency }
+        },
+        accessibilityLabel: `${hotelInfo.name}. ${hotelInfo.address?.cityName || location}. Price ${price} ${currency}`,
+        description: offer.room?.description?.text || '',
+        amenities: hotelInfo.amenities || [],
+        photos: [],
         reviews: [],
-        reviewScore: hotel.reviewScore,
-        reviewCount: hotel.reviewCount,
-        externalUrls: {
-          expedia: `https://www.expedia.com/h${hotel.id}`,
-          default: `https://www.expedia.com/h${hotel.id}`
+        amadeusData: {
+          offerId: offer.id,
+          hotelId: hotel.id || hotelInfo.hotelId,
+          checkInDate: offer.checkInDate,
+          checkOutDate: offer.checkOutDate
         }
-      },
-      location: hotel.city || location,
-      region: '',
-      price: hotel.price,
-      priceBreakdown: {
-        grossPrice: { value: hotel.price, currency: hotel.currency }
-      },
-      accessibilityLabel: `${hotel.name}. ${hotel.city}. Price ${hotel.price} ${hotel.currency}`,
-      description: '',
-      amenities: hotel.amenities || [],
-      photos: [{ url: hotel.image, caption: hotel.name }].filter(p => p.url),
-      reviews: [],
-      expediaData: hotel.expediaData // Store for booking
-    }));
+      };
+    });
 
     return {
       type: 'hotels',
