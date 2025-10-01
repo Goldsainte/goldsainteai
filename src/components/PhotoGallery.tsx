@@ -14,6 +14,18 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showGrid, setShowGrid] = useState(false);
 
+  // If no images, show message
+  if (!images || images.length === 0) {
+    return (
+      <div className="h-[400px] rounded-lg border-2 border-dashed border-border flex items-center justify-center">
+        <div className="text-center text-muted-foreground">
+          <p className="text-lg font-medium mb-1">No photos available</p>
+          <p className="text-sm">Photos for this property are not available at this time.</p>
+        </div>
+      </div>
+    );
+  }
+
   const nextImage = () => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
   };

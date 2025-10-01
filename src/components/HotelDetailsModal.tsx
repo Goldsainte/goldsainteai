@@ -85,88 +85,22 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     return getRoomImages(roomPhotos, `room-${roomIndex}`, 3);
   };
 
-  // Generate unique reviews based on hotel ID
-  const generateReviews = (hotelId: number, avgRating: number): Review[] => {
-    const comments = {
-      excellent: [
-        "Absolutely stunning property! The attention to detail was impeccable. Staff went above and beyond to make our stay memorable. The room was spotless and beautifully appointed.",
-        "Outstanding hotel in every way. From the moment we arrived, we felt like VIPs. The spa facilities were world-class and the restaurant exceeded our expectations.",
-        "Exceptional service throughout our stay. The concierge helped us plan perfect day trips. Room was luxurious with breathtaking views. Can't wait to return!",
-        "Five-star experience from check-in to check-out. The breakfast buffet was incredible with endless fresh options. Pool area was immaculate. Highly recommend!",
-        "Perfect in every way! The staff remembered our names and preferences. Room was upgraded as a lovely surprise. Best hotel experience we've ever had.",
-        "Incredible attention to every detail. The turn-down service with chocolates was a lovely touch. Bathroom amenities were top-notch. Would stay again in a heartbeat!",
-        "Exceeded all expectations! The rooftop bar had stunning views. Staff was knowledgeable about local attractions. Room was spotlessly clean and beautifully decorated."
-      ],
-      good: [
-        "Great location with easy access to main attractions. Rooms were clean and comfortable. Staff was friendly and helpful throughout our stay.",
-        "Really enjoyed our time here. The hotel offered good value for money. Breakfast had plenty of options. Would definitely stay again.",
-        "Solid choice for the price. Room was spacious and well-maintained. The gym facilities were better than expected. Staff was accommodating.",
-        "Pleasant stay overall. The rooftop bar had amazing views. Room service was prompt. Minor issue with AC was quickly resolved.",
-        "Good hotel with professional service. Location was convenient for business meetings. The business center had everything we needed.",
-        "Comfortable and clean. Staff was polite and helpful. The pool was nice. Some minor wear and tear but overall a good experience.",
-        "Nice hotel in a great location. Breakfast was decent with good variety. Room was comfortable. Wi-Fi worked well. Good value overall."
-      ],
-      average: [
-        "Decent hotel for the price. Room was clean but could use some updating. Staff was polite. Location worked well for our needs.",
-        "Okay experience. The hotel is showing its age in some areas. Breakfast was basic but adequate. Would consider other options next time.",
-        "Mixed feelings about this stay. Some aspects were great (location, cleanliness) while others need improvement (wifi speed, noise insulation).",
-        "Fair value. Room met our basic needs. The pool area could be better maintained. Staff tried their best despite being understaffed.",
-        "Average hotel with standard amenities. Nothing particularly stood out, but nothing was terrible either. Served its purpose for a short stay.",
-        "Met expectations for the price point. Room was small but functional. Location was the main selling point. Service could be more attentive.",
-        "Basic accommodation that does the job. Some noise from neighboring rooms. Breakfast options were limited. Check-in process was slow."
-      ]
-    };
-
-    const getRatingCategory = (rating: number) => {
-      if (rating >= 8.5) return "excellent";
-      if (rating >= 7) return "good";
-      return "average";
-    };
-
-    const category = getRatingCategory(avgRating);
-    const reviewList = comments[category];
-    
-    // Generate 20-30 reviews per hotel
-    const numReviews = 20 + (hotelId % 11);
-    const reviews: Review[] = [];
-    
-    const names = ["Sarah M.", "James T.", "Emma L.", "Michael R.", "Lisa K.", "David P.", "Anna S.", "Chris B.", "Maria G.", "John D.", 
-                   "Sophie W.", "Robert H.", "Elena C.", "Thomas M.", "Julia F.", "Daniel S.", "Isabel R.", "Mark L.", "Nina P.", "Alex K.",
-                   "Rachel B.", "Peter S.", "Laura W.", "Steven K.", "Hannah M.", "Brian C.", "Olivia T.", "Matthew D.", "Grace H.", "Andrew P."];
-    
-    for (let i = 0; i < numReviews; i++) {
-      const seed = hotelId * 1000 + i;
-      const variation = ((seed % 10) - 5) / 10;
-      const reviewRating = Math.max(6, Math.min(10, avgRating + variation));
-      
-      const daysAgo = Math.floor((seed % 90) + 1);
-      const dateText = daysAgo === 1 ? "1 day ago" : 
-                      daysAgo < 7 ? `${daysAgo} days ago` :
-                      daysAgo < 30 ? `${Math.floor(daysAgo / 7)} weeks ago` :
-                      `${Math.floor(daysAgo / 30)} months ago`;
-      
-      const commentIndex = (seed + i) % reviewList.length;
-      const nameIndex = (seed + i * 7) % names.length;
-      
-      // Some reviews have photos
-      const hasPhotos = (seed + i) % 3 === 0 && hotelPhotos.length > 0;
-      const photoCount = hasPhotos ? 1 + ((seed + i) % 3) : 0;
-      const photoStartIdx = (seed + i * 3) % Math.max(1, hotelPhotos.length);
-      
-      reviews.push({
-        id: `${hotelId}-${i}`,
-        author: names[nameIndex],
-        rating: Math.round(reviewRating * 10) / 10,
-        date: dateText,
-        comment: reviewList[commentIndex],
-        photos: hasPhotos ? hotelPhotos.slice(photoStartIdx, photoStartIdx + photoCount) : undefined
-      });
+  // STRICT RULE: Only use real reviews from API, never generate fallback content
+  const allReviews = useMemo(() => {
+    // Use reviews from property.reviews if available (real TripAdvisor reviews)
+    if (propertyData?.reviews && propertyData.reviews.length > 0) {
+      return propertyData.reviews.map((review: any, i: number) => ({
+        id: review.id || `review-${i}`,
+        author: review.user || 'Guest',
+        rating: Number(review.rating || 0),
+        date: review.published_date || new Date().toISOString(),
+        comment: review.text || '',
+        photos: []
+      }));
     }
-    
-    return reviews;
-  };
-
-  const allReviews = useMemo(() => generateReviews(hotelId, hotelRating), [hotelId, hotelRating]);
+    // If no real reviews available, return empty array
+    return [];
+  }, [propertyData]);
 
   // Sort reviews based on selected filter
   const sortedReviews = useMemo(() => {
@@ -967,55 +901,75 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
             </div>
 
             <div className="space-y-3 max-h-[500px] overflow-y-auto">
-              {sortedReviews.map((review) => (
-                <div key={review.id} className="border rounded-lg p-4 space-y-3">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-semibold">{review.author}</div>
-                      <div className="text-xs text-muted-foreground">{review.date}</div>
-                    </div>
-                    <Badge className="gap-1">
-                      <Star className="h-3 w-3 fill-current" />
-                      {review.rating}
-                    </Badge>
-                  </div>
-                  
-                  <p className="text-sm leading-relaxed">{review.comment}</p>
-                  
-                  {review.photos && review.photos.length > 0 && (
-                    <div className="flex gap-2">
-                      {review.photos.map((photo, idx) => (
-                        <div key={idx} className="w-20 h-20 rounded overflow-hidden">
-                          <img src={photo} alt={`Guest photo of ${hotelName}`} loading="lazy" className="w-full h-full object-cover" />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              {allReviews.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Star className="h-12 w-12 mx-auto text-muted-foreground/50 mb-3" />
+                  <h3 className="text-lg font-semibold mb-2">No reviews available</h3>
+                  <p className="text-sm text-muted-foreground">
+                    This property doesn't have verified reviews yet.
+                  </p>
                 </div>
-              ))}
+              ) : (
+                sortedReviews.map((review) => (
+                  <div key={review.id} className="border rounded-lg p-4 space-y-3">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="font-semibold">{review.author}</div>
+                        <div className="text-xs text-muted-foreground">{review.date}</div>
+                      </div>
+                      <Badge className="gap-1">
+                        <Star className="h-3 w-3 fill-current" />
+                        {review.rating}
+                      </Badge>
+                    </div>
+                    
+                    <p className="text-sm leading-relaxed">{review.comment}</p>
+                    
+                    {review.photos && review.photos.length > 0 && (
+                      <div className="flex gap-2">
+                        {review.photos.map((photo, idx) => (
+                          <div key={idx} className="w-20 h-20 rounded overflow-hidden">
+                            <img src={photo} alt={`Guest photo of ${hotelName}`} loading="lazy" className="w-full h-full object-cover" />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
             
-            <div className="text-center text-sm text-muted-foreground pt-4 border-t">
-              Showing {sortedReviews.length} reviews • Sorted by {reviewSort}
-            </div>
+            {allReviews.length > 0 && (
+              <div className="text-center text-sm text-muted-foreground pt-4 border-t">
+                Showing {sortedReviews.length} reviews • Sorted by {reviewSort}
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="photos" className="mt-4">
-            <div className="grid grid-cols-3 gap-3">
-              {customerPhotos.map((photo, idx) => (
-                <div key={idx} className="aspect-square rounded-lg overflow-hidden">
-                  <img 
-                    src={photo} 
-                    alt={`${hotelName} photo ${idx + 1}`}
-                    loading="lazy"
-                    className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
-                  />
+            {customerPhotos.length === 0 ? (
+              <div className="py-12 text-center">
+                <p className="text-muted-foreground">No verified photos available for this property yet.</p>
+              </div>
+            ) : (
+              <>
+                <div className="grid grid-cols-3 gap-3">
+                  {customerPhotos.map((photo, idx) => (
+                    <div key={idx} className="aspect-square rounded-lg overflow-hidden">
+                      <img 
+                        src={photo} 
+                        alt={`${hotelName} photo ${idx + 1}`}
+                        loading="lazy"
+                        className="w-full h-full object-cover hover:scale-110 transition-transform cursor-pointer"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <p className="text-center text-sm text-muted-foreground mt-4">
-              {customerPhotos.length} photos from verified guests
-            </p>
+                <p className="text-center text-sm text-muted-foreground mt-4">
+                  {customerPhotos.length} photos from verified guests
+                </p>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </DialogContent>

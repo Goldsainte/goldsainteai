@@ -476,6 +476,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
 });
 
 async function searchHotels(args: any, apiKey: string) {
+  // STRICT COMPANY RULE: ONLY return hotels with real photos AND reviews from TripAdvisor API
+  // NO FALLBACK CONTENT to maintain customer credibility
   try {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
     console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
@@ -558,12 +560,22 @@ async function searchHotels(args: any, apiKey: string) {
           let reviews = [];
           if (reviewsResponse.ok) {
             const reviewsData = await reviewsResponse.json();
-            reviews = (reviewsData.data || []).slice(0, 5).map((review: any) => ({
+            reviews = (reviewsData.data || []).slice(0, 10).map((review: any) => ({
               rating: review.rating || 0,
               text: review.text || '',
               published_date: review.published_date || '',
               user: review.user?.username || 'Guest'
             }));
+          }
+
+          // STRICT RULE: Only return hotels with real photos AND reviews from API
+          // No fallback content to maintain credibility
+          const hasRealPhotos = photos.length > 0;
+          const hasRealReviews = reviews.length > 0;
+          
+          if (!hasRealPhotos || !hasRealReviews) {
+            console.log(`Filtered out: ${details.name || hotel.name} - Missing real photos (${photos.length}) or reviews (${reviews.length})`);
+            return null;
           }
 
           // Calculate estimated price based on price level
@@ -582,15 +594,15 @@ async function searchHotels(args: any, apiKey: string) {
             city: details.address_obj?.city || '',
             country: details.address_obj?.country || '',
             rating: details.rating || 0,
-            num_reviews: details.num_reviews || 0,
+            num_reviews: reviews.length, // Use actual fetched review count, not API total
             property: {
               name: details.name || hotel.name,
-              photoUrls: photos.slice(0, 5).map((photo: any) => 
+              photoUrls: photos.slice(0, 10).map((photo: any) => 
                 photo.images?.large?.url || photo.images?.original?.url || ''
               ).filter(Boolean),
               reviews: reviews,
               reviewScore: details.rating || 0,
-              reviewCount: details.num_reviews || 0,
+              reviewCount: reviews.length, // Use actual fetched review count
               externalUrls: { 
                 tripadvisor: details.web_url || '',
                 default: details.web_url || ''
@@ -612,7 +624,8 @@ async function searchHotels(args: any, apiKey: string) {
               url: photo.images?.large?.url || photo.images?.original?.url || '',
               caption: photo.caption || ''
             })).filter((p: any) => p.url),
-            reviews: reviews
+            reviews: reviews,
+            web_url: details.web_url
           };
         } catch (error) {
           console.error(`Error fetching details for hotel ${hotel.location_id}:`, error);
