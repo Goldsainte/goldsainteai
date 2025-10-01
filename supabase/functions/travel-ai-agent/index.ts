@@ -604,7 +604,8 @@ async function searchHotels(args: any, apiKey: string) {
           let reviews = [];
           if (reviewsResponse.ok) {
             const reviewsData = await reviewsResponse.json();
-            reviews = (reviewsData.data || []).slice(0, 10).map((review: any) => ({
+            // Fetch ALL reviews without limiting
+            reviews = (reviewsData.data || []).map((review: any) => ({
               rating: review.rating || 0,
               text: review.text || '',
               published_date: review.published_date || '',
@@ -641,7 +642,8 @@ async function searchHotels(args: any, apiKey: string) {
             num_reviews: reviews.length, // Use actual fetched review count, not API total
             property: {
               name: details.name || hotel.name,
-              photoUrls: photos.slice(0, 10).map((photo: any) => 
+              // Include ALL photos without limiting
+              photoUrls: photos.map((photo: any) => 
                 photo.images?.large?.url || photo.images?.original?.url || ''
               ).filter(Boolean),
               reviews: reviews,
@@ -664,7 +666,8 @@ async function searchHotels(args: any, apiKey: string) {
             amenities: details.amenities || [],
             latitude: details.latitude,
             longitude: details.longitude,
-            photos: photos.slice(0, 20).map((photo: any) => ({
+            // Include ALL photos without limiting
+            photos: photos.map((photo: any) => ({
               url: photo.images?.large?.url || photo.images?.original?.url || '',
               caption: photo.caption || ''
             })).filter((p: any) => p.url),
