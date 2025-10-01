@@ -6,7 +6,10 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Hotel, Plane, UtensilsCrossed, Car, Ticket } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Hotel, Plane, UtensilsCrossed, Car, Ticket, FileDown, FileText } from "lucide-react";
+import jsPDF from "jspdf";
 
 interface PreferencesFormProps {
   onSubmit: (data: any) => void;
@@ -16,10 +19,24 @@ interface PreferencesFormProps {
 
 export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading }: PreferencesFormProps) {
   const [formData, setFormData] = useState(initialData || {});
+  const [hotelPriceRange, setHotelPriceRange] = useState([initialData?.price_range_min || 20, initialData?.price_range_max || 1000]);
+  const [flightMaxPrice, setFlightMaxPrice] = useState(initialData?.max_price_per_passenger || 500);
+  const [carBudgetRange, setCarBudgetRange] = useState([initialData?.car_budget_min || 20, initialData?.car_budget_max || 500]);
+  const [eventBudgetRange, setEventBudgetRange] = useState([initialData?.event_budget_min || 20, initialData?.event_budget_max || 500]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const submitData = {
+      ...formData,
+      price_range_min: hotelPriceRange[0],
+      price_range_max: hotelPriceRange[1],
+      max_price_per_passenger: flightMaxPrice,
+      car_budget_min: carBudgetRange[0],
+      car_budget_max: carBudgetRange[1],
+      event_budget_min: eventBudgetRange[0],
+      event_budget_max: eventBudgetRange[1],
+    };
+    onSubmit(submitData);
   };
 
   const updateField = (field: string, value: any) => {
@@ -29,6 +46,110 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
   const updateArrayField = (field: string, value: string) => {
     const array = value.split(',').map(s => s.trim()).filter(Boolean);
     updateField(field, array);
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    let yPos = 20;
+
+    doc.setFontSize(18);
+    doc.text("Travel Booking Preferences", pageWidth / 2, yPos, { align: "center" });
+    yPos += 15;
+
+    doc.setFontSize(12);
+    
+    // Helper to add section
+    const addSection = (title: string, content: Record<string, any>) => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.setFont(undefined, "bold");
+      doc.text(title, 20, yPos);
+      yPos += 7;
+      doc.setFont(undefined, "normal");
+      
+      Object.entries(content).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && value !== "") {
+          if (yPos > 280) {
+            doc.addPage();
+            yPos = 20;
+          }
+          const label = key.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase());
+          const val = Array.isArray(value) ? value.join(", ") : String(value);
+          doc.text(`${label}: ${val}`, 25, yPos);
+          yPos += 6;
+        }
+      });
+      yPos += 5;
+    };
+
+    // Hotel Section
+    addSection("Hotel Preferences", {
+      destination: formData.destination,
+      neighborhood: formData.neighborhood,
+      "price_range": `$${hotelPriceRange[0]} - $${hotelPriceRange[1]}`,
+      "distance_from_center": formData.distance_from_center ? `${formData.distance_from_center} miles` : undefined,
+      "distance_from_airport": formData.distance_from_airport ? `${formData.distance_from_airport} miles` : undefined,
+      room_type: formData.room_type,
+      bed_type: formData.bed_type,
+      min_star_rating: formData.preferred_hotel_rating,
+      adults: formData.number_of_adults,
+      children: formData.number_of_children,
+      amenities: formData.preferred_amenities,
+    });
+
+    // Flight Section
+    addSection("Flight Preferences", {
+      departure_airport: formData.departure_airport,
+      destination_airport: formData.destination_airport,
+      flight_type: formData.flight_type,
+      cabin_class: formData.cabin_class,
+      max_price: `$${flightMaxPrice}`,
+      preferred_airlines: formData.preferred_airlines,
+      seat_preference: formData.seat_preference,
+    });
+
+    // Restaurant Section
+    addSection("Restaurant Preferences", {
+      cuisine_types: formData.cuisine_types,
+      dietary_restrictions: formData.dietary_restrictions,
+      price_range: formData.restaurant_price_range,
+      seating_preference: formData.seating_preference,
+    });
+
+    // Car Rental Section
+    addSection("Car Rental Preferences", {
+      car_type: formData.car_type,
+      transmission: formData.transmission_type,
+      budget: `$${carBudgetRange[0]} - $${carBudgetRange[1]}`,
+      pickup_location: formData.pickup_location,
+      dropoff_location: formData.dropoff_location,
+    });
+
+    // Event Section
+    addSection("Event Preferences", {
+      event_types: formData.event_types,
+      event_location: formData.event_location,
+      budget: `$${eventBudgetRange[0]} - $${eventBudgetRange[1]}`,
+      ticket_type: formData.ticket_type,
+    });
+
+    // Travel Documents Section
+    addSection("Travel Documents", {
+      passport_number: formData.passport_number,
+      passport_expiry: formData.passport_expiry,
+      passport_issuing_country: formData.passport_issuing_country,
+      visa_required_countries: formData.visa_required_countries,
+      visa_assistance_needed: formData.visa_assistance_needed ? "Yes" : "No",
+    });
+
+    if (formData.special_requests) {
+      addSection("Special Requests", { notes: formData.special_requests });
+    }
+
+    doc.save("travel-preferences.pdf");
   };
 
   return (
@@ -66,46 +187,42 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="distance_from_center">Distance from City Center (km)</Label>
+                <Label htmlFor="distance_from_center">Distance from City Center (miles)</Label>
                 <Input
                   id="distance_from_center"
                   type="number"
                   step="0.1"
+                  placeholder="e.g., 2.5"
                   defaultValue={initialData?.distance_from_center}
                   onChange={(e) => updateField('distance_from_center', parseFloat(e.target.value))}
                 />
               </div>
               <div>
-                <Label htmlFor="distance_from_airport">Distance from Airport (km)</Label>
+                <Label htmlFor="distance_from_airport">Distance from Airport (miles)</Label>
                 <Input
                   id="distance_from_airport"
                   type="number"
                   step="0.1"
+                  placeholder="e.g., 5.0"
                   defaultValue={initialData?.distance_from_airport}
                   onChange={(e) => updateField('distance_from_airport', parseFloat(e.target.value))}
                 />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="price_range_min">Min Price/Night ($)</Label>
-                <Input
-                  id="price_range_min"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.price_range_min}
-                  onChange={(e) => updateField('price_range_min', parseFloat(e.target.value))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="price_range_max">Max Price/Night ($)</Label>
-                <Input
-                  id="price_range_max"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.price_range_max}
-                  onChange={(e) => updateField('price_range_max', parseFloat(e.target.value))}
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Price Range per Night</Label>
+                  <span className="text-sm font-medium">${hotelPriceRange[0]} - ${hotelPriceRange[1] >= 1000 ? '1000+' : hotelPriceRange[1]}</span>
+                </div>
+                <Slider
+                  min={20}
+                  max={1000}
+                  step={10}
+                  value={hotelPriceRange}
+                  onValueChange={setHotelPriceRange}
+                  className="w-full"
                 />
               </div>
               <div>
@@ -406,15 +523,19 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
-                <Label htmlFor="max_price_per_passenger">Max Price per Passenger ($)</Label>
-                <Input
-                  id="max_price_per_passenger"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.max_price_per_passenger}
-                  onChange={(e) => updateField('max_price_per_passenger', parseFloat(e.target.value))}
+                <div className="flex items-center justify-between mb-2">
+                  <Label>Max Price per Passenger</Label>
+                  <span className="text-sm font-medium">${flightMaxPrice >= 1000 ? '1000+' : flightMaxPrice}</span>
+                </div>
+                <Slider
+                  min={20}
+                  max={1000}
+                  step={10}
+                  value={[flightMaxPrice]}
+                  onValueChange={(val) => setFlightMaxPrice(val[0])}
+                  className="w-full"
                 />
               </div>
               <div>
@@ -674,27 +795,19 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="car_budget_min">Min Budget ($)</Label>
-                <Input
-                  id="car_budget_min"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.car_budget_min}
-                  onChange={(e) => updateField('car_budget_min', parseFloat(e.target.value))}
-                />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Car Rental Budget</Label>
+                <span className="text-sm font-medium">${carBudgetRange[0]} - ${carBudgetRange[1] >= 1000 ? '1000+' : carBudgetRange[1]}</span>
               </div>
-              <div>
-                <Label htmlFor="car_budget_max">Max Budget ($)</Label>
-                <Input
-                  id="car_budget_max"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.car_budget_max}
-                  onChange={(e) => updateField('car_budget_max', parseFloat(e.target.value))}
-                />
-              </div>
+              <Slider
+                min={20}
+                max={1000}
+                step={10}
+                value={carBudgetRange}
+                onValueChange={setCarBudgetRange}
+                className="w-full"
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -754,13 +867,25 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
           </AccordionTrigger>
           <AccordionContent className="space-y-4 pt-4">
             <div>
-              <Label htmlFor="event_types">Event Types (comma-separated)</Label>
-              <Input
-                id="event_types"
-                placeholder="Concerts, Festivals, Sports, Theater, Tours"
-                defaultValue={initialData?.event_types?.join(', ')}
-                onChange={(e) => updateArrayField('event_types', e.target.value)}
-              />
+              <Label htmlFor="event_types">Event Types</Label>
+              <Select
+                value={formData.event_types?.[0] || ""}
+                onValueChange={(val) => updateField('event_types', [val])}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select event type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="music">Music / Concerts</SelectItem>
+                  <SelectItem value="sports">Sports</SelectItem>
+                  <SelectItem value="arts">Arts & Theatre</SelectItem>
+                  <SelectItem value="family">Family / Kids</SelectItem>
+                  <SelectItem value="festivals">Festivals</SelectItem>
+                  <SelectItem value="comedy">Comedy</SelectItem>
+                  <SelectItem value="film">Film / Movies</SelectItem>
+                  <SelectItem value="miscellaneous">Miscellaneous</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -820,27 +945,19 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="event_budget_min">Min Budget ($)</Label>
-                <Input
-                  id="event_budget_min"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.event_budget_min}
-                  onChange={(e) => updateField('event_budget_min', parseFloat(e.target.value))}
-                />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Event Budget</Label>
+                <span className="text-sm font-medium">${eventBudgetRange[0]} - ${eventBudgetRange[1] >= 1000 ? '1000+' : eventBudgetRange[1]}</span>
               </div>
-              <div>
-                <Label htmlFor="event_budget_max">Max Budget ($)</Label>
-                <Input
-                  id="event_budget_max"
-                  type="number"
-                  step="0.01"
-                  defaultValue={initialData?.event_budget_max}
-                  onChange={(e) => updateField('event_budget_max', parseFloat(e.target.value))}
-                />
-              </div>
+              <Slider
+                min={20}
+                max={1000}
+                step={10}
+                value={eventBudgetRange}
+                onValueChange={setEventBudgetRange}
+                className="w-full"
+              />
             </div>
 
             <div className="space-y-3">
@@ -861,6 +978,90 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
                   </div>
                 ))}
               </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Travel Documents */}
+        <AccordionItem value="documents">
+          <AccordionTrigger className="text-lg font-semibold">
+            <div className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-primary" />
+              Travel Documents & Visa Information
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="space-y-4 pt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="passport_number">Passport Number</Label>
+                <Input
+                  id="passport_number"
+                  placeholder="e.g., AB1234567"
+                  defaultValue={initialData?.passport_number}
+                  onChange={(e) => updateField('passport_number', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="passport_expiry">Passport Expiry Date</Label>
+                <Input
+                  id="passport_expiry"
+                  type="date"
+                  defaultValue={initialData?.passport_expiry}
+                  onChange={(e) => updateField('passport_expiry', e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="passport_issuing_country">Passport Issuing Country</Label>
+                <Input
+                  id="passport_issuing_country"
+                  placeholder="e.g., United States"
+                  defaultValue={initialData?.passport_issuing_country}
+                  onChange={(e) => updateField('passport_issuing_country', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="nationality">Nationality</Label>
+                <Input
+                  id="nationality"
+                  placeholder="e.g., American"
+                  defaultValue={initialData?.nationality}
+                  onChange={(e) => updateField('nationality', e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="visa_required_countries">Countries Where Visa May Be Required (comma-separated)</Label>
+              <Input
+                id="visa_required_countries"
+                placeholder="e.g., China, Russia, India"
+                defaultValue={initialData?.visa_required_countries?.join(', ')}
+                onChange={(e) => updateArrayField('visa_required_countries', e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="visa_assistance_needed"
+                defaultChecked={initialData?.visa_assistance_needed}
+                onCheckedChange={(checked) => updateField('visa_assistance_needed', checked)}
+              />
+              <Label htmlFor="visa_assistance_needed" className="cursor-pointer">
+                I need visa assistance for my travels
+              </Label>
+            </div>
+
+            <div>
+              <Label htmlFor="travel_insurance">Travel Insurance Provider (optional)</Label>
+              <Input
+                id="travel_insurance"
+                placeholder="e.g., Allianz, World Nomads"
+                defaultValue={initialData?.travel_insurance}
+                onChange={(e) => updateField('travel_insurance', e.target.value)}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
@@ -888,9 +1089,15 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
         </Label>
       </div>
 
-      <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
-        {isLoading ? "Saving..." : "Save All Preferences"}
-      </Button>
+      <div className="flex gap-3">
+        <Button type="submit" className="flex-1" size="lg" disabled={isLoading}>
+          {isLoading ? "Saving..." : "Save All Preferences"}
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={exportToPDF} className="gap-2">
+          <FileDown className="h-4 w-4" />
+          Export PDF
+        </Button>
+      </div>
     </form>
   );
 }

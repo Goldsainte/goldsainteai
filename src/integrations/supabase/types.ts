@@ -636,6 +636,7 @@ export type Database = {
           meal_preference: string | null
           min_review_score: number | null
           minimum_driver_age: number | null
+          nationality: string | null
           near_accommodation: boolean | null
           near_hotel: boolean | null
           neighborhood: string | null
@@ -644,6 +645,9 @@ export type Database = {
           number_of_children: number | null
           number_of_infants: number | null
           parking: boolean | null
+          passport_expiry: string | null
+          passport_issuing_country: string | null
+          passport_number: string | null
           pay_at_property: boolean | null
           pet_friendly: boolean | null
           pickup_location: string | null
@@ -669,9 +673,12 @@ export type Database = {
           special_requests: string | null
           ticket_type: string | null
           transmission_type: string | null
+          travel_insurance: string | null
           unlimited_mileage: boolean | null
           updated_at: string
           user_id: string
+          visa_assistance_needed: boolean | null
+          visa_required_countries: string[] | null
           walkable_distance: boolean | null
           wheelchair_assistance: boolean | null
           young_driver_accepted: boolean | null
@@ -729,6 +736,7 @@ export type Database = {
           meal_preference?: string | null
           min_review_score?: number | null
           minimum_driver_age?: number | null
+          nationality?: string | null
           near_accommodation?: boolean | null
           near_hotel?: boolean | null
           neighborhood?: string | null
@@ -737,6 +745,9 @@ export type Database = {
           number_of_children?: number | null
           number_of_infants?: number | null
           parking?: boolean | null
+          passport_expiry?: string | null
+          passport_issuing_country?: string | null
+          passport_number?: string | null
           pay_at_property?: boolean | null
           pet_friendly?: boolean | null
           pickup_location?: string | null
@@ -762,9 +773,12 @@ export type Database = {
           special_requests?: string | null
           ticket_type?: string | null
           transmission_type?: string | null
+          travel_insurance?: string | null
           unlimited_mileage?: boolean | null
           updated_at?: string
           user_id: string
+          visa_assistance_needed?: boolean | null
+          visa_required_countries?: string[] | null
           walkable_distance?: boolean | null
           wheelchair_assistance?: boolean | null
           young_driver_accepted?: boolean | null
@@ -822,6 +836,7 @@ export type Database = {
           meal_preference?: string | null
           min_review_score?: number | null
           minimum_driver_age?: number | null
+          nationality?: string | null
           near_accommodation?: boolean | null
           near_hotel?: boolean | null
           neighborhood?: string | null
@@ -830,6 +845,9 @@ export type Database = {
           number_of_children?: number | null
           number_of_infants?: number | null
           parking?: boolean | null
+          passport_expiry?: string | null
+          passport_issuing_country?: string | null
+          passport_number?: string | null
           pay_at_property?: boolean | null
           pet_friendly?: boolean | null
           pickup_location?: string | null
@@ -855,9 +873,12 @@ export type Database = {
           special_requests?: string | null
           ticket_type?: string | null
           transmission_type?: string | null
+          travel_insurance?: string | null
           unlimited_mileage?: boolean | null
           updated_at?: string
           user_id?: string
+          visa_assistance_needed?: boolean | null
+          visa_required_countries?: string[] | null
           walkable_distance?: boolean | null
           wheelchair_assistance?: boolean | null
           young_driver_accepted?: boolean | null
