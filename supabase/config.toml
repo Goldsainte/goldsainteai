@@ -48,5 +48,8 @@ verify_jwt = false
 [functions.customer-portal]
 verify_jwt = false
 
+[functions.ai-booking-assistant]
+verify_jwt = false
+
 [functions.send-confirmation-email]
 verify_jwt = false

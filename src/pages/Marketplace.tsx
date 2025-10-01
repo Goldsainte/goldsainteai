@@ -70,16 +70,16 @@ export default function Marketplace() {
       const { error } = await supabase
         .from('marketplace_jobs')
         .insert({
-          user_id: user?.id,
-          title: formData.get('title'),
-          description: formData.get('description'),
-          booking_type: formData.get('booking_type'),
+          user_id: user?.id!,
+          title: formData.get('title') as string,
+          description: formData.get('description') as string,
+          booking_type: formData.get('booking_type') as string,
           requirements: {},
           budget_min: parseFloat(formData.get('budget_min') as string),
           budget_max: parseFloat(formData.get('budget_max') as string),
-          destination: formData.get('destination'),
+          destination: formData.get('destination') as string,
           number_of_travelers: parseInt(formData.get('travelers') as string)
-        });
+        } as any);
 
       if (error) throw error;
 

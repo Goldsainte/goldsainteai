@@ -15,6 +15,9 @@ import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
 import Dashboard from "./pages/Dashboard";
 import Marketplace from "./pages/Marketplace";
+import AgentOnboarding from "./pages/AgentOnboarding";
+import AgentDashboard from "./pages/AgentDashboard";
+import BookingPreferences from "./pages/BookingPreferences";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -36,8 +39,11 @@ function App() {
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/marketplace" element={<Marketplace />} />
-                    <Route path="/favorites" element={<Favorites />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/agent-onboarding" element={<AgentOnboarding />} />
+              <Route path="/agent-dashboard" element={<AgentDashboard />} />
+              <Route path="/booking-preferences" element={<BookingPreferences />} />
+              <Route path="/favorites" element={<Favorites />} />
                     <Route path="/search" element={<SearchResults />} />
                     <Route path="/hotel-booking" element={<HotelBooking />} />
                     <Route path="/booking-confirmation" element={<BookingConfirmation />} />

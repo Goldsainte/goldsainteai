@@ -7,7 +7,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, DollarSign, Clock, User, Search, Heart } from "lucide-react";
+import { Calendar, MapPin, DollarSign, Clock, User, Search, Heart, CreditCard, Settings, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 
 interface Booking {
@@ -259,7 +259,7 @@ export default function Dashboard() {
                   </div>
                   
                   <div className="pt-4 border-t space-y-3">
-                    <h3 className="font-semibold">Payment Methods</h3>
+                    <h3 className="font-semibold">Payment & Preferences</h3>
                     <Button 
                       onClick={async () => {
                         try {
@@ -273,22 +273,35 @@ export default function Dashboard() {
                         }
                       }}
                       variant="outline" 
-                      className="w-full"
+                      className="w-full justify-start gap-2"
                     >
+                      <CreditCard className="h-4 w-4" />
                       Manage Payment Methods
+                    </Button>
+                    
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-2"
+                      onClick={() => navigate('/booking-preferences')}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Booking Preferences & AI Assistant
                     </Button>
                   </div>
 
                   <div className="pt-4 border-t space-y-3">
-                    <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full">
-                      <Heart className="mr-2 h-4 w-4" />
+                    <h3 className="font-semibold">Quick Actions</h3>
+                    <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full justify-start gap-2">
+                      <Heart className="h-4 w-4" />
                       View Favorites
                     </Button>
-                    <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full">
+                    <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full justify-start gap-2">
+                      <Briefcase className="h-4 w-4" />
                       Post Complex Booking Job
                     </Button>
-                    <Button onClick={() => navigate('/profile')} className="w-full">
-                      Edit Profile
+                    <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
+                      <Briefcase className="h-4 w-4" />
+                      Become a Travel Agent
                     </Button>
                   </div>
                 </div>
