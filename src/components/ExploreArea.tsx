@@ -1,6 +1,9 @@
+import { useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Star, Navigation, Coffee, Utensils, ShoppingBag, Landmark, Award } from "lucide-react";
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Attraction {
   name: string;
@@ -12,9 +15,41 @@ interface Attraction {
 
 interface ExploreAreaProps {
   cityName: string;
+  latitude?: number;
+  longitude?: number;
 }
 
-export const ExploreArea = ({ cityName }: ExploreAreaProps) => {
+export const ExploreArea = ({ cityName, latitude = 40.7128, longitude = -74.0060 }: ExploreAreaProps) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainer.current || map.current) return;
+
+    const mapboxToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw'; // Public demo token
+    
+    mapboxgl.accessToken = mapboxToken;
+    
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v12',
+      center: [longitude, latitude],
+      zoom: 13,
+    });
+
+    // Add navigation controls
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    // Add marker for hotel location
+    new mapboxgl.Marker({ color: '#D4AF37' })
+      .setLngLat([longitude, latitude])
+      .setPopup(new mapboxgl.Popup().setHTML(`<strong>${cityName}</strong>`))
+      .addTo(map.current);
+
+    return () => {
+      map.current?.remove();
+    };
+  }, [cityName, latitude, longitude]);
   const attractions: Attraction[] = [
     { name: "City Center", category: "Downtown", distance: "0.5 km", rating: 4.8, icon: Landmark },
     { name: "Grand Museum", category: "Museum", distance: "1.2 km", rating: 4.9, icon: Award },
@@ -43,15 +78,8 @@ export const ExploreArea = ({ cityName }: ExploreAreaProps) => {
         <Navigation className="h-5 w-5 text-muted-foreground" />
       </div>
 
-      {/* Map Placeholder */}
-      <div className="aspect-video bg-muted rounded-lg relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <MapPin className="h-12 w-12 text-muted-foreground" />
-        </div>
-        <div className="absolute top-4 left-4 bg-background/90 backdrop-blur-sm px-3 py-2 rounded-lg text-sm font-medium">
-          {cityName}
-        </div>
-      </div>
+      {/* Interactive Map */}
+      <div ref={mapContainer} className="aspect-video rounded-lg overflow-hidden border" />
 
       {/* Attractions List */}
       <div className="space-y-3">

@@ -410,7 +410,11 @@ export default function HotelBooking() {
             />
 
             {/* Explore Area */}
-            <ExploreArea cityName={hotelAddress} />
+            <ExploreArea 
+              cityName={hotelAddress}
+              latitude={bookingData.hotel?.latitude || bookingData.amadeusOffer?.hotel?.latitude}
+              longitude={bookingData.hotel?.longitude || bookingData.amadeusOffer?.hotel?.longitude}
+            />
           </div>
         </div>
       </div>

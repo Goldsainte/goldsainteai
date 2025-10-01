@@ -78,7 +78,7 @@ export const PriceCalendar = ({ basePrice, currency, checkIn, checkOut }: PriceC
   }, [calendarDays]);
 
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="p-6 space-y-4 bg-card border shadow-sm sticky top-4 z-10">
       <div className="flex items-center justify-between">
         <h3 className="text-xl font-semibold">Best time to book</h3>
         {cheapestDays.length > 0 && (
