@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { SlidersHorizontal, ArrowUpDown, X, DollarSign, Star } from "lucide-react";
 import { Label } from "@/components/ui/label";
 
@@ -164,12 +164,11 @@ export const HotelFilters = ({
               </div>
 
               {/* Apply Button */}
-              <Button 
-                className="w-full" 
-                onClick={() => document.body.click()}
-              >
-                Apply Filters
-              </Button>
+              <SheetClose asChild>
+                <Button className="w-full">
+                  Apply Filters
+                </Button>
+              </SheetClose>
             </div>
           </SheetContent>
         </Sheet>
