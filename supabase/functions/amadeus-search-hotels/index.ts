@@ -111,8 +111,15 @@ serve(async (req) => {
     const offersData = await offersResponse.json();
     console.log('Hotel offers found:', offersData.data?.length || 0);
 
+    // Filter to only include hotels with available offers
+    const availableHotels = (offersData.data || []).filter((hotel: any) => {
+      return hotel.available === true && hotel.offers && hotel.offers.length > 0;
+    });
+
+    console.log('Available hotels after filtering:', availableHotels.length);
+
     return new Response(JSON.stringify({ 
-      results: offersData.data || [],
+      results: availableHotels,
       meta: offersData.meta
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

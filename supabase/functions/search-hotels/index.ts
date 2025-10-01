@@ -161,8 +161,14 @@ serve(async (req) => {
     const offersData = await offersResponse.json();
     console.log('Hotel offers found:', offersData.data?.length || 0);
 
+    // Filter to only include available hotels with valid offers
+    const baseOffers = (offersData.data || []).filter((offer: any) => {
+      return offer.available === true && offer.offers && offer.offers.length > 0;
+    });
+    
+    console.log('Available hotels after filtering:', baseOffers.length);
+
     // Transform Amadeus format to match expected property card format with Google Places enrichment
-    const baseOffers = offersData.data || [];
     const transformedResults = await Promise.all(baseOffers.map(async (offer: any) => {
       const hotel = offer.hotel;
       const firstOffer = offer.offers?.[0];
