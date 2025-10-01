@@ -32,6 +32,14 @@ async function getAmadeusToken() {
   return data.access_token;
 }
 
+// Fetch with timeout helper to avoid long waits
+async function fetchWithTimeout(input: any, init: any = {}, timeoutMs = 12000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeoutMs);
+  try { return await fetch(input, { ...init, signal: controller.signal }); }
+  finally { clearTimeout(id); }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -50,13 +58,14 @@ serve(async (req) => {
       cityCode
     });
 
-    const hotelListResponse = await fetch(
+    const hotelListResponse = await fetchWithTimeout(
       `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?${hotelListParams}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
         }
-      }
+      },
+      12000
     );
 
     if (!hotelListResponse.ok) {
@@ -78,8 +87,8 @@ serve(async (req) => {
       });
     }
 
-    // Get first 50 hotel IDs (increased from 10)
-    const hotelIds = hotelListData.data.slice(0, 50).map((hotel: any) => hotel.hotelId).join(',');
+    // Get first 40 hotel IDs for faster response
+    const hotelIds = hotelListData.data.slice(0, 40).map((hotel: any) => hotel.hotelId).join(',');
     console.log('Fetching offers for hotel IDs');
 
     // Step 2: Get hotel offers with prices
@@ -93,13 +102,14 @@ serve(async (req) => {
       bestRateOnly: 'true'
     });
 
-    const offersResponse = await fetch(
+    const offersResponse = await fetchWithTimeout(
       `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
         }
-      }
+      },
+      15000
     );
 
     if (!offersResponse.ok) {
@@ -113,7 +123,11 @@ serve(async (req) => {
 
     // Filter to only include hotels with available offers
     const availableHotels = (offersData.data || []).filter((hotel: any) => {
-      return hotel.available === true && hotel.offers && hotel.offers.length > 0;
+      const name = hotel.hotel?.name || '';
+      const lat = hotel.hotel?.latitude;
+      const lon = hotel.hotel?.longitude;
+      const looksFake = /test/i.test(name) || (lat === 0 && lon === 0);
+      return hotel.available === true && hotel.offers && hotel.offers.length > 0 && !looksFake;
     });
 
     console.log('Available hotels after filtering:', availableHotels.length);
