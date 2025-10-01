@@ -374,7 +374,7 @@ const Index = () => {
                   Sainté Voyage AI
                 </h1>
                 <p className="text-sm text-muted-foreground text-center">(A Goldsainte Brand)</p>
-                <p className="text-sm text-muted-foreground text-center max-w-2xl leading-relaxed">
+                <p className="text-xs text-muted-foreground text-center max-w-2xl leading-relaxed">
                   <span className="font-semibold text-foreground">AI-powered efficiency. Human-powered access.</span>
                   <br />
                   Our cutting-edge AI handles quick requests with speed and precision— while our licensed travel experts' step in to unlock contract-only rates, navigate complex ticketing, and deliver exclusive perks you won't find on public sites.
