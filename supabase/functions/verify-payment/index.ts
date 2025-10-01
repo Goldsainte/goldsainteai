@@ -67,22 +67,91 @@ serve(async (req) => {
       console.error('Payment update error:', paymentError);
     }
 
-    // Update booking status
-    if (session.payment_status === 'paid') {
-      const { error: bookingError } = await supabaseClient
-        .from('bookings')
-        .update({
-          status: 'confirmed'
-        })
-        .eq('id', bookingId);
+    // Get booking details first
+    const { data: booking } = await supabaseClient
+      .from('bookings')
+      .select('*, guests(*)')
+      .eq('id', bookingId)
+      .single();
 
-      if (bookingError) {
-        console.error('Booking update error:', bookingError);
+    if (!booking) {
+      throw new Error('Booking not found');
+    }
+
+    // Update booking status and process Expedia booking if payment succeeded
+    if (session.payment_status === 'paid') {
+      // For hotel bookings with Expedia data, create the actual Expedia booking
+      if (booking.booking_type === 'hotel' && booking.booking_data?.rooms) {
+        try {
+          console.log('Processing Expedia hotel booking...');
+          
+          // Get the selected room and rate from booking data
+          const selectedRoom = booking.booking_data.rooms?.[0];
+          const selectedRate = selectedRoom?.rates?.[0];
+          
+          if (selectedRoom && selectedRate && booking.booking_data.propertyInfo?.id) {
+            const expediaBookingResult = await supabaseClient.functions.invoke('expedia-book-hotel', {
+              body: {
+                propertyId: booking.booking_data.propertyInfo.id,
+                roomId: selectedRoom.id,
+                rateId: selectedRate.id,
+                checkIn: booking.booking_data.propertyInfo.checkIn,
+                checkOut: booking.booking_data.propertyInfo.checkOut,
+                guestInfo: {
+                  email: booking.guests.email,
+                  firstName: booking.guests.first_name,
+                  lastName: booking.guests.last_name,
+                  phone: booking.guests.phone,
+                  specialRequests: booking.booking_data.specialRequests || ''
+                },
+                paymentToken: session.payment_intent as string,
+                bookingReference: booking.booking_reference
+              }
+            });
+
+            if (expediaBookingResult.error) {
+              console.error('Expedia booking error:', expediaBookingResult.error);
+              // Update booking with error
+              await supabaseClient
+                .from('bookings')
+                .update({
+                  status: 'payment_received_booking_failed',
+                  booking_data: {
+                    ...booking.booking_data,
+                    expedia_error: expediaBookingResult.error
+                  }
+                })
+                .eq('id', bookingId);
+            } else {
+              console.log('Expedia booking successful:', expediaBookingResult.data);
+            }
+          }
+        } catch (expediaError) {
+          console.error('Failed to create Expedia booking:', expediaError);
+          await supabaseClient
+            .from('bookings')
+            .update({
+              status: 'payment_received_booking_failed'
+            })
+            .eq('id', bookingId);
+        }
+      } else {
+        // For non-Expedia bookings, just mark as confirmed
+        const { error: bookingError } = await supabaseClient
+          .from('bookings')
+          .update({
+            status: 'confirmed'
+          })
+          .eq('id', bookingId);
+
+        if (bookingError) {
+          console.error('Booking update error:', bookingError);
+        }
       }
     }
 
-    // Get updated booking
-    const { data: booking } = await supabaseClient
+    // Get final updated booking
+    const { data: finalBooking } = await supabaseClient
       .from('bookings')
       .select('*, guests(*)')
       .eq('id', bookingId)
@@ -90,7 +159,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({ 
       paymentStatus: session.payment_status,
-      booking
+      booking: finalBooking
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

@@ -16,6 +16,7 @@ interface DateSelectionModalProps {
   onAvailabilityConfirmed: (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => void;
   cityCode: string;
   hotelName: string;
+  propertyId?: string;
   currency?: string;
 }
 
@@ -25,6 +26,7 @@ export const DateSelectionModal = ({
   onAvailabilityConfirmed,
   cityCode,
   hotelName,
+  propertyId,
   currency = 'USD'
 }: DateSelectionModalProps) => {
   const { toast } = useToast();
@@ -55,9 +57,10 @@ export const DateSelectionModal = ({
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
+      // Use Expedia to check real availability
+      const { data, error } = await supabase.functions.invoke('expedia-get-availability', {
         body: {
-          location: hotelName,
+          propertyId: propertyId || cityCode,
           checkIn: format(checkInDate, 'yyyy-MM-dd'),
           checkOut: format(checkOutDate, 'yyyy-MM-dd'),
           guests: adults,
@@ -66,7 +69,7 @@ export const DateSelectionModal = ({
 
       if (error) throw error;
 
-      if (!data.results || data.results.length === 0) {
+      if (!data.available || !data.rooms || data.rooms.length === 0) {
         toast({
           title: "No availability",
           description: "No rooms available for these dates. Please try different dates.",
@@ -75,16 +78,14 @@ export const DateSelectionModal = ({
         return;
       }
 
-      // Find the best offer for this hotel
-      const hotelOffer = data.results[0];
-      
       toast({
         title: "Availability confirmed!",
-        description: `Found available rooms for ${format(checkInDate, 'MMM dd')} - ${format(checkOutDate, 'MMM dd')}`,
+        description: `Found ${data.rooms.length} available room${data.rooms.length > 1 ? 's' : ''} for ${format(checkInDate, 'MMM dd')} - ${format(checkOutDate, 'MMM dd')}`,
       });
 
+      // Pass the full Expedia availability data
       onAvailabilityConfirmed(
-        hotelOffer,
+        data,
         format(checkInDate, 'yyyy-MM-dd'),
         format(checkOutDate, 'yyyy-MM-dd'),
         adults

@@ -124,6 +124,7 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
         onAvailabilityConfirmed={handleAvailabilityConfirmed}
         cityCode={hotelData.cityCode || hotelData.iataCode || "PAR"}
         hotelName={hotelData.name}
+        propertyId={hotel.id || hotelData.hotelId}
       />
     </>
   );
