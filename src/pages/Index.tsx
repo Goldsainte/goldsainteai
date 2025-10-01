@@ -550,7 +550,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('hotels')}
-                    className="rounded-full gap-2 h-9"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47]"
                   >
                     <Hotel className="h-4 w-4" />
                     Hotels
@@ -559,7 +559,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('flights')}
-                    className="rounded-full gap-2 h-9"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47]"
                   >
                     <Plane className="h-4 w-4" />
                     Flights
@@ -568,7 +568,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('restaurants')}
-                    className="rounded-full gap-2 h-9"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47]"
                   >
                     <UtensilsCrossed className="h-4 w-4" />
                     Restaurants
@@ -577,7 +577,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('events')}
-                    className="rounded-full gap-2 h-9"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47]"
                   >
                     <Ticket className="h-4 w-4" />
                     Events
@@ -586,7 +586,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleQuickAction('cars')}
-                    className="rounded-full gap-2 h-9"
+                    className="rounded-full gap-2 h-9 text-[#0C4D47] hover:text-[#0C4D47]"
                   >
                     <Car className="h-4 w-4" />
                     Car Rentals
