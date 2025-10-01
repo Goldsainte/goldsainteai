@@ -520,7 +520,7 @@ const Index = () => {
                 </div>
 
                 {/* Main Search */}
-                <div className="relative">
+                <div className="relative pt-3">
                   <Input
                     placeholder="Where would you like to go?"
                     className="w-full h-14 px-4 pr-14 text-base rounded-3xl border-border shadow-sm focus-visible:ring-1 focus-visible:ring-primary"
