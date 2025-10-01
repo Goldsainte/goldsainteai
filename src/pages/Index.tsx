@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -334,7 +334,10 @@ const Index = () => {
         ? `Show me popular restaurants near my current location`
         : "Show me popular restaurants near me",
       visa: "What are visa requirements for traveling abroad?",
-      events: "Show me upcoming events and concerts near me"
+      events: "Show me upcoming events and concerts near me",
+      cars: userLocation
+        ? `Show me car rental options near my current location`
+        : "Show me car rental options"
     };
     const query = queries[action as keyof typeof queries];
     console.log('Quick action selected:', action, '->', query);
@@ -433,6 +436,15 @@ const Index = () => {
                   >
                     <Ticket className="h-4 w-4" />
                     Events
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickAction('cars')}
+                    className="rounded-full gap-2 h-9"
+                  >
+                    <Car className="h-4 w-4" />
+                    Car Rentals
                   </Button>
                 </div>
 
