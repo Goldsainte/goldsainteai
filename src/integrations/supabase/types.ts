@@ -236,6 +236,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_booking_preferences: {
+        Row: {
+          accessibility_needs: string[] | null
+          auto_booking_enabled: boolean | null
+          created_at: string
+          dietary_restrictions: string[] | null
+          id: string
+          max_price_per_night: number | null
+          meal_preference: string | null
+          notification_preferences: Json | null
+          preferred_airlines: string[] | null
+          preferred_amenities: string[] | null
+          preferred_hotel_rating: number | null
+          seat_preference: string | null
+          special_requests: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accessibility_needs?: string[] | null
+          auto_booking_enabled?: boolean | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          max_price_per_night?: number | null
+          meal_preference?: string | null
+          notification_preferences?: Json | null
+          preferred_airlines?: string[] | null
+          preferred_amenities?: string[] | null
+          preferred_hotel_rating?: number | null
+          seat_preference?: string | null
+          special_requests?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accessibility_needs?: string[] | null
+          auto_booking_enabled?: boolean | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          max_price_per_night?: number | null
+          meal_preference?: string | null
+          notification_preferences?: Json | null
+          preferred_airlines?: string[] | null
+          preferred_amenities?: string[] | null
+          preferred_hotel_rating?: number | null
+          seat_preference?: string | null
+          special_requests?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       visa_service_requests: {
         Row: {
           additional_notes: string | null
