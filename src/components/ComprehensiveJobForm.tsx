@@ -127,7 +127,8 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         </span>
       </div>
 
-      <ScrollArea className="flex-1 pr-4">
+      <ScrollArea className="flex-1 overflow-y-auto">
+        <div className="pr-4 space-y-6">
         {/* Step 1: Basic Overview */}
         {step === 1 && (
           <div className="space-y-4">
@@ -696,6 +697,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
             </div>
           </div>
         )}
+        </div>
       </ScrollArea>
 
       {/* Navigation Buttons */}
