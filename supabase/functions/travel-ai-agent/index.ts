@@ -1246,14 +1246,45 @@ async function searchHotels(args: any, apiKey: string) {
     const normalizeLocation = (loc: string) => 
       (loc || '').toLowerCase().replace(/\s+city\s*/gi, '').trim();
     
-    // Map common abbreviations to full names
+    // Map common abbreviations and airport codes to full names
     const cityAbbreviations: { [key: string]: string[] } = {
       'nyc': ['new york', 'ny'],
+      'jfk': ['new york', 'ny', 'nyc'],
+      'lga': ['new york', 'ny', 'nyc'],
+      'ewr': ['new york', 'ny', 'nyc', 'newark'],
       'la': ['los angeles'],
+      'lax': ['los angeles', 'la'],
       'sf': ['san francisco'],
+      'sfo': ['san francisco', 'sf'],
       'dc': ['washington'],
+      'dca': ['washington', 'dc'],
+      'iad': ['washington', 'dc'],
       'philly': ['philadelphia'],
-      'vegas': ['las vegas']
+      'phl': ['philadelphia', 'philly'],
+      'vegas': ['las vegas'],
+      'las': ['las vegas', 'vegas'],
+      'chi': ['chicago'],
+      'ord': ['chicago', 'chi'],
+      'mdw': ['chicago', 'chi'],
+      'mia': ['miami'],
+      'bos': ['boston'],
+      'sea': ['seattle'],
+      'atl': ['atlanta'],
+      'dfw': ['dallas'],
+      'dal': ['dallas'],
+      'iah': ['houston'],
+      'hou': ['houston'],
+      'phx': ['phoenix'],
+      'den': ['denver'],
+      'mco': ['orlando'],
+      'dtw': ['detroit'],
+      'msp': ['minneapolis'],
+      'pdx': ['portland'],
+      'san': ['san diego'],
+      'aus': ['austin'],
+      'bna': ['nashville'],
+      'slc': ['salt lake city'],
+      'clt': ['charlotte']
     };
     
     const searchLocation = normalizeLocation(location);
