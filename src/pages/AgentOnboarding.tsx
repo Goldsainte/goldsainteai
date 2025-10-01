@@ -53,6 +53,7 @@ export default function AgentOnboarding() {
         primary_contact_title: formData.get('primary_contact_title') as string,
         email: formData.get('email') as string,
         phone: formData.get('phone') as string,
+        whatsapp_number: formData.get('whatsapp_number') as string,
         business_address: formData.get('business_address') as string,
         website: formData.get('website') as string,
         social_media: formData.get('social_media') as string,
@@ -168,6 +169,11 @@ export default function AgentOnboarding() {
                   <div>
                     <Label htmlFor="phone">Phone Number *</Label>
                     <Input id="phone" name="phone" type="tel" required placeholder="+1 (555) 123-4567" />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="whatsapp_number">WhatsApp Number *</Label>
+                    <Input id="whatsapp_number" name="whatsapp_number" type="tel" required placeholder="+1 (555) 123-4567" />
                   </div>
                   
                   <div className="col-span-2">

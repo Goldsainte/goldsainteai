@@ -485,6 +485,7 @@ export type Database = {
           updated_at: string
           user_id: string
           website: string | null
+          whatsapp_number: string | null
         }
         Insert: {
           accepted_gdpr?: boolean | null
@@ -526,6 +527,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           website?: string | null
+          whatsapp_number?: string | null
         }
         Update: {
           accepted_gdpr?: boolean | null
@@ -567,6 +569,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           website?: string | null
+          whatsapp_number?: string | null
         }
         Relationships: []
       }

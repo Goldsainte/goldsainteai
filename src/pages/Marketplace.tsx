@@ -135,7 +135,34 @@ export default function Marketplace() {
 
       if (error) throw error;
 
-      toast.success('Job posted successfully!');
+      // Notify agents about the new job
+      try {
+        const { data: jobData } = await supabase
+          .from('marketplace_jobs')
+          .select('id, title, description, destination, budget_min, budget_max')
+          .eq('user_id', user?.id!)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (jobData) {
+          await supabase.functions.invoke('notify-agents-new-job', {
+            body: {
+              jobId: jobData.id,
+              jobTitle: jobData.title,
+              jobDescription: jobData.description,
+              destination: jobData.destination || 'Not specified',
+              budgetMin: jobData.budget_min,
+              budgetMax: jobData.budget_max,
+            }
+          });
+        }
+      } catch (notifyError) {
+        console.error('Error notifying agents:', notifyError);
+        // Don't fail the job posting if notification fails
+      }
+
+      toast.success('Job posted successfully! Agents have been notified.');
       setIsCreateDialogOpen(false);
       fetchJobs();
     } catch (error: any) {
