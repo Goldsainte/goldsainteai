@@ -62,7 +62,12 @@ function getCityVariations(location: string): string[] {
   
   // Also check if the search is a full name that matches an abbreviation
   for (const [abbrev, fullNames] of Object.entries(cityAbbreviations)) {
-    if (fullNames.some(name => searchLocation.includes(name))) {
+    if (fullNames.some((name) => {
+      const n = (name || '').toLowerCase().trim();
+      // Avoid false positives like "la" matching "atlanta"
+      if (n.length < 3) return searchLocation === n; // exact match only for very short tokens
+      return searchLocation.includes(n);
+    })) {
       searchVariations.push(abbrev, ...fullNames);
     }
   }
