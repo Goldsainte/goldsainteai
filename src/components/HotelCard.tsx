@@ -1,23 +1,20 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Hotel, Star, MapPin, Eye } from "lucide-react";
-import { useState } from "react";
-import { BookingModal } from "./BookingModal";
-import { DateSelectionModal } from "./DateSelectionModal";
 import { HotelDetailsModal } from "./HotelDetailsModal";
+import { DateSelectionModal } from "./DateSelectionModal";
 
 interface HotelCardProps {
   hotel: any;
 }
 
 export const HotelCard = ({ hotel }: HotelCardProps) => {
+  const navigate = useNavigate();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedHotelOffer, setSelectedHotelOffer] = useState<any>(null);
-  const [selectedRoom, setSelectedRoom] = useState<any>(null);
-  const [bookingDates, setBookingDates] = useState<{ checkIn: string; checkOut: string; adults: number } | null>(null);
   
   const hotelData = hotel.hotel;
   const offer = hotel.offers?.[0];
@@ -25,9 +22,25 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
   const currency = offer?.price?.currency || 'USD';
 
   const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
-    setSelectedHotelOffer(hotelOffer);
-    setBookingDates({ checkIn, checkOut, adults });
-    setShowBookingModal(true);
+    const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
+    
+    const bookingData = {
+      ...hotelOffer,
+      hotel: hotelData,
+      hotelName: hotelData.name,
+      hotelAddress: hotelData.address?.lines?.[0] || hotelData.address,
+      hotelImage: hotelData.image,
+      checkIn,
+      checkOut,
+      adults,
+      guests: adults,
+      rooms: 1,
+      nights,
+      totalPrice: parseFloat(hotelOffer.offers?.[0]?.price?.total || hotelOffer.price?.total || 0),
+      currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || 'USD',
+    };
+    
+    navigate(`/hotel-booking?data=${encodeURIComponent(JSON.stringify(bookingData))}`);
   };
 
   return (
@@ -100,8 +113,7 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
         open={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
         hotel={hotel}
-        onSelectRoom={(room) => {
-          setSelectedRoom(room);
+        onSelectRoom={() => {
           setShowDetailsModal(false);
           setShowDateModal(true);
         }}
@@ -114,27 +126,6 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
         cityCode={hotelData.cityCode || hotelData.iataCode || "PAR"}
         hotelName={hotelData.name}
       />
-
-      {showBookingModal && selectedHotelOffer && bookingDates && (
-        <BookingModal
-          open={showBookingModal}
-          onClose={() => {
-            setShowBookingModal(false);
-            setSelectedHotelOffer(null);
-            setBookingDates(null);
-          }}
-          bookingType="hotel"
-          bookingData={{
-            ...selectedHotelOffer,
-            selectedRoom,
-            checkInDate: bookingDates.checkIn,
-            checkOutDate: bookingDates.checkOut,
-            adults: bookingDates.adults
-          }}
-          totalPrice={selectedRoom?.price || (selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : price)}
-          currency={selectedHotelOffer.offers?.[0]?.price?.currency || currency}
-        />
-      )}
     </>
   );
 };

@@ -9,6 +9,7 @@ import { SimpleHeader } from "@/components/SimpleHeader";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
+import HotelBooking from "./pages/HotelBooking";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Auth from "./pages/Auth";
 import Favorites from "./pages/Favorites";
@@ -34,6 +35,7 @@ function App() {
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/favorites" element={<Favorites />} />
                     <Route path="/search" element={<SearchResults />} />
+                    <Route path="/hotel-booking" element={<HotelBooking />} />
                     <Route path="/booking-confirmation" element={<BookingConfirmation />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />

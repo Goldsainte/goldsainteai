@@ -1,10 +1,11 @@
-import { Heart, Star, MapPin, Eye } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { BookingModal } from "./BookingModal";
-import { DateSelectionModal } from "./DateSelectionModal";
+import { useNavigate } from "react-router-dom";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { MapPin, Star, Heart, Bed, Users, Home, Eye } from "lucide-react";
 import { HotelDetailsModal } from "./HotelDetailsModal";
+import { DateSelectionModal } from "./DateSelectionModal";
 import { useFavorites } from "@/hooks/useFavorites";
 
 interface SimplePropertyCardProps {
@@ -13,12 +14,9 @@ interface SimplePropertyCardProps {
 }
 
 export const SimplePropertyCard = ({ property, type = "hotels" }: SimplePropertyCardProps) => {
+  const navigate = useNavigate();
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedHotelOffer, setSelectedHotelOffer] = useState<any>(null);
-  const [selectedRoom, setSelectedRoom] = useState<any>(null);
-  const [bookingDates, setBookingDates] = useState<{ checkIn: string; checkOut: string; adults: number } | null>(null);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   // Parse Booking.com API data properly
@@ -104,9 +102,25 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
   };
 
   const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
-    setSelectedHotelOffer(hotelOffer);
-    setBookingDates({ checkIn, checkOut, adults });
-    setShowBookingModal(true);
+    const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
+    
+    const bookingData = {
+      ...hotelOffer,
+      hotel: property,
+      hotelName: title,
+      hotelAddress: property.location || property.address,
+      hotelImage: property.photoUrls?.[0] || property.image,
+      checkIn,
+      checkOut,
+      adults,
+      guests: adults,
+      rooms: 1,
+      nights,
+      totalPrice: parseFloat(hotelOffer.offers?.[0]?.price?.total || hotelOffer.price?.total || displayPrice || 0),
+      currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || currency,
+    };
+    
+    navigate(`/hotel-booking?data=${encodeURIComponent(JSON.stringify(bookingData))}`);
   };
 
   const favoriteId = isFavorite('hotel', property);
@@ -208,8 +222,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
         open={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
         hotel={{ hotel: property, property }}
-        onSelectRoom={(room) => {
-          setSelectedRoom(room);
+        onSelectRoom={() => {
           setShowDetailsModal(false);
           setShowDateModal(true);
         }}
@@ -223,27 +236,6 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
         hotelName={title}
         currency={currency}
       />
-
-      {showBookingModal && selectedHotelOffer && bookingDates && (
-        <BookingModal
-          open={showBookingModal}
-          onClose={() => {
-            setShowBookingModal(false);
-            setSelectedHotelOffer(null);
-            setBookingDates(null);
-          }}
-          bookingType="hotel"
-          bookingData={{
-            ...selectedHotelOffer,
-            selectedRoom,
-            checkInDate: bookingDates.checkIn,
-            checkOutDate: bookingDates.checkOut,
-            adults: bookingDates.adults
-          }}
-          totalPrice={selectedRoom?.price || (selectedHotelOffer.offers?.[0]?.price?.total ? parseFloat(selectedHotelOffer.offers[0].price.total) : displayPrice)}
-          currency={selectedHotelOffer.offers?.[0]?.price?.currency || currency}
-        />
-      )}
     </>
   );
 };
