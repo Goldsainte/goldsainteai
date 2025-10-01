@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.amadeus-book-hotel]
+verify_jwt = false
+
 [functions.search-hotels]
 verify_jwt = false
 
