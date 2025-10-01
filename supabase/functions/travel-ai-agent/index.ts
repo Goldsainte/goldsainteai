@@ -1304,7 +1304,7 @@ async function searchHotels(args: any, apiKey: string) {
             
             if (photosResponse.ok) {
               const photosData = await photosResponse.json();
-              hotel.tripAdvisorPhotos = photosData.data?.slice(0, 5) || [];
+              hotel.tripAdvisorPhotos = photosData.data || [];
             }
             
             // Get reviews
@@ -1320,7 +1320,7 @@ async function searchHotels(args: any, apiKey: string) {
             
             if (reviewsResponse.ok) {
               const reviewsData = await reviewsResponse.json();
-              hotel.tripAdvisorReviews = reviewsData.data?.slice(0, 5) || [];
+              hotel.tripAdvisorReviews = reviewsData.data || [];
             }
             
             console.log(`Enriched ${hotelName} with TripAdvisor data`);
