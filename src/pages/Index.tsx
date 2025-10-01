@@ -372,6 +372,9 @@ const Index = () => {
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center space-y-3">
                   <img src={logomark} alt="Goldsainte.Ai" className="h-16 w-16" />
+                  <p className="text-sm font-medium text-center text-muted-foreground max-w-xl">
+                    The first travel platform to combine AI precision with human passion — one platform, infinite possibilities.
+                  </p>
                 </div>
 
                 {/* Main Search */}
