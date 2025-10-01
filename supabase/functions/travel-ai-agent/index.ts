@@ -1212,7 +1212,12 @@ async function searchHotels(args: any, apiKey: string) {
     const data = await response.json();
     let hotels = data.results || [];
     
-    console.log(`Amadeus returned ${hotels.length} hotels`);
+    // Calculate number of nights for per-night price calculation
+    const checkInDate = new Date(checkIn || new Date().toISOString().split('T')[0]);
+    const checkOutDate = new Date(checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0]);
+    const nights = Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
+    
+    console.log(`Amadeus returned ${hotels.length} hotels for ${nights} nights`);
     console.log('Sample hotel structure:', hotels[0] ? JSON.stringify(hotels[0]).substring(0, 500) : 'No hotels');
 
 
@@ -1229,11 +1234,12 @@ async function searchHotels(args: any, apiKey: string) {
     if (typeof maxPrice === 'number') {
       const beforeFilter = hotels.length;
       hotels = hotels.filter((h: any) => {
-        const price = h.offers?.[0]?.price?.total ? parseFloat(h.offers[0].price.total) : 0;
-        console.log(`Hotel price: ${price}, max: ${maxPrice}, passes: ${price <= maxPrice}`);
-        return price <= maxPrice;
+        const totalPrice = h.offers?.[0]?.price?.total ? parseFloat(h.offers[0].price.total) : 0;
+        const pricePerNight = totalPrice / nights;
+        console.log(`Hotel total: $${totalPrice}, per night: $${pricePerNight.toFixed(2)}, max: $${maxPrice}, passes: ${pricePerNight <= maxPrice}`);
+        return pricePerNight <= maxPrice;
       });
-      console.log(`Price filter (max $${maxPrice}): ${beforeFilter} → ${hotels.length} hotels`);
+      console.log(`Price filter (max $${maxPrice}/night): ${beforeFilter} → ${hotels.length} hotels`);
     }
     if (sortBy === 'price') {
       hotels.sort((a: any, b: any) => {
@@ -1255,7 +1261,8 @@ async function searchHotels(args: any, apiKey: string) {
     const transformedHotels = hotels.map((hotel: any) => {
       const hotelInfo = hotel.hotel || {};
       const offer = hotel.offers?.[0] || {};
-      const price = offer.price?.total ? parseFloat(offer.price.total) : 0;
+      const totalPrice = offer.price?.total ? parseFloat(offer.price.total) : 0;
+      const pricePerNight = totalPrice / nights;
       const currency = offer.price?.currency || 'USD';
 
       return {
@@ -1279,11 +1286,12 @@ async function searchHotels(args: any, apiKey: string) {
         },
         location: hotelInfo.address?.cityName || location,
         region: '',
-        price: price,
+        price: pricePerNight,
         priceBreakdown: {
-          grossPrice: { value: price, currency: currency }
+          grossPrice: { value: pricePerNight, currency: currency },
+          totalPrice: { value: totalPrice, currency: currency }
         },
-        accessibilityLabel: `${hotelInfo.name}. ${hotelInfo.address?.cityName || location}. Price ${price} ${currency}`,
+        accessibilityLabel: `${hotelInfo.name}. ${hotelInfo.address?.cityName || location}. Price ${pricePerNight.toFixed(2)} ${currency} per night`,
         description: offer.room?.description?.text || '',
         amenities: hotelInfo.amenities || [],
         photos: [],
@@ -1292,7 +1300,8 @@ async function searchHotels(args: any, apiKey: string) {
           offerId: offer.id,
           hotelId: hotel.id || hotelInfo.hotelId,
           checkInDate: offer.checkInDate,
-          checkOutDate: offer.checkOutDate
+          checkOutDate: offer.checkOutDate,
+          totalPrice: totalPrice
         }
       };
     });
