@@ -80,7 +80,7 @@ export const BookingModal = ({
   const bookingFor = form.watch('bookingFor');
   
   // Calculate tax and fees (assuming 10% tax and 5% service fee)
-  const subtotal = totalPrice;
+  const subtotal = totalPrice || 0;
   const tax = subtotal * 0.10;
   const serviceFee = subtotal * 0.05;
   const total = subtotal + tax + serviceFee;
