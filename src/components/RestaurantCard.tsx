@@ -27,7 +27,10 @@ export const RestaurantCard = ({
 }: RestaurantCardProps) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
 
-  const restaurantData = { id, name, rating, userRatingsTotal, priceLevel, address, photoUrl, openNow };
+  // Safely convert rating to number
+  const numericRating = typeof rating === 'number' ? rating : Number(rating) || 0;
+
+  const restaurantData = { id, name, rating: numericRating, userRatingsTotal, priceLevel, address, photoUrl, openNow };
   const favoriteId = isFavorite('restaurant', restaurantData);
   
   const handleToggleFavorite = async (e: React.MouseEvent) => {
@@ -96,10 +99,10 @@ export const RestaurantCard = ({
         <div className="transform transition-all duration-500 group-hover:translate-y-0 translate-y-2">
           {/* Rating and Price */}
           <div className="flex items-center gap-3 mb-3">
-            {rating > 0 && (
+            {numericRating > 0 && (
               <div className="flex items-center gap-1 bg-primary/20 backdrop-blur-sm px-2 py-1 rounded-lg">
                 <Star className="h-4 w-4 fill-primary text-primary" />
-                <span className="text-sm font-semibold">{rating.toFixed(1)}</span>
+                <span className="text-sm font-semibold">{numericRating.toFixed(1)}</span>
                 <span className="text-xs text-primary-foreground/70">({userRatingsTotal})</span>
               </div>
             )}
