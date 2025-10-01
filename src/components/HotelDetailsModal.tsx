@@ -45,9 +45,9 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const propertyData = hotelData.property || hotel.property;
   
   const hotelName = propertyData?.name || hotelData.name || "Hotel";
-  const hotelRating = propertyData?.reviewScore || hotelData.rating || 8.5;
+  const hotelRating = Number(propertyData?.reviewScore ?? hotelData.rating ?? 8.5);
   const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || "Location";
-  const reviewCount = propertyData?.reviewCount || 0;
+  const reviewCount = Number(propertyData?.reviewCount ?? 0);
   const hotelId = propertyData?.id || hotelData.hotel_id || 0;
 
   // Get actual hotel photos from multiple possible fields and dedupe by base image id (prefer highest resolution)
