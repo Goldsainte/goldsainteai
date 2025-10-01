@@ -1145,259 +1145,93 @@ Always show results first with minimal text, ask questions later. Be conversatio
 });
 
 async function searchHotels(args: any, apiKey: string) {
-  // STRICT COMPANY RULE: ONLY return hotels with real photos AND reviews from TripAdvisor API
-  // NO FALLBACK CONTENT to maintain customer credibility
+  // Using Expedia Rapid API for real hotel bookings
   try {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
-    console.log('searchHotels called with:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
+    console.log('searchHotels called with Expedia:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
 
-    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
-    if (!tripAdvisorKey) {
-      return { error: 'TripAdvisor API key not configured', results: [] };
+    const expediaKey = Deno.env.get('EXPEDIA_API_KEY');
+    if (!expediaKey) {
+      return { error: 'Expedia API key not configured', results: [] };
     }
 
-    // Search for hotels in the location
-    const searchParams = new URLSearchParams({
-      key: tripAdvisorKey,
-      searchQuery: location,
-      category: 'hotels',
-      language: 'en'
-    });
-
-    const searchResponse = await fetch(
-      `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-      { headers: { 'Accept': 'application/json' } }
-    );
-
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error('TripAdvisor hotels search error:', searchResponse.status, errorText);
-      return { error: `Could not find hotels in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
-    }
-
-    const searchData = await searchResponse.json();
-    console.log('TripAdvisor hotels found:', searchData.data?.length || 0);
-
-    // Get detailed information for each hotel
-    const hotelDetails = await Promise.all(
-      (searchData.data || []).slice(0, 20).map(async (hotel: any) => {
-        try {
-          const detailsParams = new URLSearchParams({
-            key: tripAdvisorKey,
-            language: 'en'
-          });
-
-          const detailsResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/details?${detailsParams}`,
-            { headers: { 'Accept': 'application/json' } }
-          );
-
-          if (!detailsResponse.ok) {
-            return null;
-          }
-
-          const details = await detailsResponse.json();
-
-          // Get photos
-          const photosParams = new URLSearchParams({
-            key: tripAdvisorKey,
-            language: 'en',
-            limit: '200'
-          });
-
-          const photosResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/photos?${photosParams}`,
-            { headers: { 'Accept': 'application/json' } }
-          );
-
-          let photos = [];
-          if (photosResponse.ok) {
-            const photosData = await photosResponse.json();
-            photos = photosData.data || [];
-          }
-
-          // Get reviews
-          const reviewsParams = new URLSearchParams({
-            key: tripAdvisorKey,
-            language: 'en',
-            limit: '200'
-          });
-
-          const reviewsResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${hotel.location_id}/reviews?${reviewsParams}`,
-            { headers: { 'Accept': 'application/json' } }
-          );
-
-          let reviews = [];
-          if (reviewsResponse.ok) {
-            const reviewsData = await reviewsResponse.json();
-            // Fetch ALL reviews without limiting
-            reviews = (reviewsData.data || []).map((review: any) => ({
-              rating: review.rating || 0,
-              text: review.text || '',
-              published_date: review.published_date || '',
-              user: review.user?.username || 'Guest'
-            }));
-          }
-
-          // STRICT RULE: Only return hotels with real photos AND reviews from API
-          // No fallback content to maintain credibility
-          const hasRealPhotos = photos.length > 0;
-          const hasRealReviews = reviews.length > 0;
-          
-          if (!hasRealPhotos || !hasRealReviews) {
-            console.log(`Filtered out: ${details.name || hotel.name} - Missing real photos (${photos.length}) or reviews (${reviews.length})`);
-            return null;
-          }
-
-          // Calculate estimated price based on price level
-          const basePrices: { [key: string]: number } = {
-            '$': 80,
-            '$$ - $$$': 150,
-            '$$$$': 300
-          };
-          const basePrice = basePrices[details.price_level || ''] || 120;
-          const estimatedPrice = basePrice * Math.ceil(guests / 2);
-
-          return {
-            hotel_id: hotel.location_id,
-            name: details.name || hotel.name,
-            address: details.address || '',
-            city: details.address_obj?.city || '',
-            country: details.address_obj?.country || '',
-            rating: details.rating || 0,
-            num_reviews: reviews.length, // Use actual fetched review count, not API total
-            property: {
-              name: details.name || hotel.name,
-              // Include ALL photos without limiting
-              photoUrls: photos.map((photo: any) => 
-                photo.images?.large?.url || photo.images?.original?.url || ''
-              ).filter(Boolean),
-              reviews: reviews,
-              reviewScore: details.rating || 0,
-              reviewCount: reviews.length, // Use actual fetched review count
-              externalUrls: { 
-                tripadvisor: details.web_url || '',
-                default: details.web_url || ''
-              }
-            },
-            location: details.address_obj?.city || location,
-            region: details.address_obj?.country || '',
-            price: estimatedPrice,
-            priceBreakdown: {
-              grossPrice: { value: estimatedPrice, currency: 'USD' }
-            },
-            price_level: details.price_level || '',
-            accessibilityLabel: `${details.name}. ${details.address_obj?.city || ''}. Estimated price ${estimatedPrice} USD`,
-            description: details.description || '',
-            amenities: details.amenities || [],
-            latitude: details.latitude,
-            longitude: details.longitude,
-            // Include ALL photos without limiting
-            photos: photos.map((photo: any) => ({
-              url: photo.images?.large?.url || photo.images?.original?.url || '',
-              caption: photo.caption || ''
-            })).filter((p: any) => p.url),
-            reviews: reviews,
-            web_url: details.web_url
-          };
-        } catch (error) {
-          console.error(`Error fetching details for hotel ${hotel.location_id}:`, error);
-          return null;
-        }
+    // Call our Expedia search edge function
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    const response = await fetch(`${supabaseUrl}/functions/v1/expedia-search-hotels`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        location,
+        checkIn: checkIn || new Date().toISOString().split('T')[0],
+        checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        guests,
+        rooms: 1
       })
-    );
-
-    let transformedHotels = hotelDetails.filter(hotel => hotel !== null);
-
-    // CRITICAL: Filter by actual city location to prevent geographical mismatches
-    // Normalize location names for comparison (remove "city", lowercase, trim)
-    const normalizeLocation = (loc: string) => 
-      (loc || '').toLowerCase().replace(/\s+city\s*/gi, '').trim();
-    
-    // Map common abbreviations and airport codes to full names
-    const cityAbbreviations: { [key: string]: string[] } = {
-      'nyc': ['new york', 'ny'],
-      'jfk': ['new york', 'ny', 'nyc'],
-      'lga': ['new york', 'ny', 'nyc'],
-      'ewr': ['new york', 'ny', 'nyc', 'newark'],
-      'la': ['los angeles'],
-      'lax': ['los angeles', 'la'],
-      'sf': ['san francisco'],
-      'sfo': ['san francisco', 'sf'],
-      'dc': ['washington'],
-      'dca': ['washington', 'dc'],
-      'iad': ['washington', 'dc'],
-      'philly': ['philadelphia'],
-      'phl': ['philadelphia', 'philly'],
-      'vegas': ['las vegas'],
-      'las': ['las vegas', 'vegas'],
-      'chi': ['chicago'],
-      'ord': ['chicago', 'chi'],
-      'mdw': ['chicago', 'chi'],
-      'mia': ['miami'],
-      'bos': ['boston'],
-      'sea': ['seattle'],
-      'atl': ['atlanta'],
-      'dfw': ['dallas'],
-      'dal': ['dallas'],
-      'iah': ['houston'],
-      'hou': ['houston'],
-      'phx': ['phoenix'],
-      'den': ['denver'],
-      'mco': ['orlando'],
-      'dtw': ['detroit'],
-      'msp': ['minneapolis'],
-      'pdx': ['portland'],
-      'san': ['san diego'],
-      'aus': ['austin'],
-      'bna': ['nashville'],
-      'slc': ['salt lake city'],
-      'clt': ['charlotte']
-    };
-    
-    const searchLocation = normalizeLocation(location);
-    
-    // Get all possible variations for the search location
-    const searchVariations = [searchLocation];
-    if (cityAbbreviations[searchLocation]) {
-      searchVariations.push(...cityAbbreviations[searchLocation]);
-    }
-    // Also check if the search is a full name that matches an abbreviation
-    for (const [abbrev, fullNames] of Object.entries(cityAbbreviations)) {
-      if (fullNames.some(name => searchLocation.includes(name))) {
-        searchVariations.push(abbrev, ...fullNames);
-      }
-    }
-    
-    // Filter hotels to only those in the searched city
-    transformedHotels = transformedHotels.filter((hotel: any) => {
-      const hotelCity = normalizeLocation(hotel.city || hotel.location || '');
-      // Check if hotel city matches any search location variation
-      const isMatch = searchVariations.some(variation => 
-        hotelCity.includes(variation) || variation.includes(hotelCity)
-      );
-      if (!isMatch) {
-        console.log(`Filtered out: ${hotel.name} (City: ${hotel.city}) - doesn't match search: ${location}`);
-      }
-      return isMatch;
     });
 
-    console.log(`Filtered to ${transformedHotels.length} hotels in ${location}`);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Expedia search error:', response.status, errorText);
+      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
+    }
+
+    const data = await response.json();
+    let hotels = data.hotels || [];
+    
+    console.log(`Expedia returned ${hotels.length} hotels`);
 
     // Apply filters
-    const minRatingNormalized = typeof minRating === 'number' ? (minRating > 5 ? minRating / 2 : minRating) : undefined;
-    if (typeof minRatingNormalized === 'number') {
-      transformedHotels = transformedHotels.filter((h: any) => h.property.reviewScore >= minRatingNormalized);
+    if (typeof minRating === 'number') {
+      const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
+      hotels = hotels.filter((h: any) => h.rating >= minRatingNormalized);
     }
     if (typeof maxPrice === 'number') {
-      transformedHotels = transformedHotels.filter((h: any) => h.price <= maxPrice);
+      hotels = hotels.filter((h: any) => h.price <= maxPrice);
     }
     if (sortBy === 'price') {
-      transformedHotels.sort((a: any, b: any) => a.price - b.price);
+      hotels.sort((a: any, b: any) => a.price - b.price);
     } else if (sortBy === 'review_score') {
-      transformedHotels.sort((a: any, b: any) => b.property.reviewScore - a.property.reviewScore);
+      hotels.sort((a: any, b: any) => b.reviewScore - a.reviewScore);
     }
+
+    // Transform to match expected format
+    const transformedHotels = hotels.map((hotel: any) => ({
+      hotel_id: hotel.id,
+      name: hotel.name,
+      address: hotel.address,
+      city: hotel.city,
+      country: '',
+      rating: hotel.rating,
+      num_reviews: hotel.reviewCount,
+      property: {
+        name: hotel.name,
+        photoUrls: [hotel.image].filter(Boolean),
+        reviews: [],
+        reviewScore: hotel.reviewScore,
+        reviewCount: hotel.reviewCount,
+        externalUrls: {
+          expedia: `https://www.expedia.com/h${hotel.id}`,
+          default: `https://www.expedia.com/h${hotel.id}`
+        }
+      },
+      location: hotel.city || location,
+      region: '',
+      price: hotel.price,
+      priceBreakdown: {
+        grossPrice: { value: hotel.price, currency: hotel.currency }
+      },
+      accessibilityLabel: `${hotel.name}. ${hotel.city}. Price ${hotel.price} ${hotel.currency}`,
+      description: '',
+      amenities: hotel.amenities || [],
+      photos: [{ url: hotel.image, caption: hotel.name }].filter(p => p.url),
+      reviews: [],
+      expediaData: hotel.expediaData // Store for booking
+    }));
 
     return {
       type: 'hotels',

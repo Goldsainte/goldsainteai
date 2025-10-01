@@ -53,3 +53,12 @@ verify_jwt = false
 
 [functions.send-confirmation-email]
 verify_jwt = false
+
+[functions.expedia-search-hotels]
+verify_jwt = false
+
+[functions.expedia-book-hotel]
+verify_jwt = false
+
+[functions.expedia-get-availability]
+verify_jwt = false
