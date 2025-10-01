@@ -46,9 +46,13 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   
   const hotelName = propertyData?.name || hotelData.name || "Hotel";
   const hotelRating = Number(propertyData?.reviewScore ?? hotelData.rating ?? 8.5);
-  const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || "Location";
+  const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || hotelData.address || "Location";
   const reviewCount = Number(propertyData?.reviewCount ?? 0);
   const hotelId = propertyData?.id || hotelData.hotel_id || 0;
+
+  // Extract coordinates from all possible locations
+  const hotelLatitude = propertyData?.latitude || hotelData.latitude || hotel.latitude;
+  const hotelLongitude = propertyData?.longitude || hotelData.longitude || hotel.longitude;
 
   // Get actual hotel photos from multiple possible fields and dedupe by base image id (prefer highest resolution)
   const hotelPhotos = useMemo(() => {
@@ -772,14 +776,14 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
             <div>
               <h3 className="text-lg font-semibold mb-3">Location & Map</h3>
               <HotelMap
-                latitude={propertyData?.latitude}
-                longitude={propertyData?.longitude}
+                latitude={hotelLatitude}
+                longitude={hotelLongitude}
                 hotelName={hotelName}
-                landmarks={[
-                  { name: "City Center", lat: (propertyData?.latitude || 0) + 0.01, lng: (propertyData?.longitude || 0) + 0.01, distance: "0.5 mi" },
-                  { name: "Main Station", lat: (propertyData?.latitude || 0) - 0.015, lng: (propertyData?.longitude || 0) + 0.02, distance: "0.8 mi" },
-                  { name: "Museum District", lat: (propertyData?.latitude || 0) + 0.02, lng: (propertyData?.longitude || 0) - 0.01, distance: "1.2 mi" },
-                ]}
+                landmarks={hotelLatitude && hotelLongitude ? [
+                  { name: "City Center", lat: hotelLatitude + 0.01, lng: hotelLongitude + 0.01, distance: "0.5 mi" },
+                  { name: "Main Station", lat: hotelLatitude - 0.015, lng: hotelLongitude + 0.02, distance: "0.8 mi" },
+                  { name: "Museum District", lat: hotelLatitude + 0.02, lng: hotelLongitude - 0.01, distance: "1.2 mi" },
+                ] : []}
               />
               <p className="text-sm text-muted-foreground mt-2">{hotelAddress}</p>
             </div>
