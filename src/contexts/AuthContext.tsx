@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       title: "Signed out",
       description: "You've been successfully signed out.",
     });
-    navigate('/auth');
+    navigate('/');
   };
 
   return (
