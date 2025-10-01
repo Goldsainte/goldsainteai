@@ -42,8 +42,8 @@ export default function HotelBooking() {
 
   const hotelName = bookingData.hotel?.name || bookingData.hotelName || 'Hotel';
   const hotelAddress = bookingData.hotel?.address || bookingData.hotelAddress || 'Address';
-  const rating = bookingData.hotel?.property?.reviewScore || bookingData.hotel?.rating || 8.5;
-  const reviewCount = bookingData.hotel?.property?.reviewCount || 1043;
+  const rating = Number(bookingData.hotel?.property?.reviewScore ?? bookingData.hotel?.rating ?? 8.5);
+  const reviewCount = Number(bookingData.hotel?.property?.reviewCount ?? 1043);
   const checkIn = bookingData.checkIn;
   const checkOut = bookingData.checkOut;
   const nights = bookingData.nights || 1;
@@ -376,7 +376,7 @@ export default function HotelBooking() {
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Member Prices available</div>
                   <div className="text-3xl font-bold">
-                    {bookingData.currency || 'USD'} {(bookingData.totalPrice || 200).toFixed(2)}
+                    {bookingData.currency || 'USD'} {Number(bookingData.totalPrice || 200).toFixed(2)}
                   </div>
                   <div className="text-sm text-muted-foreground">per night</div>
                 </div>
