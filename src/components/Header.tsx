@@ -14,20 +14,17 @@ export const Header = () => {
             </a>
             
             <nav className="hidden md:flex items-center gap-6">
-              <a href="#" className="text-sm hover:text-accent transition-colors font-medium">
+              <a href="/search?type=hotels" className="text-sm hover:text-accent transition-colors font-medium">
                 Stays
               </a>
-              <a href="#" className="text-sm hover:text-accent transition-colors font-medium">
+              <a href="/search?type=flights" className="text-sm hover:text-accent transition-colors font-medium">
                 Flights
               </a>
-              <a href="#" className="text-sm hover:text-accent transition-colors font-medium">
-                Car Rentals
+              <a href="/search?type=restaurants" className="text-sm hover:text-accent transition-colors font-medium">
+                Restaurants
               </a>
-              <a href="#" className="text-sm hover:text-accent transition-colors font-medium">
-                Attractions
-              </a>
-              <a href="#" className="text-sm hover:text-accent transition-colors font-medium">
-                Airport Taxis
+              <a href="/search?type=events" className="text-sm hover:text-accent transition-colors font-medium">
+                Events
               </a>
             </nav>
           </div>
