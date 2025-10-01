@@ -1,21 +1,41 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
 
 export const SearchBar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { addSearch } = useSearchHistory();
   const [searchType, setSearchType] = useState(searchParams.get("type") || "hotels");
   const [location, setLocation] = useState(searchParams.get("location") || "");
   const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
   const [checkOut, setCheckOut] = useState(searchParams.get("checkOut") || "");
   const [guests, setGuests] = useState(searchParams.get("guests") || "2");
 
+  // Update form when URL params change
+  useEffect(() => {
+    const type = searchParams.get("type");
+    if (type) setSearchType(type);
+    const loc = searchParams.get("location");
+    if (loc) setLocation(loc);
+  }, [searchParams]);
+
   const handleSearch = () => {
     if (!location.trim()) return;
+    
+    // Save to search history
+    addSearch({
+      type: searchType,
+      location,
+      ...(searchType === "hotels" && { checkIn, checkOut, guests }),
+      ...(searchType === "flights" && { checkIn }),
+      ...(searchType === "events" && { checkIn })
+    });
+    
     const params = new URLSearchParams({
       type: searchType,
       location,

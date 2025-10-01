@@ -1,5 +1,5 @@
-import { Home, Search, Heart, User, Settings, MessageSquare, LogIn, LogOut } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-gold.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -14,12 +14,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useSearchHistory } from "@/hooks/useSearchHistory";
+import { format } from "date-fns";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
   { title: "Search", url: "/search", icon: Search },
   { title: "Favorites", url: "/favorites", icon: Heart },
-  { title: "Messages", url: "/messages", icon: MessageSquare },
 ];
 
 const bottomItems = [
@@ -29,6 +30,29 @@ const bottomItems = [
 export function AppSidebar() {
   const { open } = useSidebar();
   const { user, signOut } = useAuth();
+  const { history, removeItem } = useSearchHistory();
+  const navigate = useNavigate();
+
+  const getSearchIcon = (type: string) => {
+    switch (type) {
+      case "hotels": return Hotel;
+      case "flights": return Plane;
+      case "restaurants": return UtensilsCrossed;
+      case "events": return Ticket;
+      default: return Search;
+    }
+  };
+
+  const handleHistoryClick = (item: any) => {
+    const params = new URLSearchParams({
+      type: item.type,
+      location: item.location,
+      ...(item.checkIn && { checkIn: item.checkIn }),
+      ...(item.checkOut && { checkOut: item.checkOut }),
+      ...(item.guests && { guests: item.guests }),
+    });
+    navigate(`/search?${params.toString()}`);
+  };
 
   return (
     <Sidebar className="border-r border-border">
@@ -42,7 +66,7 @@ export function AppSidebar() {
         </div>
 
         {/* Main Navigation */}
-        <SidebarGroup className="flex-1">
+        <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -67,6 +91,59 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Recent Searches */}
+        {history.length > 0 && (
+          <SidebarGroup className="flex-1 overflow-hidden">
+            <SidebarGroupLabel className="flex items-center gap-2">
+              <Clock className="h-4 w-4" />
+              Recent Searches
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {history.slice(0, 5).map((item) => {
+                  const Icon = getSearchIcon(item.type);
+                  return (
+                    <SidebarMenuItem key={item.id}>
+                      <SidebarMenuButton
+                        onClick={() => handleHistoryClick(item)}
+                        className="hover:bg-muted/50 group relative"
+                      >
+                        <Icon className="h-4 w-4 flex-shrink-0" />
+                        {open && (
+                          <div className="flex-1 min-w-0 pr-6">
+                            <div className="truncate text-sm font-medium">
+                              {item.location}
+                            </div>
+                            {item.checkIn && (
+                              <div className="text-xs text-muted-foreground truncate">
+                                {format(new Date(item.checkIn), "MMM d")}
+                                {item.checkOut && ` - ${format(new Date(item.checkOut), "MMM d")}`}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        {open && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeItem(item.id);
+                            }}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* Bottom Navigation */}
         <SidebarGroup>
