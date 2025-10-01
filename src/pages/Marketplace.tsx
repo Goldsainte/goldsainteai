@@ -6,338 +6,270 @@ import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Briefcase, DollarSign, Users, MessageSquare } from "lucide-react";
+import { Briefcase, Plus, MapPin, DollarSign, Clock } from "lucide-react";
 import { toast } from "sonner";
-
-interface Job {
-  id: string;
-  title: string;
-  description: string;
-  booking_type: string;
-  budget_min: number;
-  budget_max: number;
-  currency: string;
-  status: string;
-  created_at: string;
-  agent_bids: Array<{
-    id: string;
-    proposed_price: number;
-    proposal_details: string;
-    agent_id: string;
-    travel_agents: {
-      agency_name: string;
-      rating: number;
-    };
-  }>;
-}
 
 export default function Marketplace() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [myJobs, setMyJobs] = useState<Job[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  // Form state
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [bookingType, setBookingType] = useState("package");
-  const [budgetMin, setBudgetMin] = useState("");
-  const [budgetMax, setBudgetMax] = useState("");
-  const [destination, setDestination] = useState("");
-  const [travelers, setTravelers] = useState("1");
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [myJobs, setMyJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    fetchMyJobs();
+
+    fetchJobs();
   }, [user, navigate]);
 
-  const fetchMyJobs = async () => {
+  const fetchJobs = async () => {
     try {
-      const { data, error } = await supabase
+      setLoading(true);
+
+      const { data: openJobs, error: openError } = await supabase
         .from('marketplace_jobs')
-        .select(`
-          *,
-          agent_bids(
-            id,
-            proposed_price,
-            proposal_details,
-            agent_id,
-            travel_agents(agency_name, rating)
-          )
-        `)
+        .select('*')
+        .eq('status', 'open')
+        .order('created_at', { ascending: false });
+
+      if (openError) throw openError;
+      setJobs(openJobs || []);
+
+      const { data: userJobs, error: userError } = await supabase
+        .from('marketplace_jobs')
+        .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setMyJobs(data || []);
+      if (userError) throw userError;
+      setMyJobs(userJobs || []);
+
     } catch (error: any) {
       console.error('Error fetching jobs:', error);
-      toast.error('Failed to load jobs');
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('marketplace_jobs')
-        .insert({
-          user_id: user.id,
-          title,
-          description,
-          booking_type: bookingType,
-          requirements: {
-            destination,
-            travelers: parseInt(travelers)
-          },
-          budget_min: budgetMin ? parseFloat(budgetMin) : null,
-          budget_max: budgetMax ? parseFloat(budgetMax) : null,
-          currency: 'USD',
-          destination,
-          number_of_travelers: parseInt(travelers)
-        });
-
-      if (error) throw error;
-
-      toast.success('Job posted successfully! Agents will start bidding soon.');
-      setShowForm(false);
-      fetchMyJobs();
-      
-      // Reset form
-      setTitle("");
-      setDescription("");
-      setBudgetMin("");
-      setBudgetMax("");
-      setDestination("");
-      setTravelers("1");
-    } catch (error: any) {
-      console.error('Error posting job:', error);
-      toast.error('Failed to post job');
+      toast.error('Failed to load marketplace jobs');
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const handleCreateJob = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    try {
+      const { error } = await supabase
+        .from('marketplace_jobs')
+        .insert({
+          user_id: user?.id,
+          title: formData.get('title'),
+          description: formData.get('description'),
+          booking_type: formData.get('booking_type'),
+          requirements: {},
+          budget_min: parseFloat(formData.get('budget_min') as string),
+          budget_max: parseFloat(formData.get('budget_max') as string),
+          destination: formData.get('destination'),
+          number_of_travelers: parseInt(formData.get('travelers') as string)
+        });
+
+      if (error) throw error;
+
+      toast.success('Job posted successfully!');
+      setIsCreateDialogOpen(false);
+      fetchJobs();
+    } catch (error: any) {
+      console.error('Error creating job:', error);
+      toast.error('Failed to post job');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <SimpleHeader />
+        <div className="container mx-auto px-4 py-8 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <SimpleHeader />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-chiffon text-primary mb-2">Travel Agent Marketplace</h1>
-          <p className="text-muted-foreground">Post complex booking requests and receive bids from professional travel agents</p>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-chiffon text-primary mb-2">Travel Agent Marketplace</h1>
+            <p className="text-muted-foreground">Connect with expert travel agents for complex bookings</p>
+          </div>
+          
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Post a Job
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Post a Travel Job</DialogTitle>
+                <DialogDescription>
+                  Describe your travel needs and agents will bid on your job
+                </DialogDescription>
+              </DialogHeader>
+              
+              <form onSubmit={handleCreateJob} className="space-y-4">
+                <div>
+                  <Label htmlFor="title">Job Title</Label>
+                  <Input id="title" name="title" required placeholder="e.g., Luxury European Tour Package" />
+                </div>
+                
+                <div>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea id="description" name="description" required placeholder="Describe your travel requirements in detail..." rows={4} />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="booking_type">Booking Type</Label>
+                    <select id="booking_type" name="booking_type" required className="w-full h-10 px-3 rounded-md border border-input bg-background">
+                      <option value="package">Package</option>
+                      <option value="hotel">Hotel</option>
+                      <option value="flight">Flight</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="destination">Destination</Label>
+                    <Input id="destination" name="destination" required placeholder="Paris, France" />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="budget_min">Min Budget ($)</Label>
+                    <Input id="budget_min" name="budget_min" type="number" required />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="budget_max">Max Budget ($)</Label>
+                    <Input id="budget_max" name="budget_max" type="number" required />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="travelers">Travelers</Label>
+                    <Input id="travelers" name="travelers" type="number" required defaultValue="2" />
+                  </div>
+                </div>
+                
+                <Button type="submit" className="w-full">Post Job</Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        {!showForm ? (
-          <div className="space-y-6">
-            <Card>
-              <CardContent className="py-8 text-center">
-                <Briefcase className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h2 className="text-xl font-semibold mb-2">Need help with a complex booking?</h2>
-                <p className="text-muted-foreground mb-4">
-                  Post your travel requirements and let professional agents compete for your business
-                </p>
-                <Button onClick={() => setShowForm(true)} size="lg">
-                  Post a Job
-                </Button>
-              </CardContent>
-            </Card>
+        <Tabs defaultValue="browse" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="browse">Browse Jobs</TabsTrigger>
+            <TabsTrigger value="my-jobs">My Jobs ({myJobs.length})</TabsTrigger>
+          </TabsList>
 
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">My Posted Jobs</h2>
-              {myJobs.length === 0 ? (
-                <Card>
-                  <CardContent className="py-8 text-center text-muted-foreground">
-                    No jobs posted yet
+          <TabsContent value="browse" className="space-y-4">
+            {jobs.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No open jobs</h3>
+                  <p className="text-muted-foreground text-center">
+                    Be the first to post a travel job
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              jobs.map((job) => (
+                <Card key={job.id} className="hover:shadow-lg transition-shadow">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-xl font-chiffon">{job.title}</CardTitle>
+                        <CardDescription>{job.description}</CardDescription>
+                      </div>
+                      <Badge>{job.booking_type}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{job.destination}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">${job.budget_min} - ${job.budget_max}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{new Date(job.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <Button variant="outline" className="w-full">View Details & Bid</Button>
                   </CardContent>
                 </Card>
-              ) : (
-                <div className="space-y-4">
-                  {myJobs.map((job) => (
-                    <Card key={job.id}>
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle>{job.title}</CardTitle>
-                            <CardDescription>{formatDate(job.created_at)}</CardDescription>
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            job.status === 'open' ? 'bg-green-50 text-green-600' :
-                            job.status === 'assigned' ? 'bg-blue-50 text-blue-600' :
-                            'bg-gray-50 text-gray-600'
-                          }`}>
-                            {job.status}
-                          </span>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <p className="text-sm">{job.description}</p>
-                        
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <DollarSign className="h-4 w-4" />
-                            <span>
-                              {job.budget_min && job.budget_max 
-                                ? `${job.currency} ${job.budget_min} - ${job.budget_max}`
-                                : 'Budget flexible'}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <MessageSquare className="h-4 w-4" />
-                            <span>{job.agent_bids?.length || 0} bids</span>
-                          </div>
-                        </div>
+              ))
+            )}
+          </TabsContent>
 
-                        {job.agent_bids && job.agent_bids.length > 0 && (
-                          <div className="pt-4 border-t">
-                            <h4 className="font-semibold mb-2">Recent Bids:</h4>
-                            <div className="space-y-2">
-                              {job.agent_bids.slice(0, 3).map((bid) => (
-                                <div key={bid.id} className="flex items-center justify-between p-2 bg-muted rounded-lg">
-                                  <span className="text-sm font-medium">{bid.travel_agents.agency_name}</span>
-                                  <span className="text-sm">{job.currency} {bid.proposed_price}</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>Post a New Job</CardTitle>
-              <CardDescription>
-                Describe your travel needs and budget. Travel agents will bid on your job.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-2">
-                  <Label htmlFor="title">Job Title *</Label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="e.g., Plan 2-week European vacation for family of 4"
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Provide detailed requirements, preferences, and any special needs..."
-                    rows={6}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="bookingType">Booking Type *</Label>
-                    <Select value={bookingType} onValueChange={setBookingType}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="hotel">Hotel Only</SelectItem>
-                        <SelectItem value="flight">Flight Only</SelectItem>
-                        <SelectItem value="package">Complete Package</SelectItem>
-                        <SelectItem value="custom">Custom Request</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="travelers">Number of Travelers *</Label>
-                    <Input
-                      id="travelers"
-                      type="number"
-                      min="1"
-                      value={travelers}
-                      onChange={(e) => setTravelers(e.target.value)}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="destination">Destination *</Label>
-                  <Input
-                    id="destination"
-                    value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    placeholder="e.g., Paris, France"
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="budgetMin">Budget Min (USD)</Label>
-                    <Input
-                      id="budgetMin"
-                      type="number"
-                      min="0"
-                      value={budgetMin}
-                      onChange={(e) => setBudgetMin(e.target.value)}
-                      placeholder="Optional"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="budgetMax">Budget Max (USD)</Label>
-                    <Input
-                      id="budgetMax"
-                      type="number"
-                      min="0"
-                      value={budgetMax}
-                      onChange={(e) => setBudgetMax(e.target.value)}
-                      placeholder="Optional"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <Button type="submit" disabled={loading} className="flex-1">
-                    {loading ? 'Posting...' : 'Post Job'}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
+          <TabsContent value="my-jobs" className="space-y-4">
+            {myJobs.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Briefcase className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No jobs posted yet</h3>
+                  <p className="text-muted-foreground text-center mb-4">
+                    Post your first travel job to connect with agents
+                  </p>
+                  <Button onClick={() => setIsCreateDialogOpen(true)}>Post a Job</Button>
+                </CardContent>
+              </Card>
+            ) : (
+              myJobs.map((job) => (
+                <Card key={job.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="text-xl font-chiffon">{job.title}</CardTitle>
+                        <CardDescription>{job.destination}</CardDescription>
+                      </div>
+                      <Badge variant={job.status === 'open' ? 'default' : 'secondary'}>
+                        {job.status}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        Budget: ${job.budget_min} - ${job.budget_max}
+                      </span>
+                      <Button variant="outline" size="sm">View Bids</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </TabsContent>
+        </Tabs>
       </main>
 
       <Footer />
