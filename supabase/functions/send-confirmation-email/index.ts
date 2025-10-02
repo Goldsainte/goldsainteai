@@ -461,7 +461,7 @@ const handler = async (req: Request): Promise<Response> => {
               background: #ffffff;
             }
             .header {
-              background: #BFAD72;
+              background: transparent;
               padding: 24px;
               text-align: center;
             }

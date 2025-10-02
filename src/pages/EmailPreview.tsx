@@ -148,7 +148,7 @@ export default function EmailPreview() {
               background: #ffffff;
             }
             .header {
-              background: #BFAD72;
+              background: transparent;
               padding: 24px;
               text-align: center;
             }
