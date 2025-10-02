@@ -1660,7 +1660,24 @@ async function searchRestaurants(args: any) {
       })
     );
 
-    const validRestaurants = restaurantDetails.filter(restaurant => restaurant !== null);
+    // Filter out nulls and verify location match
+    const validRestaurants = restaurantDetails.filter(restaurant => {
+      if (restaurant === null) return false;
+      
+      // Check if restaurant city matches the requested location
+      const restaurantCity = (restaurant.city || '').toLowerCase().trim();
+      const requestedCity = normalizedLocation.toLowerCase().trim();
+      
+      // Also check against original location and all variations
+      const locationVariations = getCityVariations(location).map(v => v.toLowerCase().trim());
+      
+      // Restaurant must be in one of the location variations
+      return locationVariations.some(variation => 
+        restaurantCity.includes(variation) || variation.includes(restaurantCity)
+      );
+    });
+    
+    console.log(`Filtered restaurants: ${validRestaurants.length} out of ${restaurantDetails.length} are in ${location}`);
     
     return {
       type: 'restaurants',
