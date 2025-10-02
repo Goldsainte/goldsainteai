@@ -17,6 +17,22 @@ export const SearchBar = () => {
   const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
   const [checkOut, setCheckOut] = useState(searchParams.get("checkOut") || "");
   const [guests, setGuests] = useState(searchParams.get("guests") || "2");
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  const rotatingMessages = [
+    "Where luxury meets adventure...",
+    "Discover your next destination...",
+    "Experience world-class hospitality...",
+    "Find exclusive travel experiences...",
+    "Your journey begins here..."
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMessageIndex((prev) => (prev + 1) % rotatingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Update form when URL params change
   useEffect(() => {
@@ -69,35 +85,40 @@ export const SearchBar = () => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 md:px-0">
-      <div className="bg-card border border-border rounded-2xl shadow-sm p-4 md:p-6">
-        <Tabs value={searchType} onValueChange={setSearchType} className="mb-4">
+    <div className="w-full max-w-5xl mx-auto px-4 md:px-0">
+      <div className="bg-card border border-border rounded-3xl shadow-lg p-6 md:p-8">
+        <div className="mb-6 text-center">
+          <p className="text-lg md:text-xl text-muted-foreground transition-opacity duration-500">
+            {rotatingMessages[currentMessageIndex]}
+          </p>
+        </div>
+        <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
           <TabsList className="grid w-full grid-cols-4 h-auto">
-            <TabsTrigger value="hotels" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
-              <Hotel className="h-4 w-4 flex-shrink-0" />
+            <TabsTrigger value="hotels" className="gap-2 py-4 text-sm md:text-base">
+              <Hotel className="h-5 w-5 flex-shrink-0" />
               <span className="hidden sm:inline">Hotels</span>
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
-              <Plane className="h-4 w-4 flex-shrink-0" />
+            <TabsTrigger value="flights" className="gap-2 py-4 text-sm md:text-base">
+              <Plane className="h-5 w-5 flex-shrink-0" />
               <span className="hidden sm:inline">Flights</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
-              <UtensilsCrossed className="h-4 w-4 flex-shrink-0" />
+            <TabsTrigger value="restaurants" className="gap-2 py-4 text-sm md:text-base">
+              <UtensilsCrossed className="h-5 w-5 flex-shrink-0" />
               <span className="hidden sm:inline">Restaurants</span>
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-1 md:gap-2 py-3 text-xs md:text-sm">
-              <Ticket className="h-4 w-4 flex-shrink-0" />
+            <TabsTrigger value="events" className="gap-2 py-4 text-sm md:text-base">
+              <Ticket className="h-5 w-5 flex-shrink-0" />
               <span className="hidden sm:inline">Events</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
           <div className="relative">
-            <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <MapPin className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
             <Input
               placeholder={searchType === "flights" ? "From where?" : "Where to?"}
-              className="pl-10 h-12 border-border text-base"
+              className="pl-12 h-16 border-border text-lg rounded-xl"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
             />
@@ -106,33 +127,33 @@ export const SearchBar = () => {
           {searchType === "hotels" && (
             <>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
                 <Input
                   type="date"
                   placeholder="Check-in"
-                  className="pl-10 h-12 border-border text-base"
+                  className="pl-12 h-16 border-border text-lg rounded-xl"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
                 />
               </div>
 
               <div className="relative">
-                <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
                 <Input
                   type="date"
                   placeholder="Check-out"
-                  className="pl-10 h-12 border-border text-base"
+                  className="pl-12 h-16 border-border text-lg rounded-xl"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
                 />
               </div>
 
               <div className="relative">
-                <Users className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Users className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
                 <Input
                   type="number"
                   placeholder="2 guests"
-                  className="pl-10 h-12 border-border text-base"
+                  className="pl-12 h-16 border-border text-lg rounded-xl"
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
                 />
@@ -142,11 +163,11 @@ export const SearchBar = () => {
 
           {searchType === "flights" && (
             <div className="relative md:col-span-3">
-              <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
               <Input
                 type="date"
                 placeholder="Departure date"
-                className="pl-10 h-12 border-border text-base"
+                className="pl-12 h-16 border-border text-lg rounded-xl"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
               />
@@ -155,11 +176,11 @@ export const SearchBar = () => {
 
           {searchType === "events" && (
             <div className="relative md:col-span-3">
-              <Calendar className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
               <Input
                 type="date"
                 placeholder="Event date"
-                className="pl-10 h-12 border-border text-base"
+                className="pl-12 h-16 border-border text-lg rounded-xl"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
               />
@@ -172,10 +193,10 @@ export const SearchBar = () => {
         </div>
 
         <Button 
-          className="w-full mt-4 h-12 bg-primary text-primary-foreground hover:bg-primary/90 text-base font-medium"
+          className="w-full mt-6 h-16 bg-primary text-primary-foreground hover:bg-primary/90 text-lg font-semibold rounded-xl"
           onClick={handleSearch}
         >
-          <Search className="h-5 w-5 mr-2" />
+          <Search className="h-6 w-6 mr-2" />
           {getSearchButtonText()}
         </Button>
       </div>
