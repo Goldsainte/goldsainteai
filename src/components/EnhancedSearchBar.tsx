@@ -68,7 +68,7 @@ export const EnhancedSearchBar = () => {
   const [eventDate, setEventDate] = useState<Date | undefined>(
     searchParams.get("date") ? new Date(searchParams.get("date")!) : undefined
   );
-  const [eventCategory, setEventCategory] = useState(searchParams.get("category") || "");
+  const [eventCategory, setEventCategory] = useState(searchParams.get("category") || "all");
 
   const [showPassengerPopover, setShowPassengerPopover] = useState(false);
 
@@ -154,11 +154,11 @@ export const EnhancedSearchBar = () => {
         ...searchData,
         location: eventLocation,
         date: eventDate ? format(eventDate, "yyyy-MM-dd") : null,
-        category: eventCategory,
+        category: eventCategory !== "all" ? eventCategory : null,
       };
       params.append("location", eventLocation);
       if (eventDate) params.append("date", format(eventDate, "yyyy-MM-dd"));
-      if (eventCategory) params.append("category", eventCategory);
+      if (eventCategory && eventCategory !== "all") params.append("category", eventCategory);
     }
 
     addSearch(searchData);
@@ -508,7 +508,7 @@ export const EnhancedSearchBar = () => {
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All categories</SelectItem>
+            <SelectItem value="all">All categories</SelectItem>
             <SelectItem value="music">Music</SelectItem>
             <SelectItem value="sports">Sports</SelectItem>
             <SelectItem value="arts">Arts & Theater</SelectItem>
