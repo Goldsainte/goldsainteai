@@ -344,8 +344,12 @@ const Index = () => {
       const aiMessage = data.message.toLowerCase();
       if (aiMessage.includes('when are you planning to stay') || 
           aiMessage.includes('when are you planning to travel') ||
-          aiMessage.includes('when do you need the car')) {
-        const type = aiMessage.includes('stay') ? 'hotel' : 'flight';
+          aiMessage.includes('when do you need the car') ||
+          aiMessage.includes('when would you like to depart') ||
+          aiMessage.includes('when would you like to fly') ||
+          aiMessage.includes('what date') ||
+          aiMessage.includes('travel dates')) {
+        const type = aiMessage.includes('stay') || aiMessage.includes('hotel') ? 'hotel' : 'flight';
         setTimeout(() => setShowDatePicker({ type, context: 'quicklink' }), 500);
       }
 
