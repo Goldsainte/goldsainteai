@@ -69,8 +69,12 @@ export default function BookingDetails() {
     try {
       setCancelling(true);
       
-      // Call cancel flight edge function
-      const { data, error } = await supabase.functions.invoke('amadeus-cancel-flight', {
+      const functionName = booking.booking_type === 'flight' 
+        ? 'amadeus-cancel-flight' 
+        : 'amadeus-cancel-hotel';
+      
+      // Call appropriate cancel function
+      const { data, error } = await supabase.functions.invoke(functionName, {
         body: { 
           bookingId,
           reason: 'Customer requested cancellation'
@@ -79,7 +83,12 @@ export default function BookingDetails() {
 
       if (error) throw error;
 
-      toast.success('Booking cancelled successfully');
+      if (data.refundAmount) {
+        toast.success(`Booking cancelled! Refund of ${booking.currency} $${data.refundAmount.toFixed(2)} processed.`);
+      } else {
+        toast.success('Booking cancelled successfully');
+      }
+      
       fetchBookingDetails();
       setShowCancelDialog(false);
     } catch (error: any) {
@@ -223,13 +232,33 @@ export default function BookingDetails() {
           {canModify && (
             <div className="flex gap-4">
               <Button 
+                variant="outline"
+                className="flex-1"
+                onClick={() => navigate(`/modify-flight/${bookingId}`)}
+              >
+                Modify Flight
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={() => setShowCancelDialog(true)}
+                disabled={cancelling}
+              >
+                <XCircle className="mr-2 h-4 w-4" />
+                Cancel Booking
+              </Button>
+            </div>
+          )}
+
+          {booking.status !== 'cancelled' && booking.booking_type === 'hotel' && (
+            <div className="flex gap-4">
+              <Button 
                 variant="destructive" 
                 className="flex-1"
                 onClick={() => setShowCancelDialog(true)}
                 disabled={cancelling}
               >
                 <XCircle className="mr-2 h-4 w-4" />
-                Cancel Booking
+                Cancel Hotel Booking
               </Button>
             </div>
           )}

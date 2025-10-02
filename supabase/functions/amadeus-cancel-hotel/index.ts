@@ -18,7 +18,7 @@ serve(async (req) => {
       throw new Error('Booking ID is required');
     }
 
-    console.log('Cancelling flight booking:', bookingId);
+    console.log('Cancelling hotel booking:', bookingId);
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -36,60 +36,12 @@ serve(async (req) => {
       throw new Error('Booking not found');
     }
 
-    // Check if this is a flight booking
-    if (booking.booking_type !== 'flight') {
-      throw new Error('Only flight bookings can be cancelled through this endpoint');
+    // Check if this is a hotel booking
+    if (booking.booking_type !== 'hotel') {
+      throw new Error('Only hotel bookings can be cancelled through this endpoint');
     }
 
-    // Get Amadeus access token
-    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
-    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
-
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        grant_type: 'client_credentials',
-        client_id: amadeusKey!,
-        client_secret: amadeusSecret!,
-      }),
-    });
-
-    if (!tokenResponse.ok) {
-      throw new Error('Failed to get Amadeus access token');
-    }
-
-    const { access_token } = await tokenResponse.json();
-
-    // Extract order ID from booking data
-    const orderId = booking.booking_data?.orderId || booking.booking_reference;
-
-    if (!orderId) {
-      throw new Error('Flight order ID not found in booking');
-    }
-
-    console.log('Attempting to cancel Amadeus order:', orderId);
-
-    // Delete the flight order (Amadeus cancellation)
-    const cancelResponse = await fetch(
-      `https://test.api.amadeus.com/v1/booking/flight-orders/${orderId}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${access_token}`,
-        },
-      }
-    );
-
-    if (!cancelResponse.ok) {
-      const errorText = await cancelResponse.text();
-      console.error('Amadeus cancellation failed:', errorText);
-      throw new Error(`Failed to cancel flight with Amadeus: ${errorText}`);
-    }
-
-    console.log('Flight order cancelled successfully with Amadeus');
+    console.log('Processing hotel cancellation for booking:', booking.booking_reference);
 
     // Create modification record
     const { data: modification, error: modError } = await supabaseClient
@@ -100,7 +52,6 @@ serve(async (req) => {
         modification_type: 'cancel',
         status: 'completed',
         original_booking_data: booking.booking_data,
-        amadeus_order_id: orderId,
         reason: reason || 'User requested cancellation',
         processed_at: new Date().toISOString(),
       })
@@ -121,10 +72,7 @@ serve(async (req) => {
       console.error('Error updating booking status:', updateError);
     }
 
-    // In a real implementation, you would process refunds here
-    // This would involve calling Stripe's refund API
-    
-    // Get the payment record for this booking
+    // Process refund if payment exists
     const { data: payment } = await supabaseClient
       .from('payments')
       .select('*')
@@ -138,24 +86,21 @@ serve(async (req) => {
     if (payment && payment.stripe_payment_intent_id) {
       console.log('Processing refund for payment:', payment.stripe_payment_intent_id);
       
-      // Get Stripe instance
       const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
       const Stripe = (await import('https://esm.sh/stripe@18.5.0')).default;
       const stripe = new Stripe(stripeKey!, { apiVersion: '2025-08-27.basil' });
 
       try {
-        // Create refund in Stripe
         const refund = await stripe.refunds.create({
           payment_intent: payment.stripe_payment_intent_id,
           reason: 'requested_by_customer',
         });
 
-        refundAmount = refund.amount / 100; // Convert cents to dollars
+        refundAmount = refund.amount / 100;
         refundStatus = refund.status === 'succeeded' ? 'completed' : 'processing';
         
         console.log('Refund created:', refund.id, 'Status:', refund.status);
 
-        // Update payment record
         await supabaseClient
           .from('payments')
           .update({ status: 'refunded' })
@@ -166,7 +111,7 @@ serve(async (req) => {
       }
     }
 
-    // Update modification record with refund info
+    // Update modification with refund info
     if (modification) {
       await supabaseClient
         .from('booking_modifications')
@@ -182,7 +127,7 @@ serve(async (req) => {
     try {
       await supabaseClient.functions.invoke('send-cancellation-email', {
         body: {
-          email: booking.booking_data?.email || booking.booking_data?.passengers?.[0]?.email,
+          email: booking.booking_data?.email || booking.booking_data?.guestEmail,
           bookingReference: booking.booking_reference,
           bookingData: booking.booking_data,
           refundAmount: refundAmount,
@@ -196,7 +141,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({
         success: true,
-        message: 'Flight cancelled successfully',
+        message: 'Hotel booking cancelled successfully',
         modificationId: modification?.id,
         refundAmount: refundAmount,
         refundStatus: refundStatus,
@@ -207,7 +152,7 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error('Error in amadeus-cancel-flight:', error);
+    console.error('Error in amadeus-cancel-hotel:', error);
     return new Response(
       JSON.stringify({ error: error.message || 'An error occurred' }),
       {

@@ -142,9 +142,9 @@ export default function MyBookings() {
           {booking.status !== 'cancelled' && booking.booking_type === 'flight' && (
             <Button 
               variant="default" 
-              onClick={() => navigate(`/booking-details/${booking.id}?action=modify`)}
+              onClick={() => navigate(`/modify-flight/${booking.id}`)}
             >
-              Modify Booking
+              Modify Flight
             </Button>
           )}
         </div>
