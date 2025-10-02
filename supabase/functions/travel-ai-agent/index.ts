@@ -1015,302 +1015,63 @@ Always show results first with minimal text, ask questions later. Be conversatio
 });
 
 async function searchHotels(args: any, apiKey: string) {
-  // Using Amadeus Hotel Search API for real hotel bookings
+  // Use unified hotel search for consistency with Search page
   try {
-    const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice, amenities } = args;
-    console.log('searchHotels called with Amadeus:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice, amenities });
+    const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
+    console.log('searchHotels called with unified function:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice });
 
-    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
-    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
-    if (!amadeusKey || !amadeusSecret) {
-      return { error: 'Amadeus API credentials not configured', results: [] };
-    }
-
-    // Get Amadeus token for Location API lookup
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
-    });
-
-    if (!tokenResponse.ok) {
-      console.error('Failed to get Amadeus token');
-      return { error: 'Authentication failed', results: [] };
-    }
-
-    const tokenData = await tokenResponse.json();
-    const token = tokenData.access_token;
-
-    // Convert city name to IATA code using Amadeus Location API
-    let cityCode = location.toUpperCase();
-    
-    // If not already a 3-letter code, use Amadeus Location API
-    if (!/^[A-Z]{3}$/.test(cityCode)) {
-      console.log(`Looking up city code for: ${location}`);
-      
-      const searchParams = new URLSearchParams({
-        keyword: location,
-        subType: 'CITY',
-        'page[limit]': '1'
-      });
-
-      const locationResponse = await fetch(
-        `https://test.api.amadeus.com/v1/reference-data/locations?${searchParams}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
-
-      if (locationResponse.ok) {
-        const locationData = await locationResponse.json();
-        if (locationData.data && locationData.data.length > 0) {
-          cityCode = locationData.data[0].iataCode;
-          console.log(`Amadeus Location API: "${location}" → ${cityCode}`);
-        } else {
-          console.warn(`No IATA code found for "${location}", trying fallback...`);
-          // Fallback to manual mapping
-          const variations = getCityVariations(location);
-          const possibleCode = variations.find(v => v.length === 3);
-          if (possibleCode) {
-            cityCode = possibleCode.toUpperCase();
-          } else {
-            cityCode = location.replace(/\s+/g, '').substring(0, 3).toUpperCase();
-          }
-          console.log(`Using fallback city code: ${cityCode}`);
-        }
-      } else {
-        console.warn(`Location API failed, using fallback for "${location}"`);
-        const variations = getCityVariations(location);
-        const possibleCode = variations.find(v => v.length === 3);
-        if (possibleCode) {
-          cityCode = possibleCode.toUpperCase();
-        } else {
-          cityCode = location.replace(/\s+/g, '').substring(0, 3).toUpperCase();
-        }
-      }
-    }
-    
-    console.log(`Final city code for hotel search: ${cityCode}`);
-
-    // Call our Amadeus search edge function
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
     
-    const response = await fetch(`${supabaseUrl}/functions/v1/amadeus-search-hotels`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/unified-search-hotels`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${supabaseAnonKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        cityCode: cityCode,
-        cityName: location, // Pass city name for currency detection
-        checkInDate: checkIn || new Date().toISOString().split('T')[0],
-        checkOutDate: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        adults: guests || 2
+        location,
+        checkIn: checkIn || new Date().toISOString().split('T')[0],
+        checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        guests: guests || 2
       })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Amadeus search error:', response.status, errorText);
-      return { error: `Could not find hotels in "${location}" (tried city code: ${cityCode}). Please try a different location or use a 3-letter city code (e.g., NYC, LAX, DET).`, results: [] };
+      console.error('Unified hotel search error:', response.status, errorText);
+      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
     }
 
     const data = await response.json();
     let hotels = data.results || [];
     
-    // Calculate number of nights for per-night price calculation
-    const checkInDate = new Date(checkIn || new Date().toISOString().split('T')[0]);
-    const checkOutDate = new Date(checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0]);
-    const nights = Math.max(1, Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
-    
-    console.log(`Amadeus returned ${hotels.length} hotels for ${nights} nights`);
-    console.log('Sample hotel structure:', hotels[0] ? JSON.stringify(hotels[0]).substring(0, 500) : 'No hotels');
+    console.log(`Unified search returned ${hotels.length} hotels`);
 
-
-    // Apply filters on Amadeus data
+    // Apply filters
     if (typeof minRating === 'number') {
       const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
-      const beforeFilter = hotels.length;
-      hotels = hotels.filter((h: any) => {
-        const rating = h.hotel?.rating || 0;
-        return rating >= minRatingNormalized;
-      });
-      console.log(`Rating filter: ${beforeFilter} → ${hotels.length} hotels`);
+      hotels = hotels.filter((h: any) => (h.rating || 0) >= minRatingNormalized);
     }
     if (typeof maxPrice === 'number') {
-      const beforeFilter = hotels.length;
-      hotels = hotels.filter((h: any) => {
-        const totalPrice = h.offers?.[0]?.price?.total ? parseFloat(h.offers[0].price.total) : 0;
-        const pricePerNight = totalPrice / nights;
-        console.log(`Hotel total: $${totalPrice}, per night: $${pricePerNight.toFixed(2)}, max: $${maxPrice}, passes: ${pricePerNight <= maxPrice}`);
-        return pricePerNight <= maxPrice;
-      });
-      console.log(`Price filter (max $${maxPrice}/night): ${beforeFilter} → ${hotels.length} hotels`);
+      hotels = hotels.filter((h: any) => (h.price || 0) <= maxPrice);
     }
     if (sortBy === 'price') {
-      hotels.sort((a: any, b: any) => {
-        const priceA = a.offers?.[0]?.price?.total ? parseFloat(a.offers[0].price.total) : 0;
-        const priceB = b.offers?.[0]?.price?.total ? parseFloat(b.offers[0].price.total) : 0;
-        return priceA - priceB;
-      });
+      hotels.sort((a: any, b: any) => (a.price || 0) - (b.price || 0));
     } else if (sortBy === 'review_score') {
-      hotels.sort((a: any, b: any) => {
-        const ratingA = a.hotel?.rating || 0;
-        const ratingB = b.hotel?.rating || 0;
-        return ratingB - ratingA;
-      });
+      hotels.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
     }
 
-    console.log(`After all filters: ${hotels.length} hotels`);
-
-    // Enrich hotels with TripAdvisor photos and reviews
-    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
-    if (tripAdvisorKey && hotels.length > 0) {
-      console.log('Enriching hotels with TripAdvisor data...');
-      
-      // Process hotels in parallel
-      const hotelsToEnrich = hotels;
-      
-      await Promise.all(
-        hotelsToEnrich.map(async (hotel: any) => {
-          try {
-            const hotelName = hotel.hotel?.name || '';
-            const hotelCity = hotel.hotel?.address?.cityName || location;
-            
-            // Search TripAdvisor for this hotel
-            const searchParams = new URLSearchParams({
-              key: tripAdvisorKey,
-              searchQuery: `${hotelName} ${hotelCity}`,
-              category: 'hotels',
-              language: 'en'
-            });
-            
-            const searchResponse = await fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-            
-            if (!searchResponse.ok) return;
-            
-            const searchData = await searchResponse.json();
-            const tripAdvisorLocation = searchData.data?.[0];
-            
-            if (!tripAdvisorLocation) return;
-            
-            // Get photos
-            const photosParams = new URLSearchParams({
-              key: tripAdvisorKey,
-              language: 'en'
-            });
-            
-            const photosResponse = await fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${tripAdvisorLocation.location_id}/photos?${photosParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-            
-            if (photosResponse.ok) {
-              const photosData = await photosResponse.json();
-              hotel.tripAdvisorPhotos = photosData.data || [];
-            }
-            
-            // Get reviews
-            const reviewsParams = new URLSearchParams({
-              key: tripAdvisorKey,
-              language: 'en'
-            });
-            
-            const reviewsResponse = await fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${tripAdvisorLocation.location_id}/reviews?${reviewsParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-            
-            if (reviewsResponse.ok) {
-              const reviewsData = await reviewsResponse.json();
-              hotel.tripAdvisorReviews = reviewsData.data || [];
-            }
-            
-            console.log(`Enriched ${hotelName} with TripAdvisor data`);
-          } catch (error) {
-            console.error(`Failed to enrich hotel with TripAdvisor:`, error);
-          }
-        })
-      );
-    }
-
-    // Transform Amadeus data to match expected format
-    const transformedHotels = hotels.map((hotel: any) => {
-      const hotelInfo = hotel.hotel || {};
-      const offer = hotel.offers?.[0] || {};
-      const totalPrice = offer.price?.total ? parseFloat(offer.price.total) : 0;
-      const pricePerNight = totalPrice / nights;
-      const currency = offer.price?.currency || 'USD';
-      
-      // Get TripAdvisor photos and reviews if available
-      const tripAdvisorPhotos = hotel.tripAdvisorPhotos || [];
-      const tripAdvisorReviews = hotel.tripAdvisorReviews || [];
-      
-      const photoUrls = tripAdvisorPhotos.map((photo: any) => ({
-        url: photo.images?.large?.url || photo.images?.medium?.url || photo.images?.small?.url,
-        caption: photo.caption || hotelInfo.name
-      })).filter((p: any) => p.url);
-      
-      const reviews = tripAdvisorReviews.map((review: any) => ({
-        author: review.user?.username || 'Anonymous',
-        rating: review.rating || 0,
-        text: review.text || '',
-        date: review.published_date || '',
-        title: review.title || ''
-      }));
-
-      return {
-        hotel_id: hotel.id || hotelInfo.hotelId,
-        name: hotelInfo.name || 'Hotel',
-        address: hotelInfo.address?.lines?.[0] || '',
-        city: hotelInfo.address?.cityName || location,
-        country: hotelInfo.address?.countryCode || '',
-        rating: hotelInfo.rating || 0,
-        num_reviews: reviews.length || 0,
-        property: {
-          name: hotelInfo.name || 'Hotel',
-          photoUrls: photoUrls,
-          reviews: reviews,
-          reviewScore: hotelInfo.rating || 0,
-          reviewCount: reviews.length || 0,
-          externalUrls: {
-            amadeus: hotel.self || '',
-            default: hotel.self || ''
-          }
-        },
-        location: hotelInfo.address?.cityName || location,
-        region: '',
-        price: pricePerNight,
-        priceBreakdown: {
-          grossPrice: { value: pricePerNight, currency: currency },
-          totalPrice: { value: totalPrice, currency: currency }
-        },
-        accessibilityLabel: `${hotelInfo.name}. ${hotelInfo.address?.cityName || location}. Price ${pricePerNight.toFixed(2)} ${currency} per night`,
-        description: offer.room?.description?.text || '',
-        amenities: hotelInfo.amenities || [],
-        photos: photoUrls,
-        reviews: reviews,
-        amadeusData: {
-          offerId: offer.id,
-          hotelId: hotel.id || hotelInfo.hotelId,
-          checkInDate: offer.checkInDate,
-          checkOutDate: offer.checkOutDate,
-          totalPrice: totalPrice
-        }
-      };
-    });
+    console.log(`After filters: ${hotels.length} hotels`);
 
     return {
       type: 'hotels',
       location: { name: location, dest_id: location },
-      results: transformedHotels,
+      results: hotels,
       checkIn: checkIn || new Date().toISOString().split('T')[0],
       checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
       guests,
-      filters: { sortBy, minRating, maxPrice, amenities }
+      filters: { sortBy, minRating, maxPrice }
     };
   } catch (error) {
     console.error('Error in searchHotels:', error);
