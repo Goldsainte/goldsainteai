@@ -216,7 +216,8 @@ The user has saved preferences but has chosen to search without strict filtering
     }
 
     // Sequential question flow with state tracking
-    let quickLinkState = conversationHistory.find((msg: any) => msg.quickLinkState)?.quickLinkState;
+    // Get the MOST RECENT quickLinkState, not the first one
+    let quickLinkState = [...conversationHistory].reverse().find((msg: any) => msg.quickLinkState)?.quickLinkState;
     
     // Initialize state for quick links
     if (isQuickLink && !quickLinkState) {
