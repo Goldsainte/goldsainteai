@@ -497,6 +497,15 @@ const Index = () => {
     handleSearch(cuisine);
   };
 
+  const getPlaceholderText = () => {
+    if (activeQuickLink === 'hotels') return 'Ask about hotels, accommodations, or places to stay...';
+    if (activeQuickLink === 'flights') return 'Ask about flights, airfare, or travel...';
+    if (activeQuickLink === 'restaurants') return 'Ask about restaurants, dining, or cuisine...';
+    if (activeQuickLink === 'events') return 'Ask about events, concerts, or entertainment...';
+    if (activeQuickLink === 'cars') return 'Ask about car rentals or transportation...';
+    return 'Ask me anything about travel...';
+  };
+
   const showChat = messages.length > 0;
 
   return (
@@ -1059,7 +1068,7 @@ const Index = () => {
                   <div className="p-2">
                     <div className="relative">
                       <Input
-                        placeholder="Ask me anything about travel..."
+                        placeholder={getPlaceholderText()}
                         className="w-full h-12 px-4 pr-14 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
