@@ -52,17 +52,32 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
   const handleBooking = async () => {
     setLoading(true);
     try {
+      // Check if user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Please log in to book a flight", {
+          action: {
+            label: "Log In",
+            onClick: () => navigate('/auth')
+          }
+        });
+        setLoading(false);
+        return;
+      }
+
       // Validate passenger info
       for (let i = 0; i < passengers.length; i++) {
         const p = passengers[i];
         if (!p.firstName || !p.lastName || !p.dateOfBirth || !p.gender) {
           toast.error(`Please complete all required fields for passenger ${i + 1}`);
+          setLoading(false);
           return;
         }
       }
 
       if (!contactInfo.email || !contactInfo.phone) {
         toast.error("Please provide contact information");
+        setLoading(false);
         return;
       }
 
