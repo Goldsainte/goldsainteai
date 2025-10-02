@@ -456,8 +456,14 @@ The user has saved preferences but has chosen to search without strict filtering
           const txt = (m || '').trim();
           if (!txt) continue;
           const lower = txt.toLowerCase();
+          // Skip messages that are clearly not city names
+          if (lower.startsWith('dates:') || lower.startsWith('budget:') || lower.startsWith('cuisine:')) continue;
           if (lower.includes('looking for') || lower.includes('restaurants')) continue;
-          if (txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
+          if (/^\$?\d+$/.test(txt)) continue; // Skip pure numbers/prices
+          // Check if it matches a known cuisine - if so, skip it
+          const CUISINES = ['italian','french','japanese','chinese','mexican','indian','thai','mediterranean','american','korean','vietnamese','spanish','greek','middle eastern','seafood','steakhouse','vegetarian','vegan','any'];
+          if (CUISINES.includes(lower)) continue;
+          if (txt.split(/\s+/).length <= 6) {
             return txt;
           }
         }
@@ -466,18 +472,22 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractCuisine = (): string | null => {
         const msgs = getLastUserMessages().slice().reverse();
-        const city = extractCity();
-        const cityVariations = city ? getCityVariations(city).map(s => s.toLowerCase()) : [];
         const CUISINES = ['italian','french','japanese','chinese','mexican','indian','thai','mediterranean','american','korean','vietnamese','spanish','greek','middle eastern','seafood','steakhouse','vegetarian','vegan','any'];
+        
         for (const m of msgs) {
           const txt = (m || '').trim();
           if (!txt) continue;
           const lower = txt.toLowerCase();
-          if (lower.includes('looking for') || lower.includes('restaurant') || lower.includes('restaurants') || lower.includes('budget')) continue;
-          if (city && (lower === city.toLowerCase() || cityVariations.includes(lower))) continue;
-          // Try to match known cuisines within the text
-          const match = CUISINES.find(c => lower === c || lower.includes(c));
-          if (match) return match.charAt(0).toUpperCase() + match.slice(1);
+          // Skip non-cuisine messages
+          if (lower.includes('looking for') || lower.includes('restaurant') || lower.includes('restaurants')) continue;
+          if (/^\$?\d+$/.test(txt)) continue; // Skip prices
+          
+          // Direct match or contains cuisine keyword
+          const match = CUISINES.find(c => lower === c || (lower.length < 20 && lower.includes(c)));
+          if (match) {
+            console.log('Cuisine extracted:', match);
+            return match.charAt(0).toUpperCase() + match.slice(1);
+          }
         }
         return null;
       };
