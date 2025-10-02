@@ -2,13 +2,63 @@ import { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Card } from '@/components/ui/card';
-import { MapPin } from 'lucide-react';
+import { MapPin, Hotel, UtensilsCrossed, Calendar } from 'lucide-react';
 
 interface ResultsMapViewProps {
   location: string;
   results: any[];
   type?: string;
 }
+
+const getMarkerColor = (type: string) => {
+  switch (type) {
+    case 'restaurants':
+      return '#EF4444'; // red
+    case 'events':
+      return '#8B5CF6'; // purple
+    default:
+      return '#C4A962'; // gold for hotels
+  }
+};
+
+const getPopupContent = (result: any, type: string) => {
+  const name = result.name || result.title || 'Location';
+  const address = result.address || result.location || '';
+  
+  let details = '';
+  if (type === 'restaurants') {
+    const rating = result.rating ? `⭐ ${result.rating}` : '';
+    const cuisine = result.cuisine || '';
+    const price = result.price_level || '';
+    details = `
+      ${rating ? `<div class="text-xs">${rating}</div>` : ''}
+      ${cuisine ? `<div class="text-xs text-muted-foreground">${cuisine}</div>` : ''}
+      ${price ? `<div class="text-xs">${price}</div>` : ''}
+    `;
+  } else if (type === 'hotels') {
+    const price = result.price || result.estimated_price;
+    const rating = result.property?.reviewScore || (result.rating ? Number(result.rating) * 2 : 0);
+    details = `
+      ${price ? `<div class="text-xs font-semibold">$${Math.round(price)}/night</div>` : ''}
+      ${rating ? `<div class="text-xs">⭐ ${rating.toFixed(1)}</div>` : ''}
+    `;
+  } else if (type === 'events') {
+    const date = result.date || '';
+    const venue = result.venue || '';
+    details = `
+      ${date ? `<div class="text-xs">${date}</div>` : ''}
+      ${venue ? `<div class="text-xs text-muted-foreground">${venue}</div>` : ''}
+    `;
+  }
+
+  return `
+    <div class="p-2 min-w-[200px]">
+      <h3 class="font-semibold text-sm mb-1">${name}</h3>
+      ${address ? `<p class="text-xs text-muted-foreground mb-1">${address}</p>` : ''}
+      ${details}
+    </div>
+  `;
+};
 
 export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMapViewProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -28,12 +78,11 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
 
       mapboxgl.accessToken = mapboxToken;
       
-      // Initialize map centered on the location
-      // In production, you'd geocode the location string to get coordinates
+      // Initialize map
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [2.3522, 48.8566], // Default to Paris, should be geocoded from location
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-73.935242, 40.730610], // Default to NYC
         zoom: 12,
       });
 
@@ -45,22 +94,36 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
         'top-right'
       );
 
+      const markerColor = getMarkerColor(type);
+      const bounds = new mapboxgl.LngLatBounds();
+      let hasValidCoordinates = false;
+
       // Add markers for each result with coordinates
-      results.forEach((result, index) => {
-        if (result.latitude && result.longitude) {
-          const marker = new mapboxgl.Marker({ color: '#C4A962' })
-            .setLngLat([result.longitude, result.latitude])
+      results.forEach((result) => {
+        const lat = Number(result.latitude);
+        const lng = Number(result.longitude);
+        
+        if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+          hasValidCoordinates = true;
+          bounds.extend([lng, lat]);
+          
+          const marker = new mapboxgl.Marker({ color: markerColor })
+            .setLngLat([lng, lat])
             .setPopup(
-              new mapboxgl.Popup({ offset: 25 }).setHTML(
-                `<div class="p-2">
-                  <h3 class="font-semibold text-sm">${result.name || result.title || 'Property'}</h3>
-                  <p class="text-xs text-muted-foreground">${result.price ? `$${result.price}/night` : ''}</p>
-                </div>`
-              )
+              new mapboxgl.Popup({ offset: 25, maxWidth: '300px' })
+                .setHTML(getPopupContent(result, type))
             )
             .addTo(map.current!);
         }
       });
+
+      // Fit map to show all markers
+      if (hasValidCoordinates) {
+        map.current.fitBounds(bounds, {
+          padding: { top: 50, bottom: 50, left: 50, right: 50 },
+          maxZoom: 15,
+        });
+      }
 
       // Cleanup
       return () => {
@@ -88,12 +151,31 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
     );
   }
 
+  const getTypeLabel = () => {
+    switch (type) {
+      case 'restaurants':
+        return 'Restaurant';
+      case 'events':
+        return 'Event';
+      default:
+        return 'Hotel';
+    }
+  };
+
+  const TypeIcon = type === 'restaurants' ? UtensilsCrossed : type === 'events' ? Calendar : Hotel;
+
   return (
     <Card className="overflow-hidden mb-4">
+      <div className="bg-muted/50 px-4 py-2 border-b flex items-center gap-2">
+        <TypeIcon className="h-4 w-4 text-primary" />
+        <span className="text-sm font-medium">
+          {getTypeLabel()} Locations Map - {results.length} Results
+        </span>
+      </div>
       <div 
         ref={mapContainer} 
-        className="w-full h-[250px]"
-        style={{ minHeight: '250px' }}
+        className="w-full h-[350px]"
+        style={{ minHeight: '350px' }}
       />
     </Card>
   );

@@ -440,8 +440,8 @@ const SearchResults = () => {
 
               {/* Results List */}
               <main className="lg:col-span-9">
-                {/* Map View at Top */}
-                {searchType === "hotels" && (
+                {/* Map View at Top for hotels, restaurants, and events */}
+                {(searchType === "hotels" || searchType === "restaurants" || searchType === "events") && (
                   <ResultsMapView 
                     location={location || ''} 
                     results={filteredResults}
