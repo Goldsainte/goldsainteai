@@ -402,8 +402,13 @@ const handler = async (req: Request): Promise<Response> => {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
+            @import url('https://fonts.googleapis.com/css2?family=Gupter:wght@400;500;700&display=swap');
+            @font-face {
+              font-family: 'Chiffon';
+              src: url('https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/Chiffon.otf') format('opentype');
+            }
             body {
-              font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              font-family: 'Gupter', BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
               margin: 0;
               padding: 0;
               background-color: #E5DFC6;
@@ -431,18 +436,20 @@ const handler = async (req: Request): Promise<Response> => {
               padding: 0 8px;
             }
             h1 {
-              font-size: 24px;
-              line-height: 32px;
-              font-weight: bold;
-              color: #333333;
+              font-family: 'Chiffon', serif;
+              font-size: 32px;
+              line-height: 40px;
+              font-weight: normal;
+              color: #0c4d47;
               margin: 32px 0 16px 0;
               padding: 0 8px;
             }
             h2 {
-              font-size: 16px;
-              line-height: 24px;
-              font-weight: bold;
-              color: #333333;
+              font-family: 'Chiffon', serif;
+              font-size: 22px;
+              line-height: 28px;
+              font-weight: normal;
+              color: #0c4d47;
               margin: 16px 0;
               padding: 0 8px;
             }
