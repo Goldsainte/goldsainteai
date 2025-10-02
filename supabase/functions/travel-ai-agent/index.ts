@@ -215,8 +215,37 @@ The user has saved preferences but has chosen to search without strict filtering
       }
     }
 
-    // Conversational approach is now the default for all interactions
-    // The AI will use tools to search when it has enough information
+    // For quick links, guide the conversation more explicitly while keeping it natural
+    // Quick links need some structure to ensure the AI gathers required info
+    const quickLinkSystemAddition = isQuickLink ? `
+
+QUICK LINK MODE: The user clicked a quick link for ${quickLinkType}. Your job is to gather the minimum required information naturally and then search immediately:
+
+For ${quickLinkType}:
+${quickLinkType === 'hotels' ? `
+- Required: location (city), check-in date, check-out date
+- After getting these, call search_hotels immediately
+- If they just give a city name, ask about dates naturally
+- Example: User says "paris" → You say "Perfect! When would you like to check in?" then after dates → call search_hotels
+` : quickLinkType === 'flights' ? `
+- Required: origin, destination, departure date
+- After getting these, call search_flights immediately  
+- If missing origin, ask naturally: "Where will you be flying from?"
+- Example: User says "to Tokyo" → You ask "Where from?" → then call search_flights
+` : quickLinkType === 'restaurants' ? `
+- Required: city/location
+- Optional but helpful: cuisine type
+- After getting location, call search_restaurants immediately
+- Example: User says "New York" → call search_restaurants right away
+` : quickLinkType === 'events' ? `
+- Required: city/location
+- Optional: date range, event type
+- After getting location, call search_events immediately
+` : ''}
+
+CRITICAL: When you have the required information, call the search tool IMMEDIATELY. Don't keep asking questions.` : '';
+
+    // Conversational approach for all interactions with optional quick link guidance
 
 
 
@@ -495,6 +524,7 @@ ONLY search when you have enough information to provide relevant results. It's b
       {
         role: "system",
         content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}${userContext}
+${quickLinkSystemAddition}
 ${conversationalBehavior}
 
 ⚠️ CRITICAL PREFERENCE ENFORCEMENT:
