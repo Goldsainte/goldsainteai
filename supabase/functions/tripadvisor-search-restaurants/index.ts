@@ -68,9 +68,9 @@ serve(async (req) => {
       }
       offset += page.length;
 
-      // Increased limit for more comprehensive results
-      if (allSearchResults.length >= 1000) {
-        console.log('Reached maximum limit of 1000 results');
+      // Limit to 100 results for faster loading
+      if (allSearchResults.length >= 100) {
+        console.log('Reached maximum limit of 100 results');
         break;
       }
     }
