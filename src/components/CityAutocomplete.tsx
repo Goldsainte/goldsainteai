@@ -16,8 +16,13 @@ interface CitySuggestion {
     city?: string;
     town?: string;
     village?: string;
+    municipality?: string;
+    locality?: string;
     state?: string;
     country?: string;
+  };
+  extratags?: {
+    admin_level?: string;
   };
 }
 
@@ -42,15 +47,19 @@ export const CityAutocomplete = ({
 
   // Build a user-friendly label
   const getLabel = (s: CitySuggestion) => {
-    const city = s.address?.city || s.address?.town || s.address?.village;
+    const cityField = s.address?.city || s.address?.town || s.address?.village || s.address?.municipality || s.address?.locality;
+    const city = cityField || (s.display_name ? s.display_name.split(",")[0] : "");
     const state = s.address?.state;
     const country = s.address?.country;
     return [city, state, country].filter(Boolean).join(", ");
   };
 
-  const filtered = useMemo(() => {
-    return results.filter((r) => r.class === "place" && ["city", "town", "village", "municipality", "locality"].includes(r.type));
-  }, [results]);
+  const isCityLike = (r: CitySuggestion) => {
+    const placeTypes = ["city", "town", "village", "municipality", "locality", "hamlet", "suburb"];
+    if (r.class === "place" && placeTypes.includes(r.type)) return true;
+    if (r.class === "boundary" && r.type === "administrative" && ["8", "9", "10"].includes(r.extratags?.admin_level || "")) return true;
+    return false;
+  };
 
   useEffect(() => {
     // Debounce queries to avoid spamming the API
@@ -67,7 +76,7 @@ export const CityAutocomplete = ({
         controllerRef.current?.abort();
         controllerRef.current = new AbortController();
         setLoading(true);
-        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=8&q=${encodeURIComponent(
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&extratags=1&dedupe=1&limit=8&q=${encodeURIComponent(
           value.trim()
         )}`;
         const res = await fetch(url, {
@@ -79,8 +88,9 @@ export const CityAutocomplete = ({
         });
         if (!res.ok) throw new Error("Geocoding failed");
         const data: CitySuggestion[] = await res.json();
-        setResults(data);
-        setOpen(data.length > 0);
+        const filteredData = data.filter(isCityLike);
+        setResults(filteredData);
+        setOpen(filteredData.length > 0);
       } catch (e) {
         if ((e as any).name !== "AbortError") {
           console.warn("City autocomplete error", e);
@@ -115,7 +125,7 @@ export const CityAutocomplete = ({
               className={cn("pl-10 h-12 border-border text-base", className)}
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              onFocus={() => filtered.length > 0 && setOpen(true)}
+              onFocus={() => results.length > 0 && setOpen(true)}
               autoComplete="off"
             />
           </div>
@@ -125,11 +135,11 @@ export const CityAutocomplete = ({
             <CommandList>
               {loading ? (
                 <CommandEmpty>Searching...</CommandEmpty>
-              ) : filtered.length === 0 ? (
+              ) : results.length === 0 ? (
                 <CommandEmpty>No locations found.</CommandEmpty>
               ) : (
                 <CommandGroup>
-                  {filtered.map((s) => {
+                  {results.map((s) => {
                     const label = getLabel(s) || s.display_name;
                     return (
                       <CommandItem key={s.place_id} value={label} onSelect={() => handleSelect(s)} className="cursor-pointer">
