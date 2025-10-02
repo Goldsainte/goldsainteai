@@ -130,30 +130,32 @@ export default function EmailPreview() {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          body {
-            font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-          }
-          .container {
-            max-width: 640px;
-            margin: 0 auto;
-            background: #ffffff;
-          }
-          .header {
-            background: #003580;
-            padding: 24px;
-            text-align: center;
-          }
-          .logo {
-            color: #ffffff;
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            margin: 0;
-          }
+          <style>
+            body {
+              font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              background-color: #E5DFC6;
+            }
+            .container {
+              max-width: 640px;
+              margin: 0 auto;
+              background: #ffffff;
+            }
+            .header {
+              background: #0c4d47;
+              padding: 24px;
+              text-align: center;
+            }
+            .logo {
+              max-width: 280px;
+              height: auto;
+            }
+            .hero-image {
+              width: 100%;
+              height: auto;
+              display: block;
+            }
           .content {
             padding: 0 8px;
           }
@@ -180,27 +182,28 @@ export default function EmailPreview() {
             margin: 16px 0;
             padding: 0 8px;
           }
-          .conf-box {
-            border: 2px solid #008009;
-            border-radius: 4px;
-            padding: 16px;
-            margin: 16px 8px;
-            text-align: center;
-          }
-          .conf-label {
-            font-size: 12px;
-            color: #595959;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-          }
-          .conf-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: #333333;
-            letter-spacing: 2px;
-            font-family: monospace;
-          }
+            .conf-box {
+              border: 2px solid #bfad72;
+              border-radius: 4px;
+              padding: 16px;
+              margin: 16px 8px;
+              text-align: center;
+              background: #f9f8f5;
+            }
+            .conf-label {
+              font-size: 12px;
+              color: #8d8d8d;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 4px;
+            }
+            .conf-number {
+              font-size: 28px;
+              font-weight: 700;
+              color: #0A2225;
+              letter-spacing: 2px;
+              font-family: monospace;
+            }
           .info-box {
             border: 1px solid #e7e7e7;
             border-radius: 4px;
@@ -236,13 +239,13 @@ export default function EmailPreview() {
             padding: 16px;
             margin: 12px 0;
           }
-          .segment-header {
-            font-size: 14px;
-            font-weight: 600;
-            color: #008009;
-            margin-bottom: 12px;
-            text-transform: uppercase;
-          }
+            .segment-header {
+              font-size: 14px;
+              font-weight: 600;
+              color: #0c4d47;
+              margin-bottom: 12px;
+              text-transform: uppercase;
+            }
           .flight-times {
             display: table;
             width: 100%;
@@ -341,14 +344,14 @@ export default function EmailPreview() {
             font-weight: 700;
             color: #333333;
           }
-          .footer {
-            background: #f5f5f5;
-            text-align: center;
-            padding: 24px;
-            color: #595959;
-            font-size: 12px;
-            margin-top: 32px;
-          }
+            .footer {
+              background: #0A2225;
+              text-align: center;
+              padding: 24px;
+              color: #E5DFC6;
+              font-size: 12px;
+              margin-top: 32px;
+            }
           @media only screen and (max-width: 639px) {
             .info-label, .info-value {
               display: block;
@@ -368,8 +371,10 @@ export default function EmailPreview() {
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo">GOLDSAINTE</div>
+            <img src="/wordmark-gold.png" alt="GoldSainte" class="logo" />
           </div>
+          
+          <img src="/email-hero-luxury.jpg" alt="Luxury Travel" class="hero-image" />
           
           <div class="content">
             <h1>✓ Your flight is confirmed</h1>
