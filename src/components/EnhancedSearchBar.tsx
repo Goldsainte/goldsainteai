@@ -73,6 +73,43 @@ export const EnhancedSearchBar = () => {
 
   const [showPassengerPopover, setShowPassengerPopover] = useState(false);
 
+  // Sync state with URL parameters when they change
+  useEffect(() => {
+    const currentType = searchParams.get("type") || "hotels";
+    const location = searchParams.get("location") || "";
+    
+    setSearchType(currentType);
+    
+    // Update location fields based on search type
+    if (currentType === "hotels") {
+      setHotelLocation(location);
+      const checkIn = searchParams.get("checkIn");
+      const checkOut = searchParams.get("checkOut");
+      if (checkIn) setCheckInDate(new Date(checkIn));
+      if (checkOut) setCheckOutDate(new Date(checkOut));
+    } else if (currentType === "restaurants") {
+      setRestaurantLocation(location);
+      const date = searchParams.get("date");
+      const time = searchParams.get("time");
+      if (date) setRestaurantDate(new Date(date));
+      if (time) setRestaurantTime(time);
+    } else if (currentType === "events") {
+      setEventLocation(location);
+      const date = searchParams.get("date");
+      if (date) setEventDate(new Date(date));
+    } else if (currentType === "flights") {
+      const origin = searchParams.get("origin");
+      const destination = searchParams.get("destination");
+      const departureDate = searchParams.get("departureDate");
+      const returnDate = searchParams.get("returnDate");
+      
+      if (origin) setOrigin(origin);
+      if (destination) setDestination(destination);
+      if (departureDate) setDepartureDate(new Date(departureDate));
+      if (returnDate) setReturnDate(new Date(returnDate));
+    }
+  }, [searchParams]);
+
   const handleSwapLocations = () => {
     const temp = origin;
     setOrigin(destination);
