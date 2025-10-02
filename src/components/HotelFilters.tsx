@@ -5,14 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetClose } from "@/components/ui/sheet";
-import { SlidersHorizontal, ArrowUpDown, X, DollarSign, Star } from "lucide-react";
+import { SlidersHorizontal, ArrowUpDown, X, DollarSign, Star, Building2, Home } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 interface HotelFiltersProps {
   onSortChange: (sortBy: string) => void;
   onMinRatingChange: (rating: number | null) => void;
   onPriceRangeChange?: (min: number, max: number) => void;
   onAmenitiesChange?: (amenities: string[]) => void;
+  onPropertyTypesChange?: (types: string[]) => void;
+  onStarRatingsChange?: (ratings: number[]) => void;
   currentSort?: string;
   currentMinRating?: number;
   currentPriceRange?: [number, number];
@@ -24,6 +27,8 @@ export const HotelFilters = ({
   onMinRatingChange,
   onPriceRangeChange,
   onAmenitiesChange,
+  onPropertyTypesChange,
+  onStarRatingsChange,
   currentSort = 'popularity',
   currentMinRating,
   currentPriceRange = [0, 1000],
@@ -31,16 +36,38 @@ export const HotelFilters = ({
 }: HotelFiltersProps) => {
   const [priceRange, setPriceRange] = useState<[number, number]>(currentPriceRange);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const [selectedStarRatings, setSelectedStarRatings] = useState<number[]>([]);
   
+  const propertyTypes = [
+    "Hotels",
+    "Apartments",
+    "Resorts",
+    "Villas",
+    "Vacation Homes",
+    "Guesthouses",
+    "Homestays",
+    "Hostels",
+    "Motels",
+    "Bed & Breakfast"
+  ];
+
   const amenitiesList = [
     "Free WiFi",
     "Free Parking",
-    "Pool",
-    "Gym",
+    "Swimming Pool",
+    "Fitness Center",
     "Restaurant",
     "Room Service",
+    "Bar/Lounge",
     "Airport Shuttle",
-    "Pet Friendly"
+    "Spa",
+    "Pet Friendly",
+    "Business Center",
+    "Concierge",
+    "Kitchen/Kitchenette",
+    "Air Conditioning",
+    "Non-smoking Rooms"
   ];
 
   const handleAmenityToggle = (amenity: string) => {
@@ -51,7 +78,24 @@ export const HotelFilters = ({
     onAmenitiesChange?.(updated);
   };
 
-  const hasActiveFilters = currentMinRating || currentSort !== 'popularity' || selectedAmenities.length > 0;
+  const handlePropertyTypeToggle = (type: string) => {
+    const updated = selectedPropertyTypes.includes(type)
+      ? selectedPropertyTypes.filter(t => t !== type)
+      : [...selectedPropertyTypes, type];
+    setSelectedPropertyTypes(updated);
+    onPropertyTypesChange?.(updated);
+  };
+
+  const handleStarRatingToggle = (rating: number) => {
+    const updated = selectedStarRatings.includes(rating)
+      ? selectedStarRatings.filter(r => r !== rating)
+      : [...selectedStarRatings, rating];
+    setSelectedStarRatings(updated);
+    onStarRatingsChange?.(updated);
+  };
+
+  const hasActiveFilters = currentMinRating || currentSort !== 'popularity' || 
+    selectedAmenities.length > 0 || selectedPropertyTypes.length > 0 || selectedStarRatings.length > 0;
 
   return (
     <div className="space-y-3">
@@ -101,9 +145,9 @@ export const HotelFilters = ({
             <Button variant="outline" size="sm" className="gap-2">
               <SlidersHorizontal className="h-4 w-4" />
               More Filters
-              {selectedAmenities.length > 0 && (
+              {(selectedAmenities.length + selectedPropertyTypes.length + selectedStarRatings.length) > 0 && (
                 <Badge variant="secondary" className="ml-1 h-5 min-w-[1.25rem] px-1">
-                  {selectedAmenities.length}
+                  {selectedAmenities.length + selectedPropertyTypes.length + selectedStarRatings.length}
                 </Badge>
               )}
             </Button>
@@ -116,54 +160,143 @@ export const HotelFilters = ({
               </SheetDescription>
             </SheetHeader>
             
-            <div className="space-y-6 mt-6">
+            <Accordion type="multiple" className="space-y-4 mt-6">
               {/* Price Range */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <Label className="text-base font-semibold flex items-center gap-2">
+              <AccordionItem value="price" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4" />
-                    Price Range
-                  </Label>
-                  <span className="text-sm text-muted-foreground">
-                    ${priceRange[0]} - ${priceRange[1]}
-                  </span>
-                </div>
-                <Slider
-                  min={0}
-                  max={1000}
-                  step={50}
-                  value={priceRange}
-                  onValueChange={(value) => {
-                    setPriceRange(value as [number, number]);
-                    onPriceRangeChange?.(value[0], value[1]);
-                  }}
-                  className="mt-2"
-                />
-              </div>
+                    <span className="font-semibold">Price Range</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4 pb-2">
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        ${priceRange[0]} - ${priceRange[1]}
+                      </span>
+                    </div>
+                    <Slider
+                      min={0}
+                      max={1000}
+                      step={50}
+                      value={priceRange}
+                      onValueChange={(value) => {
+                        setPriceRange(value as [number, number]);
+                        onPriceRangeChange?.(value[0], value[1]);
+                      }}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Property Type */}
+              <AccordionItem value="property-type" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4" />
+                    <span className="font-semibold">Property Type</span>
+                    {selectedPropertyTypes.length > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {selectedPropertyTypes.length}
+                      </Badge>
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4 pb-2">
+                  <div className="space-y-3">
+                    {propertyTypes.map((type) => (
+                      <div key={type} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`type-${type}`}
+                          checked={selectedPropertyTypes.includes(type)}
+                          onCheckedChange={() => handlePropertyTypeToggle(type)}
+                        />
+                        <label
+                          htmlFor={`type-${type}`}
+                          className="text-sm font-medium leading-none cursor-pointer"
+                        >
+                          {type}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Star Rating */}
+              <AccordionItem value="star-rating" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-4 w-4" />
+                    <span className="font-semibold">Star Rating</span>
+                    {selectedStarRatings.length > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {selectedStarRatings.length}
+                      </Badge>
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4 pb-2">
+                  <div className="space-y-3">
+                    {[5, 4, 3, 2, 1].map((rating) => (
+                      <div key={rating} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`star-${rating}`}
+                          checked={selectedStarRatings.includes(rating)}
+                          onCheckedChange={() => handleStarRatingToggle(rating)}
+                        />
+                        <label
+                          htmlFor={`star-${rating}`}
+                          className="text-sm font-medium leading-none cursor-pointer flex items-center gap-1"
+                        >
+                          {Array.from({ length: rating }).map((_, i) => (
+                            <Star key={i} className="h-3 w-3 fill-primary text-primary" />
+                          ))}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
 
               {/* Amenities */}
-              <div className="space-y-3">
-                <Label className="text-base font-semibold">Amenities</Label>
-                <div className="space-y-3">
-                  {amenitiesList.map((amenity) => (
-                    <div key={amenity} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={amenity}
-                        checked={selectedAmenities.includes(amenity)}
-                        onCheckedChange={() => handleAmenityToggle(amenity)}
-                      />
-                      <label
-                        htmlFor={amenity}
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                      >
-                        {amenity}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <AccordionItem value="amenities" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-2">
+                    <Home className="h-4 w-4" />
+                    <span className="font-semibold">Amenities</span>
+                    {selectedAmenities.length > 0 && (
+                      <Badge variant="secondary" className="ml-2">
+                        {selectedAmenities.length}
+                      </Badge>
+                    )}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pt-4 pb-2">
+                  <div className="space-y-3">
+                    {amenitiesList.map((amenity) => (
+                      <div key={amenity} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={amenity}
+                          checked={selectedAmenities.includes(amenity)}
+                          onCheckedChange={() => handleAmenityToggle(amenity)}
+                        />
+                        <label
+                          htmlFor={amenity}
+                          className="text-sm font-medium leading-none cursor-pointer"
+                        >
+                          {amenity}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
 
-              {/* Apply Button */}
+            {/* Apply Button */}
+            <div className="mt-6">
               <SheetClose asChild>
                 <Button className="w-full">
                   Apply Filters
@@ -182,6 +315,10 @@ export const HotelFilters = ({
               onMinRatingChange(null);
               setSelectedAmenities([]);
               onAmenitiesChange?.([]);
+              setSelectedPropertyTypes([]);
+              onPropertyTypesChange?.([]);
+              setSelectedStarRatings([]);
+              onStarRatingsChange?.([]);
               setPriceRange([0, 1000]);
               onPriceRangeChange?.(0, 1000);
             }}
@@ -194,7 +331,7 @@ export const HotelFilters = ({
       </div>
 
       {/* Active Filters Display */}
-      {(selectedAmenities.length > 0 || currentMinRating) && (
+      {(selectedAmenities.length > 0 || selectedPropertyTypes.length > 0 || selectedStarRatings.length > 0 || currentMinRating) && (
         <div className="flex flex-wrap gap-2 px-4">
           {currentMinRating && (
             <Badge variant="secondary" className="gap-1">
@@ -205,6 +342,24 @@ export const HotelFilters = ({
               />
             </Badge>
           )}
+          {selectedPropertyTypes.map((type) => (
+            <Badge key={type} variant="secondary" className="gap-1">
+              {type}
+              <X 
+                className="h-3 w-3 cursor-pointer" 
+                onClick={() => handlePropertyTypeToggle(type)}
+              />
+            </Badge>
+          ))}
+          {selectedStarRatings.map((rating) => (
+            <Badge key={rating} variant="secondary" className="gap-1">
+              {rating} Star
+              <X 
+                className="h-3 w-3 cursor-pointer" 
+                onClick={() => handleStarRatingToggle(rating)}
+              />
+            </Badge>
+          ))}
           {selectedAmenities.map((amenity) => (
             <Badge key={amenity} variant="secondary" className="gap-1">
               {amenity}

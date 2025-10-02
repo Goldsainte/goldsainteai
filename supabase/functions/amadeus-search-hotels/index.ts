@@ -91,8 +91,8 @@ serve(async (req) => {
       });
     }
 
-    // Get first 40 hotel IDs for faster response
-    const hotelIds = hotelListData.data.slice(0, 40).map((hotel: any) => hotel.hotelId).join(',');
+    // Get first 200 hotel IDs for comprehensive filtering
+    const hotelIds = hotelListData.data.slice(0, 200).map((hotel: any) => hotel.hotelId).join(',');
     console.log('Fetching offers for hotel IDs');
 
     // Step 2: Get hotel offers with prices

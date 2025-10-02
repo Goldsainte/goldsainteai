@@ -34,6 +34,8 @@ const SearchResults = () => {
   const [minRating, setMinRating] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
+  const [selectedStarRatings, setSelectedStarRatings] = useState<number[]>([]);
   const [userPreferences, setUserPreferences] = useState<any>(null);
 
   const searchType = searchParams.get("type") || "hotels";
@@ -186,10 +188,28 @@ const SearchResults = () => {
       });
     }
 
-    // Apply amenities filter (user preferences)
+    // Apply property type filter
+    if (selectedPropertyTypes.length > 0) {
+      filtered = filtered.filter((item) => {
+        const propertyType = item.hotel?.type || item.property?.propertyType || item.type || '';
+        return selectedPropertyTypes.some(type => 
+          propertyType.toLowerCase().includes(type.toLowerCase())
+        );
+      });
+    }
+
+    // Apply star rating filter
+    if (selectedStarRatings.length > 0) {
+      filtered = filtered.filter((item) => {
+        const starRating = item.hotel?.rating || item.property?.starRating || item.rating || 0;
+        return selectedStarRatings.includes(Math.floor(Number(starRating)));
+      });
+    }
+
+    // Apply amenities filter
     if (selectedAmenities.length > 0) {
       filtered = filtered.filter((item) => {
-        const itemAmenities = item.property?.amenities || [];
+        const itemAmenities = item.hotel?.amenities || item.property?.amenities || item.amenities || [];
         return selectedAmenities.some(amenity => 
           itemAmenities.some((a: string) => a.toLowerCase().includes(amenity.toLowerCase()))
         );
@@ -217,7 +237,7 @@ const SearchResults = () => {
     }
 
     setFilteredResults(filtered);
-  }, [results, priceRange, minRating, sortBy]);
+  }, [results, priceRange, minRating, sortBy, selectedAmenities, selectedPropertyTypes, selectedStarRatings]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -345,6 +365,8 @@ const SearchResults = () => {
                     onMinRatingChange={setMinRating}
                     onPriceRangeChange={(min, max) => setPriceRange([min, max])}
                     onAmenitiesChange={setSelectedAmenities}
+                    onPropertyTypesChange={setSelectedPropertyTypes}
+                    onStarRatingsChange={setSelectedStarRatings}
                     currentSort={sortBy}
                     currentMinRating={minRating || undefined}
                     currentPriceRange={priceRange}
