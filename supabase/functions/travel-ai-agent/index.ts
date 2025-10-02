@@ -298,6 +298,23 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.location = message;
           shouldSearch = true;
         }
+      } else if (type === 'cars') {
+        if (step === 0) {
+          // Ask for pickup location
+          nextStep = 1;
+        } else if (step === 1) {
+          // Got location, ask for pickup date
+          nextData.pickupLocation = message;
+          nextStep = 2;
+        } else if (step === 2) {
+          // Got pickup date, ask for return date
+          nextData.pickupDate = message;
+          nextStep = 3;
+        } else if (step === 3) {
+          // Got return date, search
+          nextData.returnDate = message;
+          shouldSearch = true;
+        }
       }
       
       // Execute search if ready
@@ -326,6 +343,12 @@ The user has saved preferences but has chosen to search without strict filtering
         } else if (type === 'events') {
           toolResult = await searchEvents({
             location: nextData.location
+          });
+        } else if (type === 'cars') {
+          toolResult = await searchCars({
+            pickupLocation: nextData.pickupLocation,
+            pickupDate: nextData.pickupDate,
+            returnDate: nextData.returnDate
           });
         }
         
@@ -359,6 +382,10 @@ The user has saved preferences but has chosen to search without strict filtering
         else if (nextStep === 2) nextQuestion = "What type of cuisine are you interested in? (or say 'any' for all types)";
       } else if (type === 'events') {
         if (nextStep === 1) nextQuestion = "Which city would you like to find events in?";
+      } else if (type === 'cars') {
+        if (nextStep === 1) nextQuestion = "Where would you like to pick up the car?";
+        else if (nextStep === 2) nextQuestion = `Great! When would you like to pick up the car in ${nextData.pickupLocation}?`;
+        else if (nextStep === 3) nextQuestion = "And when would you like to return the car?";
       }
       
       return new Response(JSON.stringify({
@@ -1600,6 +1627,72 @@ async function searchFlights(args: any) {
 
   } catch (error) {
     console.error('Error in searchFlights:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+async function searchCars(args: any) {
+  try {
+    const { pickupLocation, pickupDate, returnDate } = args;
+    console.log('searchCars called with:', { pickupLocation, pickupDate, returnDate });
+
+    // Get Amadeus credentials
+    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
+    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
+    if (!amadeusKey || !amadeusSecret) {
+      return { error: 'Amadeus credentials not configured', results: [] };
+    }
+
+    // Get Amadeus token
+    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
+    });
+
+    if (!tokenResponse.ok) {
+      return { error: 'Failed to authenticate with Amadeus', results: [] };
+    }
+
+    const { access_token } = await tokenResponse.json();
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      pickupLocation,
+      pickupDate,
+      dropoffDate: returnDate,
+      currencyCode: 'USD'
+    });
+
+    const response = await fetch(
+      `https://test.api.amadeus.com/v1/shopping/car-rental-offers?${params}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Amadeus car search error:', error);
+      return { error: 'Car search failed', results: [] };
+    }
+
+    const data = await response.json();
+    console.log('Cars found:', data.data?.length || 0);
+
+    return {
+      type: 'cars',
+      pickupLocation,
+      pickupDate,
+      returnDate,
+      results: data.data || [],
+      meta: data.meta
+    };
+
+  } catch (error) {
+    console.error('Error in searchCars:', error);
     return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
   }
 }
