@@ -82,11 +82,12 @@ export const useSearchHistory = () => {
 
     try {
       // Insert into database
+      const normalizedType = (search.type || '').replace(/s$/, '');
       const { data, error } = await supabase
         .from('search_history')
         .insert({
           user_id: user.id,
-          search_type: search.type,
+          search_type: normalizedType,
           search_params: {
             location: search.location,
             checkIn: search.checkIn,

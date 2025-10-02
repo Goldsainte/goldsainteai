@@ -54,6 +54,24 @@ export function AppSidebar() {
   };
 
   const handleHistoryClick = (item: any) => {
+    // Helper to pluralize types for SearchResults route
+    const getPluralType = (t: string) => {
+      switch (t) {
+        case 'flight':
+          return 'flights';
+        case 'hotel':
+          return 'hotels';
+        case 'restaurant':
+          return 'restaurants';
+        case 'event':
+          return 'events';
+        case 'destination':
+          return 'destinations';
+        default:
+          return t.endsWith('s') ? t : `${t}s`;
+      }
+    };
+
     // Handle flight searches differently
     if (item.type === 'flight' && item.origin && item.destination) {
       const params = new URLSearchParams({
@@ -67,17 +85,17 @@ export function AppSidebar() {
         children: item.children || '0',
         infants: item.infants || '0',
         flightType: item.flightType || 'round-trip',
-      });
+      } as any);
       navigate(`/search?${params.toString()}`);
     } else {
-      // Handle hotel/other searches
+      // Handle hotels/restaurants/events/destinations
       const params = new URLSearchParams({
-        type: item.type === 'flight' ? 'flights' : item.type,
-        location: item.location,
+        type: getPluralType(item.type),
+        location: item.location || '',
         ...(item.checkIn && { checkIn: item.checkIn }),
         ...(item.checkOut && { checkOut: item.checkOut }),
         ...(item.guests && { guests: item.guests }),
-      });
+      } as any);
       navigate(`/search?${params.toString()}`);
     }
   };
@@ -230,7 +248,6 @@ export function AppSidebar() {
               <SidebarMenu>
                 {history
                   .filter((item) => searchFilter === null || item.type === searchFilter)
-                  .slice(0, 15)
                   .map((item) => {
                   const Icon = getSearchIcon(item.type);
                   return (
