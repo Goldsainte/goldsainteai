@@ -461,7 +461,7 @@ const handler = async (req: Request): Promise<Response> => {
               background: #ffffff;
             }
             .header {
-              background: #0c4d47;
+              background: #BFAD72;
               padding: 24px;
               text-align: center;
             }
@@ -666,10 +666,10 @@ const handler = async (req: Request): Promise<Response> => {
               width: 100%;
             }
             .footer {
-              background: #0A2225;
+              background: #BFAD72;
               text-align: center;
               padding: 24px;
-              color: #E5DFC6;
+              color: #0A2225;
               font-size: 12px;
               margin-top: 32px;
             }
@@ -678,7 +678,7 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/wordmark-gold.png" alt="GoldSainte" class="logo" />
+              <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
             </div>
             
             <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/email-hero-luxury.jpg" alt="Luxury Travel" class="hero-image" />

@@ -148,7 +148,7 @@ export default function EmailPreview() {
               background: #ffffff;
             }
             .header {
-              background: #0c4d47;
+              background: #BFAD72;
               padding: 24px;
               text-align: center;
             }
@@ -353,10 +353,10 @@ export default function EmailPreview() {
             color: #333333;
           }
             .footer {
-              background: #0A2225;
+              background: #BFAD72;
               text-align: center;
               padding: 24px;
-              color: #E5DFC6;
+              color: #0A2225;
               font-size: 12px;
               margin-top: 32px;
             }
@@ -379,10 +379,10 @@ export default function EmailPreview() {
       <body>
         <div class="container">
           <div class="header">
-            <img src="/wordmark-gold.png" alt="GoldSainte" class="logo" />
+            <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
           </div>
           
-          <img src="/email-hero-luxury.jpg?v=4" alt="Luxury Travel" class="hero-image" />
+          <img src="/email-hero-luxury.jpg?v=5" alt="Luxury Travel" class="hero-image" />
           
           <div class="content">
             <h1>✓ Your flight is confirmed</h1>
