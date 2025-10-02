@@ -842,17 +842,6 @@ const Index = () => {
                 </Card>
               </div>
 
-              {/* Date Picker - Initial View */}
-              {showDatePicker && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
-                  <ChatDatePicker
-                    type={showDatePicker.type}
-                    onDatesSelected={handleDatesSelected}
-                    onCancel={() => setShowDatePicker(null)}
-                  />
-                </div>
-              )}
-
               {/* Cuisine Selector - Initial View */}
               {showCuisineSelector && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
@@ -909,17 +898,6 @@ const Index = () => {
                     </div>
                   </div>
                 ))}
-
-                {/* Date Picker */}
-                {showDatePicker && (
-                  <div className="animate-in fade-in slide-in-from-bottom-4">
-                    <ChatDatePicker
-                      type={showDatePicker.type}
-                      onDatesSelected={handleDatesSelected}
-                      onCancel={() => setShowDatePicker(null)}
-                    />
-                  </div>
-                )}
 
                 {/* Price Slider */}
                 {showPriceSlider && (
