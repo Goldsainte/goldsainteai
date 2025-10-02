@@ -1601,7 +1601,7 @@ async function searchRestaurants(args: any) {
             price_level: details.price_level || '',
             cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
             description: details.description || '',
-            photos: photos.slice(0, 5).map((photo: any) => ({
+            photos: photos.map((photo: any) => ({
               url: photo.images?.large?.url || photo.images?.original?.url,
               caption: photo.caption || ''
             })),
