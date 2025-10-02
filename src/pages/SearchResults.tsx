@@ -43,6 +43,16 @@ const SearchResults = () => {
   const checkIn = searchParams.get("checkIn") || "";
   const checkOut = searchParams.get("checkOut") || "";
   const guests = searchParams.get("guests") || "2";
+  
+  // Flight-specific params
+  const origin = searchParams.get("origin") || "";
+  const destination = searchParams.get("destination") || "";
+  const departureDate = searchParams.get("departureDate") || "";
+  const returnDate = searchParams.get("returnDate") || "";
+  const cabinClass = searchParams.get("cabinClass") || "ECONOMY";
+  const adults = searchParams.get("adults") || "1";
+  const children = searchParams.get("children") || "0";
+  const infants = searchParams.get("infants") || "0";
 
   // Load user preferences on mount
   useEffect(() => {
@@ -86,13 +96,16 @@ const SearchResults = () => {
 
   useEffect(() => {
     const performSearch = async () => {
+      // Normalize search type to singular form for database
+      const normalizedType = searchType.replace(/s$/, ''); // Remove trailing 's'
+      
       // Save search to history when performing a search
-      if (location) {
+      if (location || origin) {
         addSearch({
-          type: searchType,
-          location,
+          type: normalizedType,
+          location: location || origin,
           ...(searchType === "hotels" && checkIn && checkOut && { checkIn, checkOut, guests }),
-          ...(searchType === "flights" && checkIn && { checkIn }),
+          ...(searchType === "flights" && departureDate && { checkIn: departureDate }),
           ...(searchType === "events" && checkIn && { checkIn })
         });
       }
@@ -110,6 +123,28 @@ const SearchResults = () => {
           const hotelResults = data.results || [];
           setResults(hotelResults);
           setFilteredResults(hotelResults);
+        } else if (searchType === "flights") {
+          // Extract airport code from "CODE - City" format
+          const originCode = origin.split(' - ')[0].trim();
+          const destCode = destination.split(' - ')[0].trim();
+          
+          const { data, error } = await supabase.functions.invoke('amadeus-search-flights', {
+            body: { 
+              origin: originCode,
+              destination: destCode,
+              departureDate,
+              ...(returnDate && { returnDate }),
+              adults: parseInt(adults),
+              children: parseInt(children),
+              infants: parseInt(infants),
+              cabinClass
+            }
+          });
+
+          if (error) throw error;
+          const flightResults = data.results || [];
+          setResults(flightResults);
+          setFilteredResults(flightResults);
         } else if (searchType === "destinations") {
           const { data, error } = await supabase.functions.invoke('search-destinations', {
             body: { query: location }
@@ -161,14 +196,14 @@ const SearchResults = () => {
       }
     };
 
-    if (location) {
+    if (location || origin) {
       performSearch();
     } else {
       setLoading(false);
       setResults([]);
       setFilteredResults([]);
     }
-  }, [searchType, location, checkIn, checkOut, guests]);
+  }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass]);
 
   // Apply filters and sorting
   useEffect(() => {

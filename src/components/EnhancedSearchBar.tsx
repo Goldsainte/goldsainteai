@@ -163,7 +163,9 @@ export const EnhancedSearchBar = () => {
     }
 
     addSearch(searchData);
-    trackSearch(searchType as any, searchData);
+    // Normalize search type to singular form for database
+    const normalizedType = searchType.replace(/s$/, '') as 'hotel' | 'flight' | 'car' | 'restaurant' | 'event' | 'destination';
+    trackSearch(normalizedType, searchData);
     navigate(`/search?${params.toString()}`);
   };
 

@@ -57,7 +57,9 @@ export const SearchBar = () => {
     addSearch(searchData);
     
     // Save to database for authenticated users (async)
-    trackSearch(searchType as any, {
+    // Normalize search type to singular form for database
+    const normalizedType = searchType.replace(/s$/, '') as 'hotel' | 'flight' | 'car' | 'restaurant' | 'event' | 'destination';
+    trackSearch(normalizedType, {
       location,
       checkIn: checkIn || null,
       checkOut: checkOut || null,
