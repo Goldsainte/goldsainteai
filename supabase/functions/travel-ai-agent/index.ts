@@ -1369,32 +1369,48 @@ async function searchRestaurants(args: any) {
       searchQuery += ` ${cuisine}`;
     }
 
-    // Search for restaurants in the location
-    const searchParams = new URLSearchParams({
-      key: tripAdvisorKey,
-      searchQuery: searchQuery,
-      category: 'restaurants',
-      language: 'en'
-    });
+    // Paginated search for restaurants to get a broader set of candidates
+    const perPage = 10;
+    let offset = 0;
+    const allSearchResults: any[] = [];
 
-    const searchResponse = await fetch(
-      `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-      { headers: { 'Accept': 'application/json' } }
-    );
+    while (true) {
+      const searchParams = new URLSearchParams({
+        key: tripAdvisorKey,
+        searchQuery: searchQuery,
+        category: 'restaurants',
+        language: 'en',
+        limit: String(perPage),
+        offset: String(offset),
+      });
 
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error('TripAdvisor search error:', searchResponse.status, errorText);
-      return { error: `Could not find restaurants in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
+      const searchResponse = await fetch(
+        `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+
+      if (!searchResponse.ok) {
+        const errorText = await searchResponse.text();
+        console.error('TripAdvisor search error:', searchResponse.status, errorText);
+        return { error: `Could not find restaurants in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
+      }
+
+      const searchData = await searchResponse.json();
+      const page = searchData.data || [];
+      allSearchResults.push(...page);
+      console.log(`TripAdvisor page fetched: ${page.length} items (total: ${allSearchResults.length})`);
+
+      if (page.length === 0) break;
+      offset += page.length;
+
+      // Cap for latency; we don't need thousands for a good UX
+      if (allSearchResults.length >= 30) break;
     }
-
-    const searchData = await searchResponse.json();
-    console.log('TripAdvisor restaurants found:', searchData.data?.length || 0);
 
     // Get detailed information for each restaurant with throttling and fallback
     const MAX_RESULTS = 20;
     const batchSize = 5;
-    const items = (searchData.data || []).slice(0, MAX_RESULTS);
+    const items = allSearchResults.slice(0, MAX_RESULTS);
 
     const chunks: any[][] = [];
     for (let i = 0; i < items.length; i += batchSize) {
@@ -1417,12 +1433,14 @@ async function searchRestaurants(args: any) {
             );
 
             if (!detailsResponse.ok) {
-              // Fallback minimal info
+              // Fallback minimal info when details endpoint fails (rate limits, missing entity, etc.)
+              const fallbackCity = restaurant.address_obj?.city || normalizedLocation;
+              const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
               return {
                 id: restaurant.location_id,
                 name: restaurant.name,
                 address: restaurant.address_obj?.address_string || '',
-                city: restaurant.address_obj?.city || '',
+                city: fallbackCity,
                 country: restaurant.address_obj?.country || '',
                 rating: 0,
                 num_reviews: 0,
@@ -1436,6 +1454,8 @@ async function searchRestaurants(args: any) {
                 web_url: '',
                 phone: '',
                 website: '',
+                reservationUrl: googleMapsUrl,
+                reviews: [],
                 hours: {},
                 openNow: undefined,
                 latitude: undefined,
@@ -1456,15 +1476,33 @@ async function searchRestaurants(args: any) {
               { headers: { 'Accept': 'application/json' } }
             );
 
+            // Fetch reviews (optional)
+            const reviewsParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+            const reviewsResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${reviewsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+
             let photos: any[] = [];
             if (photosResponse.ok) {
               const photosData = await photosResponse.json();
               photos = photosData.data || [];
             }
 
+            let reviews: any[] = [];
+            if (reviewsResponse.ok) {
+              const reviewsData = await reviewsResponse.json();
+              reviews = (reviewsData.data || []).slice(0, 3);
+            }
+
             if (priceRange && details.price_level && details.price_level !== priceRange) {
               return null;
             }
+
+            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || normalizedLocation}`)}`;
 
             return {
               id: restaurant.location_id,
@@ -1487,6 +1525,13 @@ async function searchRestaurants(args: any) {
               web_url: details.web_url || '',
               phone: details.phone || '',
               website: details.website || '',
+              reservationUrl: details.website || googleMapsUrl,
+              reviews: reviews.map((review: any) => ({
+                rating: review.rating || 0,
+                text: review.text || '',
+                published_date: review.published_date || '',
+                user: review.user?.username || 'Anonymous'
+              })),
               hours: details.hours || {},
               openNow: details.is_closed === false,
               latitude: details.latitude,
@@ -1501,20 +1546,20 @@ async function searchRestaurants(args: any) {
       restaurantDetails.push(...groupResults);
     }
 
-    // Filter out nulls and verify location match
+    // Filter out nulls and verify location match (be lenient if city is missing)
     const validRestaurants = restaurantDetails.filter(restaurant => {
       if (restaurant === null) return false;
-      
-      // Check if restaurant city matches the requested location
       const restaurantCity = (restaurant.city || '').toLowerCase().trim();
       const requestedCity = normalizedLocation.toLowerCase().trim();
-      
-      // Also check against original location and all variations
       const locationVariations = getCityVariations(location).map(v => v.toLowerCase().trim());
-      
-      // Restaurant must be in one of the location variations
-      return locationVariations.some(variation => 
-        restaurantCity.includes(variation) || variation.includes(restaurantCity)
+
+      // If we couldn't resolve a city (due to API limits), keep the item
+      if (!restaurantCity) return true;
+
+      return locationVariations.some(variation =>
+        restaurantCity.includes(variation) ||
+        variation.includes(restaurantCity) ||
+        (restaurant.name || '').toLowerCase().includes(variation)
       );
     });
     
