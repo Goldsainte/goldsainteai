@@ -31,113 +31,135 @@ serve(async (req) => {
       searchQuery += ` ${cuisine}`;
     }
 
-    // Search for restaurants in the location - request more results
-    const searchParams = new URLSearchParams({
-      key: apiKey,
-      searchQuery: searchQuery,
-      category: 'restaurants',
-      language: 'en',
-      limit: '30'  // Request up to 30 results
-    });
+    // Paginate through TripAdvisor search results to avoid low limits
+    const perPage = 50; // TripAdvisor supports limit & offset; fetch in large pages
+    let offset = 0;
+    const allSearchResults: any[] = [];
 
-    const searchResponse = await fetch(
-      `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-      {
-        headers: {
-          'Accept': 'application/json'
-        }
+    while (true) {
+      const searchParams = new URLSearchParams({
+        key: apiKey,
+        searchQuery: searchQuery,
+        category: 'restaurants',
+        language: 'en',
+        limit: String(perPage),
+        offset: String(offset),
+      });
+
+      const searchResponse = await fetch(
+        `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+
+      if (!searchResponse.ok) {
+        const error = await searchResponse.text();
+        console.error('TripAdvisor search error:', error);
+        throw new Error(`Restaurant search failed: ${searchResponse.statusText}`);
       }
-    );
 
-    if (!searchResponse.ok) {
-      const error = await searchResponse.text();
-      console.error('TripAdvisor search error:', error);
-      throw new Error(`Restaurant search failed: ${searchResponse.statusText}`);
+      const searchData = await searchResponse.json();
+      const page = searchData.data || [];
+      allSearchResults.push(...page);
+      console.log(`Fetched page with ${page.length} restaurants (total: ${allSearchResults.length})`);
+
+      if (page.length < perPage) break; // no more pages
+      offset += perPage;
+
+      // Safety guard to prevent excessive runtime; remove or raise if needed
+      if (allSearchResults.length > 300) break;
     }
 
-    const searchData = await searchResponse.json();
-    console.log('Restaurants found:', searchData.data?.length || 0);
+    // Fetch detailed information for each restaurant (batched to limit concurrency)
+    const batchSize = 20;
+    const fetchDetailsFor = async (restaurant: any) => {
+      try {
+        const detailsParams = new URLSearchParams({
+          key: apiKey,
+          language: 'en'
+        });
 
-    // Get detailed information for each restaurant (fetch all results)
-    const restaurantDetails = await Promise.all(
-      (searchData.data || []).map(async (restaurant: any) => {
-        try {
-          const detailsParams = new URLSearchParams({
-            key: apiKey,
-            language: 'en'
-          });
+        // Fetch details, photos, and reviews in parallel
+        const [detailsResponse, photosResponse, reviewsResponse] = await Promise.all([
+          fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          ),
+          fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${detailsParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          ),
+          fetch(
+            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${detailsParams}`,
+            { headers: { 'Accept': 'application/json' } }
+          )
+        ]);
 
-          // Fetch details, photos, and reviews in parallel
-          const [detailsResponse, photosResponse, reviewsResponse] = await Promise.all([
-            fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            ),
-            fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${detailsParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            ),
-            fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${detailsParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            )
-          ]);
-
-          if (!detailsResponse.ok) {
-            console.error(`Failed to fetch details for ${restaurant.location_id}`);
-            return null;
-          }
-
-          const [details, photosData, reviewsData] = await Promise.all([
-            detailsResponse.json(),
-            photosResponse.ok ? photosResponse.json() : Promise.resolve({ data: [] }),
-            reviewsResponse.ok ? reviewsResponse.json() : Promise.resolve({ data: [] })
-          ]);
-
-          // Filter by price range if specified
-          if (priceRange && details.price_level && details.price_level !== priceRange) {
-            return null;
-          }
-
-          const photos = (photosData.data || []).slice(0, 5);
-          const reviews = (reviewsData.data || []).slice(0, 3);
-
-          return {
-            id: restaurant.location_id,
-            name: details.name || restaurant.name,
-            address: details.address_obj?.address_string || '',
-            city: details.address_obj?.city || '',
-            country: details.address_obj?.country || '',
-            rating: details.rating || 0,
-            num_reviews: details.num_reviews || 0,
-            price_level: details.price_level || '',
-            cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
-            description: details.description || '',
-            photos: photos.map((photo: any) => ({
-              url: photo.images?.large?.url || photo.images?.original?.url,
-              caption: photo.caption || ''
-            })),
-            reviews: reviews.map((review: any) => ({
-              rating: review.rating || 0,
-              text: review.text || '',
-              published_date: review.published_date || '',
-              user: review.user?.username || 'Anonymous'
-            })),
-            web_url: details.web_url || '',
-            phone: details.phone || '',
-            website: details.website || '',
-            hours: details.hours || {},
-            latitude: details.latitude,
-            longitude: details.longitude
-          };
-        } catch (error) {
-          console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
+        if (!detailsResponse.ok) {
+          console.error(`Failed to fetch details for ${restaurant.location_id}`);
           return null;
         }
-      })
-    );
 
-    const validRestaurants = restaurantDetails.filter(restaurant => restaurant !== null);
+        const [details, photosData, reviewsData] = await Promise.all([
+          detailsResponse.json(),
+          photosResponse.ok ? photosResponse.json() : Promise.resolve({ data: [] }),
+          reviewsResponse.ok ? reviewsResponse.json() : Promise.resolve({ data: [] })
+        ]);
+
+        // Filter by price range if specified
+        if (priceRange && details.price_level && details.price_level !== priceRange) {
+          return null;
+        }
+
+        const photos = (photosData.data || []).slice(0, 5);
+        const reviews = (reviewsData.data || []).slice(0, 3);
+
+        return {
+          id: restaurant.location_id,
+          name: details.name || restaurant.name,
+          address: details.address_obj?.address_string || '',
+          city: details.address_obj?.city || '',
+          country: details.address_obj?.country || '',
+          rating: details.rating || 0,
+          num_reviews: details.num_reviews || 0,
+          price_level: details.price_level || '',
+          cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
+          description: details.description || '',
+          photos: photos.map((photo: any) => ({
+            url: photo.images?.large?.url || photo.images?.original?.url,
+            caption: photo.caption || ''
+          })),
+          reviews: reviews.map((review: any) => ({
+            rating: review.rating || 0,
+            text: review.text || '',
+            published_date: review.published_date || '',
+            user: review.user?.username || 'Anonymous'
+          })),
+          web_url: details.web_url || '',
+          phone: details.phone || '',
+          website: details.website || '',
+          hours: details.hours || {},
+          latitude: details.latitude,
+          longitude: details.longitude
+        };
+      } catch (error) {
+        console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
+        return null;
+      }
+    };
+
+    // Batch processing to limit parallel requests
+    const chunks: any[][] = [];
+    for (let i = 0; i < allSearchResults.length; i += batchSize) {
+      chunks.push(allSearchResults.slice(i, i + batchSize));
+    }
+
+    const restaurantDetails: any[] = [];
+    for (const group of chunks) {
+      const groupResults = await Promise.all(group.map(fetchDetailsFor));
+      restaurantDetails.push(...groupResults);
+    }
+
+    const validRestaurants = restaurantDetails.filter((restaurant) => restaurant !== null);
 
     return new Response(JSON.stringify({ 
       results: validRestaurants
