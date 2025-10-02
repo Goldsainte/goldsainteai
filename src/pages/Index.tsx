@@ -21,7 +21,7 @@ import { TripTypeSelector } from "@/components/TripTypeSelector";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
-import { WelcomeBox } from "@/components/WelcomeBox";
+import { WelcomeModal } from "@/components/WelcomeModal";
 import logomark from "@/assets/logomark-seal-gold.png";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
 import swissAlps from "@/assets/swiss-alps.jpg";
@@ -95,6 +95,7 @@ const Index = () => {
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -631,11 +632,15 @@ const Index = () => {
                     <Car className="h-4 w-4" />
                     Car Rentals
                   </Button>
-                </div>
-
-                {/* Welcome Box */}
-                <div className="px-2 md:px-0">
-                  <WelcomeBox />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowWelcomeModal(true)}
+                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    What Goldsainte.Ai can do
+                  </Button>
                 </div>
 
                 {/* Footer */}
@@ -1139,6 +1144,12 @@ const Index = () => {
           fromCountry={visaModalData.fromCountry}
           toCountry={visaModalData.toCountry}
           visaInformation={visaModalData.visaInformation}
+        />
+
+        {/* Welcome Modal */}
+        <WelcomeModal
+          open={showWelcomeModal}
+          onClose={() => setShowWelcomeModal(false)}
         />
 
         {/* Date Picker Modal */}
