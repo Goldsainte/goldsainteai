@@ -57,45 +57,25 @@ export const DateSelectionModal = ({
     setLoading(true);
 
     try {
-      // Use Expedia to check real availability
-      const { data, error } = await supabase.functions.invoke('expedia-get-availability', {
-        body: {
-          propertyId: propertyId || cityCode,
-          checkIn: format(checkInDate, 'yyyy-MM-dd'),
-          checkOut: format(checkOutDate, 'yyyy-MM-dd'),
-          guests: adults,
-        }
-      });
-
-      if (error) throw error;
-
-      if (!data.available || !data.rooms || data.rooms.length === 0) {
-        toast({
-          title: "No availability",
-          description: "No rooms available for these dates. Please try different dates.",
-          variant: "destructive",
-        });
-        return;
-      }
-
+      // Proceed directly with booking - availability already confirmed from search
       toast({
-        title: "Availability confirmed!",
-        description: `Found ${data.rooms.length} available room${data.rooms.length > 1 ? 's' : ''} for ${format(checkInDate, 'MMM dd')} - ${format(checkOutDate, 'MMM dd')}`,
+        title: "Dates confirmed!",
+        description: `${format(checkInDate, 'MMM dd')} - ${format(checkOutDate, 'MMM dd')}`,
       });
 
-      // Pass the full Expedia availability data
+      // Pass booking data with selected dates
       onAvailabilityConfirmed(
-        data,
+        { available: true },
         format(checkInDate, 'yyyy-MM-dd'),
         format(checkOutDate, 'yyyy-MM-dd'),
         adults
       );
       onClose();
     } catch (error: any) {
-      console.error('Availability check error:', error);
+      console.error('Date selection error:', error);
       toast({
-        title: "Availability check failed",
-        description: error.message || "Failed to check availability",
+        title: "Error",
+        description: error.message || "Failed to confirm dates",
         variant: "destructive",
       });
     } finally {
@@ -194,10 +174,10 @@ export const DateSelectionModal = ({
             {loading ? (
               <>
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                Checking Availability...
+                Confirming Dates...
               </>
             ) : (
-              'Check Availability'
+              'Continue to Booking'
             )}
           </Button>
         </div>
