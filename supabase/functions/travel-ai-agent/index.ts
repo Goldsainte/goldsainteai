@@ -368,6 +368,11 @@ The user has saved preferences but has chosen to search without strict filtering
           if (!txtRaw) continue;
           const lower = txtRaw.toLowerCase();
           
+          // Skip budget, date, and trip type answers
+          if (/^\$?\d+$/.test(txtRaw)) continue; // Skip pure numbers/budgets
+          if (/^\d{4}-\d{2}-\d{2}/.test(txtRaw)) continue; // Skip dates
+          if (lower === 'one-way' || lower === 'round-trip' || lower === 'one' || lower === 'round') continue;
+          
           // 1) Try pattern "from X to Y"
           const match = txtRaw.match(fromToRegex);
           if (match && match[1]) {
@@ -388,8 +393,8 @@ The user has saved preferences but has chosen to search without strict filtering
             return normalized;
           }
           
-          // 3) Short fallback
-          if (i === msgs.length - 1 && txtRaw.split(/\s+/).length <= 4 && !/[0-9$]/.test(txtRaw)) {
+          // 3) Short city-like answer (any position, not just last)
+          if (txtRaw.split(/\s+/).length <= 4) {
             const normalized = normalizeCityName(txtRaw);
             console.log('extractOrigin(short) ->', txtRaw, '=>', normalized);
             return normalized;
@@ -406,6 +411,11 @@ The user has saved preferences but has chosen to search without strict filtering
           const txtRaw = (msgs[i] || '').trim();
           if (!txtRaw) continue;
           const lower = txtRaw.toLowerCase();
+          
+          // Skip budget, date, and trip type answers
+          if (/^\$?\d+$/.test(txtRaw)) continue;
+          if (/^\d{4}-\d{2}-\d{2}/.test(txtRaw)) continue;
+          if (lower === 'one-way' || lower === 'round-trip' || lower === 'one' || lower === 'round') continue;
           
           // 1) Try pattern "to Y" or "going to Y"
           const match = txtRaw.match(toRegex);
@@ -427,8 +437,8 @@ The user has saved preferences but has chosen to search without strict filtering
             return normalized;
           }
           
-          // 3) Short fallback
-          if (i === msgs.length - 1 && msgs.length > 1 && txtRaw.split(/\s+/).length <= 4 && !/[0-9$]/.test(txtRaw)) {
+          // 3) Short city-like answer after origin is set (any position if we have multiple messages)
+          if (msgs.length > 1 && txtRaw.split(/\s+/).length <= 4) {
             const normalized = normalizeCityName(txtRaw);
             console.log('extractDestination(short) ->', txtRaw, '=>', normalized);
             return normalized;
