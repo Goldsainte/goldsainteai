@@ -633,6 +633,11 @@ const Index = () => {
                   </Button>
                 </div>
 
+                {/* Welcome Box */}
+                <div className="px-2 md:px-0">
+                  <WelcomeBox />
+                </div>
+
                 {/* Footer */}
                 <p className="text-xs text-muted-foreground text-center pt-4">
                   By using Goldsainte.Ai, you agree to our{" "}
@@ -646,9 +651,6 @@ const Index = () => {
             {/* Inspiration Content - Far below the fold */}
             <div className="px-6 pb-12 pt-20">
               <div className="w-full max-w-7xl mx-auto space-y-6">
-                {/* Welcome Box */}
-                <WelcomeBox />
-                
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
