@@ -14,6 +14,7 @@ import { InspirationCard } from "@/components/InspirationCard";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
 import { EventCard } from "@/components/EventCard";
+import { PackageCard } from "@/components/PackageCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { PriceSlider } from "@/components/PriceSlider";
 import { CuisineSelector } from "@/components/CuisineSelector";
@@ -53,18 +54,26 @@ interface Message {
 
 interface SearchResult {
   type: string;
-  results: any[];
+  results?: any[];
   location?: any;
   checkIn?: string;
   checkOut?: string;
   guests?: number;
   filters?: any;
-  origin?: { code: string; name: string };
-  destination?: { code: string; name: string };
+  origin?: { code: string; name: string } | string;
+  destination?: { code: string; name: string } | string;
+  dictionaries?: any;
+  city?: string;
   departureDate?: string;
   returnDate?: string;
-  dictionaries?: any;
   meta?: any;
+  // Package-specific fields
+  flights?: any[];
+  hotels?: any[];
+  cars?: any[];
+  travelers?: number;
+  estimatedTotal?: number;
+  savings?: number;
 }
 
 const Index = () => {
@@ -1022,18 +1031,18 @@ const Index = () => {
                       </div>
                     )}
 
-                    {result.type === 'flights' && result.results.length > 0 && (
+                    {result.type === 'flights' && result.results && result.results.length > 0 && (
                       <div className="space-y-4">
                         <div>
                           <h3 className="text-xl font-semibold text-foreground mb-4">
-                            ✈️ Flights from {result.origin?.name} to {result.destination?.name}
+                            ✈️ Flights from {typeof result.origin === 'string' ? result.origin : result.origin?.name} to {typeof result.destination === 'string' ? result.destination : result.destination?.name}
                           </h3>
                           <FlightFilters
                             resultsCount={result.results.length}
                             currentSort={result.filters?.sortBy || 'best'}
                             onSortChange={(sortBy) => {
-                              const origin = result.origin?.name;
-                              const destination = result.destination?.name;
+                              const origin = typeof result.origin === 'string' ? result.origin : result.origin?.name;
+                              const destination = typeof result.destination === 'string' ? result.destination : result.destination?.name;
                               const departureDate = result.departureDate;
                               const returnDate = result.returnDate;
                               
@@ -1057,8 +1066,8 @@ const Index = () => {
                               handleSearch(query);
                             }}
                             onClearFilters={() => {
-                              const origin = result.origin?.name;
-                              const destination = result.destination?.name;
+                              const origin = typeof result.origin === 'string' ? result.origin : result.origin?.name;
+                              const destination = typeof result.destination === 'string' ? result.destination : result.destination?.name;
                               const departureDate = result.departureDate;
                               const returnDate = result.returnDate;
                               
@@ -1098,6 +1107,31 @@ const Index = () => {
                               event={event}
                             />
                           ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {result.type === 'package' && result.flights && result.hotels && (
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-semibold text-foreground">
+                          ✨ Complete Travel Packages
+                        </h3>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Save up to 10% when booking flights, hotels, and cars together
+                        </p>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                          <PackageCard packageData={{
+                            flights: result.flights || [],
+                            hotels: result.hotels || [],
+                            cars: result.cars || [],
+                            origin: typeof result.origin === 'string' ? result.origin : result.origin?.name || '',
+                            destination: typeof result.destination === 'string' ? result.destination : result.destination?.name || '',
+                            departureDate: result.departureDate || '',
+                            returnDate: result.returnDate || '',
+                            travelers: result.travelers || 1,
+                            estimatedTotal: result.estimatedTotal,
+                            savings: result.savings
+                          }} />
                         </div>
                       </div>
                     )}

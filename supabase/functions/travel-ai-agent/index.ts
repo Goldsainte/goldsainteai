@@ -448,6 +448,51 @@ The user has saved preferences but has chosen to search without strict filtering
       {
         type: "function",
         function: {
+          name: "search_packages",
+          description: "Search for complete travel packages that include flights, hotels, and car rentals together. Use this when users ask about package deals, vacation packages, or want to book flights + hotels + cars together for a complete trip.",
+          parameters: {
+            type: "object",
+            properties: {
+              origin: {
+                type: "string",
+                description: "Origin city or airport for flights"
+              },
+              destination: {
+                type: "string",
+                description: "Destination city for the entire package"
+              },
+              departureDate: {
+                type: "string",
+                description: "Trip start date in YYYY-MM-DD format"
+              },
+              returnDate: {
+                type: "string",
+                description: "Trip end date in YYYY-MM-DD format"
+              },
+              travelers: {
+                type: "number",
+                description: "Number of travelers (adults)"
+              },
+              includeHotel: {
+                type: "boolean",
+                description: "Whether to include hotel in package (default true)"
+              },
+              includeCar: {
+                type: "boolean",
+                description: "Whether to include car rental in package (default true)"
+              },
+              budget: {
+                type: "string",
+                description: "Total budget for entire package (e.g., '$2000-$5000')"
+              }
+            },
+            required: ["origin", "destination", "departureDate", "returnDate", "travelers"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "search_hotels",
           description: "Search for hotels in a specific location with various filters. Use this when users ask about hotels, accommodations, or places to stay. You can filter by price, rating, amenities, and sort by different criteria.",
           parameters: {
@@ -884,7 +929,9 @@ Always show results first with minimal text, ask questions later. Be conversatio
         
         let toolResult;
         
-        if (functionName === 'search_hotels') {
+        if (functionName === 'search_packages') {
+          toolResult = await searchPackages(functionArgs);
+        } else if (functionName === 'search_hotels') {
           toolResult = await searchHotels(functionArgs, BOOKING_API_KEY);
         } else if (functionName === 'search_destinations') {
           toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
@@ -1864,6 +1911,101 @@ async function searchEvents(args: any) {
 
   } catch (error) {
     console.error('Error in searchEvents:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+async function searchPackages(args: any) {
+  try {
+    const { origin, destination, departureDate, returnDate, travelers, includeHotel = true, includeCar = true, budget } = args;
+    console.log('searchPackages called with:', { origin, destination, departureDate, returnDate, travelers, includeHotel, includeCar, budget });
+
+    // Parse budget if provided
+    let maxFlightPrice, maxHotelPrice, maxCarPrice;
+    if (budget) {
+      const match = budget.match(/\$?(\d+)-\$?(\d+)/);
+      if (match) {
+        const totalMax = parseInt(match[2]);
+        // Allocate budget: 50% flights, 30% hotel, 20% car
+        maxFlightPrice = Math.floor(totalMax * 0.5);
+        maxHotelPrice = Math.floor(totalMax * 0.3);
+        maxCarPrice = Math.floor(totalMax * 0.2);
+      }
+    }
+
+    // Search all components in parallel
+    const searches: Promise<any>[] = [
+      searchFlights({
+        origin,
+        destination,
+        departureDate,
+        returnDate,
+        adults: travelers,
+        travelClass: 'ECONOMY',
+        sortBy: 'price'
+      })
+    ];
+
+    if (includeHotel) {
+      searches.push(searchHotels({
+        location: destination,
+        checkIn: departureDate,
+        checkOut: returnDate,
+        guests: travelers,
+        sortBy: 'price',
+        ...(maxHotelPrice && { maxPrice: maxHotelPrice })
+      }, Deno.env.get('BOOKING_API_KEY') || ''));
+    }
+
+    if (includeCar) {
+      searches.push(searchCars({
+        pickupLocation: destination,
+        pickupDate: departureDate,
+        returnDate,
+      }));
+    }
+
+    const results = await Promise.all(searches);
+    
+    // Combine results
+    const packageResult: any = {
+      type: 'package',
+      flights: results[0]?.results || [],
+      hotels: includeHotel ? (results[1]?.results || []) : [],
+      cars: includeCar ? (results[includeHotel ? 2 : 1]?.results || []) : [],
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      travelers
+    };
+
+    // Calculate sample package prices
+    if (packageResult.flights.length > 0 && packageResult.hotels.length > 0) {
+      const cheapestFlight = packageResult.flights[0];
+      const cheapestHotel = packageResult.hotels[0];
+      const flightPrice = parseFloat(cheapestFlight.price?.total || 0);
+      const hotelPrice = parseFloat(cheapestHotel.offers?.[0]?.price?.total || 0);
+      
+      let carPrice = 0;
+      if (packageResult.cars.length > 0) {
+        carPrice = parseFloat(packageResult.cars[0].price?.total || 0);
+      }
+
+      packageResult.estimatedTotal = flightPrice + hotelPrice + carPrice;
+      packageResult.savings = Math.floor((flightPrice + hotelPrice + carPrice) * 0.1); // 10% package discount
+    }
+
+    console.log('Package search completed:', {
+      flights: packageResult.flights.length,
+      hotels: packageResult.hotels.length,
+      cars: packageResult.cars.length
+    });
+
+    return packageResult;
+
+  } catch (error) {
+    console.error('Error in searchPackages:', error);
     return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
   }
 }
