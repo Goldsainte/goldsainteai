@@ -395,6 +395,34 @@ export default function EmailPreview() {
               <div class="conf-number">ABC123</div>
             </div>
             
+            <h2>Ticket Information</h2>
+            <div class="info-box">
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Ticket Number</td>
+                    <td class="info-value">0062249595503</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Issue Date</td>
+                    <td class="info-value">07 JUL 24</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Expiration Date</td>
+                    <td class="info-value">07 JUL 25</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            
             <h2>Flight details</h2>
             
             <div class="info-box">
@@ -452,12 +480,13 @@ export default function EmailPreview() {
             </div>
             
             <div class="warning-box">
-              <div class="warning-title">⚠ Important travel information</div>
+              <div class="warning-title">⚠ Important Travel Information</div>
               <div class="warning-text">
-                <strong>Check-in:</strong> Online check-in opens 24 hours before departure.<br><br>
-                <strong>Airport arrival:</strong> Arrive at least 2 hours before domestic flights, 3 hours for international.<br><br>
-                <strong>ID requirements:</strong> Government-issued photo ID required for all passengers. Valid passport required for international travel.<br><br>
-                <strong>Baggage:</strong> Review airline baggage policies. Checked baggage fees may apply.
+                <strong>Check-in:</strong> Check in online beginning 24 hours prior to departure. Airport kiosks and ticket counters also available.<br><br>
+                <strong>Airport Arrival:</strong> Please arrive at the airport at least 2 hours before domestic flights and 3 hours before international flights.<br><br>
+                <strong>Travel Documents:</strong> Valid government-issued photo identification is required for all passengers. International travel requires a valid passport.<br><br>
+                <strong>Baggage Information:</strong> Review airline baggage policies. Additional fees may apply for checked baggage and oversized items.<br><br>
+                <strong>Boarding:</strong> Boarding begins approximately 30-45 minutes prior to departure. Please arrive at your gate with adequate time.
               </div>
             </div>
             
@@ -488,11 +517,12 @@ export default function EmailPreview() {
             </p>
           </div>
           
-          <div class="footer">
-            <p style="margin: 0 0 8px 0;">Thank you for choosing GoldSainte</p>
-            <p style="margin: 0; font-size: 11px;">This is an automated confirmation email. Please do not reply to this message.</p>
-            <p style="margin: 12px 0 0 0; font-size: 11px;">© 2025 GoldSainte. All rights reserved.</p>
-          </div>
+            <div class="footer">
+              <p style="margin: 0 0 8px 0;">Thank you for choosing GoldSainte</p>
+              <p style="margin: 8px 0; font-size: 11px;">Need assistance? Contact our 24/7 Concierge Support Team</p>
+              <p style="margin: 0; font-size: 11px;">This is an automated confirmation email. Please do not reply to this message.</p>
+              <p style="margin: 12px 0 0 0; font-size: 11px;">© 2025 GoldSainte. All rights reserved.</p>
+            </div>
         </div>
       </body>
     </html>
