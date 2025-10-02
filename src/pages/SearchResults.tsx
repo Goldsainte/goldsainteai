@@ -5,6 +5,7 @@ import { SimpleHeader } from "@/components/SimpleHeader";
 import { EnhancedSearchBar } from "@/components/EnhancedSearchBar";
 import { CompactHotelCard } from "@/components/CompactHotelCard";
 import { CompactFlightCard } from "@/components/CompactFlightCard";
+import { CompactRestaurantCard } from "@/components/CompactRestaurantCard";
 import { ResultsMapView } from "@/components/ResultsMapView";
 import { HotelFilters } from "@/components/HotelFilters";
 import { Button } from "@/components/ui/button";
@@ -450,25 +451,38 @@ const SearchResults = () => {
 
                 {viewMode === "list" ? (
                   <div className="space-y-2">
-                    {filteredResults.map((result, index) => (
-                      searchType === "hotels" ? (
-                        <CompactHotelCard
-                          key={result.hotel_id || result.dest_id || index}
-                          property={result}
-                        />
-                      ) : searchType === "flights" ? (
-                        <CompactFlightCard
-                          key={result.id || index}
-                          flight={result}
-                          dictionaries={flightDictionaries}
-                        />
-                      ) : (
-                        <CompactHotelCard
-                          key={result.hotel_id || result.dest_id || index}
-                          property={result}
-                        />
-                      )
-                    ))}
+                    {filteredResults.map((result, index) => {
+                      if (searchType === "hotels") {
+                        return (
+                          <CompactHotelCard
+                            key={result.hotel_id || result.dest_id || index}
+                            property={result}
+                          />
+                        );
+                      } else if (searchType === "flights") {
+                        return (
+                          <CompactFlightCard
+                            key={result.id || index}
+                            flight={result}
+                            dictionaries={flightDictionaries}
+                          />
+                        );
+                      } else if (searchType === "restaurants") {
+                        return (
+                          <CompactRestaurantCard
+                            key={result.id || index}
+                            restaurant={result}
+                          />
+                        );
+                      } else {
+                        return (
+                          <CompactHotelCard
+                            key={result.hotel_id || result.dest_id || index}
+                            property={result}
+                          />
+                        );
+                      }
+                    })}
                   </div>
                 ) : (
                   <div className="h-[calc(100vh-300px)] rounded-lg border bg-muted flex items-center justify-center">

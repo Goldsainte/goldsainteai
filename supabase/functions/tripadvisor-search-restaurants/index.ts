@@ -31,12 +31,13 @@ serve(async (req) => {
       searchQuery += ` ${cuisine}`;
     }
 
-    // Search for restaurants in the location
+    // Search for restaurants in the location - request more results
     const searchParams = new URLSearchParams({
       key: apiKey,
       searchQuery: searchQuery,
       category: 'restaurants',
-      language: 'en'
+      language: 'en',
+      limit: '30'  // Request up to 30 results
     });
 
     const searchResponse = await fetch(
