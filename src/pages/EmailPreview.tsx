@@ -381,7 +381,7 @@ export default function EmailPreview() {
             <img src="/wordmark-gold.png" alt="GoldSainte" class="logo" />
           </div>
           
-          <img src="/email-hero-luxury.jpg?v=2" alt="Luxury Travel" class="hero-image" />
+          <img src="/email-hero-luxury.jpg?v=3" alt="Luxury Travel" class="hero-image" />
           
           <div class="content">
             <h1>✓ Your flight is confirmed</h1>
