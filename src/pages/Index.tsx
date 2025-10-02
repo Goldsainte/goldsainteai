@@ -16,6 +16,7 @@ import { FlightCard } from "@/components/FlightCard";
 import { EventCard } from "@/components/EventCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { PriceSlider } from "@/components/PriceSlider";
+import { CuisineSelector } from "@/components/CuisineSelector";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
@@ -88,6 +89,7 @@ const Index = () => {
     visaInformation: null 
   });
   const [showPriceSlider, setShowPriceSlider] = useState<{ type: "hotel" | "flight" | "restaurant" | "car" } | null>(null);
+  const [showCuisineSelector, setShowCuisineSelector] = useState(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
 
@@ -361,6 +363,13 @@ const Index = () => {
                  aiMessage.includes('what is your budget per day')) {
         setTimeout(() => setShowPriceSlider({ type: 'car' }), 500);
       }
+      
+      // Check if AI is asking about cuisine preference
+      if (aiMessage.includes('what type of cuisine') || 
+          aiMessage.includes('what cuisine are you') ||
+          aiMessage.includes('cuisine preference')) {
+        setTimeout(() => setShowCuisineSelector(true), 500);
+      }
     } catch (err: any) {
       console.error('AI Agent error:', err);
       toast({
@@ -475,11 +484,17 @@ const Index = () => {
     setPendingFlightDates(null);
     setShowDatePicker(null);
     setShowPriceSlider(null);
+    setShowCuisineSelector(false);
   };
 
   const handlePriceSelected = (price: number) => {
     setShowPriceSlider(null);
     handleSearch(`$${price}`);
+  };
+
+  const handleCuisineSelected = (cuisine: string) => {
+    setShowCuisineSelector(false);
+    handleSearch(cuisine);
   };
 
   const showChat = messages.length > 0;
@@ -774,16 +789,12 @@ const Index = () => {
                 </div>
               )}
 
-              {/* Price Slider - Initial View */}
-              {showPriceSlider && (
+              {/* Cuisine Selector - Initial View */}
+              {showCuisineSelector && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
-                  <PriceSlider
-                    type={showPriceSlider.type}
-                    onPriceSelected={handlePriceSelected}
-                    onCancel={() => setShowPriceSlider(null)}
-                    min={showPriceSlider.type === 'restaurant' ? 10 : 50}
-                    max={showPriceSlider.type === 'flight' ? 2000 : showPriceSlider.type === 'restaurant' ? 200 : 1000}
-                    defaultValue={showPriceSlider.type === 'flight' ? 500 : showPriceSlider.type === 'restaurant' ? 50 : 200}
+                  <CuisineSelector
+                    onCuisineSelected={handleCuisineSelected}
+                    onCancel={() => setShowCuisineSelector(false)}
                   />
                 </div>
               )}
@@ -856,6 +867,16 @@ const Index = () => {
                       min={showPriceSlider.type === 'restaurant' ? 10 : 50}
                       max={showPriceSlider.type === 'flight' ? 2000 : showPriceSlider.type === 'restaurant' ? 200 : 1000}
                       defaultValue={showPriceSlider.type === 'flight' ? 500 : showPriceSlider.type === 'restaurant' ? 50 : 200}
+                    />
+                  </div>
+                )}
+
+                {/* Cuisine Selector */}
+                {showCuisineSelector && (
+                  <div className="animate-in fade-in slide-in-from-bottom-4">
+                    <CuisineSelector
+                      onCuisineSelected={handleCuisineSelected}
+                      onCancel={() => setShowCuisineSelector(false)}
                     />
                   </div>
                 )}

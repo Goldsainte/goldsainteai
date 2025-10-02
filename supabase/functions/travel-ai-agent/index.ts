@@ -464,6 +464,21 @@ The user has saved preferences but has chosen to search without strict filtering
         return null;
       };
 
+      const extractCuisine = (): string | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const txt = (m || '').trim();
+          if (!txt) continue;
+          const lower = txt.toLowerCase();
+          if (lower.includes('looking for') || lower.includes('restaurants') || lower.includes('budget')) continue;
+          // Check if it's a short response that could be a cuisine type
+          if (txt.split(/\s+/).length <= 3 && !/[0-9$]/.test(txt)) {
+            return txt;
+          }
+        }
+        return null;
+      };
+
       const extractBudget = (): number | null => {
         const msgs = getLastUserMessages().slice().reverse();
         for (const m of msgs) {
@@ -476,10 +491,19 @@ The user has saved preferences but has chosen to search without strict filtering
       };
 
       const city = extractCity();
+      const cuisine = extractCuisine();
       const budget = extractBudget();
 
       if (!city) {
         const assistant = 'Which city are you looking for restaurants in?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+      if (!cuisine) {
+        const assistant = 'What type of cuisine are you in the mood for?';
         return new Response(JSON.stringify({
           message: assistant,
           toolResults: [],
@@ -495,9 +519,10 @@ The user has saved preferences but has chosen to search without strict filtering
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
       }
 
-      const result = await searchRestaurants({ location: city });
+      const result = await searchRestaurants({ location: city, cuisine });
 
-      const finalMessage = `Perfect! I found great restaurants in ${city}. Check out the options below!`;
+      const cuisineText = cuisine.toLowerCase() === 'any' ? '' : `${cuisine} `;
+      const finalMessage = `Perfect! I found great ${cuisineText}restaurants in ${city}. Check out the options below!`;
       return new Response(JSON.stringify({
         message: finalMessage,
         toolResults: [result],
