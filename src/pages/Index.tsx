@@ -20,20 +20,20 @@ import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import logomark from "@/assets/logomark-seal-gold.png";
-import property1 from "@/assets/property1.jpg";
-import property2 from "@/assets/property2.jpg";
-import property3 from "@/assets/property3.jpg";
-import property4 from "@/assets/property4.jpg";
-import property5 from "@/assets/property5.jpg";
-import property6 from "@/assets/property6.jpg";
+import santoriniGreece from "@/assets/santorini-greece.jpg";
+import swissAlps from "@/assets/swiss-alps.jpg";
+import maldivesTropical from "@/assets/maldives-tropical.jpg";
+import parisUrban from "@/assets/paris-urban.jpg";
+import dubaiDesert from "@/assets/dubai-desert.jpg";
+import amalfiCoast from "@/assets/amalfi-coast.jpg";
+import icelandNorthernLights from "@/assets/iceland-northern-lights.jpg";
+import baliSerenity from "@/assets/bali-serenity.jpg";
 import restaurant1 from "@/assets/restaurant1.jpg";
 import restaurant2 from "@/assets/restaurant2.jpg";
 import restaurant3 from "@/assets/restaurant3.jpg";
 import flight1 from "@/assets/flight1.jpg";
 import flight2 from "@/assets/flight2.jpg";
 import flight3 from "@/assets/flight3.jpg";
-import destination7 from "@/assets/destination7.jpg";
-import destination8 from "@/assets/destination8.jpg";
 import luxuryHotels from "@/assets/luxury-hotels.jpg";
 import luxuryFlights from "@/assets/luxury-flights.jpg";
 import luxuryDestinations from "@/assets/luxury-destinations.jpg";
@@ -162,49 +162,49 @@ const Index = () => {
 
   const inspirationDestinations = [
     {
-      image: property1,
+      image: santoriniGreece,
       title: "Santorini Paradise",
       location: "Greece",
       description: "Experience breathtaking sunsets and pristine white architecture overlooking the Aegean Sea."
     },
     {
-      image: property2,
+      image: swissAlps,
       title: "Alpine Luxury",
       location: "Swiss Alps",
       description: "Discover world-class skiing and cozy mountain retreats in the heart of the Alps."
     },
     {
-      image: property3,
+      image: maldivesTropical,
       title: "Tropical Escape",
       location: "Maldives",
       description: "Unwind in overwater bungalows surrounded by crystal-clear turquoise waters."
     },
     {
-      image: property4,
+      image: parisUrban,
       title: "Urban Elegance",
       location: "Paris, France",
       description: "Immerse yourself in art, culture, and world-renowned cuisine in the City of Light."
     },
     {
-      image: property5,
+      image: dubaiDesert,
       title: "Desert Oasis",
       location: "Dubai, UAE",
       description: "Experience luxury redefined with stunning architecture and endless entertainment."
     },
     {
-      image: property6,
+      image: amalfiCoast,
       title: "Coastal Charm",
       location: "Amalfi Coast, Italy",
       description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
     },
     {
-      image: destination7,
+      image: icelandNorthernLights,
       title: "Northern Lights",
       location: "Iceland",
       description: "Witness the magical aurora borealis in a winter wonderland of natural beauty."
     },
     {
-      image: destination8,
+      image: baliSerenity,
       title: "Bali Serenity",
       location: "Bali, Indonesia",
       description: "Find peace in lush rice terraces and traditional temples with world-class hospitality."
