@@ -213,31 +213,31 @@ const Index = () => {
 
   const featuredRestaurants = [
     {
-      id: "maison-dor",
+      id: "le-bernardin",
       image: restaurant1,
-      title: "Maison d'Or",
-      cuisine: "French Fine Dining",
-      address: "123 Champs-Élysées, Paris, France",
-      rating: 4.9,
-      description: "Exquisite French cuisine in an intimate setting with impeccable service."
-    },
-    {
-      id: "sky-lounge",
-      image: restaurant2,
-      title: "Sky Lounge",
-      cuisine: "Contemporary Fusion",
-      address: "456 Tower Plaza, New York, NY",
+      title: "Le Bernardin",
+      cuisine: "French Seafood",
+      address: "155 W 51st St, New York, NY 10019",
       rating: 4.8,
-      description: "Panoramic city views paired with innovative culinary creations."
+      description: "Three Michelin-starred seafood restaurant offering refined French cuisine."
     },
     {
-      id: "azure-coast",
+      id: "eleven-madison-park",
+      image: restaurant2,
+      title: "Eleven Madison Park",
+      cuisine: "Contemporary American",
+      address: "11 Madison Ave, New York, NY 10010",
+      rating: 4.7,
+      description: "Iconic three-Michelin-starred restaurant featuring seasonal plant-based tasting menu."
+    },
+    {
+      id: "per-se",
       image: restaurant3,
-      title: "Azure Coast",
-      cuisine: "Mediterranean Seafood",
-      address: "789 Coastal Drive, Monaco",
-      rating: 4.9,
-      description: "Fresh ocean catches and coastal flavors in a stunning beachfront location."
+      title: "Per Se",
+      cuisine: "French Contemporary",
+      address: "10 Columbus Circle, New York, NY 10019",
+      rating: 4.6,
+      description: "Thomas Keller's three-Michelin-starred restaurant with stunning Central Park views."
     }
   ];
 
@@ -666,15 +666,15 @@ const Index = () => {
                         <Button 
                           onClick={(e) => {
                             e.stopPropagation();
-                            const query = encodeURIComponent(`${restaurant.title} ${restaurant.address}`);
-                            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
-                            window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+                            const query = encodeURIComponent(`${restaurant.title} ${restaurant.address} reservations`);
+                            const reservationUrl = `https://www.google.com/search?q=${query}`;
+                            window.open(reservationUrl, '_blank', 'noopener,noreferrer');
                           }}
                           className="w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                           size="sm"
                         >
                           <UtensilsCrossed className="h-4 w-4 mr-2" />
-                          View on Google Maps
+                          Make Reservation
                         </Button>
                       </div>
                     </Card>
