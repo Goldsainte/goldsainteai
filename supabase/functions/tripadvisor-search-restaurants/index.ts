@@ -32,7 +32,7 @@ serve(async (req) => {
     }
 
     // Paginate through TripAdvisor search results to avoid low limits
-    const perPage = 50; // Fetch 50 per page to reduce requests
+    const perPage = 10; // TripAdvisor API returns up to 10 per page; paginate reliably
     let offset = 0;
     const allSearchResults: any[] = [];
 
@@ -62,11 +62,11 @@ serve(async (req) => {
       allSearchResults.push(...page);
       console.log(`Fetched page with ${page.length} restaurants (total: ${allSearchResults.length})`);
 
-      if (page.length < perPage) {
+      if (page.length === 0) {
         console.log('No more pages available from TripAdvisor API');
         break;
       }
-      offset += perPage;
+      offset += page.length;
 
       // Increased limit for more comprehensive results
       if (allSearchResults.length >= 1000) {
