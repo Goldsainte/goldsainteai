@@ -693,6 +693,14 @@ const handler = async (req: Request): Promise<Response> => {
               
               <p>Thank you for booking with GoldSainte. Your reservation has been confirmed. Please review the details below and save this email for your records.</p>
               
+              <p>We're excited to be part of your upcoming journey!</p>
+              
+              <p>You can check in for your flight using your confirmation number either at the airline's self-service kiosks at the airport (typically available up to 6 hours before departure), or online or via the airline's mobile app starting 24 hours prior to your flight.</p>
+              
+              <p>Please note that boarding priority is determined by the airline and may vary based on travel date, fare class, and other factors. If you're flying on a standby basis, seats are subject to availability and will be assigned at the gate. Standby travel is generally allowed only on flights operated by the airline listed on your itinerary.</p>
+              
+              <p>For the most accurate information, be sure to check your airline's specific policies and mobile tools before you travel.</p>
+              
               <div class="conf-box">
                 <div class="conf-label">Confirmation Number</div>
                 <div class="conf-number">${bookingReference}</div>
