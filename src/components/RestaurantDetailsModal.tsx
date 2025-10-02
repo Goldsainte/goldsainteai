@@ -156,6 +156,37 @@ const reservationRedirect = buildReservationRedirect(reservationUrl);
               </div>
             )}
 
+            {/* Reviews */}
+            {Array.isArray((restaurant as any).reviews) && (restaurant as any).reviews.length > 0 && (
+              <div className="space-y-3 border-t pt-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <Star className="h-5 w-5 fill-primary text-primary" />
+                  Recent Reviews
+                </h3>
+                <div className="space-y-4">
+                  {(restaurant as any).reviews.slice(0, 3).map((rev: any, idx: number) => (
+                    <div key={idx} className="bg-muted/30 rounded-lg p-3">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Star className="h-4 w-4 fill-primary text-primary" />
+                        {rev.rating ? (
+                          <span className="text-sm font-medium">{Number(rev.rating).toFixed(1)}</span>
+                        ) : null}
+                        {rev.user && (
+                          <span className="text-xs text-muted-foreground">• {rev.user}</span>
+                        )}
+                        {rev.published_date && (
+                          <span className="text-xs text-muted-foreground">• {new Date(rev.published_date).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                      {rev.text && (
+                        <p className="text-sm text-muted-foreground leading-relaxed">{rev.text}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4 border-t">
               {websiteUrl && (

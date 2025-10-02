@@ -14,6 +14,7 @@ export default function Redirect() {
       // Validate allowed hosts for safety
       const allowedHosts = [
         'google.com', 'www.google.com', 'maps.google.com',
+        'goo.gl', 'app.goo.gl', 'maps.app.goo.gl', 'g.co', 'g.page',
         'tripadvisor.com', 'www.tripadvisor.com',
         'opentable.com', 'www.opentable.com',
         'resy.com', 'www.resy.com',
