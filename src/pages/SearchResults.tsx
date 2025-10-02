@@ -117,12 +117,30 @@ const SearchResults = () => {
 
       try {
         if (searchType === "hotels") {
-          const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
-            body: { location, checkIn, checkOut, guests: parseInt(guests) }
-          });
+          // Try TripAdvisor first
+          let hotelResults: any[] = [];
+          try {
+            const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
+              body: { location, checkIn, checkOut, guests: parseInt(guests) }
+            });
+            if (error) throw error;
+            hotelResults = data.results || [];
+          } catch (e) {
+            console.warn('TripAdvisor hotel search failed, falling back to Expedia:', e);
+          }
 
-          if (error) throw error;
-          const hotelResults = data.results || [];
+          // Fallback to Expedia if no results
+          if (!hotelResults || hotelResults.length === 0) {
+            const { data: expediaData, error: expediaError } = await supabase.functions.invoke('expedia-search-hotels', {
+              body: { location, checkIn, checkOut, guests: parseInt(guests), rooms: 1 }
+            });
+            if (!expediaError) {
+              hotelResults = expediaData.hotels || [];
+            } else {
+              console.error('Expedia fallback failed:', expediaError);
+            }
+          }
+
           setResults(hotelResults);
           setFilteredResults(hotelResults);
         } else if (searchType === "flights") {
@@ -167,11 +185,11 @@ const SearchResults = () => {
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "packages") {
-          // Fetch hotels, flights, and restaurants in parallel
+          // Fetch hotels, flights, and restaurants in parallel (TripAdvisor first)
           const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
             supabase.functions.invoke('tripadvisor-search-hotels', {
               body: { location, checkIn, checkOut, guests: parseInt(guests) }
-            }),
+            }).catch(() => ({ data: { results: [] }, error: null })),
             supabase.functions.invoke('amadeus-search-flights', {
               body: { origin: 'JFK', destination: location, departureDate: checkIn, adults: parseInt(guests) }
             }).catch(() => ({ data: { results: [] }, error: null })),
@@ -180,8 +198,17 @@ const SearchResults = () => {
             }).catch(() => ({ data: { results: [] }, error: null }))
           ]);
 
+          let hotelsList: any[] = hotelsRes.data?.results || [];
+          // Fallback to Expedia if TripAdvisor returns nothing
+          if (!hotelsList || hotelsList.length === 0) {
+            const { data: expediaData } = await supabase.functions.invoke('expedia-search-hotels', {
+              body: { location, checkIn, checkOut, guests: parseInt(guests), rooms: 1 }
+            }).catch(() => ({ data: { hotels: [] } } as any));
+            hotelsList = expediaData?.hotels || [];
+          }
+
           const packageResults = [
-            ...(hotelsRes.data?.results || []).slice(0, 3).map((r: any) => ({ ...r, packageType: 'hotel' })),
+            ...hotelsList.slice(0, 3).map((r: any) => ({ ...r, packageType: 'hotel' })),
             ...(flightsRes.data?.results || []).slice(0, 3).map((r: any) => ({ ...r, packageType: 'flight' })),
             ...(restaurantsRes.data?.results || []).slice(0, 3).map((r: any) => ({ ...r, packageType: 'restaurant' }))
           ];

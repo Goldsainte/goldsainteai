@@ -364,12 +364,10 @@ export const EnhancedSearchBar = () => {
   const renderHotelSearch = () => (
     <div className="space-y-4">
       <div className="relative">
-        <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-        <Input
-          placeholder="Where are you going? (City, hotel name, or landmark)"
-          className="pl-10 h-12 border-border text-base"
+        <CityAutocomplete
           value={hotelLocation}
-          onChange={(e) => setHotelLocation(e.target.value)}
+          onChange={setHotelLocation}
+          placeholder="Where are you going? (City, hotel name, or landmark)"
         />
       </div>
 
