@@ -96,6 +96,23 @@ const Index = () => {
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  const rotatingMessages = [
+    "Where luxury meets adventure...",
+    "Discover your next destination...",
+    "Experience world-class hospitality...",
+    "Find exclusive travel experiences...",
+    "Your journey begins here..."
+  ];
+
+  // Rotating messages effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentMessageIndex((prev) => (prev + 1) % rotatingMessages.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -554,9 +571,16 @@ const Index = () => {
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
-                  <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
+                  <img src={logomark} alt="Goldsainte.Ai" className="h-24 w-24 md:h-20 md:w-20" />
                   <p className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2">
                     The first travel platform to combine AI precision with human passion — one platform, infinite possibilities.
+                  </p>
+                </div>
+
+                {/* Rotating Message */}
+                <div className="text-center py-2">
+                  <p className="text-lg md:text-xl text-muted-foreground transition-opacity duration-500 font-medium">
+                    {rotatingMessages[currentMessageIndex]}
                   </p>
                 </div>
 
@@ -564,7 +588,7 @@ const Index = () => {
                 <div className="relative pt-2 md:pt-3 px-2 md:px-0">
                   <Input
                     placeholder="Where would you like to go?"
-                    className="w-full h-14 md:h-16 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72]"
+                    className="w-full h-16 md:h-20 px-6 pr-16 text-lg md:text-xl rounded-3xl border-[#BFAD72] shadow-lg focus-visible:ring-2 focus-visible:ring-[#BFAD72]"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -574,13 +598,13 @@ const Index = () => {
                     onClick={() => handleSearch()}
                     size="icon"
                     variant="ghost"
-                    className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 h-11 w-11 md:h-10 md:w-10 rounded-full hover:bg-muted"
+                    className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full hover:bg-muted"
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin" />
                     ) : (
-                      <Send className="h-5 w-5" />
+                      <Send className="h-6 w-6" />
                     )}
                   </Button>
                 </div>
