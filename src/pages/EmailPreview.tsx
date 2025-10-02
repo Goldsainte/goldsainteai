@@ -160,6 +160,7 @@ export default function EmailPreview() {
               width: 100%;
               height: 200px;
               object-fit: cover;
+              object-position: center center;
               display: block;
             }
           .content {
