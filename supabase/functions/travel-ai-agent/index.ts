@@ -407,6 +407,15 @@ The user has saved preferences but has chosen to search without strict filtering
         const msgs = getLastUserMessages();
         const toRegex = /\b(?:to|going to)\s+([a-zA-Z][\w\s\.'-]{1,50})/i;
         
+        // Get list of already-answered questions from assistant messages
+        const assistantMsgs = hist.filter((m: any) => m.role === 'assistant').map((m: any) => (m.content || '').toLowerCase());
+        const askedForDestination = assistantMsgs.some(a => a.includes('where would you like to fly to') || a.includes('where are you flying to'));
+        
+        // If we haven't asked for destination yet, don't try to extract it
+        if (!askedForDestination) {
+          return null;
+        }
+        
         for (let i = msgs.length - 1; i >= 0; i--) {
           const txtRaw = (msgs[i] || '').trim();
           if (!txtRaw) continue;
@@ -417,12 +426,15 @@ The user has saved preferences but has chosen to search without strict filtering
           if (/^\d{4}-\d{2}-\d{2}/.test(txtRaw)) continue;
           if (lower === 'one-way' || lower === 'round-trip' || lower === 'one' || lower === 'round') continue;
           
+          // Skip if it matches the origin city
+          if (origin && lower === origin.toLowerCase()) continue;
+          
           // 1) Try pattern "to Y" or "going to Y"
           const match = txtRaw.match(toRegex);
           if (match && match[1]) {
             let candidate = match[1].trim();
             candidate = candidate.split(/[,.!?]/)[0].trim();
-            if (candidate.length >= 2) {
+            if (candidate.length >= 2 && (!origin || candidate.toLowerCase() !== origin.toLowerCase())) {
               const normalized = normalizeCityName(candidate);
               console.log('extractDestination(to) ->', candidate, '=>', normalized);
               return normalized;
@@ -432,16 +444,21 @@ The user has saved preferences but has chosen to search without strict filtering
           // 2) Explicit prefix
           if (lower.startsWith('to:')) {
             const candidate = txtRaw.replace(/^to:\s*/i, '').trim();
-            const normalized = normalizeCityName(candidate);
-            console.log('extractDestination(prefix) ->', candidate, '=>', normalized);
-            return normalized;
+            if (!origin || candidate.toLowerCase() !== origin.toLowerCase()) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractDestination(prefix) ->', candidate, '=>', normalized);
+              return normalized;
+            }
           }
           
-          // 3) Short city-like answer after origin is set (any position if we have multiple messages)
+          // 3) Short city-like answer only if we've already asked for destination
           if (msgs.length > 1 && txtRaw.split(/\s+/).length <= 4) {
-            const normalized = normalizeCityName(txtRaw);
-            console.log('extractDestination(short) ->', txtRaw, '=>', normalized);
-            return normalized;
+            // Make sure it's not the origin
+            if (!origin || lower !== origin.toLowerCase()) {
+              const normalized = normalizeCityName(txtRaw);
+              console.log('extractDestination(short) ->', txtRaw, '=>', normalized);
+              return normalized;
+            }
           }
         }
         return null;
@@ -484,10 +501,16 @@ The user has saved preferences but has chosen to search without strict filtering
       };
 
       const origin = extractOrigin();
-      const destination = extractDestination();
+      const destination = origin ? extractDestination() : null; // Only extract destination after we have origin
+      
+      // Additional check: destination must be different from origin
+      const validDestination = destination && destination.toLowerCase() !== origin?.toLowerCase() ? destination : null;
+      
       const tripType = extractTripType();
       const departureDate = extractDate();
       const budget = extractBudget();
+
+      console.log('Flight state machine extracted:', { origin, destination: validDestination, tripType, departureDate, budget });
 
       if (!origin) {
         const assistant = 'Where are you flying from?';
@@ -497,7 +520,7 @@ The user has saved preferences but has chosen to search without strict filtering
           conversationHistory: [...hist, { role: 'assistant', content: assistant }]
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
       }
-      if (!destination) {
+      if (!validDestination) {
         const assistant = 'Where would you like to fly to?';
         return new Response(JSON.stringify({
           message: assistant,
@@ -532,7 +555,7 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const result = await searchFlights({
         origin,
-        destination,
+        destination: validDestination,
         departureDate,
         adults: 1,
         travelClass: 'ECONOMY',
@@ -540,7 +563,7 @@ The user has saved preferences but has chosen to search without strict filtering
         sortBy: 'price'
       });
 
-      const finalMessage = `Great! I found flights from ${origin} to ${destination}. Check out the options below!`;
+      const finalMessage = `Great! I found flights from ${origin} to ${validDestination}. Check out the options below!`;
       return new Response(JSON.stringify({
         message: finalMessage,
         toolResults: [result],
