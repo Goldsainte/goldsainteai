@@ -99,11 +99,20 @@ export const RestaurantCard = ({
         <div className="transform transition-all duration-500 group-hover:translate-y-0 translate-y-2">
           {/* Rating and Price */}
           <div className="flex items-center gap-3 mb-3">
-            {numericRating > 0 && (
+            {(numericRating > 0 || userRatingsTotal > 0) && (
               <div className="flex items-center gap-1 bg-primary/20 backdrop-blur-sm px-2 py-1 rounded-lg">
                 <Star className="h-4 w-4 fill-primary text-primary" />
-                <span className="text-sm font-semibold">{numericRating.toFixed(1)}</span>
-                <span className="text-xs text-primary-foreground/70">({userRatingsTotal})</span>
+                {numericRating > 0 && (
+                  <>
+                    <span className="text-sm font-semibold">{numericRating.toFixed(1)}</span>
+                    {userRatingsTotal > 0 && (
+                      <span className="text-xs text-primary-foreground/70">({userRatingsTotal})</span>
+                    )}
+                  </>
+                )}
+                {numericRating === 0 && userRatingsTotal > 0 && (
+                  <span className="text-xs text-primary-foreground/70">{userRatingsTotal} reviews</span>
+                )}
               </div>
             )}
             {priceLevel && (
