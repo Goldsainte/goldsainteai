@@ -23,7 +23,7 @@ export const TripTypeSelector = ({ onSelect, onCancel }: TripTypeSelectorProps) 
       <div className="space-y-3">
         <Button
           variant="outline"
-          className="w-full h-auto py-4 flex flex-col items-start gap-1 hover:border-primary hover:bg-primary/5"
+          className="w-full h-auto py-2.5 flex flex-col items-start gap-0.5 hover:border-primary hover:bg-primary/5"
           onClick={() => onSelect("one-way")}
         >
           <span className="font-semibold">One-way</span>
@@ -31,7 +31,7 @@ export const TripTypeSelector = ({ onSelect, onCancel }: TripTypeSelectorProps) 
         </Button>
         <Button
           variant="outline"
-          className="w-full h-auto py-4 flex flex-col items-start gap-1 hover:border-primary hover:bg-primary/5"
+          className="w-full h-auto py-2.5 flex flex-col items-start gap-0.5 hover:border-primary hover:bg-primary/5"
           onClick={() => onSelect("round-trip")}
         >
           <span className="font-semibold">Round-trip</span>
