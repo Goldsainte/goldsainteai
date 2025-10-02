@@ -414,22 +414,14 @@ const Index = () => {
     setShowDatePicker(null);
 
     if (type === "hotel" && dates.checkIn && dates.checkOut) {
-      const query = `${context} from ${dates.checkIn} to ${dates.checkOut}`;
+      const query = `${dates.checkIn} to ${dates.checkOut}`;
       handleSearch(query);
     } else if (type === "flight" && dates.departureDate) {
-      // Store flight dates and prompt for destination
-      setPendingFlightDates({
-        departureDate: dates.departureDate,
-        returnDate: dates.returnDate
-      });
-      
-      // Give user a gentle nudge without resetting conversation
-      toast({
-        title: "Dates saved",
-        description: dates.returnDate
-          ? `Round-trip: depart ${dates.departureDate}, return ${dates.returnDate}. Now tell me your destination.`
-          : `One-way on ${dates.departureDate}. Now tell me your destination.`,
-      });
+      // Send the date selection as a message to continue the conversation
+      const dateMessage = dates.returnDate 
+        ? `${dates.departureDate} returning ${dates.returnDate}`
+        : dates.departureDate;
+      handleSearch(dateMessage);
     }
   };
 
