@@ -60,7 +60,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
       ...(propertyData?.photoUrls || []),
       ...(hotelData?.media?.map((m: any) => m?.uri).filter(Boolean) || []),
       ...((hotel?.images as string[]) || []),
-    ].filter(Boolean) as string[];
+    ].filter(Boolean).filter(u => typeof u === 'string') as string[];
 
     // Group by image id in URL (e.g., .../square500/581512145.jpg -> id 581512145)
     const byId = new Map<string, { url: string; size: number }>();
