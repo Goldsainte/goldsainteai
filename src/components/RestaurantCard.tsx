@@ -1,10 +1,8 @@
-import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin, DollarSign, Calendar, Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
-import { RestaurantReservationModal } from "./RestaurantReservationModal";
 
 interface RestaurantCardProps {
   id: string;
@@ -28,7 +26,7 @@ export const RestaurantCard = ({
   openNow 
 }: RestaurantCardProps) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
-  const [showReservationModal, setShowReservationModal] = useState(false);
+  
 
   // Safely convert rating to number
   const numericRating = typeof rating === 'number' ? rating : Number(rating) || 0;
@@ -47,9 +45,10 @@ export const RestaurantCard = ({
 
   const handleBookTable = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowReservationModal(true);
+    const query = encodeURIComponent(`${name} ${address} reservations`);
+    const reservationUrl = `https://www.google.com/search?q=${query}`;
+    window.open(reservationUrl, '_blank', 'noopener,noreferrer');
   };
-
   const getPriceLevelSymbol = (level?: number) => {
     if (!level) return '';
     return '$'.repeat(level);
@@ -154,17 +153,6 @@ export const RestaurantCard = ({
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
       </div>
 
-      {/* Reservation Modal */}
-      <RestaurantReservationModal
-        isOpen={showReservationModal}
-        onClose={() => setShowReservationModal(false)}
-        restaurant={{
-          id,
-          name,
-          address,
-          photoUrl
-        }}
-      />
     </Card>
   );
 };
