@@ -390,6 +390,7 @@ The user has saved preferences but has chosen to search without strict filtering
       
       return new Response(JSON.stringify({
         message: nextQuestion,
+        quickLinkState: { type, step: nextStep, data: nextData },
         toolResults: [],
         conversationHistory: [...conversationHistory,
           { role: 'user', content: message },

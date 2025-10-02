@@ -323,7 +323,7 @@ const Index = () => {
 
       if (error) throw error;
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }]);
       
       if (data.toolResults && data.toolResults.length > 0) {
         setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
@@ -493,7 +493,7 @@ const Index = () => {
 
       setMessages([
         { role: 'user', content: query },
-        { role: 'assistant', content: data.message }
+        { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }
       ]);
       
       if (data.conversationHistory) {
