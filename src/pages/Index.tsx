@@ -722,51 +722,41 @@ const Index = () => {
               </div>
 
               {/* Become a Travel Agent CTA */}
-              <div className="space-y-6 pt-16 pb-12">
-                <Card className="relative overflow-hidden border-2 border-accent/50 bg-gradient-to-br from-accent/5 via-primary/5 to-accent/5">
-                  <CardContent className="p-12">
-                    <div className="max-w-3xl mx-auto text-center space-y-6">
-                      <div className="inline-block p-3 bg-accent/10 rounded-full mb-4">
-                        <Briefcase className="h-12 w-12 text-accent" />
+              <div className="pt-12 pb-8">
+                <Card className="relative overflow-hidden border border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
+                  <CardContent className="p-8">
+                    <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-6">
+                      <div className="flex-shrink-0">
+                        <div className="inline-block p-2 bg-accent/10 rounded-full">
+                          <Briefcase className="h-8 w-8 text-accent" />
+                        </div>
                       </div>
-                      <h2 className="text-4xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
-                        Become a Goldsainte AI Travel Agent
-                      </h2>
-                      <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                        Join our exclusive network of verified travel professionals and connect with clients seeking luxury travel experiences worldwide. Earn commissions on bookings and grow your business with our AI-powered platform.
-                      </p>
-                      <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                      <div className="flex-1 text-center md:text-left space-y-2">
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent font-chiffon">
+                          Become a Travel Agent
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                          Join our network and earn commissions on luxury travel bookings
+                        </p>
+                      </div>
+                      <div className="flex flex-col sm:flex-row gap-3">
                         <Button 
-                          size="lg" 
-                          className="gap-2 text-lg px-8 py-6"
+                          size="sm"
+                          className="gap-2"
                           onClick={() => navigate('/auth?redirect=/agent-onboarding')}
                         >
-                          <Briefcase className="h-5 w-5" />
+                          <Briefcase className="h-4 w-4" />
                           Apply Now
                         </Button>
                         <Button 
-                          size="lg" 
+                          size="sm"
                           variant="outline"
-                          className="gap-2 text-lg px-8 py-6"
+                          className="gap-2"
                           onClick={() => navigate('/marketplace')}
                         >
-                          <MapPinned className="h-5 w-5" />
-                          View Marketplace
+                          <MapPinned className="h-4 w-4" />
+                          Marketplace
                         </Button>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
-                        <div className="space-y-2">
-                          <div className="text-2xl font-bold text-accent">10%+</div>
-                          <p className="text-sm text-muted-foreground">Commission Rates</p>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="text-2xl font-bold text-accent">24/7</div>
-                          <p className="text-sm text-muted-foreground">Platform Support</p>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="text-2xl font-bold text-accent">Global</div>
-                          <p className="text-sm text-muted-foreground">Client Network</p>
-                        </div>
                       </div>
                     </div>
                   </CardContent>
