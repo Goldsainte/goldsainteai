@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket, ArrowLeftRight, Plus, Minus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,7 @@ import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 export const EnhancedSearchBar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const routeLocation = useLocation();
   const { addSearch } = useSearchHistory();
   const { trackSearch } = useSearchTracking();
 
@@ -75,40 +76,40 @@ export const EnhancedSearchBar = () => {
 
   // Sync state with URL parameters when they change
   useEffect(() => {
-    const currentType = searchParams.get("type") || "hotels";
-    const location = searchParams.get("location") || "";
-    
+    const params = new URLSearchParams(routeLocation.search);
+    const currentType = params.get("type") || "hotels";
+    const loc = params.get("location") || "";
+
     setSearchType(currentType);
-    
-    // Update location fields based on search type
+
     if (currentType === "hotels") {
-      setHotelLocation(location);
-      const checkIn = searchParams.get("checkIn");
-      const checkOut = searchParams.get("checkOut");
+      setHotelLocation(loc);
+      const checkIn = params.get("checkIn");
+      const checkOut = params.get("checkOut");
       if (checkIn) setCheckInDate(new Date(checkIn));
       if (checkOut) setCheckOutDate(new Date(checkOut));
     } else if (currentType === "restaurants") {
-      setRestaurantLocation(location);
-      const date = searchParams.get("date");
-      const time = searchParams.get("time");
+      setRestaurantLocation(loc);
+      const date = params.get("date");
+      const time = params.get("time");
       if (date) setRestaurantDate(new Date(date));
       if (time) setRestaurantTime(time);
     } else if (currentType === "events") {
-      setEventLocation(location);
-      const date = searchParams.get("date");
+      setEventLocation(loc);
+      const date = params.get("date");
       if (date) setEventDate(new Date(date));
     } else if (currentType === "flights") {
-      const origin = searchParams.get("origin");
-      const destination = searchParams.get("destination");
-      const departureDate = searchParams.get("departureDate");
-      const returnDate = searchParams.get("returnDate");
-      
+      const origin = params.get("origin");
+      const destination = params.get("destination");
+      const departureDate = params.get("departureDate");
+      const returnDate = params.get("returnDate");
+
       if (origin) setOrigin(origin);
       if (destination) setDestination(destination);
       if (departureDate) setDepartureDate(new Date(departureDate));
       if (returnDate) setReturnDate(new Date(returnDate));
     }
-  }, [searchParams]);
+  }, [routeLocation.search]);
 
   const handleSwapLocations = () => {
     const temp = origin;
