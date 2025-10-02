@@ -466,19 +466,21 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractCuisine = (): string | null => {
         const msgs = getLastUserMessages().slice().reverse();
+        const city = extractCity();
+        const cityVariations = city ? getCityVariations(city).map(s => s.toLowerCase()) : [];
+        const CUISINES = ['italian','french','japanese','chinese','mexican','indian','thai','mediterranean','american','korean','vietnamese','spanish','greek','middle eastern','seafood','steakhouse','vegetarian','vegan','any'];
         for (const m of msgs) {
           const txt = (m || '').trim();
           if (!txt) continue;
           const lower = txt.toLowerCase();
-          if (lower.includes('looking for') || lower.includes('restaurants') || lower.includes('budget')) continue;
-          // Check if it's a short response that could be a cuisine type
-          if (txt.split(/\s+/).length <= 3 && !/[0-9$]/.test(txt)) {
-            return txt;
-          }
+          if (lower.includes('looking for') || lower.includes('restaurant') || lower.includes('restaurants') || lower.includes('budget')) continue;
+          if (city && (lower === city.toLowerCase() || cityVariations.includes(lower))) continue;
+          // Try to match known cuisines within the text
+          const match = CUISINES.find(c => lower === c || lower.includes(c));
+          if (match) return match.charAt(0).toUpperCase() + match.slice(1);
         }
         return null;
       };
-
       const extractBudget = (): number | null => {
         const msgs = getLastUserMessages().slice().reverse();
         for (const m of msgs) {
