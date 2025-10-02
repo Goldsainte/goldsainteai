@@ -444,7 +444,7 @@ The user has saved preferences but has chosen to search without strict filtering
     }
 
     // QUICK LINK STATE MACHINE (restaurants): enforce one-question-at-a-time flow
-    if (isQuickLink && quickLinkType === 'restaurants' && (!userPreferences || !usePreferences)) {
+    if (isQuickLink && quickLinkType === 'restaurants') {
       const hist = Array.isArray(conversationHistory) ? conversationHistory.slice() : [];
       if (message) hist.push({ role: 'user', content: String(message) });
 

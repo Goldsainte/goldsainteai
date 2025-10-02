@@ -127,7 +127,7 @@ export const RestaurantCard = ({
           
           <h3 className="text-2xl font-bold mb-2 tracking-tight line-clamp-1">{name}</h3>
           
-          <div className="flex items-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+          <div className="flex items-start gap-2 transition-opacity duration-500">
             <MapPin className="h-4 w-4 text-primary-foreground/80 mt-1 flex-shrink-0" />
             <p className="text-sm text-primary-foreground/90 leading-relaxed line-clamp-2">
               {address}
@@ -137,7 +137,7 @@ export const RestaurantCard = ({
           {/* Booking Button */}
           <Button 
             onClick={handleBookTable}
-            className="mt-4 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 relative z-10"
+            className="mt-4 w-full relative z-10"
             size="sm"
           >
             <Calendar className="h-4 w-4 mr-2" />
@@ -146,7 +146,7 @@ export const RestaurantCard = ({
         </div>
 
         {/* Decorative accent */}
-        <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500 group-hover:w-full" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-primary transition-all duration-500" />
       </div>
 
       {/* Shimmer effect on hover */}
