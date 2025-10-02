@@ -390,9 +390,7 @@ export default function EmailPreview() {
             
             <p>Dear John Smith,</p>
             
-            <p>Thank you for booking with GoldSainte. Your flight reservation has been confirmed. Please review the details below and save this email for your records.</p>
-            
-            <p>We're excited to be part of your upcoming journey!</p>
+            <p>We're excited to be part of your upcoming journey! Your flight reservation has been confirmed. Please review the details below and save this email for your records.</p>
             
             <p>You can check in for your flight using your confirmation number either at the airline's self-service kiosks at the airport (typically available up to 6 hours before departure), or online or via the airline's mobile app starting 24 hours prior to your flight.</p>
             
