@@ -954,6 +954,12 @@ const Index = () => {
                               address={restaurant.address}
                               photoUrl={restaurant.photoUrl}
                               openNow={restaurant.openNow}
+                              phone={restaurant.phone}
+                              website={restaurant.website}
+                              hours={restaurant.hours}
+                              photos={restaurant.photos}
+                              cuisine={restaurant.cuisine}
+                              description={restaurant.description}
                             />
                           ))}
                         </div>
