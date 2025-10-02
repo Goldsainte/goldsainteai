@@ -64,7 +64,7 @@ function App() {
                       <Route path="/search" element={<SearchResults />} />
                       <Route path="/hotel-booking" element={<HotelBooking />} />
                       <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-                      <Route path="/r" element={<(await import('./pages/Redirect')).default />} />
+                      <Route path="/r" element={<Redirect />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
