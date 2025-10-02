@@ -452,19 +452,44 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractCity = (): string | null => {
         const msgs = getLastUserMessages().slice().reverse();
+        const STOP_WORDS_END = ['tonight','today','tomorrow','please','now','area','city','center','downtown'];
+        const prepositionRegex = /(\b(?:in|near|around|at)\s+)([a-zA-Z][\w\s\.'-]{1,50})/i;
+        
         for (const m of msgs) {
-          const txt = (m || '').trim();
-          if (!txt) continue;
-          const lower = txt.toLowerCase();
-          // Skip messages that are clearly not city names
+          const txtRaw = (m || '').trim();
+          if (!txtRaw) continue;
+          const lower = txtRaw.toLowerCase();
+
+          // 1) Try to extract pattern like "in Dallas", "near Miami Beach"
+          const prepositionMatch = txtRaw.match(prepositionRegex);
+          if (prepositionMatch && prepositionMatch[2]) {
+            let candidate = prepositionMatch[2].trim();
+            // Cut at common delimiters
+            candidate = candidate.split(/[,.!?]/)[0].trim();
+            // Remove trailing stop words
+            const parts = candidate.split(/\s+/);
+            while (parts.length > 1 && STOP_WORDS_END.includes(parts[parts.length - 1].toLowerCase())) {
+              parts.pop();
+            }
+            candidate = parts.join(' ').trim();
+            if (candidate.length >= 2) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractCity(preposition) ->', candidate, '=>', normalized);
+              return normalized;
+            }
+          }
+
+          // 2) Heuristic fallback: short, city-like answers
+          // Skip clearly non-city messages
           if (lower.startsWith('dates:') || lower.startsWith('budget:') || lower.startsWith('cuisine:')) continue;
-          if (lower.includes('looking for') || lower.includes('restaurants')) continue;
-          if (/^\$?\d+$/.test(txt)) continue; // Skip pure numbers/prices
-          // Check if it matches a known cuisine - if so, skip it
-          const CUISINES = ['italian','french','japanese','chinese','mexican','indian','thai','mediterranean','american','korean','vietnamese','spanish','greek','middle eastern','seafood','steakhouse','vegetarian','vegan','any'];
-          if (CUISINES.includes(lower)) continue;
-          if (txt.split(/\s+/).length <= 6) {
-            return txt;
+          if (/^\$?\d+$/.test(txtRaw)) continue; // pure numbers/prices
+          // If the message contains restaurant keywords, still allow if it's short and likely a city
+          const hasRestaurantWords = lower.includes('restaurant');
+          const tokens = txtRaw.split(/\s+/);
+          if (tokens.length <= 4 && (!hasRestaurantWords || tokens.length <= 2)) {
+            const normalized = normalizeCityName(txtRaw);
+            console.log('extractCity(short) ->', txtRaw, '=>', normalized);
+            return normalized;
           }
         }
         return null;
