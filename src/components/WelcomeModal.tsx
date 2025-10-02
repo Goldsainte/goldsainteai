@@ -1,6 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Sparkles, Heart, FileCheck, ArrowRight } from "lucide-react";
+import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight } from "lucide-react";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -47,16 +47,16 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 3 */}
+            {/* Feature 3 - Travel Agent Marketplace */}
             <div className="flex gap-4 items-start">
               <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                <Heart className="h-6 w-6 text-primary" />
+                <Briefcase className="h-6 w-6 text-primary" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-semibold text-lg">Trip ideas that get you.</h3>
+                <h3 className="font-semibold text-lg">Expert agents for complex journeys.</h3>
                 <p className="text-muted-foreground text-sm">
-                  Goldsainte.Ai learns what you like and then helps find the luxury 
-                  travel options that work best for you.
+                  Planning a multi-city adventure or intricate itinerary? Post your trip 
+                  to our marketplace and let certified travel experts craft your perfect journey.
                 </p>
               </div>
             </div>
@@ -64,13 +64,27 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             {/* Feature 4 */}
             <div className="flex gap-4 items-start">
               <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Heart className="h-6 w-6 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-semibold text-lg">Personalized recommendations.</h3>
+                <p className="text-muted-foreground text-sm">
+                  Goldsainte.Ai learns your preferences and finds luxury 
+                  travel options perfectly tailored to your style.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 5 */}
+            <div className="flex gap-4 items-start">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <FileCheck className="h-6 w-6 text-primary" />
               </div>
               <div className="space-y-1">
-                <h3 className="font-semibold text-lg">All synced. All in one spot.</h3>
+                <h3 className="font-semibold text-lg">Everything organized in one place.</h3>
                 <p className="text-muted-foreground text-sm">
-                  Plan your trip and Goldsainte.Ai saves your preferences, shares 
-                  plans with friends and keeps all the details in one place.
+                  Save your travel plans, share itineraries with companions, and keep 
+                  all booking details seamlessly organized in one secure location.
                 </p>
               </div>
             </div>
