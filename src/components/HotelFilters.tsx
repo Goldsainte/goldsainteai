@@ -106,20 +106,41 @@ export const HotelFilters = ({
           <span className="text-sm font-medium">{resultsCount} properties</span>
         </div>
 
-        <div className="flex items-center gap-2 flex-1">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-          <Select value={currentSort} onValueChange={onSortChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent className="bg-background">
-              <SelectItem value="popularity">Most Popular</SelectItem>
-              <SelectItem value="price">Lowest Price</SelectItem>
-              <SelectItem value="review_score">Highest Rated</SelectItem>
-              <SelectItem value="price_desc">Highest Price</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+         <div className="flex items-center gap-2 flex-1">
+           <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+           <Select value={currentSort} onValueChange={onSortChange}>
+             <SelectTrigger className="w-[180px]">
+               <SelectValue placeholder="Sort by" />
+             </SelectTrigger>
+             <SelectContent className="bg-background">
+               <SelectItem value="popularity">Most Popular</SelectItem>
+               <SelectItem value="price">Lowest Price</SelectItem>
+               <SelectItem value="review_score">Highest Rated</SelectItem>
+               <SelectItem value="price_desc">Highest Price</SelectItem>
+             </SelectContent>
+           </Select>
+ 
+           {/* Quick Price Slider */}
+           <div className="flex items-center gap-2 ml-4">
+             <DollarSign className="h-4 w-4 text-muted-foreground" />
+             <div className="w-48">
+               <Slider
+                 min={0}
+                 max={1000}
+                 step={50}
+                 value={priceRange}
+                 onValueChange={(value) => {
+                   setPriceRange(value as [number, number]);
+                   onPriceRangeChange?.(value[0], value[1]);
+                 }}
+               />
+               <div className="flex justify-between text-xs text-muted-foreground">
+                 <span>${priceRange[0]}</span>
+                 <span>${priceRange[1]}</span>
+               </div>
+             </div>
+           </div>
+         </div>
 
         {/* Quick Rating Filters */}
         <div className="flex items-center gap-2">

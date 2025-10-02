@@ -95,21 +95,39 @@ export const AdvancedFlightFilters = ({
           <span className="text-sm font-medium">{resultsCount} flights</span>
         </div>
 
-        <div className="flex items-center gap-2 flex-1">
-          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-          <Select value={currentSort} onValueChange={onSortChange}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent className="bg-background">
-              <SelectItem value="best">Best</SelectItem>
-              <SelectItem value="price">Cheapest</SelectItem>
-              <SelectItem value="duration">Shortest</SelectItem>
-              <SelectItem value="departure_early">Earliest Departure</SelectItem>
-              <SelectItem value="departure_late">Latest Departure</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+         <div className="flex items-center gap-2 flex-1">
+           <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+           <Select value={currentSort} onValueChange={onSortChange}>
+             <SelectTrigger className="w-[180px]">
+               <SelectValue placeholder="Sort by" />
+             </SelectTrigger>
+             <SelectContent className="bg-background">
+               <SelectItem value="best">Best</SelectItem>
+               <SelectItem value="price">Cheapest</SelectItem>
+               <SelectItem value="duration">Shortest</SelectItem>
+               <SelectItem value="departure_early">Earliest Departure</SelectItem>
+               <SelectItem value="departure_late">Latest Departure</SelectItem>
+             </SelectContent>
+           </Select>
+ 
+           {/* Quick Price Slider */}
+           <div className="flex items-center gap-2 ml-4">
+             <DollarSign className="h-4 w-4 text-muted-foreground" />
+             <div className="w-48">
+               <Slider
+                 min={0}
+                 max={5000}
+                 step={100}
+                 value={filters.priceRange}
+                 onValueChange={(value) => updateFilter('priceRange', value as [number, number])}
+               />
+               <div className="flex justify-between text-xs text-muted-foreground">
+                 <span>${filters.priceRange[0]}</span>
+                 <span>${filters.priceRange[1]}</span>
+               </div>
+             </div>
+           </div>
+         </div>
 
         {/* Advanced Filters Sheet */}
         <Sheet>

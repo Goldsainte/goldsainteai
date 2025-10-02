@@ -109,54 +109,72 @@ export const RestaurantFilters = ({
           <span className="text-sm font-medium">{resultsCount} restaurants</span>
         </div>
         
-        <div className="flex items-center gap-2">
-          <Select value={currentSort} onValueChange={onSortChange}>
-            <SelectTrigger className="w-[180px]">
-              <ArrowUpDown className="h-4 w-4 mr-2" />
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="rating">Rating</SelectItem>
-              <SelectItem value="price_low">Price: Low to High</SelectItem>
-              <SelectItem value="price_high">Price: High to Low</SelectItem>
-              <SelectItem value="distance">Distance</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Mobile filters */}
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="relative">
-                <SlidersHorizontal className="h-4 w-4 mr-2" />
-                Filters
-                {activeFilterCount > 0 && (
-                  <Badge variant="destructive" className="ml-2 px-1.5 py-0.5 text-xs">
-                    {activeFilterCount}
-                  </Badge>
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80 overflow-y-auto">
-              <SheetHeader>
-                <SheetTitle>Restaurant Filters</SheetTitle>
-              </SheetHeader>
-              <div className="mt-6 space-y-6">
-                <FilterContent
-                  priceRange={priceRange}
-                  handlePriceChange={handlePriceChange}
-                  cuisineTypes={cuisineTypes}
-                  selectedCuisines={selectedCuisines}
-                  handleCuisineToggle={handleCuisineToggle}
-                  dietaryOptions={dietaryOptions}
-                  selectedDietary={selectedDietary}
-                  handleDietaryToggle={handleDietaryToggle}
-                  clearAllFilters={clearAllFilters}
-                  hasActiveFilters={hasActiveFilters}
-                />
-              </div>
-            </SheetContent>
-          </Sheet>
-        </div>
+         <div className="flex items-center gap-3">
+           <Select value={currentSort} onValueChange={onSortChange}>
+             <SelectTrigger className="w-[180px]">
+               <ArrowUpDown className="h-4 w-4 mr-2" />
+               <SelectValue placeholder="Sort by" />
+             </SelectTrigger>
+             <SelectContent>
+               <SelectItem value="rating">Rating</SelectItem>
+               <SelectItem value="price_low">Price: Low to High</SelectItem>
+               <SelectItem value="price_high">Price: High to Low</SelectItem>
+               <SelectItem value="distance">Distance</SelectItem>
+             </SelectContent>
+           </Select>
+ 
+           {/* Quick Price Slider */}
+           <div className="flex items-center gap-2">
+             <DollarSign className="h-4 w-4 text-muted-foreground" />
+             <div className="w-40">
+               <Slider
+                 value={priceRange}
+                 onValueChange={handlePriceChange}
+                 max={200}
+                 step={5}
+                 className="w-full"
+               />
+               <div className="flex justify-between text-xs text-muted-foreground">
+                 <span>${priceRange[0]}</span>
+                 <span>${priceRange[1]}</span>
+               </div>
+             </div>
+           </div>
+ 
+           {/* Mobile filters */}
+           <Sheet>
+             <SheetTrigger asChild>
+               <Button variant="outline" size="sm" className="relative">
+                 <SlidersHorizontal className="h-4 w-4 mr-2" />
+                 Filters
+                 {activeFilterCount > 0 && (
+                   <Badge variant="destructive" className="ml-2 px-1.5 py-0.5 text-xs">
+                     {activeFilterCount}
+                   </Badge>
+                 )}
+               </Button>
+             </SheetTrigger>
+             <SheetContent side="left" className="w-80 overflow-y-auto">
+               <SheetHeader>
+                 <SheetTitle>Restaurant Filters</SheetTitle>
+               </SheetHeader>
+               <div className="mt-6 space-y-6">
+                 <FilterContent
+                   priceRange={priceRange}
+                   handlePriceChange={handlePriceChange}
+                   cuisineTypes={cuisineTypes}
+                   selectedCuisines={selectedCuisines}
+                   handleCuisineToggle={handleCuisineToggle}
+                   dietaryOptions={dietaryOptions}
+                   selectedDietary={selectedDietary}
+                   handleDietaryToggle={handleDietaryToggle}
+                   clearAllFilters={clearAllFilters}
+                   hasActiveFilters={hasActiveFilters}
+                 />
+               </div>
+             </SheetContent>
+           </Sheet>
+         </div>
       </div>
 
       {/* Active filters display */}
