@@ -14,5 +14,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Ensure a single React instance to prevent ReactCurrentDispatcher errors
+    dedupe: ["react", "react-dom"],
   },
 }));
