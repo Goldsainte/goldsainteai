@@ -32,11 +32,12 @@ const SearchResults = () => {
   const [sortBy, setSortBy] = useState("popularity");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [minRating, setMinRating] = useState<number | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [selectedStarRatings, setSelectedStarRatings] = useState<number[]>([]);
   const [userPreferences, setUserPreferences] = useState<any>(null);
+  const [flightDictionaries, setFlightDictionaries] = useState<any>(null);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -145,6 +146,7 @@ const SearchResults = () => {
           const flightResults = data.results || [];
           setResults(flightResults);
           setFilteredResults(flightResults);
+          setFlightDictionaries(data.dictionaries || null);
         } else if (searchType === "destinations") {
           const { data, error } = await supabase.functions.invoke('search-destinations', {
             body: { query: location }
@@ -209,9 +211,11 @@ const SearchResults = () => {
   useEffect(() => {
     let filtered = [...results];
 
-    // Apply price filter
+    // Apply price filter (handle flights vs others)
     filtered = filtered.filter((item) => {
-      const price = item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0;
+      const price = searchType === "flights"
+        ? Number(item.price?.grandTotal ?? item.price?.total ?? 0)
+        : (item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0);
       return price >= priceRange[0] && price <= priceRange[1];
     });
 
@@ -254,10 +258,18 @@ const SearchResults = () => {
     // Apply sorting
     switch (sortBy) {
       case "price":
-        filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+        filtered.sort((a, b) => {
+          const ap = searchType === "flights" ? Number(a.price?.grandTotal ?? a.price?.total ?? 0) : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
+          const bp = searchType === "flights" ? Number(b.price?.grandTotal ?? b.price?.total ?? 0) : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
+          return ap - bp;
+        });
         break;
       case "price_desc":
-        filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+        filtered.sort((a, b) => {
+          const ap = searchType === "flights" ? Number(a.price?.grandTotal ?? a.price?.total ?? 0) : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
+          const bp = searchType === "flights" ? Number(b.price?.grandTotal ?? b.price?.total ?? 0) : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
+          return bp - ap;
+        });
         break;
       case "review_score":
         filtered.sort((a, b) => {
@@ -308,7 +320,7 @@ const SearchResults = () => {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  {filteredResults.length} {searchType === "hotels" ? "properties" : searchType === "packages" ? "package options" : "destinations"} in {location}
+                  {filteredResults.length} {searchType === "hotels" ? "properties" : searchType === "packages" ? "package options" : searchType === "flights" ? "flights" : "destinations"} {searchType === "flights" ? `from ${origin.split(' - ')[0]} to ${destination.split(' - ')[0]}` : `in ${location}`}
                 </h2>
                 {searchType === "hotels" && checkIn && (
                   <div className="mt-1 space-y-1">
@@ -433,7 +445,7 @@ const SearchResults = () => {
                         <CompactFlightCard
                           key={result.id || index}
                           flight={result}
-                          dictionaries={result.dictionaries}
+                          dictionaries={flightDictionaries}
                         />
                       ) : (
                         <CompactHotelCard
