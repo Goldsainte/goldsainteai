@@ -215,37 +215,166 @@ The user has saved preferences but has chosen to search without strict filtering
       }
     }
 
-    // For quick links, guide the conversation more explicitly while keeping it natural
-    // Quick links need some structure to ensure the AI gathers required info
-    const quickLinkSystemAddition = isQuickLink ? `
+    // Sequential question flow with state tracking
+    let quickLinkState = conversationHistory.find((msg: any) => msg.quickLinkState)?.quickLinkState;
+    
+    // Initialize state for quick links
+    if (isQuickLink && !quickLinkState) {
+      quickLinkState = {
+        type: quickLinkType,
+        step: 0,
+        data: {}
+      };
+    }
+    
+    // State machine for sequential questions
+    if (isQuickLink && quickLinkState) {
+      const { type, step, data } = quickLinkState;
+      let nextStep = step;
+      let nextData = { ...data };
+      let shouldSearch = false;
+      
+      if (type === 'hotels') {
+        if (step === 0) {
+          // Ask for location
+          nextStep = 1;
+        } else if (step === 1) {
+          // Got location, ask for check-in
+          nextData.location = message;
+          nextStep = 2;
+        } else if (step === 2) {
+          // Got check-in, ask for check-out
+          nextData.checkIn = message;
+          nextStep = 3;
+        } else if (step === 3) {
+          // Got all data, search
+          nextData.checkOut = message;
+          shouldSearch = true;
+        }
+      } else if (type === 'flights') {
+        if (step === 0) {
+          // Ask for origin
+          nextStep = 1;
+        } else if (step === 1) {
+          // Got origin, ask for destination
+          nextData.origin = message;
+          nextStep = 2;
+        } else if (step === 2) {
+          // Got destination, ask for departure date
+          nextData.destination = message;
+          nextStep = 3;
+        } else if (step === 3) {
+          // Got departure, optionally ask for return
+          nextData.departureDate = message;
+          nextStep = 4;
+        } else if (step === 4) {
+          // Got return date or skip, search
+          if (message && !message.toLowerCase().includes('one way') && !message.toLowerCase().includes('skip')) {
+            nextData.returnDate = message;
+          }
+          shouldSearch = true;
+        }
+      } else if (type === 'restaurants') {
+        if (step === 0) {
+          // Ask for location
+          nextStep = 1;
+        } else if (step === 1) {
+          // Got location, optionally ask cuisine
+          nextData.location = message;
+          nextStep = 2;
+        } else if (step === 2) {
+          // Got cuisine or skip, search
+          if (message && !message.toLowerCase().includes('any') && !message.toLowerCase().includes('skip')) {
+            nextData.cuisineType = message;
+          }
+          shouldSearch = true;
+        }
+      } else if (type === 'events') {
+        if (step === 0) {
+          // Ask for location
+          nextStep = 1;
+        } else if (step === 1) {
+          // Got location, search
+          nextData.location = message;
+          shouldSearch = true;
+        }
+      }
+      
+      // Execute search if ready
+      if (shouldSearch) {
+        let toolResult;
+        if (type === 'hotels') {
+          toolResult = await searchHotels({
+            location: nextData.location,
+            checkIn: nextData.checkIn,
+            checkOut: nextData.checkOut,
+            guests: 2
+          }, userContext);
+        } else if (type === 'flights') {
+          toolResult = await searchFlights({
+            origin: nextData.origin,
+            destination: nextData.destination,
+            departureDate: nextData.departureDate,
+            returnDate: nextData.returnDate,
+            adults: 1
+          });
+        } else if (type === 'restaurants') {
+          toolResult = await searchRestaurants({
+            location: nextData.location,
+            cuisineType: nextData.cuisineType
+          });
+        } else if (type === 'events') {
+          toolResult = await searchEvents({
+            location: nextData.location
+          });
+        }
+        
+        const finalMessage = `Great! I found some options for you. Check them out below!`;
+        return new Response(JSON.stringify({
+          message: finalMessage,
+          toolResults: [toolResult],
+          conversationHistory: [...conversationHistory,
+            { role: 'user', content: message },
+            { role: 'assistant', content: finalMessage }
+          ]
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+      
+      // Generate next question
+      let nextQuestion = '';
+      if (type === 'hotels') {
+        if (nextStep === 1) nextQuestion = "Where would you like to stay?";
+        else if (nextStep === 2) nextQuestion = `Perfect! When would you like to check in to ${nextData.location}?`;
+        else if (nextStep === 3) nextQuestion = "And when would you like to check out?";
+      } else if (type === 'flights') {
+        if (nextStep === 1) nextQuestion = "Where will you be flying from?";
+        else if (nextStep === 2) nextQuestion = `Great! Where would you like to fly to from ${nextData.origin}?`;
+        else if (nextStep === 3) nextQuestion = "When would you like to depart?";
+        else if (nextStep === 4) nextQuestion = "When would you like to return? (or say 'one way' for a one-way flight)";
+      } else if (type === 'restaurants') {
+        if (nextStep === 1) nextQuestion = "Which city are you looking for restaurants in?";
+        else if (nextStep === 2) nextQuestion = "What type of cuisine are you interested in? (or say 'any' for all types)";
+      } else if (type === 'events') {
+        if (nextStep === 1) nextQuestion = "Which city would you like to find events in?";
+      }
+      
+      return new Response(JSON.stringify({
+        message: nextQuestion,
+        toolResults: [],
+        conversationHistory: [...conversationHistory,
+          { role: 'user', content: message },
+          { role: 'assistant', content: nextQuestion, quickLinkState: { type, step: nextStep, data: nextData } }
+        ]
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
 
-QUICK LINK MODE: The user clicked a quick link for ${quickLinkType}. Your job is to gather the minimum required information naturally and then search immediately:
-
-For ${quickLinkType}:
-${quickLinkType === 'hotels' ? `
-- Required: location (city), check-in date, check-out date
-- After getting these, call search_hotels immediately
-- If they just give a city name, ask about dates naturally
-- Example: User says "paris" → You say "Perfect! When would you like to check in?" then after dates → call search_hotels
-` : quickLinkType === 'flights' ? `
-- Required: origin, destination, departure date
-- After getting these, call search_flights immediately  
-- If missing origin, ask naturally: "Where will you be flying from?"
-- Example: User says "to Tokyo" → You ask "Where from?" → then call search_flights
-` : quickLinkType === 'restaurants' ? `
-- Required: city/location
-- Optional but helpful: cuisine type
-- After getting location, call search_restaurants immediately
-- Example: User says "New York" → call search_restaurants right away
-` : quickLinkType === 'events' ? `
-- Required: city/location
-- Optional: date range, event type
-- After getting location, call search_events immediately
-` : ''}
-
-CRITICAL: When you have the required information, call the search tool IMMEDIATELY. Don't keep asking questions.` : '';
-
-    // Conversational approach for all interactions with optional quick link guidance
+    // Conversational approach for non-quick link interactions
 
 
 
@@ -524,7 +653,6 @@ ONLY search when you have enough information to provide relevant results. It's b
       {
         role: "system",
         content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}${userContext}
-${quickLinkSystemAddition}
 ${conversationalBehavior}
 
 ⚠️ CRITICAL PREFERENCE ENFORCEMENT:
@@ -753,33 +881,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
       });
     }
 
-    // No tool calls - attempt a smart fallback for simple city queries
-    const simpleText = (message || '').trim();
-    const looksLikeCity = simpleText.length > 0 && simpleText.length <= 60 && /[a-zA-Z]/.test(simpleText) && simpleText.split(/\s+/).length <= 5;
-
-    if (looksLikeCity) {
-      console.log('No tool calls from AI. Fallback: trying searchHotels with', simpleText);
-      const fallbackResult = await searchHotels({ location: simpleText, guests: 2, sortBy: 'popularity' }, '');
-
-      if (fallbackResult && Array.isArray(fallbackResult.results) && fallbackResult.results.length > 0) {
-        const finalMessage = `Perfect! I found some great hotels in ${simpleText}. Check out the options below!`;
-        return new Response(JSON.stringify({
-          message: finalMessage,
-          toolResults: [fallbackResult],
-          conversationHistory: [...conversationHistory,
-            { role: 'user', content: message },
-            { role: 'assistant', content: finalMessage }
-          ]
-        }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
-        });
-      }
-
-      console.log('Fallback search returned no results for', simpleText);
-    }
-
-    // No tool calls and no fallback results, return direct response
+    // No tool calls - return conversational response
     return new Response(JSON.stringify({
       message: assistantMessage.content,
       toolResults: [],
