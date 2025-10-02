@@ -3,7 +3,9 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SimpleHeader } from "@/components/SimpleHeader";
 import { EnhancedSearchBar } from "@/components/EnhancedSearchBar";
-import { SimplePropertyCard } from "@/components/SimplePropertyCard";
+import { CompactHotelCard } from "@/components/CompactHotelCard";
+import { CompactFlightCard } from "@/components/CompactFlightCard";
+import { ResultsMapView } from "@/components/ResultsMapView";
 import { HotelFilters } from "@/components/HotelFilters";
 import { Button } from "@/components/ui/button";
 import { Loader2, SlidersHorizontal, Map, List, ArrowLeft } from "lucide-react";
@@ -353,14 +355,35 @@ const SearchResults = () => {
 
               {/* Results List */}
               <main className="lg:col-span-9">
+                {/* Map View at Top */}
+                {searchType === "hotels" && (
+                  <ResultsMapView 
+                    location={location || ''} 
+                    results={filteredResults}
+                    type={searchType}
+                  />
+                )}
+
                 {viewMode === "list" ? (
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {filteredResults.map((result, index) => (
-                      <SimplePropertyCard
-                        key={result.hotel_id || result.dest_id || index}
-                        property={result}
-                        type={searchType}
-                      />
+                      searchType === "hotels" ? (
+                        <CompactHotelCard
+                          key={result.hotel_id || result.dest_id || index}
+                          property={result}
+                        />
+                      ) : searchType === "flights" ? (
+                        <CompactFlightCard
+                          key={result.id || index}
+                          flight={result}
+                          dictionaries={result.dictionaries}
+                        />
+                      ) : (
+                        <CompactHotelCard
+                          key={result.hotel_id || result.dest_id || index}
+                          property={result}
+                        />
+                      )
                     ))}
                   </div>
                 ) : (
