@@ -37,16 +37,14 @@ export const RestaurantDetailsModal = ({
     return '$'.repeat(level);
   };
 
+  const websiteUrl = restaurant.website
+    ? (/^https?:\/\//i.test(restaurant.website) ? restaurant.website : `https://${restaurant.website}`)
+    : undefined;
+
   const handleMakeReservation = () => {
     const query = encodeURIComponent(`${restaurant.name} ${restaurant.address} reservations`);
     const reservationUrl = `https://www.google.com/search?q=${query}`;
     window.open(reservationUrl, '_blank', 'noopener,noreferrer');
-  };
-
-  const handleViewWebsite = () => {
-    if (restaurant.website) {
-      window.open(restaurant.website, '_blank', 'noopener,noreferrer');
-    }
   };
 
   return (
@@ -127,11 +125,11 @@ export const RestaurantDetailsModal = ({
                 </div>
               )}
 
-              {restaurant.website && (
+              {websiteUrl && (
                 <div className="flex items-center gap-3">
                   <Globe className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                   <a 
-                    href={restaurant.website} 
+                    href={websiteUrl} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-sm hover:underline text-primary"
@@ -159,14 +157,12 @@ export const RestaurantDetailsModal = ({
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4 border-t">
-              {restaurant.website && (
-                <Button
-                  variant="outline"
-                  onClick={handleViewWebsite}
-                  className="flex-1"
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  View Menu on Website
+              {websiteUrl && (
+                <Button asChild variant="outline" className="flex-1">
+                  <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View Menu on Website
+                  </a>
                 </Button>
               )}
               <Button
@@ -178,7 +174,7 @@ export const RestaurantDetailsModal = ({
               </Button>
             </div>
 
-            {!restaurant.website && (
+            {!websiteUrl && (
               <p className="text-sm text-muted-foreground text-center">
                 Menu information may be available when you make a reservation
               </p>
