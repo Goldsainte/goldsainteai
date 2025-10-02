@@ -15,7 +15,8 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
   const [checkIn, setCheckIn] = useState<Date>();
   const [checkOut, setCheckOut] = useState<Date>();
   const [departureDate, setDepartureDate] = useState<Date>();
-  const [mode, setMode] = useState<"checkIn" | "checkOut" | "departure">(
+  const [returnDate, setReturnDate] = useState<Date>();
+  const [mode, setMode] = useState<"checkIn" | "checkOut" | "departure" | "return">(
     type === "hotel" ? "checkIn" : "departure"
   );
 
@@ -30,7 +31,13 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
         setCheckOut(date);
       }
     } else {
-      setDepartureDate(date);
+      // For flights
+      if (mode === "departure") {
+        setDepartureDate(date);
+        setMode("return");
+      } else {
+        setReturnDate(date);
+      }
     }
   };
 
@@ -43,19 +50,28 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
     } else if (type === "flight" && departureDate) {
       onDatesSelected({
         departureDate: format(departureDate, "yyyy-MM-dd"),
+        returnDate: returnDate ? format(returnDate, "yyyy-MM-dd") : undefined,
+      });
+    }
+  };
+
+  const handleSkipReturn = () => {
+    if (departureDate) {
+      onDatesSelected({
+        departureDate: format(departureDate, "yyyy-MM-dd"),
       });
     }
   };
 
   const canConfirm = type === "hotel" 
     ? checkIn && checkOut 
-    : departureDate;
+    : departureDate; // Can confirm with just departure for one-way
 
   const getTitle = () => {
     if (type === "hotel") {
       return mode === "checkIn" ? "Select Check-in Date" : "Select Check-out Date";
     }
-    return "Select Departure Date";
+    return mode === "departure" ? "Select Departure Date" : "Select Return Date (Optional)";
   };
 
   const getSelectedDates = () => {
@@ -67,6 +83,9 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
         return `Check-in: ${format(checkIn, "MMM dd, yyyy")}`;
       }
     } else {
+      if (departureDate && returnDate) {
+        return `${format(departureDate, "MMM dd")} - ${format(returnDate, "MMM dd")}`;
+      }
       if (departureDate) {
         return `Departure: ${format(departureDate, "MMM dd, yyyy")}`;
       }
@@ -93,19 +112,28 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
 
       <Calendar
         mode="single"
-        selected={mode === "checkIn" ? checkIn : mode === "checkOut" ? checkOut : departureDate}
+        selected={mode === "checkIn" ? checkIn : mode === "checkOut" ? checkOut : mode === "departure" ? departureDate : returnDate}
         onSelect={handleDateSelect}
         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
         className="rounded-md border pointer-events-auto"
       />
 
       <div className="flex gap-2 pt-4">
+        {type === "flight" && mode === "return" && (
+          <Button
+            variant="outline"
+            onClick={handleSkipReturn}
+            className="flex-1"
+          >
+            Skip (One-way)
+          </Button>
+        )}
         <Button
           onClick={handleConfirm}
           disabled={!canConfirm}
           className="flex-1"
         >
-          Confirm Date{type === "hotel" && checkIn && checkOut ? "s" : ""}
+          Confirm Date{(type === "hotel" && checkIn && checkOut) || (type === "flight" && departureDate && returnDate) ? "s" : ""}
         </Button>
       </div>
     </Card>
