@@ -117,27 +117,65 @@ const SearchResults = () => {
 
       try {
         if (searchType === "hotels") {
-          // Try TripAdvisor first
+          // Extract city code from location string
+          const getCityCode = (loc: string): string => {
+            const cityMap: { [key: string]: string } = {
+              'charlotte': 'CLT', 'new york': 'NYC', 'los angeles': 'LAX', 'miami': 'MIA',
+              'chicago': 'CHI', 'san francisco': 'SFO', 'las vegas': 'LAS', 'seattle': 'SEA',
+              'boston': 'BOS', 'washington': 'WAS', 'atlanta': 'ATL', 'dallas': 'DFW',
+              'houston': 'HOU', 'philadelphia': 'PHL', 'phoenix': 'PHX', 'san diego': 'SAN',
+              'denver': 'DEN', 'orlando': 'ORL', 'detroit': 'DTW', 'minneapolis': 'MSP',
+              'tampa': 'TPA', 'portland': 'PDX', 'austin': 'AUS', 'nashville': 'BNA',
+              'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO', 'dubai': 'DXB',
+              'singapore': 'SIN', 'hong kong': 'HKG', 'barcelona': 'BCN', 'rome': 'ROM',
+              'amsterdam': 'AMS', 'madrid': 'MAD', 'berlin': 'BER', 'istanbul': 'IST'
+            };
+            const cityName = loc.split(',')[0].trim().toLowerCase();
+            return cityMap[cityName] || 'NYC'; // Default to NYC if not found
+          };
+
+          // Try Amadeus first (primary source)
           let hotelResults: any[] = [];
+          const cityCode = getCityCode(location);
           try {
-            const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
-              body: { location, checkIn, checkOut, guests: parseInt(guests) }
+            const { data, error } = await supabase.functions.invoke('amadeus-search-hotels', {
+              body: { 
+                cityCode, 
+                checkInDate: checkIn, 
+                checkOutDate: checkOut, 
+                adults: parseInt(guests),
+                cityName: location 
+              }
             });
             if (error) throw error;
             hotelResults = data.results || [];
+            console.log('Amadeus hotels:', hotelResults.length);
           } catch (e) {
-            console.warn('TripAdvisor hotel search failed, falling back to Expedia:', e);
+            console.warn('Amadeus hotel search failed, falling back to TripAdvisor:', e);
           }
 
-          // Fallback to Expedia if no results
+          // Fallback to TripAdvisor if Amadeus has no results
+          if (!hotelResults || hotelResults.length === 0) {
+            try {
+              const { data, error } = await supabase.functions.invoke('tripadvisor-search-hotels', {
+                body: { location, checkIn, checkOut, guests: parseInt(guests) }
+              });
+              if (error) throw error;
+              hotelResults = data.results || [];
+              console.log('TripAdvisor hotels:', hotelResults.length);
+            } catch (e) {
+              console.warn('TripAdvisor fallback failed, trying Expedia:', e);
+            }
+          }
+
+          // Final fallback to Expedia
           if (!hotelResults || hotelResults.length === 0) {
             const { data: expediaData, error: expediaError } = await supabase.functions.invoke('expedia-search-hotels', {
               body: { location, checkIn, checkOut, guests: parseInt(guests), rooms: 1 }
             });
             if (!expediaError) {
               hotelResults = expediaData.hotels || [];
-            } else {
-              console.error('Expedia fallback failed:', expediaError);
+              console.log('Expedia hotels:', hotelResults.length);
             }
           }
 
@@ -185,10 +223,24 @@ const SearchResults = () => {
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "packages") {
-          // Fetch hotels, flights, and restaurants in parallel (TripAdvisor first)
+          // Extract city code for Amadeus
+          const getCityCode = (loc: string): string => {
+            const cityMap: { [key: string]: string } = {
+              'charlotte': 'CLT', 'new york': 'NYC', 'los angeles': 'LAX', 'miami': 'MIA',
+              'chicago': 'CHI', 'san francisco': 'SFO', 'las vegas': 'LAS', 'seattle': 'SEA',
+              'boston': 'BOS', 'washington': 'WAS', 'atlanta': 'ATL', 'dallas': 'DFW',
+              'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO', 'dubai': 'DXB'
+            };
+            const cityName = loc.split(',')[0].trim().toLowerCase();
+            return cityMap[cityName] || 'NYC';
+          };
+
+          const cityCode = getCityCode(location);
+          
+          // Fetch hotels (Amadeus first), flights, and restaurants in parallel
           const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
-            supabase.functions.invoke('tripadvisor-search-hotels', {
-              body: { location, checkIn, checkOut, guests: parseInt(guests) }
+            supabase.functions.invoke('amadeus-search-hotels', {
+              body: { cityCode, checkInDate: checkIn, checkOutDate: checkOut, adults: parseInt(guests), cityName: location }
             }).catch(() => ({ data: { results: [] }, error: null })),
             supabase.functions.invoke('amadeus-search-flights', {
               body: { origin: 'JFK', destination: location, departureDate: checkIn, adults: parseInt(guests) }
@@ -199,12 +251,12 @@ const SearchResults = () => {
           ]);
 
           let hotelsList: any[] = hotelsRes.data?.results || [];
-          // Fallback to Expedia if TripAdvisor returns nothing
+          // Fallback to TripAdvisor/Expedia if Amadeus returns nothing
           if (!hotelsList || hotelsList.length === 0) {
-            const { data: expediaData } = await supabase.functions.invoke('expedia-search-hotels', {
-              body: { location, checkIn, checkOut, guests: parseInt(guests), rooms: 1 }
-            }).catch(() => ({ data: { hotels: [] } } as any));
-            hotelsList = expediaData?.hotels || [];
+            const { data: tripData } = await supabase.functions.invoke('tripadvisor-search-hotels', {
+              body: { location, checkIn, checkOut, guests: parseInt(guests) }
+            }).catch(() => ({ data: { results: [] } } as any));
+            hotelsList = tripData?.results || [];
           }
 
           const packageResults = [
