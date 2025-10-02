@@ -98,7 +98,39 @@ serve(async (req) => {
 
           if (!detailsResponse.ok) {
             console.error(`Failed to fetch details for ${hotel.location_id}`);
-            return null;
+            // Fallback: still return hotel using photos/reviews when details fail
+            const photosData = photosResponse.ok ? await photosResponse.json() : { data: [] };
+            const reviewsData = reviewsResponse.ok ? await reviewsResponse.json() : { data: [] };
+            const photos = (photosData.data || []).slice(0, 30);
+            const reviews = (reviewsData.data || []).slice(0, 50);
+
+            return {
+              id: hotel.location_id,
+              name: hotel.name,
+              address: '',
+              city: '',
+              country: '',
+              rating: 0,
+              num_reviews: reviews.length,
+              price_level: '',
+              description: '',
+              amenities: [],
+              photos: photos.map((photo: any) => ({
+                url: photo.images?.large?.url || photo.images?.original?.url,
+                caption: photo.caption || ''
+              })),
+              reviews: reviews.map((review: any) => ({
+                rating: review.rating || 0,
+                text: review.text || '',
+                published_date: review.published_date || '',
+                user: review.user?.username || 'Anonymous'
+              })),
+              web_url: '',
+              latitude: undefined,
+              longitude: undefined,
+              estimated_price: calculateEstimatedPrice('', guests),
+              currency: 'USD'
+            };
           }
 
           const [details, photosData, reviewsData] = await Promise.all([
