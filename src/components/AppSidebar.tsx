@@ -1,5 +1,6 @@
 import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -36,6 +37,7 @@ export function AppSidebar() {
   const { isAdmin, isAgent } = useUserRole();
   const { history, removeItem } = useSearchHistory();
   const navigate = useNavigate();
+  const [searchFilter, setSearchFilter] = useState<string | null>(null);
 
   const getSearchIcon = (type: string) => {
     switch (type) {
@@ -176,9 +178,60 @@ export function AppSidebar() {
               <Clock className="h-4 w-4" />
               Recent Searches
             </SidebarGroupLabel>
+            {open && (
+              <div className="px-2 pb-2 flex gap-1 flex-wrap">
+                <Button
+                  variant={searchFilter === null ? "default" : "outline"}
+                  size="sm"
+                  className="h-6 text-xs px-2"
+                  onClick={() => setSearchFilter(null)}
+                >
+                  All
+                </Button>
+                <Button
+                  variant={searchFilter === "flight" ? "default" : "outline"}
+                  size="sm"
+                  className="h-6 text-xs px-2"
+                  onClick={() => setSearchFilter("flight")}
+                >
+                  <Plane className="h-3 w-3 mr-1" />
+                  Flights
+                </Button>
+                <Button
+                  variant={searchFilter === "hotel" ? "default" : "outline"}
+                  size="sm"
+                  className="h-6 text-xs px-2"
+                  onClick={() => setSearchFilter("hotel")}
+                >
+                  <Hotel className="h-3 w-3 mr-1" />
+                  Hotels
+                </Button>
+                <Button
+                  variant={searchFilter === "restaurant" ? "default" : "outline"}
+                  size="sm"
+                  className="h-6 text-xs px-2"
+                  onClick={() => setSearchFilter("restaurant")}
+                >
+                  <UtensilsCrossed className="h-3 w-3 mr-1" />
+                  Dining
+                </Button>
+                <Button
+                  variant={searchFilter === "event" ? "default" : "outline"}
+                  size="sm"
+                  className="h-6 text-xs px-2"
+                  onClick={() => setSearchFilter("event")}
+                >
+                  <Ticket className="h-3 w-3 mr-1" />
+                  Events
+                </Button>
+              </div>
+            )}
             <SidebarGroupContent>
               <SidebarMenu>
-                {history.slice(0, 15).map((item) => {
+                {history
+                  .filter((item) => searchFilter === null || item.type === searchFilter)
+                  .slice(0, 15)
+                  .map((item) => {
                   const Icon = getSearchIcon(item.type);
                   return (
                     <SidebarMenuItem key={item.id}>
