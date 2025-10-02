@@ -43,6 +43,42 @@ serve(async (req) => {
 
     console.log('Processing hotel cancellation for booking:', booking.booking_reference);
 
+    // Check hotel cancellation policy from booking data
+    // Hotels may have different policies - check if property offers free cancellation
+    const bookingTime = new Date(booking.created_at);
+    const checkInDate = new Date(booking.booking_data?.checkIn || booking.booking_data?.check_in);
+    const currentTime = new Date();
+    const hoursSinceBooking = (currentTime.getTime() - bookingTime.getTime()) / (1000 * 60 * 60);
+    const hoursUntilCheckIn = (checkInDate.getTime() - currentTime.getTime()) / (1000 * 60 * 60);
+    
+    // Check if hotel has free cancellation policy in booking data
+    const hotelPolicy = booking.booking_data?.cancellationPolicy || booking.booking_data?.policies?.cancellation;
+    const hasFreeCancellation = hotelPolicy?.freeCancellation === true;
+    const freeCancellationDeadlineHours = hotelPolicy?.deadlineHours || 24;
+    
+    // Determine if cancellation is free based on property's policy
+    const qualifiesForFreeCancellation = hasFreeCancellation && 
+      (hoursUntilCheckIn >= freeCancellationDeadlineHours || hoursSinceBooking < 24);
+    
+    console.log('Hotel cancellation policy check:', {
+      hasFreeCancellation,
+      freeCancellationDeadlineHours,
+      hoursSinceBooking,
+      hoursUntilCheckIn,
+      qualifiesForFreeCancellation,
+      policyDetails: hotelPolicy
+    });
+
+    // Determine cancellation fee based on hotel policy
+    const cancellationFee = qualifiesForFreeCancellation ? 0 : 75;
+    
+    console.log('Hotel cancellation fee:', {
+      cancellationFee,
+      reason: qualifiesForFreeCancellation 
+        ? 'Property offers free cancellation within policy window' 
+        : 'Outside free cancellation window or property does not offer free cancellation'
+    });
+
     // Create modification record
     const { data: modification, error: modError } = await supabaseClient
       .from('booking_modifications')
@@ -53,6 +89,7 @@ serve(async (req) => {
         status: 'completed',
         original_booking_data: booking.booking_data,
         reason: reason || 'User requested cancellation',
+        cancellation_fee: cancellationFee,
         processed_at: new Date().toISOString(),
       })
       .select()
@@ -91,9 +128,27 @@ serve(async (req) => {
       const stripe = new Stripe(stripeKey!, { apiVersion: '2025-08-27.basil' });
 
       try {
+        // Calculate refund amount (total payment minus cancellation fee)
+        const totalPaid = payment.amount;
+        const refundAmountCents = qualifiesForFreeCancellation 
+          ? totalPaid 
+          : Math.max(0, totalPaid - (cancellationFee * 100)); // Convert fee to cents
+
+        console.log('Hotel refund calculation:', {
+          totalPaid,
+          cancellationFee,
+          refundAmountCents,
+          qualifiesForFreeCancellation
+        });
+
         const refund = await stripe.refunds.create({
           payment_intent: payment.stripe_payment_intent_id,
+          amount: refundAmountCents,
           reason: 'requested_by_customer',
+          metadata: {
+            cancellation_fee: cancellationFee.toString(),
+            free_cancellation_policy: qualifiesForFreeCancellation.toString(),
+          }
         });
 
         refundAmount = refund.amount / 100;

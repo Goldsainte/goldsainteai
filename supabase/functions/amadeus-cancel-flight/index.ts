@@ -41,6 +41,30 @@ serve(async (req) => {
       throw new Error('Only flight bookings can be cancelled through this endpoint');
     }
 
+    // Check for US DOT 24-hour free cancellation policy
+    // Applies to flights to/from/within the US if cancelled within 24 hours of booking
+    const bookingTime = new Date(booking.created_at);
+    const currentTime = new Date();
+    const hoursSinceBooking = (currentTime.getTime() - bookingTime.getTime()) / (1000 * 60 * 60);
+    
+    const origin = booking.booking_data?.origin || '';
+    const destination = booking.booking_data?.destination || '';
+    const isUSFlight = ['US', 'USA'].some(code => 
+      origin.includes(code) || destination.includes(code)
+    ) || booking.booking_data?.segments?.some((seg: any) => 
+      seg.departure?.iataCode?.match(/^[A-Z]{3}$/) || seg.arrival?.iataCode?.match(/^[A-Z]{3}$/)
+    );
+    
+    const qualifiesForFreeCancellation = isUSFlight && hoursSinceBooking < 24;
+    
+    console.log('Cancellation eligibility:', {
+      isUSFlight,
+      hoursSinceBooking,
+      qualifiesForFreeCancellation,
+      bookingTime: bookingTime.toISOString(),
+      currentTime: currentTime.toISOString()
+    });
+
     // Get Amadeus access token
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
     const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
@@ -91,6 +115,16 @@ serve(async (req) => {
 
     console.log('Flight order cancelled successfully with Amadeus');
 
+    // Determine cancellation fee based on 24-hour rule
+    const cancellationFee = qualifiesForFreeCancellation ? 0 : 50;
+    
+    console.log('Cancellation fee:', {
+      cancellationFee,
+      reason: qualifiesForFreeCancellation 
+        ? 'US DOT 24-hour free cancellation policy' 
+        : 'Outside 24-hour window or non-US flight'
+    });
+
     // Create modification record
     const { data: modification, error: modError } = await supabaseClient
       .from('booking_modifications')
@@ -102,6 +136,7 @@ serve(async (req) => {
         original_booking_data: booking.booking_data,
         amadeus_order_id: orderId,
         reason: reason || 'User requested cancellation',
+        cancellation_fee: cancellationFee,
         processed_at: new Date().toISOString(),
       })
       .select()
@@ -144,10 +179,28 @@ serve(async (req) => {
       const stripe = new Stripe(stripeKey!, { apiVersion: '2025-08-27.basil' });
 
       try {
+        // Calculate refund amount (total payment minus cancellation fee)
+        const totalPaid = payment.amount;
+        const refundAmountCents = qualifiesForFreeCancellation 
+          ? totalPaid 
+          : Math.max(0, totalPaid - (cancellationFee * 100)); // Convert fee to cents
+
+        console.log('Refund calculation:', {
+          totalPaid,
+          cancellationFee,
+          refundAmountCents,
+          qualifiesForFreeCancellation
+        });
+
         // Create refund in Stripe
         const refund = await stripe.refunds.create({
           payment_intent: payment.stripe_payment_intent_id,
+          amount: refundAmountCents,
           reason: 'requested_by_customer',
+          metadata: {
+            cancellation_fee: cancellationFee.toString(),
+            us_dot_24hr_policy: qualifiesForFreeCancellation.toString(),
+          }
         });
 
         refundAmount = refund.amount / 100; // Convert cents to dollars

@@ -18,7 +18,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plane, Calendar, Clock, MapPin, User, CreditCard, ArrowLeft, XCircle } from "lucide-react";
+import { Plane, Calendar, Clock, MapPin, User, CreditCard, ArrowLeft, XCircle, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -228,6 +228,46 @@ export default function BookingDetails() {
             </CardContent>
           </Card>
 
+          {/* Cancellation Policy Card */}
+          <Card className="mb-6 bg-muted/50 border-muted-foreground/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <AlertCircle className="h-5 w-5" />
+                Cancellation Policy
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {booking.booking_type === 'flight' ? (
+                <div className="space-y-2 text-sm">
+                  <p className="font-medium">
+                    US Department of Transportation 24-Hour Rule:
+                  </p>
+                  <p>
+                    Free cancellation within 24 hours of booking for flights to, from, 
+                    or within the United States.
+                  </p>
+                  <p className="text-muted-foreground">
+                    After 24 hours, a $50 cancellation fee will be deducted from your refund.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2 text-sm">
+                  <p className="font-medium">
+                    Hotel Cancellation Policy:
+                  </p>
+                  <p>
+                    Cancellation policies vary by property. Many properties offer free cancellation 
+                    within 24 hours of booking if the booking terms include a flexible cancellation policy.
+                  </p>
+                  <p className="text-muted-foreground">
+                    If the property does not offer free cancellation or you cancel outside the grace period, 
+                    a $75 cancellation fee may be deducted from your refund.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Action Buttons */}
           {canModify && (
             <div className="flex gap-4">
@@ -281,9 +321,19 @@ export default function BookingDetails() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel Booking?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to cancel this booking? This action cannot be undone.
-              Cancellation fees may apply based on the fare rules.
+            <AlertDialogDescription className="space-y-2">
+              <p>Are you sure you want to cancel this booking? This action cannot be undone.</p>
+              {booking.booking_type === 'flight' ? (
+                <p className="text-sm">
+                  <strong>Note:</strong> US flights booked within the last 24 hours qualify for free 
+                  cancellation. Otherwise, a $50 cancellation fee will apply.
+                </p>
+              ) : (
+                <p className="text-sm">
+                  <strong>Note:</strong> Free cancellation depends on the property's policy. 
+                  A $75 fee may apply if outside the free cancellation window.
+                </p>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
