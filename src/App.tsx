@@ -22,6 +22,8 @@ import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import BookingPreferences from "./pages/BookingPreferences";
 import CommissionDashboard from "./pages/CommissionDashboard";
 import EmailPreview from "./pages/EmailPreview";
+import MyBookings from "./pages/MyBookings";
+import BookingDetails from "./pages/BookingDetails";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +54,8 @@ function App() {
               <Route path="/commission-dashboard" element={<CommissionDashboard />} />
               <Route path="/email-preview" element={<EmailPreview />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
                     <Route path="/search" element={<SearchResults />} />
                     <Route path="/hotel-booking" element={<HotelBooking />} />
                     <Route path="/booking-confirmation" element={<BookingConfirmation />} />

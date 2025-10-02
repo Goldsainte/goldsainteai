@@ -113,6 +113,80 @@ export type Database = {
           },
         ]
       }
+      booking_modifications: {
+        Row: {
+          amadeus_order_id: string | null
+          booking_id: string
+          cancellation_fee: number | null
+          change_fee: number | null
+          created_at: string
+          fare_difference: number | null
+          id: string
+          modification_type: string
+          new_booking_data: Json | null
+          notes: string | null
+          original_booking_data: Json
+          processed_at: string | null
+          reason: string | null
+          refund_amount: number | null
+          refund_currency: string | null
+          refund_status: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amadeus_order_id?: string | null
+          booking_id: string
+          cancellation_fee?: number | null
+          change_fee?: number | null
+          created_at?: string
+          fare_difference?: number | null
+          id?: string
+          modification_type: string
+          new_booking_data?: Json | null
+          notes?: string | null
+          original_booking_data: Json
+          processed_at?: string | null
+          reason?: string | null
+          refund_amount?: number | null
+          refund_currency?: string | null
+          refund_status?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amadeus_order_id?: string | null
+          booking_id?: string
+          cancellation_fee?: number | null
+          change_fee?: number | null
+          created_at?: string
+          fare_difference?: number | null
+          id?: string
+          modification_type?: string
+          new_booking_data?: Json | null
+          notes?: string | null
+          original_booking_data?: Json
+          processed_at?: string | null
+          reason?: string | null
+          refund_amount?: number | null
+          refund_currency?: string | null
+          refund_status?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_modifications_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       bookings: {
         Row: {
           base_cost: number | null
