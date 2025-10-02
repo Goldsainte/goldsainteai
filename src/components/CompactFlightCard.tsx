@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plane, Heart, ChevronDown, ChevronUp, Clock } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
+import { formatCurrency } from "@/lib/currencyHelpers";
 
 interface CompactFlightCardProps {
   flight: any;
@@ -93,7 +94,7 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           {/* Price & Actions */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <div className="text-xl font-bold">{currency} {markedUpPrice}</div>
+              <div className="text-xl font-bold">{formatCurrency(parseFloat(markedUpPrice), currency)}</div>
               <div className="text-xs text-muted-foreground">total</div>
             </div>
             

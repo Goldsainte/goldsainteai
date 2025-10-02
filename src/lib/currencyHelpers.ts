@@ -234,3 +234,23 @@ export function formatPrice(amount: number, location: string): string {
 export function getCurrencyCode(location: string): string {
   return getCurrencyFromLocation(location).code;
 }
+
+/**
+ * Get currency symbol from currency code
+ */
+export function getCurrencySymbol(currencyCode: string): string {
+  const entry = Object.values(countryCurrencyMap).find(c => c.code === currencyCode);
+  return entry?.symbol || currencyCode;
+}
+
+/**
+ * Format amount with currency symbol from currency code
+ */
+export function formatCurrency(amount: number, currencyCode: string): string {
+  const symbol = getCurrencySymbol(currencyCode);
+  // For codes that don't have a symbol, put code after amount
+  if (symbol === currencyCode) {
+    return `${amount.toFixed(2)} ${currencyCode}`;
+  }
+  return `${symbol}${amount.toFixed(2)}`;
+}
