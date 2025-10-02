@@ -59,41 +59,76 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
   }
   
   const list = await listRes.json();
-  console.log(`Found ${list.data?.length || 0} hotels in city`);
+  const idArray: string[] = (list.data || []).map((h: any) => h.hotelId).filter(Boolean);
+  console.log(`Found ${idArray.length} hotels in city`);
   
-  const ids = (list.data || []).slice(0, 150).map((h: any) => h.hotelId).join(",");
-  if (!ids) {
+  if (!idArray.length) {
     console.warn("No hotel IDs found for city code:", cityCode);
     return [] as any[];
   }
 
-  // 2) Get offers
-  const params = new URLSearchParams({
-    hotelIds: ids,
-    checkInDate: checkIn,
-    checkOutDate: checkOut,
-    adults: String(adults),
-    currency: "USD",
-    roomQuantity: "1",
-    bestRateOnly: "true",
-  });
-  
-  console.log(`Fetching offers for ${ids.split(',').length} hotels`);
-  const offersRes = await fetch(`https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  
-  if (!offersRes.ok) {
-    const errorText = await offersRes.text();
-    console.error(`Hotel offers failed: ${offersRes.status}`, errorText);
-    console.error('Request params:', { hotelIds: ids.split(',').length, checkIn, checkOut, adults });
-    throw new Error(`Hotel offers failed: ${offersRes.status} - ${errorText}`);
+  // 2) Fetch offers in chunks to avoid URL length/400 errors
+  const MAX_IDS = 100; // cap total ids to keep URLs reasonable
+  const CHUNK_SIZE = 25; // safe chunk size for query string
+  const toProcess = idArray.slice(0, MAX_IDS);
+
+  const chunks: string[][] = [];
+  for (let i = 0; i < toProcess.length; i += CHUNK_SIZE) {
+    chunks.push(toProcess.slice(i, i + CHUNK_SIZE));
   }
-  
-  const offers = await offersRes.json();
-  const available = (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
-  console.log(`Found ${available.length} available hotel offers`);
-  return available;
+
+  const aggregated: any[] = [];
+
+  for (const chunk of chunks) {
+    const params = new URLSearchParams({
+      hotelIds: chunk.join(','),
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      adults: String(Math.max(1, Number(adults) || 1)),
+      currency: "USD",
+      roomQuantity: "1",
+      bestRateOnly: "true",
+    });
+
+    let attempt = 1;
+    const maxAttempts = 3;
+    while (attempt <= maxAttempts) {
+      try {
+        console.log(`Fetching offers for chunk size ${chunk.length}, attempt ${attempt}/${maxAttempts}`);
+        const offersRes = await fetch(`https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!offersRes.ok) {
+          const errorText = await offersRes.text();
+          console.error(`Hotel offers failed (status ${offersRes.status}) for chunk:`, errorText);
+          // On 4xx other than 429, don't retry this chunk; continue to next chunk
+          if (offersRes.status >= 400 && offersRes.status < 500 && offersRes.status !== 429) {
+            break;
+          }
+          if (attempt === maxAttempts) {
+            break;
+          }
+          await new Promise(r => setTimeout(r, 500 * attempt));
+          attempt++;
+          continue;
+        }
+
+        const offers = await offersRes.json();
+        const available = (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
+        aggregated.push(...available);
+        break; // success, move to next chunk
+      } catch (e) {
+        console.error('Error fetching offers for chunk:', e);
+        if (attempt === maxAttempts) break;
+        await new Promise(r => setTimeout(r, 500 * attempt));
+        attempt++;
+      }
+    }
+  }
+
+  console.log(`Total available hotel offers aggregated: ${aggregated.length}`);
+  return aggregated;
 }
 
 async function enrichWithTripAdvisor(hotels: any[], location: string) {
