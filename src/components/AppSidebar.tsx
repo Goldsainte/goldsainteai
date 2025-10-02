@@ -22,7 +22,6 @@ const items = [
   { title: "Home", url: "/", icon: Home },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, authRequired: true },
   { title: "My Bookings", url: "/my-bookings", icon: Ticket, authRequired: true },
-  { title: "Commission", url: "/commission-dashboard", icon: DollarSign, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Clipboard, authRequired: true },
   { title: "Search", url: "/search", icon: Search },
   { title: "Favorites", url: "/favorites", icon: Heart },
@@ -112,21 +111,38 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               )}
               {isAdmin && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to="/admin/agent-approvals"
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-accent/10 text-accent font-medium"
-                          : "hover:bg-muted/50"
-                      }
-                    >
-                      <ShieldCheck className="h-5 w-5" />
-                      {open && <span>Agent Approvals</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to="/commission-dashboard"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-accent/10 text-accent font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <DollarSign className="h-5 w-5" />
+                        {open && <span>Commission</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to="/admin/agent-approvals"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-accent/10 text-accent font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <ShieldCheck className="h-5 w-5" />
+                        {open && <span>Agent Approvals</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
               )}
             </SidebarMenu>
           </SidebarGroupContent>
