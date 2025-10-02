@@ -70,7 +70,7 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
 
     try {
       // Check if Mapbox token is available
-      const mapboxToken = import.meta.env.VITE_MAPBOX_TOKEN;
+      const mapboxToken = import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN;
       if (!mapboxToken) {
         setMapError(true);
         return;
