@@ -131,336 +131,355 @@ export default function EmailPreview() {
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            line-height: 1.6; 
-            color: #333333; 
+          body {
+            font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
           }
-          .container { 
-            max-width: 680px; 
-            margin: 0 auto; 
-            background: white;
+          .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: #ffffff;
           }
-          .header { 
-            background: #1A1F2C;
-            padding: 30px 40px;
+          .header {
+            background: #003580;
+            padding: 24px;
             text-align: center;
           }
-          .logo { 
-            color: #C9A55B; 
-            font-size: 32px; 
-            font-weight: 700;
-            letter-spacing: 3px;
-            margin: 0;
-          }
-          .confirmation-banner {
-            background: #0B7A3E;
-            color: white;
-            padding: 20px 40px;
-            text-align: center;
-          }
-          .confirmation-banner h2 {
-            margin: 0;
+          .logo {
+            color: #ffffff;
             font-size: 24px;
-            font-weight: 600;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin: 0;
           }
-          .confirmation-number {
-            background: white;
-            border: 2px solid #0B7A3E;
-            padding: 20px;
-            margin: 20px 40px;
+          .content {
+            padding: 0 8px;
+          }
+          h1 {
+            font-size: 24px;
+            line-height: 32px;
+            font-weight: bold;
+            color: #333333;
+            margin: 32px 0 16px 0;
+            padding: 0 8px;
+          }
+          h2 {
+            font-size: 16px;
+            line-height: 24px;
+            font-weight: bold;
+            color: #333333;
+            margin: 16px 0;
+            padding: 0 8px;
+          }
+          p {
+            font-size: 16px;
+            line-height: 24px;
+            color: #333333;
+            margin: 16px 0;
+            padding: 0 8px;
+          }
+          .conf-box {
+            border: 2px solid #008009;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 16px 8px;
             text-align: center;
           }
           .conf-label {
             font-size: 12px;
-            color: #666;
+            color: #595959;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
           }
-          .conf-value {
-            font-size: 32px;
+          .conf-number {
+            font-size: 28px;
             font-weight: 700;
-            color: #1A1F2C;
+            color: #333333;
             letter-spacing: 2px;
             font-family: monospace;
           }
-          .content { 
-            padding: 30px 40px;
-            background: white;
+          .info-box {
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            margin: 16px 8px;
           }
-          .flight-summary {
-            background: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 25px;
-            margin: 20px 0;
+          .info-row {
+            border-top: 1px solid #e7e7e7;
+            padding: 16px;
+            display: table;
+            width: 100%;
           }
-          .flight-route {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #dee2e6;
+          .info-row:first-child {
+            border-top: none;
           }
-          .airport {
-            text-align: center;
+          .info-label {
+            display: table-cell;
+            width: 224px;
+            font-size: 16px;
+            line-height: 24px;
+            color: #595959;
+            vertical-align: top;
           }
-          .airport-code {
-            font-size: 36px;
-            font-weight: 700;
-            color: #1A1F2C;
-          }
-          .airport-name {
-            font-size: 13px;
-            color: #666;
-            margin-top: 5px;
-          }
-          .arrow {
-            font-size: 24px;
-            color: #666;
+          .info-value {
+            display: table-cell;
+            font-size: 16px;
+            line-height: 24px;
+            color: #333333;
+            vertical-align: top;
           }
           .flight-segment {
-            background: white;
-            border: 1px solid #dee2e6;
-            border-radius: 6px;
-            padding: 20px;
-            margin: 15px 0;
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 12px 0;
           }
           .segment-header {
             font-size: 14px;
             font-weight: 600;
-            color: #0B7A3E;
-            margin-bottom: 15px;
+            color: #008009;
+            margin-bottom: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
           }
-          .segment-details {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 15px;
-            align-items: start;
+          .flight-times {
+            display: table;
+            width: 100%;
           }
-          .time-block {
-            font-size: 24px;
+          .time-col {
+            display: table-cell;
+            width: 33%;
+            vertical-align: top;
+          }
+          .time-big {
+            font-size: 20px;
             font-weight: 700;
-            color: #1A1F2C;
+            color: #333333;
           }
-          .date-block {
+          .time-date {
             font-size: 13px;
-            color: #666;
-            margin-top: 3px;
+            color: #595959;
+            margin-top: 4px;
           }
-          .city-block {
+          .time-city {
             font-size: 14px;
-            color: #333;
-            margin-top: 5px;
+            color: #333333;
+            margin-top: 4px;
+          }
+          .time-arrow {
+            text-align: center;
+            font-size: 24px;
+            color: #595959;
           }
           .duration {
-            text-align: center;
-            padding-top: 8px;
-          }
-          .duration-text {
             font-size: 12px;
-            color: #666;
+            color: #595959;
+            text-align: center;
           }
-          .info-section {
-            margin: 25px 0;
-          }
-          .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1A1F2C;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #C9A55B;
-          }
-          .passenger-list {
-            background: #f8f9fa;
-            border-radius: 6px;
-            padding: 15px;
+          .passenger-box {
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 12px 16px;
+            margin: 12px 0;
           }
           .passenger-item {
-            padding: 10px 0;
-            border-bottom: 1px solid #dee2e6;
+            padding: 8px 0;
+            border-bottom: 1px solid #e7e7e7;
           }
           .passenger-item:last-child {
             border-bottom: none;
           }
           .passenger-name {
-            font-weight: 600;
             font-size: 16px;
-            color: #1A1F2C;
+            font-weight: 600;
+            color: #333333;
           }
           .passenger-details {
-            font-size: 13px;
-            color: #666;
-            margin-top: 3px;
-          }
-          .important-info {
-            background: #FFF3CD;
-            border-left: 4px solid #FFC107;
-            padding: 20px;
-            margin: 25px 0;
-          }
-          .important-title {
-            font-weight: 600;
-            color: #856404;
-            margin-bottom: 10px;
-            font-size: 16px;
-          }
-          .important-text {
             font-size: 14px;
-            color: #856404;
-            line-height: 1.6;
+            color: #595959;
+            margin-top: 4px;
           }
-          .price-summary {
-            background: #f8f9fa;
-            border: 2px solid #C9A55B;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 25px 0;
+          .warning-box {
+            border: 1px solid #FFE08A;
+            background: #FEFBF0;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px 8px;
+          }
+          .warning-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 8px;
+          }
+          .warning-text {
+            font-size: 14px;
+            line-height: 20px;
+            color: #333333;
+          }
+          .price-box {
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px 8px;
           }
           .price-row {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
             font-size: 14px;
+            color: #333333;
           }
           .price-total {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0 0 0;
-            margin-top: 15px;
-            border-top: 2px solid #C9A55B;
-            font-size: 24px;
+            padding: 16px 0 0 0;
+            margin-top: 8px;
+            border-top: 2px solid #e7e7e7;
+            font-size: 20px;
             font-weight: 700;
-            color: #1A1F2C;
+            color: #333333;
           }
-          .footer { 
-            background: #f8f9fa;
-            text-align: center; 
-            padding: 30px 40px;
-            color: #666;
-            font-size: 13px;
-            border-top: 1px solid #dee2e6;
+          .footer {
+            background: #f5f5f5;
+            text-align: center;
+            padding: 24px;
+            color: #595959;
+            font-size: 12px;
+            margin-top: 32px;
+          }
+          @media only screen and (max-width: 639px) {
+            .info-label, .info-value {
+              display: block;
+              width: 100%;
+            }
+            .info-label {
+              padding-bottom: 4px;
+            }
+            .time-col {
+              display: block;
+              width: 100%;
+              margin-bottom: 12px;
+            }
           }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1 class="logo">GOLDSAINTE</h1>
-          </div>
-          
-          <div class="confirmation-banner">
-            <h2>✓ Your flight is confirmed</h2>
-          </div>
-
-          <div class="confirmation-number">
-            <div class="conf-label">Confirmation Number</div>
-            <div class="conf-value">ABC123</div>
+            <div class="logo">GOLDSAINTE</div>
           </div>
           
           <div class="content">
+            <h1>✓ Your flight is confirmed</h1>
+            
             <p>Dear John Smith,</p>
             
-            <p>Your flight reservation has been confirmed. Please review the details below and save this email for your records.</p>
+            <p>Thank you for booking with GoldSainte. Your flight reservation has been confirmed. Please review the details below and save this email for your records.</p>
             
-            <div class="flight-summary">
-              <div class="flight-route">
-                <div class="airport">
-                  <div class="airport-code">JFK</div>
-                  <div class="airport-name">Sat, Mar 15, 2024</div>
-                </div>
-                <div class="arrow">✈</div>
-                <div class="airport">
-                  <div class="airport-code">LAX</div>
-                  <div class="airport-name">Sat, Mar 15, 2024</div>
-                </div>
+            <div class="conf-box">
+              <div class="conf-label">Confirmation Number</div>
+              <div class="conf-number">ABC123</div>
+            </div>
+            
+            <h2>Flight details</h2>
+            
+            <div class="info-box">
+              <div class="info-row">
+                <div class="info-label">Route</div>
+                <div class="info-value"><strong>New York (JFK) → Los Angeles (LAX)</strong></div>
               </div>
-              
-              <div class="info-section">
-                <div class="section-title">Outbound Flight</div>
-                <div class="flight-segment">
-                  <div class="segment-header">AA 123 • BOEING 777</div>
-                  <div class="segment-details">
-                    <div>
-                      <div class="time-block">08:00 AM</div>
-                      <div class="date-block">Sat, Mar 15, 2024</div>
-                      <div class="city-block">JFK</div>
-                    </div>
-                    <div class="duration">
-                      <div class="arrow">→</div>
-                      <div class="duration-text">5h 45m</div>
-                    </div>
-                    <div>
-                      <div class="time-block">11:45 AM</div>
-                      <div class="date-block">Sat, Mar 15, 2024</div>
-                      <div class="city-block">LAX</div>
-                    </div>
+              <div class="info-row">
+                <div class="info-label">Travel date</div>
+                <div class="info-value">Saturday, March 15, 2024</div>
+              </div>
+              <div class="info-row">
+                <div class="info-label">Passengers</div>
+                <div class="info-value">2 adults</div>
+              </div>
+            </div>
+            
+            <h2>Outbound flight</h2>
+            
+            <div style="padding: 0 8px;">
+              <div class="flight-segment">
+                <div class="segment-header">AA 123 • Boeing 777</div>
+                <div class="flight-times">
+                  <div class="time-col">
+                    <div class="time-big">08:00</div>
+                    <div class="time-date">Sat, Mar 15</div>
+                    <div class="time-city">New York JFK</div>
+                  </div>
+                  <div class="time-col">
+                    <div class="time-arrow">→</div>
+                    <div class="duration">5h 45m</div>
+                  </div>
+                  <div class="time-col">
+                    <div class="time-big">11:45</div>
+                    <div class="time-date">Sat, Mar 15</div>
+                    <div class="time-city">Los Angeles LAX</div>
                   </div>
                 </div>
               </div>
             </div>
             
-            <div class="info-section">
-              <div class="section-title">Passenger Information</div>
-              <div class="passenger-list">
+            <h2>Passenger information</h2>
+            
+            <div style="padding: 0 8px;">
+              <div class="passenger-box">
                 <div class="passenger-item">
                   <div class="passenger-name">John Smith</div>
-                  <div class="passenger-details">Seat: 12A • 1 checked bag(s)</div>
+                  <div class="passenger-details">Seat 12A • 1 checked bag</div>
                 </div>
                 <div class="passenger-item">
                   <div class="passenger-name">Jane Smith</div>
-                  <div class="passenger-details">Seat: 12B • 1 checked bag(s)</div>
+                  <div class="passenger-details">Seat 12B • 1 checked bag</div>
                 </div>
               </div>
             </div>
             
-            <div class="important-info">
-              <div class="important-title">⚠ Important Travel Information</div>
-              <div class="important-text">
-                <strong>Check-in:</strong> Online check-in opens 24 hours before departure.<br>
-                <strong>Airport Arrival:</strong> Arrive at least 2 hours before domestic flights, 3 hours for international.<br>
-                <strong>ID Requirements:</strong> Government-issued photo ID required for all passengers. Valid passport required for international travel.<br>
+            <div class="warning-box">
+              <div class="warning-title">⚠ Important travel information</div>
+              <div class="warning-text">
+                <strong>Check-in:</strong> Online check-in opens 24 hours before departure.<br><br>
+                <strong>Airport arrival:</strong> Arrive at least 2 hours before domestic flights, 3 hours for international.<br><br>
+                <strong>ID requirements:</strong> Government-issued photo ID required for all passengers. Valid passport required for international travel.<br><br>
                 <strong>Baggage:</strong> Review airline baggage policies. Checked baggage fees may apply.
               </div>
             </div>
             
-            <div class="price-summary">
+            <h2>Price breakdown</h2>
+            
+            <div class="price-box">
               <div class="price-row">
-                <span>Base Fare</span>
+                <span>Base fare</span>
                 <span>USD 980.00</span>
               </div>
               <div class="price-row">
-                <span>Seat Selection</span>
+                <span>Seat selection</span>
                 <span>USD 70.00</span>
               </div>
               <div class="price-row">
-                <span>Baggage</span>
+                <span>Checked baggage (2 bags)</span>
                 <span>USD 100.00</span>
               </div>
               <div class="price-total">
-                <span>Total Paid</span>
+                <span>Total paid</span>
                 <span>USD 1,150.00</span>
               </div>
             </div>
             
-            <div style="text-align: center; margin: 30px 0;">
-              <p style="margin-bottom: 15px; font-weight: 600;">Questions about your booking?</p>
-              <p style="font-size: 14px; color: #666;">Contact GoldSainte Concierge Support<br>Available 24/7</p>
-            </div>
+            <p style="text-align: center; margin: 32px 0;">
+              <strong>Questions about your booking?</strong><br>
+              <span style="font-size: 14px; color: #595959;">Contact GoldSainte Concierge Support<br>Available 24/7</span>
+            </p>
           </div>
           
           <div class="footer">
-            <p>Thank you for choosing GoldSainte</p>
-            <p style="margin-top: 10px; font-size: 12px;">This is an automated confirmation email. Please do not reply to this message.</p>
+            <p style="margin: 0 0 8px 0;">Thank you for choosing GoldSainte</p>
+            <p style="margin: 0; font-size: 11px;">This is an automated confirmation email. Please do not reply to this message.</p>
+            <p style="margin: 12px 0 0 0; font-size: 11px;">© 2025 GoldSainte. All rights reserved.</p>
           </div>
         </div>
       </body>

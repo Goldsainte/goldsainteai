@@ -85,26 +85,60 @@ const handler = async (req: Request): Promise<Response> => {
       emailSubject = `Hotel Booking Confirmed - ${hotelName}`;
       
       bookingDetails = `
-        <div class="section-title">Hotel Details</div>
-        <div class="detail-item">
-          <span class="detail-label">Property</span>
-          <span class="detail-value">${hotelName}</span>
+        <h2>Reservation details</h2>
+        <div class="info-box">
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Property</td>
+                <td class="info-value">${hotelName}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Room type</td>
+                <td class="info-value">${roomType}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Bed type</td>
+                <td class="info-value">${bedType}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Check-in</td>
+                <td class="info-value">${checkInDate || 'TBD'}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Check-out</td>
+                <td class="info-value">${checkOutDate || 'TBD'}</td>
+              </tr>
+            </table>
+          </div>
         </div>
-        <div class="detail-item">
-          <span class="detail-label">Room Type</span>
-          <span class="detail-value">${roomType}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Bed Type</span>
-          <span class="detail-value">${bedType}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Check-in</span>
-          <span class="detail-value">${checkInDate || 'TBD'}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Check-out</span>
-          <span class="detail-value">${checkOutDate || 'TBD'}</span>
+        
+        <h2>Price breakdown</h2>
+        <div class="price-box">
+          <div class="price-total">
+            <table>
+              <tr>
+                <td>Total paid</td>
+                <td style="text-align: right;">${currency} ${totalPrice.toFixed(2)}</td>
+              </tr>
+            </table>
+          </div>
         </div>
       `;
     } else if (bookingType === 'flight') {
@@ -123,8 +157,6 @@ const handler = async (req: Request): Promise<Response> => {
         const destination = lastSegment?.arrival?.iataCode || 'N/A';
         const departureTime = firstSegment?.departure?.at;
         const arrivalTime = lastSegment?.arrival?.at;
-        const duration = flightOffer.itineraries?.[0]?.duration || 'N/A';
-        const stops = flightOffer.itineraries?.[0]?.segments?.length - 1 || 0;
         
         emailSubject = `Flight Confirmed - ${origin} to ${destination} - Confirmation ${bookingReference}`;
         
@@ -134,22 +166,24 @@ const handler = async (req: Request): Promise<Response> => {
           outboundSegments += `
             <div class="flight-segment">
               <div class="segment-header">${segment.carrierCode} ${segment.number} • ${segment.aircraft?.code || 'N/A'}</div>
-              <div class="segment-details">
-                <div>
-                  <div class="time-block">${formatTime(segment.departure.at)}</div>
-                  <div class="date-block">${formatDate(segment.departure.at)}</div>
-                  <div class="city-block">${segment.departure.iataCode}</div>
-                </div>
-                <div class="duration">
-                  <div class="arrow">→</div>
-                  <div class="duration-text">${getDuration(segment.duration)}</div>
-                </div>
-                <div>
-                  <div class="time-block">${formatTime(segment.arrival.at)}</div>
-                  <div class="date-block">${formatDate(segment.arrival.at)}</div>
-                  <div class="city-block">${segment.arrival.iataCode}</div>
-                </div>
-              </div>
+              <table class="flight-times">
+                <tr>
+                  <td>
+                    <div class="time-big">${formatTime(segment.departure.at)}</div>
+                    <div class="time-date">${formatDate(segment.departure.at)}</div>
+                    <div class="time-city">${segment.departure.iataCode}</div>
+                  </td>
+                  <td>
+                    <div class="time-arrow">→</div>
+                    <div class="duration">${getDuration(segment.duration)}</div>
+                  </td>
+                  <td>
+                    <div class="time-big">${formatTime(segment.arrival.at)}</div>
+                    <div class="time-date">${formatDate(segment.arrival.at)}</div>
+                    <div class="time-city">${segment.arrival.iataCode}</div>
+                  </td>
+                </tr>
+              </table>
             </div>
           `;
         });
@@ -161,22 +195,24 @@ const handler = async (req: Request): Promise<Response> => {
             returnSegments += `
               <div class="flight-segment">
                 <div class="segment-header">${segment.carrierCode} ${segment.number} • ${segment.aircraft?.code || 'N/A'}</div>
-                <div class="segment-details">
-                  <div>
-                    <div class="time-block">${formatTime(segment.departure.at)}</div>
-                    <div class="date-block">${formatDate(segment.departure.at)}</div>
-                    <div class="city-block">${segment.departure.iataCode}</div>
-                  </div>
-                  <div class="duration">
-                    <div class="arrow">→</div>
-                    <div class="duration-text">${getDuration(segment.duration)}</div>
-                  </div>
-                  <div>
-                    <div class="time-block">${formatTime(segment.arrival.at)}</div>
-                    <div class="date-block">${formatDate(segment.arrival.at)}</div>
-                    <div class="city-block">${segment.arrival.iataCode}</div>
-                  </div>
-                </div>
+                <table class="flight-times">
+                  <tr>
+                    <td>
+                      <div class="time-big">${formatTime(segment.departure.at)}</div>
+                      <div class="time-date">${formatDate(segment.departure.at)}</div>
+                      <div class="time-city">${segment.departure.iataCode}</div>
+                    </td>
+                    <td>
+                      <div class="time-arrow">→</div>
+                      <div class="duration">${getDuration(segment.duration)}</div>
+                    </td>
+                    <td>
+                      <div class="time-big">${formatTime(segment.arrival.at)}</div>
+                      <div class="time-date">${formatDate(segment.arrival.at)}</div>
+                      <div class="time-city">${segment.arrival.iataCode}</div>
+                    </td>
+                  </tr>
+                </table>
               </div>
             `;
           });
@@ -192,7 +228,7 @@ const handler = async (req: Request): Promise<Response> => {
             <div class="passenger-item">
               <div class="passenger-name">${passenger.firstName} ${passenger.lastName}</div>
               <div class="passenger-details">
-                ${seat ? `Seat: ${seat.seatNumber}` : 'Seat not selected'} 
+                ${seat ? `Seat ${seat.seatNumber}` : 'Seat not selected'} 
                 ${baggage && baggage.bags > 0 ? `• ${baggage.bags} checked bag(s)` : ''}
               </div>
             </div>
@@ -200,73 +236,98 @@ const handler = async (req: Request): Promise<Response> => {
         });
         
         bookingDetails = `
-          <div class="flight-summary">
-            <div class="flight-route">
-              <div class="airport">
-                <div class="airport-code">${origin}</div>
-                <div class="airport-name">${formatDate(departureTime)}</div>
-              </div>
-              <div class="arrow">✈</div>
-              <div class="airport">
-                <div class="airport-code">${destination}</div>
-                <div class="airport-name">${formatDate(arrivalTime)}</div>
-              </div>
+          <h2>Flight details</h2>
+          <div class="info-box">
+            <div class="info-row">
+              <table>
+                <tr>
+                  <td class="info-label">Route</td>
+                  <td class="info-value"><strong>${origin} → ${destination}</strong></td>
+                </tr>
+              </table>
             </div>
-            
-            <div class="info-section">
-              <div class="section-title">Outbound Flight</div>
-              ${outboundSegments}
+            <div class="info-row">
+              <table>
+                <tr>
+                  <td class="info-label">Travel date</td>
+                  <td class="info-value">${formatDate(departureTime)}</td>
+                </tr>
+              </table>
             </div>
-            
-            ${returnSegments ? `
-              <div class="info-section">
-                <div class="section-title">Return Flight</div>
-                ${returnSegments}
-              </div>
-            ` : ''}
-          </div>
-          
-          <div class="info-section">
-            <div class="section-title">Passenger Information</div>
-            <div class="passenger-list">
-              ${passengerList}
+            <div class="info-row">
+              <table>
+                <tr>
+                  <td class="info-label">Passengers</td>
+                  <td class="info-value">${passengers.length} ${passengers.length === 1 ? 'passenger' : 'passengers'}</td>
+                </tr>
+              </table>
             </div>
           </div>
           
-          <div class="important-info">
-            <div class="important-title">⚠ Important Travel Information</div>
-            <div class="important-text">
-              <strong>Check-in:</strong> Online check-in opens 24 hours before departure.<br>
-              <strong>Airport Arrival:</strong> Arrive at least 2 hours before domestic flights, 3 hours for international.<br>
-              <strong>ID Requirements:</strong> Government-issued photo ID required for all passengers. Valid passport required for international travel.<br>
+          <h2>Outbound flight</h2>
+          ${outboundSegments}
+          
+          ${returnSegments ? `<h2>Return flight</h2>${returnSegments}` : ''}
+          
+          <h2>Passenger information</h2>
+          <div class="passenger-box">
+            ${passengerList}
+          </div>
+          
+          <div class="warning-box">
+            <div class="warning-title">⚠ Important travel information</div>
+            <div class="warning-text">
+              <strong>Check-in:</strong> Online check-in opens 24 hours before departure.<br><br>
+              <strong>Airport arrival:</strong> Arrive at least 2 hours before domestic flights, 3 hours for international.<br><br>
+              <strong>ID requirements:</strong> Government-issued photo ID required for all passengers. Valid passport required for international travel.<br><br>
               <strong>Baggage:</strong> Review airline baggage policies. Checked baggage fees may apply.
             </div>
           </div>
           
-          <div class="price-summary">
-            <div class="price-row">
-              <span>Base Fare</span>
-              <span>${currency} ${(totalPrice - (fees.baggage || 0) - (fees.seats || 0)).toFixed(2)}</span>
-            </div>
+          <h2>Price breakdown</h2>
+          <div class="price-box">
+            ${fees.seats > 0 || fees.baggage > 0 ? `
+              <div class="price-row">
+                <table>
+                  <tr>
+                    <td>Base fare</td>
+                    <td style="text-align: right;">${currency} ${(totalPrice - (fees.baggage || 0) - (fees.seats || 0)).toFixed(2)}</td>
+                  </tr>
+                </table>
+              </div>
+            ` : ''}
             ${fees.seats > 0 ? `
               <div class="price-row">
-                <span>Seat Selection</span>
-                <span>${currency} ${fees.seats.toFixed(2)}</span>
+                <table>
+                  <tr>
+                    <td>Seat selection</td>
+                    <td style="text-align: right;">${currency} ${fees.seats.toFixed(2)}</td>
+                  </tr>
+                </table>
               </div>
             ` : ''}
             ${fees.baggage > 0 ? `
               <div class="price-row">
-                <span>Baggage</span>
-                <span>${currency} ${fees.baggage.toFixed(2)}</span>
+                <table>
+                  <tr>
+                    <td>Checked baggage</td>
+                    <td style="text-align: right;">${currency} ${fees.baggage.toFixed(2)}</td>
+                  </tr>
+                </table>
               </div>
             ` : ''}
             <div class="price-total">
-              <span>Total Paid</span>
-              <span>${currency} ${totalPrice.toFixed(2)}</span>
+              <table>
+                <tr>
+                  <td>Total paid</td>
+                  <td style="text-align: right;">${currency} ${totalPrice.toFixed(2)}</td>
+                </tr>
+              </table>
             </div>
           </div>
         `;
       }
+    } else if (bookingType === 'restaurant') {
       const restaurantName = bookingData.restaurantName || 'Restaurant';
       const restaurantAddress = bookingData.restaurantAddress || '';
       const date = bookingData.date || 'TBD';
@@ -276,26 +337,60 @@ const handler = async (req: Request): Promise<Response> => {
       emailSubject = `Reservation Confirmed - ${restaurantName}`;
       
       bookingDetails = `
-        <div class="section-title">Restaurant Reservation</div>
-        <div class="detail-item">
-          <span class="detail-label">Restaurant</span>
-          <span class="detail-value">${restaurantName}</span>
+        <h2>Reservation details</h2>
+        <div class="info-box">
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Restaurant</td>
+                <td class="info-value">${restaurantName}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Location</td>
+                <td class="info-value">${restaurantAddress}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Date</td>
+                <td class="info-value">${date}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Time</td>
+                <td class="info-value">${time}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Party size</td>
+                <td class="info-value">${guests} ${guests === 1 ? 'guest' : 'guests'}</td>
+              </tr>
+            </table>
+          </div>
         </div>
-        <div class="detail-item">
-          <span class="detail-label">Location</span>
-          <span class="detail-value">${restaurantAddress}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Date</span>
-          <span class="detail-value">${date}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Time</span>
-          <span class="detail-value">${time}</span>
-        </div>
-        <div class="detail-item">
-          <span class="detail-label">Party Size</span>
-          <span class="detail-value">${guests} ${guests === 1 ? 'guest' : 'guests'}</span>
+        
+        <h2>Price breakdown</h2>
+        <div class="price-box">
+          <div class="price-total">
+            <table>
+              <tr>
+                <td>Total paid</td>
+                <td style="text-align: right;">${currency} ${totalPrice.toFixed(2)}</td>
+              </tr>
+            </table>
+          </div>
         </div>
       `;
     }
@@ -307,275 +402,256 @@ const handler = async (req: Request): Promise<Response> => {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body { 
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-              line-height: 1.6; 
-              color: #333333; 
+            body {
+              font-family: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
               margin: 0;
               padding: 0;
               background-color: #f4f4f4;
             }
-            .container { 
-              max-width: 680px; 
-              margin: 0 auto; 
-              background: white;
+            .container {
+              max-width: 640px;
+              margin: 0 auto;
+              background: #ffffff;
             }
-            .header { 
-              background: #1A1F2C;
-              padding: 30px 40px;
+            .header {
+              background: #003580;
+              padding: 24px;
               text-align: center;
             }
-            .logo { 
-              color: #C9A55B; 
-              font-size: 32px; 
-              font-weight: 700;
-              letter-spacing: 3px;
-              margin: 0;
-            }
-            .confirmation-banner {
-              background: #0B7A3E;
-              color: white;
-              padding: 20px 40px;
-              text-align: center;
-            }
-            .confirmation-banner h2 {
-              margin: 0;
+            .logo {
+              color: #ffffff;
               font-size: 24px;
-              font-weight: 600;
+              font-weight: 700;
+              letter-spacing: 2px;
+              margin: 0;
             }
-            .confirmation-number {
-              background: white;
-              border: 2px solid #0B7A3E;
-              padding: 20px;
-              margin: 20px 40px;
+            .content {
+              padding: 0 8px;
+            }
+            h1 {
+              font-size: 24px;
+              line-height: 32px;
+              font-weight: bold;
+              color: #333333;
+              margin: 32px 0 16px 0;
+              padding: 0 8px;
+            }
+            h2 {
+              font-size: 16px;
+              line-height: 24px;
+              font-weight: bold;
+              color: #333333;
+              margin: 16px 0;
+              padding: 0 8px;
+            }
+            p {
+              font-size: 16px;
+              line-height: 24px;
+              color: #333333;
+              margin: 16px 0;
+              padding: 0 8px;
+            }
+            .conf-box {
+              border: 2px solid #008009;
+              border-radius: 4px;
+              padding: 16px;
+              margin: 16px 8px;
               text-align: center;
             }
             .conf-label {
               font-size: 12px;
-              color: #666;
+              color: #595959;
               text-transform: uppercase;
               letter-spacing: 1px;
-              margin-bottom: 5px;
+              margin-bottom: 4px;
             }
-            .conf-value {
-              font-size: 32px;
+            .conf-number {
+              font-size: 28px;
               font-weight: 700;
-              color: #1A1F2C;
+              color: #333333;
               letter-spacing: 2px;
               font-family: monospace;
             }
-            .content { 
-              padding: 30px 40px;
-              background: white;
+            .info-box {
+              border: 1px solid #e7e7e7;
+              border-radius: 4px;
+              margin: 16px 8px;
             }
-            .flight-summary {
-              background: #f8f9fa;
-              border: 1px solid #dee2e6;
-              border-radius: 8px;
-              padding: 25px;
-              margin: 20px 0;
+            .info-row {
+              border-top: 1px solid #e7e7e7;
+              padding: 16px;
             }
-            .flight-route {
-              display: grid;
-              grid-template-columns: 1fr auto 1fr;
-              gap: 20px;
-              align-items: center;
-              margin-bottom: 20px;
-              padding-bottom: 20px;
-              border-bottom: 2px solid #dee2e6;
+            .info-row:first-child {
+              border-top: none;
             }
-            .airport {
-              text-align: center;
+            .info-row table {
+              width: 100%;
+              border-collapse: collapse;
             }
-            .airport-code {
-              font-size: 36px;
-              font-weight: 700;
-              color: #1A1F2C;
+            .info-label {
+              width: 224px;
+              font-size: 16px;
+              line-height: 24px;
+              color: #595959;
+              vertical-align: top;
             }
-            .airport-name {
-              font-size: 13px;
-              color: #666;
-              margin-top: 5px;
-            }
-            .arrow {
-              font-size: 24px;
-              color: #666;
+            .info-value {
+              font-size: 16px;
+              line-height: 24px;
+              color: #333333;
+              vertical-align: top;
             }
             .flight-segment {
-              background: white;
-              border: 1px solid #dee2e6;
-              border-radius: 6px;
-              padding: 20px;
-              margin: 15px 0;
+              background: #f5f5f5;
+              border-radius: 4px;
+              padding: 16px;
+              margin: 12px 8px;
             }
             .segment-header {
               font-size: 14px;
               font-weight: 600;
-              color: #0B7A3E;
-              margin-bottom: 15px;
+              color: #008009;
+              margin-bottom: 12px;
               text-transform: uppercase;
-              letter-spacing: 0.5px;
             }
-            .segment-details {
-              display: grid;
-              grid-template-columns: 1fr auto 1fr;
-              gap: 15px;
-              align-items: start;
+            .flight-times {
+              width: 100%;
             }
-            .time-block {
-              font-size: 24px;
+            .flight-times td {
+              vertical-align: top;
+              width: 33%;
+            }
+            .time-big {
+              font-size: 20px;
               font-weight: 700;
-              color: #1A1F2C;
+              color: #333333;
             }
-            .date-block {
+            .time-date {
               font-size: 13px;
-              color: #666;
-              margin-top: 3px;
+              color: #595959;
+              margin-top: 4px;
             }
-            .city-block {
+            .time-city {
               font-size: 14px;
-              color: #333;
-              margin-top: 5px;
+              color: #333333;
+              margin-top: 4px;
+            }
+            .time-arrow {
+              text-align: center;
+              font-size: 24px;
+              color: #595959;
             }
             .duration {
-              text-align: center;
-              padding-top: 8px;
-            }
-            .duration-text {
               font-size: 12px;
-              color: #666;
+              color: #595959;
+              text-align: center;
             }
-            .flight-info {
-              font-size: 13px;
-              color: #666;
-              margin-top: 15px;
-              padding-top: 15px;
-              border-top: 1px solid #dee2e6;
-            }
-            .info-section {
-              margin: 25px 0;
-            }
-            .section-title {
-              font-size: 18px;
-              font-weight: 600;
-              color: #1A1F2C;
-              margin-bottom: 15px;
-              padding-bottom: 10px;
-              border-bottom: 2px solid #C9A55B;
-            }
-            .passenger-list {
-              background: #f8f9fa;
-              border-radius: 6px;
-              padding: 15px;
+            .passenger-box {
+              background: #f5f5f5;
+              border-radius: 4px;
+              padding: 12px 16px;
+              margin: 12px 8px;
             }
             .passenger-item {
-              padding: 10px 0;
-              border-bottom: 1px solid #dee2e6;
+              padding: 8px 0;
+              border-bottom: 1px solid #e7e7e7;
             }
             .passenger-item:last-child {
               border-bottom: none;
             }
             .passenger-name {
-              font-weight: 600;
               font-size: 16px;
-              color: #1A1F2C;
+              font-weight: 600;
+              color: #333333;
             }
             .passenger-details {
-              font-size: 13px;
-              color: #666;
-              margin-top: 3px;
-            }
-            .important-info {
-              background: #FFF3CD;
-              border-left: 4px solid #FFC107;
-              padding: 20px;
-              margin: 25px 0;
-            }
-            .important-title {
-              font-weight: 600;
-              color: #856404;
-              margin-bottom: 10px;
-              font-size: 16px;
-            }
-            .important-text {
               font-size: 14px;
-              color: #856404;
-              line-height: 1.6;
+              color: #595959;
+              margin-top: 4px;
             }
-            .price-summary {
-              background: #f8f9fa;
-              border: 2px solid #C9A55B;
-              border-radius: 8px;
-              padding: 20px;
-              margin: 25px 0;
+            .warning-box {
+              border: 1px solid #FFE08A;
+              background: #FEFBF0;
+              border-radius: 4px;
+              padding: 16px;
+              margin: 24px 8px;
+            }
+            .warning-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: #333333;
+              margin-bottom: 8px;
+            }
+            .warning-text {
+              font-size: 14px;
+              line-height: 20px;
+              color: #333333;
+            }
+            .price-box {
+              border: 1px solid #e7e7e7;
+              border-radius: 4px;
+              padding: 16px;
+              margin: 24px 8px;
             }
             .price-row {
-              display: flex;
-              justify-content: space-between;
               padding: 8px 0;
               font-size: 14px;
+              color: #333333;
+            }
+            .price-row table {
+              width: 100%;
             }
             .price-total {
-              display: flex;
-              justify-content: space-between;
-              padding: 15px 0 0 0;
-              margin-top: 15px;
-              border-top: 2px solid #C9A55B;
-              font-size: 24px;
+              padding: 16px 0 0 0;
+              margin-top: 8px;
+              border-top: 2px solid #e7e7e7;
+              font-size: 20px;
               font-weight: 700;
-              color: #1A1F2C;
+              color: #333333;
             }
-            .action-button {
-              display: inline-block;
-              background: #0B7A3E;
-              color: white;
-              padding: 15px 40px;
-              text-decoration: none;
-              border-radius: 6px;
-              font-weight: 600;
-              margin: 10px 5px;
+            .price-total table {
+              width: 100%;
             }
-            .footer { 
-              background: #f8f9fa;
-              text-align: center; 
-              padding: 30px 40px;
-              color: #666;
-              font-size: 13px;
-              border-top: 1px solid #dee2e6;
+            .footer {
+              background: #f5f5f5;
+              text-align: center;
+              padding: 24px;
+              color: #595959;
+              font-size: 12px;
+              margin-top: 32px;
             }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1 class="logo">GOLDSAINTE</h1>
-            </div>
-            
-            <div class="confirmation-banner">
-              <h2>✓ Your flight is confirmed</h2>
-            </div>
-
-            <div class="confirmation-number">
-              <div class="conf-label">Confirmation Number</div>
-              <div class="conf-value">${bookingReference}</div>
+              <div class="logo">GOLDSAINTE</div>
             </div>
             
             <div class="content">
+              <h1>✓ Your ${bookingType} is confirmed</h1>
+              
               <p>Dear ${guestName},</p>
               
-              <p>Your flight reservation has been confirmed. Please review the details below and save this email for your records.</p>
+              <p>Thank you for booking with GoldSainte. Your reservation has been confirmed. Please review the details below and save this email for your records.</p>
+              
+              <div class="conf-box">
+                <div class="conf-label">Confirmation Number</div>
+                <div class="conf-number">${bookingReference}</div>
+              </div>
               
               ${bookingDetails}
               
-              <div style="text-align: center; margin: 30px 0;">
-                <p style="margin-bottom: 15px; font-weight: 600;">Questions about your booking?</p>
-                <p style="font-size: 14px; color: #666;">Contact GoldSainte Concierge Support<br>Available 24/7</p>
-              </div>
+              <p style="text-align: center; margin: 32px 0;">
+                <strong>Questions about your booking?</strong><br>
+                <span style="font-size: 14px; color: #595959;">Contact GoldSainte Concierge Support<br>Available 24/7</span>
+              </p>
             </div>
             
             <div class="footer">
-              <p>Thank you for choosing GoldSainte</p>
-              <p style="margin-top: 10px; font-size: 12px;">This is an automated confirmation email. Please do not reply to this message.</p>
+              <p style="margin: 0 0 8px 0;">Thank you for choosing GoldSainte</p>
+              <p style="margin: 0; font-size: 11px;">This is an automated confirmation email. Please do not reply to this message.</p>
+              <p style="margin: 12px 0 0 0; font-size: 11px;">© 2025 GoldSainte. All rights reserved.</p>
             </div>
           </div>
         </body>
