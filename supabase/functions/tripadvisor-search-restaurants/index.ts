@@ -108,7 +108,7 @@ serve(async (req) => {
           const photos = (photosData.data || []).slice(0, 5);
           const reviews = (reviewsData.data || []).slice(0, 3);
           const fallbackCity = restaurant.address_obj?.city || '';
-          const reservationUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
+          const reservationUrl = `https://www.tripadvisor.com/Search?q=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
 
           return {
             id: restaurant.location_id,
@@ -156,9 +156,10 @@ serve(async (req) => {
         const photos = (photosData.data || []).slice(0, 5);
         const reviews = (reviewsData.data || []).slice(0, 3);
 
-        const reservationUrl = (details.website || details.web_url)
-          ? (details.website || details.web_url)
-          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || ''}`)}`;
+        const primaryUrl = details.website || details.web_url || '';
+        const reservationUrl = primaryUrl
+          ? (primaryUrl.startsWith('http') ? primaryUrl : `https://${primaryUrl}`)
+          : `https://www.tripadvisor.com/Search?q=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || ''}`)}`;
 
         return {
           id: restaurant.location_id,
@@ -206,6 +207,8 @@ serve(async (req) => {
     for (const group of chunks) {
       const groupResults = await Promise.all(group.map(fetchDetailsFor));
       restaurantDetails.push(...groupResults);
+      // brief delay to reduce rate limiting
+      await new Promise((r) => setTimeout(r, 250));
     }
 
     const validRestaurants = restaurantDetails.filter((restaurant) => restaurant !== null);

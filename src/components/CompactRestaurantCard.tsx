@@ -129,12 +129,17 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
               {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               {expanded ? 'Less' : 'More'}
             </Button>
-<Button size="sm" className="h-7 px-3 text-xs gap-1" asChild>
-  <a href={reservationUrl} target="_blank" rel="noopener noreferrer">
-    <Calendar className="h-3 w-3" />
-    Reserve
-  </a>
-</Button>
+            <Button
+              size="sm"
+              className="h-7 px-3 text-xs gap-1"
+              onClick={(e) => {
+                e.stopPropagation();
+                try { window.open(reservationUrl, '_blank', 'noopener'); } catch {}
+              }}
+            >
+              <Calendar className="h-3 w-3" />
+              Reserve
+            </Button>
           </div>
         </div>
       </div>
