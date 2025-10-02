@@ -21,6 +21,7 @@ import { TripTypeSelector } from "@/components/TripTypeSelector";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
+import { WelcomeModal } from "@/components/WelcomeModal";
 import logomark from "@/assets/logomark-seal-gold.png";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
 import swissAlps from "@/assets/swiss-alps.jpg";
@@ -94,6 +95,16 @@ const Index = () => {
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  // Show welcome modal for first-time visitors
+  useEffect(() => {
+    const hasVisited = localStorage.getItem("goldsainte_visited");
+    if (!hasVisited) {
+      setShowWelcomeModal(true);
+      localStorage.setItem("goldsainte_visited", "true");
+    }
+  }, []);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -1133,6 +1144,12 @@ const Index = () => {
           fromCountry={visaModalData.fromCountry}
           toCountry={visaModalData.toCountry}
           visaInformation={visaModalData.visaInformation}
+        />
+
+        {/* Welcome Modal */}
+        <WelcomeModal
+          open={showWelcomeModal}
+          onClose={() => setShowWelcomeModal(false)}
         />
 
         {/* Date Picker Modal */}
