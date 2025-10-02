@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useSearchTracking } from "@/hooks/useSearchTracking";
@@ -117,13 +118,24 @@ export const SearchBar = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
           <div className="relative">
-            <MapPin className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder={searchType === "flights" ? "From where?" : "Where to?"}
-              className="pl-12 h-16 border-border text-lg rounded-xl"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
+            {searchType === "restaurants" ? (
+              <CityAutocomplete
+                placeholder="City, restaurant name, or cuisine"
+                className="h-16 text-lg rounded-xl pl-12"
+                value={location}
+                onChange={setLocation}
+              />
+            ) : (
+              <>
+                <MapPin className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+                <Input
+                  placeholder={searchType === "flights" ? "From where?" : "Where to?"}
+                  className="pl-12 h-16 border-border text-lg rounded-xl"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+              </>
+            )}
           </div>
 
           {searchType === "hotels" && (

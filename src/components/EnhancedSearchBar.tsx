@@ -15,6 +15,7 @@ import { useSearchTracking } from "@/hooks/useSearchTracking";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/AirportAutocomplete";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 
 export const EnhancedSearchBar = () => {
   const navigate = useNavigate();
@@ -464,12 +465,11 @@ export const EnhancedSearchBar = () => {
   const renderRestaurantSearch = () => (
     <div className="space-y-4">
       <div className="relative">
-        <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-        <Input
+        <CityAutocomplete
           placeholder="City, restaurant name, or cuisine"
-          className="pl-10 h-12 border-border text-base"
+          className="h-12"
           value={restaurantLocation}
-          onChange={(e) => setRestaurantLocation(e.target.value)}
+          onChange={setRestaurantLocation}
         />
       </div>
 
