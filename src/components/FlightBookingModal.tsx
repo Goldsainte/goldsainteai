@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [showAutofillPrompt, setShowAutofillPrompt] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
   
   const numberOfTravelers = parseInt(flight.travelerPricings?.length || 1);
   const [passengers, setPassengers] = useState(
@@ -57,6 +59,78 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
     const updated = [...passengers];
     updated[index] = { ...updated[index], [field]: value };
     setPassengers(updated);
+  };
+
+  // Load user profile and preferences when modal opens
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!open) return;
+      
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      // Fetch profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+
+      // Fetch preferences
+      const { data: preferences } = await supabase
+        .from('user_booking_preferences')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .single();
+
+      if (profile || preferences) {
+        setUserProfile({ profile, preferences });
+        setShowAutofillPrompt(true);
+      }
+    };
+
+    loadUserData();
+  }, [open]);
+
+  const handleAutofill = () => {
+    if (!userProfile) return;
+
+    const { profile, preferences } = userProfile;
+    const updated = [...passengers];
+    
+    // Autofill first passenger with user data
+    updated[0] = {
+      ...updated[0],
+      title: profile?.first_name ? "MR" : updated[0].title,
+      firstName: profile?.first_name || updated[0].firstName,
+      middleName: updated[0].middleName,
+      lastName: profile?.last_name || updated[0].lastName,
+      dateOfBirth: updated[0].dateOfBirth,
+      gender: updated[0].gender,
+      nationality: preferences?.nationality || updated[0].nationality,
+      passportNumber: preferences?.passport_number || updated[0].passportNumber,
+      passportExpiry: preferences?.passport_expiry || updated[0].passportExpiry,
+      passportCountry: preferences?.passport_issuing_country || updated[0].passportCountry,
+      knownTravelerNumber: updated[0].knownTravelerNumber,
+      frequentFlyerNumber: updated[0].frequentFlyerNumber
+    };
+
+    setPassengers(updated);
+
+    // Autofill contact info
+    setContactInfo({
+      email: profile?.email || contactInfo.email,
+      phone: profile?.phone || contactInfo.phone,
+      countryCode: contactInfo.countryCode,
+      address: contactInfo.address,
+      city: contactInfo.city,
+      state: contactInfo.state,
+      postalCode: contactInfo.postalCode,
+      country: profile?.country || preferences?.nationality || contactInfo.country
+    });
+
+    setShowAutofillPrompt(false);
+    toast.success("Information autofilled from your profile");
   };
 
   const handleBooking = async () => {
@@ -128,6 +202,35 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
         <DialogHeader>
           <DialogTitle>Complete Your Flight Booking</DialogTitle>
         </DialogHeader>
+
+        {/* Autofill Prompt */}
+        {showAutofillPrompt && (
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h4 className="font-semibold mb-1">Use your saved information?</h4>
+                <p className="text-sm text-muted-foreground">
+                  We found your profile information. Would you like to autofill the first passenger details?
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowAutofillPrompt(false)}
+                >
+                  No thanks
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={handleAutofill}
+                >
+                  Yes, autofill
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6">
           {/* Flight Summary */}
