@@ -265,9 +265,18 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.destination = message;
           nextStep = 3;
         } else if (step === 3) {
-          // Got departure, optionally ask for return
-          nextData.departureDate = message;
-          nextStep = 4;
+          // Check if both dates were provided at once (from date picker)
+          const returningMatch = message.match(/^(\d{4}-\d{2}-\d{2})\s+returning\s+(\d{4}-\d{2}-\d{2})$/i);
+          if (returningMatch) {
+            // Both dates provided, skip to search
+            nextData.departureDate = returningMatch[1];
+            nextData.returnDate = returningMatch[2];
+            shouldSearch = true;
+          } else {
+            // Just departure date provided, ask for return
+            nextData.departureDate = message;
+            nextStep = 4;
+          }
         } else if (step === 4) {
           // Got return date or skip, search
           if (message && !message.toLowerCase().includes('one way') && !message.toLowerCase().includes('skip')) {
