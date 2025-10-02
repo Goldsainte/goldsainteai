@@ -213,9 +213,9 @@ serve(async (req) => {
 
     const validRestaurants = restaurantDetails.filter((restaurant: any) => {
       if (!restaurant) return false;
-      const hasPhotos = Array.isArray(restaurant.photos) && restaurant.photos.length > 0;
-      const hasReviews = Array.isArray(restaurant.reviews) && restaurant.reviews.length > 0;
-      return hasPhotos && hasReviews;
+      const hasPhoto = !!restaurant.photoUrl || (Array.isArray(restaurant.photos) && restaurant.photos.length > 0);
+      const hasQuality = (Array.isArray(restaurant.reviews) && restaurant.reviews.length > 0) || (Number(restaurant.rating) > 0);
+      return hasPhoto && hasQuality;
     });
 
     return new Response(JSON.stringify({ 

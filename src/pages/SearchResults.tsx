@@ -451,14 +451,14 @@ if (minRating && searchType !== "restaurants") {
                       if (searchType === "hotels") {
                         return (
                           <CompactHotelCard
-                            key={result.hotel_id || result.dest_id || index}
+                            key={`${result.hotel_id || result.dest_id || 'hotel'}-${index}`}
                             property={result}
                           />
                         );
                       } else if (searchType === "flights") {
                         return (
                           <CompactFlightCard
-                            key={result.id || index}
+                            key={`${result.id || 'flight'}-${index}`}
                             flight={result}
                             dictionaries={flightDictionaries}
                           />
@@ -466,14 +466,14 @@ if (minRating && searchType !== "restaurants") {
                       } else if (searchType === "restaurants") {
                         return (
                           <CompactRestaurantCard
-                            key={result.id || index}
+                            key={`${result.id || 'restaurant'}-${index}`}
                             restaurant={result}
                           />
                         );
                       } else {
                         return (
                           <CompactHotelCard
-                            key={result.hotel_id || result.dest_id || index}
+                            key={`${result.hotel_id || result.dest_id || 'pkg'}-${index}`}
                             property={result}
                           />
                         );
