@@ -62,11 +62,17 @@ serve(async (req) => {
       allSearchResults.push(...page);
       console.log(`Fetched page with ${page.length} restaurants (total: ${allSearchResults.length})`);
 
-      if (page.length < perPage) break; // no more pages
+      if (page.length < perPage) {
+        console.log('No more pages available from TripAdvisor API');
+        break;
+      }
       offset += perPage;
 
-      // Safety guard to prevent excessive runtime; remove or raise if needed
-      if (allSearchResults.length > 300) break;
+      // Increased limit for more comprehensive results
+      if (allSearchResults.length >= 1000) {
+        console.log('Reached maximum limit of 1000 results');
+        break;
+      }
     }
 
     // Fetch detailed information for each restaurant (batched to limit concurrency)
