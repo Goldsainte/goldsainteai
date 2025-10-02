@@ -364,33 +364,44 @@ const Index = () => {
 
       // Check if AI is asking about dates and show date picker
       const aiMessage = data.message.toLowerCase();
-      if (aiMessage.includes('when are you planning to stay') || 
-          aiMessage.includes('when are you planning to travel') ||
-          aiMessage.includes('when do you need the car') ||
-          aiMessage.includes('when would you like to depart') ||
-          aiMessage.includes('when would you like to fly') ||
-          aiMessage.includes('what date') ||
-          aiMessage.includes('travel dates')) {
-        const type = aiMessage.includes('stay') || aiMessage.includes('hotel') ? 'hotel' : 'flight';
+      const dateKeywords = [
+        'when are you', 'when will you', 'which dates', 'what dates',
+        'check-in', 'check in', 'check out', 'checkout',
+        'when would you like to check', 'when would you like to stay',
+        'when would you like to depart', 'when would you like to fly',
+        'travel dates', 'departure date', 'return date',
+        'when do you want to', 'what day', 'when should',
+        'when do you need', 'arrival date', 'leaving on'
+      ];
+      
+      const hasDateKeyword = dateKeywords.some(keyword => aiMessage.includes(keyword));
+      
+      if (hasDateKeyword) {
+        const type = (aiMessage.includes('stay') || 
+                     aiMessage.includes('hotel') || 
+                     aiMessage.includes('check')) ? 'hotel' : 'flight';
         setTimeout(() => setShowDatePicker({ type, context: 'quicklink' }), 500);
       }
 
       // Check if AI is asking about budget and show price slider
-      if (aiMessage.includes('what\'s your budget per night') || 
-          aiMessage.includes('what is your budget per night')) {
-        setTimeout(() => setShowPriceSlider({ type: 'hotel' }), 500);
-      } else if (aiMessage.includes('what\'s your budget per passenger') ||
-                 aiMessage.includes('what is your budget per passenger') ||
-                 aiMessage.includes('budget for the flight') ||
-                 aiMessage.includes('budget per person for')) {
-        setTimeout(() => setShowPriceSlider({ type: 'flight' }), 500);
-      } else if (aiMessage.includes('what\'s your budget per person') ||
-                 aiMessage.includes('what is your budget per person') ||
-                 aiMessage.includes('budget per person for dining')) {
-        setTimeout(() => setShowPriceSlider({ type: 'restaurant' }), 500);
-      } else if (aiMessage.includes('what\'s your budget per day') ||
-                 aiMessage.includes('what is your budget per day')) {
-        setTimeout(() => setShowPriceSlider({ type: 'car' }), 500);
+      const budgetKeywords = {
+        hotel: ['budget per night', 'price range per night', 'spend per night', 'nightly budget', 'per night'],
+        flight: ['budget per passenger', 'budget for the flight', 'price per person', 'flight budget', 'per passenger', 'spend on flights'],
+        restaurant: ['budget per person', 'dining budget', 'spend on food', 'price range for dining', 'meal budget', 'per person for dining'],
+        car: ['budget per day', 'daily budget', 'car rental budget', 'spend per day', 'per day']
+      };
+      
+      let budgetType: "hotel" | "flight" | "restaurant" | "car" | null = null;
+      
+      for (const [type, keywords] of Object.entries(budgetKeywords)) {
+        if (keywords.some(keyword => aiMessage.includes(keyword))) {
+          budgetType = type as "hotel" | "flight" | "restaurant" | "car";
+          break;
+        }
+      }
+      
+      if (budgetType) {
+        setTimeout(() => setShowPriceSlider({ type: budgetType }), 500);
       }
       
       // Check if AI is asking about cuisine preference
