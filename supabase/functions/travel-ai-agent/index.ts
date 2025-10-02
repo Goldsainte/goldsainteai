@@ -1055,10 +1055,10 @@ async function searchHotels(args: any, apiKey: string) {
       },
       body: JSON.stringify({
         cityCode: cityCode,
+        cityName: location, // Pass city name for currency detection
         checkInDate: checkIn || new Date().toISOString().split('T')[0],
         checkOutDate: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        adults: guests || 2,
-        currency: 'USD'
+        adults: guests || 2
       })
     });
 
@@ -1572,8 +1572,8 @@ async function searchFlights(args: any) {
       adults: adults.toString(),
       travelClass,
       nonStop: nonStop ? 'true' : 'false',
-      currencyCode: 'USD',
-      max: '20'
+      max: '20',
+      destinationCity: destination // Pass destination city for currency detection
     });
 
     if (returnDate) {

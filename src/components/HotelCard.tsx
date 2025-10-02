@@ -8,6 +8,7 @@ import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { getHotelImage } from "@/lib/imageHelpers";
 import { encodeData } from "@/lib/utils";
+import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
 interface HotelCardProps {
   hotel: any;
@@ -21,7 +22,11 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
   const hotelData = hotel.hotel;
   const offer = hotel.offers?.[0];
   const price = parseFloat(offer?.price?.total || 0);
-  const currency = offer?.price?.currency || 'USD';
+  
+  // Get currency symbol based on hotel location
+  const hotelCity = hotelData.address?.cityName || hotelData.cityCode;
+  const currencyInfo = getCurrencyFromLocation(hotelCity);
+  const currencySymbol = currencyInfo.symbol;
 
   const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
     const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
@@ -59,7 +64,7 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
             }}
           />
           <Badge className="absolute top-2 right-2 text-xs md:text-sm" variant="secondary">
-            {currency} {price.toFixed(2)}
+            {currencySymbol}{price.toFixed(2)}
           </Badge>
         </div>
         <div className="p-3 md:p-4 space-y-3 flex-1 flex flex-col">

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,9 +47,12 @@ serve(async (req) => {
   }
 
   try {
-    const { cityCode, checkInDate, checkOutDate, adults = 1, currency = 'USD' } = await req.json();
+    const { cityCode, checkInDate, checkOutDate, adults = 1, cityName } = await req.json();
     
-    console.log('Hotel search request:', { cityCode, checkInDate, checkOutDate, adults });
+    // Determine currency from city
+    const currency = cityName ? getCurrencyFromLocation(cityName) : getCurrencyFromLocation(cityCode);
+    
+    console.log('Hotel search request:', { cityCode, checkInDate, checkOutDate, adults, currency });
 
     const token = await getAmadeusToken();
 

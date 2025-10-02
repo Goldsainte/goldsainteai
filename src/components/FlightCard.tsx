@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plane, Clock, Calendar, Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
+import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
 interface FlightCardProps {
   flight: any;
@@ -19,7 +20,11 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
   const basePrice = parseFloat(flight.price.total);
   const markedUpPrice = (basePrice * 1.15).toFixed(2);
-  const currency = flight.price.currency;
+  
+  // Get currency symbol from destination
+  const destination = lastSegment.arrival.iataCode;
+  const currencyInfo = getCurrencyFromLocation(destination);
+  const currencySymbol = currencyInfo.symbol;
 
   const formatTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleTimeString('en-US', { 
@@ -72,7 +77,7 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
             </div>
             <div className="flex items-center gap-2">
               <Badge variant="secondary" className="text-lg">
-                {currency} {markedUpPrice}
+                {currencySymbol}{markedUpPrice}
               </Badge>
               <Button
                 variant="ghost"
@@ -120,7 +125,7 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
             className="w-full"
             onClick={() => setBookingModalOpen(true)}
           >
-            Book Now - {currency} {markedUpPrice}
+            Book Now - {currencySymbol}{markedUpPrice}
           </Button>
         </div>
       </Card>

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -38,7 +39,10 @@ serve(async (req) => {
   }
 
   try {
-    const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, travelClass = 'ECONOMY', nonStop = 'false', currencyCode = 'USD', max = 20, includedAirlineCodes } = await req.json();
+    const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, travelClass = 'ECONOMY', nonStop = 'false', max = 20, includedAirlineCodes, destinationCity } = await req.json();
+    
+    // Determine currency from destination
+    const currencyCode = destinationCity ? getCurrencyFromLocation(destinationCity) : 'USD';
     
     console.log('Flight search request:', { 
       originLocationCode, 
@@ -46,6 +50,7 @@ serve(async (req) => {
       departureDate, 
       returnDate,
       adults,
+      currencyCode,
       includedAirlineCodes 
     });
 

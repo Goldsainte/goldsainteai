@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Music, ExternalLink } from "lucide-react";
+import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
 interface EventCardProps {
   event: any;
@@ -11,6 +12,12 @@ export const EventCard = ({ event }: EventCardProps) => {
   const imageUrl = event.images?.find((img: any) => img.ratio === "16_9")?.url || event.images?.[0]?.url;
   const venue = event._embedded?.venues?.[0];
   const priceRange = event.priceRanges?.[0];
+  
+  // Get currency symbol based on venue location
+  const venueCity = venue?.city?.name || venue?.country?.name || 'US';
+  const currencyInfo = getCurrencyFromLocation(venueCity);
+  const currencySymbol = currencyInfo.symbol;
+  
   const date = new Date(event.dates?.start?.dateTime || event.dates?.start?.localDate);
   const formattedDate = date.toLocaleDateString('en-US', { 
     weekday: 'short', 
@@ -40,7 +47,7 @@ export const EventCard = ({ event }: EventCardProps) => {
         )}
         {priceRange && (
           <Badge className="absolute top-2 right-2" variant="secondary">
-            ${priceRange.min} - ${priceRange.max}
+            {currencySymbol}{priceRange.min} - {currencySymbol}{priceRange.max}
           </Badge>
         )}
         {event.classifications?.[0] && (
