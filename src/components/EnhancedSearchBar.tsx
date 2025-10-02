@@ -525,19 +525,19 @@ export const EnhancedSearchBar = () => {
       <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
           <TabsList className="grid w-full grid-cols-4 h-auto bg-muted">
-            <TabsTrigger value="hotels" className="gap-2 py-3 data-[state=active]:bg-background">
+            <TabsTrigger value="hotels" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <Hotel className="h-5 w-5" />
               <span>Hotels</span>
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-2 py-3 data-[state=active]:bg-background">
+            <TabsTrigger value="flights" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <Plane className="h-5 w-5" />
               <span>Flights</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-2 py-3 data-[state=active]:bg-background">
+            <TabsTrigger value="restaurants" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <UtensilsCrossed className="h-5 w-5" />
               <span>Restaurants</span>
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2 py-3 data-[state=active]:bg-background">
+            <TabsTrigger value="events" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <Ticket className="h-5 w-5" />
               <span>Events</span>
             </TabsTrigger>
