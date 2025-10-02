@@ -248,8 +248,12 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.checkIn = message;
           nextStep = 3;
         } else if (step === 3) {
-          // Got all data, search
+          // Got check-out, ask for budget
           nextData.checkOut = message;
+          nextStep = 4;
+        } else if (step === 4) {
+          // Got budget, search
+          nextData.budget = message;
           shouldSearch = true;
         }
       } else if (type === 'flights') {
@@ -268,20 +272,24 @@ The user has saved preferences but has chosen to search without strict filtering
           // Check if both dates were provided at once (from date picker)
           const returningMatch = message.match(/^(\d{4}-\d{2}-\d{2})\s+returning\s+(\d{4}-\d{2}-\d{2})$/i);
           if (returningMatch) {
-            // Both dates provided, skip to search
+            // Both dates provided, ask for budget
             nextData.departureDate = returningMatch[1];
             nextData.returnDate = returningMatch[2];
-            shouldSearch = true;
+            nextStep = 5; // Skip to budget step
           } else {
             // Just departure date provided, ask for return
             nextData.departureDate = message;
             nextStep = 4;
           }
         } else if (step === 4) {
-          // Got return date or skip, search
+          // Got return date or skip, ask for budget
           if (message && !message.toLowerCase().includes('one way') && !message.toLowerCase().includes('skip')) {
             nextData.returnDate = message;
           }
+          nextStep = 5;
+        } else if (step === 5) {
+          // Got budget, search
+          nextData.budget = message;
           shouldSearch = true;
         }
       } else if (type === 'restaurants') {
@@ -293,10 +301,14 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.location = message;
           nextStep = 2;
         } else if (step === 2) {
-          // Got cuisine or skip, search
+          // Got cuisine or skip, ask for budget
           if (message && !message.toLowerCase().includes('any') && !message.toLowerCase().includes('skip')) {
             nextData.cuisineType = message;
           }
+          nextStep = 3;
+        } else if (step === 3) {
+          // Got budget, search
+          nextData.budget = message;
           shouldSearch = true;
         }
       } else if (type === 'events') {
@@ -304,8 +316,12 @@ The user has saved preferences but has chosen to search without strict filtering
           // Ask for location
           nextStep = 1;
         } else if (step === 1) {
-          // Got location, search
+          // Got location, ask for budget
           nextData.location = message;
+          nextStep = 2;
+        } else if (step === 2) {
+          // Got budget, search
+          nextData.budget = message;
           shouldSearch = true;
         }
       } else if (type === 'cars') {
@@ -321,8 +337,12 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.pickupDate = message;
           nextStep = 3;
         } else if (step === 3) {
-          // Got return date, search
+          // Got return date, ask for budget
           nextData.returnDate = message;
+          nextStep = 4;
+        } else if (step === 4) {
+          // Got budget, search
+          nextData.budget = message;
           shouldSearch = true;
         }
       }
@@ -382,20 +402,25 @@ The user has saved preferences but has chosen to search without strict filtering
         if (nextStep === 1) nextQuestion = "Where would you like to stay?";
         else if (nextStep === 2) nextQuestion = `Perfect! When would you like to check in to ${nextData.location}?`;
         else if (nextStep === 3) nextQuestion = "And when would you like to check out?";
+        else if (nextStep === 4) nextQuestion = "What's your budget per night? (e.g., $100-$300)";
       } else if (type === 'flights') {
         if (nextStep === 1) nextQuestion = "Where will you be flying from?";
         else if (nextStep === 2) nextQuestion = `Great! Where would you like to fly to from ${nextData.origin}?`;
         else if (nextStep === 3) nextQuestion = "When would you like to depart?";
         else if (nextStep === 4) nextQuestion = "When would you like to return? (or say 'one way' for a one-way flight)";
+        else if (nextStep === 5) nextQuestion = "What's your budget for the flight? (e.g., $500-$1500)";
       } else if (type === 'restaurants') {
         if (nextStep === 1) nextQuestion = "Which city are you looking for restaurants in?";
         else if (nextStep === 2) nextQuestion = "What type of cuisine are you interested in? (or say 'any' for all types)";
+        else if (nextStep === 3) nextQuestion = "What's your budget per person? (e.g., $20-$100)";
       } else if (type === 'events') {
         if (nextStep === 1) nextQuestion = "Which city would you like to find events in?";
+        else if (nextStep === 2) nextQuestion = "What's your budget per ticket? (e.g., $50-$200)";
       } else if (type === 'cars') {
         if (nextStep === 1) nextQuestion = "Where would you like to pick up the car?";
         else if (nextStep === 2) nextQuestion = `Great! When would you like to pick up the car in ${nextData.pickupLocation}?`;
         else if (nextStep === 3) nextQuestion = "And when would you like to return the car?";
+        else if (nextStep === 4) nextQuestion = "What's your budget per day? (e.g., $50-$150)";
       }
       
       return new Response(JSON.stringify({
