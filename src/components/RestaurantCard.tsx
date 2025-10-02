@@ -44,10 +44,10 @@ export const RestaurantCard = ({
 
   const handleBookTable = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Construct Google Maps search URL with restaurant name and address
-    const query = encodeURIComponent(`${name} ${address}`);
-    const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`;
-    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+    // Construct Google search URL for restaurant reservations
+    const query = encodeURIComponent(`${name} ${address} reservations`);
+    const reservationUrl = `https://www.google.com/search?q=${query}`;
+    window.open(reservationUrl, '_blank', 'noopener,noreferrer');
   };
 
   const getPriceLevelSymbol = (level?: number) => {
@@ -132,7 +132,7 @@ export const RestaurantCard = ({
             size="sm"
           >
             <Calendar className="h-4 w-4 mr-2" />
-            View on Google Maps
+            Make Reservation
           </Button>
         </div>
 
