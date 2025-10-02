@@ -24,20 +24,30 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
   const numberOfTravelers = parseInt(flight.travelerPricings?.length || 1);
   const [passengers, setPassengers] = useState(
     Array.from({ length: numberOfTravelers }, () => ({
+      title: "MR",
       firstName: "",
+      middleName: "",
       lastName: "",
       dateOfBirth: "",
       gender: "MALE",
+      nationality: "",
       passportNumber: "",
       passportExpiry: "",
       passportCountry: "",
-      nationality: ""
+      knownTravelerNumber: "",
+      frequentFlyerNumber: ""
     }))
   );
 
   const [contactInfo, setContactInfo] = useState({
     email: "",
-    phone: ""
+    phone: "",
+    countryCode: "+1",
+    address: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "US"
   });
 
   const basePrice = parseFloat(flight.price.total);
@@ -68,15 +78,15 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
       // Validate passenger info
       for (let i = 0; i < passengers.length; i++) {
         const p = passengers[i];
-        if (!p.firstName || !p.lastName || !p.dateOfBirth || !p.gender) {
+        if (!p.title || !p.firstName || !p.lastName || !p.dateOfBirth || !p.gender || !p.nationality) {
           toast.error(`Please complete all required fields for passenger ${i + 1}`);
           setLoading(false);
           return;
         }
       }
 
-      if (!contactInfo.email || !contactInfo.phone) {
-        toast.error("Please provide contact information");
+      if (!contactInfo.email || !contactInfo.phone || !contactInfo.address || !contactInfo.city || !contactInfo.postalCode || !contactInfo.country) {
+        toast.error("Please complete all required contact and address fields");
         setLoading(false);
         return;
       }
@@ -152,14 +162,40 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                 <div key={index} className="p-4 border rounded-lg space-y-4">
                   <h4 className="font-semibold">Passenger {index + 1}</h4>
                   
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-4 gap-4">
+                    <div>
+                      <Label htmlFor={`title-${index}`}>Title *</Label>
+                      <Select
+                        value={passenger.title}
+                        onValueChange={(value) => updatePassenger(index, 'title', value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="MR">Mr</SelectItem>
+                          <SelectItem value="MRS">Mrs</SelectItem>
+                          <SelectItem value="MS">Ms</SelectItem>
+                          <SelectItem value="DR">Dr</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                     <div>
                       <Label htmlFor={`firstName-${index}`}>First Name *</Label>
                       <Input
                         id={`firstName-${index}`}
                         value={passenger.firstName}
                         onChange={(e) => updatePassenger(index, 'firstName', e.target.value)}
-                        placeholder="John"
+                        placeholder="As on passport"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor={`middleName-${index}`}>Middle Name</Label>
+                      <Input
+                        id={`middleName-${index}`}
+                        value={passenger.middleName}
+                        onChange={(e) => updatePassenger(index, 'middleName', e.target.value)}
+                        placeholder="Optional"
                       />
                     </div>
                     <div>
@@ -168,12 +204,12 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         id={`lastName-${index}`}
                         value={passenger.lastName}
                         onChange={(e) => updatePassenger(index, 'lastName', e.target.value)}
-                        placeholder="Doe"
+                        placeholder="As on passport"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor={`dob-${index}`}>Date of Birth *</Label>
                       <Input
@@ -198,26 +234,73 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor={`passport-${index}`}>Passport Number</Label>
+                      <Label htmlFor={`nationality-${index}`}>Nationality *</Label>
                       <Input
-                        id={`passport-${index}`}
-                        value={passenger.passportNumber}
-                        onChange={(e) => updatePassenger(index, 'passportNumber', e.target.value)}
-                        placeholder="Optional"
+                        id={`nationality-${index}`}
+                        value={passenger.nationality}
+                        onChange={(e) => updatePassenger(index, 'nationality', e.target.value)}
+                        placeholder="US"
+                        maxLength={2}
                       />
                     </div>
-                    <div>
-                      <Label htmlFor={`passportCountry-${index}`}>Passport Country</Label>
-                      <Input
-                        id={`passportCountry-${index}`}
-                        value={passenger.passportCountry}
-                        onChange={(e) => updatePassenger(index, 'passportCountry', e.target.value)}
-                        placeholder="US"
-                      />
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <h5 className="text-sm font-semibold mb-3">Passport Information (Required for International Flights)</h5>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor={`passport-${index}`}>Passport Number</Label>
+                        <Input
+                          id={`passport-${index}`}
+                          value={passenger.passportNumber}
+                          onChange={(e) => updatePassenger(index, 'passportNumber', e.target.value)}
+                          placeholder="Optional"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`passportExpiry-${index}`}>Expiry Date</Label>
+                        <Input
+                          id={`passportExpiry-${index}`}
+                          type="date"
+                          value={passenger.passportExpiry}
+                          onChange={(e) => updatePassenger(index, 'passportExpiry', e.target.value)}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`passportCountry-${index}`}>Issuing Country</Label>
+                        <Input
+                          id={`passportCountry-${index}`}
+                          value={passenger.passportCountry}
+                          onChange={(e) => updatePassenger(index, 'passportCountry', e.target.value)}
+                          placeholder="US"
+                          maxLength={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-4">
+                    <h5 className="text-sm font-semibold mb-3">Optional Information</h5>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor={`ktn-${index}`}>Known Traveler Number / TSA PreCheck</Label>
+                        <Input
+                          id={`ktn-${index}`}
+                          value={passenger.knownTravelerNumber}
+                          onChange={(e) => updatePassenger(index, 'knownTravelerNumber', e.target.value)}
+                          placeholder="Optional"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor={`ffn-${index}`}>Frequent Flyer Number</Label>
+                        <Input
+                          id={`ffn-${index}`}
+                          value={passenger.frequentFlyerNumber}
+                          onChange={(e) => updatePassenger(index, 'frequentFlyerNumber', e.target.value)}
+                          placeholder="Optional"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -232,26 +315,106 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
           {/* Step 2: Contact Information */}
           {step === 2 && (
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={contactInfo.email}
-                  onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                  placeholder="john@example.com"
-                />
+              <h4 className="font-semibold">Contact Information</h4>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={contactInfo.email}
+                    onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
+                    placeholder="john@example.com"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="phone">Phone Number *</Label>
+                  <div className="flex gap-2">
+                    <Select
+                      value={contactInfo.countryCode}
+                      onValueChange={(value) => setContactInfo({ ...contactInfo, countryCode: value })}
+                    >
+                      <SelectTrigger className="w-24">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="+1">+1 (US)</SelectItem>
+                        <SelectItem value="+44">+44 (UK)</SelectItem>
+                        <SelectItem value="+971">+971 (AE)</SelectItem>
+                        <SelectItem value="+81">+81 (JP)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      value={contactInfo.phone}
+                      onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
+                      placeholder="1234567890"
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div>
-                <Label htmlFor="phone">Phone *</Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={contactInfo.phone}
-                  onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
-                  placeholder="+1234567890"
-                />
+              <div className="border-t pt-4">
+                <h4 className="font-semibold mb-3">Billing Address</h4>
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="address">Street Address *</Label>
+                    <Input
+                      id="address"
+                      value={contactInfo.address}
+                      onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
+                      placeholder="123 Main Street"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="city">City *</Label>
+                      <Input
+                        id="city"
+                        value={contactInfo.city}
+                        onChange={(e) => setContactInfo({ ...contactInfo, city: e.target.value })}
+                        placeholder="New York"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state">State / Province</Label>
+                      <Input
+                        id="state"
+                        value={contactInfo.state}
+                        onChange={(e) => setContactInfo({ ...contactInfo, state: e.target.value })}
+                        placeholder="NY"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="postalCode">Postal / Zip Code *</Label>
+                      <Input
+                        id="postalCode"
+                        value={contactInfo.postalCode}
+                        onChange={(e) => setContactInfo({ ...contactInfo, postalCode: e.target.value })}
+                        placeholder="10001"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="country">Country *</Label>
+                      <Input
+                        id="country"
+                        value={contactInfo.country}
+                        onChange={(e) => setContactInfo({ ...contactInfo, country: e.target.value })}
+                        placeholder="US"
+                        maxLength={2}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex gap-2">
