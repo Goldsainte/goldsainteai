@@ -577,18 +577,11 @@ const Index = () => {
                   </p>
                 </div>
 
-                {/* Rotating Message */}
-                <div className="text-center py-2">
-                  <p className="text-lg md:text-xl text-muted-foreground transition-opacity duration-500 font-medium">
-                    {rotatingMessages[currentMessageIndex]}
-                  </p>
-                </div>
-
-                {/* Main Search */}
+                {/* Main Search with rotating placeholder */}
                 <div className="relative pt-2 md:pt-3 px-2 md:px-0">
                   <Input
-                    placeholder="Where would you like to go?"
-                    className="w-full h-16 md:h-20 px-6 pr-16 text-lg md:text-xl rounded-3xl border-[#BFAD72] shadow-lg focus-visible:ring-2 focus-visible:ring-[#BFAD72]"
+                    placeholder={rotatingMessages[currentMessageIndex]}
+                    className="w-full h-20 md:h-24 px-6 pr-20 text-xl md:text-2xl rounded-full border-2 border-[#BFAD72] shadow-xl focus-visible:ring-2 focus-visible:ring-[#BFAD72] placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -597,14 +590,13 @@ const Index = () => {
                   <Button
                     onClick={() => handleSearch()}
                     size="icon"
-                    variant="ghost"
-                    className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 h-12 w-12 md:h-14 md:w-14 rounded-full hover:bg-muted"
+                    className="absolute right-2 md:right-2 top-1/2 -translate-y-1/2 h-16 w-16 md:h-20 md:w-20 rounded-full bg-primary hover:bg-primary/90"
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin" />
+                      <Loader2 className="h-7 w-7 md:h-8 md:w-8 animate-spin" />
                     ) : (
-                      <Send className="h-6 w-6" />
+                      <Send className="h-7 w-7 md:h-8 md:w-8" />
                     )}
                   </Button>
                 </div>
