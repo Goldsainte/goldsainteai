@@ -95,7 +95,7 @@ const Index = () => {
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const rotatingMessages = [
