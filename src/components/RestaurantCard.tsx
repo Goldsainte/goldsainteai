@@ -17,6 +17,8 @@ interface RestaurantCardProps {
   openNow?: boolean;
   phone?: string;
   website?: string;
+  web_url?: string;
+  reservationUrl?: string;
   hours?: any;
   photos?: Array<{ url: string; caption?: string }>;
   cuisine?: string;

@@ -30,9 +30,10 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
     }
   };
 
-// Build a Google Reservations search URL for opening in a new tab via anchor (avoids popup blockers)
-const reservationQuery = encodeURIComponent(`${name} ${location} reservations`);
-const reservationUrl = `https://www.google.com/search?q=${reservationQuery}`;
+// Build a best-effort reservation URL prioritizing official sources
+const websiteUrl = restaurant.website && /^https?:\/\//i.test(restaurant.website) ? restaurant.website : (restaurant.website ? `https://${restaurant.website}` : undefined);
+const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${location}`)}`;
+const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web_url || mapsFallback;
 
   const favoriteId = isFavorite('restaurant', restaurant);
   

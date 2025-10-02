@@ -102,23 +102,40 @@ serve(async (req) => {
 
         if (!detailsResponse.ok) {
           console.error(`Failed to fetch details for ${restaurant.location_id}`);
-          // Fallback: return minimal data instead of dropping the item
+          // Even if details fail, try to enrich with photos and reviews
+          const photosData = photosResponse.ok ? await photosResponse.json() : { data: [] };
+          const reviewsData = reviewsResponse.ok ? await reviewsResponse.json() : { data: [] };
+          const photos = (photosData.data || []).slice(0, 5);
+          const reviews = (reviewsData.data || []).slice(0, 3);
+          const fallbackCity = restaurant.address_obj?.city || '';
+          const reservationUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
+
           return {
             id: restaurant.location_id,
             name: restaurant.name,
-            address: '',
-            city: '',
-            country: '',
+            address: restaurant.address_obj?.address_string || '',
+            city: fallbackCity,
+            country: restaurant.address_obj?.country || '',
             rating: 0,
             num_reviews: 0,
             price_level: '',
             cuisine: '',
             description: '',
-            photos: [],
-            reviews: [],
+            photos: photos.map((photo: any) => ({
+              url: photo.images?.large?.url || photo.images?.original?.url,
+              caption: photo.caption || ''
+            })),
+            photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
+            reviews: reviews.map((review: any) => ({
+              rating: review.rating || 0,
+              text: review.text || '',
+              published_date: review.published_date || '',
+              user: review.user?.username || 'Anonymous'
+            })),
             web_url: '',
             phone: '',
             website: '',
+            reservationUrl,
             hours: {},
             latitude: undefined,
             longitude: undefined
@@ -139,6 +156,10 @@ serve(async (req) => {
         const photos = (photosData.data || []).slice(0, 5);
         const reviews = (reviewsData.data || []).slice(0, 3);
 
+        const reservationUrl = (details.website || details.web_url)
+          ? (details.website || details.web_url)
+          : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || ''}`)}`;
+
         return {
           id: restaurant.location_id,
           name: details.name || restaurant.name,
@@ -154,6 +175,7 @@ serve(async (req) => {
             url: photo.images?.large?.url || photo.images?.original?.url,
             caption: photo.caption || ''
           })),
+          photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
           reviews: reviews.map((review: any) => ({
             rating: review.rating || 0,
             text: review.text || '',
@@ -163,6 +185,7 @@ serve(async (req) => {
           web_url: details.web_url || '',
           phone: details.phone || '',
           website: details.website || '',
+          reservationUrl,
           hours: details.hours || {},
           latitude: details.latitude,
           longitude: details.longitude

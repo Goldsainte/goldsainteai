@@ -18,6 +18,8 @@ interface RestaurantDetailsModalProps {
     openNow?: boolean;
     phone?: string;
     website?: string;
+    web_url?: string;
+    reservationUrl?: string;
     hours?: any;
     photos?: Array<{ url: string; caption?: string }>;
     cuisine?: string;
@@ -41,7 +43,8 @@ export const RestaurantDetailsModal = ({
     ? (/^https?:\/\//i.test(restaurant.website) ? restaurant.website : `https://${restaurant.website}`)
     : undefined;
 
-const reservationUrl = `https://www.google.com/search?q=${encodeURIComponent(`${restaurant.name} ${restaurant.address} reservations`)}`;
+const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${restaurant.address}`)}`;
+const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web_url || mapsFallback;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
