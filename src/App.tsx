@@ -25,6 +25,7 @@ import EmailPreview from "./pages/EmailPreview";
 import MyBookings from "./pages/MyBookings";
 import BookingDetails from "./pages/BookingDetails";
 import ModifyFlight from "./pages/ModifyFlight";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ function App() {
               <Route path="/email-preview" element={<EmailPreview />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/my-bookings" element={<MyBookings />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
               <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
                     <Route path="/search" element={<SearchResults />} />

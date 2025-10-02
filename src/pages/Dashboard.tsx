@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useUserRole } from "@/hooks/useUserRole";
 import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Calendar, MapPin, DollarSign, Clock, User, Search, Heart, CreditCard, Settings, Briefcase, ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, DollarSign, Clock, Search, Plane, Hotel, ChevronRight, ArrowLeft } from "lucide-react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 
 interface Booking {
@@ -20,11 +21,6 @@ interface Booking {
   currency: string;
   booking_data: any;
   created_at: string;
-  guests: {
-    first_name: string;
-    last_name: string;
-    email: string;
-  };
 }
 
 interface SearchHistory {
@@ -37,7 +33,6 @@ interface SearchHistory {
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { isAgent, loading: roleLoading } = useUserRole();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,7 +53,7 @@ export default function Dashboard() {
       // Fetch bookings
       const { data: bookingsData, error: bookingsError } = await supabase
         .from('bookings')
-        .select('*, guests(*)')
+        .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
@@ -86,20 +81,110 @@ export default function Dashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'text-green-600 bg-green-50';
-      case 'pending': return 'text-yellow-600 bg-yellow-50';
-      case 'cancelled': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'confirmed': return 'bg-green-500';
+      case 'pending': return 'bg-yellow-500';
+      case 'cancelled': return 'bg-red-500';
+      default: return 'bg-gray-500';
+    }
+  };
+
+  const getBookingIcon = (type: string) => {
+    switch (type) {
+      case 'flight':
+        return <Plane className="h-5 w-5" />;
+      case 'hotel':
+        return <Hotel className="h-5 w-5" />;
+      default:
+        return <Calendar className="h-5 w-5" />;
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+    return format(new Date(dateString), 'MMM dd, yyyy');
   };
+
+  const upcomingBookings = bookings.filter(b => 
+    b.status !== 'cancelled' && 
+    new Date(b.booking_data?.departureDate || b.booking_data?.checkIn) > new Date()
+  );
+
+  const pastBookings = bookings.filter(b => 
+    b.status === 'cancelled' ||
+    new Date(b.booking_data?.departureDate || b.booking_data?.checkIn) <= new Date()
+  );
+
+  const renderBookingCard = (booking: Booking) => (
+    <Card key={booking.id} className="hover:shadow-lg transition-shadow">
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              {getBookingIcon(booking.booking_type)}
+            </div>
+            <div>
+              <CardTitle className="text-lg">
+                {booking.booking_type === 'flight' 
+                  ? `${booking.booking_data?.origin} → ${booking.booking_data?.destination}`
+                  : booking.booking_data?.hotelName || 'Hotel Booking'
+                }
+              </CardTitle>
+              <CardDescription>
+                Ref: {booking.booking_reference}
+              </CardDescription>
+            </div>
+          </div>
+          <Badge className={getStatusColor(booking.status)}>
+            {booking.status}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex items-center gap-2 text-sm">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <span>
+              {formatDate(booking.booking_data?.departureDate || booking.booking_data?.checkIn)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Clock className="h-4 w-4 text-muted-foreground" />
+            <span>
+              {booking.booking_data?.departureTime || booking.booking_data?.checkInTime || 'N/A'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <span className="font-semibold">
+              {booking.currency} {Number(booking.total_price).toFixed(2)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <span>{booking.booking_data?.destination}</span>
+          </div>
+        </div>
+        
+        <div className="flex gap-2 pt-2">
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            onClick={() => navigate(`/booking-details/${booking.id}`)}
+          >
+            View Details
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+          {booking.status !== 'cancelled' && booking.booking_type === 'flight' && (
+            <Button 
+              variant="default" 
+              onClick={() => navigate(`/modify-flight/${booking.id}`)}
+            >
+              Modify Flight
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   if (loading) {
     return (
@@ -130,24 +215,28 @@ export default function Dashboard() {
         
         <div className="mb-8">
           <h1 className="text-4xl font-chiffon text-primary mb-2">My Dashboard</h1>
-          <p className="text-muted-foreground">Manage your bookings and preferences</p>
+          <p className="text-muted-foreground">Manage your bookings and activity</p>
         </div>
 
-        <Tabs defaultValue="bookings" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md">
-            <TabsTrigger value="bookings">Bookings</TabsTrigger>
+        <Tabs defaultValue="upcoming" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 max-w-xl">
+            <TabsTrigger value="upcoming">
+              Upcoming ({upcomingBookings.length})
+            </TabsTrigger>
+            <TabsTrigger value="past">
+              Past ({pastBookings.length})
+            </TabsTrigger>
             <TabsTrigger value="history">Search History</TabsTrigger>
-            <TabsTrigger value="profile">Profile</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="bookings" className="space-y-4">
-            {bookings.length === 0 ? (
+          <TabsContent value="upcoming" className="space-y-4">
+            {upcomingBookings.length === 0 ? (
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Calendar className="h-16 w-16 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No bookings yet</h3>
+                  <h3 className="text-lg font-semibold mb-2">No upcoming bookings</h3>
                   <p className="text-muted-foreground text-center mb-4">
-                    Start exploring and make your first booking
+                    Start planning your next adventure
                   </p>
                   <Button onClick={() => navigate('/')}>
                     Explore Options
@@ -155,63 +244,23 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
             ) : (
-              bookings.map((booking) => (
-                <Card key={booking.id} className="hover:shadow-lg transition-shadow">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <CardTitle className="text-xl font-chiffon">
-                          {booking.booking_type.charAt(0).toUpperCase() + booking.booking_type.slice(1)} Booking
-                        </CardTitle>
-                        <CardDescription>
-                          Ref: {booking.booking_reference}
-                        </CardDescription>
-                      </div>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
-                        {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
-                      </span>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex items-center gap-2">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">
-                          {booking.guests.first_name} {booking.guests.last_name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm font-semibold">
-                          {booking.currency} {booking.total_price.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">
-                          {formatDate(booking.created_at)}
-                        </span>
-                      </div>
-                      {booking.booking_data?.hotelName && (
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">
-                            {booking.booking_data.hotelName}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {booking.booking_data?.checkInDate && booking.booking_data?.checkOutDate && (
-                      <div className="pt-2 border-t">
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(booking.booking_data.checkInDate)} - {formatDate(booking.booking_data.checkOutDate)}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
+              upcomingBookings.map(renderBookingCard)
+            )}
+          </TabsContent>
+
+          <TabsContent value="past" className="space-y-4">
+            {pastBookings.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center py-12">
+                  <Clock className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">No past bookings</h3>
+                  <p className="text-muted-foreground text-center">
+                    Your booking history will appear here
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              pastBookings.map(renderBookingCard)
             )}
           </TabsContent>
 
@@ -252,74 +301,6 @@ export default function Dashboard() {
                 </Card>
               ))
             )}
-          </TabsContent>
-
-          <TabsContent value="profile">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Settings</CardTitle>
-                <CardDescription>
-                  Manage your account information and preferences
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-muted-foreground">{user?.email}</p>
-                  </div>
-                  
-                  <div className="pt-4 border-t space-y-3">
-                    <h3 className="font-semibold">Payment & Preferences</h3>
-                    <Button 
-                      onClick={async () => {
-                        try {
-                          const { data, error } = await supabase.functions.invoke('customer-portal');
-                          if (error) throw error;
-                          if (data?.url) {
-                            window.open(data.url, '_blank');
-                          }
-                        } catch (error: any) {
-                          toast.error('Failed to open payment portal');
-                        }
-                      }}
-                      variant="outline" 
-                      className="w-full justify-start gap-2"
-                    >
-                      <CreditCard className="h-4 w-4" />
-                      Manage Payment Methods
-                    </Button>
-                    
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start gap-2"
-                      onClick={() => navigate('/booking-preferences')}
-                    >
-                      <Settings className="h-4 w-4" />
-                      Booking Preferences & AI Assistant
-                    </Button>
-                  </div>
-
-                  <div className="pt-4 border-t space-y-3">
-                    <h3 className="font-semibold">Quick Actions</h3>
-                    <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full justify-start gap-2">
-                      <Heart className="h-4 w-4" />
-                      View Favorites
-                    </Button>
-                    <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full justify-start gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      Post Complex Booking Job
-                    </Button>
-                    {!isAgent && !roleLoading && (
-                      <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
-                        <Briefcase className="h-4 w-4" />
-                        Become a Travel Agent
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </main>
