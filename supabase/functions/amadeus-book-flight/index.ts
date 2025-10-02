@@ -165,7 +165,30 @@ serve(async (req) => {
 
     console.log('Booking stored in database:', booking.id);
 
-    return new Response(JSON.stringify({ 
+    // Send confirmation email in background
+    supabaseClient.functions.invoke('send-confirmation-email', {
+      body: {
+        guestInfo: {
+          firstName: passengers[0].firstName,
+          lastName: passengers[0].lastName,
+          email: contactInfo.email,
+          phone: contactInfo.phone
+        },
+        bookingReference: bookingData.data.id,
+        bookingType: 'flight',
+        bookingData: {
+          flight_offer: flightOffer,
+          passengers: passengers,
+          selected_seats: selectedSeats,
+          selected_baggage: selectedBaggage,
+          fees: { baggage: baggageFees, seats: seatFees }
+        },
+        totalPrice: totalPrice,
+        currency: flightOffer.price.currency
+      }
+    }).catch(err => console.error('Email send error:', err));
+
+    return new Response(JSON.stringify({
       success: true,
       booking: {
         id: booking.id,
