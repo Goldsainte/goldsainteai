@@ -26,35 +26,54 @@ serve(async (req) => {
       throw new Error('TripAdvisor API key not configured');
     }
 
-    // Search for hotels in the location
-    const searchParams = new URLSearchParams({
-      key: apiKey,
-      searchQuery: location,
-      category: 'hotels',
-      language: 'en'
-    });
+    // Paginate through TripAdvisor search results to fetch more hotels
+    const perPage = 10; // TripAdvisor API returns up to 10 per page
+    let offset = 0;
+    const allSearchResults: any[] = [];
 
-    const searchResponse = await fetch(
-      `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-      {
-        headers: {
-          'Accept': 'application/json'
-        }
+    while (true) {
+      const searchParams = new URLSearchParams({
+        key: apiKey,
+        searchQuery: location,
+        category: 'hotels',
+        language: 'en',
+        limit: String(perPage),
+        offset: String(offset),
+      });
+
+      const searchResponse = await fetch(
+        `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+
+      if (!searchResponse.ok) {
+        const error = await searchResponse.text();
+        console.error('TripAdvisor search error:', error);
+        throw new Error(`Hotel search failed: ${searchResponse.statusText}`);
       }
-    );
 
-    if (!searchResponse.ok) {
-      const error = await searchResponse.text();
-      console.error('TripAdvisor search error:', error);
-      throw new Error(`Hotel search failed: ${searchResponse.statusText}`);
+      const searchData = await searchResponse.json();
+      const page = searchData.data || [];
+      allSearchResults.push(...page);
+      console.log(`Fetched page with ${page.length} hotels (total: ${allSearchResults.length})`);
+
+      if (page.length === 0) {
+        console.log('No more pages available from TripAdvisor API');
+        break;
+      }
+      offset += page.length;
+
+      // Increased limit for more comprehensive results
+      if (allSearchResults.length >= 1000) {
+        console.log('Reached maximum limit of 1000 results');
+        break;
+      }
     }
 
-    const searchData = await searchResponse.json();
-    console.log('Hotels found:', searchData.data?.length || 0);
-
-    // Get detailed information for each hotel (fetch all results)
+    // Get detailed information for each hotel (batched to limit concurrency)
+    const batchSize = 20;
     const hotelDetails = await Promise.all(
-      (searchData.data || []).map(async (hotel: any) => {
+      allSearchResults.map(async (hotel: any) => {
         try {
           const detailsParams = new URLSearchParams({
             key: apiKey,
