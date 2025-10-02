@@ -571,7 +571,7 @@ const Index = () => {
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
-                  <img src={logomark} alt="Goldsainte.Ai" className="h-24 w-24 md:h-20 md:w-20" />
+                  <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
                   <p className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2">
                     The first travel platform to combine AI precision with human passion — one platform, infinite possibilities.
                   </p>
@@ -581,7 +581,7 @@ const Index = () => {
                 <div className="relative pt-2 md:pt-3 px-2 md:px-0">
                   <Input
                     placeholder={rotatingMessages[currentMessageIndex]}
-                    className="w-full h-20 md:h-24 px-6 pr-20 text-xl md:text-2xl rounded-full border-2 border-[#BFAD72] shadow-xl focus-visible:ring-2 focus-visible:ring-[#BFAD72] placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500"
+                    className="w-full h-14 md:h-16 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72] placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -590,13 +590,14 @@ const Index = () => {
                   <Button
                     onClick={() => handleSearch()}
                     size="icon"
-                    className="absolute right-2 md:right-2 top-1/2 -translate-y-1/2 h-16 w-16 md:h-20 md:w-20 rounded-full bg-primary hover:bg-primary/90"
+                    variant="ghost"
+                    className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 h-11 w-11 md:h-10 md:w-10 rounded-full hover:bg-muted"
                     disabled={isLoading}
                   >
                     {isLoading ? (
-                      <Loader2 className="h-7 w-7 md:h-8 md:w-8 animate-spin" />
+                      <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
-                      <Send className="h-7 w-7 md:h-8 md:w-8" />
+                      <Send className="h-5 w-5" />
                     )}
                   </Button>
                 </div>
