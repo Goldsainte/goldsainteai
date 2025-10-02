@@ -363,6 +363,10 @@ The user has saved preferences but has chosen to search without strict filtering
         const msgs = getLastUserMessages();
         const fromToRegex = /\b(?:from|leaving)\s+([a-zA-Z][\w\s\.'-]{1,50?})(?:\s+to\s+|\s+→\s+|$)/i;
         
+        // Check if we've already asked for origin
+        const assistantMsgs = hist.filter((m: any) => m.role === 'assistant').map((m: any) => (m.content || '').toLowerCase());
+        const askedForOrigin = assistantMsgs.some(a => a.includes('where are you flying from'));
+        
         for (let i = msgs.length - 1; i >= 0; i--) {
           const txtRaw = (msgs[i] || '').trim();
           if (!txtRaw) continue;
@@ -393,8 +397,9 @@ The user has saved preferences but has chosen to search without strict filtering
             return normalized;
           }
           
-          // 3) Short city-like answer (any position, not just last)
-          if (txtRaw.split(/\s+/).length <= 4) {
+          // 3) Short city-like answer - only if we've asked for origin and it's the immediate response
+          // This prevents later answers (like destination) from being mistaken as origin
+          if (askedForOrigin && i === msgs.length - 1 && txtRaw.split(/\s+/).length <= 4) {
             const normalized = normalizeCityName(txtRaw);
             console.log('extractOrigin(short) ->', txtRaw, '=>', normalized);
             return normalized;
