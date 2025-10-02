@@ -160,7 +160,7 @@ const SearchResults = () => {
           const originCode = origin.split(' - ')[0].trim();
           const destCode = destination.split(' - ')[0].trim();
           
-          const { data, error } = await supabase.functions.invoke('amadeus-search-flights', {
+          const { data, error } = await supabase.functions.invoke('unified-search-flights', {
             body: { 
               origin: originCode,
               destination: destCode,
@@ -202,7 +202,7 @@ const SearchResults = () => {
             supabase.functions.invoke('unified-search-hotels', {
               body: { location, checkIn, checkOut, guests: parseInt(guests) }
             }).catch(() => ({ data: { results: [] }, error: null })),
-            supabase.functions.invoke('amadeus-search-flights', {
+            supabase.functions.invoke('unified-search-flights', {
               body: { origin: 'JFK', destination: location, departureDate: checkIn, adults: parseInt(guests) }
             }).catch(() => ({ data: { results: [] }, error: null })),
             supabase.functions.invoke('tripadvisor-search-restaurants', {

@@ -1339,138 +1339,68 @@ async function searchRestaurants(args: any) {
 }
 
 // Search flights using Amadeus API
+// Search flights using unified flight search function
 async function searchFlights(args: any) {
   try {
     const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false, sortBy = 'best' } = args;
     console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop, sortBy });
 
-    // Get Amadeus credentials
-    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
-    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
-    if (!amadeusKey || !amadeusSecret) {
-      return { error: 'Amadeus credentials not configured', results: [] };
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return { error: 'Supabase configuration missing', results: [] };
     }
 
-    // Get Amadeus token
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
-    });
-
-    if (!tokenResponse.ok) {
-      return { error: 'Failed to authenticate with Amadeus', results: [] };
-    }
-
-    const tokenData = await tokenResponse.json();
-    const token = tokenData.access_token;
-
-    // Convert city names to airport codes if needed
-    const getAirportCode = async (location: string) => {
+    // Convert city names to airport codes if needed (simple lookup)
+    const getAirportCode = (location: string) => {
       // If already looks like an airport code (3 letters), use it
       if (/^[A-Z]{3}$/i.test(location.trim())) {
         return location.toUpperCase();
       }
 
-      // Try to get variations from our abbreviation map first
-      const variations = getCityVariations(location);
-      const normalizedLocation = variations[variations.length - 1] || location; // Use full name
-
-      // Helper: attempt Amadeus location lookup
-      const tryLookup = async (keyword: string, subType: string = 'AIRPORT,CITY') => {
-        const params = new URLSearchParams({
-          keyword,
-          subType,
-          'page[limit]': '1'
-        });
-        const r = await fetch(
-          `https://test.api.amadeus.com/v1/reference-data/locations?${params}`,
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        if (!r.ok) return null;
-        const j = await r.json();
-        const code = j?.data?.[0]?.iataCode;
-        return (typeof code === 'string' && code.length === 3) ? code : null;
-      };
-
-      // First attempts
-      let code = await tryLookup(normalizedLocation);
-      if (!code) code = await tryLookup(normalizedLocation, 'CITY');
-      if (!code && variations.length > 0) code = await tryLookup(variations[0], 'AIRPORT,CITY');
-      if (code) return code;
-
-      // Fallback mappings for popular cities
+      // Simple city to code mapping for common cities
       const cityToCode: Record<string, string> = {
-        'new york': 'NYC',
-        'los angeles': 'LAX',
-        'san francisco': 'SFO',
-        'washington': 'WAS',
-        'chicago': 'CHI',
-        'miami': 'MIA',
-        'seattle': 'SEA',
-        'atlanta': 'ATL',
-        'dallas': 'DFW',
-        'houston': 'HOU',
-        'phoenix': 'PHX',
-        'denver': 'DEN',
-        'orlando': 'ORL',
-        'detroit': 'DTT',
-        'minneapolis': 'MSP',
-        'portland': 'PDX',
-        'san diego': 'SAN',
-        'austin': 'AUS',
-        'nashville': 'BNA',
-        'salt lake city': 'SLC',
-        'charlotte': 'CLT',
-        'paris': 'PAR',
-        'london': 'LON',
-        'tokyo': 'TYO',
-        'dubai': 'DXB',
-        'doha': 'DOH',
-        'singapore': 'SIN',
-        'hong kong': 'HKG',
-        'sydney': 'SYD',
-        'toronto': 'YTO'
+        'new york': 'NYC', 'los angeles': 'LAX', 'san francisco': 'SFO',
+        'washington': 'WAS', 'chicago': 'CHI', 'miami': 'MIA',
+        'seattle': 'SEA', 'atlanta': 'ATL', 'dallas': 'DFW',
+        'houston': 'HOU', 'phoenix': 'PHX', 'denver': 'DEN',
+        'orlando': 'ORL', 'detroit': 'DTT', 'minneapolis': 'MSP',
+        'portland': 'PDX', 'san diego': 'SAN', 'austin': 'AUS',
+        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
+        'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO',
+        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG'
       };
-      const lowerNorm = normalizedLocation.toLowerCase();
-      if (cityToCode[lowerNorm]) return cityToCode[lowerNorm];
-
-      // Fallback: if it's a known airport code abbreviation, return it
-      const upperLocation = location.toUpperCase();
-      const airportCodes = ['JFK', 'LGA', 'EWR', 'LAX', 'SFO', 'ORD', 'MDW', 'DCA', 'IAD', 'PHL', 'LAS', 'MIA', 'BOS', 'SEA', 'ATL', 'DFW', 'DAL', 'IAH', 'HOU', 'PHX', 'DEN', 'MCO', 'DTW', 'MSP', 'PDX', 'SAN', 'AUS', 'BNA', 'SLC', 'CLT'];
-      if (airportCodes.includes(upperLocation)) {
-        return upperLocation;
-      }
-
-      // Last resort: return normalized 3-letter slice if applicable
-      if (/^[A-Z]{3,}$/.test(upperLocation)) return upperLocation.slice(0,3);
-      return upperLocation;
+      
+      const lowerLocation = location.toLowerCase().trim();
+      return cityToCode[lowerLocation] || location.toUpperCase().slice(0, 3);
     };
 
-    const originCode = await getAirportCode(origin);
-    const destinationCode = await getAirportCode(destination);
+    const originCode = getAirportCode(origin);
+    const destinationCode = getAirportCode(destination);
 
     console.log('Airport codes:', { originCode, destinationCode });
 
-    // Build flight search params
-    const flightParams = new URLSearchParams({
-      originLocationCode: originCode,
-      destinationLocationCode: destinationCode,
-      departureDate,
-      adults: adults.toString(),
-      travelClass,
-      nonStop: nonStop ? 'true' : 'false',
-      max: '20',
-      destinationCity: destination // Pass destination city for currency detection
-    });
-
-    if (returnDate) {
-      flightParams.append('returnDate', returnDate);
-    }
-
+    // Call unified flight search
     const flightResponse = await fetch(
-      `https://test.api.amadeus.com/v2/shopping/flight-offers?${flightParams}`,
-      { headers: { 'Authorization': `Bearer ${token}` } }
+      `${supabaseUrl}/functions/v1/unified-search-flights`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        },
+        body: JSON.stringify({
+          origin: originCode,
+          destination: destinationCode,
+          departureDate,
+          returnDate,
+          adults,
+          travelClass,
+          nonStop: nonStop ? 'true' : 'false',
+          destinationCity: destination
+        })
+      }
     );
 
     if (!flightResponse.ok) {
@@ -1482,15 +1412,14 @@ async function searchFlights(args: any) {
     }
 
     const flightData = await flightResponse.json();
-    console.log('Flights found:', flightData.data?.length || 0);
+    console.log('Flights found:', flightData.results?.length || 0);
 
     // Sort flights based on sortBy parameter
-    let sortedFlights = flightData.data || [];
+    let sortedFlights = flightData.results || [];
     
     if (sortBy && sortedFlights.length > 0) {
       switch (sortBy) {
         case 'price':
-          // Sort by total price (lowest first)
           sortedFlights.sort((a: any, b: any) => {
             const priceA = parseFloat(a.price.total);
             const priceB = parseFloat(b.price.total);
@@ -1499,7 +1428,6 @@ async function searchFlights(args: any) {
           break;
           
         case 'duration':
-          // Sort by duration (shortest first)
           sortedFlights.sort((a: any, b: any) => {
             const getDurationMinutes = (duration: string) => {
               const hours = duration.match(/(\d+)H/)?.[1] || '0';
@@ -1513,7 +1441,6 @@ async function searchFlights(args: any) {
           break;
           
         case 'departure_early':
-          // Sort by earliest departure time
           sortedFlights.sort((a: any, b: any) => {
             const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
             const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
@@ -1522,7 +1449,6 @@ async function searchFlights(args: any) {
           break;
           
         case 'departure_late':
-          // Sort by latest departure time
           sortedFlights.sort((a: any, b: any) => {
             const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
             const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
@@ -1532,7 +1458,7 @@ async function searchFlights(args: any) {
           
         case 'best':
         default:
-          // Keep Amadeus default sorting (combination of price, duration, and quality)
+          // Keep default sorting
           break;
       }
     }
