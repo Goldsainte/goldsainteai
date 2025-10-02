@@ -38,12 +38,15 @@ serve(async (req) => {
   }
 
   try {
-    const { flightOffer, passengers, contactInfo, baseCost } = await req.json();
+    const { flightOffer, passengers, contactInfo, baseCost, selectedSeats = [], selectedBaggage = [], additionalFees = { baggage: 0, seats: 0 } } = await req.json();
     
     console.log('Flight booking request:', { 
       flightOffer: flightOffer?.id,
       passengersCount: passengers?.length,
-      baseCost 
+      baseCost,
+      selectedSeats: selectedSeats.length,
+      selectedBaggage: selectedBaggage.length,
+      additionalFees
     });
 
     // Authenticate user
@@ -118,10 +121,12 @@ serve(async (req) => {
     const bookingData = await bookingResponse.json();
     console.log('Flight order created:', bookingData.data.id);
 
-    // Calculate pricing
+    // Calculate pricing with additional fees
     const basePrice = baseCost || parseFloat(flightOffer.price.total);
     const markupAmount = basePrice * MARKUP_PERCENTAGE;
-    const totalPrice = basePrice + markupAmount;
+    const baggageFees = additionalFees.baggage || 0;
+    const seatFees = additionalFees.seats || 0;
+    const totalPrice = basePrice + markupAmount + baggageFees + seatFees;
 
     // Store booking in database
     const { data: booking, error: bookingError } = await supabaseClient
@@ -141,7 +146,13 @@ serve(async (req) => {
           flight_offer: flightOffer,
           passengers: passengers,
           contact: contactInfo,
-          booking_response: bookingData.data
+          booking_response: bookingData.data,
+          selected_seats: selectedSeats,
+          selected_baggage: selectedBaggage,
+          fees: {
+            baggage: baggageFees,
+            seats: seatFees
+          }
         }
       })
       .select()

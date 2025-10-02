@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.amadeus-get-seatmap]
+verify_jwt = false
+
 [functions.amadeus-book-hotel]
 verify_jwt = false
 

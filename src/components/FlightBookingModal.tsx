@@ -8,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { SeatMapSelector } from "./SeatMapSelector";
+import { BaggageSelector } from "./BaggageSelector";
 
 interface FlightBookingModalProps {
   open: boolean;
@@ -22,6 +24,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
   const [step, setStep] = useState(1);
   const [showAutofillPrompt, setShowAutofillPrompt] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
+  const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
+  const [selectedBaggage, setSelectedBaggage] = useState<any[]>([]);
   
   const numberOfTravelers = parseInt(flight.travelerPricings?.length || 1);
   const [passengers, setPassengers] = useState(
@@ -180,12 +184,27 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
       }
 
       // Call booking function
+      // Calculate total with baggage fees
+      const baggageTotal = selectedBaggage.reduce((total, b) => {
+        const includedChecked = flight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.includedCheckedBags?.quantity || 0;
+        const extraChecked = Math.max(0, b.checked - includedChecked);
+        return total + (extraChecked * 35); // $35 per checked bag
+      }, 0);
+
+      const seatTotal = selectedSeats.reduce((total, s) => total + (s.price || 0), 0);
+
       const { data, error } = await supabase.functions.invoke('amadeus-book-flight', {
         body: {
           flightOffer: flight,
           passengers: passengers,
           contactInfo: contactInfo,
-          baseCost: basePrice
+          baseCost: basePrice,
+          selectedSeats: selectedSeats,
+          selectedBaggage: selectedBaggage,
+          additionalFees: {
+            baggage: baggageTotal,
+            seats: seatTotal
+          }
         }
       });
 
@@ -260,15 +279,25 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
           </div>
 
           {/* Step Indicator */}
-          <div className="flex items-center justify-center space-x-4">
+          <div className="flex items-center justify-center space-x-2 overflow-x-auto pb-2">
             <div className={`flex items-center ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
-              <span className="ml-2">Passengers</span>
+              <span className="ml-2 text-sm">Passengers</span>
             </div>
-            <div className="w-12 h-px bg-border" />
+            <div className="w-8 h-px bg-border" />
             <div className={`flex items-center ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>2</div>
-              <span className="ml-2">Contact</span>
+              <span className="ml-2 text-sm">Seats</span>
+            </div>
+            <div className="w-8 h-px bg-border" />
+            <div className={`flex items-center ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>3</div>
+              <span className="ml-2 text-sm">Baggage</span>
+            </div>
+            <div className="w-8 h-px bg-border" />
+            <div className={`flex items-center ${step >= 4 ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 4 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>4</div>
+              <span className="ml-2 text-sm">Payment</span>
             </div>
           </div>
 
@@ -461,13 +490,49 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
               ))}
 
               <Button onClick={() => setStep(2)} className="w-full">
-                Continue to Contact Information
+                Continue to Seat Selection
               </Button>
             </div>
           )}
 
-          {/* Step 2: Contact Information */}
+          {/* Step 2: Seat Selection */}
           {step === 2 && (
+            <div className="space-y-4">
+              <SeatMapSelector
+                flight={flight}
+                passengers={numberOfTravelers}
+                onSeatsSelected={(seats) => {
+                  setSelectedSeats(seats);
+                  setStep(3);
+                }}
+                selectedSeats={selectedSeats}
+              />
+              <Button variant="outline" onClick={() => setStep(1)} className="w-full">
+                Back to Passenger Details
+              </Button>
+            </div>
+          )}
+
+          {/* Step 3: Baggage Selection */}
+          {step === 3 && (
+            <div className="space-y-4">
+              <BaggageSelector
+                flight={flight}
+                passengers={numberOfTravelers}
+                onBaggageSelected={(baggage) => {
+                  setSelectedBaggage(baggage);
+                  setStep(4);
+                }}
+                selectedBaggage={selectedBaggage}
+              />
+              <Button variant="outline" onClick={() => setStep(2)} className="w-full">
+                Back to Seat Selection
+              </Button>
+            </div>
+          )}
+
+          {/* Step 4: Contact & Payment Information */}
+          {step === 4 && (
             <div className="space-y-4">
               <h4 className="font-semibold">Contact Information</h4>
               
@@ -572,8 +637,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
               </div>
 
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
-                  Back
+                <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
+                  Back to Baggage
                 </Button>
                 <Button onClick={handleBooking} disabled={loading} className="flex-1">
                   {loading ? (
@@ -582,7 +647,16 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                       Booking...
                     </>
                   ) : (
-                    `Book for ${flight.price.currency} ${markedUpPrice.toFixed(2)}`
+                    (() => {
+                      const baggageFees = selectedBaggage.reduce((total, b) => {
+                        const includedChecked = flight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.includedCheckedBags?.quantity || 0;
+                        const extraChecked = Math.max(0, b.checked - includedChecked);
+                        return total + (extraChecked * 35);
+                      }, 0);
+                      const seatFees = selectedSeats.reduce((total, s) => total + (s.price || 0), 0);
+                      const total = markedUpPrice + baggageFees + seatFees;
+                      return `Book for ${flight.price.currency} ${total.toFixed(2)}`;
+                    })()
                   )}
                 </Button>
               </div>
