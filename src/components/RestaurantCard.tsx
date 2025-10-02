@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Star, MapPin, DollarSign, Calendar, Heart } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { RestaurantDetailsModal } from "./RestaurantDetailsModal";
+import { buildReservationRedirect } from "@/lib/urlHelpers";
 
 interface RestaurantCardProps {
   id: string;
@@ -36,6 +37,8 @@ export const RestaurantCard = ({
   openNow,
   phone,
   website,
+  web_url,
+  reservationUrl,
   hours,
   photos,
   cuisine,
@@ -65,9 +68,11 @@ export const RestaurantCard = ({
 
   const handleBookTable = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const query = encodeURIComponent(`${name} ${address} reservations`);
-    const reservationUrl = `https://www.google.com/search?q=${query}`;
-    window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+    const websiteUrl = website ? (/^https?:\/\//i.test(website) ? website : `https://${website}`) : undefined;
+    const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${address}`)}`;
+    const target = reservationUrl || websiteUrl || web_url || mapsFallback;
+    const redirectUrl = buildReservationRedirect(target);
+    window.open(redirectUrl, '_blank', 'noopener');
   };
 
   const getPriceLevelSymbol = (level?: number) => {
@@ -193,6 +198,8 @@ export const RestaurantCard = ({
           openNow,
           phone,
           website,
+          web_url,
+          reservationUrl,
           hours,
           photos,
           cuisine,

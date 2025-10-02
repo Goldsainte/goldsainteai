@@ -211,7 +211,12 @@ serve(async (req) => {
       await new Promise((r) => setTimeout(r, 250));
     }
 
-    const validRestaurants = restaurantDetails.filter((restaurant) => restaurant !== null);
+    const validRestaurants = restaurantDetails.filter((restaurant: any) => {
+      if (!restaurant) return false;
+      const hasPhotos = Array.isArray(restaurant.photos) && restaurant.photos.length > 0;
+      const hasReviews = Array.isArray(restaurant.reviews) && restaurant.reviews.length > 0;
+      return hasPhotos && hasReviews;
+    });
 
     return new Response(JSON.stringify({ 
       results: validRestaurants

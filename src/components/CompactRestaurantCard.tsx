@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Star, Heart, ChevronDown, ChevronUp, Calendar, DollarSign } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
+import { buildReservationRedirect } from "@/lib/urlHelpers";
 
 interface CompactRestaurantCardProps {
   restaurant: any;
@@ -134,7 +135,7 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
               className="h-7 px-3 text-xs gap-1"
               onClick={(e) => {
                 e.stopPropagation();
-                try { window.open(reservationUrl, '_blank', 'noopener'); } catch {}
+                try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
               }}
             >
               <Calendar className="h-3 w-3" />

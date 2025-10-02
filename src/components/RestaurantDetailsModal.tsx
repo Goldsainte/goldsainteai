@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Star, MapPin, Phone, Globe, Clock, Calendar, ExternalLink } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { buildReservationRedirect } from "@/lib/urlHelpers";
 
 interface RestaurantDetailsModalProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ export const RestaurantDetailsModal = ({
 
 const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${restaurant.address}`)}`;
 const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web_url || mapsFallback;
+const reservationRedirect = buildReservationRedirect(reservationUrl);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -165,7 +167,7 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
                 </Button>
               )}
 <Button asChild className="flex-1">
-  <a href={reservationUrl} target="_blank" rel="noopener noreferrer">
+  <a href={reservationRedirect} target="_blank" rel="noopener noreferrer">
     <Calendar className="h-4 w-4 mr-2" />
     Make Reservation
   </a>

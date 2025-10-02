@@ -27,6 +27,7 @@ import BookingDetails from "./pages/BookingDetails";
 import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
+import Redirect from "./pages/Redirect";
 
 const queryClient = new QueryClient();
 
@@ -43,29 +44,30 @@ function App() {
                 <AppSidebar />
                 <div className="flex-1 flex flex-col w-full">
                   <SimpleHeader />
-                  <Routes>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/auth" element={<Auth />} />
-                    <Route path="/onboarding" element={<Onboarding />} />
-                    <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/agent-onboarding" element={<AgentOnboarding />} />
-              <Route path="/agent-dashboard" element={<AgentDashboard />} />
-              <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
-              <Route path="/booking-preferences" element={<BookingPreferences />} />
-              <Route path="/commission-dashboard" element={<CommissionDashboard />} />
-              <Route path="/email-preview" element={<EmailPreview />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/my-bookings" element={<MyBookings />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
-              <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
-                    <Route path="/search" element={<SearchResults />} />
-                    <Route path="/hotel-booking" element={<HotelBooking />} />
-                    <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
+                   <Routes>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/auth" element={<Auth />} />
+                      <Route path="/onboarding" element={<Onboarding />} />
+                      <Route path="/dashboard" element={<Dashboard />} />
+               <Route path="/marketplace" element={<Marketplace />} />
+               <Route path="/agent-onboarding" element={<AgentOnboarding />} />
+               <Route path="/agent-dashboard" element={<AgentDashboard />} />
+               <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
+               <Route path="/booking-preferences" element={<BookingPreferences />} />
+               <Route path="/commission-dashboard" element={<CommissionDashboard />} />
+               <Route path="/email-preview" element={<EmailPreview />} />
+               <Route path="/favorites" element={<Favorites />} />
+               <Route path="/my-bookings" element={<MyBookings />} />
+               <Route path="/profile" element={<Profile />} />
+               <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
+               <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
+                      <Route path="/search" element={<SearchResults />} />
+                      <Route path="/hotel-booking" element={<HotelBooking />} />
+                      <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+                      <Route path="/r" element={<(await import('./pages/Redirect')).default />} />
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
                 </div>
               </div>
             </SidebarProvider>
