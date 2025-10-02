@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -365,12 +364,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
                   { id: 'include_taxes_fees', label: 'Include Taxes/Fees' },
                 ].map(({ id, label }) => (
                   <div key={id} className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id={id}
                       defaultChecked={initialData?.[id] ?? true}
                       onCheckedChange={(checked) => updateField(id, checked)}
                     />
-                    <Label htmlFor={id} className="cursor-pointer">{label}</Label>
+                    <Label htmlFor={id} className="cursor-pointer text-sm">{label}</Label>
                   </div>
                 ))}
               </div>
@@ -594,12 +593,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
                   { id: 'wheelchair_assistance', label: 'Wheelchair Assistance' },
                 ].map(({ id, label }) => (
                   <div key={id} className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id={id}
                       defaultChecked={initialData?.[id]}
                       onCheckedChange={(checked) => updateField(id, checked)}
                     />
-                    <Label htmlFor={id} className="cursor-pointer">{label}</Label>
+                    <Label htmlFor={id} className="cursor-pointer text-sm">{label}</Label>
                   </div>
                 ))}
               </div>
@@ -709,12 +708,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
                   { id: 'walkable_distance', label: 'Walkable' },
                 ].map(({ id, label }) => (
                   <div key={id} className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id={id}
                       defaultChecked={initialData?.[id]}
                       onCheckedChange={(checked) => updateField(id, checked)}
                     />
-                    <Label htmlFor={id} className="cursor-pointer">{label}</Label>
+                    <Label htmlFor={id} className="cursor-pointer text-sm">{label}</Label>
                   </div>
                 ))}
               </div>
@@ -845,12 +844,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
                   { id: 'young_driver_accepted', label: 'Young Driver OK' },
                 ].map(({ id, label }) => (
                   <div key={id} className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id={id}
                       defaultChecked={initialData?.[id] ?? true}
                       onCheckedChange={(checked) => updateField(id, checked)}
                     />
-                    <Label htmlFor={id} className="cursor-pointer">{label}</Label>
+                    <Label htmlFor={id} className="cursor-pointer text-sm">{label}</Label>
                   </div>
                 ))}
               </div>
@@ -970,12 +969,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
                   { id: 'event_accessibility', label: 'Accessibility' },
                 ].map(({ id, label }) => (
                   <div key={id} className="flex items-center space-x-2">
-                    <Switch
+                    <Checkbox
                       id={id}
                       defaultChecked={initialData?.[id] ?? true}
                       onCheckedChange={(checked) => updateField(id, checked)}
                     />
-                    <Label htmlFor={id} className="cursor-pointer">{label}</Label>
+                    <Label htmlFor={id} className="cursor-pointer text-sm">{label}</Label>
                   </div>
                 ))}
               </div>
@@ -1045,12 +1044,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
             </div>
 
             <div className="flex items-center space-x-2">
-              <Switch
+              <Checkbox
                 id="visa_assistance_needed"
                 defaultChecked={initialData?.visa_assistance_needed}
                 onCheckedChange={(checked) => updateField('visa_assistance_needed', checked)}
               />
-              <Label htmlFor="visa_assistance_needed" className="cursor-pointer">
+              <Label htmlFor="visa_assistance_needed" className="cursor-pointer text-sm">
                 I need visa assistance for my travels
               </Label>
             </div>
@@ -1080,12 +1079,12 @@ export function ComprehensivePreferencesForm({ onSubmit, initialData, isLoading 
       </div>
 
       <div className="flex items-center space-x-2 p-4 bg-muted rounded-lg">
-        <Switch
+        <Checkbox
           id="auto_booking_enabled"
           defaultChecked={initialData?.auto_booking_enabled}
           onCheckedChange={(checked) => updateField('auto_booking_enabled', checked)}
         />
-        <Label htmlFor="auto_booking_enabled" className="cursor-pointer">
+        <Label htmlFor="auto_booking_enabled" className="cursor-pointer text-sm">
           Enable Auto-Booking (AI will automatically book based on your preferences)
         </Label>
       </div>
