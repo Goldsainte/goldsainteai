@@ -1391,80 +1391,115 @@ async function searchRestaurants(args: any) {
     const searchData = await searchResponse.json();
     console.log('TripAdvisor restaurants found:', searchData.data?.length || 0);
 
-    // Get detailed information for each restaurant (fetch all results)
-    const restaurantDetails = await Promise.all(
-      (searchData.data || []).map(async (restaurant: any) => {
-        try {
-          const detailsParams = new URLSearchParams({
-            key: tripAdvisorKey,
-            language: 'en'
-          });
+    // Get detailed information for each restaurant with throttling and fallback
+    const MAX_RESULTS = 20;
+    const batchSize = 5;
+    const items = (searchData.data || []).slice(0, MAX_RESULTS);
 
-          const detailsResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
-            { headers: { 'Accept': 'application/json' } }
-          );
+    const chunks: any[][] = [];
+    for (let i = 0; i < items.length; i += batchSize) {
+      chunks.push(items.slice(i, i + batchSize));
+    }
 
-          if (!detailsResponse.ok) {
+    const restaurantDetails: any[] = [];
+    for (const group of chunks) {
+      const groupResults = await Promise.all(
+        group.map(async (restaurant: any) => {
+          try {
+            const detailsParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+
+            const detailsResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+
+            if (!detailsResponse.ok) {
+              // Fallback minimal info
+              return {
+                id: restaurant.location_id,
+                name: restaurant.name,
+                address: restaurant.address_obj?.address_string || '',
+                city: restaurant.address_obj?.city || '',
+                country: restaurant.address_obj?.country || '',
+                rating: 0,
+                num_reviews: 0,
+                userRatingsTotal: 0,
+                price_level: '',
+                priceLevel: 0,
+                cuisine: '',
+                description: '',
+                photos: [],
+                photoUrl: null,
+                web_url: '',
+                phone: '',
+                website: '',
+                hours: {},
+                openNow: undefined,
+                latitude: undefined,
+                longitude: undefined
+              };
+            }
+
+            const details = await detailsResponse.json();
+
+            // Get photos (optional)
+            const photosParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+
+            const photosResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${photosParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+
+            let photos: any[] = [];
+            if (photosResponse.ok) {
+              const photosData = await photosResponse.json();
+              photos = photosData.data || [];
+            }
+
+            if (priceRange && details.price_level && details.price_level !== priceRange) {
+              return null;
+            }
+
+            return {
+              id: restaurant.location_id,
+              name: details.name || restaurant.name,
+              address: details.address_obj?.address_string || '',
+              city: details.address_obj?.city || '',
+              country: details.address_obj?.country || '',
+              rating: details.rating || 0,
+              num_reviews: details.num_reviews || 0,
+              userRatingsTotal: details.num_reviews || 0,
+              price_level: details.price_level || '',
+              priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
+              cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
+              description: details.description || '',
+              photos: photos.map((photo: any) => ({
+                url: photo.images?.large?.url || photo.images?.original?.url,
+                caption: photo.caption || ''
+              })),
+              photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
+              web_url: details.web_url || '',
+              phone: details.phone || '',
+              website: details.website || '',
+              hours: details.hours || {},
+              openNow: details.is_closed === false,
+              latitude: details.latitude,
+              longitude: details.longitude
+            };
+          } catch (error) {
+            console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
             return null;
           }
-
-          const details = await detailsResponse.json();
-
-          // Get photos
-          const photosParams = new URLSearchParams({
-            key: tripAdvisorKey,
-            language: 'en'
-          });
-
-          const photosResponse = await fetch(
-            `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${photosParams}`,
-            { headers: { 'Accept': 'application/json' } }
-          );
-
-          let photos = [];
-          if (photosResponse.ok) {
-            const photosData = await photosResponse.json();
-            photos = photosData.data || [];
-          }
-
-          // Filter by price range if specified
-          if (priceRange && details.price_level && details.price_level !== priceRange) {
-            return null;
-          }
-
-          return {
-            id: restaurant.location_id,
-            name: details.name || restaurant.name,
-            address: details.address_obj?.address_string || '',
-            city: details.address_obj?.city || '',
-            country: details.address_obj?.country || '',
-            rating: details.rating || 0,
-            num_reviews: details.num_reviews || 0,
-            userRatingsTotal: details.num_reviews || 0,
-            price_level: details.price_level || '',
-            priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
-            cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
-            description: details.description || '',
-            photos: photos.map((photo: any) => ({
-              url: photo.images?.large?.url || photo.images?.original?.url,
-              caption: photo.caption || ''
-            })),
-            photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
-            web_url: details.web_url || '',
-            phone: details.phone || '',
-            website: details.website || '',
-            hours: details.hours || {},
-            openNow: details.is_closed === false,
-            latitude: details.latitude,
-            longitude: details.longitude
-          };
-        } catch (error) {
-          console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
-          return null;
-        }
-      })
-    );
+        })
+      );
+      restaurantDetails.push(...groupResults);
+    }
 
     // Filter out nulls and verify location match
     const validRestaurants = restaurantDetails.filter(restaurant => {

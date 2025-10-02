@@ -68,15 +68,15 @@ serve(async (req) => {
       }
       offset += page.length;
 
-      // Limit to 100 results for faster loading
-      if (allSearchResults.length >= 100) {
-        console.log('Reached maximum limit of 100 results');
+      // Limit to 30 results for faster loading
+      if (allSearchResults.length >= 30) {
+        console.log('Reached maximum limit of 30 results');
         break;
       }
     }
 
     // Fetch detailed information for each restaurant (batched to limit concurrency)
-    const batchSize = 20;
+    const batchSize = 5;
     const fetchDetailsFor = async (restaurant: any) => {
       try {
         const detailsParams = new URLSearchParams({
@@ -102,7 +102,27 @@ serve(async (req) => {
 
         if (!detailsResponse.ok) {
           console.error(`Failed to fetch details for ${restaurant.location_id}`);
-          return null;
+          // Fallback: return minimal data instead of dropping the item
+          return {
+            id: restaurant.location_id,
+            name: restaurant.name,
+            address: '',
+            city: '',
+            country: '',
+            rating: 0,
+            num_reviews: 0,
+            price_level: '',
+            cuisine: '',
+            description: '',
+            photos: [],
+            reviews: [],
+            web_url: '',
+            phone: '',
+            website: '',
+            hours: {},
+            latitude: undefined,
+            longitude: undefined
+          };
         }
 
         const [details, photosData, reviewsData] = await Promise.all([
