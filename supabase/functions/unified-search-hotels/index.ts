@@ -133,10 +133,14 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
 
 async function enrichWithTripAdvisor(hotels: any[], location: string) {
   const tripKey = Deno.env.get("TRIPADVISOR_API_KEY");
-  if (!tripKey) return hotels; // No enrichment if key missing
+  if (!tripKey) {
+    console.log("TripAdvisor API key not configured, skipping photo/review enrichment");
+    return hotels;
+  }
 
   const limit = Math.min(hotels.length, 20);
   const target = hotels.slice(0, limit);
+  console.log(`Enriching ${target.length} hotels with TripAdvisor photos and reviews...`);
 
   // Simple concurrency control
   const batchSize = 5;
@@ -176,12 +180,17 @@ async function enrichWithTripAdvisor(hotels: any[], location: string) {
             date: rev.published_date || "",
             title: rev.title || "",
           }));
+          
+          console.log(`Enriched ${name}: ${hotel.__tripPhotos?.length || 0} photos, ${hotel.__tripReviews?.length || 0} reviews`);
         } catch (e) {
-          console.warn("TripAdvisor enrichment failed for a hotel", e);
+          console.warn(`TripAdvisor enrichment failed for ${hotel.hotel?.name}:`, e);
         }
       })
     );
   }
+  
+  const enrichedCount = hotels.filter(h => h.__tripPhotos?.length > 0).length;
+  console.log(`TripAdvisor enrichment complete: ${enrichedCount}/${target.length} hotels have photos`);
   return hotels;
 }
 

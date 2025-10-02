@@ -8,6 +8,9 @@ import { CompactFlightCard } from "@/components/CompactFlightCard";
 import { CompactRestaurantCard } from "@/components/CompactRestaurantCard";
 import { ResultsMapView } from "@/components/ResultsMapView";
 import { HotelFilters } from "@/components/HotelFilters";
+import { RestaurantFilters } from "@/components/RestaurantFilters";
+import { AdvancedEventFilters } from "@/components/AdvancedEventFilters";
+import { AdvancedFlightFilters } from "@/components/AdvancedFlightFilters";
 import { Button } from "@/components/ui/button";
 import { Loader2, SlidersHorizontal, Map, List, ArrowLeft } from "lucide-react";
 import {
@@ -37,6 +40,9 @@ const SearchResults = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState<string[]>([]);
   const [selectedStarRatings, setSelectedStarRatings] = useState<number[]>([]);
+  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
+  const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
+  const [selectedEventCategories, setSelectedEventCategories] = useState<string[]>([]);
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [flightDictionaries, setFlightDictionaries] = useState<any>(null);
 
@@ -244,8 +250,16 @@ const SearchResults = () => {
   useEffect(() => {
     let filtered = [...results];
 
-    // Apply price filter (skip for restaurants as they use price_level, not numeric price)
-    if (searchType !== "restaurants") {
+    // Apply price filter
+    if (searchType === "restaurants") {
+      // For restaurants, filter by price range if set
+      if (priceRange[0] !== 0 || priceRange[1] !== 200) {
+        filtered = filtered.filter((item) => {
+          const price = item.price_level ? (item.price_level * 50) : 50; // Estimate $ = 50, $$ = 100, etc.
+          return price >= priceRange[0] && price <= priceRange[1];
+        });
+      }
+    } else {
       filtered = filtered.filter((item) => {
         const price = searchType === "flights"
           ? Number(item.price?.grandTotal ?? item.price?.total ?? 0)
@@ -292,6 +306,38 @@ if (minRating && searchType !== "restaurants") {
       });
     }
 
+    // Apply cuisine filter for restaurants
+    if (searchType === "restaurants" && selectedCuisines.length > 0) {
+      filtered = filtered.filter((item) => {
+        const cuisineTypes = item.cuisine?.map((c: any) => c.name || c).join(' ').toLowerCase() || '';
+        return selectedCuisines.some(cuisine => 
+          cuisineTypes.includes(cuisine.toLowerCase())
+        );
+      });
+    }
+
+    // Apply dietary filter for restaurants
+    if (searchType === "restaurants" && selectedDietary.length > 0) {
+      filtered = filtered.filter((item) => {
+        const dietaryOptions = item.dietary_restrictions?.join(' ').toLowerCase() || '';
+        return selectedDietary.some(diet => 
+          dietaryOptions.includes(diet.toLowerCase())
+        );
+      });
+    }
+
+    // Apply event category filter
+    if (searchType === "events" && selectedEventCategories.length > 0) {
+      filtered = filtered.filter((item) => {
+        const categories = item.classifications?.map((c: any) => 
+          c.segment?.name || c.genre?.name || ''
+        ).join(' ').toLowerCase() || '';
+        return selectedEventCategories.some(cat => 
+          categories.includes(cat.toLowerCase())
+        );
+      });
+    }
+
     // Apply sorting
     switch (sortBy) {
       case "price":
@@ -328,7 +374,7 @@ if (minRating && searchType !== "restaurants") {
     }
 
     setFilteredResults(filtered);
-  }, [results, priceRange, minRating, sortBy, selectedAmenities, selectedPropertyTypes, selectedStarRatings]);
+  }, [results, priceRange, minRating, sortBy, selectedAmenities, selectedPropertyTypes, selectedStarRatings, selectedCuisines, selectedDietary, selectedEventCategories]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -397,16 +443,48 @@ if (minRating && searchType !== "restaurants") {
                       <SheetTitle>Filters</SheetTitle>
                     </SheetHeader>
                     <div className="mt-6">
-                      <HotelFilters
-                        onSortChange={setSortBy}
-                        onMinRatingChange={setMinRating}
-                        onPriceRangeChange={(min, max) => setPriceRange([min, max])}
-                        onAmenitiesChange={setSelectedAmenities}
-                        currentSort={sortBy}
-                        currentMinRating={minRating || undefined}
-                        currentPriceRange={priceRange}
-                        resultsCount={filteredResults.length}
-                      />
+                      {searchType === "hotels" || searchType === "packages" ? (
+                        <HotelFilters
+                          onSortChange={setSortBy}
+                          onMinRatingChange={setMinRating}
+                          onPriceRangeChange={(min, max) => setPriceRange([min, max])}
+                          onAmenitiesChange={setSelectedAmenities}
+                          currentSort={sortBy}
+                          currentMinRating={minRating || undefined}
+                          currentPriceRange={priceRange}
+                          resultsCount={filteredResults.length}
+                        />
+                      ) : searchType === "restaurants" ? (
+                        <RestaurantFilters
+                          onSortChange={setSortBy}
+                          onPriceRangeChange={(min, max) => setPriceRange([min, max])}
+                          onCuisineChange={setSelectedCuisines}
+                          onDietaryChange={setSelectedDietary}
+                          currentSort={sortBy}
+                          currentPriceRange={priceRange}
+                          resultsCount={filteredResults.length}
+                        />
+                      ) : searchType === "events" ? (
+                        <AdvancedEventFilters
+                          onSortChange={setSortBy}
+                          onFilterChange={(filters) => {
+                            setPriceRange(filters.priceRange);
+                            setSelectedEventCategories(filters.categories);
+                          }}
+                          currentSort={sortBy}
+                          resultsCount={filteredResults.length}
+                        />
+                      ) : searchType === "flights" ? (
+                        <AdvancedFlightFilters
+                          onSortChange={setSortBy}
+                          onFilterChange={(filters) => {
+                            setPriceRange(filters.priceRange);
+                          }}
+                          currentSort={sortBy}
+                          resultsCount={filteredResults.length}
+                          availableAirlines={[]}
+                        />
+                      ) : null}
                     </div>
                   </SheetContent>
                 </Sheet>
@@ -451,18 +529,50 @@ if (minRating && searchType !== "restaurants") {
               {/* Filters Sidebar - Desktop */}
               <aside className="hidden sm:block lg:col-span-3">
                 <div className="sticky top-4">
-                  <HotelFilters
-                    onSortChange={setSortBy}
-                    onMinRatingChange={setMinRating}
-                    onPriceRangeChange={(min, max) => setPriceRange([min, max])}
-                    onAmenitiesChange={setSelectedAmenities}
-                    onPropertyTypesChange={setSelectedPropertyTypes}
-                    onStarRatingsChange={setSelectedStarRatings}
-                    currentSort={sortBy}
-                    currentMinRating={minRating || undefined}
-                    currentPriceRange={priceRange}
-                    resultsCount={filteredResults.length}
-                  />
+                  {searchType === "hotels" || searchType === "packages" ? (
+                    <HotelFilters
+                      onSortChange={setSortBy}
+                      onMinRatingChange={setMinRating}
+                      onPriceRangeChange={(min, max) => setPriceRange([min, max])}
+                      onAmenitiesChange={setSelectedAmenities}
+                      onPropertyTypesChange={setSelectedPropertyTypes}
+                      onStarRatingsChange={setSelectedStarRatings}
+                      currentSort={sortBy}
+                      currentMinRating={minRating || undefined}
+                      currentPriceRange={priceRange}
+                      resultsCount={filteredResults.length}
+                    />
+                  ) : searchType === "restaurants" ? (
+                    <RestaurantFilters
+                      onSortChange={setSortBy}
+                      onPriceRangeChange={(min, max) => setPriceRange([min, max])}
+                      onCuisineChange={setSelectedCuisines}
+                      onDietaryChange={setSelectedDietary}
+                      currentSort={sortBy}
+                      currentPriceRange={priceRange}
+                      resultsCount={filteredResults.length}
+                    />
+                  ) : searchType === "events" ? (
+                    <AdvancedEventFilters
+                      onSortChange={setSortBy}
+                      onFilterChange={(filters) => {
+                        setPriceRange(filters.priceRange);
+                        setSelectedEventCategories(filters.categories);
+                      }}
+                      currentSort={sortBy}
+                      resultsCount={filteredResults.length}
+                    />
+                  ) : searchType === "flights" ? (
+                    <AdvancedFlightFilters
+                      onSortChange={setSortBy}
+                      onFilterChange={(filters) => {
+                        setPriceRange(filters.priceRange);
+                      }}
+                      currentSort={sortBy}
+                      resultsCount={filteredResults.length}
+                      availableAirlines={[]}
+                    />
+                  ) : null}
                 </div>
               </aside>
 
