@@ -99,8 +99,7 @@ const Index = () => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const rotatingMessages = [
-    "Where to next?",
-    "Discover handpicked hotels tailored to your taste.",
+    "Where to next? Discover handpicked hotels tailored to your taste.",
     "Book smarter flights with AI that knows your preferences.",
     "Find restaurants worth the reservation — curated by locals and AI.",
     "Unlock exclusive events and local experiences wherever you land.",
