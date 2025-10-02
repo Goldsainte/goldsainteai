@@ -39,23 +39,45 @@ export function AppSidebar() {
 
   const getSearchIcon = (type: string) => {
     switch (type) {
+      case "hotel":
       case "hotels": return Hotel;
+      case "flight":
       case "flights": return Plane;
+      case "restaurant":
       case "restaurants": return UtensilsCrossed;
+      case "event":
       case "events": return Ticket;
       default: return Search;
     }
   };
 
   const handleHistoryClick = (item: any) => {
-    const params = new URLSearchParams({
-      type: item.type,
-      location: item.location,
-      ...(item.checkIn && { checkIn: item.checkIn }),
-      ...(item.checkOut && { checkOut: item.checkOut }),
-      ...(item.guests && { guests: item.guests }),
-    });
-    navigate(`/search?${params.toString()}`);
+    // Handle flight searches differently
+    if (item.type === 'flight' && item.origin && item.destination) {
+      const params = new URLSearchParams({
+        type: 'flights',
+        origin: item.origin,
+        destination: item.destination,
+        departureDate: item.departureDate || '',
+        ...(item.returnDate && { returnDate: item.returnDate }),
+        cabinClass: item.cabinClass || 'ECONOMY',
+        adults: item.adults || '1',
+        children: item.children || '0',
+        infants: item.infants || '0',
+        flightType: item.flightType || 'round-trip',
+      });
+      navigate(`/search?${params.toString()}`);
+    } else {
+      // Handle hotel/other searches
+      const params = new URLSearchParams({
+        type: item.type === 'flight' ? 'flights' : item.type,
+        location: item.location,
+        ...(item.checkIn && { checkIn: item.checkIn }),
+        ...(item.checkOut && { checkOut: item.checkOut }),
+        ...(item.guests && { guests: item.guests }),
+      });
+      navigate(`/search?${params.toString()}`);
+    }
   };
 
   return (
@@ -168,12 +190,17 @@ export function AppSidebar() {
                         {open && (
                           <div className="flex-1 min-w-0 pr-6">
                             <div className="truncate text-sm font-medium">
-                              {item.location}
+                              {item.type === 'flight' && item.origin && item.destination 
+                                ? `${item.origin.split(' - ')[0]} → ${item.destination.split(' - ')[0]}`
+                                : item.location}
                             </div>
-                            {item.checkIn && (
+                            {(item.departureDate || item.checkIn) && (
                               <div className="text-xs text-muted-foreground truncate">
-                                {format(new Date(item.checkIn), "MMM d")}
-                                {item.checkOut && ` - ${format(new Date(item.checkOut), "MMM d")}`}
+                                {item.departureDate 
+                                  ? format(new Date(item.departureDate), "MMM d")
+                                  : format(new Date(item.checkIn), "MMM d")}
+                                {(item.returnDate || item.checkOut) && 
+                                  ` - ${format(new Date(item.returnDate || item.checkOut), "MMM d")}`}
                               </div>
                             )}
                           </div>

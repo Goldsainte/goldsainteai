@@ -10,6 +10,16 @@ export interface SearchHistoryItem {
   checkOut?: string;
   guests?: string;
   timestamp: number;
+  // Flight-specific fields
+  origin?: string;
+  destination?: string;
+  departureDate?: string;
+  returnDate?: string;
+  cabinClass?: string;
+  adults?: string;
+  children?: string;
+  infants?: string;
+  flightType?: string;
 }
 
 const MAX_HISTORY_ITEMS = 20;
@@ -46,6 +56,16 @@ export const useSearchHistory = () => {
               checkOut: params?.checkOut,
               guests: params?.guests,
               timestamp: new Date(item.created_at).getTime(),
+              // Flight-specific fields
+              origin: params?.origin,
+              destination: params?.destination,
+              departureDate: params?.departureDate,
+              returnDate: params?.returnDate,
+              cabinClass: params?.cabinClass,
+              adults: params?.adults,
+              children: params?.children,
+              infants: params?.infants,
+              flightType: params?.flightType,
             };
           });
           setHistory(formatted);
