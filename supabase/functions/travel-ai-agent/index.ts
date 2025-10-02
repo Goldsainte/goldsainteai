@@ -1598,17 +1598,21 @@ async function searchRestaurants(args: any) {
             country: details.address_obj?.country || '',
             rating: details.rating || 0,
             num_reviews: details.num_reviews || 0,
+            userRatingsTotal: details.num_reviews || 0,
             price_level: details.price_level || '',
+            priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
             cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
             description: details.description || '',
             photos: photos.map((photo: any) => ({
               url: photo.images?.large?.url || photo.images?.original?.url,
               caption: photo.caption || ''
             })),
+            photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
             web_url: details.web_url || '',
             phone: details.phone || '',
             website: details.website || '',
             hours: details.hours || {},
+            openNow: details.is_closed === false,
             latitude: details.latitude,
             longitude: details.longitude
           };
