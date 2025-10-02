@@ -21,7 +21,7 @@ import { TripTypeSelector } from "@/components/TripTypeSelector";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
-import { WelcomeModal } from "@/components/WelcomeModal";
+import { WelcomeBox } from "@/components/WelcomeBox";
 import logomark from "@/assets/logomark-seal-gold.png";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
 import swissAlps from "@/assets/swiss-alps.jpg";
@@ -95,16 +95,6 @@ const Index = () => {
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-
-  // Show welcome modal for first-time visitors
-  useEffect(() => {
-    const hasVisited = localStorage.getItem("goldsainte_visited");
-    if (!hasVisited) {
-      setShowWelcomeModal(true);
-      localStorage.setItem("goldsainte_visited", "true");
-    }
-  }, []);
 
   // Get user's current location on mount
   useEffect(() => {
@@ -656,6 +646,9 @@ const Index = () => {
             {/* Inspiration Content - Far below the fold */}
             <div className="px-6 pb-12 pt-20">
               <div className="w-full max-w-7xl mx-auto space-y-6">
+                {/* Welcome Box */}
+                <WelcomeBox />
+                
                 <div className="text-center space-y-2">
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
@@ -1144,12 +1137,6 @@ const Index = () => {
           fromCountry={visaModalData.fromCountry}
           toCountry={visaModalData.toCountry}
           visaInformation={visaModalData.visaInformation}
-        />
-
-        {/* Welcome Modal */}
-        <WelcomeModal
-          open={showWelcomeModal}
-          onClose={() => setShowWelcomeModal(false)}
         />
 
         {/* Date Picker Modal */}
