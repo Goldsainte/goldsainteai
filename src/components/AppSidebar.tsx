@@ -20,10 +20,10 @@ import { format } from "date-fns";
 
 const items = [
   { title: "Home", url: "/", icon: Home },
+  { title: "Search", url: "/search", icon: Search },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, authRequired: true },
   { title: "My Bookings", url: "/my-bookings", icon: Ticket, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Clipboard, authRequired: true },
-  { title: "Search", url: "/search", icon: Search },
   { title: "Favorites", url: "/favorites", icon: Heart },
 ];
 
