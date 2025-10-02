@@ -13,7 +13,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
       <DialogContent className="max-w-2xl p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
         <div className="p-8 space-y-8">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-covik text-primary">
+            <h2 className="text-3xl font-secondary text-primary">
               What Goldsainte.Ai can do for you
             </h2>
           </div>
