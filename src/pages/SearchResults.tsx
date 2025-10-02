@@ -211,18 +211,26 @@ const SearchResults = () => {
   useEffect(() => {
     let filtered = [...results];
 
-    // Apply price filter (handle flights vs others)
-    filtered = filtered.filter((item) => {
-      const price = searchType === "flights"
-        ? Number(item.price?.grandTotal ?? item.price?.total ?? 0)
-        : (item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0);
-      return price >= priceRange[0] && price <= priceRange[1];
-    });
+    // Apply price filter (skip for restaurants as they use price_level, not numeric price)
+    if (searchType !== "restaurants") {
+      filtered = filtered.filter((item) => {
+        const price = searchType === "flights"
+          ? Number(item.price?.grandTotal ?? item.price?.total ?? 0)
+          : (item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0);
+        return price >= priceRange[0] && price <= priceRange[1];
+      });
+    }
 
     // Apply rating filter
     if (minRating) {
       filtered = filtered.filter((item) => {
-        const rating = (item.property?.reviewScore ?? (item.rating ? Number(item.rating) * 2 : 0));
+        // Handle different rating formats across search types
+        let rating = 0;
+        if (searchType === "restaurants") {
+          rating = Number(item.rating) || 0; // Restaurant rating is 0-5
+        } else {
+          rating = (item.property?.reviewScore ?? (item.rating ? Number(item.rating) * 2 : 0));
+        }
         return rating >= minRating;
       });
     }
@@ -273,8 +281,15 @@ const SearchResults = () => {
         break;
       case "review_score":
         filtered.sort((a, b) => {
-          const ra = a.property?.reviewScore ?? (a.rating ? Number(a.rating) * 2 : 0);
-          const rb = b.property?.reviewScore ?? (b.rating ? Number(b.rating) * 2 : 0);
+          let ra = 0;
+          let rb = 0;
+          if (searchType === "restaurants") {
+            ra = Number(a.rating) || 0;
+            rb = Number(b.rating) || 0;
+          } else {
+            ra = a.property?.reviewScore ?? (a.rating ? Number(a.rating) * 2 : 0);
+            rb = b.property?.reviewScore ?? (b.rating ? Number(b.rating) * 2 : 0);
+          }
           return rb - ra;
         });
         break;

@@ -1168,8 +1168,8 @@ async function searchHotels(args: any, apiKey: string) {
     if (tripAdvisorKey && hotels.length > 0) {
       console.log('Enriching hotels with TripAdvisor data...');
       
-      // Process hotels in parallel but limit to top 10 to avoid rate limits
-      const hotelsToEnrich = hotels.slice(0, 10);
+      // Process hotels in parallel
+      const hotelsToEnrich = hotels;
       
       await Promise.all(
         hotelsToEnrich.map(async (hotel: any) => {
@@ -1391,9 +1391,9 @@ async function searchRestaurants(args: any) {
     const searchData = await searchResponse.json();
     console.log('TripAdvisor restaurants found:', searchData.data?.length || 0);
 
-    // Get detailed information for each restaurant
+    // Get detailed information for each restaurant (fetch all results)
     const restaurantDetails = await Promise.all(
-      (searchData.data || []).slice(0, 30).map(async (restaurant: any) => {
+      (searchData.data || []).map(async (restaurant: any) => {
         try {
           const detailsParams = new URLSearchParams({
             key: tripAdvisorKey,

@@ -52,9 +52,9 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     console.log('Hotels found:', searchData.data?.length || 0);
 
-    // Get detailed information for each hotel (optimized: fewer items + parallel sub-requests)
+    // Get detailed information for each hotel (fetch all results)
     const hotelDetails = await Promise.all(
-      (searchData.data || []).slice(0, 8).map(async (hotel: any) => {
+      (searchData.data || []).map(async (hotel: any) => {
         try {
           const detailsParams = new URLSearchParams({
             key: apiKey,

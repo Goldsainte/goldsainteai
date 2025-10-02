@@ -57,9 +57,9 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     console.log('Restaurants found:', searchData.data?.length || 0);
 
-    // Get detailed information for each restaurant (optimized: fewer items + parallel sub-requests)
+    // Get detailed information for each restaurant (fetch all results)
     const restaurantDetails = await Promise.all(
-      (searchData.data || []).slice(0, 12).map(async (restaurant: any) => {
+      (searchData.data || []).map(async (restaurant: any) => {
         try {
           const detailsParams = new URLSearchParams({
             key: apiKey,

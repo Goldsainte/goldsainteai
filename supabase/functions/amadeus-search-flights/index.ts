@@ -39,7 +39,7 @@ serve(async (req) => {
   }
 
   try {
-    const { origin, destination, departureDate, returnDate, adults, travelClass = 'ECONOMY', cabinClass, nonStop = 'false', max = 20, includedAirlineCodes, destinationCity } = await req.json();
+    const { origin, destination, departureDate, returnDate, adults, travelClass = 'ECONOMY', cabinClass, nonStop = 'false', max = 100, includedAirlineCodes, destinationCity } = await req.json();
     
     // Support both parameter naming conventions
     const originLocationCode = origin;
