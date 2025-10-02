@@ -46,14 +46,26 @@ async function resolveCityCode(token: string, location: string): Promise<string>
 
 async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: string, checkOut: string, adults: number) {
   // 1) Get hotel IDs in city
+  console.log(`Fetching hotels for city code: ${cityCode}`);
   const listRes = await fetch(
     `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${encodeURIComponent(cityCode)}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
-  if (!listRes.ok) throw new Error(`Hotel list failed: ${listRes.status}`);
+  
+  if (!listRes.ok) {
+    const errorText = await listRes.text();
+    console.error(`Hotel list failed: ${listRes.status}`, errorText);
+    throw new Error(`Hotel list failed: ${listRes.status}`);
+  }
+  
   const list = await listRes.json();
+  console.log(`Found ${list.data?.length || 0} hotels in city`);
+  
   const ids = (list.data || []).slice(0, 150).map((h: any) => h.hotelId).join(",");
-  if (!ids) return [] as any[];
+  if (!ids) {
+    console.warn("No hotel IDs found for city code:", cityCode);
+    return [] as any[];
+  }
 
   // 2) Get offers
   const params = new URLSearchParams({
@@ -65,12 +77,23 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
     roomQuantity: "1",
     bestRateOnly: "true",
   });
+  
+  console.log(`Fetching offers for ${ids.split(',').length} hotels`);
   const offersRes = await fetch(`https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
-  if (!offersRes.ok) throw new Error(`Hotel offers failed: ${offersRes.status}`);
+  
+  if (!offersRes.ok) {
+    const errorText = await offersRes.text();
+    console.error(`Hotel offers failed: ${offersRes.status}`, errorText);
+    console.error('Request params:', { hotelIds: ids.split(',').length, checkIn, checkOut, adults });
+    throw new Error(`Hotel offers failed: ${offersRes.status} - ${errorText}`);
+  }
+  
   const offers = await offersRes.json();
-  return (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
+  const available = (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
+  console.log(`Found ${available.length} available hotel offers`);
+  return available;
 }
 
 async function enrichWithTripAdvisor(hotels: any[], location: string) {
