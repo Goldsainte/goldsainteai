@@ -405,6 +405,36 @@ The user has saved preferences but has chosen to search without strict filtering
             return normalized;
           }
         }
+        // 4) Fallback: if we've asked for origin earlier, use the first user reply after that question
+        if (askedForOrigin) {
+          let lastAskIdx = -1;
+          for (let k = hist.length - 1; k >= 0; k--) {
+            const m = hist[k];
+            if (m.role === 'assistant' && String(m.content || '').toLowerCase().includes('where are you flying from')) {
+              lastAskIdx = k;
+              break;
+            }
+          }
+          if (lastAskIdx !== -1) {
+            for (let k = lastAskIdx + 1; k < hist.length; k++) {
+              const m = hist[k];
+              if (m.role !== 'user') continue;
+              const ansRaw = String(m.content || '').trim();
+              if (!ansRaw) continue;
+              const ansLower = ansRaw.toLowerCase();
+              if (/^\$?\d+$/.test(ansRaw)) continue; // budgets
+              if (/^\d{4}-\d{2}-\d{2}/.test(ansRaw)) continue; // dates
+              if (ansLower === 'one-way' || ansLower === 'round-trip' || ansLower === 'one' || ansLower === 'round') continue; // trip types
+              const tokens = ansRaw.split(/\s+/);
+              if (tokens.length <= 6) {
+                const normalized = normalizeCityName(ansRaw);
+                console.log('extractOrigin(fallback-after-ask) ->', ansRaw, '=>', normalized);
+                return normalized;
+              }
+              break; // first user answer after ask wasn't city-like
+            }
+          }
+        }
         return null;
       };
 
@@ -568,7 +598,16 @@ The user has saved preferences but has chosen to search without strict filtering
         sortBy: 'price'
       });
 
-      const finalMessage = `Great! I found flights from ${origin} to ${validDestination}. Check out the options below!`;
+      if (result.error || !result.results || result.results.length === 0) {
+        const assistant = result.error || `I couldn't find flights from ${origin} to ${validDestination} for those dates. Try different dates or nearby airports.`;
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [result],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
+
+      const finalMessage = `Great! I found ${result.results.length} flights from ${origin} to ${validDestination}. Check out the options below!`;
       return new Response(JSON.stringify({
         message: finalMessage,
         toolResults: [result],
@@ -1937,24 +1976,64 @@ async function searchFlights(args: any) {
       const variations = getCityVariations(location);
       const normalizedLocation = variations[variations.length - 1] || location; // Use full name
 
-      // Search for airport code using normalized location
-      const searchParams = new URLSearchParams({
-        keyword: normalizedLocation,
-        subType: 'AIRPORT,CITY',
-        'page[limit]': '1'
-      });
+      // Helper: attempt Amadeus location lookup
+      const tryLookup = async (keyword: string, subType: string = 'AIRPORT,CITY') => {
+        const params = new URLSearchParams({
+          keyword,
+          subType,
+          'page[limit]': '1'
+        });
+        const r = await fetch(
+          `https://test.api.amadeus.com/v1/reference-data/locations?${params}`,
+          { headers: { 'Authorization': `Bearer ${token}` } }
+        );
+        if (!r.ok) return null;
+        const j = await r.json();
+        const code = j?.data?.[0]?.iataCode;
+        return (typeof code === 'string' && code.length === 3) ? code : null;
+      };
 
-      const resp = await fetch(
-        `https://test.api.amadeus.com/v1/reference-data/locations?${searchParams}`,
-        { headers: { 'Authorization': `Bearer ${token}` } }
-      );
+      // First attempts
+      let code = await tryLookup(normalizedLocation);
+      if (!code) code = await tryLookup(normalizedLocation, 'CITY');
+      if (!code && variations.length > 0) code = await tryLookup(variations[0], 'AIRPORT,CITY');
+      if (code) return code;
 
-      if (resp.ok) {
-        const data = await resp.json();
-        if (data.data && data.data.length > 0) {
-          return data.data[0].iataCode;
-        }
-      }
+      // Fallback mappings for popular cities
+      const cityToCode: Record<string, string> = {
+        'new york': 'NYC',
+        'los angeles': 'LAX',
+        'san francisco': 'SFO',
+        'washington': 'WAS',
+        'chicago': 'CHI',
+        'miami': 'MIA',
+        'seattle': 'SEA',
+        'atlanta': 'ATL',
+        'dallas': 'DFW',
+        'houston': 'HOU',
+        'phoenix': 'PHX',
+        'denver': 'DEN',
+        'orlando': 'ORL',
+        'detroit': 'DTT',
+        'minneapolis': 'MSP',
+        'portland': 'PDX',
+        'san diego': 'SAN',
+        'austin': 'AUS',
+        'nashville': 'BNA',
+        'salt lake city': 'SLC',
+        'charlotte': 'CLT',
+        'paris': 'PAR',
+        'london': 'LON',
+        'tokyo': 'TYO',
+        'dubai': 'DXB',
+        'doha': 'DOH',
+        'singapore': 'SIN',
+        'hong kong': 'HKG',
+        'sydney': 'SYD',
+        'toronto': 'YTO'
+      };
+      const lowerNorm = normalizedLocation.toLowerCase();
+      if (cityToCode[lowerNorm]) return cityToCode[lowerNorm];
 
       // Fallback: if it's a known airport code abbreviation, return it
       const upperLocation = location.toUpperCase();
@@ -1963,7 +2042,9 @@ async function searchFlights(args: any) {
         return upperLocation;
       }
 
-      return location.toUpperCase();
+      // Last resort: return normalized 3-letter slice if applicable
+      if (/^[A-Z]{3,}$/.test(upperLocation)) return upperLocation.slice(0,3);
+      return upperLocation;
     };
 
     const originCode = await getAirportCode(origin);
