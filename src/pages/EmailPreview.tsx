@@ -484,10 +484,12 @@ export default function EmailPreview() {
             <div class="warning-box">
               <div class="warning-title">⚠ Important Travel Information</div>
               <div class="warning-text">
-                <strong>Check-in:</strong> Check in online beginning 24 hours prior to departure. Airport kiosks and ticket counters also available.<br><br>
+                <strong>Check-in:</strong> Check in online beginning 24 hours prior to departure. Airport kiosks and ticket counters also available. You must be checked in and at the gate by the check-in deadline or your reservation may be cancelled.<br><br>
                 <strong>Airport Arrival:</strong> Please arrive at the airport at least 2 hours before domestic flights and 3 hours before international flights.<br><br>
                 <strong>Travel Documents:</strong> Valid government-issued photo identification is required for all passengers. International travel requires a valid passport.<br><br>
-                <strong>Baggage Information:</strong> Review airline baggage policies. Additional fees may apply for checked baggage and oversized items.<br><br>
+                <strong>Carry-on Baggage:</strong> You may carry on one bag and one personal item at no charge. All items must easily fit into the overhead bin or under the seat in front of you or will need to be checked.<br><br>
+                <strong>Checked Baggage:</strong> You may check up to two bags without charge in most markets as long as your bags fit within size and weight limits. Only one checked bag is allowed to certain destinations. Additional fees may apply for oversized items.<br><br>
+                <strong>Check-in Requirements:</strong> Check-in requirements vary by airline. If your ticket includes travel on other airlines, please check with the operating carrier on your ticket to avoid any surprises.<br><br>
                 <strong>Boarding:</strong> Boarding begins approximately 30-45 minutes prior to departure. Please arrive at your gate with adequate time.
               </div>
             </div>
