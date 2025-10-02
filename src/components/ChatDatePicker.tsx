@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 interface ChatDatePickerProps {
   type: "hotel" | "flight";
@@ -12,82 +13,70 @@ interface ChatDatePickerProps {
 }
 
 export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePickerProps) => {
-  const [checkIn, setCheckIn] = useState<Date>();
-  const [checkOut, setCheckOut] = useState<Date>();
-  const [departureDate, setDepartureDate] = useState<Date>();
-  const [returnDate, setReturnDate] = useState<Date>();
-  const [mode, setMode] = useState<"checkIn" | "checkOut" | "departure" | "return">(
-    type === "hotel" ? "checkIn" : "departure"
-  );
+  const [tripType, setTripType] = useState<"round-trip" | "one-way" | null>(type === "hotel" ? "round-trip" : null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [singleDate, setSingleDate] = useState<Date>();
 
-  const handleDateSelect = (date: Date | undefined) => {
-    if (!date) return;
+  const handleDateSelect = (range: DateRange | undefined) => {
+    setDateRange(range);
+  };
 
-    if (type === "hotel") {
-      if (mode === "checkIn") {
-        setCheckIn(date);
-        setMode("checkOut");
-      } else {
-        setCheckOut(date);
-      }
-    } else {
-      // For flights
-      if (mode === "departure") {
-        setDepartureDate(date);
-        setMode("return");
-      } else {
-        setReturnDate(date);
-      }
-    }
+  const handleSingleDateSelect = (date: Date | undefined) => {
+    setSingleDate(date);
   };
 
   const handleConfirm = () => {
-    if (type === "hotel" && checkIn && checkOut) {
+    if (type === "hotel" && dateRange?.from && dateRange?.to) {
       onDatesSelected({
-        checkIn: format(checkIn, "yyyy-MM-dd"),
-        checkOut: format(checkOut, "yyyy-MM-dd"),
+        checkIn: format(dateRange.from, "yyyy-MM-dd"),
+        checkOut: format(dateRange.to, "yyyy-MM-dd"),
       });
-    } else if (type === "flight" && departureDate) {
-      onDatesSelected({
-        departureDate: format(departureDate, "yyyy-MM-dd"),
-        returnDate: returnDate ? format(returnDate, "yyyy-MM-dd") : undefined,
-      });
+    } else if (type === "flight") {
+      if (tripType === "round-trip" && dateRange?.from && dateRange?.to) {
+        onDatesSelected({
+          departureDate: format(dateRange.from, "yyyy-MM-dd"),
+          returnDate: format(dateRange.to, "yyyy-MM-dd"),
+        });
+      } else if (tripType === "one-way" && singleDate) {
+        onDatesSelected({
+          departureDate: format(singleDate, "yyyy-MM-dd"),
+        });
+      }
     }
   };
 
-  const handleSkipReturn = () => {
-    if (departureDate) {
-      onDatesSelected({
-        departureDate: format(departureDate, "yyyy-MM-dd"),
-      });
+  const canConfirm = () => {
+    if (type === "hotel") {
+      return dateRange?.from && dateRange?.to;
     }
+    if (type === "flight") {
+      if (!tripType) return false;
+      if (tripType === "round-trip") return dateRange?.from && dateRange?.to;
+      if (tripType === "one-way") return !!singleDate;
+    }
+    return false;
   };
-
-  const canConfirm = type === "hotel" 
-    ? checkIn && checkOut 
-    : departureDate; // Can confirm with just departure for one-way
 
   const getTitle = () => {
     if (type === "hotel") {
-      return mode === "checkIn" ? "Select Check-in Date" : "Select Check-out Date";
+      return "Select Check-in & Check-out Dates";
     }
-    return mode === "departure" ? "Select Departure Date" : "Select Return Date (Optional)";
+    if (!tripType) {
+      return "Select Trip Type";
+    }
+    return tripType === "round-trip" ? "Select Departure & Return Dates" : "Select Departure Date";
   };
 
   const getSelectedDates = () => {
-    if (type === "hotel") {
-      if (checkIn && checkOut) {
-        return `${format(checkIn, "MMM dd")} - ${format(checkOut, "MMM dd")}`;
+    if (type === "hotel" && dateRange?.from && dateRange?.to) {
+      return `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`;
+    }
+    if (type === "flight") {
+      if (tripType === "round-trip" && dateRange?.from && dateRange?.to) {
+        return `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`;
       }
-      if (checkIn) {
-        return `Check-in: ${format(checkIn, "MMM dd, yyyy")}`;
-      }
-    } else {
-      if (departureDate && returnDate) {
-        return `${format(departureDate, "MMM dd")} - ${format(returnDate, "MMM dd")}`;
-      }
-      if (departureDate) {
-        return `Departure: ${format(departureDate, "MMM dd, yyyy")}`;
+      if (tripType === "one-way" && singleDate) {
+        return `Departure: ${format(singleDate, "MMM dd, yyyy")}`;
       }
     }
     return null;
@@ -110,32 +99,67 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
         </Button>
       </div>
 
-      <Calendar
-        mode="single"
-        selected={mode === "checkIn" ? checkIn : mode === "checkOut" ? checkOut : mode === "departure" ? departureDate : returnDate}
-        onSelect={handleDateSelect}
-        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-        className="rounded-md border pointer-events-auto"
-      />
-
-      <div className="flex gap-2 pt-4">
-        {type === "flight" && mode === "return" && (
+      {type === "flight" && !tripType ? (
+        <div className="flex gap-2 pt-4">
           <Button
             variant="outline"
-            onClick={handleSkipReturn}
+            onClick={() => setTripType("round-trip")}
             className="flex-1"
           >
-            Skip (One-way)
+            Round Trip
           </Button>
-        )}
-        <Button
-          onClick={handleConfirm}
-          disabled={!canConfirm}
-          className="flex-1"
-        >
-          Confirm Date{(type === "hotel" && checkIn && checkOut) || (type === "flight" && departureDate && returnDate) ? "s" : ""}
-        </Button>
-      </div>
+          <Button
+            variant="outline"
+            onClick={() => setTripType("one-way")}
+            className="flex-1"
+          >
+            One Way
+          </Button>
+        </div>
+      ) : (
+        <>
+          {tripType === "one-way" ? (
+            <Calendar
+              mode="single"
+              selected={singleDate}
+              onSelect={handleSingleDateSelect}
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              className="rounded-md border pointer-events-auto"
+            />
+          ) : (
+            <Calendar
+              mode="range"
+              selected={dateRange}
+              onSelect={handleDateSelect}
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              className="rounded-md border pointer-events-auto"
+            />
+          )}
+
+          <div className="flex gap-2 pt-4">
+            {type === "flight" && tripType && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setTripType(null);
+                  setDateRange(undefined);
+                  setSingleDate(undefined);
+                }}
+                className="flex-1"
+              >
+                Change Trip Type
+              </Button>
+            )}
+            <Button
+              onClick={handleConfirm}
+              disabled={!canConfirm()}
+              className="flex-1"
+            >
+              Confirm Date{((type === "hotel" || tripType === "round-trip") && dateRange?.from && dateRange?.to) ? "s" : ""}
+            </Button>
+          </div>
+        </>
+      )}
     </Card>
   );
 };
