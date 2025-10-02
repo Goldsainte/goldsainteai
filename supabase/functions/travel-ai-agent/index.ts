@@ -437,6 +437,21 @@ The user has saved preferences but has chosen to search without strict filtering
         return null;
       };
 
+      const extractTripType = (): 'one-way' | 'round-trip' | null => {
+        const msgs = getLastUserMessages().slice().reverse();
+        for (const m of msgs) {
+          const lower = (m || '').toLowerCase().trim();
+          if (lower.includes('one way') || lower === 'one-way' || lower === 'oneway' || lower === 'one') {
+            return 'one-way';
+          }
+          if (lower.includes('round trip') || lower.includes('round-trip') || lower === 'roundtrip' || 
+              lower === 'return' || lower === 'round' || lower.includes('coming back')) {
+            return 'round-trip';
+          }
+        }
+        return null;
+      };
+
       const extractDate = (): string | null => {
         const msgs = getLastUserMessages();
         const dateRegex = /\b20\d{2}-\d{2}-\d{2}\b/;
@@ -460,6 +475,7 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const origin = extractOrigin();
       const destination = extractDestination();
+      const tripType = extractTripType();
       const departureDate = extractDate();
       const budget = extractBudget();
 
@@ -479,8 +495,16 @@ The user has saved preferences but has chosen to search without strict filtering
           conversationHistory: [...hist, { role: 'assistant', content: assistant }]
         }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
       }
+      if (!tripType) {
+        const assistant = 'Would you like a one-way flight or a round-trip?';
+        return new Response(JSON.stringify({
+          message: assistant,
+          toolResults: [],
+          conversationHistory: [...hist, { role: 'assistant', content: assistant }]
+        }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 });
+      }
       if (!departureDate) {
-        const assistant = 'When would you like to depart? (Please provide date as YYYY-MM-DD)';
+        const assistant = 'When would you like to depart?';
         return new Response(JSON.stringify({
           message: assistant,
           toolResults: [],

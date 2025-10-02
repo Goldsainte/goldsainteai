@@ -357,11 +357,14 @@ const Index = () => {
       if (aiMessage.includes('what\'s your budget per night') || 
           aiMessage.includes('what is your budget per night')) {
         setTimeout(() => setShowPriceSlider({ type: 'hotel' }), 500);
-      } else if (aiMessage.includes('what\'s your budget for the flight') ||
-                 aiMessage.includes('what is your budget for the flight')) {
+      } else if (aiMessage.includes('what\'s your budget per passenger') ||
+                 aiMessage.includes('what is your budget per passenger') ||
+                 aiMessage.includes('budget for the flight') ||
+                 aiMessage.includes('budget per person for')) {
         setTimeout(() => setShowPriceSlider({ type: 'flight' }), 500);
       } else if (aiMessage.includes('what\'s your budget per person') ||
-                 aiMessage.includes('what is your budget per person')) {
+                 aiMessage.includes('what is your budget per person') ||
+                 aiMessage.includes('budget per person for dining')) {
         setTimeout(() => setShowPriceSlider({ type: 'restaurant' }), 500);
       } else if (aiMessage.includes('what\'s your budget per day') ||
                  aiMessage.includes('what is your budget per day')) {
