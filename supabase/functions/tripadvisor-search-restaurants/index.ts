@@ -26,7 +26,7 @@ serve(async (req) => {
     }
 
     // Build search query
-    let searchQuery = location;
+    let searchQuery = `${location} restaurants`;
     if (cuisine) {
       searchQuery += ` ${cuisine}`;
     }

@@ -41,11 +41,7 @@ export const RestaurantDetailsModal = ({
     ? (/^https?:\/\//i.test(restaurant.website) ? restaurant.website : `https://${restaurant.website}`)
     : undefined;
 
-  const handleMakeReservation = () => {
-    const query = encodeURIComponent(`${restaurant.name} ${restaurant.address} reservations`);
-    const reservationUrl = `https://www.google.com/search?q=${query}`;
-    window.open(reservationUrl, '_blank', 'noopener,noreferrer');
-  };
+const reservationUrl = `https://www.google.com/search?q=${encodeURIComponent(`${restaurant.name} ${restaurant.address} reservations`)}`;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -165,13 +161,12 @@ export const RestaurantDetailsModal = ({
                   </a>
                 </Button>
               )}
-              <Button
-                onClick={handleMakeReservation}
-                className="flex-1"
-              >
-                <Calendar className="h-4 w-4 mr-2" />
-                Make Reservation
-              </Button>
+<Button asChild className="flex-1">
+  <a href={reservationUrl} target="_blank" rel="noopener noreferrer">
+    <Calendar className="h-4 w-4 mr-2" />
+    Make Reservation
+  </a>
+</Button>
             </div>
 
             {!websiteUrl && (

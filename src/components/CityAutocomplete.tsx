@@ -12,6 +12,7 @@ interface CitySuggestion {
   lon: string;
   class: string;
   type: string;
+  addresstype?: string;
   address?: {
     city?: string;
     town?: string;
@@ -54,12 +55,16 @@ export const CityAutocomplete = ({
     return [city, state, country].filter(Boolean).join(", ");
   };
 
-  const isCityLike = (r: CitySuggestion) => {
-    const placeTypes = ["city", "town", "village", "municipality", "locality", "hamlet", "suburb"];
-    if (r.class === "place" && placeTypes.includes(r.type)) return true;
-    if (r.class === "boundary" && r.type === "administrative" && ["8", "9", "10"].includes(r.extratags?.admin_level || "")) return true;
-    return false;
-  };
+const isCityLike = (r: CitySuggestion) => {
+  const placeTypes = ["city", "town", "village", "municipality", "locality", "hamlet", "suburb"];
+  if (r.class === "place" && placeTypes.includes(r.type)) return true;
+  // Accept administrative boundaries that represent city-like areas (common in Nominatim responses)
+  if (r.class === "boundary") {
+    if (r.type === "administrative" && ["6", "7", "8", "9", "10"].includes(r.extratags?.admin_level || "")) return true;
+    if (r.addresstype && placeTypes.includes(r.addresstype)) return true;
+  }
+  return false;
+};
 
   useEffect(() => {
     // Debounce queries to avoid spamming the API

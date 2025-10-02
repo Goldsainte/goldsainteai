@@ -30,11 +30,9 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
     }
   };
 
-  const handleReservation = () => {
-    const query = encodeURIComponent(`${name} ${location} reservations`);
-    const reservationUrl = `https://www.google.com/search?q=${query}`;
-    window.open(reservationUrl, '_blank', 'noopener,noreferrer');
-  };
+// Build a Google Reservations search URL for opening in a new tab via anchor (avoids popup blockers)
+const reservationQuery = encodeURIComponent(`${name} ${location} reservations`);
+const reservationUrl = `https://www.google.com/search?q=${reservationQuery}`;
 
   const favoriteId = isFavorite('restaurant', restaurant);
   
@@ -130,14 +128,12 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
               {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
               {expanded ? 'Less' : 'More'}
             </Button>
-            <Button
-              size="sm"
-              className="h-7 px-3 text-xs gap-1"
-              onClick={handleReservation}
-            >
-              <Calendar className="h-3 w-3" />
-              Reserve
-            </Button>
+<Button size="sm" className="h-7 px-3 text-xs gap-1" asChild>
+  <a href={reservationUrl} target="_blank" rel="noopener noreferrer">
+    <Calendar className="h-3 w-3" />
+    Reserve
+  </a>
+</Button>
           </div>
         </div>
       </div>

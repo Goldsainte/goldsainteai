@@ -222,19 +222,15 @@ const SearchResults = () => {
       });
     }
 
-    // Apply rating filter
-    if (minRating) {
-      filtered = filtered.filter((item) => {
-        // Handle different rating formats across search types
-        let rating = 0;
-        if (searchType === "restaurants") {
-          rating = Number(item.rating) || 0; // Restaurant rating is 0-5
-        } else {
-          rating = (item.property?.reviewScore ?? (item.rating ? Number(item.rating) * 2 : 0));
-        }
-        return rating >= minRating;
-      });
-    }
+// Apply rating filter (skip for restaurants to avoid over-filtering by preferences)
+if (minRating && searchType !== "restaurants") {
+  filtered = filtered.filter((item) => {
+    // Handle different rating formats across search types
+    let rating = 0;
+    rating = (item.property?.reviewScore ?? (item.rating ? Number(item.rating) * 2 : 0));
+    return rating >= minRating;
+  });
+}
 
     // Apply property type filter
     if (selectedPropertyTypes.length > 0) {
