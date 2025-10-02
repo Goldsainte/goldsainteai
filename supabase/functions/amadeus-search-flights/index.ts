@@ -39,7 +39,12 @@ serve(async (req) => {
   }
 
   try {
-    const { originLocationCode, destinationLocationCode, departureDate, returnDate, adults, travelClass = 'ECONOMY', nonStop = 'false', max = 20, includedAirlineCodes, destinationCity } = await req.json();
+    const { origin, destination, departureDate, returnDate, adults, travelClass = 'ECONOMY', cabinClass, nonStop = 'false', max = 20, includedAirlineCodes, destinationCity } = await req.json();
+    
+    // Support both parameter naming conventions
+    const originLocationCode = origin;
+    const destinationLocationCode = destination;
+    const finalTravelClass = cabinClass || travelClass;
     
     // Determine currency from destination
     const currencyCode = destinationCity ? getCurrencyFromLocation(destinationCity) : 'USD';
@@ -62,7 +67,7 @@ serve(async (req) => {
       destinationLocationCode,
       departureDate,
       adults: adults.toString(),
-      travelClass,
+      travelClass: finalTravelClass,
       nonStop,
       currencyCode,
       max: max.toString()
