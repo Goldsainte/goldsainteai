@@ -226,15 +226,40 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractCity = (): string | null => {
         const msgs = getLastUserMessages().slice().reverse();
+        const STOP_WORDS_END = ['tonight','today','tomorrow','please','now','area','city','center','downtown'];
+        const prepositionRegex = /(\b(?:in|near|around|at)\s+)([a-zA-Z][\w\s\.'-]{1,50})/i;
+        
         for (const m of msgs) {
-          const txt = (m || '').trim();
-          if (!txt) continue;
-          const lower = txt.toLowerCase();
+          const txtRaw = (m || '').trim();
+          if (!txtRaw) continue;
+          const lower = txtRaw.toLowerCase();
+
+          // 1) Try to extract pattern like "in Dallas", "near Miami"
+          const prepositionMatch = txtRaw.match(prepositionRegex);
+          if (prepositionMatch && prepositionMatch[2]) {
+            let candidate = prepositionMatch[2].trim();
+            candidate = candidate.split(/[,.!?]/)[0].trim();
+            const parts = candidate.split(/\s+/);
+            while (parts.length > 1 && STOP_WORDS_END.includes(parts[parts.length - 1].toLowerCase())) {
+              parts.pop();
+            }
+            candidate = parts.join(' ').trim();
+            if (candidate.length >= 2) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractCity(hotels/preposition) ->', candidate, '=>', normalized);
+              return normalized;
+            }
+          }
+
+          // 2) Heuristic fallback: short city-like answers
           if (lower.startsWith('dates:') || lower.startsWith('budget:')) continue;
           if (/[0-9$]/.test(lower)) continue;
-          if (lower.includes('looking for') || lower.includes('hotels') || lower.includes('help')) continue;
-          if (txt.split(/\s+/).length <= 6) {
-            return txt;
+          const hasHotelWords = lower.includes('hotel');
+          const tokens = txtRaw.split(/\s+/);
+          if (tokens.length <= 4 && (!hasHotelWords || tokens.length <= 2)) {
+            const normalized = normalizeCityName(txtRaw);
+            console.log('extractCity(hotels/short) ->', txtRaw, '=>', normalized);
+            return normalized;
           }
         }
         return null;
@@ -336,15 +361,38 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractOrigin = (): string | null => {
         const msgs = getLastUserMessages();
+        const fromToRegex = /\b(?:from|leaving)\s+([a-zA-Z][\w\s\.'-]{1,50?})(?:\s+to\s+|\s+→\s+|$)/i;
+        
         for (let i = msgs.length - 1; i >= 0; i--) {
-          const txt = (msgs[i] || '').trim();
-          if (!txt) continue;
-          const lower = txt.toLowerCase();
-          if (lower.startsWith('from:') || lower.includes('flying from')) {
-            return txt.replace(/^from:\s*/i, '').replace(/flying from\s*/i, '').trim();
+          const txtRaw = (msgs[i] || '').trim();
+          if (!txtRaw) continue;
+          const lower = txtRaw.toLowerCase();
+          
+          // 1) Try pattern "from X to Y"
+          const match = txtRaw.match(fromToRegex);
+          if (match && match[1]) {
+            let candidate = match[1].trim();
+            candidate = candidate.split(/[,.!?]/)[0].trim();
+            if (candidate.length >= 2) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractOrigin(from-to) ->', candidate, '=>', normalized);
+              return normalized;
+            }
           }
-          if (i === msgs.length - 1 && txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
-            return txt;
+          
+          // 2) Explicit prefix
+          if (lower.startsWith('from:') || lower.includes('flying from')) {
+            const candidate = txtRaw.replace(/^from:\s*/i, '').replace(/flying from\s*/i, '').trim();
+            const normalized = normalizeCityName(candidate);
+            console.log('extractOrigin(prefix) ->', candidate, '=>', normalized);
+            return normalized;
+          }
+          
+          // 3) Short fallback
+          if (i === msgs.length - 1 && txtRaw.split(/\s+/).length <= 4 && !/[0-9$]/.test(txtRaw)) {
+            const normalized = normalizeCityName(txtRaw);
+            console.log('extractOrigin(short) ->', txtRaw, '=>', normalized);
+            return normalized;
           }
         }
         return null;
@@ -352,15 +400,38 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractDestination = (): string | null => {
         const msgs = getLastUserMessages();
+        const toRegex = /\b(?:to|going to)\s+([a-zA-Z][\w\s\.'-]{1,50})/i;
+        
         for (let i = msgs.length - 1; i >= 0; i--) {
-          const txt = (msgs[i] || '').trim();
-          if (!txt) continue;
-          const lower = txt.toLowerCase();
-          if (lower.startsWith('to:') || lower.includes('going to')) {
-            return txt.replace(/^to:\s*/i, '').replace(/going to\s*/i, '').trim();
+          const txtRaw = (msgs[i] || '').trim();
+          if (!txtRaw) continue;
+          const lower = txtRaw.toLowerCase();
+          
+          // 1) Try pattern "to Y" or "going to Y"
+          const match = txtRaw.match(toRegex);
+          if (match && match[1]) {
+            let candidate = match[1].trim();
+            candidate = candidate.split(/[,.!?]/)[0].trim();
+            if (candidate.length >= 2) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractDestination(to) ->', candidate, '=>', normalized);
+              return normalized;
+            }
           }
-          if (i === msgs.length - 1 && msgs.length > 1 && txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
-            return txt;
+          
+          // 2) Explicit prefix
+          if (lower.startsWith('to:')) {
+            const candidate = txtRaw.replace(/^to:\s*/i, '').trim();
+            const normalized = normalizeCityName(candidate);
+            console.log('extractDestination(prefix) ->', candidate, '=>', normalized);
+            return normalized;
+          }
+          
+          // 3) Short fallback
+          if (i === msgs.length - 1 && msgs.length > 1 && txtRaw.split(/\s+/).length <= 4 && !/[0-9$]/.test(txtRaw)) {
+            const normalized = normalizeCityName(txtRaw);
+            console.log('extractDestination(short) ->', txtRaw, '=>', normalized);
+            return normalized;
           }
         }
         return null;
@@ -576,13 +647,38 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractCity = (): string | null => {
         const msgs = getLastUserMessages().slice().reverse();
+        const STOP_WORDS_END = ['tonight','today','tomorrow','please','now','area','city','center','downtown'];
+        const prepositionRegex = /(\b(?:in|near|around|at)\s+)([a-zA-Z][\w\s\.'-]{1,50})/i;
+        
         for (const m of msgs) {
-          const txt = (m || '').trim();
-          if (!txt) continue;
-          const lower = txt.toLowerCase();
+          const txtRaw = (m || '').trim();
+          if (!txtRaw) continue;
+          const lower = txtRaw.toLowerCase();
+
+          // 1) Try to extract pattern like "in Dallas", "near Miami"
+          const prepositionMatch = txtRaw.match(prepositionRegex);
+          if (prepositionMatch && prepositionMatch[2]) {
+            let candidate = prepositionMatch[2].trim();
+            candidate = candidate.split(/[,.!?]/)[0].trim();
+            const parts = candidate.split(/\s+/);
+            while (parts.length > 1 && STOP_WORDS_END.includes(parts[parts.length - 1].toLowerCase())) {
+              parts.pop();
+            }
+            candidate = parts.join(' ').trim();
+            if (candidate.length >= 2) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractCity(events/preposition) ->', candidate, '=>', normalized);
+              return normalized;
+            }
+          }
+
+          // 2) Heuristic fallback
           if (lower.includes('looking for') || lower.includes('events')) continue;
-          if (txt.split(/\s+/).length <= 4 && !/[0-9]/.test(txt)) {
-            return txt;
+          const tokens = txtRaw.split(/\s+/);
+          if (tokens.length <= 4 && !/[0-9]/.test(txtRaw)) {
+            const normalized = normalizeCityName(txtRaw);
+            console.log('extractCity(events/short) ->', txtRaw, '=>', normalized);
+            return normalized;
           }
         }
         return null;
@@ -638,13 +734,38 @@ The user has saved preferences but has chosen to search without strict filtering
 
       const extractCity = (): string | null => {
         const msgs = getLastUserMessages().slice().reverse();
+        const STOP_WORDS_END = ['tonight','today','tomorrow','please','now','area','city','center','downtown'];
+        const prepositionRegex = /(\b(?:in|near|around|at)\s+)([a-zA-Z][\w\s\.'-]{1,50})/i;
+        
         for (const m of msgs) {
-          const txt = (m || '').trim();
-          if (!txt) continue;
-          const lower = txt.toLowerCase();
+          const txtRaw = (m || '').trim();
+          if (!txtRaw) continue;
+          const lower = txtRaw.toLowerCase();
+
+          // 1) Try to extract pattern like "in Dallas", "near Miami"
+          const prepositionMatch = txtRaw.match(prepositionRegex);
+          if (prepositionMatch && prepositionMatch[2]) {
+            let candidate = prepositionMatch[2].trim();
+            candidate = candidate.split(/[,.!?]/)[0].trim();
+            const parts = candidate.split(/\s+/);
+            while (parts.length > 1 && STOP_WORDS_END.includes(parts[parts.length - 1].toLowerCase())) {
+              parts.pop();
+            }
+            candidate = parts.join(' ').trim();
+            if (candidate.length >= 2) {
+              const normalized = normalizeCityName(candidate);
+              console.log('extractCity(cars/preposition) ->', candidate, '=>', normalized);
+              return normalized;
+            }
+          }
+
+          // 2) Heuristic fallback
           if (lower.includes('looking for') || lower.includes('car') || lower.includes('rental')) continue;
-          if (txt.split(/\s+/).length <= 4 && !/[0-9$]/.test(txt)) {
-            return txt;
+          const tokens = txtRaw.split(/\s+/);
+          if (tokens.length <= 4 && !/[0-9$]/.test(txtRaw)) {
+            const normalized = normalizeCityName(txtRaw);
+            console.log('extractCity(cars/short) ->', txtRaw, '=>', normalized);
+            return normalized;
           }
         }
         return null;
