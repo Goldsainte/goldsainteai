@@ -14,6 +14,7 @@ import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useSearchTracking } from "@/hooks/useSearchTracking";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 
 export const EnhancedSearchBar = () => {
   const navigate = useNavigate();
@@ -182,13 +183,11 @@ export const EnhancedSearchBar = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
         {/* Origin */}
-        <div className="md:col-span-5 relative">
-          <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-          <Input
-            placeholder="From (e.g., JFK, New York)"
-            className="pl-10 h-12 border-border text-base"
+        <div className="md:col-span-5">
+          <AirportAutocomplete
             value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
+            onChange={setOrigin}
+            placeholder="From (e.g., JFK, New York)"
           />
         </div>
 
@@ -205,13 +204,11 @@ export const EnhancedSearchBar = () => {
         </div>
 
         {/* Destination */}
-        <div className="md:col-span-5 relative">
-          <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-          <Input
-            placeholder="To (e.g., LAX, Los Angeles)"
-            className="pl-10 h-12 border-border text-base"
+        <div className="md:col-span-5">
+          <AirportAutocomplete
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={setDestination}
+            placeholder="To (e.g., LAX, Los Angeles)"
           />
         </div>
       </div>
