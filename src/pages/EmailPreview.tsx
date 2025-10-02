@@ -158,7 +158,8 @@ export default function EmailPreview() {
             }
             .hero-image {
               width: 100%;
-              height: auto;
+              height: 200px;
+              object-fit: cover;
               display: block;
             }
           .content {
@@ -381,7 +382,7 @@ export default function EmailPreview() {
             <img src="/wordmark-gold.png" alt="GoldSainte" class="logo" />
           </div>
           
-          <img src="/email-hero-luxury.jpg?v=3" alt="Luxury Travel" class="hero-image" />
+          <img src="/email-hero-luxury.jpg?v=4" alt="Luxury Travel" class="hero-image" />
           
           <div class="content">
             <h1>✓ Your flight is confirmed</h1>

@@ -471,7 +471,8 @@ const handler = async (req: Request): Promise<Response> => {
             }
             .hero-image {
               width: 100%;
-              height: auto;
+              height: 200px;
+              object-fit: cover;
               display: block;
             }
             .content {
