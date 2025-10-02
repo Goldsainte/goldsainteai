@@ -6,11 +6,15 @@ interface InspirationCardProps {
   title: string;
   location: string;
   description: string;
+  onClick?: () => void;
 }
 
-export const InspirationCard = ({ image, title, location, description }: InspirationCardProps) => {
+export const InspirationCard = ({ image, title, location, description, onClick }: InspirationCardProps) => {
   return (
-    <Card className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl border-0 h-64">
+    <Card 
+      className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl border-0 h-64"
+      onClick={onClick}
+    >
       {/* Image with overlay */}
       <div className="absolute inset-0">
         <img 

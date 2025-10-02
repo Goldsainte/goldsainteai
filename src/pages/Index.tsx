@@ -517,6 +517,18 @@ const Index = () => {
     }
   };
 
+  const handleInspirationClick = async (destination: { title: string; location: string; description: string }) => {
+    // Scroll to top (chat area)
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Wait for scroll to complete
+    setTimeout(() => {
+      // Pre-populate message asking about travel to this destination
+      const message = `I'm interested in traveling to ${destination.location}. Can you help me find flights and hotels?`;
+      handleSearch(message);
+    }, 500);
+  };
+
   const resetChat = () => {
     setMessages([]);
     setSearchResults([]);
@@ -702,6 +714,7 @@ const Index = () => {
                       title={destination.title}
                       location={destination.location}
                       description={destination.description}
+                      onClick={() => handleInspirationClick(destination)}
                     />
                   ))}
                 </div>
