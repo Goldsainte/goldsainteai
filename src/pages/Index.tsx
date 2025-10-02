@@ -99,11 +99,13 @@ const Index = () => {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const rotatingMessages = [
-    "Where luxury meets adventure...",
-    "Discover your next destination...",
-    "Experience world-class hospitality...",
-    "Find exclusive travel experiences...",
-    "Your journey begins here..."
+    "Where to next?",
+    "Discover handpicked hotels tailored to your taste.",
+    "Book smarter flights with AI that knows your preferences.",
+    "Find restaurants worth the reservation — curated by locals and AI.",
+    "Unlock exclusive events and local experiences wherever you land.",
+    "Join a planned excursion — guided by experts, powered by Goldsainte.",
+    "Need more than a booking? Match with expert travel agents in minutes."
   ];
 
   // Rotating messages effect
