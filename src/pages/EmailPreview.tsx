@@ -90,7 +90,7 @@ export default function EmailPreview() {
             
             <div class="total-price">
               <div class="total-label">Total Amount</div>
-              USD 1,725.00
+              $1,725.00
             </div>
             
             <div class="info-box">
@@ -505,19 +505,19 @@ export default function EmailPreview() {
             <div class="price-box">
               <div class="price-row">
                 <span>Base fare</span>
-                <span>USD 980.00</span>
+                <span>$980.00</span>
               </div>
               <div class="price-row">
                 <span>Seat selection</span>
-                <span>USD 70.00</span>
+                <span>$70.00</span>
               </div>
               <div class="price-row">
                 <span>Checked baggage (2 bags)</span>
-                <span>USD 100.00</span>
+                <span>$100.00</span>
               </div>
               <div class="price-total">
                 <span>Total paid</span>
-                <span>USD 1,150.00</span>
+                <span>$1,150.00</span>
               </div>
             </div>
             
