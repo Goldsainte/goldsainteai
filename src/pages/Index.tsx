@@ -423,12 +423,13 @@ const Index = () => {
         returnDate: dates.returnDate
       });
       
-      const promptMessage = dates.returnDate 
-        ? `Great! You're looking for a round-trip flight departing on ${dates.departureDate} and returning on ${dates.returnDate}. Where would you like to fly to?`
-        : `Great! You're looking for a one-way flight on ${dates.departureDate}. Where would you like to fly to?`;
-      
-      setMessages([{ role: 'assistant', content: promptMessage }]);
-      setConversationHistory([{ role: 'assistant', content: promptMessage }]);
+      // Give user a gentle nudge without resetting conversation
+      toast({
+        title: "Dates saved",
+        description: dates.returnDate
+          ? `Round-trip: depart ${dates.departureDate}, return ${dates.returnDate}. Now tell me your destination.`
+          : `One-way on ${dates.departureDate}. Now tell me your destination.`,
+      });
     }
   };
 
