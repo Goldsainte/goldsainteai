@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { SimpleHeader } from "@/components/SimpleHeader";
-import { SearchBar } from "@/components/SearchBar";
+import { EnhancedSearchBar } from "@/components/EnhancedSearchBar";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { HotelFilters } from "@/components/HotelFilters";
 import { Button } from "@/components/ui/button";
@@ -230,7 +230,7 @@ const SearchResults = () => {
         </Button>
         
         <div className="mb-6">
-          <SearchBar />
+          <EnhancedSearchBar />
         </div>
 
         {loading ? (
