@@ -32,7 +32,7 @@ serve(async (req) => {
     }
 
     // Paginate through TripAdvisor search results to avoid low limits
-    const perPage = 50; // TripAdvisor supports limit & offset; fetch in large pages
+    const perPage = 50; // Fetch 50 per page to reduce requests
     let offset = 0;
     const allSearchResults: any[] = [];
 

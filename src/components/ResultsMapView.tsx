@@ -117,12 +117,24 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
         }
       });
 
-      // Fit map to show all markers
+      // Fit map or geocode location to center
       if (hasValidCoordinates) {
         map.current.fitBounds(bounds, {
           padding: { top: 50, bottom: 50, left: 50, right: 50 },
           maxZoom: 15,
         });
+      } else if (location) {
+        // Fallback: center map based on the searched city using Mapbox Geocoding
+        fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(location)}.json?access_token=${mapboxToken}&limit=1`)
+          .then((res) => res.ok ? res.json() : null)
+          .then((geo) => {
+            const feature = geo?.features?.[0];
+            if (feature?.center && map.current) {
+              map.current.setCenter(feature.center as [number, number]);
+              map.current.setZoom(12);
+            }
+          })
+          .catch((e) => console.warn('Geocoding failed:', e));
       }
 
       // Cleanup
