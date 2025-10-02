@@ -17,6 +17,7 @@ import { EventCard } from "@/components/EventCard";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { PriceSlider } from "@/components/PriceSlider";
 import { CuisineSelector } from "@/components/CuisineSelector";
+import { TripTypeSelector } from "@/components/TripTypeSelector";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
@@ -90,6 +91,7 @@ const Index = () => {
   });
   const [showPriceSlider, setShowPriceSlider] = useState<{ type: "hotel" | "flight" | "restaurant" | "car" } | null>(null);
   const [showCuisineSelector, setShowCuisineSelector] = useState(false);
+  const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
 
@@ -377,6 +379,13 @@ const Index = () => {
           aiMessage.includes('cuisine preference')) {
         setTimeout(() => setShowCuisineSelector(true), 500);
       }
+      
+      // Check if AI is asking about trip type
+      if (aiMessage.includes('one-way flight or a round-trip') ||
+          aiMessage.includes('one-way or round-trip') ||
+          aiMessage.includes('would you like a one-way')) {
+        setTimeout(() => setShowTripTypeSelector(true), 500);
+      }
     } catch (err: any) {
       console.error('AI Agent error:', err);
       toast({
@@ -492,6 +501,7 @@ const Index = () => {
     setShowDatePicker(null);
     setShowPriceSlider(null);
     setShowCuisineSelector(false);
+    setShowTripTypeSelector(false);
   };
 
   const handlePriceSelected = (price: number) => {
@@ -502,6 +512,11 @@ const Index = () => {
   const handleCuisineSelected = (cuisine: string) => {
     setShowCuisineSelector(false);
     handleSearch(cuisine);
+  };
+
+  const handleTripTypeSelected = (tripType: "one-way" | "round-trip") => {
+    setShowTripTypeSelector(false);
+    handleSearch(tripType);
   };
 
   const getPlaceholderText = () => {
@@ -893,6 +908,16 @@ const Index = () => {
                     <CuisineSelector
                       onCuisineSelected={handleCuisineSelected}
                       onCancel={() => setShowCuisineSelector(false)}
+                    />
+                  </div>
+                )}
+
+                {/* Trip Type Selector */}
+                {showTripTypeSelector && (
+                  <div className="animate-in fade-in slide-in-from-bottom-4">
+                    <TripTypeSelector
+                      onSelect={handleTripTypeSelected}
+                      onCancel={() => setShowTripTypeSelector(false)}
                     />
                   </div>
                 )}
