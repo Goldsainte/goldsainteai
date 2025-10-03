@@ -82,6 +82,35 @@ function normalizeCityName(location: string): string {
   return variations.sort((a, b) => b.length - a.length)[0] || location;
 }
 
+// Helpers: parse single dates or ranges and normalize to YYYY-MM-DD
+function pad(n: number) { return n.toString().padStart(2, '0'); }
+function toISO(y: number, m: number, d: number) { return `${y}-${pad(m)}-${pad(d)}`; }
+
+function parseDates(input: string): { checkIn?: string; checkOut?: string } {
+  if (!input) return {};
+  const s = input.trim();
+  // ISO range: 2025-10-10 to 2025-10-13
+  const isoRange = s.match(/(\d{4}-\d{2}-\d{2})\s*(?:to|-|–|—|until)\s*(\d{4}-\d{2}-\d{2})/i);
+  if (isoRange) return { checkIn: isoRange[1], checkOut: isoRange[2] };
+
+  // MM/DD/YYYY range
+  const mdyRange = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s*(?:to|-|–|—|until)\s*(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/i);
+  if (mdyRange) {
+    const m1 = Number(mdyRange[1]), d1 = Number(mdyRange[2]), y1 = Number(mdyRange[3]);
+    const m2 = Number(mdyRange[4]), d2 = Number(mdyRange[5]), y2 = Number(mdyRange[6]);
+    return { checkIn: toISO(y1, m1, d1), checkOut: toISO(y2, m2, d2) };
+  }
+
+  // Single ISO date
+  const isoSingle = s.match(/(\d{4}-\d{2}-\d{2})/);
+  if (isoSingle) return { checkIn: isoSingle[1] };
+  // Single MM/DD/YYYY
+  const mdy = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if (mdy) return { checkIn: toISO(Number(mdy[3]), Number(mdy[1]), Number(mdy[2])) };
+
+  return {};
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -244,12 +273,21 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.location = message;
           nextStep = 2;
         } else if (step === 2) {
-          // Got check-in, ask for check-out
-          nextData.checkIn = message;
-          nextStep = 3;
+          // Got check-in (or range) from user
+          const parsed = parseDates(message);
+          if (parsed.checkIn && parsed.checkOut) {
+            nextData.checkIn = parsed.checkIn;
+            nextData.checkOut = parsed.checkOut;
+            nextStep = 4; // both provided, skip to budget
+          } else {
+            nextData.checkIn = parsed.checkIn || message;
+            nextStep = 3;
+          }
         } else if (step === 3) {
-          // Got check-out, ask for budget
-          nextData.checkOut = message;
+          // Got check-out (or range), ask for budget
+          const parsed = parseDates(message);
+          if (parsed.checkIn && !nextData.checkIn) nextData.checkIn = parsed.checkIn;
+          nextData.checkOut = parsed.checkOut || message;
           nextStep = 4;
         } else if (step === 4) {
           // Got budget, search
@@ -400,8 +438,8 @@ The user has saved preferences but has chosen to search without strict filtering
       let nextQuestion = '';
       if (type === 'hotels') {
         if (nextStep === 1) nextQuestion = "Where would you like to stay?";
-        else if (nextStep === 2) nextQuestion = `Perfect! When would you like to check in to ${nextData.location}?`;
-        else if (nextStep === 3) nextQuestion = "And when would you like to check out?";
+        else if (nextStep === 2) nextQuestion = `Perfect! When would you like to check in to ${nextData.location}? (single date, YYYY-MM-DD)`;
+        else if (nextStep === 3) nextQuestion = "And when would you like to check out? (single date, YYYY-MM-DD)";
         else if (nextStep === 4) nextQuestion = "What's your budget per night? (e.g., $100-$300)";
       } else if (type === 'flights') {
         if (nextStep === 1) nextQuestion = "Where will you be flying from?";
