@@ -240,7 +240,14 @@ serve(async (req) => {
       const perNight = total / nights;
       const currency = offer.price?.currency || "USD";
 
-      const photoUrls = (h.__googlePhotos || []).slice(0, 12);
+      // Build photo URL list as plain strings
+      const googlePhotoUrls: string[] = (h.__googlePhotos || [])
+        .slice(0, 12)
+        .map((p: any) => p?.url)
+        .filter((u: any) => typeof u === 'string' && !!u);
+      const fallbackMedia: string[] = (info.media?.map((m: any) => m?.uri).filter(Boolean)) || [];
+      const photoUrls: string[] = googlePhotoUrls.length > 0 ? googlePhotoUrls : fallbackMedia;
+
       const reviews = h.__googleReviews || [];
       const googleRating = h.__googleRating || info.rating || 0;
       const googleReviewCount = h.__googleRatingCount || 0;
