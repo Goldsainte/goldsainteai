@@ -21,7 +21,28 @@ async function getAmadeusToken() {
 }
 
 async function resolveCityCode(token: string, location: string): Promise<string> {
-  // Try Amadeus Locations API first
+  const raw = (location || "").trim().toLowerCase();
+  const base = raw.split(",")[0];
+
+  // First handle well-known neighborhoods/boroughs that should map to metro codes
+  const boroughs: Record<string, string> = {
+    // New York City boroughs and popular areas
+    "manhattan": "NYC",
+    "brooklyn": "NYC",
+    "queens": "NYC",
+    "bronx": "NYC",
+    "staten island": "NYC",
+    "times square": "NYC",
+    "soho": "NYC",
+    "upper east side": "NYC",
+    "upper west side": "NYC",
+    "tribeca": "NYC",
+    "chelsea": "NYC",
+    "harlem": "NYC",
+  };
+  if (boroughs[base]) return boroughs[base];
+
+  // Try Amadeus Locations API
   const params = new URLSearchParams({ keyword: location, subType: "CITY", "page[limit]": "1" });
   const r = await fetch(`https://test.api.amadeus.com/v1/reference-data/locations?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -40,7 +61,7 @@ async function resolveCityCode(token: string, location: string): Promise<string>
     "charlotte": "CLT", "boston": "BOS", "las vegas": "LAS",
     "paris": "PAR", "london": "LON", "tokyo": "TYO", "dubai": "DXB", "singapore": "SIN",
   };
-  const cityName = (location || "").split(",")[0].trim().toLowerCase();
+  const cityName = base;
   return map[cityName] || (cityName.replace(/\s+/g, "").slice(0, 3).toUpperCase() || "NYC");
 }
 

@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getHotelImage, getRoomImage, getHotelImages } from "@/lib/imageHelpers";
+import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 import { decodeData } from "@/lib/utils";
 import { BookingModal } from "@/components/BookingModal";
 import { PhotoGallery } from "@/components/PhotoGallery";
@@ -49,7 +50,7 @@ export default function HotelBooking() {
   const nights = bookingData.nights || 1;
   const guests = bookingData.guests || 2;
 
-  // Generate comprehensive image gallery - use real photos from Google Places
+// Generate comprehensive image gallery - use real photos from Google Places
   const hotelPhotos = bookingData.hotel?.property?.photoUrls || 
                       bookingData.property?.photoUrls || 
                       [];
@@ -61,6 +62,12 @@ export default function HotelBooking() {
         bookingData.hotel?.hotelId || hotelName,
         20
       );
+
+  // Currency symbol based on hotel location
+  const currencyInfo = getCurrencyFromLocation(
+    bookingData.hotel?.address?.cityName || bookingData.hotel?.address?.countryCode || bookingData.hotelAddress || ""
+  );
+  const currencySymbol = currencyInfo.symbol;
 
   const amenities = [
     { icon: Waves, label: "Outdoor pool" },
@@ -91,7 +98,7 @@ export default function HotelBooking() {
     setShowBookingModal(true);
   };
 
-  // Generate available rooms
+// Generate available rooms
   const availableRooms = bookingData.offers?.map((offer: any, index: number) => ({
     id: offer.id || `room-${index}`,
     name: offer.roomInformation?.typeEstimated?.category || offer.room?.typeEstimated?.category || 'Standard Room',
@@ -100,7 +107,7 @@ export default function HotelBooking() {
     bedType: offer.roomInformation?.typeEstimated?.bedType || offer.room?.typeEstimated?.bedType || 'Queen',
     price: parseFloat(offer.price?.total || bookingData.totalPrice || 200),
     currency: offer.price?.currency || bookingData.currency || 'USD',
-    image: getRoomImage(undefined, `room-${index}`),
+    image: offer.room?.images?.[0] || galleryImages[0] || '',
     amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
     cancellation: offer.policies?.refundable?.cancellationRefund === 'REFUNDABLE_UP_TO_DEADLINE' ? 'Free cancellation' : 'Non-refundable',
   })) || [
@@ -112,7 +119,7 @@ export default function HotelBooking() {
       bedType: 'Queen',
       price: bookingData.totalPrice || 200,
       currency: bookingData.currency || 'USD',
-      image: getRoomImage(undefined, 'default-room'),
+      image: galleryImages[0] || '',
       amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
       cancellation: 'Free cancellation',
     }
@@ -195,10 +202,14 @@ export default function HotelBooking() {
                     <div className="grid md:grid-cols-[280px_1fr] gap-6 p-6">
                       {/* Room Image */}
                       <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
-                        <img 
-                          src={room.image} 
+<img 
+                          src={room.image}
                           alt={room.name}
+                          loading="lazy"
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).style.display = 'none';
+                          }}
                         />
                         {room.cancellation.includes('Free') && (
                           <Badge className="absolute top-3 left-3 bg-green-600">
@@ -239,11 +250,11 @@ export default function HotelBooking() {
                             <div className="text-sm text-muted-foreground mb-1">
                               {nights} night{nights > 1 ? 's' : ''} total
                             </div>
-                            <div className="text-3xl font-bold text-primary">
-                              {room.currency} {(room.price * nights).toFixed(2)}
+<div className="text-3xl font-bold text-primary">
+                              {currencySymbol}{(room.price * nights).toFixed(2)}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {room.currency} {room.price.toFixed(2)} per night
+                              {currencySymbol}{room.price.toFixed(2)} per night
                             </div>
                             <div className="text-xs text-muted-foreground">
                               +taxes & fees

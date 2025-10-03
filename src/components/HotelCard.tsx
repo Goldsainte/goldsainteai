@@ -54,18 +54,26 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
     <>
       <Card className="overflow-hidden hover:shadow-lg transition-all border-2 hover:border-primary h-full flex flex-col">
         <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
-          <img 
-            src={getHotelImage(
-              hotel.photos?.[0] || hotelData.media?.[0]?.uri, 
+          {(() => {
+            const src = getHotelImage(
+              hotel.photos?.[0] || hotelData.media?.[0]?.uri,
               hotelData.hotelId || hotelData.name
-            )} 
-            alt={hotelData.name}
-            className="w-full h-full object-cover"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.src = getHotelImage(undefined, hotelData.hotelId || hotelData.name);
-            }}
-          />
+            );
+            return src ? (
+              <img
+                src={src}
+                alt={hotelData.name}
+                className="w-full h-full object-cover"
+                loading="lazy"
+                onError={(e) => {
+                  // Hide broken image; keep muted background visible
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-full h-full animate-pulse" aria-label="No image available" />
+            );
+          })()}
           <Badge className="absolute top-2 right-2 text-xs md:text-sm" variant="secondary">
             {currencySymbol}{price.toFixed(2)}
           </Badge>

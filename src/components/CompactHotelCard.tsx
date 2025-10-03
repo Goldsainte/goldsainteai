@@ -106,15 +106,21 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
       <Card className="group hover:shadow-md transition-all overflow-hidden">
         <div className="flex gap-3 p-3">
           {/* Image */}
-          <div className="relative w-32 h-24 flex-shrink-0 rounded-md overflow-hidden">
-            <img
-              src={image}
-              alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                e.currentTarget.src = getHotelImage(undefined, title);
-              }}
-            />
+          <div className="relative w-32 h-24 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+            {image ? (
+              <img
+                src={image}
+                alt={title}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  // Hide broken image so muted background shows instead
+                  (e.currentTarget as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            ) : (
+              <div className="w-full h-full animate-pulse" aria-label="No image available" />
+            )}
           </div>
 
           {/* Content */}
