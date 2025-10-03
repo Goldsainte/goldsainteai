@@ -91,13 +91,13 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
   // STRICT RULE: Only use real reviews from API, never generate fallback content
   const allReviews = useMemo(() => {
-    // Use reviews from property.reviews if available (real TripAdvisor reviews)
+    // Use reviews from property.reviews if available (real Google Places reviews)
     if (propertyData?.reviews && propertyData.reviews.length > 0) {
       return propertyData.reviews.map((review: any, i: number) => ({
         id: review.id || `review-${i}`,
-        author: review.user || 'Guest',
+        author: review.author || 'Guest',
         rating: Number(review.rating || 0),
-        date: review.published_date || new Date().toISOString(),
+        date: review.date || new Date().toISOString(),
         comment: review.text || '',
         photos: []
       }));

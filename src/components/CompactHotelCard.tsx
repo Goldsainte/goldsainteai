@@ -20,7 +20,7 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   const title = property.property?.name || property.name || property.title || "Hotel";
-  const imageUrl = property.property?.photoUrls?.[0] || property.photos?.[0]?.url || property.image;
+  const imageUrl = property.photos?.[0] || property.property?.photoUrls?.[0] || property.image;
   const image = getHotelImage(imageUrl, property.hotel_id || title);
   
   const getCityCode = () => {

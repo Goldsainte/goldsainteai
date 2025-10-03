@@ -55,7 +55,10 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
       <Card className="overflow-hidden hover:shadow-lg transition-all border-2 hover:border-primary h-full flex flex-col">
         <div className="aspect-video relative overflow-hidden bg-muted flex-shrink-0">
           <img 
-            src={getHotelImage(hotelData.media?.[0]?.uri, hotelData.hotelId || hotelData.name)} 
+            src={getHotelImage(
+              hotel.photos?.[0] || hotelData.media?.[0]?.uri, 
+              hotelData.hotelId || hotelData.name
+            )} 
             alt={hotelData.name}
             className="w-full h-full object-cover"
             loading="lazy"
