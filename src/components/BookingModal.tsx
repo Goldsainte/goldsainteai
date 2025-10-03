@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
+import { getCurrencySymbol } from "@/lib/currencyHelpers";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -118,6 +119,9 @@ export const BookingModal = ({
   const tax = subtotal * 0.10;
   const serviceFee = subtotal * 0.05;
   const total = subtotal + tax + serviceFee;
+  
+  // Get currency symbol from currency code
+  const currencySymbol = getCurrencySymbol(currency);
 
   const onSubmit = async (values: z.infer<typeof bookingFormSchema>) => {
     setLoading(true);
@@ -474,7 +478,7 @@ export const BookingModal = ({
                 render={({ field }) => (
                   <FormItem className="flex items-center space-x-2 space-y-0">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-4 w-4" />
                     </FormControl>
                     <FormLabel className="!mt-0 font-normal">I prefer paperless confirmation</FormLabel>
                   </FormItem>
@@ -489,7 +493,7 @@ export const BookingModal = ({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-4 w-4" />
                       </FormControl>
                       <FormLabel className="!mt-0 font-normal">Email</FormLabel>
                     </FormItem>
@@ -501,7 +505,7 @@ export const BookingModal = ({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-4 w-4" />
                       </FormControl>
                       <FormLabel className="!mt-0 font-normal">Text Message</FormLabel>
                     </FormItem>
@@ -518,20 +522,20 @@ export const BookingModal = ({
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between">
                   <span>Subtotal:</span>
-                  <span>{currency} {subtotal.toFixed(2)}</span>
+                  <span>{currencySymbol} {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Tax (10%):</span>
-                  <span>{currency} {tax.toFixed(2)}</span>
+                  <span>{currencySymbol} {tax.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Service Fee (5%):</span>
-                  <span>{currency} {serviceFee.toFixed(2)}</span>
+                  <span>{currencySymbol} {serviceFee.toFixed(2)}</span>
                 </div>
                 <Separator className="my-2" />
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total:</span>
-                  <span>{currency} {total.toFixed(2)}</span>
+                  <span>{currencySymbol} {total.toFixed(2)}</span>
                 </div>
               </div>
             </div>
