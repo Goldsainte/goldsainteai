@@ -131,16 +131,16 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
   return aggregated;
 }
 
-async function enrichWithTripAdvisor(hotels: any[], location: string) {
-  const tripKey = Deno.env.get("TRIPADVISOR_API_KEY");
-  if (!tripKey) {
-    console.log("TripAdvisor API key not configured, skipping photo/review enrichment");
+async function enrichWithGooglePlaces(hotels: any[], location: string) {
+  const apiKey = Deno.env.get("GOOGLE_PLACES_API_KEY");
+  if (!apiKey) {
+    console.log("Google Places API key not configured, skipping photo/review enrichment");
     return hotels;
   }
 
   const limit = Math.min(hotels.length, 20);
   const target = hotels.slice(0, limit);
-  console.log(`Enriching ${target.length} hotels with TripAdvisor photos and reviews...`);
+  console.log(`Enriching ${target.length} hotels with Google Places photos and reviews...`);
 
   // Simple concurrency control
   const batchSize = 5;
@@ -152,45 +152,64 @@ async function enrichWithTripAdvisor(hotels: any[], location: string) {
           const name = hotel.hotel?.name || "";
           const city = hotel.hotel?.address?.cityName || (location.split(",")[0] || "");
 
-          const searchParams = new URLSearchParams({ key: tripKey, searchQuery: `${name} ${city}`, category: "hotels", language: "en" });
-          const sRes = await fetch(`https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`, { headers: { Accept: "application/json" } });
-          if (!sRes.ok) return;
-          const sData = await sRes.json();
-          const locId = sData.data?.[0]?.location_id;
-          if (!locId) return;
+          // Text Search for hotel
+          const searchRes = await fetch("https://places.googleapis.com/v1/places:searchText", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Goog-Api-Key": apiKey,
+              "X-Goog-FieldMask": "places.id,places.displayName,places.photos,places.rating,places.userRatingCount,places.reviews"
+            },
+            body: JSON.stringify({
+              textQuery: `${name} hotel ${city}`,
+              maxResultCount: 1
+            })
+          });
 
-          const commonParams = new URLSearchParams({ key: tripKey, language: "en" });
-          const [pRes, rRes] = await Promise.all([
-            fetch(`https://api.content.tripadvisor.com/api/v1/location/${locId}/photos?${commonParams}`, { headers: { Accept: "application/json" } }),
-            fetch(`https://api.content.tripadvisor.com/api/v1/location/${locId}/reviews?${commonParams}`, { headers: { Accept: "application/json" } }),
-          ]);
+          if (!searchRes.ok) {
+            console.log(`Google Places search failed for ${name}: ${searchRes.status}`);
+            return;
+          }
 
-          const photosData = pRes.ok ? await pRes.json() : { data: [] };
-          const reviewsData = rRes.ok ? await rRes.json() : { data: [] };
+          const searchData = await searchRes.json();
+          if (!searchData.places || searchData.places.length === 0) return;
 
-          hotel.__tripPhotos = (photosData.data || []).map((ph: any) => ({
-            url: ph.images?.large?.url || ph.images?.medium?.url || ph.images?.small?.url,
-            caption: ph.caption || name,
-          })).filter((p: any) => p.url);
+          const place = searchData.places[0];
 
-          hotel.__tripReviews = (reviewsData.data || []).slice(0, 5).map((rev: any) => ({
-            author: rev.user?.username || "Anonymous",
-            rating: rev.rating || 0,
-            text: rev.text || "",
-            date: rev.published_date || "",
-            title: rev.title || "",
+          // Extract photos
+          hotel.__googlePhotos = (place.photos || []).slice(0, 12).map((photo: any) => ({
+            url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=1200&maxWidthPx=1600`,
+            attribution: photo.authorAttributions?.[0]?.displayName || ""
           }));
-          
-          console.log(`Enriched ${name}: ${hotel.__tripPhotos?.length || 0} photos, ${hotel.__tripReviews?.length || 0} reviews`);
+
+          // Extract reviews
+          hotel.__googleReviews = (place.reviews || []).slice(0, 5).map((review: any) => ({
+            author: review.authorAttribution?.displayName || "Anonymous",
+            rating: review.rating || 0,
+            text: review.text?.text || review.originalText?.text || "",
+            date: review.publishTime || "",
+            relativeTime: review.relativePublishTimeDescription || ""
+          }));
+
+          // Overall rating
+          hotel.__googleRating = place.rating || 0;
+          hotel.__googleRatingCount = place.userRatingCount || 0;
+
+          console.log(`Enriched ${name}: ${hotel.__googlePhotos?.length || 0} photos, ${hotel.__googleReviews?.length || 0} reviews, rating: ${hotel.__googleRating}`);
         } catch (e) {
-          console.warn(`TripAdvisor enrichment failed for ${hotel.hotel?.name}:`, e);
+          console.warn(`Google Places enrichment failed for ${hotel.hotel?.name}:`, e);
         }
       })
     );
+    
+    // Small delay between batches
+    if (i + batchSize < target.length) {
+      await new Promise(r => setTimeout(r, 100));
+    }
   }
   
-  const enrichedCount = hotels.filter(h => h.__tripPhotos?.length > 0).length;
-  console.log(`TripAdvisor enrichment complete: ${enrichedCount}/${target.length} hotels have photos`);
+  const enrichedCount = hotels.filter(h => h.__googlePhotos?.length > 0).length;
+  console.log(`Google Places enrichment complete: ${enrichedCount}/${target.length} hotels have photos`);
   return hotels;
 }
 
@@ -210,7 +229,7 @@ serve(async (req) => {
     const amadeusHotels = await fetchAmadeusHotels(token, cityCode, checkIn, checkOut, Number(guests) || 2);
     console.log("Amadeus hotels fetched:", amadeusHotels.length);
 
-    const enriched = await enrichWithTripAdvisor(amadeusHotels, location);
+    const enriched = await enrichWithGooglePlaces(amadeusHotels, location);
 
     // Transform result to UI-friendly structure
     const nights = Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)));
@@ -221,8 +240,10 @@ serve(async (req) => {
       const perNight = total / nights;
       const currency = offer.price?.currency || "USD";
 
-      const photoUrls = (h.__tripPhotos || []).slice(0, 12);
-      const reviews = h.__tripReviews || [];
+      const photoUrls = (h.__googlePhotos || []).slice(0, 12);
+      const reviews = h.__googleReviews || [];
+      const googleRating = h.__googleRating || info.rating || 0;
+      const googleReviewCount = h.__googleRatingCount || 0;
 
       return {
         hotel_id: h.id || info.hotelId,
@@ -230,14 +251,14 @@ serve(async (req) => {
         address: info.address?.lines?.[0] || "",
         city: info.address?.cityName || location,
         country: info.address?.countryCode || "",
-        rating: info.rating || 0,
-        num_reviews: reviews.length,
+        rating: googleRating,
+        num_reviews: googleReviewCount,
         property: {
           name: info.name || "Hotel",
           photoUrls,
           reviews,
-          reviewScore: info.rating || 0,
-          reviewCount: reviews.length,
+          reviewScore: googleRating,
+          reviewCount: googleReviewCount,
           externalUrls: { amadeus: h.self || "", default: h.self || "" },
         },
         location: info.address?.cityName || location,
