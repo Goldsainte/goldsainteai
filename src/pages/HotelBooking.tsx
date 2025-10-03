@@ -13,7 +13,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { PhotoGallery } from "@/components/PhotoGallery";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { ExploreArea } from "@/components/ExploreArea";
-import { PriceCalendar } from "@/components/PriceCalendar";
+
 
 export default function HotelBooking() {
   const [searchParams] = useSearchParams();
@@ -472,13 +472,6 @@ export default function HotelBooking() {
               </div>
             </Card>
 
-            {/* Price Calendar */}
-            <PriceCalendar 
-              basePrice={bookingData.totalPrice || 200}
-              currency={bookingData.currency || 'USD'}
-              checkIn={checkIn}
-              checkOut={checkOut}
-            />
 
           </div>
         </div>
