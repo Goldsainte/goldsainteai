@@ -66,6 +66,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
     const urls: string[] = [
       ...(propertyData?.photoUrls || []),
       ...(hotelData?.media?.map((m: any) => m?.uri).filter(Boolean) || []),
+      ...((hotel?.photos as string[]) || []),
       ...((hotel?.images as string[]) || []),
     ].filter(Boolean).filter(u => typeof u === 'string') as string[];
 

@@ -1,14 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import { CalendarIcon, Loader2, Users, Minus, Plus } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
+import { useSearchParams } from "react-router-dom";
 
 interface DateSelectionModalProps {
   open: boolean;
@@ -34,6 +33,24 @@ export const DateSelectionModal = ({
   const [checkOutDate, setCheckOutDate] = useState<Date>();
   const [adults, setAdults] = useState(2);
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  // Default dates sourced from URL or sensible defaults when modal opens
+  useEffect(() => {
+    if (!open) return;
+    const ci = searchParams.get('checkIn');
+    const co = searchParams.get('checkOut');
+    if (ci) setCheckInDate(new Date(ci));
+    if (co) setCheckOutDate(new Date(co));
+    if (!ci || !co) {
+      const start = new Date();
+      start.setDate(start.getDate() + 1);
+      const end = new Date(start);
+      end.setDate(end.getDate() + 2);
+      setCheckInDate((prev) => prev ?? start);
+      setCheckOutDate((prev) => prev ?? end);
+    }
+  }, [open]);
 
   const handleCheckAvailability = async () => {
     if (!checkInDate || !checkOutDate) {
@@ -97,21 +114,7 @@ export const DateSelectionModal = ({
           {/* Date Range Selection */}
           <Card className="p-4 border-accent/20">
             <Label className="text-sm font-medium mb-3 block">Select Dates</Label>
-            <Calendar
-              mode="range"
-              selected={{
-                from: checkInDate,
-                to: checkOutDate,
-              }}
-              onSelect={(range) => {
-                setCheckInDate(range?.from);
-                setCheckOutDate(range?.to);
-              }}
-              disabled={(date) => date < new Date()}
-              numberOfMonths={2}
-              initialFocus
-              className="p-3 pointer-events-auto rounded-md border"
-            />
+            {/* Dates Summary (Calendar removed for stability) */}
             
             {/* Date Summary */}
             {checkInDate && checkOutDate && (
