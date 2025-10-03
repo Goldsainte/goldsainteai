@@ -9,6 +9,7 @@ import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Chec
 import { useState, useMemo } from "react";
 import { HotelMap } from "./HotelMap";
 import { getHotelImages, getRoomImages } from "@/lib/imageHelpers";
+import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
 interface RoomOption {
   id: string;
@@ -49,6 +50,12 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
   const hotelAddress = propertyData?.address || hotelData.address?.lines?.[0] || hotelData.address || "Location";
   const reviewCount = Number(propertyData?.reviewCount ?? 0);
   const hotelId = propertyData?.id || hotelData.hotel_id || 0;
+
+  // Currency based on hotel city or country
+  const hotelCityOrCountry = hotelData.address?.cityName || hotelData.address?.countryCode || "United States";
+  const currencyInfo = getCurrencyFromLocation(hotelCityOrCountry);
+  const currencySymbol = currencyInfo.symbol;
+  const currencyCode = currencyInfo.code;
 
   // Extract coordinates from all possible locations
   const hotelLatitude = propertyData?.latitude || hotelData.latitude || hotel.latitude;
@@ -334,9 +341,9 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <AccordionContent>
                     <div className="space-y-2 text-sm">
                       <div><strong>Accepted:</strong> Visa, Mastercard, American Express, Discover</div>
-                      <div><strong>Deposit:</strong> Credit card hold of $100 per night required at check-in</div>
+                      <div><strong>Deposit:</strong> Credit card hold of {currencySymbol}100 per night required at check-in</div>
                       <div><strong>Incidentals:</strong> Additional charges for room service, minibar, etc.</div>
-                      <div><strong>Currency:</strong> USD accepted, other currencies subject to conversion fees</div>
+                      <div><strong>Currency:</strong> {currencyCode} accepted, other currencies subject to conversion fees</div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -344,10 +351,10 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   <AccordionTrigger>Pets & Children</AccordionTrigger>
                   <AccordionContent>
                     <div className="space-y-2 text-sm">
-                      <div><strong>Pets:</strong> Small pets allowed with $50/night fee (max 2 pets, 25 lbs each)</div>
+                      <div><strong>Pets:</strong> Small pets allowed with {currencySymbol}50/night fee (max 2 pets, 25 lbs each)</div>
                       <div><strong>Children:</strong> Children of all ages welcome</div>
                       <div><strong>Cribs:</strong> Available upon request, complimentary</div>
-                      <div><strong>Extra Beds:</strong> $30 per night for guests over 12 years old</div>
+                      <div><strong>Extra Beds:</strong> {currencySymbol}30 per night for guests over 12 years old</div>
                     </div>
                   </AccordionContent>
                 </AccordionItem>
@@ -371,7 +378,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                 <div className="flex gap-4">
                   <div className="w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
                     <img 
-                      src={room.images[0]} 
+                      src={room.images[0] || hotelPhotos[0]}
                       alt={`${room.name} - room photo`}
                       loading="lazy"
                       className="w-full h-full object-cover"
@@ -399,7 +406,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                       </div>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-primary">
-                          ${room.price}
+                          {currencySymbol}{room.price}
                         </div>
                         <div className="text-xs text-muted-foreground">per night</div>
                       </div>

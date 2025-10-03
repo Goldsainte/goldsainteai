@@ -109,7 +109,8 @@ export const DateSelectionModal = ({
               }}
               disabled={(date) => date < new Date()}
               numberOfMonths={2}
-              className="pointer-events-auto rounded-md border"
+              initialFocus
+              className="p-3 pointer-events-auto rounded-md border"
             />
             
             {/* Date Summary */}
