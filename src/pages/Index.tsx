@@ -380,15 +380,26 @@ const Index = () => {
         'when would you like to depart', 'when would you like to fly',
         'travel dates', 'departure date', 'return date',
         'when do you want to', 'what day', 'when should',
-        'when do you need', 'arrival date', 'leaving on'
+        'when do you need', 'arrival date', 'leaving on',
+        'pick up the car', 'pickup date', 'when would you like to pick up',
+        'return the car', 'drop off', 'when would you like to return'
       ];
       
       const hasDateKeyword = dateKeywords.some(keyword => aiMessage.includes(keyword));
       
       if (hasDateKeyword) {
-        const type = (aiMessage.includes('stay') || 
-                     aiMessage.includes('hotel') || 
-                     aiMessage.includes('check')) ? 'hotel' : 'flight';
+        // Determine the type based on context
+        let type: 'hotel' | 'flight' = 'flight';
+        if (aiMessage.includes('stay') || 
+            aiMessage.includes('hotel') || 
+            aiMessage.includes('check')) {
+          type = 'hotel';
+        } else if (aiMessage.includes('pick up') || 
+                   aiMessage.includes('pickup') || 
+                   aiMessage.includes('car') ||
+                   aiMessage.includes('rental')) {
+          type = 'flight'; // Use flight type for car rentals (handles single dates)
+        }
         setTimeout(() => setShowDatePicker({ type, context: 'quicklink' }), 500);
       }
 

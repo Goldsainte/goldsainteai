@@ -371,9 +371,18 @@ The user has saved preferences but has chosen to search without strict filtering
           nextData.pickupLocation = message;
           nextStep = 2;
         } else if (step === 2) {
-          // Got pickup date, ask for return date
-          nextData.pickupDate = message;
-          nextStep = 3;
+          // Check if both dates were provided at once (from date picker)
+          const returningMatch = message.match(/^(\d{4}-\d{2}-\d{2})\s+returning\s+(\d{4}-\d{2}-\d{2})$/i);
+          if (returningMatch) {
+            // Both dates provided, ask for budget
+            nextData.pickupDate = returningMatch[1];
+            nextData.returnDate = returningMatch[2];
+            nextStep = 4; // Skip to budget step
+          } else {
+            // Just pickup date provided, ask for return
+            nextData.pickupDate = message;
+            nextStep = 3;
+          }
         } else if (step === 3) {
           // Got return date, ask for budget
           nextData.returnDate = message;
