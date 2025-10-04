@@ -367,27 +367,44 @@ The user has saved preferences but has chosen to search without strict filtering
           // Ask for pickup location
           nextStep = 1;
         } else if (step === 1) {
-          // Got location, ask for pickup date
+          // Got location, ask for trip type (one-way or round-trip)
           nextData.pickupLocation = message;
           nextStep = 2;
         } else if (step === 2) {
+          // Got trip type
+          const isOneWay = message.toLowerCase().includes('one-way') || message.toLowerCase().includes('one way');
+          nextData.tripType = isOneWay ? 'one-way' : 'round-trip';
+          
+          if (isOneWay) {
+            // Ask for dropoff location
+            nextStep = 3;
+          } else {
+            // Round-trip, skip to pickup date
+            nextData.dropoffLocation = nextData.pickupLocation; // Same location
+            nextStep = 4;
+          }
+        } else if (step === 3) {
+          // Got dropoff location (one-way only)
+          nextData.dropoffLocation = message;
+          nextStep = 4;
+        } else if (step === 4) {
           // Check if both dates were provided at once (from date picker)
           const returningMatch = message.match(/^(\d{4}-\d{2}-\d{2})\s+returning\s+(\d{4}-\d{2}-\d{2})$/i);
           if (returningMatch) {
             // Both dates provided, ask for budget
             nextData.pickupDate = returningMatch[1];
             nextData.returnDate = returningMatch[2];
-            nextStep = 4; // Skip to budget step
+            nextStep = 6; // Skip to budget step
           } else {
             // Just pickup date provided, ask for return
             nextData.pickupDate = message;
-            nextStep = 3;
+            nextStep = 5;
           }
-        } else if (step === 3) {
+        } else if (step === 5) {
           // Got return date, ask for budget
           nextData.returnDate = message;
-          nextStep = 4;
-        } else if (step === 4) {
+          nextStep = 6;
+        } else if (step === 6) {
           // Got budget, search
           nextData.budget = message;
           shouldSearch = true;
@@ -425,7 +442,8 @@ The user has saved preferences but has chosen to search without strict filtering
           toolResult = await searchCars({
             pickupLocation: nextData.pickupLocation,
             pickupDate: nextData.pickupDate,
-            returnDate: nextData.returnDate
+            returnDate: nextData.returnDate,
+            dropoffLocation: nextData.dropoffLocation
           });
         }
         
@@ -465,9 +483,11 @@ The user has saved preferences but has chosen to search without strict filtering
         else if (nextStep === 2) nextQuestion = "What's your budget per ticket? (e.g., $50-$200)";
       } else if (type === 'cars') {
         if (nextStep === 1) nextQuestion = "Where would you like to pick up the car?";
-        else if (nextStep === 2) nextQuestion = `Great! When would you like to pick up the car in ${nextData.pickupLocation}?`;
-        else if (nextStep === 3) nextQuestion = "And when would you like to return the car?";
-        else if (nextStep === 4) nextQuestion = "What's your budget per day? (e.g., $50-$150)";
+        else if (nextStep === 2) nextQuestion = `Great! Is this a one-way rental or round-trip?`;
+        else if (nextStep === 3) nextQuestion = `Where would you like to drop off the car?`;
+        else if (nextStep === 4) nextQuestion = `Perfect! When would you like to pick up the car in ${nextData.pickupLocation}?`;
+        else if (nextStep === 5) nextQuestion = "And when would you like to return the car?";
+        else if (nextStep === 6) nextQuestion = "What's your budget per day? (e.g., $50-$150)";
       }
       
       return new Response(JSON.stringify({
@@ -1535,8 +1555,8 @@ async function searchFlights(args: any) {
 
 async function searchCars(args: any) {
   try {
-    const { pickupLocation, pickupDate, returnDate } = args;
-    console.log('searchCars called with:', { pickupLocation, pickupDate, returnDate });
+    const { pickupLocation, pickupDate, returnDate, dropoffLocation } = args;
+    console.log('searchCars called with:', { pickupLocation, pickupDate, returnDate, dropoffLocation });
 
     // Convert city names to airport codes if needed
     const getAirportCode = (location: string) => {
@@ -1563,7 +1583,8 @@ async function searchCars(args: any) {
     };
 
     const pickupCode = getAirportCode(pickupLocation);
-    console.log('Converted pickup location to airport code:', pickupCode);
+    const dropoffCode = dropoffLocation ? getAirportCode(dropoffLocation) : pickupCode;
+    console.log('Converted locations to airport codes:', { pickupCode, dropoffCode });
 
     // Get Amadeus credentials
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
@@ -1597,6 +1618,11 @@ async function searchCars(args: any) {
       currencyCode: 'USD'
     });
 
+    // Add dropoff location if different from pickup
+    if (dropoffCode && dropoffCode !== pickupCode) {
+      params.append('dropoffLocation', dropoffCode);
+    }
+
     console.log('Calling Amadeus API with params:', params.toString());
 
     const response = await fetch(
@@ -1620,6 +1646,7 @@ async function searchCars(args: any) {
     return {
       type: 'cars',
       pickupLocation: pickupCode,
+      dropoffLocation: dropoffCode,
       pickupDate: pickupDateTime,
       returnDate: returnDateTime,
       results: data.data || [],

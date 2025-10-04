@@ -434,7 +434,9 @@ const Index = () => {
       // Check if AI is asking about trip type
       if (aiMessage.includes('one-way flight or a round-trip') ||
           aiMessage.includes('one-way or round-trip') ||
-          aiMessage.includes('would you like a one-way')) {
+          aiMessage.includes('would you like a one-way') ||
+          aiMessage.includes('one-way rental or round-trip') ||
+          aiMessage.includes('is this a one-way rental')) {
         setTimeout(() => setShowTripTypeSelector(true), 500);
       }
     } catch (err: any) {
