@@ -489,7 +489,32 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                 </div>
               ))}
 
-              <Button onClick={() => setStep(2)} className="w-full">
+              <Button 
+                onClick={() => {
+                  // Validate passenger info before proceeding
+                  const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
+                  const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
+                  const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+
+                  for (let i = 0; i < passengers.length; i++) {
+                    const p = passengers[i];
+                    if (!p.title || !p.firstName || !p.lastName || !p.dateOfBirth || !p.gender || !p.nationality) {
+                      toast.error(`Please complete all required fields for passenger ${i + 1}`);
+                      return;
+                    }
+                    
+                    if (isInternational) {
+                      if (!p.passportNumber || !p.passportExpiry || !p.passportCountry) {
+                        toast.error(`Passport information is required for international flights (Passenger ${i + 1})`);
+                        return;
+                      }
+                    }
+                  }
+                  
+                  setStep(2);
+                }} 
+                className="w-full"
+              >
                 Continue to Seat Selection
               </Button>
             </div>
@@ -535,6 +560,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
           {step === 4 && (
             <div className="space-y-4">
               <h4 className="font-semibold">Contact Information</h4>
+              <p className="text-sm text-muted-foreground">All fields marked with * are required</p>
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -640,7 +666,18 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                 <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
                   Back to Baggage
                 </Button>
-                <Button onClick={handleBooking} disabled={loading} className="flex-1">
+                <Button 
+                  onClick={() => {
+                    // Validate contact info before booking
+                    if (!contactInfo.email || !contactInfo.phone || !contactInfo.address || !contactInfo.city || !contactInfo.postalCode || !contactInfo.country) {
+                      toast.error("Please complete all required contact and address fields");
+                      return;
+                    }
+                    handleBooking();
+                  }} 
+                  disabled={loading} 
+                  className="flex-1"
+                >
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />

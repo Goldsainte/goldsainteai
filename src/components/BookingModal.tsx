@@ -36,6 +36,14 @@ const bookingFormSchema = z.object({
   specialRequests: z.string().optional(),
   estimatedArrivalTime: z.string().optional(),
   needCrib: z.boolean().default(false),
+}).refine((data) => {
+  if (data.bookingFor === "someone_else") {
+    return data.guestName && data.guestName.trim().length > 0;
+  }
+  return true;
+}, {
+  message: "Guest name is required when booking for someone else",
+  path: ["guestName"],
 });
 
 interface BookingModalProps {
