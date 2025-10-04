@@ -15,6 +15,7 @@ import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
 import { JobBidsReview } from "@/components/JobBidsReview";
 import { JobMessaging } from "@/components/JobMessaging";
 import { JobApprovalModal } from "@/components/JobApprovalModal";
+import { ReviewModal } from "@/components/ReviewModal";
 
 export default function Marketplace() {
   const { user } = useAuth();
@@ -28,6 +29,10 @@ export default function Marketplace() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isViewJobDialogOpen, setIsViewJobDialogOpen] = useState(false);
   const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [reviewJobId, setReviewJobId] = useState<string>("");
+  const [reviewAgentId, setReviewAgentId] = useState<string>("");
+  const [reviewAgentName, setReviewAgentName] = useState<string>("");
 
   useEffect(() => {
     if (!user) {
@@ -491,7 +496,35 @@ export default function Marketplace() {
             fetchJobs();
             setIsApprovalModalOpen(false);
             setIsViewJobDialogOpen(false);
-            toast.success('You can now leave a review for the agent!');
+            
+            // Prompt for review
+            if (selectedJob?.assigned_agent_id) {
+              const agentBid = jobBids.find(bid => bid.status === 'accepted');
+              if (agentBid) {
+                setReviewJobId(selectedJob.id);
+                setReviewAgentId(selectedJob.assigned_agent_id);
+                setReviewAgentName(agentBid.travel_agents?.agency_name || 'this agent');
+                setIsReviewModalOpen(true);
+              }
+            }
+          }}
+        />
+      )}
+
+      {reviewJobId && reviewAgentId && (
+        <ReviewModal
+          jobId={reviewJobId}
+          agentId={reviewAgentId}
+          agentName={reviewAgentName}
+          isOpen={isReviewModalOpen}
+          onClose={() => {
+            setIsReviewModalOpen(false);
+            setReviewJobId("");
+            setReviewAgentId("");
+            setReviewAgentName("");
+          }}
+          onSuccess={() => {
+            toast.success('Thank you for your review!');
           }}
         />
       )}

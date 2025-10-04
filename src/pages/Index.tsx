@@ -785,6 +785,15 @@ const Index = () => {
                   <Button
                     variant="outline"
                     size="sm"
+                    onClick={() => navigate('/browse-agents')}
+                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
+                  >
+                    <Briefcase className="h-4 w-4" />
+                    Travel Agents
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
                     onClick={() => setShowWelcomeModal(true)}
                     className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
                   >

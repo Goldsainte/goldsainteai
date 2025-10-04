@@ -19,6 +19,8 @@ import Marketplace from "./pages/Marketplace";
 import AgentOnboarding from "./pages/AgentOnboarding";
 import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
+import AgentProfile from "./pages/AgentProfile";
+import BrowseAgents from "./pages/BrowseAgents";
 import BookingPreferences from "./pages/BookingPreferences";
 import CommissionDashboard from "./pages/CommissionDashboard";
 import EmailPreview from "./pages/EmailPreview";
@@ -49,9 +51,11 @@ function App() {
                       <Route path="/auth" element={<Auth />} />
                       <Route path="/onboarding" element={<Onboarding />} />
                       <Route path="/dashboard" element={<Dashboard />} />
-               <Route path="/marketplace" element={<Marketplace />} />
-               <Route path="/agent-onboarding" element={<AgentOnboarding />} />
-               <Route path="/agent-dashboard" element={<AgentDashboard />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/browse-agents" element={<BrowseAgents />} />
+                <Route path="/agent/:agentId" element={<AgentProfile />} />
+                <Route path="/agent-onboarding" element={<AgentOnboarding />} />
+                <Route path="/agent-dashboard" element={<AgentDashboard />} />
                <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
                <Route path="/booking-preferences" element={<BookingPreferences />} />
                <Route path="/commission-dashboard" element={<CommissionDashboard />} />

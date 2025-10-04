@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign, Users } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -24,6 +24,7 @@ const items = [
   { title: "Search", url: "/search", icon: Search },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, authRequired: true },
   { title: "Marketplace", url: "/marketplace", icon: Clipboard, authRequired: true },
+  { title: "Browse Agents", url: "/browse-agents", icon: Users },
   { title: "Favorites", url: "/favorites", icon: Heart },
 ];
 
