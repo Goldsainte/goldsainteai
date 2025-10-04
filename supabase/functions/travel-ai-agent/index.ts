@@ -1538,6 +1538,33 @@ async function searchCars(args: any) {
     const { pickupLocation, pickupDate, returnDate } = args;
     console.log('searchCars called with:', { pickupLocation, pickupDate, returnDate });
 
+    // Convert city names to airport codes if needed
+    const getAirportCode = (location: string) => {
+      // If already looks like an airport code (3 letters), use it
+      if (/^[A-Z]{3}$/i.test(location.trim())) {
+        return location.toUpperCase();
+      }
+
+      // Simple city to code mapping for common cities
+      const cityToCode: Record<string, string> = {
+        'new york': 'JFK', 'los angeles': 'LAX', 'san francisco': 'SFO',
+        'washington': 'IAD', 'chicago': 'ORD', 'miami': 'MIA',
+        'boston': 'BOS', 'seattle': 'SEA', 'atlanta': 'ATL',
+        'denver': 'DEN', 'las vegas': 'LAS', 'phoenix': 'PHX',
+        'dallas': 'DFW', 'houston': 'IAH', 'detroit': 'DTW',
+        'minneapolis': 'MSP', 'orlando': 'MCO', 'philadelphia': 'PHL',
+        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
+        'paris': 'CDG', 'london': 'LHR', 'tokyo': 'NRT',
+        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG'
+      };
+      
+      const lowerLocation = location.toLowerCase().trim();
+      return cityToCode[lowerLocation] || location.toUpperCase().slice(0, 3);
+    };
+
+    const pickupCode = getAirportCode(pickupLocation);
+    console.log('Converted pickup location to airport code:', pickupCode);
+
     // Get Amadeus credentials
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
     const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
@@ -1558,13 +1585,19 @@ async function searchCars(args: any) {
 
     const { access_token } = await tokenResponse.json();
 
+    // Add times to dates (10:00 AM for pickup and return)
+    const pickupDateTime = `${pickupDate}T10:00:00`;
+    const returnDateTime = `${returnDate}T10:00:00`;
+
     // Build query parameters
     const params = new URLSearchParams({
-      pickupLocation,
-      pickupDate,
-      dropoffDate: returnDate,
+      pickupLocation: pickupCode,
+      pickupDate: pickupDateTime,
+      dropoffDate: returnDateTime,
       currencyCode: 'USD'
     });
+
+    console.log('Calling Amadeus API with params:', params.toString());
 
     const response = await fetch(
       `https://test.api.amadeus.com/v1/shopping/car-rental-offers?${params}`,
@@ -1586,9 +1619,9 @@ async function searchCars(args: any) {
 
     return {
       type: 'cars',
-      pickupLocation,
-      pickupDate,
-      returnDate,
+      pickupLocation: pickupCode,
+      pickupDate: pickupDateTime,
+      returnDate: returnDateTime,
       results: data.data || [],
       meta: data.meta
     };
