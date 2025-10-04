@@ -105,6 +105,7 @@ const Index = () => {
   const [selectedTripType, setSelectedTripType] = useState<"one-way" | "round-trip" | null>(null);
   const selectedTripTypeRef = useRef<"one-way" | "round-trip" | null>(null);
   const tripTypeResolvedRef = useRef<boolean>(false);
+  const lastRequestIdRef = useRef<number>(0);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(true);
@@ -301,6 +302,7 @@ const Index = () => {
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
     if (!queryToSend.trim()) return;
+    const requestId = ++lastRequestIdRef.current;
 
     // Close Trip Type modal if the user typed the answer directly
     const normalizedTrip = queryToSend.trim().toLowerCase();
@@ -348,6 +350,9 @@ const Index = () => {
       });
 
       if (error) throw error;
+
+      // Ignore stale responses
+      if (requestId !== lastRequestIdRef.current) return;
 
       setMessages(prev => [...prev, { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }]);
       
@@ -467,7 +472,7 @@ const Index = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      if (requestId === lastRequestIdRef.current) setIsLoading(false);
     }
   };
 
@@ -515,6 +520,8 @@ const Index = () => {
     setSearchResults([]);
     setMessages([{ role: 'user', content: query }]);
 
+    const requestId = ++lastRequestIdRef.current;
+
     try {
       setActiveQuickLink(action as "hotels" | "flights" | "restaurants" | "events" | "cars");
       const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
@@ -533,13 +540,66 @@ const Index = () => {
 
       if (error) throw error;
 
+      // Ignore stale responses
+      if (requestId !== lastRequestIdRef.current) return;
+
       setMessages([
         { role: 'user', content: query },
         { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }
       ]);
       
+      if (data.toolResults && data.toolResults.length > 0) {
+        setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+        setActiveQuickLink(null);
+      }
+      
       if (data.conversationHistory) {
         setConversationHistory(data.conversationHistory);
+      }
+
+      // Mirror modal triggers used in handleSearch
+      const aiMessage = data.message.toLowerCase();
+      const dateKeywords = [
+        'when are you', 'when will you', 'which dates', 'what dates',
+        'check-in', 'check in', 'check out', 'checkout',
+        'when would you like to check', 'when would you like to stay',
+        'when would you like to depart', 'when would you like to fly',
+        'travel dates', 'departure date', 'return date',
+        'when do you want to', 'what day', 'when should',
+        'when do you need', 'arrival date', 'leaving on',
+        'pick up the car', 'pickup date', 'when would you like to pick up',
+        'return the car', 'drop off', 'when would you like to return'
+      ];
+      const hasDateKeyword = dateKeywords.some((k) => aiMessage.includes(k));
+      if (hasDateKeyword) {
+        let type: 'hotel' | 'flight' = 'flight';
+        if (aiMessage.includes('stay') || aiMessage.includes('hotel') || aiMessage.includes('check')) type = 'hotel';
+        else if (aiMessage.includes('pick up') || aiMessage.includes('pickup') || aiMessage.includes('car') || aiMessage.includes('rental')) type = 'flight';
+        setTimeout(() => setShowDatePicker((prev) => prev ?? { type, context: 'quicklink' }), 500);
+      }
+
+      const budgetKeywords = {
+        hotel: ['budget per night', 'price range per night', 'spend per night', 'nightly budget', 'per night'],
+        flight: ['budget per passenger', 'budget for the flight', 'price per person', 'flight budget', 'per passenger', 'spend on flights'],
+        restaurant: ['budget per person', 'dining budget', 'spend on food', 'price range for dining', 'meal budget', 'per person for dining'],
+        car: ['budget per day', 'daily budget', 'car rental budget', 'spend per day', 'per day']
+      } as const;
+      let budgetType: "hotel" | "flight" | "restaurant" | "car" | null = null;
+      for (const [type, keywords] of Object.entries(budgetKeywords)) {
+        if (keywords.some((k) => aiMessage.includes(k))) { budgetType = type as any; break; }
+      }
+      if (budgetType) setTimeout(() => setShowPriceSlider({ type: budgetType! }), 500);
+
+      if (
+        aiMessage.includes('one-way flight or a round-trip') ||
+        aiMessage.includes('one-way or round-trip') ||
+        aiMessage.includes('would you like a one-way') ||
+        aiMessage.includes('one-way rental or round-trip') ||
+        aiMessage.includes('is this a one-way rental')
+      ) {
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector) {
+          setTimeout(() => setShowTripTypeSelector(true), 500);
+        }
       }
     } catch (err: any) {
       console.error('AI Agent error:', err);
@@ -550,7 +610,7 @@ const Index = () => {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      if (requestId === lastRequestIdRef.current) setIsLoading(false);
     }
   };
 
