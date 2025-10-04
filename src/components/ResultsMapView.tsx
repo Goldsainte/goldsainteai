@@ -100,10 +100,39 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
 
       // Add markers for each result with coordinates
       results.forEach((result) => {
-        const lat = Number(result.latitude);
-        const lng = Number(result.longitude);
+        // Extract coordinates from various hotel API formats
+        let lat: number | null = null;
+        let lng: number | null = null;
+
+        if (type === 'hotels') {
+          // Try different coordinate structures from various APIs
+          lat = Number(
+            result.latitude || 
+            result.lat || 
+            result.coordinates?.latitude || 
+            result.coordinates?.lat ||
+            result.location?.lat ||
+            result.geoCode?.latitude ||
+            result.hotel?.latitude ||
+            result.property?.latitude
+          );
+          lng = Number(
+            result.longitude || 
+            result.lng || 
+            result.coordinates?.longitude || 
+            result.coordinates?.lng ||
+            result.location?.lng ||
+            result.geoCode?.longitude ||
+            result.hotel?.longitude ||
+            result.property?.longitude
+          );
+        } else {
+          // Other types (restaurants, events) use standard latitude/longitude
+          lat = Number(result.latitude || result.lat);
+          lng = Number(result.longitude || result.lng);
+        }
         
-        if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+        if (lat && lng && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
           hasValidCoordinates = true;
           bounds.extend([lng, lat]);
           
