@@ -662,6 +662,10 @@ export const EnhancedSearchBar = () => {
               <Plane className="h-5 w-5" />
               <span>Flights</span>
             </TabsTrigger>
+            <TabsTrigger value="cars" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <Car className="h-5 w-5" />
+              <span>Cars</span>
+            </TabsTrigger>
             <TabsTrigger value="restaurants" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <UtensilsCrossed className="h-5 w-5" />
               <span>Restaurants</span>
@@ -669,10 +673,6 @@ export const EnhancedSearchBar = () => {
             <TabsTrigger value="events" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <Ticket className="h-5 w-5" />
               <span>Events</span>
-            </TabsTrigger>
-            <TabsTrigger value="cars" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
-              <Car className="h-5 w-5" />
-              <span>Cars</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
