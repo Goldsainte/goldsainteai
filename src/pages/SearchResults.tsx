@@ -6,6 +6,7 @@ import { EnhancedSearchBar } from "@/components/EnhancedSearchBar";
 import { CompactHotelCard } from "@/components/CompactHotelCard";
 import { CompactFlightCard } from "@/components/CompactFlightCard";
 import { CompactRestaurantCard } from "@/components/CompactRestaurantCard";
+import { CarCard } from "@/components/CarCard";
 import { ResultsMapView } from "@/components/ResultsMapView";
 import { HotelFilters } from "@/components/HotelFilters";
 import { RestaurantFilters } from "@/components/RestaurantFilters";
@@ -52,15 +53,26 @@ const SearchResults = () => {
   const checkOut = searchParams.get("checkOut") || "";
   const guests = searchParams.get("guests") || "2";
   
-  // Flight-specific params
-  const origin = searchParams.get("origin") || "";
-  const destination = searchParams.get("destination") || "";
-  const departureDate = searchParams.get("departureDate") || "";
-  const returnDate = searchParams.get("returnDate") || "";
-  const cabinClass = searchParams.get("cabinClass") || "ECONOMY";
-  const adults = searchParams.get("adults") || "1";
-  const children = searchParams.get("children") || "0";
-  const infants = searchParams.get("infants") || "0";
+// Flight-specific params
+const origin = searchParams.get("origin") || "";
+const destination = searchParams.get("destination") || "";
+const departureDate = searchParams.get("departureDate") || "";
+const returnDate = searchParams.get("returnDate") || "";
+const cabinClass = searchParams.get("cabinClass") || "ECONOMY";
+const adults = searchParams.get("adults") || "1";
+const children = searchParams.get("children") || "0";
+const infants = searchParams.get("infants") || "0";
+
+// Car-specific params
+const pickup = searchParams.get("pickup") || "";
+const dropoff = searchParams.get("dropoff") || "";
+const pickupDateCar = searchParams.get("pickupDate") || "";
+const returnDateCar = searchParams.get("returnDate") || "";
+const carTripType = searchParams.get("carTripType") || "round-trip";
+
+// Derived display codes
+const pickupCode = pickup ? pickup.split(" - ")[0].trim() : "";
+const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
   // Load user preferences on mount
   useEffect(() => {
@@ -202,6 +214,20 @@ const SearchResults = () => {
           const restaurantResults = data.results || [];
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
+        } else if (searchType === "cars") {
+          const { data, error } = await supabase.functions.invoke('amadeus-search-cars', {
+            body: {
+              pickupLocation: pickup,
+              pickupDate: pickupDateCar,
+              dropoffDate: returnDateCar,
+              dropoffLocation: dropoff || pickup,
+              currencyCode: 'USD'
+            }
+          });
+          if (error) throw error;
+          const carResults = data.results || [];
+          setResults(carResults);
+          setFilteredResults(carResults);
         } else if (searchType === "packages") {
           // Fetch hotels via unified function, plus flights and restaurants in parallel
           const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
@@ -237,14 +263,14 @@ const SearchResults = () => {
       }
     };
 
-    if (location || origin) {
+    if (searchType === "cars" ? !!pickup : !!(location || origin)) {
       performSearch();
     } else {
       setLoading(false);
       setResults([]);
       setFilteredResults([]);
     }
-  }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass]);
+  }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass, pickup, dropoff, pickupDateCar, returnDateCar, carTripType]);
 
   // Apply filters and sorting
   useEffect(() => {
@@ -263,7 +289,9 @@ const SearchResults = () => {
       filtered = filtered.filter((item) => {
         const price = searchType === "flights"
           ? Number(item.price?.grandTotal ?? item.price?.total ?? 0)
-          : (item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0);
+          : searchType === "cars"
+            ? Number(item.price?.total ?? 0)
+            : (item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0);
         return price >= priceRange[0] && price <= priceRange[1];
       });
     }
@@ -342,15 +370,31 @@ if (minRating && searchType !== "restaurants") {
     switch (sortBy) {
       case "price":
         filtered.sort((a, b) => {
-          const ap = searchType === "flights" ? Number(a.price?.grandTotal ?? a.price?.total ?? 0) : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
-          const bp = searchType === "flights" ? Number(b.price?.grandTotal ?? b.price?.total ?? 0) : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
+          const ap = searchType === "flights"
+            ? Number(a.price?.grandTotal ?? a.price?.total ?? 0)
+            : searchType === "cars"
+              ? Number(a.price?.total ?? 0)
+              : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
+          const bp = searchType === "flights"
+            ? Number(b.price?.grandTotal ?? b.price?.total ?? 0)
+            : searchType === "cars"
+              ? Number(b.price?.total ?? 0)
+              : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
           return ap - bp;
         });
         break;
       case "price_desc":
         filtered.sort((a, b) => {
-          const ap = searchType === "flights" ? Number(a.price?.grandTotal ?? a.price?.total ?? 0) : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
-          const bp = searchType === "flights" ? Number(b.price?.grandTotal ?? b.price?.total ?? 0) : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
+          const ap = searchType === "flights"
+            ? Number(a.price?.grandTotal ?? a.price?.total ?? 0)
+            : searchType === "cars"
+              ? Number(a.price?.total ?? 0)
+              : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
+          const bp = searchType === "flights"
+            ? Number(b.price?.grandTotal ?? b.price?.total ?? 0)
+            : searchType === "cars"
+              ? Number(b.price?.total ?? 0)
+              : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
           return bp - ap;
         });
         break;
@@ -410,7 +454,7 @@ if (minRating && searchType !== "restaurants") {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b">
               <div>
                 <h2 className="text-2xl font-semibold text-foreground">
-                  {filteredResults.length} {searchType === "hotels" ? "properties" : searchType === "packages" ? "package options" : searchType === "flights" ? "flights" : "destinations"} {searchType === "flights" ? `from ${origin.split(' - ')[0]} to ${destination.split(' - ')[0]}` : `in ${location}`}
+                  {filteredResults.length} {searchType === "hotels" ? "properties" : searchType === "packages" ? "package options" : searchType === "flights" ? "flights" : searchType === "cars" ? "cars" : "destinations"} {searchType === "flights" ? `from ${origin.split(' - ')[0]} to ${destination.split(' - ')[0]}` : searchType === "cars" ? `from ${pickupCode}${dropoffCode && pickupCode !== dropoffCode ? ` to ${dropoffCode}` : ''}` : `in ${location}`}
                 </h2>
                 {searchType === "hotels" && checkIn && (
                   <div className="mt-1 space-y-1">
@@ -425,6 +469,13 @@ if (minRating && searchType !== "restaurants") {
                         </p>
                       </div>
                     )}
+                  </div>
+                )}
+                {searchType === "cars" && pickupDateCar && (
+                  <div className="mt-1 space-y-1">
+                    <p className="text-sm text-muted-foreground">
+                      {pickupDateCar} to {returnDateCar} • {pickupCode}{dropoffCode && pickupCode !== dropoffCode ? ` → ${dropoffCode}` : ''}
+                    </p>
                   </div>
                 )}
               </div>
@@ -603,6 +654,13 @@ if (minRating && searchType !== "restaurants") {
                             key={`${result.id || 'flight'}-${index}`}
                             flight={result}
                             dictionaries={flightDictionaries}
+                          />
+                        );
+                      } else if (searchType === "cars") {
+                        return (
+                          <CarCard
+                            key={`${result.id || result.offerId || 'car'}-${index}`}
+                            car={result}
                           />
                         );
                       } else if (searchType === "restaurants") {
