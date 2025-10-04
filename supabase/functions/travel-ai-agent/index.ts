@@ -367,33 +367,18 @@ The user has saved preferences but has chosen to search without strict filtering
           // Ask for pickup location
           nextStep = 1;
         } else if (step === 1) {
-          // Got location, ask for trip type
+          // Got location, ask for pickup date
           nextData.pickupLocation = message;
           nextStep = 2;
         } else if (step === 2) {
-          // Got trip type, ask for pickup date
-          nextData.tripType = message;
+          // Got pickup date, ask for return date
+          nextData.pickupDate = message;
           nextStep = 3;
         } else if (step === 3) {
-          // Check if both dates were provided at once (from date picker)
-          const returningMatch = message.match(/^(\d{4}-\d{2}-\d{2})\s+returning\s+(\d{4}-\d{2}-\d{2})$/i);
-          if (returningMatch) {
-            // Both dates provided, ask for budget
-            nextData.pickupDate = returningMatch[1];
-            nextData.returnDate = returningMatch[2];
-            nextStep = 5; // Skip to budget step
-          } else {
-            // Just pickup date provided, ask for return
-            nextData.pickupDate = message;
-            nextStep = 4;
-          }
+          // Got return date, ask for budget
+          nextData.returnDate = message;
+          nextStep = 4;
         } else if (step === 4) {
-          // Got return date or skip for one-way, ask for budget
-          if (message && !message.toLowerCase().includes('one way') && !message.toLowerCase().includes('one-way')) {
-            nextData.returnDate = message;
-          }
-          nextStep = 5;
-        } else if (step === 5) {
           // Got budget, search
           nextData.budget = message;
           shouldSearch = true;
@@ -471,10 +456,9 @@ The user has saved preferences but has chosen to search without strict filtering
         else if (nextStep === 2) nextQuestion = "What's your budget per ticket? (e.g., $50-$200)";
       } else if (type === 'cars') {
         if (nextStep === 1) nextQuestion = "Where would you like to pick up the car?";
-        else if (nextStep === 2) nextQuestion = "Would you like a one-way rental or round-trip?";
-        else if (nextStep === 3) nextQuestion = `Perfect! When would you like to pick up the car in ${nextData.pickupLocation}?`;
-        else if (nextStep === 4) nextQuestion = "And when would you like to return the car?";
-        else if (nextStep === 5) nextQuestion = "What's your budget per day? (e.g., $50-$150)";
+        else if (nextStep === 2) nextQuestion = `Great! When would you like to pick up the car in ${nextData.pickupLocation}?`;
+        else if (nextStep === 3) nextQuestion = "And when would you like to return the car?";
+        else if (nextStep === 4) nextQuestion = "What's your budget per day? (e.g., $50-$150)";
       }
       
       return new Response(JSON.stringify({
