@@ -1234,7 +1234,7 @@ async function searchRestaurants(args: any) {
             if (!detailsResponse.ok) {
               // Fallback minimal info when details endpoint fails (rate limits, missing entity, etc.)
               const fallbackCity = restaurant.address_obj?.city || normalizedLocation;
-              const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
+              const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
               return {
                 id: restaurant.location_id,
                 name: restaurant.name,
@@ -1253,7 +1253,7 @@ async function searchRestaurants(args: any) {
                 web_url: '',
                 phone: '',
                 website: '',
-                reservationUrl: googleMapsUrl,
+                reservationUrl: googleReservationsUrl,
                 reviews: [],
                 hours: {},
                 openNow: undefined,
@@ -1301,7 +1301,12 @@ async function searchRestaurants(args: any) {
               return null;
             }
 
-            const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || normalizedLocation}`)}`;
+            // Construct Google Reservations URL for consistency
+            const primaryUrl = details.website || details.web_url || '';
+            const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || normalizedLocation}`)}`;
+            const reservationUrl = primaryUrl 
+              ? (primaryUrl.startsWith('http') ? primaryUrl : `https://${primaryUrl}`)
+              : googleReservationsUrl;
 
             return {
               id: restaurant.location_id,
@@ -1324,7 +1329,7 @@ async function searchRestaurants(args: any) {
               web_url: details.web_url || '',
               phone: details.phone || '',
               website: details.website || '',
-              reservationUrl: details.website || googleMapsUrl,
+              reservationUrl,
               reviews: reviews.map((review: any) => ({
                 rating: review.rating || 0,
                 text: review.text || '',

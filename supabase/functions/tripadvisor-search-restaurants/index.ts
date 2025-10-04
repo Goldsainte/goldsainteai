@@ -108,7 +108,7 @@ serve(async (req) => {
           const photos = (photosData.data || []).slice(0, 5);
           const reviews = (reviewsData.data || []).slice(0, 3);
           const fallbackCity = restaurant.address_obj?.city || '';
-          const reservationUrl = `https://www.tripadvisor.com/Search?q=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
+          const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
 
           return {
             id: restaurant.location_id,
@@ -118,7 +118,9 @@ serve(async (req) => {
             country: restaurant.address_obj?.country || '',
             rating: 0,
             num_reviews: 0,
+            userRatingsTotal: 0,
             price_level: '',
+            priceLevel: 0,
             cuisine: '',
             description: '',
             photos: photos.map((photo: any) => ({
@@ -135,8 +137,9 @@ serve(async (req) => {
             web_url: '',
             phone: '',
             website: '',
-            reservationUrl,
+            reservationUrl: googleReservationsUrl,
             hours: {},
+            openNow: undefined,
             latitude: undefined,
             longitude: undefined
           };
@@ -157,9 +160,10 @@ serve(async (req) => {
         const reviews = (reviewsData.data || []).slice(0, 3);
 
         const primaryUrl = details.website || details.web_url || '';
+        const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || ''}`)}`;
         const reservationUrl = primaryUrl
           ? (primaryUrl.startsWith('http') ? primaryUrl : `https://${primaryUrl}`)
-          : `https://www.tripadvisor.com/Search?q=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || ''}`)}`;
+          : googleReservationsUrl;
 
         return {
           id: restaurant.location_id,
@@ -169,7 +173,9 @@ serve(async (req) => {
           country: details.address_obj?.country || '',
           rating: details.rating || 0,
           num_reviews: details.num_reviews || 0,
+          userRatingsTotal: details.num_reviews || 0,
           price_level: details.price_level || '',
+          priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
           cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
           description: details.description || '',
           photos: photos.map((photo: any) => ({
@@ -188,6 +194,7 @@ serve(async (req) => {
           website: details.website || '',
           reservationUrl,
           hours: details.hours || {},
+          openNow: details.is_closed === false,
           latitude: details.latitude,
           longitude: details.longitude
         };
