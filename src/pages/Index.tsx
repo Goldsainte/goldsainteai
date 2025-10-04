@@ -428,9 +428,10 @@ const Index = () => {
       }
     } catch (err: any) {
       console.error('AI Agent error:', err);
+      console.error('Error details:', JSON.stringify(err, null, 2));
       toast({
         title: "Error",
-        description: err.message || "Failed to process your request",
+        description: err.message || err.error?.message || "Failed to process your request. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -510,9 +511,10 @@ const Index = () => {
       }
     } catch (err: any) {
       console.error('AI Agent error:', err);
+      console.error('Error details:', JSON.stringify(err, null, 2));
       toast({
         title: "Error",
-        description: err.message || "Failed to process your request",
+        description: err.message || err.error?.message || "Failed to process your request. Please try again.",
         variant: "destructive",
       });
     } finally {
