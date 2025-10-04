@@ -380,15 +380,22 @@ const Index = () => {
         'when would you like to depart', 'when would you like to fly',
         'travel dates', 'departure date', 'return date',
         'when do you want to', 'what day', 'when should',
-        'when do you need', 'arrival date', 'leaving on'
+        'when do you need', 'arrival date', 'leaving on',
+        'pick up', 'pickup', 'pick-up', 'drop off', 'dropoff', 'drop-off',
+        'rent the car', 'rental dates'
       ];
       
       const hasDateKeyword = dateKeywords.some(keyword => aiMessage.includes(keyword));
       
       if (hasDateKeyword) {
-        const type = (aiMessage.includes('stay') || 
-                     aiMessage.includes('hotel') || 
-                     aiMessage.includes('check')) ? 'hotel' : 'flight';
+        let type: 'hotel' | 'flight' = 'flight';
+        if (aiMessage.includes('stay') || aiMessage.includes('hotel') || aiMessage.includes('check')) {
+          type = 'hotel';
+        } else if (aiMessage.includes('pick up') || aiMessage.includes('pickup') || 
+                   aiMessage.includes('pick-up') || aiMessage.includes('rent') || 
+                   aiMessage.includes('car')) {
+          type = 'flight'; // Reuse flight picker for car rentals (works for date ranges)
+        }
         setTimeout(() => setShowDatePicker({ type, context: 'quicklink' }), 500);
       }
 
@@ -423,7 +430,11 @@ const Index = () => {
       // Check if AI is asking about trip type
       if (aiMessage.includes('one-way flight or a round-trip') ||
           aiMessage.includes('one-way or round-trip') ||
-          aiMessage.includes('would you like a one-way')) {
+          aiMessage.includes('would you like a one-way') ||
+          aiMessage.includes('one-way rental or round-trip') ||
+          aiMessage.includes('one-way car') ||
+          aiMessage.includes('returning the car') ||
+          aiMessage.includes('drop off at a different location')) {
         setTimeout(() => setShowTripTypeSelector(true), 500);
       }
     } catch (err: any) {
