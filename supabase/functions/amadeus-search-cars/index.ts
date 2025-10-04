@@ -49,21 +49,42 @@ serve(async (req) => {
 
     const token = await getAmadeusToken();
 
+    // Normalize locations to IATA airport codes
+    const getAirportCode = (location: string) => {
+      if (/^[A-Z]{3}$/i.test((location || '').trim())) return location.toUpperCase();
+      const map: Record<string, string> = {
+        'new york': 'JFK','los angeles': 'LAX','san francisco': 'SFO','washington': 'IAD','chicago': 'ORD','miami': 'MIA',
+        'boston': 'BOS','seattle': 'SEA','atlanta': 'ATL','denver': 'DEN','las vegas': 'LAS','phoenix': 'PHX',
+        'dallas': 'DFW','houston': 'IAH','detroit': 'DTW','minneapolis': 'MSP','orlando': 'MCO','philadelphia': 'PHL',
+        'nashville': 'BNA','salt lake city': 'SLC','charlotte': 'CLT','paris': 'CDG','london': 'LHR','tokyo': 'NRT',
+        'dubai': 'DXB','singapore': 'SIN','hong kong': 'HKG'
+      };
+      const key = (location || '').toLowerCase().trim();
+      return map[key] || key.slice(0,3).toUpperCase();
+    };
+
+    const pickupCode = getAirportCode(pickupLocation);
+    const dropoffCode = dropoffLocation ? getAirportCode(dropoffLocation) : pickupCode;
+
+    // Add default times (10:00) to satisfy Amadeus requirements
+    const pickupDateTime = `${pickupDate}T10:00:00`;
+    const returnDateTime = `${dropoffDate}T10:00:00`;
+
     // Build query parameters
     const params = new URLSearchParams({
-      pickupLocation,
-      pickupDate,
-      dropoffDate,
+      pickupLocation: pickupCode,
+      pickupDateTime,
+      returnDateTime,
       currencyCode
     });
 
     // Add dropoff location if different from pickup
-    if (dropoffLocation && dropoffLocation !== pickupLocation) {
-      params.append('dropoffLocation', dropoffLocation);
+    if (dropoffCode && dropoffCode !== pickupCode) {
+      params.append('dropoffLocation', dropoffCode);
     }
 
     const response = await fetch(
-      `https://test.api.amadeus.com/v1/shopping/car-rental-offers?${params}`,
+      `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`

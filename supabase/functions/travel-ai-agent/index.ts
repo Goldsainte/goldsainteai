@@ -1592,15 +1592,15 @@ async function searchCars(args: any) {
     // Build query parameters
     const params = new URLSearchParams({
       pickupLocation: pickupCode,
-      pickupDate: pickupDateTime,
-      dropoffDate: returnDateTime,
+      pickupDateTime: pickupDateTime,
+      returnDateTime: returnDateTime,
       currencyCode: 'USD'
     });
 
     console.log('Calling Amadeus API with params:', params.toString());
 
     const response = await fetch(
-      `https://test.api.amadeus.com/v1/shopping/car-rental-offers?${params}`,
+      `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
       {
         headers: {
           'Authorization': `Bearer ${access_token}`
