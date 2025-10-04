@@ -215,19 +215,35 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "cars") {
-          const { data, error } = await supabase.functions.invoke('amadeus-search-cars', {
-            body: {
-              pickupLocation: pickup,
-              pickupDate: pickupDateCar,
-              dropoffDate: returnDateCar,
-              dropoffLocation: dropoff || pickup,
-              currencyCode: 'USD'
+          try {
+            const { data, error } = await supabase.functions.invoke('amadeus-search-cars', {
+              body: {
+                pickupLocation: pickup,
+                pickupDate: pickupDateCar,
+                dropoffDate: returnDateCar,
+                dropoffLocation: dropoff || pickup,
+                currencyCode: 'USD'
+              }
+            });
+            if (error) {
+              console.warn('Car rental search error:', error);
+              setResults([]);
+              setFilteredResults([]);
+              setError('No car rentals available for this location. Try a major airport like JFK, LAX, or LHR.');
+              return;
             }
-          });
-          if (error) throw error;
-          const carResults = data.results || [];
-          setResults(carResults);
-          setFilteredResults(carResults);
+            const carResults = data.results || [];
+            if (carResults.length === 0) {
+              setError('No car rentals found for this location and date. Try a different airport or dates.');
+            }
+            setResults(carResults);
+            setFilteredResults(carResults);
+          } catch (err) {
+            console.error('Car search failed:', err);
+            setResults([]);
+            setFilteredResults([]);
+            setError('Unable to search for car rentals. The test API may not have data for this airport.');
+          }
         } else if (searchType === "packages") {
           // Fetch hotels via unified function, plus flights and restaurants in parallel
           const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
