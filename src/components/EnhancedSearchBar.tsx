@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket, ArrowLeftRight, Plus, Minus, X } from "lucide-react";
+import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket, ArrowLeftRight, Plus, Minus, X, Car } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -43,6 +43,20 @@ export const EnhancedSearchBar = () => {
     children: parseInt(searchParams.get("children") || "0"),
     infants: parseInt(searchParams.get("infants") || "0"),
   });
+
+  // Car-specific states
+  const [carTripType, setCarTripType] = useState<"round-trip" | "one-way">(
+    (searchParams.get("carTripType") as any) || "round-trip"
+  );
+  const [pickupLocation, setPickupLocation] = useState(searchParams.get("pickup") || "");
+  const [dropoffLocation, setDropoffLocation] = useState(searchParams.get("dropoff") || "");
+  const [pickupDateCar, setPickupDateCar] = useState<Date | undefined>(
+    searchParams.get("pickupDate") ? new Date(searchParams.get("pickupDate")!) : undefined
+  );
+  const [returnDateCar, setReturnDateCar] = useState<Date | undefined>(
+    searchParams.get("returnDate") ? new Date(searchParams.get("returnDate")!) : undefined
+  );
+
 
   // Hotel-specific states
   const [hotelLocation, setHotelLocation] = useState(searchParams.get("location") || "");
@@ -109,6 +123,17 @@ export const EnhancedSearchBar = () => {
       if (destination) setDestination(destination);
       if (departureDate) setDepartureDate(new Date(departureDate));
       if (returnDate) setReturnDate(new Date(returnDate));
+    } else if (currentType === "cars") {
+      const pu = params.get("pickup");
+      const doLoc = params.get("dropoff");
+      const puDate = params.get("pickupDate");
+      const rtDate = params.get("returnDate");
+      const tt = (params.get("carTripType") as any) || "round-trip";
+      if (pu) setPickupLocation(pu);
+      if (doLoc) setDropoffLocation(doLoc);
+      if (puDate) setPickupDateCar(new Date(puDate));
+      if (rtDate) setReturnDateCar(new Date(rtDate));
+      setCarTripType(tt);
     }
   }, [routeLocation.search]);
 
@@ -199,6 +224,24 @@ export const EnhancedSearchBar = () => {
       params.append("location", eventLocation);
       if (eventDate) params.append("date", format(eventDate, "yyyy-MM-dd"));
       if (eventCategory && eventCategory !== "all") params.append("category", eventCategory);
+    } else if (searchType === "cars") {
+      if (!pickupLocation.trim() || !pickupDateCar || !returnDateCar) {
+        return;
+      }
+      const finalDrop = carTripType === 'one-way' ? dropoffLocation.trim() : pickupLocation.trim();
+      searchData = {
+        ...searchData,
+        pickup: pickupLocation,
+        dropoff: finalDrop,
+        pickupDate: format(pickupDateCar, "yyyy-MM-dd"),
+        returnDate: format(returnDateCar, "yyyy-MM-dd"),
+        carTripType,
+      };
+      params.append("pickup", pickupLocation);
+      params.append("dropoff", finalDrop);
+      params.append("pickupDate", format(pickupDateCar, "yyyy-MM-dd"));
+      params.append("returnDate", format(returnDateCar, "yyyy-MM-dd"));
+      params.append("carTripType", carTripType);
     }
 
     addSearch(searchData);
@@ -555,11 +598,62 @@ export const EnhancedSearchBar = () => {
     </div>
   );
 
+  // Car Search UI
+  const renderCarSearch = () => (
+    <div className="space-y-4">
+      <RadioGroup value={carTripType} onValueChange={(v: any) => setCarTripType(v)} className="flex gap-4">
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="round-trip" id="car-round-trip" />
+          <Label htmlFor="car-round-trip" className="cursor-pointer">Return to same location</Label>
+        </div>
+        <div className="flex items-center space-x-2">
+          <RadioGroupItem value="one-way" id="car-one-way" />
+          <Label htmlFor="car-one-way" className="cursor-pointer">Drop off at different location</Label>
+        </div>
+      </RadioGroup>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <AirportAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Pick-up airport or city" />
+        {carTripType === 'one-way' ? (
+          <AirportAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Drop-off airport or city" />
+        ) : (
+          <Input value={pickupLocation} readOnly className="h-12" aria-label="Drop-off same as pickup" />
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !pickupDateCar && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4" />
+              {pickupDateCar ? format(pickupDateCar, "MMM dd, yyyy") : "Pick-up date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <CalendarComponent mode="single" selected={pickupDateCar} onSelect={setPickupDateCar} initialFocus disabled={(date) => date < new Date()} />
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDateCar && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4" />
+              {returnDateCar ? format(returnDateCar, "MMM dd, yyyy") : "Return date"}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <CalendarComponent mode="single" selected={returnDateCar} onSelect={setReturnDateCar} initialFocus disabled={(date) => date < (pickupDateCar || new Date())} />
+          </PopoverContent>
+        </Popover>
+      </div>
+    </div>
+  );
+
   return (
     <div className="w-full max-w-6xl mx-auto px-4 md:px-0">
       <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto bg-muted">
+          <TabsList className="grid w-full grid-cols-5 h-auto bg-muted">
             <TabsTrigger value="hotels" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
               <Hotel className="h-5 w-5" />
               <span>Hotels</span>
@@ -576,6 +670,10 @@ export const EnhancedSearchBar = () => {
               <Ticket className="h-5 w-5" />
               <span>Events</span>
             </TabsTrigger>
+            <TabsTrigger value="cars" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <Car className="h-5 w-5" />
+              <span>Cars</span>
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 
@@ -583,6 +681,7 @@ export const EnhancedSearchBar = () => {
         {searchType === "hotels" && renderHotelSearch()}
         {searchType === "restaurants" && renderRestaurantSearch()}
         {searchType === "events" && renderEventSearch()}
+        {searchType === "cars" && renderCarSearch()}
 
         <Button className="w-full mt-6 h-14 text-lg font-semibold bg-primary hover:bg-primary/90" onClick={handleSearch}>
           <Search className="h-5 w-5 mr-2" />
