@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getHotelImage, getRoomImage, getHotelImages } from "@/lib/imageHelpers";
-import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
+import { getCurrencyFromLocation, getCurrencySymbol } from "@/lib/currencyHelpers";
 import { decodeData } from "@/lib/utils";
 import { BookingModal } from "@/components/BookingModal";
 import { PhotoGallery } from "@/components/PhotoGallery";
@@ -250,11 +250,11 @@ export default function HotelBooking() {
                             <div className="text-sm text-muted-foreground mb-1">
                               {nights} night{nights > 1 ? 's' : ''} total
                             </div>
-<div className="text-3xl font-bold text-primary">
-                              {currencySymbol}{(room.price * nights).toFixed(2)}
+                            <div className="text-3xl font-bold text-primary">
+                              {getCurrencySymbol(room.currency)}{(room.price * nights).toFixed(2)}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {currencySymbol}{room.price.toFixed(2)} per night
+                              {getCurrencySymbol(room.currency)}{room.price.toFixed(2)} per night
                             </div>
                             <div className="text-xs text-muted-foreground">
                               +taxes & fees
@@ -415,16 +415,16 @@ export default function HotelBooking() {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">
-                        {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? selectedRoom.price.toFixed(2) : Number(bookingData.totalPrice || 200).toFixed(2)} x {nights} night{nights > 1 ? 's' : ''}
+                        {getCurrencySymbol(selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD')}{selectedRoom ? selectedRoom.price.toFixed(2) : Number(bookingData.totalPrice || 200).toFixed(2)} x {nights} night{nights > 1 ? 's' : ''}
                       </span>
                       <span className="font-medium">
-                        {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? (selectedRoom.price * nights).toFixed(2) : (Number(bookingData.totalPrice || 200) * nights).toFixed(2)}
+                        {getCurrencySymbol(selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD')}{selectedRoom ? (selectedRoom.price * nights).toFixed(2) : (Number(bookingData.totalPrice || 200) * nights).toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Taxes & fees</span>
                       <span className="font-medium">
-                        {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? ((selectedRoom.price * nights) * 0.15).toFixed(2) : ((Number(bookingData.totalPrice || 200) * nights) * 0.15).toFixed(2)}
+                        {getCurrencySymbol(selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD')}{selectedRoom ? ((selectedRoom.price * nights) * 0.15).toFixed(2) : ((Number(bookingData.totalPrice || 200) * nights) * 0.15).toFixed(2)}
                       </span>
                     </div>
                   </div>
@@ -434,7 +434,7 @@ export default function HotelBooking() {
                       <span className="font-semibold">Total</span>
                       <div className="text-right">
                         <div className="text-2xl font-bold text-primary">
-                          {selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD'} {selectedRoom ? ((selectedRoom.price * nights) * 1.15).toFixed(2) : ((Number(bookingData.totalPrice || 200) * nights) * 1.15).toFixed(2)}
+                          {getCurrencySymbol(selectedRoom ? selectedRoom.currency : bookingData.currency || 'USD')}{selectedRoom ? ((selectedRoom.price * nights) * 1.15).toFixed(2) : ((Number(bookingData.totalPrice || 200) * nights) * 1.15).toFixed(2)}
                         </div>
                         <div className="text-xs text-muted-foreground">
                           Total includes taxes & fees
