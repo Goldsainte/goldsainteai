@@ -83,30 +83,65 @@ serve(async (req) => {
       params.append('dropoffLocation', dropoffCode);
     }
 
-    const response = await fetch(
-      `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+    // Helper to perform the API call for a given pickup code
+    const tryFetch = async (code: string) => {
+      const p = new URLSearchParams({
+        pickupLocation: code,
+        pickupDateTime,
+        returnDateTime,
+        currencyCode
+      });
+      if (dropoffCode && dropoffCode !== code) {
+        p.append('dropoffLocation', dropoffCode);
       }
-    );
+      const res = await fetch(
+        `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${p}`,
+        { headers: { 'Authorization': `Bearer ${token}` } }
+      );
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Amadeus car rental search error:', errorText);
+        return { ok: false as const, data: null };
+      }
+      const json = await res.json();
+      return { ok: true as const, data: json };
+    };
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Amadeus car rental search error:', error);
-      throw new Error(`Car rental search failed: ${response.statusText}`);
+    // Try the requested pickup first
+    let attempt = await tryFetch(pickupCode);
+    if (attempt.ok && attempt.data?.data?.length) {
+      console.log('Car rentals found:', attempt.data.data.length);
+      return new Response(JSON.stringify({
+        results: attempt.data.data || [],
+        meta: { ...(attempt.data.meta || {}), pickupUsed: pickupCode }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
     }
 
-    const data = await response.json();
-    console.log('Car rentals found:', data.data?.length || 0);
+    // Fallback: try popular airports known to have sandbox data
+    const fallbackAirports = ['JFK', 'LAX', 'LHR', 'CDG', 'DXB', 'SFO', 'MIA'];
+    for (const fb of fallbackAirports) {
+      attempt = await tryFetch(fb);
+      if (attempt.ok && attempt.data?.data?.length) {
+        console.log('Car rentals fallback used:', fb, 'count:', attempt.data.data.length);
+        return new Response(JSON.stringify({
+          results: attempt.data.data || [],
+          meta: { ...(attempt.data.meta || {}), pickupUsed: fb, fallbackUsed: true }
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+    }
 
-    return new Response(JSON.stringify({ 
-      results: data.data || [],
-      meta: data.meta
+    // Nothing found anywhere
+    return new Response(JSON.stringify({
+      error: 'Car rental search failed for provided airport and common fallbacks.'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
+      status: 404,
     });
 
   } catch (error) {
