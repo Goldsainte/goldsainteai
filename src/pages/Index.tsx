@@ -23,6 +23,7 @@ import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
 import swissAlps from "@/assets/swiss-alps.jpg";
@@ -1205,6 +1206,17 @@ const Index = () => {
                               key={event.id || eventIdx}
                               event={event}
                             />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {result.type === 'cars' && result.results && result.results.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="text-xl font-semibold text-foreground">🚗 Rental Cars</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {result.results.map((car: any, carIdx: number) => (
+                            <CarCard key={car.id || carIdx} car={car} />
                           ))}
                         </div>
                       </div>
