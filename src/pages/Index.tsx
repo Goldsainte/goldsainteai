@@ -104,6 +104,7 @@ const Index = () => {
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [selectedTripType, setSelectedTripType] = useState<"one-way" | "round-trip" | null>(null);
   const selectedTripTypeRef = useRef<"one-way" | "round-trip" | null>(null);
+  const tripTypeResolvedRef = useRef<boolean>(false);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(true);
@@ -306,10 +307,12 @@ const Index = () => {
     if (normalizedTrip === 'one-way' || normalizedTrip === 'one way') {
       setSelectedTripType('one-way');
       selectedTripTypeRef.current = 'one-way';
+      tripTypeResolvedRef.current = true;
       setShowTripTypeSelector(false);
     } else if (normalizedTrip === 'round-trip' || normalizedTrip === 'round trip' || normalizedTrip === 'roundtrip') {
       setSelectedTripType('round-trip');
       selectedTripTypeRef.current = 'round-trip';
+      tripTypeResolvedRef.current = true;
       setShowTripTypeSelector(false);
     }
     
@@ -451,7 +454,7 @@ const Index = () => {
           aiMessage.includes('would you like a one-way') ||
           aiMessage.includes('one-way rental or round-trip') ||
           aiMessage.includes('is this a one-way rental')) {
-        if (!selectedTripTypeRef.current) {
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }
@@ -595,6 +598,7 @@ const Index = () => {
   const handleTripTypeSelected = (tripType: "one-way" | "round-trip") => {
     setSelectedTripType(tripType);
     selectedTripTypeRef.current = tripType;
+    tripTypeResolvedRef.current = true;
     setShowTripTypeSelector(false);
     handleSearch(tripType);
   };
