@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -103,6 +103,7 @@ const Index = () => {
   const [showCuisineSelector, setShowCuisineSelector] = useState(false);
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
   const [selectedTripType, setSelectedTripType] = useState<"one-way" | "round-trip" | null>(null);
+  const selectedTripTypeRef = useRef<"one-way" | "round-trip" | null>(null);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(true);
@@ -304,9 +305,11 @@ const Index = () => {
     const normalizedTrip = queryToSend.trim().toLowerCase();
     if (normalizedTrip === 'one-way' || normalizedTrip === 'one way') {
       setSelectedTripType('one-way');
+      selectedTripTypeRef.current = 'one-way';
       setShowTripTypeSelector(false);
     } else if (normalizedTrip === 'round-trip' || normalizedTrip === 'round trip' || normalizedTrip === 'roundtrip') {
       setSelectedTripType('round-trip');
+      selectedTripTypeRef.current = 'round-trip';
       setShowTripTypeSelector(false);
     }
     
@@ -448,7 +451,7 @@ const Index = () => {
           aiMessage.includes('would you like a one-way') ||
           aiMessage.includes('one-way rental or round-trip') ||
           aiMessage.includes('is this a one-way rental')) {
-        if (!selectedTripType) {
+        if (!selectedTripTypeRef.current) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }
@@ -576,6 +579,7 @@ const Index = () => {
     setShowCuisineSelector(false);
     setShowTripTypeSelector(false);
     setSelectedTripType(null);
+    selectedTripTypeRef.current = null;
   };
 
   const handlePriceSelected = (price: number) => {
@@ -590,6 +594,7 @@ const Index = () => {
 
   const handleTripTypeSelected = (tripType: "one-way" | "round-trip") => {
     setSelectedTripType(tripType);
+    selectedTripTypeRef.current = tripType;
     setShowTripTypeSelector(false);
     handleSearch(tripType);
   };
