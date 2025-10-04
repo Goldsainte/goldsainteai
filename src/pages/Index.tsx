@@ -102,6 +102,7 @@ const Index = () => {
   const [showPriceSlider, setShowPriceSlider] = useState<{ type: "hotel" | "flight" | "restaurant" | "car" } | null>(null);
   const [showCuisineSelector, setShowCuisineSelector] = useState(false);
   const [showTripTypeSelector, setShowTripTypeSelector] = useState(false);
+  const [selectedTripType, setSelectedTripType] = useState<"one-way" | "round-trip" | null>(null);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(true);
@@ -298,6 +299,16 @@ const Index = () => {
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
     if (!queryToSend.trim()) return;
+
+    // Close Trip Type modal if the user typed the answer directly
+    const normalizedTrip = queryToSend.trim().toLowerCase();
+    if (normalizedTrip === 'one-way' || normalizedTrip === 'one way') {
+      setSelectedTripType('one-way');
+      setShowTripTypeSelector(false);
+    } else if (normalizedTrip === 'round-trip' || normalizedTrip === 'round trip' || normalizedTrip === 'roundtrip') {
+      setSelectedTripType('round-trip');
+      setShowTripTypeSelector(false);
+    }
     
     // If we have pending flight dates, include them in the query
     let finalQuery = queryToSend;
@@ -437,7 +448,9 @@ const Index = () => {
           aiMessage.includes('would you like a one-way') ||
           aiMessage.includes('one-way rental or round-trip') ||
           aiMessage.includes('is this a one-way rental')) {
-        setTimeout(() => setShowTripTypeSelector(true), 500);
+        if (!selectedTripType) {
+          setTimeout(() => setShowTripTypeSelector(true), 500);
+        }
       }
     } catch (err: any) {
       console.error('AI Agent error:', err);
@@ -562,6 +575,7 @@ const Index = () => {
     setShowPriceSlider(null);
     setShowCuisineSelector(false);
     setShowTripTypeSelector(false);
+    setSelectedTripType(null);
   };
 
   const handlePriceSelected = (price: number) => {
@@ -575,6 +589,7 @@ const Index = () => {
   };
 
   const handleTripTypeSelected = (tripType: "one-way" | "round-trip") => {
+    setSelectedTripType(tripType);
     setShowTripTypeSelector(false);
     handleSearch(tripType);
   };
@@ -962,7 +977,7 @@ const Index = () => {
 
                 {/* Trip Type Selector */}
                 {showTripTypeSelector && (
-                  <div className="animate-in fade-in slide-in-from-bottom-4">
+                  <div className="animate-in fade-in slide-in-from-bottom-4" aria-live="polite">
                     <TripTypeSelector
                       onSelect={handleTripTypeSelected}
                       onCancel={() => setShowTripTypeSelector(false)}
