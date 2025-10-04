@@ -341,6 +341,59 @@ export type Database = {
         }
         Relationships: []
       }
+      job_completion_submissions: {
+        Row: {
+          agent_id: string
+          attachments: Json | null
+          completion_notes: string | null
+          created_at: string
+          customer_response: string | null
+          customer_response_at: string | null
+          deliverables_description: string | null
+          id: string
+          job_id: string
+          status: string
+          submitted_at: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          attachments?: Json | null
+          completion_notes?: string | null
+          created_at?: string
+          customer_response?: string | null
+          customer_response_at?: string | null
+          deliverables_description?: string | null
+          id?: string
+          job_id: string
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          attachments?: Json | null
+          completion_notes?: string | null
+          created_at?: string
+          customer_response?: string | null
+          customer_response_at?: string | null
+          deliverables_description?: string | null
+          id?: string
+          job_id?: string
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_completion_submissions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_jobs: {
         Row: {
           agent_payout_amount: number | null
@@ -349,16 +402,22 @@ export type Database = {
           booking_type: string
           budget_max: number | null
           budget_min: number | null
+          completed_at: string | null
+          completion_notes: string | null
           created_at: string
           currency: string
+          customer_approved_at: string | null
           description: string
           destination: string | null
           expires_at: string
+          funds_released: boolean | null
+          funds_released_at: string | null
           id: string
           number_of_travelers: number | null
           paid_at: string | null
           payment_intent_id: string | null
           payment_status: string | null
+          rejection_reason: string | null
           requirements: Json
           service_fee_collected: number | null
           status: string
@@ -377,16 +436,22 @@ export type Database = {
           booking_type: string
           budget_max?: number | null
           budget_min?: number | null
+          completed_at?: string | null
+          completion_notes?: string | null
           created_at?: string
           currency?: string
+          customer_approved_at?: string | null
           description: string
           destination?: string | null
           expires_at?: string
+          funds_released?: boolean | null
+          funds_released_at?: string | null
           id?: string
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_intent_id?: string | null
           payment_status?: string | null
+          rejection_reason?: string | null
           requirements: Json
           service_fee_collected?: number | null
           status?: string
@@ -405,16 +470,22 @@ export type Database = {
           booking_type?: string
           budget_max?: number | null
           budget_min?: number | null
+          completed_at?: string | null
+          completion_notes?: string | null
           created_at?: string
           currency?: string
+          customer_approved_at?: string | null
           description?: string
           destination?: string | null
           expires_at?: string
+          funds_released?: boolean | null
+          funds_released_at?: string | null
           id?: string
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_intent_id?: string | null
           payment_status?: string | null
+          rejection_reason?: string | null
           requirements?: Json
           service_fee_collected?: number | null
           status?: string
@@ -480,11 +551,15 @@ export type Database = {
           booking_id: string
           created_at: string
           currency: string
+          escrow_held: boolean | null
           id: string
           payment_method: string | null
           status: string
           stripe_payment_intent_id: string | null
           stripe_session_id: string | null
+          transfer_id: string | null
+          transferred_at: string | null
+          transferred_to_agent: boolean | null
           updated_at: string
         }
         Insert: {
@@ -492,11 +567,15 @@ export type Database = {
           booking_id: string
           created_at?: string
           currency?: string
+          escrow_held?: boolean | null
           id?: string
           payment_method?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          transfer_id?: string | null
+          transferred_at?: string | null
+          transferred_to_agent?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -504,11 +583,15 @@ export type Database = {
           booking_id?: string
           created_at?: string
           currency?: string
+          escrow_held?: boolean | null
           id?: string
           payment_method?: string | null
           status?: string
           stripe_payment_intent_id?: string | null
           stripe_session_id?: string | null
+          transfer_id?: string | null
+          transferred_at?: string | null
+          transferred_to_agent?: boolean | null
           updated_at?: string
         }
         Relationships: [

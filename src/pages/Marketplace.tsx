@@ -9,11 +9,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Briefcase, Plus, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare } from "lucide-react";
+import { Briefcase, Plus, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
 import { JobBidsReview } from "@/components/JobBidsReview";
 import { JobMessaging } from "@/components/JobMessaging";
+import { JobApprovalModal } from "@/components/JobApprovalModal";
 
 export default function Marketplace() {
   const { user } = useAuth();
@@ -22,9 +23,11 @@ export default function Marketplace() {
   const [myJobs, setMyJobs] = useState<any[]>([]);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [jobBids, setJobBids] = useState<any[]>([]);
+  const [completionSubmission, setCompletionSubmission] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isViewJobDialogOpen, setIsViewJobDialogOpen] = useState(false);
+  const [isApprovalModalOpen, setIsApprovalModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -84,7 +87,29 @@ export default function Marketplace() {
   const handleViewJob = async (job: any) => {
     setSelectedJob(job);
     await fetchJobBids(job.id);
+    
+    // If job is pending approval, fetch completion submission
+    if (job.status === 'pending_approval') {
+      await fetchCompletionSubmission(job.id);
+    }
+    
     setIsViewJobDialogOpen(true);
+  };
+
+  const fetchCompletionSubmission = async (jobId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('job_completion_submissions')
+        .select('*')
+        .eq('job_id', jobId)
+        .eq('status', 'pending')
+        .single();
+
+      if (error && error.code !== 'PGRST116') throw error; // PGRST116 is "no rows returned"
+      setCompletionSubmission(data);
+    } catch (error: any) {
+      console.error('Error fetching completion submission:', error);
+    }
   };
 
   const handleCreateJob = async (jobData: any) => {
@@ -326,9 +351,17 @@ export default function Marketplace() {
                         <CardTitle className="text-xl font-chiffon">{job.title}</CardTitle>
                         <CardDescription>{job.destination}</CardDescription>
                       </div>
-                      <Badge variant={job.status === 'open' ? 'default' : 'secondary'}>
-                        {job.status}
-                      </Badge>
+                       <Badge variant={
+                         job.status === 'open' ? 'default' :
+                         job.status === 'in_progress' ? 'default' :
+                         job.status === 'pending_approval' ? 'secondary' :
+                         job.status === 'completed' ? 'default' :
+                         job.status === 'assigned' ? 'secondary' :
+                         job.status === 'expired' ? 'destructive' :
+                         'outline'
+                       }>
+                         {job.status.replace('_', ' ')}
+                       </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -413,7 +446,31 @@ export default function Marketplace() {
               }}
             />
 
-            {selectedJob?.status === 'assigned' && selectedJob?.assigned_agent_id && (
+            {selectedJob?.status === 'pending_approval' && completionSubmission && (
+              <div className="space-y-4">
+                <div className="bg-orange-50 dark:bg-orange-950 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 text-orange-600 mt-0.5" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-orange-900 dark:text-orange-100 mb-1">
+                        Job Completion Submitted
+                      </h3>
+                      <p className="text-sm text-orange-800 dark:text-orange-200 mb-3">
+                        Your agent has marked this job as complete. Please review their work and approve to release payment.
+                      </p>
+                      <Button 
+                        onClick={() => setIsApprovalModalOpen(true)}
+                        size="sm"
+                      >
+                        Review & Approve
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {(selectedJob?.status === 'assigned' || selectedJob?.status === 'in_progress') && selectedJob?.assigned_agent_id && (
               <JobMessaging
                 jobId={selectedJob.id}
                 jobOwnerId={selectedJob.user_id}
@@ -423,6 +480,21 @@ export default function Marketplace() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {completionSubmission && selectedJob && (
+        <JobApprovalModal
+          submission={completionSubmission}
+          jobTitle={selectedJob.title}
+          isOpen={isApprovalModalOpen}
+          onClose={() => setIsApprovalModalOpen(false)}
+          onSuccess={() => {
+            fetchJobs();
+            setIsApprovalModalOpen(false);
+            setIsViewJobDialogOpen(false);
+            toast.success('You can now leave a review for the agent!');
+          }}
+        />
+      )}
 
       <Footer />
     </div>

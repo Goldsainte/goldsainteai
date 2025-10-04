@@ -74,8 +74,8 @@ export const PaymentModal = ({
               <strong>Payment Breakdown:</strong>
               <ul className="mt-2 space-y-1 text-xs">
                 <li>• Service Fee: Included in total</li>
-                <li>• Secure Payment: Powered by Stripe</li>
-                <li>• Agent receives payment after job completion</li>
+                <li>• <strong>Escrow Protection:</strong> Funds held securely until job completion</li>
+                <li>• Agent receives payment after you approve their work</li>
               </ul>
             </AlertDescription>
           </Alert>
@@ -94,8 +94,8 @@ export const PaymentModal = ({
 
           <Alert>
             <AlertDescription className="text-xs">
-              <strong>Protection:</strong> Your payment is held securely until the job is completed. 
-              Agent receives funds only after successful delivery.
+              <strong>Escrow Protection:</strong> Your payment is held securely in escrow until the job is completed. 
+              The agent receives funds only after you review and approve their work. This ensures quality and protects both parties.
             </AlertDescription>
           </Alert>
 

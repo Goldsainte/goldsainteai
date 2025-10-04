@@ -12,10 +12,11 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
+import { JobCompletionModal } from "@/components/JobCompletionModal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AgentDashboard() {
@@ -29,6 +30,8 @@ export default function AgentDashboard() {
   const [isBidDialogOpen, setIsBidDialogOpen] = useState(false);
   const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
   const [selectedJobForMessaging, setSelectedJobForMessaging] = useState<any>(null);
+  const [completionModalOpen, setCompletionModalOpen] = useState(false);
+  const [completionJob, setCompletionJob] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -276,13 +279,25 @@ export default function AgentDashboard() {
                         <CardTitle className="text-xl font-chiffon">{bid.marketplace_jobs?.title}</CardTitle>
                         <CardDescription>{bid.marketplace_jobs?.destination}</CardDescription>
                       </div>
-                      <Badge variant={
-                        bid.status === 'accepted' ? 'default' : 
-                        bid.status === 'rejected' ? 'destructive' :
-                        'secondary'
-                      }>
-                        {bid.status}
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Badge variant={
+                          bid.status === 'accepted' ? 'default' : 
+                          bid.status === 'rejected' ? 'destructive' :
+                          'secondary'
+                        }>
+                          {bid.status}
+                        </Badge>
+                        {bid.marketplace_jobs?.status && (
+                          <Badge variant={
+                            bid.marketplace_jobs.status === 'in_progress' ? 'default' :
+                            bid.marketplace_jobs.status === 'pending_approval' ? 'secondary' :
+                            bid.marketplace_jobs.status === 'completed' ? 'default' :
+                            'outline'
+                          }>
+                            Job: {bid.marketplace_jobs.status.replace('_', ' ')}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -298,17 +313,32 @@ export default function AgentDashboard() {
                       <p className="text-sm mt-2">{bid.proposal_details}</p>
                       
                       {bid.status === 'accepted' && (
-                        <Button 
-                          onClick={() => {
-                            setSelectedJobForMessaging(bid.marketplace_jobs);
-                            setIsMessagingDialogOpen(true);
-                          }}
-                          className="w-full mt-4"
-                          variant="outline"
-                        >
-                          <MessageSquare className="h-4 w-4 mr-2" />
-                          Message Customer
-                        </Button>
+                        <div className="flex gap-2 mt-4">
+                          <Button 
+                            onClick={() => {
+                              setSelectedJobForMessaging(bid.marketplace_jobs);
+                              setIsMessagingDialogOpen(true);
+                            }}
+                            className="flex-1"
+                            variant="outline"
+                          >
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Message Customer
+                          </Button>
+                          
+                          {bid.marketplace_jobs?.status === 'in_progress' && (
+                            <Button 
+                              onClick={() => {
+                                setCompletionJob(bid.marketplace_jobs);
+                                setCompletionModalOpen(true);
+                              }}
+                              className="flex-1"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Submit Completion
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -392,6 +422,21 @@ export default function AgentDashboard() {
             )}
           </DialogContent>
         </Dialog>
+
+        {completionJob && (
+          <JobCompletionModal
+            jobId={completionJob.id}
+            jobTitle={completionJob.title}
+            isOpen={completionModalOpen}
+            onClose={() => {
+              setCompletionModalOpen(false);
+              setCompletionJob(null);
+            }}
+            onSuccess={() => {
+              fetchData();
+            }}
+          />
+        )}
       </main>
 
       <Footer />

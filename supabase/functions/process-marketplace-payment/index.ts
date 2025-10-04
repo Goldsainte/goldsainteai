@@ -63,7 +63,8 @@ serve(async (req) => {
     // Customer pays the customer_facing_price
     const customerAmount = Math.round(bid.customer_facing_price * 100); // Convert to cents
 
-    // Create payment intent
+    // Create payment intent with ESCROW - funds held until job completion
+    // NOTE: We do NOT use transfer_data here - funds stay in platform account until customer approves completion
     const paymentIntent = await stripe.paymentIntents.create({
       amount: customerAmount,
       currency: bid.currency.toLowerCase(),
@@ -75,25 +76,36 @@ serve(async (req) => {
         agent_quoted_price: bid.agent_quoted_price.toString(),
         service_fee: bid.platform_service_fee.toString(),
         success_fee: bid.platform_success_fee.toString(),
+        agent_payout_amount: bid.agent_payout_amount.toString(),
+        stripe_account_id: bid.travel_agents.stripe_account_id,
       },
-      description: `Payment for ${job.title}`,
-      // Platform receives the full amount initially
-      application_fee_amount: Math.round((bid.platform_service_fee + bid.platform_success_fee) * 100),
-      transfer_data: {
-        // Transfer agent payout amount to agent's connected account
-        amount: Math.round(bid.agent_payout_amount * 100),
-        destination: bid.travel_agents.stripe_account_id,
-      },
+      description: `Escrow payment for ${job.title}`,
+      // Platform keeps full amount until job completion approval
+      // Funds will be transferred manually after customer approval
     });
 
-    // Update job with payment intent
+    // Update job with payment intent and set to in_progress
     await supabaseClient
       .from('marketplace_jobs')
       .update({
         payment_intent_id: paymentIntent.id,
-        payment_status: 'pending'
+        payment_status: 'pending',
+        status: 'in_progress' // Agent can now start working
       })
       .eq('id', jobId);
+
+    // Create payment record with escrow tracking
+    await supabaseClient
+      .from('payments')
+      .insert({
+        booking_id: jobId, // Reusing booking_id for marketplace jobs
+        amount: bid.customer_facing_price,
+        currency: bid.currency,
+        status: 'completed',
+        stripe_payment_intent_id: paymentIntent.id,
+        escrow_held: true,
+        transferred_to_agent: false
+      });
 
     return new Response(
       JSON.stringify({ 
