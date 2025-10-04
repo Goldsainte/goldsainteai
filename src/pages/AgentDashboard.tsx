@@ -12,8 +12,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
+import { JobMessaging } from "@/components/JobMessaging";
 
 export default function AgentDashboard() {
   const { user } = useAuth();
@@ -24,6 +25,8 @@ export default function AgentDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [isBidDialogOpen, setIsBidDialogOpen] = useState(false);
+  const [isMessagingDialogOpen, setIsMessagingDialogOpen] = useState(false);
+  const [selectedJobForMessaging, setSelectedJobForMessaging] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -251,7 +254,11 @@ export default function AgentDashboard() {
                         <CardTitle className="text-xl font-chiffon">{bid.marketplace_jobs?.title}</CardTitle>
                         <CardDescription>{bid.marketplace_jobs?.destination}</CardDescription>
                       </div>
-                      <Badge variant={bid.status === 'accepted' ? 'default' : 'secondary'}>
+                      <Badge variant={
+                        bid.status === 'accepted' ? 'default' : 
+                        bid.status === 'rejected' ? 'destructive' :
+                        'secondary'
+                      }>
                         {bid.status}
                       </Badge>
                     </div>
@@ -260,13 +267,27 @@ export default function AgentDashboard() {
                     <div className="space-y-2">
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Your Bid:</span>
-                        <span className="font-semibold">${bid.proposed_price}</span>
+                        <span className="font-semibold">{bid.currency} {bid.proposed_price}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Completion Time:</span>
                         <span>{bid.estimated_completion_days} days</span>
                       </div>
                       <p className="text-sm mt-2">{bid.proposal_details}</p>
+                      
+                      {bid.status === 'accepted' && (
+                        <Button 
+                          onClick={() => {
+                            setSelectedJobForMessaging(bid.marketplace_jobs);
+                            setIsMessagingDialogOpen(true);
+                          }}
+                          className="w-full mt-4"
+                          variant="outline"
+                        >
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Message Customer
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -308,6 +329,27 @@ export default function AgentDashboard() {
               
               <Button type="submit" className="w-full">Submit Bid</Button>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={isMessagingDialogOpen} onOpenChange={setIsMessagingDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-chiffon">
+                Messaging: {selectedJobForMessaging?.title}
+              </DialogTitle>
+              <DialogDescription>
+                Communicate with the customer about this job
+              </DialogDescription>
+            </DialogHeader>
+
+            {selectedJobForMessaging && (
+              <JobMessaging
+                jobId={selectedJobForMessaging.id}
+                jobOwnerId={selectedJobForMessaging.user_id}
+                agentId={agent?.id}
+              />
+            )}
           </DialogContent>
         </Dialog>
       </main>

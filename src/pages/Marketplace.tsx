@@ -9,17 +9,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Briefcase, Plus, MapPin, DollarSign, Clock, ArrowLeft } from "lucide-react";
+import { Briefcase, Plus, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
+import { JobBidsReview } from "@/components/JobBidsReview";
+import { JobMessaging } from "@/components/JobMessaging";
 
 export default function Marketplace() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<any[]>([]);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [jobBids, setJobBids] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isViewJobDialogOpen, setIsViewJobDialogOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -58,6 +63,28 @@ export default function Marketplace() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchJobBids = async (jobId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('agent_bids')
+        .select('*, travel_agents(*)')
+        .eq('job_id', jobId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setJobBids(data || []);
+    } catch (error: any) {
+      console.error('Error fetching bids:', error);
+      toast.error('Failed to load bids');
+    }
+  };
+
+  const handleViewJob = async (job: any) => {
+    setSelectedJob(job);
+    await fetchJobBids(job.id);
+    setIsViewJobDialogOpen(true);
   };
 
   const handleCreateJob = async (jobData: any) => {
@@ -305,12 +332,28 @@ export default function Marketplace() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        Budget: ${job.budget_min} - ${job.budget_max}
-                      </span>
-                      <Button variant="outline" size="sm">View Bids</Button>
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{job.destination}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{job.currency} {job.budget_min} - {job.budget_max}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm">{new Date(job.created_at).toLocaleDateString()}</span>
+                      </div>
                     </div>
+                    <Button 
+                      onClick={() => handleViewJob(job)} 
+                      className="w-full"
+                      variant="outline"
+                    >
+                      <MessageSquare className="h-4 w-4 mr-2" />
+                      View Bids & Messages
+                    </Button>
                   </CardContent>
                 </Card>
               ))
@@ -318,6 +361,68 @@ export default function Marketplace() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <Dialog open={isViewJobDialogOpen} onOpenChange={setIsViewJobDialogOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-chiffon">{selectedJob?.title}</DialogTitle>
+            <DialogDescription>
+              <div className="flex items-center gap-4 mt-2">
+                <Badge variant={
+                  selectedJob?.status === 'open' ? 'default' :
+                  selectedJob?.status === 'assigned' ? 'secondary' :
+                  selectedJob?.status === 'expired' ? 'destructive' :
+                  'outline'
+                }>
+                  {selectedJob?.status}
+                </Badge>
+                <span className="text-sm">
+                  Expires: {selectedJob?.expires_at ? new Date(selectedJob.expires_at).toLocaleDateString() : 'N/A'}
+                </span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold mb-2">Job Details</h3>
+              <p className="text-sm text-muted-foreground">{selectedJob?.description}</p>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Destination</p>
+                  <p className="font-medium">{selectedJob?.destination}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Budget Range</p>
+                  <p className="font-medium">
+                    {selectedJob?.currency} {selectedJob?.budget_min} - {selectedJob?.budget_max}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <JobBidsReview
+              jobId={selectedJob?.id}
+              bids={jobBids}
+              jobStatus={selectedJob?.status}
+              onBidAccepted={() => {
+                fetchJobs();
+                if (selectedJob) {
+                  fetchJobBids(selectedJob.id);
+                }
+              }}
+            />
+
+            {selectedJob?.status === 'assigned' && selectedJob?.assigned_agent_id && (
+              <JobMessaging
+                jobId={selectedJob.id}
+                jobOwnerId={selectedJob.user_id}
+                agentId={selectedJob.assigned_agent_id}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
