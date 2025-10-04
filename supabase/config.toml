@@ -74,3 +74,13 @@ verify_jwt = false
 
 [functions.expedia-get-availability]
 verify_jwt = false
+
+[functions.stripe-connect-onboarding]
+verify_jwt = true
+
+[functions.check-stripe-connect-status]
+verify_jwt = true
+
+[functions.process-marketplace-payment]
+verify_jwt = true
+

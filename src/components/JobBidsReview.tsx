@@ -16,6 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { PaymentModal } from "@/components/PaymentModal";
 
 interface JobBidsReviewProps {
   jobId: string;
@@ -28,6 +29,7 @@ export const JobBidsReview = ({ jobId, bids, jobStatus, onBidAccepted }: JobBids
   const [selectedBid, setSelectedBid] = useState<any>(null);
   const [showAcceptDialog, setShowAcceptDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [processing, setProcessing] = useState(false);
 
   const handleAcceptBid = async () => {
@@ -67,6 +69,7 @@ export const JobBidsReview = ({ jobId, bids, jobStatus, onBidAccepted }: JobBids
 
       toast.success('Bid accepted successfully!');
       setShowAcceptDialog(false);
+      setShowPaymentModal(true); // Open payment modal after accepting bid
       onBidAccepted();
     } catch (error: any) {
       console.error('Error accepting bid:', error);
@@ -146,8 +149,9 @@ export const JobBidsReview = ({ jobId, bids, jobStatus, onBidAccepted }: JobBids
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-sm text-muted-foreground">Proposed Price</p>
-                      <p className="font-semibold">{bid.currency} {bid.proposed_price}</p>
+                      <p className="text-sm text-muted-foreground">Total Price</p>
+                      <p className="font-semibold">{bid.currency} {(bid.customer_facing_price || bid.proposed_price).toFixed(2)}</p>
+                      <p className="text-xs text-muted-foreground">Includes 3% platform service fee</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -228,8 +232,24 @@ export const JobBidsReview = ({ jobId, bids, jobStatus, onBidAccepted }: JobBids
               {processing ? 'Processing...' : 'Reject Bid'}
             </AlertDialogAction>
           </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
-  );
-};
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {selectedBid && (
+          <PaymentModal
+            jobId={jobId}
+            bidId={selectedBid.id}
+            amount={selectedBid.customer_facing_price || selectedBid.proposed_price}
+            currency={selectedBid.currency}
+            agentName={selectedBid.travel_agents?.agency_name || 'Agent'}
+            isOpen={showPaymentModal}
+            onClose={() => setShowPaymentModal(false)}
+            onSuccess={() => {
+              toast.success('Payment completed!');
+              onBidAccepted();
+            }}
+          />
+        )}
+      </>
+    );
+  };

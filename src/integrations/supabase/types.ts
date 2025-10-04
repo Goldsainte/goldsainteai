@@ -17,38 +17,59 @@ export type Database = {
       agent_bids: {
         Row: {
           agent_id: string
+          agent_payout_amount: number | null
+          agent_quoted_price: number
           created_at: string
           currency: string
+          customer_facing_price: number
           estimated_completion_days: number | null
           id: string
           job_id: string
+          platform_service_fee: number | null
+          platform_success_fee: number | null
           proposal_details: string
           proposed_price: number
+          service_fee_percentage: number | null
           status: string
+          success_fee_percentage: number | null
           updated_at: string
         }
         Insert: {
           agent_id: string
+          agent_payout_amount?: number | null
+          agent_quoted_price?: number
           created_at?: string
           currency?: string
+          customer_facing_price?: number
           estimated_completion_days?: number | null
           id?: string
           job_id: string
+          platform_service_fee?: number | null
+          platform_success_fee?: number | null
           proposal_details: string
           proposed_price: number
+          service_fee_percentage?: number | null
           status?: string
+          success_fee_percentage?: number | null
           updated_at?: string
         }
         Update: {
           agent_id?: string
+          agent_payout_amount?: number | null
+          agent_quoted_price?: number
           created_at?: string
           currency?: string
+          customer_facing_price?: number
           estimated_completion_days?: number | null
           id?: string
           job_id?: string
+          platform_service_fee?: number | null
+          platform_success_fee?: number | null
           proposal_details?: string
           proposed_price?: number
+          service_fee_percentage?: number | null
           status?: string
+          success_fee_percentage?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -322,6 +343,8 @@ export type Database = {
       }
       marketplace_jobs: {
         Row: {
+          agent_payout_amount: number | null
+          agent_payout_status: string | null
           assigned_agent_id: string | null
           booking_type: string
           budget_max: number | null
@@ -333,15 +356,23 @@ export type Database = {
           expires_at: string
           id: string
           number_of_travelers: number | null
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_status: string | null
           requirements: Json
+          service_fee_collected: number | null
           status: string
+          success_fee_collected: number | null
           title: string
+          total_paid_amount: number | null
           travel_dates: Json | null
           updated_at: string
           user_id: string
           winning_bid_id: string | null
         }
         Insert: {
+          agent_payout_amount?: number | null
+          agent_payout_status?: string | null
           assigned_agent_id?: string | null
           booking_type: string
           budget_max?: number | null
@@ -353,15 +384,23 @@ export type Database = {
           expires_at?: string
           id?: string
           number_of_travelers?: number | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
           requirements: Json
+          service_fee_collected?: number | null
           status?: string
+          success_fee_collected?: number | null
           title: string
+          total_paid_amount?: number | null
           travel_dates?: Json | null
           updated_at?: string
           user_id: string
           winning_bid_id?: string | null
         }
         Update: {
+          agent_payout_amount?: number | null
+          agent_payout_status?: string | null
           assigned_agent_id?: string | null
           booking_type?: string
           budget_max?: number | null
@@ -373,9 +412,15 @@ export type Database = {
           expires_at?: string
           id?: string
           number_of_travelers?: number | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
           requirements?: Json
+          service_fee_collected?: number | null
           status?: string
+          success_fee_collected?: number | null
           title?: string
+          total_paid_amount?: number | null
           travel_dates?: Json | null
           updated_at?: string
           user_id?: string
@@ -579,6 +624,11 @@ export type Database = {
           sms_notifications_enabled: boolean | null
           social_media: string | null
           specializations: string[] | null
+          stripe_account_id: string | null
+          stripe_account_status: string | null
+          stripe_charges_enabled: boolean | null
+          stripe_onboarding_completed: boolean | null
+          stripe_payouts_enabled: boolean | null
           tax_id: string | null
           time_zone: string | null
           total_reviews: number | null
@@ -624,6 +674,11 @@ export type Database = {
           sms_notifications_enabled?: boolean | null
           social_media?: string | null
           specializations?: string[] | null
+          stripe_account_id?: string | null
+          stripe_account_status?: string | null
+          stripe_charges_enabled?: boolean | null
+          stripe_onboarding_completed?: boolean | null
+          stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
           time_zone?: string | null
           total_reviews?: number | null
@@ -669,6 +724,11 @@ export type Database = {
           sms_notifications_enabled?: boolean | null
           social_media?: string | null
           specializations?: string[] | null
+          stripe_account_id?: string | null
+          stripe_account_status?: string | null
+          stripe_charges_enabled?: boolean | null
+          stripe_onboarding_completed?: boolean | null
+          stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
           time_zone?: string | null
           total_reviews?: number | null
@@ -1063,6 +1123,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_bid_pricing: {
+        Args: {
+          agent_price: number
+          service_fee_pct?: number
+          success_fee_pct?: number
+        }
+        Returns: Json
+      }
       expire_old_marketplace_jobs: {
         Args: Record<PropertyKey, never>
         Returns: undefined

@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
+import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AgentDashboard() {
   const { user } = useAuth();
@@ -81,14 +83,32 @@ export default function AgentDashboard() {
     const formData = new FormData(e.currentTarget);
 
     try {
+      const agentPrice = parseFloat(formData.get('proposed_price') as string);
+      
+      // Calculate pricing with fees
+      // Customer sees agentPrice + 3% service fee
+      // Agent receives agentPrice - 15% success fee
+      const serviceFee = agentPrice * 0.03;
+      const successFee = agentPrice * 0.15;
+      const customerPrice = agentPrice + serviceFee;
+      const agentPayout = agentPrice - successFee;
+
       const { error } = await supabase
         .from('agent_bids')
         .insert({
           job_id: selectedJob.id,
           agent_id: agent.id,
-          proposed_price: parseFloat(formData.get('proposed_price') as string),
+          proposed_price: customerPrice, // Customer-facing price (for backwards compatibility)
+          agent_quoted_price: agentPrice,
+          customer_facing_price: customerPrice,
+          service_fee_percentage: 3.0,
+          success_fee_percentage: 15.0,
+          platform_service_fee: serviceFee,
+          platform_success_fee: successFee,
+          agent_payout_amount: agentPayout,
           estimated_completion_days: parseInt(formData.get('estimated_days') as string),
-          proposal_details: formData.get('proposal_details') as string
+          proposal_details: formData.get('proposal_details') as string,
+          currency: selectedJob.currency || 'USD'
         } as any);
 
       if (error) throw error;
@@ -173,6 +193,8 @@ export default function AgentDashboard() {
             </CardContent>
           </Card>
         )}
+
+        <StripeConnectOnboarding />
 
         <Tabs defaultValue="available" className="space-y-6">
           <TabsList>
@@ -306,9 +328,27 @@ export default function AgentDashboard() {
             </DialogHeader>
             
             <form onSubmit={handlePlaceBid} className="space-y-4">
+              <Alert className="mb-4">
+                <AlertDescription className="text-xs">
+                  Enter your base service price. Customer will see your price + 3% platform service fee. 
+                  You'll receive your quoted price minus 15% success fee after job completion.
+                </AlertDescription>
+              </Alert>
+              
               <div>
-                <Label htmlFor="proposed_price">Your Price ($)</Label>
-                <Input id="proposed_price" name="proposed_price" type="number" required step="0.01" />
+                <Label htmlFor="proposed_price">Your Service Price ({selectedJob?.currency || 'USD'})</Label>
+                <Input 
+                  id="proposed_price" 
+                  name="proposed_price" 
+                  type="number" 
+                  required 
+                  step="0.01"
+                  min="1"
+                  placeholder="Enter your price (e.g., 1000)"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Customer will be charged your price + 3% service fee
+                </p>
               </div>
               
               <div>

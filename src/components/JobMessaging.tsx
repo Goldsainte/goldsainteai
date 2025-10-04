@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Send } from "lucide-react";
+import { Send, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
+import { filterMessageContent, sanitizeContactInfo } from "@/utils/contentFilter";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const messageSchema = z.object({
   message_text: z.string().trim().min(1, "Message cannot be empty").max(1000, "Message must be less than 1000 characters")
@@ -89,6 +91,13 @@ export const JobMessaging = ({ jobId, jobOwnerId, agentId }: JobMessagingProps) 
         return;
       }
 
+      // Content filtering - check for prohibited content
+      const filterResult = filterMessageContent(validation.data.message_text);
+      if (filterResult.isViolation) {
+        toast.error(filterResult.reason, { duration: 5000 });
+        return;
+      }
+
       setSending(true);
 
       // Determine receiver based on who is sending
@@ -150,6 +159,14 @@ export const JobMessaging = ({ jobId, jobOwnerId, agentId }: JobMessagingProps) 
         <CardTitle>Messages</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription className="text-xs">
+            <strong>Platform Security:</strong> All communication must remain within Goldsainte. 
+            Messages containing emails, phone numbers, or external links are automatically blocked. 
+            Attempting to move transactions off-platform violates our Terms of Service.
+          </AlertDescription>
+        </Alert>
         <ScrollArea className="h-[400px] pr-4" ref={scrollRef}>
           {messages.length === 0 ? (
             <div className="text-center text-muted-foreground py-8">
