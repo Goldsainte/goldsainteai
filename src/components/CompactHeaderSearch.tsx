@@ -317,7 +317,7 @@ export const CompactHeaderSearch = ({ value, onValueChange }: CompactHeaderSearc
                 </SelectItem>
                 <SelectItem value="restaurants">
                   <div className="flex items-center gap-2">
-                    <PawPrint className="h-4 w-4" />
+                    <UtensilsCrossed className="h-4 w-4" />
                     <span>Restaurants</span>
                   </div>
                 </SelectItem>
