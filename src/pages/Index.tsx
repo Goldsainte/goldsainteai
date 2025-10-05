@@ -904,7 +904,7 @@ const Index = () => {
                     </div>
                     
                     {/* Bottom center - Water Sports with image */}
-                    <div className="absolute bottom-[20px] sm:bottom-[80px] md:bottom-[100px] right-[90px] sm:right-[90px] md:right-[120px] animate-float z-10" style={{ animationDelay: '3.5s' }}>
+                    <div className="absolute bottom-[20px] sm:bottom-[80px] md:bottom-[100px] right-[5px] sm:right-[90px] md:right-[120px] animate-float z-10" style={{ animationDelay: '3.5s' }}>
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={icelandNorthernLights} 
@@ -919,7 +919,7 @@ const Index = () => {
                     </div>
                     
                     {/* Bottom - Cycling with image */}
-                    <div className="absolute bottom-[80px] sm:bottom-[30px] md:bottom-[40px] left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
+                    <div className="absolute bottom-[20px] sm:bottom-[30px] md:bottom-[40px] left-[5px] sm:left-1/2 sm:-translate-x-1/2 md:left-1/2 md:-translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={cyclingTour} 
