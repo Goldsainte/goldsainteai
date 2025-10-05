@@ -10,18 +10,19 @@ import { ArrowLeft } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
 
 export default function Onboarding() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleSubmit = async (formData: any) => {
-    setIsLoading(true);
+    setIsSaving(true);
     
     try {
       const prefsData = {
@@ -41,7 +42,7 @@ export default function Onboarding() {
       console.error('Error saving preferences:', error);
       toast.error('Failed to save preferences. Please try again.');
     } finally {
-      setIsLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -80,14 +81,14 @@ export default function Onboarding() {
           <CardContent>
             <ComprehensivePreferencesForm 
               onSubmit={handleSubmit}
-              isLoading={isLoading}
+              isLoading={isSaving}
             />
             
             <div className="mt-6 text-center">
               <button
                 onClick={handleSkip}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                disabled={isLoading}
+                disabled={isSaving}
               >
                 Skip for now (you can set preferences later)
               </button>

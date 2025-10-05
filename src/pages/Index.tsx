@@ -114,8 +114,27 @@ const Index = () => {
   const lastRequestIdRef = useRef<number>(0);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(true);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+
+  const handleCloseWelcome = () => {
+    setShowWelcomeModal(false);
+    try { localStorage.setItem('welcomeDismissed', 'true'); } catch {}
+  };
+
+  useEffect(() => {
+    // Hide welcome modal if logged in, or if previously dismissed
+    if (user) {
+      setShowWelcomeModal(false);
+      return;
+    }
+    try {
+      const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
+      setShowWelcomeModal(!dismissed);
+    } catch {
+      setShowWelcomeModal(true);
+    }
+  }, [user]);
 
   const rotatingMessages = [
     "Where to next? Discover handpicked hotels tailored to your taste.",
@@ -1485,7 +1504,7 @@ const Index = () => {
         {/* Welcome Modal */}
         <WelcomeModal
           open={showWelcomeModal}
-          onClose={() => setShowWelcomeModal(false)}
+          onClose={handleCloseWelcome}
         />
 
         {/* Date Picker Modal */}

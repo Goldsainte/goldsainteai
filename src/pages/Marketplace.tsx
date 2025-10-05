@@ -24,7 +24,7 @@ import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
 import { AIAgentMatching } from "@/components/AIAgentMatching";
 
 export default function Marketplace() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<any[]>([]);
@@ -43,6 +43,7 @@ export default function Marketplace() {
   const [jobAttachments, setJobAttachments] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
+    if (isLoading) return;
     if (!user) {
       navigate('/auth');
       return;

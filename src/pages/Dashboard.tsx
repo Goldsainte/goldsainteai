@@ -31,20 +31,21 @@ interface SearchHistory {
 }
 
 export default function Dashboard() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistory[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (isLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
 
     fetchUserData();
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   const fetchUserData = async () => {
     try {

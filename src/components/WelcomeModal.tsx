@@ -1,4 +1,4 @@
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight } from "lucide-react";
 
@@ -11,6 +11,10 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-lg p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Welcome to Goldsainte.Ai</DialogTitle>
+          <DialogDescription className="sr-only">Overview of capabilities</DialogDescription>
+        </DialogHeader>
         <div className="p-6 space-y-6">
           <div className="text-center space-y-2">
             <h2 className="text-2xl font-secondary text-primary">
