@@ -825,7 +825,7 @@ const Index = () => {
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-chiffon font-bold text-secondary">
                     How it Works
                   </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
+                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-4xl mx-auto leading-relaxed">
                     Chat with us to start planning your next adventure. Ask for recommendations for any destination or request a full itinerary tailored to you. The more specific you are about the experiences you enjoy, the better we can personalize your trip—or take our quiz to discover your unique travel style.
                   </p>
                 </div>
