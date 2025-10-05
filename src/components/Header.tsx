@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Globe, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -17,7 +17,6 @@ export const Header = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const [usePreferences, setUsePreferences] = useState(true);
-  const [selectedLanguage, setSelectedLanguage] = useState("English");
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -149,110 +148,6 @@ export const Header = () => {
               <span className="xl:hidden">Agent</span>
             </Button>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="hover:bg-muted rounded-full h-9 w-9 md:h-10 md:w-10"
-                >
-                  <Globe className="h-4 w-4 md:h-5 md:w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-background border-border z-[100]">
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("English");
-                    toast({ title: "Language changed to English" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "English" ? "font-semibold" : ""}>🇬🇧 English</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("Español");
-                    toast({ title: "Idioma cambiado a Español" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "Español" ? "font-semibold" : ""}>🇪🇸 Español</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("Français");
-                    toast({ title: "Langue changée en Français" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "Français" ? "font-semibold" : ""}>🇫🇷 Français</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("Deutsch");
-                    toast({ title: "Sprache geändert auf Deutsch" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "Deutsch" ? "font-semibold" : ""}>🇩🇪 Deutsch</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("Italiano");
-                    toast({ title: "Lingua cambiata in Italiano" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "Italiano" ? "font-semibold" : ""}>🇮🇹 Italiano</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("Português");
-                    toast({ title: "Idioma alterado para Português" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "Português" ? "font-semibold" : ""}>🇵🇹 Português</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("中文");
-                    toast({ title: "语言已更改为中文" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "中文" ? "font-semibold" : ""}>🇨🇳 中文</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("日本語");
-                    toast({ title: "言語が日本語に変更されました" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "日本語" ? "font-semibold" : ""}>🇯🇵 日本語</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("한국어");
-                    toast({ title: "언어가 한국어로 변경되었습니다" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "한국어" ? "font-semibold" : ""}>🇰🇷 한국어</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => {
-                    setSelectedLanguage("العربية");
-                    toast({ title: "تم تغيير اللغة إلى العربية" });
-                  }} 
-                  className="cursor-pointer"
-                >
-                  <span className={selectedLanguage === "العربية" ? "font-semibold" : ""}>🇸🇦 العربية</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
