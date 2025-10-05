@@ -46,7 +46,6 @@ import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
 import luxuryVisa from "@/assets/luxury-visa.jpg";
 import luxuryEvents from "@/assets/luxury-events.jpg";
 import destination7 from "@/assets/destination7.jpg";
-import destination8 from "@/assets/destination8.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
