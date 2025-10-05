@@ -764,9 +764,9 @@ const Index = () => {
             {/* How Goldsainte.AI Works Section */}
             <div className="px-6 py-20 bg-gradient-to-b from-background via-accent/5 to-background">
               <div className="w-full max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-                  {/* Left side - Text content */}
-                  <div className="space-y-6 lg:pr-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                  {/* Left side - Text content only */}
+                  <div className="space-y-6 lg:pr-8 pt-8">
                     <div className="space-y-4">
                       <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                         Start chatting with us.
@@ -779,8 +779,10 @@ const Index = () => {
                     </div>
                   </div>
                   
-                  {/* Right side - Visual category showcase with images */}
-                  <div className="relative h-[600px] lg:h-[700px]">
+                  {/* Right side - Visual showcase AND search bar */}
+                  <div className="space-y-8">
+                    {/* Visual category showcase with images */}
+                    <div className="relative h-[600px] lg:h-[650px]">
                     {/* Central profile circle */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
                       <div className="h-40 w-40 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-accent to-primary p-1 shadow-2xl">
@@ -904,9 +906,10 @@ const Index = () => {
                         <span className="text-sm font-medium">Cycling</span>
                       </div>
                     </div>
+                    </div>
                     
-                    {/* Search input at bottom */}
-                    <div className="absolute -bottom-12 left-0 right-0 z-30">
+                    {/* Search input below the visual showcase */}
+                    <div className="w-full">
                       <div className="bg-card/95 backdrop-blur-sm rounded-full border-2 border-border shadow-2xl p-2 flex items-center gap-3">
                         <Button
                           size="icon"
