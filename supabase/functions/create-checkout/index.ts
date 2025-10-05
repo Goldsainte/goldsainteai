@@ -22,6 +22,36 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Authenticate user first
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('Missing authorization header');
+      return new Response(JSON.stringify({ 
+        error: 'Authentication required'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
+
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    
+    if (authError || !user) {
+      console.error('Authentication failed:', authError);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid authentication'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+      });
+    }
+
     const body = await req.json();
     
     // Validate input
@@ -29,8 +59,7 @@ serve(async (req) => {
     if (!validationResult.success) {
       console.error('Validation error:', validationResult.error);
       return new Response(JSON.stringify({ 
-        error: 'Invalid input data',
-        details: validationResult.error.issues 
+        error: 'Invalid request data'
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
@@ -41,14 +70,48 @@ serve(async (req) => {
 
     console.log('Creating checkout session for booking:', bookingId);
 
+    // SECURITY: Verify booking exists and belongs to authenticated user
+    const { data: booking, error: bookingError } = await supabaseClient
+      .from('bookings')
+      .select('id, total_price, currency, user_id')
+      .eq('id', bookingId)
+      .single();
+
+    if (bookingError || !booking) {
+      console.error('Booking not found:', bookingError);
+      return new Response(JSON.stringify({ 
+        error: 'Booking not found'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 404,
+      });
+    }
+
+    // SECURITY: Verify ownership
+    if (booking.user_id !== user.id) {
+      console.error('Unauthorized access attempt for booking:', bookingId);
+      return new Response(JSON.stringify({ 
+        error: 'Unauthorized'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
+
+    // SECURITY: Verify amount matches booking total
+    if (Math.abs(booking.total_price - amount) > 0.01) {
+      console.error('Price mismatch - Expected:', booking.total_price, 'Got:', amount);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid payment amount'
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
-
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
 
     // Create payment record
     const { data: payment, error: paymentError } = await supabaseClient
@@ -112,8 +175,8 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in create-checkout:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    // SECURITY: Return generic error message, log details server-side only
+    return new Response(JSON.stringify({ error: 'Payment processing failed. Please try again.' }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

@@ -20,6 +20,21 @@ serve(async (req) => {
   }
 
   try {
+    // SECURITY: Authenticate user (optional for guest bookings, but verify ownership later)
+    const authHeader = req.headers.get('Authorization');
+    let user = null;
+    
+    if (authHeader) {
+      const supabaseAuthClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+        { global: { headers: { Authorization: authHeader } } }
+      );
+      
+      const { data: { user: authUser } } = await supabaseAuthClient.auth.getUser();
+      user = authUser;
+    }
+
     const body = await req.json();
     
     // Validate input
@@ -27,8 +42,7 @@ serve(async (req) => {
     if (!validationResult.success) {
       console.error('Validation error:', validationResult.error);
       return new Response(JSON.stringify({ 
-        error: 'Invalid input data',
-        details: validationResult.error.issues 
+        error: 'Invalid request data'
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 400,
@@ -67,7 +81,7 @@ serve(async (req) => {
       console.error('Payment update error:', paymentError);
     }
 
-    // Get booking details first
+    // Get booking details and verify ownership
     const { data: booking } = await supabaseClient
       .from('bookings')
       .select('*, guests(*)')
@@ -76,6 +90,17 @@ serve(async (req) => {
 
     if (!booking) {
       throw new Error('Booking not found');
+    }
+
+    // SECURITY: Verify user owns this booking (guest bookings have null user_id)
+    if (booking.user_id && user && booking.user_id !== user.id) {
+      console.error('Unauthorized payment verification attempt');
+      return new Response(JSON.stringify({ 
+        error: 'Unauthorized' 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
     }
 
     // Update booking status and process Expedia booking if payment succeeded
@@ -179,17 +204,28 @@ serve(async (req) => {
       .eq('id', bookingId)
       .single();
 
+    // SECURITY: Filter sensitive guest data from response
+    const sanitizedBooking = finalBooking ? {
+      ...finalBooking,
+      guests: finalBooking.guests ? {
+        first_name: finalBooking.guests.first_name,
+        last_name: finalBooking.guests.last_name,
+        country: finalBooking.guests.country,
+        // Exclude email, phone for security
+      } : null
+    } : null;
+
     return new Response(JSON.stringify({ 
       paymentStatus: session.payment_status,
-      booking: finalBooking
+      booking: sanitizedBooking
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
     console.error('Error in verify-payment:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    // SECURITY: Return generic error message, log details server-side only
+    return new Response(JSON.stringify({ error: 'Payment verification failed. Please try again.' }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

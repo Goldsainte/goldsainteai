@@ -116,8 +116,9 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error('Error processing payment:', error);
+    // SECURITY: Return generic error message
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Payment processing failed. Please try again.' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
