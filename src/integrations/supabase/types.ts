@@ -88,6 +88,44 @@ export type Database = {
           },
         ]
       }
+      agent_badges: {
+        Row: {
+          agent_id: string
+          badge_type: string
+          created_at: string
+          criteria_met: Json | null
+          earned_at: string
+          id: string
+          valid_until: string | null
+        }
+        Insert: {
+          agent_id: string
+          badge_type: string
+          created_at?: string
+          criteria_met?: Json | null
+          earned_at?: string
+          id?: string
+          valid_until?: string | null
+        }
+        Update: {
+          agent_id?: string
+          badge_type?: string
+          created_at?: string
+          criteria_met?: Json | null
+          earned_at?: string
+          id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_badges_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_bids: {
         Row: {
           agent_id: string
@@ -159,6 +197,132 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_performance_metrics: {
+        Row: {
+          acceptance_rate_percentage: number | null
+          agent_id: string
+          avg_customer_rating: number | null
+          avg_first_response_minutes: number | null
+          avg_response_time_minutes: number | null
+          bids_accepted: number | null
+          bids_declined: number | null
+          completion_rate_percentage: number | null
+          created_at: string
+          id: string
+          jobs_cancelled: number | null
+          jobs_completed: number | null
+          on_time_delivery_rate: number | null
+          period_end: string | null
+          period_start: string | null
+          response_rate_percentage: number | null
+          total_bids_sent: number | null
+          updated_at: string
+        }
+        Insert: {
+          acceptance_rate_percentage?: number | null
+          agent_id: string
+          avg_customer_rating?: number | null
+          avg_first_response_minutes?: number | null
+          avg_response_time_minutes?: number | null
+          bids_accepted?: number | null
+          bids_declined?: number | null
+          completion_rate_percentage?: number | null
+          created_at?: string
+          id?: string
+          jobs_cancelled?: number | null
+          jobs_completed?: number | null
+          on_time_delivery_rate?: number | null
+          period_end?: string | null
+          period_start?: string | null
+          response_rate_percentage?: number | null
+          total_bids_sent?: number | null
+          updated_at?: string
+        }
+        Update: {
+          acceptance_rate_percentage?: number | null
+          agent_id?: string
+          avg_customer_rating?: number | null
+          avg_first_response_minutes?: number | null
+          avg_response_time_minutes?: number | null
+          bids_accepted?: number | null
+          bids_declined?: number | null
+          completion_rate_percentage?: number | null
+          created_at?: string
+          id?: string
+          jobs_cancelled?: number | null
+          jobs_completed?: number | null
+          on_time_delivery_rate?: number | null
+          period_end?: string | null
+          period_start?: string | null
+          response_rate_percentage?: number | null
+          total_bids_sent?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_performance_metrics_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_response_tracking: {
+        Row: {
+          agent_id: string
+          created_at: string
+          first_response_at: string | null
+          id: string
+          inquiry_received_at: string
+          job_id: string | null
+          message_id: string | null
+          response_time_minutes: number | null
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          first_response_at?: string | null
+          id?: string
+          inquiry_received_at: string
+          job_id?: string | null
+          message_id?: string | null
+          response_time_minutes?: number | null
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          first_response_at?: string | null
+          id?: string
+          inquiry_received_at?: string
+          job_id?: string | null
+          message_id?: string | null
+          response_time_minutes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_response_tracking_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_response_tracking_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_response_tracking_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_messages"
             referencedColumns: ["id"]
           },
         ]
@@ -577,6 +741,90 @@ export type Database = {
           name?: string
           report_type?: string
           schedule?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      customer_verifications: {
+        Row: {
+          created_at: string
+          document_url: string | null
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          rejection_reason: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          verification_type: string
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          rejection_reason?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          verification_type: string
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          rejection_reason?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          verification_type?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
+      emergency_contacts: {
+        Row: {
+          contact_name: string
+          country_code: string | null
+          created_at: string
+          email: string | null
+          id: string
+          is_primary: boolean | null
+          phone_number: string
+          relationship: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_name: string
+          country_code?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          phone_number: string
+          relationship: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_name?: string
+          country_code?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          is_primary?: boolean | null
+          phone_number?: string
+          relationship?: string
           updated_at?: string
           user_id?: string
         }
@@ -2431,6 +2679,10 @@ export type Database = {
         Args: { amount: number; from_curr: string; to_curr: string }
         Returns: number
       }
+      evaluate_agent_badges: {
+        Args: { target_agent_id: string }
+        Returns: boolean
+      }
       expire_old_marketplace_jobs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -2510,6 +2762,10 @@ export type Database = {
           specializations: string[]
           total_reviews: number
         }[]
+      }
+      update_agent_performance_metrics: {
+        Args: { target_agent_id: string }
+        Returns: boolean
       }
     }
     Enums: {
