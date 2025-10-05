@@ -18,6 +18,7 @@ import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
 import { JobCompletionModal } from "@/components/JobCompletionModal";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
+import { AgentAnalyticsDashboard } from "@/components/AgentAnalyticsDashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AgentDashboard() {
@@ -204,6 +205,7 @@ export default function AgentDashboard() {
           <TabsList>
             <TabsTrigger value="available">Available Jobs ({jobs.length})</TabsTrigger>
             <TabsTrigger value="my-bids">My Bids ({myBids.length})</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="available" className="space-y-4">
@@ -351,6 +353,12 @@ export default function AgentDashboard() {
             <TabsContent value="availability">
               {agent && (
                 <AgentAvailabilityCalendar agentId={agent.id} isOwner={true} />
+              )}
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              {agent && (
+                <AgentAnalyticsDashboard agentId={agent.id} />
               )}
             </TabsContent>
           </Tabs>

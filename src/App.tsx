@@ -21,6 +21,7 @@ import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
+import MyJobs from "./pages/MyJobs";
 import BookingPreferences from "./pages/BookingPreferences";
 import CommissionDashboard from "./pages/CommissionDashboard";
 import EmailPreview from "./pages/EmailPreview";
@@ -64,11 +65,12 @@ function App() {
                <Route path="/my-bookings" element={<MyBookings />} />
                <Route path="/profile" element={<Profile />} />
                <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
-               <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
-                      <Route path="/search" element={<SearchResults />} />
-                      <Route path="/hotel-booking" element={<HotelBooking />} />
-                      <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-                      <Route path="/r" element={<Redirect />} />
+                <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
+                       <Route path="/search" element={<SearchResults />} />
+                       <Route path="/hotel-booking" element={<HotelBooking />} />
+                       <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+                <Route path="/my-jobs" element={<MyJobs />} />
+                       <Route path="/r" element={<Redirect />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
