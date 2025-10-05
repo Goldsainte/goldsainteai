@@ -44,7 +44,7 @@ import { WelcomeModal } from "@/components/WelcomeModal";
 import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
-import heroAiConcierge from "@/assets/hero-ai-concierge.png";
+import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
 import cardAiSearch from "@/assets/card-ai-search.jpg";
 import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking.jpg";
