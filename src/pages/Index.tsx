@@ -791,7 +791,7 @@ const Index = () => {
                   {/* Left side - Text content only */}
                   <div className="space-y-6 lg:pr-8 pt-8">
                     <div className="space-y-4">
-                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-chiffon font-bold leading-tight">
                         Start chatting with us.
                       </h2>
                       <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-secondary">
