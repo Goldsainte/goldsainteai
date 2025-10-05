@@ -10,6 +10,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Star, MapPin, Briefcase, Award, Clock, CheckCircle, ArrowLeft, Globe, Mail, Phone } from "lucide-react";
 import { toast } from "sonner";
+import { ReviewsSection } from "@/components/ReviewsSection";
+import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
 
 export default function AgentProfile() {
   const { agentId } = useParams();
@@ -342,6 +344,9 @@ export default function AgentProfile() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Availability Calendar */}
+            <AgentAvailabilityCalendar agentId={agentId!} isOwner={false} />
           </div>
         </div>
       </main>

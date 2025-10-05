@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_availability: {
+        Row: {
+          agent_id: string
+          created_at: string
+          date: string
+          id: string
+          is_available: boolean
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          created_at?: string
+          date: string
+          id?: string
+          is_available?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          created_at?: string
+          date?: string
+          id?: string
+          is_available?: boolean
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_availability_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_bids: {
         Row: {
           agent_id: string
@@ -394,6 +432,100 @@ export type Database = {
           },
         ]
       }
+      marketplace_disputes: {
+        Row: {
+          created_at: string
+          description: string
+          dispute_type: string
+          evidence: Json | null
+          id: string
+          job_id: string
+          raised_by: string
+          resolution_notes: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          dispute_type: string
+          evidence?: Json | null
+          id?: string
+          job_id: string
+          raised_by: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          dispute_type?: string
+          evidence?: Json | null
+          id?: string
+          job_id?: string
+          raised_by?: string
+          resolution_notes?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_disputes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketplace_job_attachments: {
+        Row: {
+          created_at: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          job_id: string
+          mime_type: string | null
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          job_id: string
+          mime_type?: string | null
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          job_id?: string
+          mime_type?: string | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_job_attachments_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_jobs: {
         Row: {
           agent_payout_amount: number | null
@@ -409,6 +541,10 @@ export type Database = {
           customer_approved_at: string | null
           description: string
           destination: string | null
+          dispute_opened_at: string | null
+          dispute_reason: string | null
+          dispute_resolution: string | null
+          dispute_resolved_at: string | null
           expires_at: string
           funds_released: boolean | null
           funds_released_at: string | null
@@ -443,6 +579,10 @@ export type Database = {
           customer_approved_at?: string | null
           description: string
           destination?: string | null
+          dispute_opened_at?: string | null
+          dispute_reason?: string | null
+          dispute_resolution?: string | null
+          dispute_resolved_at?: string | null
           expires_at?: string
           funds_released?: boolean | null
           funds_released_at?: string | null
@@ -477,6 +617,10 @@ export type Database = {
           customer_approved_at?: string | null
           description?: string
           destination?: string | null
+          dispute_opened_at?: string | null
+          dispute_reason?: string | null
+          dispute_resolution?: string | null
+          dispute_resolved_at?: string | null
           expires_at?: string
           funds_released?: boolean | null
           funds_released_at?: string | null
@@ -689,6 +833,8 @@ export type Database = {
           business_address: string | null
           business_registration_number: string | null
           business_type: string | null
+          cancellation_fee_percentage: number | null
+          cancellation_hours_before: number | null
           cancellation_policy: string | null
           commission_rate: number | null
           created_at: string
@@ -739,6 +885,8 @@ export type Database = {
           business_address?: string | null
           business_registration_number?: string | null
           business_type?: string | null
+          cancellation_fee_percentage?: number | null
+          cancellation_hours_before?: number | null
           cancellation_policy?: string | null
           commission_rate?: number | null
           created_at?: string
@@ -789,6 +937,8 @@ export type Database = {
           business_address?: string | null
           business_registration_number?: string | null
           business_type?: string | null
+          cancellation_fee_percentage?: number | null
+          cancellation_hours_before?: number | null
           cancellation_policy?: string | null
           commission_rate?: number | null
           created_at?: string

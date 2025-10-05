@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
 import { JobCompletionModal } from "@/components/JobCompletionModal";
+import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AgentDashboard() {
@@ -345,8 +346,14 @@ export default function AgentDashboard() {
                 </Card>
               ))
             )}
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+
+            <TabsContent value="availability">
+              {agent && (
+                <AgentAvailabilityCalendar agentId={agent.id} isOwner={true} />
+              )}
+            </TabsContent>
+          </Tabs>
 
         <Dialog open={isBidDialogOpen} onOpenChange={setIsBidDialogOpen}>
           <DialogContent>

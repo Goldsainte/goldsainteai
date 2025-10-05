@@ -16,6 +16,8 @@ import { JobBidsReview } from "@/components/JobBidsReview";
 import { JobMessaging } from "@/components/JobMessaging";
 import { JobApprovalModal } from "@/components/JobApprovalModal";
 import { ReviewModal } from "@/components/ReviewModal";
+import { DisputeResolutionModal } from "@/components/DisputeResolutionModal";
+import { JobFileUpload } from "@/components/JobFileUpload";
 
 export default function Marketplace() {
   const { user } = useAuth();
@@ -33,6 +35,8 @@ export default function Marketplace() {
   const [reviewJobId, setReviewJobId] = useState<string>("");
   const [reviewAgentId, setReviewAgentId] = useState<string>("");
   const [reviewAgentName, setReviewAgentName] = useState<string>("");
+  const [disputeJobId, setDisputeJobId] = useState<string | null>(null);
+  const [jobAttachments, setJobAttachments] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     if (!user) {
@@ -42,6 +46,22 @@ export default function Marketplace() {
 
     fetchJobs();
   }, [user, navigate]);
+
+  const fetchAttachments = async (jobId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('marketplace_job_attachments')
+        .select('*')
+        .eq('job_id', jobId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      
+      setJobAttachments(prev => ({ ...prev, [jobId]: data || [] }));
+    } catch (error: any) {
+      console.error('Error fetching attachments:', error);
+    }
+  };
 
   const fetchJobs = async () => {
     try {
@@ -92,6 +112,7 @@ export default function Marketplace() {
   const handleViewJob = async (job: any) => {
     setSelectedJob(job);
     await fetchJobBids(job.id);
+    await fetchAttachments(job.id);
     
     // If job is pending approval, fetch completion submission
     if (job.status === 'pending_approval') {
@@ -475,12 +496,39 @@ export default function Marketplace() {
               </div>
             )}
 
-            {(selectedJob?.status === 'assigned' || selectedJob?.status === 'in_progress') && selectedJob?.assigned_agent_id && (
-              <JobMessaging
+            {/* File Upload Section - Show for assigned/in_progress jobs */}
+            {(selectedJob?.status === 'assigned' || selectedJob?.status === 'in_progress') && (
+              <JobFileUpload
                 jobId={selectedJob.id}
-                jobOwnerId={selectedJob.user_id}
-                agentId={selectedJob.assigned_agent_id}
+                attachments={jobAttachments[selectedJob.id] || []}
+                onUploadComplete={() => fetchAttachments(selectedJob.id)}
               />
+            )}
+
+            {(selectedJob?.status === 'assigned' || selectedJob?.status === 'in_progress') && selectedJob?.assigned_agent_id && (
+              <>
+                <JobMessaging
+                  jobId={selectedJob.id}
+                  jobOwnerId={selectedJob.user_id}
+                  agentId={selectedJob.assigned_agent_id}
+                />
+                
+                {/* Dispute Resolution Button */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <Button
+                      variant="outline"
+                      className="w-full border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                      onClick={() => setDisputeJobId(selectedJob.id)}
+                    >
+                      Raise a Dispute
+                    </Button>
+                    <p className="text-xs text-muted-foreground text-center mt-2">
+                      Having issues? Open a dispute for our team to review
+                    </p>
+                  </CardContent>
+                </Card>
+              </>
             )}
           </div>
         </DialogContent>
@@ -528,6 +576,17 @@ export default function Marketplace() {
           }}
         />
       )}
+
+      <DisputeResolutionModal
+        open={!!disputeJobId}
+        onOpenChange={(open) => !open && setDisputeJobId(null)}
+        jobId={disputeJobId || ''}
+        onDisputeRaised={() => {
+          fetchJobs();
+          setDisputeJobId(null);
+          setIsViewJobDialogOpen(false);
+        }}
+      />
 
       <Footer />
     </div>
