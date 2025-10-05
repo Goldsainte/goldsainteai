@@ -111,7 +111,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Calculate markup (15% default)
+    // Markup already applied in search - use baseCost as-is
+    // baseCost should be the original Amadeus price without markup
     const markupPercentage = 15;
     const markupAmount = baseCost * (markupPercentage / 100);
     const totalPrice = baseCost + markupAmount;
@@ -121,10 +122,10 @@ serve(async (req) => {
       .from('bookings')
       .update({
         status: 'confirmed',
-        base_cost: baseCost,
+        base_cost: baseCost, // Original Amadeus price
         markup_percentage: markupPercentage,
         markup_amount: markupAmount,
-        total_price: totalPrice,
+        total_price: totalPrice, // Price shown to customer
         booking_data: {
           ...bookingData.data,
           amadeus_booking_id: bookingData.data?.id,

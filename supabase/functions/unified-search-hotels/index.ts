@@ -290,12 +290,15 @@ serve(async (req) => {
           externalUrls: { amadeus: h.self || "", default: h.self || "" },
         },
         location: info.address?.cityName || location,
-        price: perNight,
+        price: perNight * 1.15, // Apply 15% markup
+        basePrice: perNight, // Store original price
         priceBreakdown: {
-          grossPrice: { value: perNight, currency },
-          totalPrice: { value: total, currency },
+          grossPrice: { value: perNight * 1.15, currency },
+          totalPrice: { value: total * 1.15, currency },
+          baseGrossPrice: { value: perNight, currency },
+          baseTotalPrice: { value: total, currency },
         },
-        accessibilityLabel: `${info.name}. ${info.address?.cityName || location}. Price ${perNight.toFixed(2)} ${currency} per night`,
+        accessibilityLabel: `${info.name}. ${info.address?.cityName || location}. Price ${(perNight * 1.15).toFixed(2)} ${currency} per night`,
         description: offer.room?.description?.text || "",
         amenities: info.amenities || [],
         photos: photoUrls,
@@ -306,6 +309,7 @@ serve(async (req) => {
           checkInDate: offer.checkInDate,
           checkOutDate: offer.checkOutDate,
           totalPrice: total,
+          basePrice: total, // Original price for booking
         },
       };
     });

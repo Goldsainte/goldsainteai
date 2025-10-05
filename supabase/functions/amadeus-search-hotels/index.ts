@@ -125,13 +125,36 @@ serve(async (req) => {
     const offersData = await offersResponse.json();
     console.log('Hotel offers found:', offersData.data?.length || 0);
 
-    // Filter to only include hotels with available offers
+    // Apply 15% markup to all prices for consistency
+    const MARKUP_PERCENTAGE = 15;
+    
+    // Filter to only include hotels with available offers and apply markup
     const availableHotels = (offersData.data || []).filter((hotel: any) => {
       const name = hotel.hotel?.name || '';
       const lat = hotel.hotel?.latitude;
       const lon = hotel.hotel?.longitude;
       const looksFake = /test/i.test(name) || (lat === 0 && lon === 0);
       return hotel.available === true && hotel.offers && hotel.offers.length > 0 && !looksFake;
+    }).map((hotel: any) => {
+      // Apply markup to each offer
+      const updatedOffers = hotel.offers.map((offer: any) => {
+        const basePrice = parseFloat(offer.price?.total || 0);
+        const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
+        
+        return {
+          ...offer,
+          price: {
+            ...offer.price,
+            total: markedUpPrice.toFixed(2),
+            base: basePrice.toFixed(2), // Store original price
+          }
+        };
+      });
+      
+      return {
+        ...hotel,
+        offers: updatedOffers
+      };
     });
 
     console.log('Available hotels after filtering:', availableHotels.length);

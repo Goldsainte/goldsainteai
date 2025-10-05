@@ -31,6 +31,10 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
   const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
     const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
     
+    // Use base price if available (for booking backend), otherwise use displayed price
+    const displayPrice = parseFloat(hotelOffer.offers?.[0]?.price?.total || hotelOffer.price?.total || 0);
+    const basePrice = parseFloat(hotelOffer.offers?.[0]?.price?.base || hotelOffer.basePrice || displayPrice / 1.15);
+    
     const bookingData = {
       ...hotelOffer,
       hotel: hotelData,
@@ -43,7 +47,8 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
       guests: adults,
       rooms: 1,
       nights,
-      totalPrice: parseFloat(hotelOffer.offers?.[0]?.price?.total || hotelOffer.price?.total || 0),
+      totalPrice: displayPrice, // Customer-facing price with markup
+      basePrice: basePrice, // Original price for backend
       currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || 'USD',
     };
     

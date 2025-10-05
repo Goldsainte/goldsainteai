@@ -99,18 +99,24 @@ export default function HotelBooking() {
   };
 
 // Generate available rooms
-  const availableRooms = bookingData.offers?.map((offer: any, index: number) => ({
-    id: offer.id || `room-${index}`,
-    name: offer.roomInformation?.typeEstimated?.category || offer.room?.typeEstimated?.category || 'Standard Room',
-    description: offer.roomInformation?.description || offer.room?.description?.text || 'Comfortable room with modern amenities',
-    beds: offer.roomInformation?.typeEstimated?.beds || offer.room?.typeEstimated?.beds || 2,
-    bedType: offer.roomInformation?.typeEstimated?.bedType || offer.room?.typeEstimated?.bedType || 'Queen',
-    price: parseFloat(offer.price?.total || bookingData.totalPrice || 200),
-    currency: offer.price?.currency || bookingData.currency || 'USD',
-    image: offer.room?.images?.[0] || galleryImages[0] || '',
-    amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
-    cancellation: offer.policies?.refundable?.cancellationRefund === 'REFUNDABLE_UP_TO_DEADLINE' ? 'Free cancellation' : 'Non-refundable',
-  })) || [
+  const availableRooms = bookingData.offers?.map((offer: any, index: number) => {
+    const displayPrice = parseFloat(offer.price?.total || bookingData.totalPrice || 200);
+    const basePrice = parseFloat(offer.price?.base || bookingData.basePrice || displayPrice / 1.15);
+    
+    return {
+      id: offer.id || `room-${index}`,
+      name: offer.roomInformation?.typeEstimated?.category || offer.room?.typeEstimated?.category || 'Standard Room',
+      description: offer.roomInformation?.description || offer.room?.description?.text || 'Comfortable room with modern amenities',
+      beds: offer.roomInformation?.typeEstimated?.beds || offer.room?.typeEstimated?.beds || 2,
+      bedType: offer.roomInformation?.typeEstimated?.bedType || offer.room?.typeEstimated?.bedType || 'Queen',
+      price: displayPrice, // Customer-facing price with markup
+      basePrice: basePrice, // Original price for backend
+      currency: offer.price?.currency || bookingData.currency || 'USD',
+      image: offer.room?.images?.[0] || galleryImages[0] || '',
+      amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
+      cancellation: offer.policies?.refundable?.cancellationRefund === 'REFUNDABLE_UP_TO_DEADLINE' ? 'Free cancellation' : 'Non-refundable',
+    };
+  }) || [
     {
       id: 'default-room',
       name: 'Standard Room',
@@ -118,6 +124,7 @@ export default function HotelBooking() {
       beds: 2,
       bedType: 'Queen',
       price: bookingData.totalPrice || 200,
+      basePrice: bookingData.basePrice || (bookingData.totalPrice ? bookingData.totalPrice / 1.15 : 200 / 1.15),
       currency: bookingData.currency || 'USD',
       image: galleryImages[0] || '',
       amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
