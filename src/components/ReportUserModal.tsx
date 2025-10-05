@@ -1,170 +1,129 @@
 import { useState } from "react";
-import { Flag } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
+import { AlertTriangle } from "lucide-react";
 
 interface ReportUserModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  isOpen: boolean;
+  onClose: () => void;
   reportedUserId: string;
-  reportedAgentId?: string;
+  reportedUserName: string;
+  relatedJobId?: string;
 }
 
-export const ReportUserModal = ({
-  open,
-  onOpenChange,
+const reportTypes = [
+  { value: "harassment", label: "Harassment or Bullying" },
+  { value: "fraud", label: "Fraud or Scam" },
+  { value: "spam", label: "Spam" },
+  { value: "inappropriate_content", label: "Inappropriate Content" },
+  { value: "payment_issue", label: "Payment Issue" },
+  { value: "other", label: "Other" },
+];
+
+export function ReportUserModal({
+  isOpen,
+  onClose,
   reportedUserId,
-  reportedAgentId,
-}: ReportUserModalProps) => {
-  const { toast } = useToast();
+  reportedUserName,
+  relatedJobId,
+}: ReportUserModalProps) {
   const [reportType, setReportType] = useState<string>("");
-  const [reportCategory, setReportCategory] = useState<string>("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!reportType || !reportCategory || !description.trim()) {
-      toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
-        variant: "destructive",
-      });
+  const handleSubmit = async () => {
+    if (!reportType || !description.trim()) {
+      toast.error("Please select a report type and provide a description");
       return;
     }
 
+    setSubmitting(true);
     try {
-      setSubmitting(true);
-
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) throw new Error("Not authenticated");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
 
       const { error } = await supabase.from("user_reports").insert({
-        reporter_id: userData.user.id,
+        reporter_id: user.id,
         reported_user_id: reportedUserId,
-        reported_agent_id: reportedAgentId || null,
         report_type: reportType,
-        report_category: reportCategory,
         description: description.trim(),
+        related_job_id: relatedJobId || null,
       });
 
       if (error) throw error;
 
-      toast({
-        title: "Report submitted",
-        description: "Thank you for helping keep our community safe. We'll review this report shortly.",
-      });
-
-      onOpenChange(false);
+      toast.success("Report submitted successfully");
+      onClose();
       setReportType("");
-      setReportCategory("");
       setDescription("");
-    } catch (error: any) {
-      console.error("Report submission error:", error);
-      toast({
-        title: "Submission failed",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error) {
+      console.error("Error submitting report:", error);
+      toast.error("Failed to submit report");
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Flag className="h-5 w-5" />
-            Report User
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            Report User: {reportedUserName}
           </DialogTitle>
-          <DialogDescription>
-            Help us maintain a safe community by reporting inappropriate behavior or content
-          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="report-type">Report Type *</Label>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="report-type">Report Type</Label>
             <Select value={reportType} onValueChange={setReportType}>
               <SelectTrigger id="report-type">
-                <SelectValue placeholder="Select a report type" />
+                <SelectValue placeholder="Select report type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="inappropriate_behavior">Inappropriate Behavior</SelectItem>
-                <SelectItem value="fraud">Fraud or Scam</SelectItem>
-                <SelectItem value="spam">Spam</SelectItem>
-                <SelectItem value="fake_profile">Fake Profile</SelectItem>
-                <SelectItem value="harassment">Harassment</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                {reportTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="report-category">Category *</Label>
-            <Select value={reportCategory} onValueChange={setReportCategory}>
-              <SelectTrigger id="report-category">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="safety">Safety Concern</SelectItem>
-                <SelectItem value="quality">Quality Issue</SelectItem>
-                <SelectItem value="conduct">Conduct Violation</SelectItem>
-                <SelectItem value="authenticity">Authenticity Issue</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description *</Label>
+          <div>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Please provide details about the issue..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={5}
-              maxLength={1000}
+              placeholder="Please provide details about your report..."
+              rows={6}
+              className="resize-none"
             />
-            <p className="text-xs text-muted-foreground">
-              {description.length}/1000 characters
+            <p className="text-xs text-muted-foreground mt-1">
+              Minimum 20 characters
             </p>
           </div>
 
           <div className="flex gap-2 justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={submitting}
-            >
+            <Button variant="outline" onClick={onClose} disabled={submitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={submitting}>
+            <Button
+              onClick={handleSubmit}
+              disabled={submitting || !reportType || description.trim().length < 20}
+            >
               {submitting ? "Submitting..." : "Submit Report"}
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );
-};
+}
