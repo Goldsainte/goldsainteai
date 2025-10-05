@@ -764,130 +764,173 @@ const Index = () => {
             {/* How Goldsainte.AI Works Section */}
             <div className="px-6 py-20 bg-gradient-to-b from-background via-accent/5 to-background">
               <div className="w-full max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                   {/* Left side - Text content */}
-                  <div className="space-y-6">
+                  <div className="space-y-6 lg:pr-8">
                     <div className="space-y-4">
-                      <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon leading-tight">
+                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                         Start chatting with us.
                       </h2>
-                      <p className="text-lg text-muted-foreground leading-relaxed">
+                      <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
                         Ask us for suggestions for any destination or ask us for an entire itinerary. 
                         Be as specific as you can about the types of experiences that you like or take 
                         our quiz to determine your travel style.
                       </p>
                     </div>
-                    
-                    {/* Feature highlights */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-accent/20">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
-                            <Sparkles className="h-4 w-4 text-accent" />
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">AI-Powered</h3>
-                          <p className="text-xs text-muted-foreground">Personalized recommendations based on your preferences</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-primary/20">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                            <MapPin className="h-4 w-4 text-primary" />
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Any Destination</h3>
-                          <p className="text-xs text-muted-foreground">From hotels to full itineraries, we've got you</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-accent/20">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
-                            <Hotel className="h-4 w-4 text-accent" />
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Luxury Focus</h3>
-                          <p className="text-xs text-muted-foreground">Curated premium experiences worldwide</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-primary/20">
-                        <div className="flex-shrink-0 mt-1">
-                          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
-                            <Plane className="h-4 w-4 text-primary" />
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm mb-1">Instant Booking</h3>
-                          <p className="text-xs text-muted-foreground">Seamless reservations in seconds</p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                   
-                  {/* Right side - Visual category showcase */}
-                  <div className="relative h-[500px] lg:h-[600px]">
+                  {/* Right side - Visual category showcase with images */}
+                  <div className="relative h-[600px] lg:h-[700px]">
                     {/* Central profile circle */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-                      <div className="h-32 w-32 rounded-full bg-gradient-to-br from-accent to-primary p-1">
-                        <div className="h-full w-full rounded-full bg-background flex items-center justify-center">
-                          <img src={logomark} alt="Goldsainte AI" className="h-16 w-16" />
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
+                      <div className="h-40 w-40 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-accent to-primary p-1 shadow-2xl">
+                        <div className="h-full w-full rounded-full bg-background flex items-center justify-center overflow-hidden">
+                          <img src={logomark} alt="Goldsainte AI" className="h-20 w-20 md:h-24 md:w-24" />
                         </div>
                       </div>
                     </div>
                     
-                    {/* Floating category cards */}
-                    <div className="absolute top-8 left-4 animate-float">
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
+                    {/* Category cards with images - positioned organically */}
+                    {/* Top left - Spa/Wellness */}
+                    <div className="absolute top-0 left-0 animate-float z-10">
+                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/95 backdrop-blur-sm shadow-lg border border-border">
                         <Hotel className="h-4 w-4 text-accent" />
-                        <span className="text-sm font-medium">Luxury Resorts</span>
+                        <span className="text-sm font-medium whitespace-nowrap">Spa / Wellness</span>
                       </div>
                     </div>
                     
-                    <div className="absolute top-24 right-8 animate-float" style={{ animationDelay: '0.5s' }}>
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-primary/30 shadow-lg backdrop-blur-sm">
-                        <UtensilsCrossed className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Fine Dining</span>
-                      </div>
-                    </div>
-                    
-                    <div className="absolute top-1/3 left-0 animate-float" style={{ animationDelay: '1s' }}>
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
-                        <MapPin className="h-4 w-4 text-accent" />
-                        <span className="text-sm font-medium">Beach Getaways</span>
-                      </div>
-                    </div>
-                    
-                    <div className="absolute bottom-32 left-8 animate-float" style={{ animationDelay: '1.5s' }}>
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-primary/30 shadow-lg backdrop-blur-sm">
+                    {/* Top right - Theater */}
+                    <div className="absolute top-4 right-8 animate-float z-10" style={{ animationDelay: '0.5s' }}>
+                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/95 backdrop-blur-sm shadow-lg border border-border">
                         <Ticket className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Cultural Tours</span>
+                        <span className="text-sm font-medium">Theater</span>
                       </div>
                     </div>
                     
-                    <div className="absolute top-2/3 right-4 animate-float" style={{ animationDelay: '2s' }}>
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
-                        <Plane className="h-4 w-4 text-accent" />
-                        <span className="text-sm font-medium">First Class Travel</span>
+                    {/* Left - Luxury Resorts with image */}
+                    <div className="absolute top-24 left-0 animate-float z-10" style={{ animationDelay: '1s' }}>
+                      <div className="relative w-48 h-48 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={maldivesTropical} 
+                          alt="Luxury Resorts" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Hotel className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-semibold">Resorts</span>
+                        </div>
                       </div>
                     </div>
                     
-                    <div className="absolute bottom-12 right-12 animate-float" style={{ animationDelay: '2.5s' }}>
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-primary/30 shadow-lg backdrop-blur-sm">
+                    {/* Center top - Beach with image */}
+                    <div className="absolute top-16 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '1.5s' }}>
+                      <div className="relative w-44 h-44 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={amalfiCoast} 
+                          alt="Beach Getaways" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <MapPin className="h-4 w-4 text-accent" />
+                          <span className="text-sm font-semibold">Beach</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Right - Wildlife with image */}
+                    <div className="absolute top-28 right-0 animate-float z-10" style={{ animationDelay: '2s' }}>
+                      <div className="relative w-44 h-44 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={dubaiDesert} 
+                          alt="Wildlife" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Star className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-semibold">Wildlife</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Bottom right - Fine Dining with image */}
+                    <div className="absolute bottom-32 right-0 animate-float z-10" style={{ animationDelay: '2.5s' }}>
+                      <div className="relative w-44 h-44 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={restaurant1} 
+                          alt="Fine Dining" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute top-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <UtensilsCrossed className="h-4 w-4 text-accent" />
+                          <span className="text-sm font-semibold">Fine Dining</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Bottom left - Historical Tours with image */}
+                    <div className="absolute bottom-28 left-4 animate-float z-10" style={{ animationDelay: '3s' }}>
+                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={parisUrban} 
+                          alt="Historical Tours" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <MapPinned className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-semibold">Historical</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Bottom center - Water Sports with image */}
+                    <div className="absolute bottom-12 right-20 animate-float z-10" style={{ animationDelay: '3.5s' }}>
+                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={icelandNorthernLights} 
+                          alt="Water Sports" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Plane className="h-4 w-4 text-accent" />
+                          <span className="text-sm font-semibold">Adventure</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Bottom pill - Cycling */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
+                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/95 backdrop-blur-sm shadow-lg border border-border">
                         <Car className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Luxury Cars</span>
+                        <span className="text-sm font-medium">Cycling</span>
                       </div>
                     </div>
                     
-                    <div className="absolute top-1/2 right-0 animate-float" style={{ animationDelay: '3s' }}>
-                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
-                        <Star className="h-4 w-4 text-accent" />
-                        <span className="text-sm font-medium">Spa & Wellness</span>
+                    {/* Search input at bottom */}
+                    <div className="absolute -bottom-12 left-0 right-0 z-30">
+                      <div className="bg-card/95 backdrop-blur-sm rounded-full border-2 border-border shadow-2xl p-2 flex items-center gap-3">
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="h-10 w-10 rounded-full flex-shrink-0"
+                        >
+                          <Search className="h-5 w-5" />
+                        </Button>
+                        <input
+                          type="text"
+                          placeholder="Ask us anything..."
+                          className="flex-1 bg-transparent border-0 outline-none text-base placeholder:text-muted-foreground"
+                          onClick={() => {
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                            const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
+                            input?.focus();
+                          }}
+                        />
+                        <Button
+                          size="icon"
+                          className="h-10 w-10 rounded-full flex-shrink-0 bg-foreground hover:bg-foreground/90"
+                        >
+                          <Send className="h-5 w-5" />
+                        </Button>
                       </div>
                     </div>
                   </div>
