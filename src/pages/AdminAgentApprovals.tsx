@@ -1,294 +1,382 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { SimpleHeader } from "@/components/SimpleHeader";
+import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, Building2, ArrowLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { CheckCircle, XCircle, Eye, Loader2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
-interface PendingAgent {
+interface VerificationRequest {
   id: string;
-  agency_name: string;
-  primary_contact_name: string;
-  email: string;
-  phone: string;
-  business_type: string;
-  business_address: string;
-  license_number?: string;
-  accreditations?: string;
-  experience_years?: number;
-  specializations?: string[];
-  destinations?: string[];
-  bio?: string;
-  is_verified: boolean;
-  created_at: string;
+  agent_id: string;
+  verification_type: string;
+  status: string;
+  submitted_at: string;
+  document_urls: any;
+  additional_info: any;
+  travel_agents: {
+    agency_name: string;
+    email: string;
+  };
 }
 
 export default function AdminAgentApprovals() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [requests, setRequests] = useState<VerificationRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [pendingAgents, setPendingAgents] = useState<PendingAgent[]>([]);
-  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
+  const [reviewNotes, setReviewNotes] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
-    checkAdminStatus();
-  }, [user]);
+    loadRequests();
+  }, []);
 
-  useEffect(() => {
-    if (isAdmin) {
-      fetchPendingAgents();
-    }
-  }, [isAdmin]);
-
-  const checkAdminStatus = async () => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-
+  const loadRequests = async () => {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .from("agent_verification_requests")
+        .select(`
+          *,
+          travel_agents (
+            agency_name,
+            email
+          )
+        `)
+        .order("submitted_at", { ascending: false });
 
       if (error) throw error;
-
-      if (!data) {
-        toast.error('Access denied. Admin privileges required.');
-        navigate('/');
-        return;
-      }
-
-      setIsAdmin(true);
+      setRequests(data || []);
     } catch (error: any) {
-      console.error('Error checking admin status:', error);
-      toast.error('Failed to verify admin access');
-      navigate('/');
+      toast({
+        title: "Error loading requests",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchPendingAgents = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('travel_agents')
-        .select('*')
-        .eq('is_verified', false)
-        .order('created_at', { ascending: false });
+  const handleApprove = async () => {
+    if (!selectedRequest) return;
 
-      if (error) throw error;
-      setPendingAgents(data || []);
+    setProcessing(true);
+    try {
+      const { error: requestError } = await supabase
+        .from("agent_verification_requests")
+        .update({
+          status: "approved",
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", selectedRequest.id);
+
+      if (requestError) throw requestError;
+
+      // Update agent verification status
+      const updateData: any = {};
+      switch (selectedRequest.verification_type) {
+        case "identity":
+          updateData.identity_verified = true;
+          updateData.identity_verification_date = new Date().toISOString();
+          break;
+        case "background_check":
+          updateData.background_check_status = "approved";
+          updateData.background_check_date = new Date().toISOString();
+          break;
+        case "professional_license":
+          updateData.professional_license_verified = true;
+          break;
+        case "insurance":
+          updateData.insurance_verified = true;
+          break;
+      }
+
+      const { error: agentError } = await supabase
+        .from("travel_agents")
+        .update(updateData)
+        .eq("id", selectedRequest.agent_id);
+
+      if (agentError) throw agentError;
+
+      toast({
+        title: "Request approved",
+        description: "Agent verification has been approved",
+      });
+
+      setSelectedRequest(null);
+      loadRequests();
     } catch (error: any) {
-      console.error('Error fetching pending agents:', error);
-      toast.error('Failed to load pending applications');
+      toast({
+        title: "Approval failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
     }
   };
 
-  const handleApproval = async (agentId: string, approve: boolean) => {
-    setProcessingId(agentId);
+  const handleReject = async () => {
+    if (!selectedRequest || !reviewNotes.trim()) {
+      toast({
+        title: "Rejection reason required",
+        description: "Please provide a reason for rejection",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setProcessing(true);
     try {
       const { error } = await supabase
-        .from('travel_agents')
-        .update({ is_verified: approve })
-        .eq('id', agentId);
+        .from("agent_verification_requests")
+        .update({
+          status: "rejected",
+          rejection_reason: reviewNotes,
+          reviewed_at: new Date().toISOString(),
+        })
+        .eq("id", selectedRequest.id);
 
       if (error) throw error;
 
-      toast.success(approve ? 'Agent approved successfully!' : 'Agent application rejected');
-      fetchPendingAgents();
+      toast({
+        title: "Request rejected",
+        description: "Agent has been notified of the rejection",
+      });
+
+      setSelectedRequest(null);
+      setReviewNotes("");
+      loadRequests();
     } catch (error: any) {
-      console.error('Error updating agent status:', error);
-      toast.error('Failed to update agent status');
+      toast({
+        title: "Rejection failed",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
-      setProcessingId(null);
+      setProcessing(false);
     }
   };
+
+  const getStatusBadge = (status: string) => {
+    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+      pending: "secondary",
+      approved: "default",
+      rejected: "destructive",
+    };
+    return <Badge variant={variants[status] || "outline"}>{status}</Badge>;
+  };
+
+  const filterRequests = (status: string) =>
+    requests.filter((r) => r.status === status);
+
+  const RequestCard = ({ request }: { request: VerificationRequest }) => (
+    <Card>
+      <CardHeader>
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="text-lg">
+              {request.travel_agents.agency_name}
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              {request.travel_agents.email}
+            </p>
+          </div>
+          {getStatusBadge(request.status)}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2">
+          <p className="text-sm">
+            <span className="font-medium">Type:</span>{" "}
+            {request.verification_type.replace("_", " ")}
+          </p>
+          <p className="text-sm">
+            <span className="font-medium">Submitted:</span>{" "}
+            {new Date(request.submitted_at).toLocaleDateString()}
+          </p>
+          <p className="text-sm">
+            <span className="font-medium">Documents:</span>{" "}
+            {request.document_urls?.length || 0} files
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSelectedRequest(request)}
+            className="w-full mt-2"
+          >
+            <Eye className="mr-2 h-4 w-4" />
+            Review Request
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Clock className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <SimpleHeader />
-      
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-6xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/dashboard')}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
-        </Button>
-        
-        <div className="mb-6">
-          <h1 className="text-4xl font-chiffon text-primary mb-2">Agent Application Review</h1>
-          <p className="text-muted-foreground">Review and approve travel agent applications</p>
-        </div>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-6">Agent Verification Approvals</h1>
 
-        {pendingAgents.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center">
-              <CheckCircle className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <p className="text-xl font-semibold mb-2">All Caught Up!</p>
-              <p className="text-muted-foreground">No pending agent applications at this time.</p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="space-y-6">
-            {pendingAgents.map((agent) => (
-              <Card key={agent.id}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <Building2 className="h-8 w-8 text-primary" />
-                      <div>
-                        <CardTitle className="text-2xl font-chiffon">{agent.agency_name}</CardTitle>
-                        <CardDescription>
-                          Submitted on {new Date(agent.created_at).toLocaleDateString()}
-                        </CardDescription>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
-                      <Clock className="h-3 w-3 mr-1" />
-                      Pending Review
-                    </Badge>
-                  </div>
-                </CardHeader>
+        <Tabs defaultValue="pending" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="pending">
+              Pending ({filterRequests("pending").length})
+            </TabsTrigger>
+            <TabsTrigger value="approved">
+              Approved ({filterRequests("approved").length})
+            </TabsTrigger>
+            <TabsTrigger value="rejected">
+              Rejected ({filterRequests("rejected").length})
+            </TabsTrigger>
+          </TabsList>
 
-                <CardContent className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div>
-                      <h3 className="font-semibold mb-3">Contact Information</h3>
-                      <dl className="space-y-2 text-sm">
-                        <div>
-                          <dt className="text-muted-foreground">Primary Contact</dt>
-                          <dd className="font-medium">{agent.primary_contact_name}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">Email</dt>
-                          <dd className="font-medium">{agent.email}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">Phone</dt>
-                          <dd className="font-medium">{agent.phone}</dd>
-                        </div>
-                        <div>
-                          <dt className="text-muted-foreground">Business Address</dt>
-                          <dd className="font-medium">{agent.business_address}</dd>
-                        </div>
-                      </dl>
-                    </div>
+          <TabsContent value="pending" className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filterRequests("pending").map((request) => (
+                <RequestCard key={request.id} request={request} />
+              ))}
+              {filterRequests("pending").length === 0 && (
+                <p className="col-span-full text-center text-muted-foreground py-8">
+                  No pending requests
+                </p>
+              )}
+            </div>
+          </TabsContent>
 
-                    <div>
-                      <h3 className="font-semibold mb-3">Business Details</h3>
-                      <dl className="space-y-2 text-sm">
-                        <div>
-                          <dt className="text-muted-foreground">Business Type</dt>
-                          <dd className="font-medium capitalize">{agent.business_type?.replace('_', ' ')}</dd>
-                        </div>
-                        {agent.license_number && (
-                          <div>
-                            <dt className="text-muted-foreground">License Number</dt>
-                            <dd className="font-medium">{agent.license_number}</dd>
-                          </div>
-                        )}
-                        {agent.accreditations && (
-                          <div>
-                            <dt className="text-muted-foreground">Accreditations</dt>
-                            <dd className="font-medium">{agent.accreditations}</dd>
-                          </div>
-                        )}
-                        {agent.experience_years && (
-                          <div>
-                            <dt className="text-muted-foreground">Experience</dt>
-                            <dd className="font-medium">{agent.experience_years} years</dd>
-                          </div>
-                        )}
-                      </dl>
-                    </div>
-                  </div>
+          <TabsContent value="approved" className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filterRequests("approved").map((request) => (
+                <RequestCard key={request.id} request={request} />
+              ))}
+              {filterRequests("approved").length === 0 && (
+                <p className="col-span-full text-center text-muted-foreground py-8">
+                  No approved requests
+                </p>
+              )}
+            </div>
+          </TabsContent>
 
-                  {agent.specializations && agent.specializations.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-2">Specializations</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {agent.specializations.map((spec, idx) => (
-                          <Badge key={idx} variant="secondary">{spec}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+          <TabsContent value="rejected" className="space-y-4">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filterRequests("rejected").map((request) => (
+                <RequestCard key={request.id} request={request} />
+              ))}
+              {filterRequests("rejected").length === 0 && (
+                <p className="col-span-full text-center text-muted-foreground py-8">
+                  No rejected requests
+                </p>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </main>
+      <Footer />
 
-                  {agent.destinations && agent.destinations.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold mb-2">Destination Expertise</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {agent.destinations.map((dest, idx) => (
-                          <Badge key={idx} variant="secondary">{dest}</Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Review Verification Request</DialogTitle>
+          </DialogHeader>
 
-                  {agent.bio && (
-                    <div>
-                      <h3 className="font-semibold mb-2">Agency Description</h3>
-                      <ScrollArea className="h-24 rounded-md border p-3">
-                        <p className="text-sm text-muted-foreground">{agent.bio}</p>
-                      </ScrollArea>
-                    </div>
-                  )}
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div>
+                <Label>Agency Name</Label>
+                <p className="text-sm mt-1">
+                  {selectedRequest.travel_agents.agency_name}
+                </p>
+              </div>
 
-                  <Separator />
+              <div>
+                <Label>Verification Type</Label>
+                <p className="text-sm mt-1">
+                  {selectedRequest.verification_type.replace("_", " ")}
+                </p>
+              </div>
 
-                  <div className="flex gap-3 justify-end">
+              <div>
+                <Label>Documents</Label>
+                <div className="space-y-2 mt-2">
+                  {selectedRequest.document_urls?.map((url: string, i: number) => (
                     <Button
+                      key={i}
                       variant="outline"
-                      onClick={() => handleApproval(agent.id, false)}
-                      disabled={processingId === agent.id}
-                      className="border-red-200 text-red-700 hover:bg-red-50"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => window.open(url, "_blank")}
                     >
-                      <XCircle className="h-4 w-4 mr-2" />
+                      View Document {i + 1}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
+              {selectedRequest.status === "pending" && (
+                <>
+                  <div>
+                    <Label htmlFor="review-notes">
+                      Review Notes (required for rejection)
+                    </Label>
+                    <Textarea
+                      id="review-notes"
+                      value={reviewNotes}
+                      onChange={(e) => setReviewNotes(e.target.value)}
+                      placeholder="Add notes or rejection reason..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
+
+                  <DialogFooter>
+                    <Button
+                      variant="destructive"
+                      onClick={handleReject}
+                      disabled={processing}
+                    >
+                      {processing ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <XCircle className="mr-2 h-4 w-4" />
+                      )}
                       Reject
                     </Button>
-                    <Button
-                      onClick={() => handleApproval(agent.id, true)}
-                      disabled={processingId === agent.id}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      {processingId === agent.id ? 'Processing...' : 'Approve'}
+                    <Button onClick={handleApprove} disabled={processing}>
+                      {processing ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                      )}
+                      Approve
                     </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </main>
-
-      <Footer />
+                  </DialogFooter>
+                </>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

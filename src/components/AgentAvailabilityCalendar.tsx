@@ -1,154 +1,251 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
+import { format, startOfMonth, endOfMonth } from "date-fns";
+import { Loader2 } from "lucide-react";
 
 interface AgentAvailabilityCalendarProps {
   agentId: string;
-  isOwner?: boolean;
 }
 
-export const AgentAvailabilityCalendar = ({ 
-  agentId, 
-  isOwner = false 
-}: AgentAvailabilityCalendarProps) => {
-  const [selectedDates, setSelectedDates] = useState<Date[]>([]);
-  const [unavailableDates, setUnavailableDates] = useState<Date[]>([]);
-  const [loading, setLoading] = useState(false);
+export function AgentAvailabilityCalendar({ agentId }: AgentAvailabilityCalendarProps) {
+  const { toast } = useToast();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [availability, setAvailability] = useState<Record<string, { available: boolean; notes?: string }>>({});
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    fetchAvailability();
+    loadAvailability();
   }, [agentId]);
 
-  const fetchAvailability = async () => {
+  useEffect(() => {
+    if (selectedDate) {
+      const dateKey = format(selectedDate, "yyyy-MM-dd");
+      setNotes(availability[dateKey]?.notes || "");
+    }
+  }, [selectedDate, availability]);
+
+  const loadAvailability = async () => {
     try {
+      const start = startOfMonth(new Date());
+      const end = endOfMonth(new Date());
+
       const { data, error } = await supabase
-        .from('agent_availability')
-        .select('*')
-        .eq('agent_id', agentId)
-        .eq('is_available', false);
+        .from("agent_availability")
+        .select("*")
+        .eq("agent_id", agentId)
+        .gte("date", format(start, "yyyy-MM-dd"))
+        .lte("date", format(end, "yyyy-MM-dd"));
 
       if (error) throw error;
 
-      const dates = data.map(item => new Date(item.date));
-      setUnavailableDates(dates);
+      const availabilityMap: Record<string, { available: boolean; notes?: string }> = {};
+      data?.forEach((item) => {
+        availabilityMap[item.date] = {
+          available: item.is_available,
+          notes: item.notes || undefined,
+        };
+      });
+
+      setAvailability(availabilityMap);
     } catch (error: any) {
-      console.error('Error fetching availability:', error);
-    }
-  };
-
-  const handleToggleAvailability = async (date: Date) => {
-    if (!isOwner) return;
-
-    try {
-      setLoading(true);
-      const dateStr = format(date, 'yyyy-MM-dd');
-
-      // Check if date already marked as unavailable
-      const isCurrentlyUnavailable = unavailableDates.some(
-        d => format(d, 'yyyy-MM-dd') === dateStr
-      );
-
-      if (isCurrentlyUnavailable) {
-        // Mark as available (delete record or update)
-        const { error } = await supabase
-          .from('agent_availability')
-          .delete()
-          .eq('agent_id', agentId)
-          .eq('date', dateStr);
-
-        if (error) throw error;
-
-        setUnavailableDates(prev => 
-          prev.filter(d => format(d, 'yyyy-MM-dd') !== dateStr)
-        );
-        toast.success("Marked as available");
-      } else {
-        // Mark as unavailable
-        const { error } = await supabase
-          .from('agent_availability')
-          .upsert({
-            agent_id: agentId,
-            date: dateStr,
-            is_available: false
-          }, {
-            onConflict: 'agent_id,date'
-          });
-
-        if (error) throw error;
-
-        setUnavailableDates(prev => [...prev, date]);
-        toast.success("Marked as unavailable");
-      }
-    } catch (error: any) {
-      console.error('Error updating availability:', error);
-      toast.error('Failed to update availability');
+      toast({
+        title: "Error loading availability",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const toggleAvailability = async () => {
+    if (!selectedDate) return;
+
+    setSaving(true);
+    const dateKey = format(selectedDate, "yyyy-MM-dd");
+    const currentlyAvailable = availability[dateKey]?.available ?? true;
+
+    try {
+      const { error } = await supabase.from("agent_availability").upsert({
+        agent_id: agentId,
+        date: dateKey,
+        is_available: !currentlyAvailable,
+        notes: notes || null,
+      });
+
+      if (error) throw error;
+
+      setAvailability((prev) => ({
+        ...prev,
+        [dateKey]: {
+          available: !currentlyAvailable,
+          notes: notes || undefined,
+        },
+      }));
+
+      toast({
+        title: "Availability updated",
+        description: `Marked as ${!currentlyAvailable ? "available" : "unavailable"}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Update failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const saveNotes = async () => {
+    if (!selectedDate) return;
+
+    setSaving(true);
+    const dateKey = format(selectedDate, "yyyy-MM-dd");
+
+    try {
+      const { error } = await supabase.from("agent_availability").upsert({
+        agent_id: agentId,
+        date: dateKey,
+        is_available: availability[dateKey]?.available ?? true,
+        notes: notes || null,
+      });
+
+      if (error) throw error;
+
+      setAvailability((prev) => ({
+        ...prev,
+        [dateKey]: {
+          ...prev[dateKey],
+          notes: notes || undefined,
+        },
+      }));
+
+      toast({
+        title: "Notes saved",
+        description: "Your notes have been updated",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Save failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const modifiers = {
-    unavailable: unavailableDates
+    unavailable: (date: Date) => {
+      const dateKey = format(date, "yyyy-MM-dd");
+      return availability[dateKey]?.available === false;
+    },
   };
 
   const modifiersStyles = {
     unavailable: {
-      textDecoration: 'line-through',
-      color: '#999',
-      backgroundColor: '#f0f0f0'
-    }
+      textDecoration: "line-through",
+      color: "var(--muted-foreground)",
+    },
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
+
+  const dateKey = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+  const isAvailable = availability[dateKey]?.available ?? true;
+
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
+    <div className="grid md:grid-cols-2 gap-6">
+      <Card>
+        <CardHeader>
           <CardTitle>Availability Calendar</CardTitle>
-          {unavailableDates.length > 0 && (
-            <Badge variant="secondary">
-              {unavailableDates.length} unavailable day{unavailableDates.length !== 1 ? 's' : ''}
-            </Badge>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Calendar
-          mode="multiple"
-          selected={selectedDates}
-          onSelect={(dates) => {
-            if (isOwner && dates && dates.length > 0) {
-              const latestDate = dates[dates.length - 1];
-              handleToggleAvailability(latestDate);
-            }
-          }}
-          disabled={loading || !isOwner}
-          modifiers={modifiers}
-          modifiersStyles={modifiersStyles}
-          className="rounded-md border"
-        />
-        {isOwner && (
-          <p className="text-xs text-muted-foreground mt-4">
-            Click on dates to mark them as unavailable. Click again to mark as available.
-          </p>
-        )}
-        {!isOwner && unavailableDates.length > 0 && (
-          <div className="mt-4">
-            <p className="text-sm font-medium mb-2">Unavailable Dates:</p>
-            <div className="flex flex-wrap gap-2">
-              {unavailableDates.map((date, idx) => (
-                <Badge key={idx} variant="outline">
-                  {format(date, 'MMM d, yyyy')}
-                </Badge>
-              ))}
-            </div>
+        </CardHeader>
+        <CardContent>
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            modifiers={modifiers}
+            modifiersStyles={modifiersStyles}
+            className="rounded-md border"
+          />
+          <div className="mt-4 text-sm text-muted-foreground">
+            <p>• Available dates shown in default color</p>
+            <p>• Unavailable dates shown crossed out</p>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>
+            {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Select a date"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Button
+              onClick={toggleAvailability}
+              disabled={saving || !selectedDate}
+              className="w-full"
+              variant={isAvailable ? "destructive" : "default"}
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : isAvailable ? (
+                "Mark as Unavailable"
+              ) : (
+                "Mark as Available"
+              )}
+            </Button>
+          </div>
+
+          <div>
+            <Label htmlFor="notes">Notes for this date</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Add notes about your availability..."
+              className="min-h-[100px]"
+            />
+            <Button
+              onClick={saveNotes}
+              disabled={saving || !selectedDate}
+              className="w-full mt-2"
+              variant="outline"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Notes"
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
-};
+}

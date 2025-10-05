@@ -366,7 +366,7 @@ export default function AgentProfile() {
             </Card>
 
             {/* Availability Calendar */}
-            <AgentAvailabilityCalendar agentId={agentId!} isOwner={false} />
+            <AgentAvailabilityCalendar agentId={agentId!} />
           </div>
         </div>
       </main>

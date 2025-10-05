@@ -386,7 +386,7 @@ export default function AgentDashboard() {
 
             <TabsContent value="availability">
               {agent && (
-                <AgentAvailabilityCalendar agentId={agent.id} isOwner={true} />
+                <AgentAvailabilityCalendar agentId={agent.id} />
               )}
             </TabsContent>
 
