@@ -991,7 +991,7 @@ const Index = () => {
             </div>
 
             {/* Inspiration Content - Far below the fold */}
-            <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-12 sm:pt-16 md:pt-20">
+            <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
               <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-4">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
