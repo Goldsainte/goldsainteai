@@ -45,6 +45,8 @@ import luxuryDestinations from "@/assets/luxury-destinations.jpg";
 import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
 import luxuryVisa from "@/assets/luxury-visa.jpg";
 import luxuryEvents from "@/assets/luxury-events.jpg";
+import destination7 from "@/assets/destination7.jpg";
+import destination8 from "@/assets/destination8.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 
@@ -797,7 +799,7 @@ const Index = () => {
                     <div className="absolute top-0 left-0 animate-float z-10">
                       <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
                         <img 
-                          src={baliSerenity} 
+                          src="/luxury-hotels.jpg" 
                           alt="Spa & Wellness" 
                           className="w-full h-full object-cover"
                         />
@@ -812,7 +814,7 @@ const Index = () => {
                     <div className="absolute top-4 right-8 animate-float z-10" style={{ animationDelay: '0.5s' }}>
                       <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
                         <img 
-                          src={santoriniGreece} 
+                          src="/luxury-events.jpg" 
                           alt="Theater" 
                           className="w-full h-full object-cover"
                         />
@@ -917,7 +919,7 @@ const Index = () => {
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
                       <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
                         <img 
-                          src={swissAlps} 
+                          src={destination7} 
                           alt="Cycling" 
                           className="w-full h-full object-cover"
                         />
