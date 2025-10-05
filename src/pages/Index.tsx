@@ -825,7 +825,7 @@ const Index = () => {
                   <div className="overflow-x-auto scrollbar-hide">
                     <div className="flex gap-6 px-6 pb-4 min-w-min">
                       {/* Card 1 - AI Search */}
-                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
                             src={cardAiSearch} 
@@ -857,7 +857,7 @@ const Index = () => {
                       </Card>
 
                       {/* Card 2 - Expert Agents */}
-                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
                             src={cardExpertAgents} 
@@ -883,7 +883,7 @@ const Index = () => {
                       </Card>
 
                       {/* Card 3 - Instant Booking */}
-                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
                             src={cardInstantBooking} 
@@ -915,7 +915,7 @@ const Index = () => {
                       </Card>
 
                       {/* Card 4 - Itinerary Builder */}
-                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
                             src={cardItinerary} 
@@ -941,7 +941,7 @@ const Index = () => {
                       </Card>
 
                       {/* Card 5 - Messaging Hub */}
-                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
                             src={cardMessaging} 
