@@ -1072,11 +1072,11 @@ const Index = () => {
 
               {/* Featured Flights */}
               <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
-                <div className="text-center space-y-2 px-2">
-                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
+                <div className="text-center space-y-2 sm:space-y-3 px-2">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Premium Flight Services
                   </h2>
-                  <p className="text-sm sm:text-base text-muted-foreground">
+                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
                     Fly in comfort and style to destinations worldwide
                   </p>
                 </div>
