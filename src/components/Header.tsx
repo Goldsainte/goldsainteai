@@ -82,20 +82,20 @@ export const Header = () => {
   return (
     <header className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <div className="grid grid-cols-3 items-center h-20 gap-4">
+          {/* Logo - Left */}
+          <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity justify-start">
             <img src={logomark} alt="Logo" className="h-8 w-8" />
             <span className="text-lg font-bold font-chiffon text-primary hidden sm:block">Goldsainte.Ai</span>
           </a>
 
-          {/* Compact Search Bar */}
-          <div className="flex-1 flex justify-center max-w-2xl mx-auto">
+          {/* Compact Search Bar - Center */}
+          <div className="flex justify-center">
             <CompactHeaderSearch />
           </div>
 
-          {/* Services Dropdown - Right side */}
-          <div className="flex items-center gap-2">
+          {/* Right side actions */}
+          <div className="flex items-center gap-1 justify-end">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
@@ -138,10 +138,6 @@ export const Header = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          </div>
-
-          {/* Right side actions */}
-          <div className="flex items-center gap-1">
             <Button 
               variant="ghost" 
               size="sm"
