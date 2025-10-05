@@ -486,7 +486,7 @@ export const BookingModal = ({
                 render={({ field }) => (
                   <FormItem className="flex items-center space-x-2 space-y-0">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-4 w-4" />
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                     </FormControl>
                     <FormLabel className="!mt-0 font-normal">I prefer paperless confirmation</FormLabel>
                   </FormItem>
@@ -501,7 +501,7 @@ export const BookingModal = ({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-4 w-4" />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel className="!mt-0 font-normal">Email</FormLabel>
                     </FormItem>
@@ -513,7 +513,7 @@ export const BookingModal = ({
                   render={({ field }) => (
                     <FormItem className="flex items-center space-x-2 space-y-0">
                       <FormControl>
-                        <Checkbox checked={field.value} onCheckedChange={field.onChange} className="h-4 w-4" />
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                       </FormControl>
                       <FormLabel className="!mt-0 font-normal">Text Message</FormLabel>
                     </FormItem>
