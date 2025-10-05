@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
@@ -26,6 +27,7 @@ import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 
 export default function AgentDashboard() {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<any>(null);
   const [jobs, setJobs] = useState<any[]>([]);
@@ -55,6 +57,8 @@ export default function AgentDashboard() {
 
     fetchData();
   }, [user, navigate]);
+
+  // Allow admins to access this page even if they're not agents
 
   const fetchData = async () => {
     try {

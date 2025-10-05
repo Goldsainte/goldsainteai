@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 
 export default function MyJobs() {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [filteredJobs, setFilteredJobs] = useState<any[]>([]);

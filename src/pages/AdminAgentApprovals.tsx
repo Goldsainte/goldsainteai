@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
@@ -33,6 +36,9 @@ interface VerificationRequest {
 }
 
 export default function AdminAgentApprovals() {
+  const { user } = useAuth();
+  const { isAdmin, loading: roleLoading } = useUserRole();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [requests, setRequests] = useState<VerificationRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,8 +47,18 @@ export default function AdminAgentApprovals() {
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
+    if (roleLoading) return;
+    if (!user || !isAdmin) {
+      navigate('/');
+      toast({
+        title: "Access Denied",
+        description: "You don't have permission to access this page.",
+        variant: "destructive",
+      });
+      return;
+    }
     loadRequests();
-  }, []);
+  }, [user, isAdmin, roleLoading, navigate]);
 
   const loadRequests = async () => {
     try {

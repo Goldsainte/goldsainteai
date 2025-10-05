@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Loader2, DollarSign, TrendingUp, Calendar, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +15,7 @@ import { format } from "date-fns";
 export default function CommissionDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<any[]>([]);
   const [stats, setStats] = useState({
@@ -32,6 +34,8 @@ export default function CommissionDashboard() {
     }
     loadCommissionData();
   }, [user, navigate]);
+
+  // Allow admins full access to commission data
 
   const loadCommissionData = async () => {
     setLoading(true);

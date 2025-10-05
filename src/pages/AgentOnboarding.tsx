@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +17,15 @@ import { TermsDialog, PrivacyDialog, VendorDialog, InsuranceDialog } from "@/com
 
 export default function AgentOnboarding() {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+  }, [user, navigate]);
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
