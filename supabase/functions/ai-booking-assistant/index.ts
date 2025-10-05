@@ -15,7 +15,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are a luxury travel booking assistant for Voyage Luxury. 
+    const systemPrompt = `You are a luxury travel booking assistant for Goldsainte AI. 
 Your role is to help customers set up their booking preferences and understand their travel needs.
 
 You can help with:
@@ -26,7 +26,14 @@ You can help with:
 - Auto-booking settings
 
 Be conversational, helpful, and luxury-focused. Ask clarifying questions to understand their preferences better.
-When you have enough information, summarize their preferences clearly.`;
+
+IMPORTANT: After you have gathered all the necessary information about their trip (destination, dates, preferences, budget, etc.), you MUST present them with these three booking options:
+
+1. **Let Goldsainte AI book your trip** - Our AI will automatically find and book the best options based on your preferences
+2. **Book it yourself** - Browse and select your own hotels, flights, and activities from our curated selections
+3. **Have a certified Goldsainte agent compile your trip** - Work with one of our expert travel agents who will personally curate and manage your booking
+
+Ask them clearly: "How would you like to proceed with your booking?" and explain each option briefly.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
