@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action: string
+          created_at: string
+          details: Json | null
+          entity_id: string
+          entity_type: string
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          details?: Json | null
+          entity_id: string
+          entity_type: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          details?: Json | null
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       agent_availability: {
         Row: {
           agent_id: string
@@ -1909,9 +1945,119 @@ export type Database = {
         }
         Relationships: []
       }
+      webhook_configurations: {
+        Row: {
+          created_at: string
+          events: string[]
+          id: string
+          is_active: boolean | null
+          last_triggered_at: string | null
+          name: string
+          retry_attempts: number | null
+          secret: string | null
+          timeout_seconds: number | null
+          updated_at: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          events: string[]
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name: string
+          retry_attempts?: number | null
+          secret?: string | null
+          timeout_seconds?: number | null
+          updated_at?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          events?: string[]
+          id?: string
+          is_active?: boolean | null
+          last_triggered_at?: string | null
+          name?: string
+          retry_attempts?: number | null
+          secret?: string | null
+          timeout_seconds?: number | null
+          updated_at?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      webhook_delivery_logs: {
+        Row: {
+          attempt_number: number | null
+          created_at: string
+          delivered_at: string | null
+          error_message: string | null
+          event_type: string
+          id: string
+          payload: Json
+          response_body: string | null
+          response_status: number | null
+          webhook_id: string
+        }
+        Insert: {
+          attempt_number?: number | null
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type: string
+          id?: string
+          payload: Json
+          response_body?: string | null
+          response_status?: number | null
+          webhook_id: string
+        }
+        Update: {
+          attempt_number?: number | null
+          created_at?: string
+          delivered_at?: string | null
+          error_message?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          response_body?: string | null
+          response_status?: number | null
+          webhook_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webhook_delivery_logs_webhook_id_fkey"
+            columns: ["webhook_id"]
+            isOneToOne: false
+            referencedRelation: "webhook_configurations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      platform_analytics: {
+        Row: {
+          active_agents: number | null
+          average_rating: number | null
+          completed_jobs: number | null
+          in_progress_jobs: number | null
+          open_disputes: number | null
+          open_jobs: number | null
+          pending_reports: number | null
+          total_agent_payouts: number | null
+          total_jobs: number | null
+          total_reviews: number | null
+          total_service_fees: number | null
+          total_success_fees: number | null
+          total_users: number | null
+          verified_agents: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_agent_trust_score: {
@@ -1944,6 +2090,61 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      search_marketplace_jobs: {
+        Args: {
+          booking_type_filter?: string
+          destination_filter?: string
+          job_status?: string
+          limit_count?: number
+          max_budget?: number
+          min_budget?: number
+          offset_count?: number
+          search_query?: string
+          user_id_filter?: string
+        }
+        Returns: {
+          bid_count: number
+          booking_type: string
+          budget_max: number
+          budget_min: number
+          created_at: string
+          currency: string
+          description: string
+          destination: string
+          expires_at: string
+          id: string
+          status: string
+          title: string
+          user_id: string
+        }[]
+      }
+      search_travel_agents: {
+        Args: {
+          destination_filter?: string[]
+          is_verified_filter?: boolean
+          language_filter?: string[]
+          limit_count?: number
+          min_rating?: number
+          offset_count?: number
+          search_query?: string
+          specialization_filter?: string[]
+        }
+        Returns: {
+          agency_name: string
+          bio: string
+          commission_rate: number
+          destinations: string[]
+          experience_years: number
+          id: string
+          is_active: boolean
+          is_verified: boolean
+          languages: string[]
+          profile_image_url: string
+          rating: number
+          specializations: string[]
+          total_reviews: number
+        }[]
       }
     }
     Enums: {
