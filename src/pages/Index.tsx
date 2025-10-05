@@ -826,7 +826,7 @@ const Index = () => {
                     How it Works
                   </h2>
                   <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
-                    Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
+                    Chat with us to start planning your next adventure. Ask for recommendations for any destination or request a full itinerary tailored to you. The more specific you are about the experiences you enjoy, the better we can personalize your trip—or take our quiz to discover your unique travel style.
                   </p>
                 </div>
 
