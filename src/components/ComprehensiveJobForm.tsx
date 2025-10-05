@@ -157,12 +157,9 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
                 <option value="">Select category</option>
                 <option value="flight">Flight Booking</option>
                 <option value="hotel">Hotel Booking</option>
-                <option value="itinerary">Full Itinerary Planning</option>
-                <option value="visa">Visa Processing</option>
-                <option value="group_tour">Group Tour Arrangement</option>
-                <option value="car_rental">Car Rental</option>
-                <option value="travel_insurance">Travel Insurance</option>
-                <option value="custom">Custom/Other</option>
+                <option value="car">Car Rental</option>
+                <option value="package">Full Package/Itinerary Planning</option>
+                <option value="custom">Custom/Other (Visa, Insurance, etc.)</option>
               </select>
             </div>
 
