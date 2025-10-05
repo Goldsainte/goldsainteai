@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase, Bike } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase, Bike, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -781,6 +781,142 @@ const Index = () => {
                   {" "}and{" "}
                   <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
                 </p>
+              </div>
+            </div>
+
+            {/* How it Works Section - Horizontal Scrolling */}
+            <div className="px-6 py-20 bg-gradient-to-b from-background via-muted/10 to-background">
+              <div className="w-full max-w-7xl mx-auto space-y-12">
+                <div className="text-center space-y-3">
+                  <h2 className="text-4xl md:text-5xl font-chiffon font-bold text-secondary">
+                    How it Works
+                  </h2>
+                  <p className="text-lg text-muted-foreground font-secondary max-w-2xl mx-auto">
+                    Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
+                  </p>
+                </div>
+
+                {/* Horizontal Scrolling Container */}
+                <div className="relative">
+                  <ScrollArea className="w-full whitespace-nowrap pb-4">
+                    <div className="flex gap-6 px-4">
+                      {/* Card 1 - AI Search */}
+                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="relative">
+                              <Search className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
+                              <Sparkles className="h-16 w-16 text-primary" />
+                            </div>
+                          </div>
+                        </div>
+                        <CardContent className="p-6 space-y-3">
+                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                            AI-Powered Search
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                            Search across flights, hotels, restaurants, events, and curated packages in one conversation
+                          </p>
+                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                            Try it Now
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 2 - Expert Agents */}
+                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-accent/10 to-primary/10">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="relative">
+                              <Briefcase className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
+                              <MessageCircle className="h-16 w-16 text-accent" />
+                            </div>
+                          </div>
+                        </div>
+                        <CardContent className="p-6 space-y-3">
+                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                            Expert Travel Agents
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                            Post complex trips to our marketplace and get matched with certified luxury travel agents
+                          </p>
+                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                            Find an Agent
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 3 - Instant Booking */}
+                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="relative">
+                              <Star className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
+                              <FileCheck className="h-16 w-16 text-primary" />
+                            </div>
+                          </div>
+                        </div>
+                        <CardContent className="p-6 space-y-3">
+                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                            Instant Booking
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                            Book instantly with transparent pricing, flexible cancellations, and smart price insights
+                          </p>
+                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                            Start Booking
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 4 - Itinerary Builder */}
+                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-accent/10 to-primary/10">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="relative">
+                              <MapPin className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
+                              <FileCheck className="h-16 w-16 text-accent" />
+                            </div>
+                          </div>
+                        </div>
+                        <CardContent className="p-6 space-y-3">
+                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                            Itinerary Management
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                            Build day-by-day itineraries, upload travel docs, and sync with your calendar
+                          </p>
+                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                            Build Itinerary
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 5 - Messaging Hub */}
+                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="relative">
+                              <Send className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
+                              <MessageCircle className="h-16 w-16 text-primary" />
+                            </div>
+                          </div>
+                        </div>
+                        <CardContent className="p-6 space-y-3">
+                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                            Real-Time Messaging
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                            Chat instantly with agents and manage all your travel conversations in one secure place
+                          </p>
+                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                            Start Chatting
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </ScrollArea>
+                </div>
               </div>
             </div>
 
