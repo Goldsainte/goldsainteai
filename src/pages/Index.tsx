@@ -841,156 +841,94 @@ const Index = () => {
                     </div>
                   </div>
                   
-                  {/* Right side - Visual showcase AND search bar */}
-                  <div className="space-y-8">
-                    {/* Visual category showcase with images */}
-                    <div className="relative h-[600px] lg:h-[650px]">
-                    {/* Central profile circle */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                      <div className="h-28 w-28 sm:h-36 sm:w-36 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-accent to-primary p-1 shadow-2xl">
-                        <div className="h-full w-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                          <img src={logomark} alt="Goldsainte AI" className="h-14 w-14 sm:h-18 sm:w-18 md:h-24 md:w-24" />
-                        </div>
+                  {/* Right side - Decorative gears showcase */}
+                  <div className="relative h-[600px] lg:h-[650px]">
+                    {/* Decorative Gear Icons - Bottom Left Corner */}
+                    <div className="absolute bottom-0 left-0 w-64 h-64">
+                      {/* Large Gear 1 - Shopping/Hotel */}
+                      <div className="absolute bottom-8 left-0 w-28 h-28 animate-[spin_20s_linear_infinite]">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          <path
+                            d="M50 0 L55 15 L60 0 L70 5 L70 20 L80 15 L85 25 L95 25 L90 35 L100 40 L95 50 L100 60 L90 65 L95 75 L85 75 L80 85 L70 80 L70 95 L60 100 L55 85 L50 100 L45 85 L40 100 L30 95 L30 80 L20 85 L15 75 L5 75 L10 65 L0 60 L5 50 L0 40 L10 35 L5 25 L15 25 L20 15 L30 20 L30 5 L40 0 L45 15Z"
+                            fill="#BFAD72"
+                            className="drop-shadow-xl"
+                          />
+                          <circle cx="50" cy="50" r="25" fill="#0C4D47" />
+                          <foreignObject x="32" y="32" width="36" height="36">
+                            <div className="flex items-center justify-center h-full">
+                              <Hotel className="h-5 w-5 text-[#BFAD72]" />
+                            </div>
+                          </foreignObject>
+                        </svg>
                       </div>
-                    </div>
-                    
-                    {/* Category cards with images - positioned in a circle with no overlap */}
-                    {/* Top - Spa/Wellness with image - 0 degrees */}
-                    <div className="absolute top-[5%] left-1/2 -translate-x-1/2 animate-float z-10">
-                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={spaWellness} 
-                          alt="Luxury spa massage treatment - Spa & Wellness" 
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 md:bottom-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Hotel className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Spa</span>
-                        </div>
+
+                      {/* Medium Gear 2 - Dining */}
+                      <div className="absolute bottom-16 left-20 w-24 h-24 animate-[spin_15s_linear_infinite_reverse]">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          <path
+                            d="M50 5 L54 18 L58 5 L66 9 L66 22 L74 18 L78 27 L86 27 L82 36 L90 40 L86 50 L90 60 L82 64 L86 73 L78 73 L74 82 L66 78 L66 91 L58 95 L54 82 L50 95 L46 82 L42 95 L34 91 L34 78 L26 82 L22 73 L14 73 L18 64 L10 60 L14 50 L10 40 L18 36 L14 27 L22 27 L26 18 L34 22 L34 9 L42 5 L46 18Z"
+                            fill="#BFAD72"
+                            className="drop-shadow-xl"
+                          />
+                          <circle cx="50" cy="50" r="22" fill="#0C4D47" />
+                          <foreignObject x="34" y="34" width="32" height="32">
+                            <div className="flex items-center justify-center h-full">
+                              <UtensilsCrossed className="h-4 w-4 text-[#BFAD72]" />
+                            </div>
+                          </foreignObject>
+                        </svg>
                       </div>
-                    </div>
-                    
-                    {/* Top right - Theater with image - 40 degrees */}
-                    <div className="absolute top-[15%] right-[8%] animate-float z-10" style={{ animationDelay: '0.5s' }}>
-                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={luxuryEvents} 
-                          alt="Theater" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Theater</span>
-                        </div>
+
+                      {/* Small Gear 3 - Flights */}
+                      <div className="absolute bottom-4 left-24 w-20 h-20 animate-[spin_12s_linear_infinite]">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          <path
+                            d="M50 8 L53 20 L56 8 L62 11 L62 23 L68 20 L71 27 L77 27 L74 34 L80 38 L77 50 L80 62 L74 66 L77 73 L71 73 L68 80 L62 77 L62 89 L56 92 L53 80 L50 92 L47 80 L44 92 L38 89 L38 77 L32 80 L29 73 L23 73 L26 66 L20 62 L23 50 L20 38 L26 34 L23 27 L29 27 L32 20 L38 23 L38 11 L44 8 L47 20Z"
+                            fill="#BFAD72"
+                            className="drop-shadow-xl"
+                          />
+                          <circle cx="50" cy="50" r="20" fill="#0C4D47" />
+                          <foreignObject x="36" y="36" width="28" height="28">
+                            <div className="flex items-center justify-center h-full">
+                              <Plane className="h-4 w-4 text-[#BFAD72]" />
+                            </div>
+                          </foreignObject>
+                        </svg>
                       </div>
-                    </div>
-                    
-                    {/* Right - Luxury Resorts with image - 90 degrees */}
-                    <div className="absolute top-1/2 -translate-y-1/2 right-[3%] animate-float z-10" style={{ animationDelay: '1s' }}>
-                      <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={maldivesTropical} 
-                          alt="Luxury Resorts" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1.5 left-1.5 sm:bottom-3 sm:left-3 md:bottom-4 md:left-4 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Hotel className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Resorts</span>
-                        </div>
+
+                      {/* Extra Small Gear 4 - Events */}
+                      <div className="absolute bottom-24 left-12 w-16 h-16 animate-[spin_18s_linear_infinite_reverse]">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          <path
+                            d="M50 10 L52 22 L54 10 L59 13 L59 25 L64 22 L66 28 L72 28 L70 35 L75 39 L72 50 L75 61 L70 65 L72 72 L66 72 L64 78 L59 75 L59 87 L54 90 L52 78 L50 90 L48 78 L46 90 L41 87 L41 75 L36 78 L34 72 L28 72 L30 65 L25 61 L28 50 L25 39 L30 35 L28 28 L34 28 L36 22 L41 25 L41 13 L46 10 L48 22Z"
+                            fill="#BFAD72"
+                            className="drop-shadow-xl"
+                          />
+                          <circle cx="50" cy="50" r="18" fill="#0C4D47" />
+                          <foreignObject x="38" y="38" width="24" height="24">
+                            <div className="flex items-center justify-center h-full">
+                              <Ticket className="h-3 w-3 text-[#BFAD72]" />
+                            </div>
+                          </foreignObject>
+                        </svg>
                       </div>
-                    </div>
-                    
-                    {/* Bottom right - Fine Dining with image - 140 degrees */}
-                    <div className="absolute bottom-[15%] right-[8%] animate-float z-10" style={{ animationDelay: '1.5s' }}>
-                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={restaurant1} 
-                          alt="Fine Dining" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 md:top-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <UtensilsCrossed className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Dining</span>
-                        </div>
+
+                      {/* Extra Small Gear 5 - Cars */}
+                      <div className="absolute bottom-0 left-16 w-16 h-16 animate-[spin_14s_linear_infinite]">
+                        <svg viewBox="0 0 100 100" className="w-full h-full">
+                          <path
+                            d="M50 10 L52 22 L54 10 L59 13 L59 25 L64 22 L66 28 L72 28 L70 35 L75 39 L72 50 L75 61 L70 65 L72 72 L66 72 L64 78 L59 75 L59 87 L54 90 L52 78 L50 90 L48 78 L46 90 L41 87 L41 75 L36 78 L34 72 L28 72 L30 65 L25 61 L28 50 L25 39 L30 35 L28 28 L34 28 L36 22 L41 25 L41 13 L46 10 L48 22Z"
+                            fill="#BFAD72"
+                            className="drop-shadow-xl"
+                          />
+                          <circle cx="50" cy="50" r="18" fill="#0C4D47" />
+                          <foreignObject x="38" y="38" width="24" height="24">
+                            <div className="flex items-center justify-center h-full">
+                              <Car className="h-3 w-3 text-[#BFAD72]" />
+                            </div>
+                          </foreignObject>
+                        </svg>
                       </div>
-                    </div>
-                    
-                    {/* Bottom - Beach with image - 180 degrees */}
-                    <div className="absolute bottom-[5%] left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '2s' }}>
-                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={amalfiCoast} 
-                          alt="Beach Getaways" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Beach</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Bottom left - Historical Tours with image - 220 degrees */}
-                    <div className="absolute bottom-[15%] left-[8%] animate-float z-10" style={{ animationDelay: '2.5s' }}>
-                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={parisUrban} 
-                          alt="Historical Tours" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 md:bottom-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <MapPinned className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">History</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Left - Wildlife with image - 270 degrees */}
-                    <div className="absolute top-1/2 -translate-y-1/2 left-[3%] animate-float z-10" style={{ animationDelay: '3s' }}>
-                      <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={destination8} 
-                          alt="Wildlife" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Wildlife</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Top left - Adventure with image - 320 degrees */}
-                    <div className="absolute top-[15%] left-[8%] animate-float z-10" style={{ animationDelay: '3.5s' }}>
-                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={icelandNorthernLights} 
-                          alt="Water Sports" 
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Plane className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Adventure</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Center top offset - Cycling with image - between top and top-left */}
-                    <div className="absolute top-[8%] left-[20%] animate-float z-10" style={{ animationDelay: '4s' }}>
-                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
-                        <img 
-                          src={cyclingTour} 
-                          alt="Professional road bike race - Tour de France style" 
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 md:bottom-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Bike className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
-                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Cycling</span>
-                        </div>
-                      </div>
-                    </div>
                     </div>
                     
                     {/* Search input below the visual showcase */}
