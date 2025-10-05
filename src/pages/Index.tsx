@@ -44,6 +44,7 @@ import { WelcomeModal } from "@/components/WelcomeModal";
 import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
+import heroAiConcierge from "@/assets/hero-ai-concierge.png";
 import cardAiSearch from "@/assets/card-ai-search.jpg";
 import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking.jpg";
@@ -806,6 +807,15 @@ const Index = () => {
                   <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
                 </p>
               </div>
+            </div>
+
+            {/* Hero Image Section */}
+            <div className="w-full overflow-hidden">
+              <img 
+                src={heroAiConcierge} 
+                alt="Introducing Goldsainte AI Assist: AI Travel Concierge" 
+                className="w-full h-auto object-cover"
+              />
             </div>
 
             {/* How it Works Section - Horizontal Scrolling */}
