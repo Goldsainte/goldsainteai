@@ -31,7 +31,7 @@ export const Hero = () => {
             Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90">
-            Search deals on hotels, homes, and much more...
+            AI-powered search, expert agents on demand, or full control — the choice is yours.
           </p>
 
           <div className="bg-card rounded-lg shadow-xl p-6">
