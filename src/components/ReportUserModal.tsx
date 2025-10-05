@@ -13,7 +13,7 @@ interface ReportUserModalProps {
   onClose: () => void;
   reportedUserId: string;
   reportedUserName: string;
-  relatedJobId?: string;
+  reportedAgentId?: string;
 }
 
 const reportTypes = [
@@ -25,20 +25,29 @@ const reportTypes = [
   { value: "other", label: "Other" },
 ];
 
+const reportCategories = [
+  { value: "user_behavior", label: "User Behavior" },
+  { value: "service_quality", label: "Service Quality" },
+  { value: "payment", label: "Payment" },
+  { value: "safety", label: "Safety" },
+  { value: "other", label: "Other" },
+];
+
 export function ReportUserModal({
   isOpen,
   onClose,
   reportedUserId,
   reportedUserName,
-  relatedJobId,
+  reportedAgentId,
 }: ReportUserModalProps) {
   const [reportType, setReportType] = useState<string>("");
+  const [reportCategory, setReportCategory] = useState<string>("");
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!reportType || !description.trim()) {
-      toast.error("Please select a report type and provide a description");
+    if (!reportType || !reportCategory || !description.trim()) {
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -50,9 +59,11 @@ export function ReportUserModal({
       const { error } = await supabase.from("user_reports").insert({
         reporter_id: user.id,
         reported_user_id: reportedUserId,
+        reported_agent_id: reportedAgentId || null,
         report_type: reportType,
+        report_category: reportCategory,
         description: description.trim(),
-        related_job_id: relatedJobId || null,
+        severity: reportType === "fraud" || reportType === "harassment" ? "high" : "medium",
       });
 
       if (error) throw error;
@@ -60,6 +71,7 @@ export function ReportUserModal({
       toast.success("Report submitted successfully");
       onClose();
       setReportType("");
+      setReportCategory("");
       setDescription("");
     } catch (error) {
       console.error("Error submitting report:", error);
@@ -97,6 +109,22 @@ export function ReportUserModal({
           </div>
 
           <div>
+            <Label htmlFor="report-category">Category</Label>
+            <Select value={reportCategory} onValueChange={setReportCategory}>
+              <SelectTrigger id="report-category">
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
+              <SelectContent>
+                {reportCategories.map((cat) => (
+                  <SelectItem key={cat.value} value={cat.value}>
+                    {cat.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
@@ -117,7 +145,7 @@ export function ReportUserModal({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={submitting || !reportType || description.trim().length < 20}
+              disabled={submitting || !reportType || !reportCategory || description.trim().length < 20}
             >
               {submitting ? "Submitting..." : "Submit Report"}
             </Button>

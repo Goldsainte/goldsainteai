@@ -375,9 +375,10 @@ export default function AgentProfile() {
       
       {agent && (
         <ReportUserModal
-          open={showReportModal}
-          onOpenChange={setShowReportModal}
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
           reportedUserId={agent.user_id}
+          reportedUserName={agent.agency_name}
           reportedAgentId={agent.id}
         />
       )}

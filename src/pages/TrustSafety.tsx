@@ -13,11 +13,14 @@ interface UserReport {
   reporter_id: string;
   reported_user_id: string;
   report_type: string;
+  report_category: string;
   description: string;
   status: string;
+  severity: string;
   created_at: string;
-  resolution_notes?: string;
-  profiles?: { username: string };
+  admin_notes?: string;
+  resolved_by?: string;
+  resolved_at?: string;
 }
 
 export default function TrustSafety() {
@@ -56,10 +59,7 @@ export default function TrustSafety() {
     try {
       const { data, error } = await supabase
         .from("user_reports")
-        .select(`
-          *,
-          profiles:reported_user_id(username)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) throw error;
@@ -81,9 +81,9 @@ export default function TrustSafety() {
         .from("user_reports")
         .update({
           status: newStatus,
-          reviewed_by: user.id,
-          reviewed_at: new Date().toISOString(),
-          resolution_notes: resolutionNotes || null,
+          resolved_by: user.id,
+          resolved_at: new Date().toISOString(),
+          admin_notes: resolutionNotes || null,
         })
         .eq("id", reportId);
 
@@ -162,10 +162,10 @@ export default function TrustSafety() {
                 <div className="flex items-start justify-between">
                   <div>
                     <CardTitle className="text-lg">
-                      Report: {report.report_type.replace("_", " ")}
+                      {report.report_type.replace("_", " ")} - {report.report_category.replace("_", " ")}
                     </CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Reported user: {report.profiles?.username || "Unknown"}
+                      Severity: <Badge variant="outline">{report.severity}</Badge>
                     </p>
                   </div>
                   {getStatusBadge(report.status)}
@@ -183,10 +183,10 @@ export default function TrustSafety() {
                   Reported on: {new Date(report.created_at).toLocaleDateString()}
                 </div>
 
-                {report.resolution_notes && (
+                {report.admin_notes && (
                   <div className="bg-muted/50 p-3 rounded-lg">
-                    <p className="font-medium text-sm mb-1">Resolution Notes:</p>
-                    <p className="text-sm">{report.resolution_notes}</p>
+                    <p className="font-medium text-sm mb-1">Admin Notes:</p>
+                    <p className="text-sm">{report.admin_notes}</p>
                   </div>
                 )}
 
