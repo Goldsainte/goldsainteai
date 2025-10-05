@@ -789,9 +789,9 @@ const Index = () => {
                     <div className="relative h-[600px] lg:h-[650px]">
                     {/* Central profile circle */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
-                      <div className="h-40 w-40 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-accent to-primary p-1 shadow-2xl">
+                      <div className="h-28 w-28 sm:h-36 sm:w-36 md:h-48 md:w-48 rounded-full bg-gradient-to-br from-accent to-primary p-1 shadow-2xl">
                         <div className="h-full w-full rounded-full bg-background flex items-center justify-center overflow-hidden">
-                          <img src={logomark} alt="Goldsainte AI" className="h-20 w-20 md:h-24 md:w-24" />
+                          <img src={logomark} alt="Goldsainte AI" className="h-14 w-14 sm:h-18 sm:w-18 md:h-24 md:w-24" />
                         </div>
                       </div>
                     </div>
@@ -799,137 +799,137 @@ const Index = () => {
                     {/* Category cards with images - positioned organically */}
                     {/* Top left - Spa/Wellness with image */}
                     <div className="absolute top-0 left-0 animate-float z-10">
-                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={spaWellness} 
                           alt="Luxury spa massage treatment - Spa & Wellness" 
                           loading="lazy"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Hotel className="h-4 w-4 text-accent" />
-                          <span className="text-sm font-semibold">Spa / Wellness</span>
+                        <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 md:bottom-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Hotel className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Spa</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Top right - Theater with image */}
-                    <div className="absolute top-4 right-8 animate-float z-10" style={{ animationDelay: '0.5s' }}>
-                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute top-4 right-2 sm:right-8 animate-float z-10" style={{ animationDelay: '0.5s' }}>
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={luxuryEvents} 
                           alt="Theater" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Ticket className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-semibold">Theater</span>
+                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Theater</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Left - Luxury Resorts with image */}
-                    <div className="absolute top-24 left-0 animate-float z-10" style={{ animationDelay: '1s' }}>
-                      <div className="relative w-48 h-48 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute top-20 sm:top-24 left-0 animate-float z-10" style={{ animationDelay: '1s' }}>
+                      <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={maldivesTropical} 
                           alt="Luxury Resorts" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-4 left-4 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Hotel className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-semibold">Resorts</span>
+                        <div className="absolute bottom-1.5 left-1.5 sm:bottom-3 sm:left-3 md:bottom-4 md:left-4 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Hotel className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Resorts</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Center top - Beach with image */}
-                    <div className="absolute top-16 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '1.5s' }}>
-                      <div className="relative w-44 h-44 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute top-12 sm:top-16 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '1.5s' }}>
+                      <div className="relative w-26 h-26 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={amalfiCoast} 
                           alt="Beach Getaways" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <MapPin className="h-4 w-4 text-accent" />
-                          <span className="text-sm font-semibold">Beach</span>
+                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Beach</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Right - Wildlife with image */}
-                    <div className="absolute top-28 right-0 animate-float z-10" style={{ animationDelay: '2s' }}>
-                      <div className="relative w-44 h-44 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute top-24 sm:top-28 right-0 animate-float z-10" style={{ animationDelay: '2s' }}>
+                      <div className="relative w-26 h-26 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={destination8} 
                           alt="Wildlife" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute top-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Star className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-semibold">Wildlife</span>
+                        <div className="absolute top-1 left-1 sm:top-2 sm:left-2 md:top-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Wildlife</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Bottom right - Fine Dining with image */}
-                    <div className="absolute bottom-32 right-0 animate-float z-10" style={{ animationDelay: '2.5s' }}>
-                      <div className="relative w-44 h-44 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-28 sm:bottom-32 right-0 animate-float z-10" style={{ animationDelay: '2.5s' }}>
+                      <div className="relative w-26 h-26 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={restaurant1} 
                           alt="Fine Dining" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute top-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <UtensilsCrossed className="h-4 w-4 text-accent" />
-                          <span className="text-sm font-semibold">Fine Dining</span>
+                        <div className="absolute top-1 right-1 sm:top-2 sm:right-2 md:top-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <UtensilsCrossed className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Dining</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Bottom left - Historical Tours with image */}
-                    <div className="absolute bottom-28 left-4 animate-float z-10" style={{ animationDelay: '3s' }}>
-                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-24 sm:bottom-28 left-2 sm:left-4 animate-float z-10" style={{ animationDelay: '3s' }}>
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={parisUrban} 
                           alt="Historical Tours" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <MapPinned className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-semibold">Historical</span>
+                        <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 md:bottom-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <MapPinned className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">History</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Bottom center - Water Sports with image */}
-                    <div className="absolute bottom-12 right-20 animate-float z-10" style={{ animationDelay: '3.5s' }}>
-                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-8 sm:bottom-12 right-12 sm:right-20 animate-float z-10" style={{ animationDelay: '3.5s' }}>
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={icelandNorthernLights} 
                           alt="Water Sports" 
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Plane className="h-4 w-4 text-accent" />
-                          <span className="text-sm font-semibold">Adventure</span>
+                        <div className="absolute bottom-1 right-1 sm:bottom-2 sm:right-2 md:bottom-3 md:right-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Plane className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Adventure</span>
                         </div>
                       </div>
                     </div>
                     
                     {/* Bottom - Cycling with image */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
-                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
+                      <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={cyclingTour} 
                           alt="Professional road bike race - Tour de France style" 
                           loading="lazy"
                           className="w-full h-full object-cover"
                         />
-                        <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
-                          <Car className="h-4 w-4 text-primary" />
-                          <span className="text-sm font-semibold">Cycling</span>
+                        <div className="absolute bottom-1 left-1 sm:bottom-2 sm:left-2 md:bottom-3 md:left-3 flex items-center gap-1 sm:gap-1.5 md:gap-2 px-2 py-1 sm:px-3 sm:py-1.5 md:px-4 md:py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Bike className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-primary" />
+                          <span className="text-[10px] sm:text-xs md:text-sm font-semibold">Cycling</span>
                         </div>
                       </div>
                     </div>
