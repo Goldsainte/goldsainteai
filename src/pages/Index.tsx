@@ -732,7 +732,7 @@ const Index = () => {
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
                   <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
                   <p className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2">
-                    The first AI concierge powered by certified travel experts — one platform, endlessly personal.
+                    Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
                   </p>
                 </div>
 
