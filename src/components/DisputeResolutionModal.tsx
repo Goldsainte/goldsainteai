@@ -4,94 +4,80 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AlertTriangle } from "lucide-react";
-import { toast } from "sonner";
-import { z } from "zod";
-
-const disputeSchema = z.object({
-  dispute_type: z.enum(['quality', 'delivery', 'communication', 'refund', 'other']),
-  description: z.string().trim().min(20, "Please provide at least 20 characters").max(2000)
-});
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { AlertTriangle, Loader2 } from "lucide-react";
 
 interface DisputeResolutionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   jobId: string;
-  onDisputeRaised: () => void;
+  onSuccess?: () => void;
 }
 
-export const DisputeResolutionModal = ({ 
-  open, 
-  onOpenChange, 
+export function DisputeResolutionModal({
+  open,
+  onOpenChange,
   jobId,
-  onDisputeRaised 
-}: DisputeResolutionModalProps) => {
+  onSuccess,
+}: DisputeResolutionModalProps) {
   const { user } = useAuth();
-  const [disputeType, setDisputeType] = useState<string>("");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [disputeType, setDisputeType] = useState("");
   const [description, setDescription] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
-    if (!user) return;
+    if (!disputeType || !description.trim() || !user) {
+      toast({
+        title: "Required fields",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    setLoading(true);
     try {
-      const validation = disputeSchema.safeParse({ 
+      const { error } = await supabase.from("marketplace_disputes").insert({
+        job_id: jobId,
+        raised_by: user.id,
         dispute_type: disputeType,
-        description 
+        description: description,
+        status: "open",
       });
 
-      if (!validation.success) {
-        toast.error(validation.error.errors[0].message);
-        return;
-      }
+      if (error) throw error;
 
-      setSubmitting(true);
+      toast({
+        title: "Dispute Raised",
+        description:
+          "Your dispute has been submitted and will be reviewed by our team",
+      });
 
-      // Create dispute record
-      const { error: disputeError } = await supabase
-        .from('marketplace_disputes')
-        .insert({
-          job_id: jobId,
-          raised_by: user.id,
-          dispute_type: validation.data.dispute_type,
-          description: validation.data.description,
-          status: 'open'
-        });
-
-      if (disputeError) throw disputeError;
-
-      // Update job status to disputed
-      const { error: jobError } = await supabase
-        .from('marketplace_jobs')
-        .update({
-          status: 'disputed',
-          dispute_reason: validation.data.description,
-          dispute_opened_at: new Date().toISOString()
-        })
-        .eq('id', jobId);
-
-      if (jobError) throw jobError;
-
-      toast.success("Dispute raised successfully. Our team will review it shortly.");
-      onDisputeRaised();
       onOpenChange(false);
-      
-      // Reset form
-      setDisputeType("");
-      setDescription("");
+      onSuccess?.();
     } catch (error: any) {
-      console.error('Error raising dispute:', error);
-      toast.error('Failed to raise dispute');
+      toast({
+        title: "Submission failed",
+        description: error.message,
+        variant: "destructive",
+      });
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
@@ -103,67 +89,78 @@ export const DisputeResolutionModal = ({
             <AlertTriangle className="h-5 w-5 text-destructive" />
             Raise a Dispute
           </DialogTitle>
-          <DialogDescription>
-            If you're experiencing issues with this job, please provide details below. 
-            Our support team will review and mediate.
-          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              Disputes should only be raised for serious issues. Our mediation
+              team will review and help resolve the matter fairly.
+            </p>
+          </div>
+
           <div>
-            <Label>Dispute Type</Label>
+            <Label htmlFor="dispute-type">
+              Dispute Type <span className="text-destructive">*</span>
+            </Label>
             <Select value={disputeType} onValueChange={setDisputeType}>
               <SelectTrigger>
                 <SelectValue placeholder="Select dispute type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="quality">Quality Issues</SelectItem>
-                <SelectItem value="delivery">Late/Non-Delivery</SelectItem>
-                <SelectItem value="communication">Communication Problems</SelectItem>
-                <SelectItem value="refund">Refund Request</SelectItem>
+                <SelectItem value="quality">Quality of Service</SelectItem>
+                <SelectItem value="delivery">
+                  Delayed or Missing Delivery
+                </SelectItem>
+                <SelectItem value="payment">Payment Issue</SelectItem>
+                <SelectItem value="communication">
+                  Communication Problem
+                </SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label>Description</Label>
+            <Label htmlFor="description">
+              Detailed Description <span className="text-destructive">*</span>
+            </Label>
             <Textarea
-              placeholder="Please describe the issue in detail (minimum 20 characters)..."
+              id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={6}
-              maxLength={2000}
+              placeholder="Please provide a detailed explanation of the issue..."
+              className="min-h-[150px]"
             />
-            <p className="text-xs text-muted-foreground mt-1">
-              {description.length}/2000 characters
-            </p>
           </div>
 
-          <div className="bg-muted p-4 rounded-lg">
-            <h4 className="font-semibold mb-2 text-sm">What happens next?</h4>
-            <ul className="text-xs text-muted-foreground space-y-1">
-              <li>• Your dispute will be reviewed by our support team within 24-48 hours</li>
-              <li>• Both parties will be contacted for additional information if needed</li>
-              <li>• Funds will remain in escrow until resolution</li>
-              <li>• You'll receive email updates on the dispute status</li>
-            </ul>
-          </div>
-
-          <div className="flex gap-2 justify-end">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              disabled={submitting || !disputeType || description.length < 20}
-              variant="destructive"
-            >
-              {submitting ? "Submitting..." : "Raise Dispute"}
-            </Button>
+          <div className="text-sm text-muted-foreground">
+            Our mediation team typically responds within 24-48 hours. Both
+            parties will be notified and have an opportunity to provide their
+            perspective.
           </div>
         </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} disabled={loading} variant="destructive">
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              "Submit Dispute"
+            )}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
-};
+}

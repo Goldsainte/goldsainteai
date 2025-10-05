@@ -475,22 +475,21 @@ export default function AgentDashboard() {
             {selectedJobForMessaging && (
               <JobMessaging
                 jobId={selectedJobForMessaging.id}
-                jobOwnerId={selectedJobForMessaging.user_id}
-                agentId={agent?.id}
+                receiverId={selectedJobForMessaging.user_id}
               />
             )}
           </DialogContent>
         </Dialog>
 
-        {completionJob && (
+        {completionJob && agent && (
           <JobCompletionModal
-            jobId={completionJob.id}
-            jobTitle={completionJob.title}
-            isOpen={completionModalOpen}
-            onClose={() => {
-              setCompletionModalOpen(false);
-              setCompletionJob(null);
+            open={completionModalOpen}
+            onOpenChange={(open) => {
+              setCompletionModalOpen(open);
+              if (!open) setCompletionJob(null);
             }}
+            jobId={completionJob.id}
+            agentId={agent.id}
             onSuccess={() => {
               fetchData();
             }}

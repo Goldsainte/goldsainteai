@@ -504,7 +504,6 @@ export default function Marketplace() {
             {(selectedJob?.status === 'assigned' || selectedJob?.status === 'in_progress') && (
               <JobFileUpload
                 jobId={selectedJob.id}
-                attachments={jobAttachments[selectedJob.id] || []}
                 onUploadComplete={() => fetchAttachments(selectedJob.id)}
               />
             )}
@@ -562,8 +561,7 @@ export default function Marketplace() {
               <>
                 <JobMessaging
                   jobId={selectedJob.id}
-                  jobOwnerId={selectedJob.user_id}
-                  agentId={selectedJob.assigned_agent_id}
+                  receiverId={selectedJob.assigned_agent_id}
                 />
                 
                 {/* Dispute Resolution Button */}
@@ -589,10 +587,12 @@ export default function Marketplace() {
 
       {completionSubmission && selectedJob && (
         <JobApprovalModal
-          submission={completionSubmission}
-          jobTitle={selectedJob.title}
-          isOpen={isApprovalModalOpen}
-          onClose={() => setIsApprovalModalOpen(false)}
+          open={isApprovalModalOpen}
+          onOpenChange={setIsApprovalModalOpen}
+          submissionId={completionSubmission.id}
+          jobId={selectedJob.id}
+          completionNotes={completionSubmission.completion_notes || ''}
+          deliverables={completionSubmission.deliverables_description}
           onSuccess={() => {
             fetchJobs();
             setIsApprovalModalOpen(false);
@@ -634,7 +634,7 @@ export default function Marketplace() {
         open={!!disputeJobId}
         onOpenChange={(open) => !open && setDisputeJobId(null)}
         jobId={disputeJobId || ''}
-        onDisputeRaised={() => {
+        onSuccess={() => {
           fetchJobs();
           setDisputeJobId(null);
           setIsViewJobDialogOpen(false);
