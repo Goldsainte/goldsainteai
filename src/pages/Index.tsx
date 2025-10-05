@@ -1,6 +1,24 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase, Bike, MessageCircle } from "lucide-react";
+import { 
+  Plane, 
+  Hotel, 
+  MapPin, 
+  UtensilsCrossed, 
+  Search, 
+  Send, 
+  Loader2, 
+  Sparkles, 
+  ArrowLeft, 
+  MapPinned, 
+  Star, 
+  FileCheck, 
+  Ticket, 
+  Car, 
+  Briefcase, 
+  Bike, 
+  MessageCircle 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
