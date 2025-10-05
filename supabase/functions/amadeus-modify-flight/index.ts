@@ -30,7 +30,7 @@ serve(async (req) => {
       .from('bookings')
       .select('*')
       .eq('id', bookingId)
-      .single();
+      .maybeSingle();
 
     if (bookingError || !booking) {
       throw new Error('Booking not found');

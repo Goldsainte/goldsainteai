@@ -51,7 +51,7 @@ export default function BookingDetails() {
         .select('*')
         .eq('id', bookingId)
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       setBooking(data);

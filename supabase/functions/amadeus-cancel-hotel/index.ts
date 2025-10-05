@@ -30,7 +30,7 @@ serve(async (req) => {
       .from('bookings')
       .select('*')
       .eq('id', bookingId)
-      .single();
+      .maybeSingle();
 
     if (bookingError || !booking) {
       throw new Error('Booking not found');
@@ -115,7 +115,7 @@ serve(async (req) => {
       .select('*')
       .eq('booking_id', bookingId)
       .eq('status', 'completed')
-      .single();
+      .maybeSingle();
 
     let refundAmount = null;
     let refundStatus = 'pending';
