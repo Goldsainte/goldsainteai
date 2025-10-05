@@ -370,6 +370,39 @@ export type Database = {
           },
         ]
       }
+      currency_exchange_rates: {
+        Row: {
+          created_at: string
+          effective_date: string
+          from_currency: string
+          id: string
+          rate: number
+          source: string | null
+          to_currency: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          effective_date?: string
+          from_currency: string
+          id?: string
+          rate: number
+          source?: string | null
+          to_currency: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          effective_date?: string
+          from_currency?: string
+          id?: string
+          rate?: number
+          source?: string | null
+          to_currency?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -541,6 +574,111 @@ export type Database = {
           },
         ]
       }
+      marketplace_invoices: {
+        Row: {
+          agent_id: string
+          amount_paid: number | null
+          billing_address: Json | null
+          created_at: string
+          currency: string
+          customer_id: string
+          customer_notes: string | null
+          discount_amount: number | null
+          due_date: string
+          id: string
+          invoice_number: string
+          issue_date: string
+          job_id: string
+          line_items: Json
+          notes: string | null
+          paid_at: string | null
+          payment_method: string | null
+          payment_terms: string | null
+          sent_at: string | null
+          status: string
+          stripe_invoice_id: string | null
+          subtotal: number
+          tax_amount: number | null
+          tax_details: Json | null
+          tax_rate: number | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          amount_paid?: number | null
+          billing_address?: Json | null
+          created_at?: string
+          currency?: string
+          customer_id: string
+          customer_notes?: string | null
+          discount_amount?: number | null
+          due_date: string
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          job_id: string
+          line_items?: Json
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_terms?: string | null
+          sent_at?: string | null
+          status?: string
+          stripe_invoice_id?: string | null
+          subtotal: number
+          tax_amount?: number | null
+          tax_details?: Json | null
+          tax_rate?: number | null
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          amount_paid?: number | null
+          billing_address?: Json | null
+          created_at?: string
+          currency?: string
+          customer_id?: string
+          customer_notes?: string | null
+          discount_amount?: number | null
+          due_date?: string
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          job_id?: string
+          line_items?: Json
+          notes?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          payment_terms?: string | null
+          sent_at?: string | null
+          status?: string
+          stripe_invoice_id?: string | null
+          subtotal?: number
+          tax_amount?: number | null
+          tax_details?: Json | null
+          tax_rate?: number | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_invoices_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_job_attachments: {
         Row: {
           created_at: string
@@ -605,10 +743,14 @@ export type Database = {
           funds_released: boolean | null
           funds_released_at: string | null
           id: string
+          installment_plan_id: string | null
           number_of_travelers: number | null
           paid_at: string | null
           payment_intent_id: string | null
+          payment_plan_enabled: boolean | null
           payment_status: string | null
+          refund_guarantee_enabled: boolean | null
+          refund_guarantee_id: string | null
           rejection_reason: string | null
           requirements: Json
           service_fee_collected: number | null
@@ -643,10 +785,14 @@ export type Database = {
           funds_released?: boolean | null
           funds_released_at?: string | null
           id?: string
+          installment_plan_id?: string | null
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_intent_id?: string | null
+          payment_plan_enabled?: boolean | null
           payment_status?: string | null
+          refund_guarantee_enabled?: boolean | null
+          refund_guarantee_id?: string | null
           rejection_reason?: string | null
           requirements: Json
           service_fee_collected?: number | null
@@ -681,10 +827,14 @@ export type Database = {
           funds_released?: boolean | null
           funds_released_at?: string | null
           id?: string
+          installment_plan_id?: string | null
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_intent_id?: string | null
+          payment_plan_enabled?: boolean | null
           payment_status?: string | null
+          refund_guarantee_enabled?: boolean | null
+          refund_guarantee_id?: string | null
           rejection_reason?: string | null
           requirements?: Json
           service_fee_collected?: number | null
@@ -703,6 +853,20 @@ export type Database = {
             columns: ["assigned_agent_id"]
             isOneToOne: false
             referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_jobs_installment_plan_id_fkey"
+            columns: ["installment_plan_id"]
+            isOneToOne: false
+            referencedRelation: "payment_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_jobs_refund_guarantee_id_fkey"
+            columns: ["refund_guarantee_id"]
+            isOneToOne: false
+            referencedRelation: "refund_guarantees"
             referencedColumns: ["id"]
           },
         ]
@@ -740,6 +904,142 @@ export type Database = {
             foreignKeyName: "marketplace_messages_job_id_fkey"
             columns: ["job_id"]
             isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_milestones: {
+        Row: {
+          amount: number
+          approved_at: string | null
+          approved_by: string | null
+          created_at: string
+          currency: string
+          deliverables: Json | null
+          description: string | null
+          due_date: string | null
+          id: string
+          job_id: string
+          milestone_number: number
+          notes: string | null
+          paid_at: string | null
+          payment_intent_id: string | null
+          percentage: number | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          currency?: string
+          deliverables?: Json | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          job_id: string
+          milestone_number: number
+          notes?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          percentage?: number | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          created_at?: string
+          currency?: string
+          deliverables?: Json | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          job_id?: string
+          milestone_number?: number
+          notes?: string | null
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          percentage?: number | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_milestones_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_plans: {
+        Row: {
+          auto_charge: boolean | null
+          created_at: string
+          currency: string
+          end_date: string
+          frequency: string
+          id: string
+          installment_amount: number
+          installments_paid: number | null
+          job_id: string
+          next_payment_date: string | null
+          number_of_installments: number
+          start_date: string
+          status: string
+          stripe_subscription_id: string | null
+          total_amount: number
+          updated_at: string
+        }
+        Insert: {
+          auto_charge?: boolean | null
+          created_at?: string
+          currency?: string
+          end_date: string
+          frequency: string
+          id?: string
+          installment_amount: number
+          installments_paid?: number | null
+          job_id: string
+          next_payment_date?: string | null
+          number_of_installments: number
+          start_date: string
+          status?: string
+          stripe_subscription_id?: string | null
+          total_amount: number
+          updated_at?: string
+        }
+        Update: {
+          auto_charge?: boolean | null
+          created_at?: string
+          currency?: string
+          end_date?: string
+          frequency?: string
+          id?: string
+          installment_amount?: number
+          installments_paid?: number | null
+          job_id?: string
+          next_payment_date?: string | null
+          number_of_installments?: number
+          start_date?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          total_amount?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_plans_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
             referencedRelation: "marketplace_jobs"
             referencedColumns: ["id"]
           },
@@ -807,6 +1107,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          billing_address: Json | null
           bio: string | null
           country: string | null
           created_at: string
@@ -816,12 +1117,15 @@ export type Database = {
           last_name: string | null
           phone: string | null
           preferences: Json | null
+          preferred_currency: string | null
           sms_notifications: boolean | null
+          tax_id: string | null
           updated_at: string
           username: string | null
         }
         Insert: {
           avatar_url?: string | null
+          billing_address?: Json | null
           bio?: string | null
           country?: string | null
           created_at?: string
@@ -831,12 +1135,15 @@ export type Database = {
           last_name?: string | null
           phone?: string | null
           preferences?: Json | null
+          preferred_currency?: string | null
           sms_notifications?: boolean | null
+          tax_id?: string | null
           updated_at?: string
           username?: string | null
         }
         Update: {
           avatar_url?: string | null
+          billing_address?: Json | null
           bio?: string | null
           country?: string | null
           created_at?: string
@@ -846,11 +1153,87 @@ export type Database = {
           last_name?: string | null
           phone?: string | null
           preferences?: Json | null
+          preferred_currency?: string | null
           sms_notifications?: boolean | null
+          tax_id?: string | null
           updated_at?: string
           username?: string | null
         }
         Relationships: []
+      }
+      refund_guarantees: {
+        Row: {
+          claim_amount: number | null
+          claim_deadline: string | null
+          claim_reason: string | null
+          claimed_at: string | null
+          claimed_by: string | null
+          coverage_percentage: number
+          covered_amount: number
+          created_at: string
+          currency: string
+          guarantee_type: string
+          id: string
+          job_id: string
+          refund_processed: boolean | null
+          refund_processed_at: string | null
+          status: string
+          terms_and_conditions: string
+          updated_at: string
+          valid_from: string
+          valid_until: string
+        }
+        Insert: {
+          claim_amount?: number | null
+          claim_deadline?: string | null
+          claim_reason?: string | null
+          claimed_at?: string | null
+          claimed_by?: string | null
+          coverage_percentage?: number
+          covered_amount: number
+          created_at?: string
+          currency?: string
+          guarantee_type: string
+          id?: string
+          job_id: string
+          refund_processed?: boolean | null
+          refund_processed_at?: string | null
+          status?: string
+          terms_and_conditions: string
+          updated_at?: string
+          valid_from?: string
+          valid_until: string
+        }
+        Update: {
+          claim_amount?: number | null
+          claim_deadline?: string | null
+          claim_reason?: string | null
+          claimed_at?: string | null
+          claimed_by?: string | null
+          coverage_percentage?: number
+          covered_amount?: number
+          created_at?: string
+          currency?: string
+          guarantee_type?: string
+          id?: string
+          job_id?: string
+          refund_processed?: boolean | null
+          refund_processed_at?: string | null
+          status?: string
+          terms_and_conditions?: string
+          updated_at?: string
+          valid_from?: string
+          valid_until?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_guarantees_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: true
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       search_history: {
         Row: {
@@ -1543,9 +1926,17 @@ export type Database = {
         }
         Returns: Json
       }
+      convert_currency: {
+        Args: { amount: number; from_curr: string; to_curr: string }
+        Returns: number
+      }
       expire_old_marketplace_jobs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      generate_invoice_number: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       has_role: {
         Args: {
