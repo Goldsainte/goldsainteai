@@ -22,6 +22,7 @@ import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager"
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { PaymentPlanSelector } from "@/components/PaymentPlanSelector";
 import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
+import { AIAgentMatching } from "@/components/AIAgentMatching";
 
 export default function Marketplace() {
   const { user } = useAuth();
@@ -463,6 +464,16 @@ export default function Marketplace() {
                 </div>
               </div>
             </div>
+
+            {/* AI Agent Matching - Show for open jobs */}
+            {selectedJob?.status === 'open' && (
+              <AIAgentMatching
+                jobId={selectedJob.id}
+                onSelectAgent={(agentId) => {
+                  navigate(`/agents/${agentId}`);
+                }}
+              />
+            )}
 
             <JobBidsReview
               jobId={selectedJob?.id}

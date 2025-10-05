@@ -264,6 +264,104 @@ export type Database = {
           },
         ]
       }
+      ai_matching_scores: {
+        Row: {
+          agent_id: string
+          confidence_level: string
+          created_at: string
+          id: string
+          job_id: string
+          match_score: number
+          matching_factors: Json | null
+        }
+        Insert: {
+          agent_id: string
+          confidence_level: string
+          created_at?: string
+          id?: string
+          job_id: string
+          match_score: number
+          matching_factors?: Json | null
+        }
+        Update: {
+          agent_id?: string
+          confidence_level?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          match_score?: number
+          matching_factors?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_matching_scores_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_matching_scores_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      auto_assignment_rules: {
+        Row: {
+          agent_id: string
+          auto_accept: boolean | null
+          booking_types: string[] | null
+          created_at: string
+          destinations: string[] | null
+          id: string
+          is_active: boolean | null
+          max_budget: number | null
+          min_budget: number | null
+          priority: number | null
+          specializations: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          auto_accept?: boolean | null
+          booking_types?: string[] | null
+          created_at?: string
+          destinations?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          max_budget?: number | null
+          min_budget?: number | null
+          priority?: number | null
+          specializations?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          auto_accept?: boolean | null
+          booking_types?: string[] | null
+          created_at?: string
+          destinations?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          max_budget?: number | null
+          min_budget?: number | null
+          priority?: number | null
+          specializations?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_assignment_rules_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_modifications: {
         Row: {
           amadeus_order_id: string | null
@@ -439,6 +537,51 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_reports: {
+        Row: {
+          columns: string[] | null
+          created_at: string
+          description: string | null
+          filters: Json | null
+          id: string
+          is_active: boolean | null
+          last_generated_at: string | null
+          name: string
+          report_type: string
+          schedule: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          columns?: string[] | null
+          created_at?: string
+          description?: string | null
+          filters?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_generated_at?: string | null
+          name: string
+          report_type: string
+          schedule?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          columns?: string[] | null
+          created_at?: string
+          description?: string | null
+          filters?: Json | null
+          id?: string
+          is_active?: boolean | null
+          last_generated_at?: string | null
+          name?: string
+          report_type?: string
+          schedule?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -556,6 +699,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      loyalty_points: {
+        Row: {
+          created_at: string
+          id: string
+          lifetime_points: number
+          points_balance: number
+          tier: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lifetime_points?: number
+          points_balance?: number
+          tier?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lifetime_points?: number
+          points_balance?: number
+          tier?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       marketplace_disputes: {
         Row: {
@@ -1140,6 +1313,39 @@ export type Database = {
           },
         ]
       }
+      points_transactions: {
+        Row: {
+          created_at: string
+          id: string
+          points_amount: number
+          reason: string
+          related_entity_id: string | null
+          related_entity_type: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_amount: number
+          reason: string
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_amount?: number
+          reason?: string
+          related_entity_id?: string | null
+          related_entity_type?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -1194,6 +1400,141 @@ export type Database = {
           tax_id?: string | null
           updated_at?: string
           username?: string | null
+        }
+        Relationships: []
+      }
+      promo_code_usage: {
+        Row: {
+          currency: string
+          discount_applied: number
+          id: string
+          job_id: string | null
+          promo_code_id: string
+          used_at: string
+          user_id: string
+        }
+        Insert: {
+          currency?: string
+          discount_applied: number
+          id?: string
+          job_id?: string | null
+          promo_code_id: string
+          used_at?: string
+          user_id: string
+        }
+        Update: {
+          currency?: string
+          discount_applied?: number
+          id?: string
+          job_id?: string | null
+          promo_code_id?: string
+          used_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promo_code_usage_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "promo_code_usage_promo_code_id_fkey"
+            columns: ["promo_code_id"]
+            isOneToOne: false
+            referencedRelation: "promotional_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      promotional_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          description: string | null
+          discount_type: string
+          discount_value: number
+          id: string
+          is_active: boolean | null
+          max_uses: number | null
+          min_order_value: number | null
+          updated_at: string
+          uses_count: number | null
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_order_value?: number | null
+          updated_at?: string
+          uses_count?: number | null
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          id?: string
+          is_active?: boolean | null
+          max_uses?: number | null
+          min_order_value?: number | null
+          updated_at?: string
+          uses_count?: number | null
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          referral_code: string
+          referred_id: string
+          referred_points_earned: number | null
+          referrer_id: string
+          referrer_points_earned: number | null
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_id: string
+          referred_points_earned?: number | null
+          referrer_id: string
+          referrer_points_earned?: number | null
+          status?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_id?: string
+          referred_points_earned?: number | null
+          referrer_id?: string
+          referrer_points_earned?: number | null
+          status?: string
         }
         Relationships: []
       }
@@ -2060,6 +2401,16 @@ export type Database = {
       }
     }
     Functions: {
+      award_loyalty_points: {
+        Args: {
+          entity_id?: string
+          entity_type?: string
+          points: number
+          target_user_id: string
+          transaction_reason: string
+        }
+        Returns: boolean
+      }
       calculate_agent_trust_score: {
         Args: { agent_uuid: string }
         Returns: number
@@ -2072,6 +2423,10 @@ export type Database = {
         }
         Returns: Json
       }
+      calculate_loyalty_tier: {
+        Args: { lifetime_points_value: number }
+        Returns: string
+      }
       convert_currency: {
         Args: { amount: number; from_curr: string; to_curr: string }
         Returns: number
@@ -2079,6 +2434,16 @@ export type Database = {
       expire_old_marketplace_jobs: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      find_matching_agents: {
+        Args: { limit_count?: number; target_job_id: string }
+        Returns: {
+          agency_name: string
+          agent_id: string
+          confidence_level: string
+          match_score: number
+          rating: number
+        }[]
       }
       generate_invoice_number: {
         Args: Record<PropertyKey, never>
