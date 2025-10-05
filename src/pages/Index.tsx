@@ -845,7 +845,7 @@ const Index = () => {
                     
                     {/* Center top - Beach with image */}
                     <div className="absolute top-12 sm:top-16 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '1.5s' }}>
-                      <div className="relative w-26 h-26 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
+                      <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={amalfiCoast} 
                           alt="Beach Getaways" 
@@ -860,7 +860,7 @@ const Index = () => {
                     
                     {/* Right - Wildlife with image */}
                     <div className="absolute top-24 sm:top-28 right-0 animate-float z-10" style={{ animationDelay: '2s' }}>
-                      <div className="relative w-26 h-26 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
+                      <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={destination8} 
                           alt="Wildlife" 
@@ -875,7 +875,7 @@ const Index = () => {
                     
                     {/* Bottom right - Fine Dining with image */}
                     <div className="absolute bottom-28 sm:bottom-32 right-0 animate-float z-10" style={{ animationDelay: '2.5s' }}>
-                      <div className="relative w-26 h-26 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
+                      <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={restaurant1} 
                           alt="Fine Dining" 
