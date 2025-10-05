@@ -798,7 +798,7 @@ const Index = () => {
                     
                     {/* Category cards with images - positioned organically */}
                     {/* Top left - Spa/Wellness with image */}
-                    <div className="absolute top-0 left-0 animate-float z-10">
+                    <div className="absolute top-[60px] sm:top-[80px] md:top-[100px] left-[20px] sm:left-[30px] md:left-[40px] animate-float z-10">
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={spaWellness} 
@@ -814,7 +814,7 @@ const Index = () => {
                     </div>
                     
                     {/* Top right - Theater with image */}
-                    <div className="absolute top-4 right-2 sm:right-8 animate-float z-10" style={{ animationDelay: '0.5s' }}>
+                    <div className="absolute top-[60px] sm:top-[80px] md:top-[100px] right-[20px] sm:right-[30px] md:right-[40px] animate-float z-10" style={{ animationDelay: '0.5s' }}>
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={luxuryEvents} 
@@ -829,7 +829,7 @@ const Index = () => {
                     </div>
                     
                     {/* Left - Luxury Resorts with image */}
-                    <div className="absolute top-20 sm:top-24 left-0 animate-float z-10" style={{ animationDelay: '1s' }}>
+                    <div className="absolute top-[140px] sm:top-[180px] md:top-[220px] left-[10px] sm:left-[20px] md:left-[30px] animate-float z-10" style={{ animationDelay: '1s' }}>
                       <div className="relative w-28 h-28 sm:w-36 sm:h-36 md:w-48 md:h-48 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={maldivesTropical} 
@@ -844,7 +844,7 @@ const Index = () => {
                     </div>
                     
                     {/* Center top - Beach with image */}
-                    <div className="absolute top-12 sm:top-16 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '1.5s' }}>
+                    <div className="absolute top-[20px] sm:top-[30px] md:top-[40px] left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '1.5s' }}>
                       <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={amalfiCoast} 
@@ -859,7 +859,7 @@ const Index = () => {
                     </div>
                     
                     {/* Right - Wildlife with image */}
-                    <div className="absolute top-24 sm:top-28 right-0 animate-float z-10" style={{ animationDelay: '2s' }}>
+                    <div className="absolute top-[140px] sm:top-[180px] md:top-[220px] right-[10px] sm:right-[20px] md:right-[30px] animate-float z-10" style={{ animationDelay: '2s' }}>
                       <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={destination8} 
@@ -874,7 +874,7 @@ const Index = () => {
                     </div>
                     
                     {/* Bottom right - Fine Dining with image */}
-                    <div className="absolute bottom-28 sm:bottom-32 right-0 animate-float z-10" style={{ animationDelay: '2.5s' }}>
+                    <div className="absolute bottom-[140px] sm:bottom-[180px] md:bottom-[220px] right-[10px] sm:right-[20px] md:right-[30px] animate-float z-10" style={{ animationDelay: '2.5s' }}>
                       <div className="relative w-24 h-24 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={restaurant1} 
@@ -889,7 +889,7 @@ const Index = () => {
                     </div>
                     
                     {/* Bottom left - Historical Tours with image */}
-                    <div className="absolute bottom-24 sm:bottom-28 left-2 sm:left-4 animate-float z-10" style={{ animationDelay: '3s' }}>
+                    <div className="absolute bottom-[140px] sm:bottom-[180px] md:bottom-[220px] left-[10px] sm:left-[20px] md:left-[30px] animate-float z-10" style={{ animationDelay: '3s' }}>
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={parisUrban} 
@@ -904,7 +904,7 @@ const Index = () => {
                     </div>
                     
                     {/* Bottom center - Water Sports with image */}
-                    <div className="absolute bottom-8 sm:bottom-12 right-12 sm:right-20 animate-float z-10" style={{ animationDelay: '3.5s' }}>
+                    <div className="absolute bottom-[60px] sm:bottom-[80px] md:bottom-[100px] right-[60px] sm:right-[90px] md:right-[120px] animate-float z-10" style={{ animationDelay: '3.5s' }}>
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={icelandNorthernLights} 
@@ -919,7 +919,7 @@ const Index = () => {
                     </div>
                     
                     {/* Bottom - Cycling with image */}
-                    <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
+                    <div className="absolute bottom-[20px] sm:bottom-[30px] md:bottom-[40px] left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
                       <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={cyclingTour} 
