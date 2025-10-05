@@ -90,7 +90,7 @@ export const Header = () => {
           </a>
 
           {/* Compact Search Bar - Center (desktop and mobile) */}
-          <div className="flex-1 flex justify-center mx-2 sm:mx-4 max-w-2xl">
+          <div className="flex-1 flex justify-center mx-2 sm:mx-4 max-w-5xl">
             <CompactHeaderSearch />
           </div>
 
