@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -79,6 +79,7 @@ interface SearchResult {
 
 const Index = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -120,6 +121,22 @@ const Index = () => {
     "Join a planned excursion — guided by experts, powered by Goldsainte.",
     "Need more than a booking? Match with expert travel agents in minutes."
   ];
+
+  // Handle service query parameter from Header
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const service = params.get('service');
+    
+    if (service && ['hotels', 'flights', 'restaurants', 'events', 'cars'].includes(service)) {
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Trigger the quick action after a short delay
+      setTimeout(() => {
+        handleQuickAction(service);
+      }, 300);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
 
   // Rotating messages effect
   useEffect(() => {
@@ -735,62 +752,8 @@ const Index = () => {
                   </Button>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 px-2 md:px-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickAction('hotels')}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
-                  >
-                    <Hotel className="h-4 w-4" />
-                    Hotels
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickAction('flights')}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
-                  >
-                    <Plane className="h-4 w-4" />
-                    Flights
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickAction('restaurants')}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
-                  >
-                    <UtensilsCrossed className="h-4 w-4" />
-                    Restaurants
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickAction('events')}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
-                  >
-                    <Ticket className="h-4 w-4" />
-                    Events
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickAction('cars')}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
-                  >
-                    <Car className="h-4 w-4" />
-                    Car Rentals
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => navigate('/browse-agents')}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
-                  >
-                    <Briefcase className="h-4 w-4" />
-                    Travel Agents
-                  </Button>
+                {/* What Goldsainte.AI can do button */}
+                <div className="flex items-center justify-center px-2 md:px-0">
                   <Button
                     variant="outline"
                     size="sm"
