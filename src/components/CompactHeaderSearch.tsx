@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, MapPin, Calendar, User, Plane, Hotel, Car, Plus, Minus, PawPrint, Ticket } from "lucide-react";
+import { Search, MapPin, Calendar, User, Plane, Hotel, Car, Plus, Minus, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 export const CompactHeaderSearch = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [searchType, setSearchType] = useState<"flights" | "hotels" | "cars" | "events">("hotels");
+  const [searchType, setSearchType] = useState<"flights" | "hotels" | "cars">("hotels");
   
   // Common fields
   const [location, setLocation] = useState("");
@@ -91,7 +91,7 @@ export const CompactHeaderSearch = () => {
             <div className="h-6 w-px bg-border" />
             <span className="font-medium">{checkInDate ? format(checkInDate, "MMM d") : "When"}</span>
             <div className="h-6 w-px bg-border" />
-            <span className="font-medium">{searchType === "hotels" ? "Hotels" : searchType === "flights" ? "Flights" : searchType === "cars" ? "Cars" : "Events"}</span>
+            <span className="font-medium">{searchType === "hotels" ? "Hotels" : searchType === "flights" ? "Flights" : "Cars"}</span>
             <div className="h-6 w-px bg-border" />
             <span className="text-muted-foreground">{totalGuests > 0 ? getGuestText() : "Who"}</span>
           </div>
@@ -302,12 +302,6 @@ export const CompactHeaderSearch = () => {
                   <div className="flex items-center gap-2">
                     <Car className="h-4 w-4" />
                     <span>Car Rentals</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value="events">
-                  <div className="flex items-center gap-2">
-                    <Ticket className="h-4 w-4" />
-                    <span>Events</span>
                   </div>
                 </SelectItem>
               </SelectContent>
