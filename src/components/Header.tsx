@@ -134,6 +134,15 @@ export const Header = () => {
               variant="ghost" 
               size="sm"
               className="hidden sm:flex gap-2 text-sm font-medium hover:bg-muted rounded-full"
+              onClick={() => navigate('/marketplace')}
+            >
+              Marketplace
+            </Button>
+            
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="hidden sm:flex gap-2 text-sm font-medium hover:bg-muted rounded-full"
               onClick={() => navigate('/agent-onboarding')}
             >
               Become an Agent
