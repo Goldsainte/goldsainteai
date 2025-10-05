@@ -172,6 +172,62 @@ export type Database = {
           },
         ]
       }
+      agent_verification_requests: {
+        Row: {
+          additional_info: Json | null
+          agent_id: string
+          created_at: string
+          document_urls: Json | null
+          expiry_date: string | null
+          id: string
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitted_at: string
+          updated_at: string
+          verification_type: string
+        }
+        Insert: {
+          additional_info?: Json | null
+          agent_id: string
+          created_at?: string
+          document_urls?: Json | null
+          expiry_date?: string | null
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          verification_type: string
+        }
+        Update: {
+          additional_info?: Json | null
+          agent_id?: string
+          created_at?: string
+          document_urls?: Json | null
+          expiry_date?: string | null
+          id?: string
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitted_at?: string
+          updated_at?: string
+          verification_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_verification_requests_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       booking_modifications: {
         Row: {
           amadeus_order_id: string | null
@@ -828,6 +884,9 @@ export type Database = {
           accepted_vendor: boolean | null
           accreditations: string | null
           agency_name: string
+          background_check_date: string | null
+          background_check_provider: string | null
+          background_check_status: string | null
           beneficiary_name: string | null
           bio: string | null
           business_address: string | null
@@ -843,6 +902,14 @@ export type Database = {
           email_notifications_enabled: boolean | null
           experience_years: number | null
           id: string
+          identity_document_url: string | null
+          identity_verification_date: string | null
+          identity_verified: boolean | null
+          insurance_document_url: string | null
+          insurance_expiry: string | null
+          insurance_policy_number: string | null
+          insurance_provider: string | null
+          insurance_verified: boolean | null
           inventory_management: string | null
           is_active: boolean | null
           is_verified: boolean | null
@@ -853,8 +920,13 @@ export type Database = {
           preferred_currency: string | null
           primary_contact_name: string | null
           primary_contact_title: string | null
+          professional_license_document_url: string | null
+          professional_license_expiry: string | null
+          professional_license_number: string | null
+          professional_license_verified: boolean | null
           profile_image_url: string | null
           rating: number | null
+          selfie_verification_url: string | null
           service_types: string[] | null
           sms_notifications_enabled: boolean | null
           social_media: string | null
@@ -867,6 +939,7 @@ export type Database = {
           tax_id: string | null
           time_zone: string | null
           total_reviews: number | null
+          trust_score: number | null
           updated_at: string
           user_id: string
           website: string | null
@@ -880,6 +953,9 @@ export type Database = {
           accepted_vendor?: boolean | null
           accreditations?: string | null
           agency_name: string
+          background_check_date?: string | null
+          background_check_provider?: string | null
+          background_check_status?: string | null
           beneficiary_name?: string | null
           bio?: string | null
           business_address?: string | null
@@ -895,6 +971,14 @@ export type Database = {
           email_notifications_enabled?: boolean | null
           experience_years?: number | null
           id?: string
+          identity_document_url?: string | null
+          identity_verification_date?: string | null
+          identity_verified?: boolean | null
+          insurance_document_url?: string | null
+          insurance_expiry?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          insurance_verified?: boolean | null
           inventory_management?: string | null
           is_active?: boolean | null
           is_verified?: boolean | null
@@ -905,8 +989,13 @@ export type Database = {
           preferred_currency?: string | null
           primary_contact_name?: string | null
           primary_contact_title?: string | null
+          professional_license_document_url?: string | null
+          professional_license_expiry?: string | null
+          professional_license_number?: string | null
+          professional_license_verified?: boolean | null
           profile_image_url?: string | null
           rating?: number | null
+          selfie_verification_url?: string | null
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
           social_media?: string | null
@@ -919,6 +1008,7 @@ export type Database = {
           tax_id?: string | null
           time_zone?: string | null
           total_reviews?: number | null
+          trust_score?: number | null
           updated_at?: string
           user_id: string
           website?: string | null
@@ -932,6 +1022,9 @@ export type Database = {
           accepted_vendor?: boolean | null
           accreditations?: string | null
           agency_name?: string
+          background_check_date?: string | null
+          background_check_provider?: string | null
+          background_check_status?: string | null
           beneficiary_name?: string | null
           bio?: string | null
           business_address?: string | null
@@ -947,6 +1040,14 @@ export type Database = {
           email_notifications_enabled?: boolean | null
           experience_years?: number | null
           id?: string
+          identity_document_url?: string | null
+          identity_verification_date?: string | null
+          identity_verified?: boolean | null
+          insurance_document_url?: string | null
+          insurance_expiry?: string | null
+          insurance_policy_number?: string | null
+          insurance_provider?: string | null
+          insurance_verified?: boolean | null
           inventory_management?: string | null
           is_active?: boolean | null
           is_verified?: boolean | null
@@ -957,8 +1058,13 @@ export type Database = {
           preferred_currency?: string | null
           primary_contact_name?: string | null
           primary_contact_title?: string | null
+          professional_license_document_url?: string | null
+          professional_license_expiry?: string | null
+          professional_license_number?: string | null
+          professional_license_verified?: boolean | null
           profile_image_url?: string | null
           rating?: number | null
+          selfie_verification_url?: string | null
           service_types?: string[] | null
           sms_notifications_enabled?: boolean | null
           social_media?: string | null
@@ -971,6 +1077,7 @@ export type Database = {
           tax_id?: string | null
           time_zone?: string | null
           total_reviews?: number | null
+          trust_score?: number | null
           updated_at?: string
           user_id?: string
           website?: string | null
@@ -1285,6 +1392,68 @@ export type Database = {
         }
         Relationships: []
       }
+      user_reports: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          evidence_urls: Json | null
+          id: string
+          report_category: string
+          report_type: string
+          reported_agent_id: string | null
+          reported_user_id: string
+          reporter_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          evidence_urls?: Json | null
+          id?: string
+          report_category: string
+          report_type: string
+          reported_agent_id?: string | null
+          reported_user_id: string
+          reporter_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          evidence_urls?: Json | null
+          id?: string
+          report_category?: string
+          report_type?: string
+          reported_agent_id?: string | null
+          reported_user_id?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_reports_reported_agent_id_fkey"
+            columns: ["reported_agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1362,6 +1531,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_agent_trust_score: {
+        Args: { agent_uuid: string }
+        Returns: number
+      }
       calculate_bid_pricing: {
         Args: {
           agent_price: number

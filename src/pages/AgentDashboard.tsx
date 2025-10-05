@@ -19,6 +19,7 @@ import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
 import { JobCompletionModal } from "@/components/JobCompletionModal";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
 import { AgentAnalyticsDashboard } from "@/components/AgentAnalyticsDashboard";
+import { AgentVerificationUpload } from "@/components/AgentVerificationUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function AgentDashboard() {
@@ -34,6 +35,13 @@ export default function AgentDashboard() {
   const [selectedJobForMessaging, setSelectedJobForMessaging] = useState<any>(null);
   const [completionModalOpen, setCompletionModalOpen] = useState(false);
   const [completionJob, setCompletionJob] = useState<any>(null);
+  const [verificationStatus, setVerificationStatus] = useState({
+    identity_verified: false,
+    background_check_status: "not_started",
+    professional_license_verified: false,
+    insurance_verified: false,
+    trust_score: 0,
+  });
 
   useEffect(() => {
     if (!user) {
@@ -56,6 +64,14 @@ export default function AgentDashboard() {
 
       if (agentError) throw agentError;
       setAgent(agentData);
+      
+      setVerificationStatus({
+        identity_verified: agentData.identity_verified || false,
+        background_check_status: agentData.background_check_status || "not_started",
+        professional_license_verified: agentData.professional_license_verified || false,
+        insurance_verified: agentData.insurance_verified || false,
+        trust_score: agentData.trust_score || 0,
+      });
 
       const { data: jobsData, error: jobsError } = await supabase
         .from('marketplace_jobs')
@@ -206,6 +222,8 @@ export default function AgentDashboard() {
             <TabsTrigger value="available">Available Jobs ({jobs.length})</TabsTrigger>
             <TabsTrigger value="my-bids">My Bids ({myBids.length})</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="availability">Availability</TabsTrigger>
+            <TabsTrigger value="verification">Verification</TabsTrigger>
           </TabsList>
 
           <TabsContent value="available" className="space-y-4">
@@ -359,6 +377,16 @@ export default function AgentDashboard() {
             <TabsContent value="analytics">
               {agent && (
                 <AgentAnalyticsDashboard agentId={agent.id} />
+              )}
+            </TabsContent>
+
+            <TabsContent value="verification">
+              {agent && (
+                <AgentVerificationUpload
+                  agentId={agent.id}
+                  status={verificationStatus}
+                  onVerificationSubmit={fetchData}
+                />
               )}
             </TabsContent>
           </Tabs>

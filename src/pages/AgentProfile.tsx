@@ -8,10 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Star, MapPin, Briefcase, Award, Clock, CheckCircle, ArrowLeft, Globe, Mail, Phone } from "lucide-react";
+import { Star, MapPin, Briefcase, Award, Clock, CheckCircle, ArrowLeft, Globe, Mail, Phone, Flag } from "lucide-react";
 import { toast } from "sonner";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
+import { TrustBadges } from "@/components/TrustBadges";
+import { ReportUserModal } from "@/components/ReportUserModal";
 
 export default function AgentProfile() {
   const { agentId } = useParams();
@@ -20,6 +22,7 @@ export default function AgentProfile() {
   const [reviews, setReviews] = useState<any[]>([]);
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
     if (agentId) {
@@ -154,14 +157,21 @@ export default function AgentProfile() {
                     </p>
                   )}
 
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1">
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-center gap-2">
                       <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold">{agent.rating || 0}</span>
+                      <span className="text-2xl font-bold">{agent.rating?.toFixed(1) || "N/A"}</span>
+                      <span className="text-muted-foreground">({agent.total_reviews || 0} reviews)</span>
                     </div>
-                    <span className="text-sm text-muted-foreground">
-                      ({agent.total_reviews || 0} reviews)
-                    </span>
+                    
+                    <TrustBadges
+                      identityVerified={agent.identity_verified}
+                      backgroundCheckStatus={agent.background_check_status}
+                      professionalLicenseVerified={agent.professional_license_verified}
+                      insuranceVerified={agent.insurance_verified}
+                      trustScore={agent.trust_score}
+                      size="md"
+                    />
                   </div>
 
                   {agent.is_verified && (
@@ -175,9 +185,19 @@ export default function AgentProfile() {
                     {agent.bio || 'No bio available'}
                   </p>
 
-                  <Button className="w-full" onClick={() => navigate('/marketplace')}>
-                    Request Service
-                  </Button>
+                  <div className="space-y-2 w-full">
+                    <Button className="w-full" onClick={() => navigate('/marketplace')}>
+                      Request Service
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setShowReportModal(true)}
+                    >
+                      <Flag className="h-4 w-4 mr-2" />
+                      Report Agent
+                    </Button>
+                  </div>
                 </div>
 
                 <Separator className="my-6" />
@@ -352,6 +372,15 @@ export default function AgentProfile() {
       </main>
 
       <Footer />
+      
+      {agent && (
+        <ReportUserModal
+          open={showReportModal}
+          onOpenChange={setShowReportModal}
+          reportedUserId={agent.user_id}
+          reportedAgentId={agent.id}
+        />
+      )}
     </div>
   );
 }
