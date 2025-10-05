@@ -471,13 +471,17 @@ const Index = () => {
         setTimeout(() => setShowCuisineSelector(true), 500);
       }
       
-      // Check if AI is asking about trip type
+      // Check if AI is asking about trip type - only for cars after location is provided
       if (aiMessage.includes('one-way flight or a round-trip') ||
           aiMessage.includes('one-way or round-trip') ||
           aiMessage.includes('would you like a one-way') ||
           aiMessage.includes('one-way rental or round-trip') ||
           aiMessage.includes('is this a one-way rental')) {
-        if (!tripTypeResolvedRef.current && !showTripTypeSelector) {
+        // Only show selector if we have location data (step > 1) or it's a flight
+        const isCarWithLocation = activeQuickLink === 'cars' && data.quickLinkState?.step >= 2;
+        const isFlightQuestion = aiMessage.includes('flight');
+        
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector && (isCarWithLocation || isFlightQuestion)) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }
