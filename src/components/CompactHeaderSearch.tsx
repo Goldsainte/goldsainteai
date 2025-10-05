@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Search, MapPin, Calendar, User, Plane, Hotel, Car } from "lucide-react";
+import { Search, MapPin, Calendar, User, Plane, Hotel, Car, Plus, Minus, PawPrint } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 import { cn } from "@/lib/utils";
@@ -16,49 +17,43 @@ export const CompactHeaderSearch = () => {
   const [open, setOpen] = useState(false);
   const [searchType, setSearchType] = useState<"flights" | "hotels" | "cars">("hotels");
   
-  // Hotels
-  const [hotelLocation, setHotelLocation] = useState("");
-  const [hotelCheckIn, setHotelCheckIn] = useState<Date>();
-  const [hotelCheckOut, setHotelCheckOut] = useState<Date>();
-  const [hotelGuests, setHotelGuests] = useState(2);
+  // Common fields
+  const [location, setLocation] = useState("");
+  const [checkInDate, setCheckInDate] = useState<Date>();
+  const [checkOutDate, setCheckOutDate] = useState<Date>();
   
-  // Flights
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
-  const [departureDate, setDepartureDate] = useState<Date>();
-  const [returnDate, setReturnDate] = useState<Date>();
-  const [passengers, setPassengers] = useState(1);
+  // Guest details (like Airbnb)
+  const [guests, setGuests] = useState({
+    adults: 1,
+    children: 0,
+    infants: 0,
+    pets: 0
+  });
   
-  // Cars
-  const [pickupLocation, setPickupLocation] = useState("");
-  const [dropoffLocation, setDropoffLocation] = useState("");
-  const [pickupDate, setPickupDate] = useState<Date>();
-  const [returnDateCar, setReturnDateCar] = useState<Date>();
+  const [showGuestPopover, setShowGuestPopover] = useState(false);
+
+  const totalGuests = guests.adults + guests.children + guests.infants;
+  
+  const getGuestText = () => {
+    if (totalGuests === 0) return "Add guests";
+    const parts = [];
+    if (guests.adults > 0) parts.push(`${guests.adults} adult${guests.adults > 1 ? 's' : ''}`);
+    if (guests.children > 0) parts.push(`${guests.children} child${guests.children > 1 ? 'ren' : ''}`);
+    if (guests.infants > 0) parts.push(`${guests.infants} infant${guests.infants > 1 ? 's' : ''}`);
+    if (guests.pets > 0) parts.push(`${guests.pets} pet${guests.pets > 1 ? 's' : ''}`);
+    return parts.join(", ");
+  };
 
   const handleSearch = () => {
     const params = new URLSearchParams();
+    params.set("type", searchType);
     
-    if (searchType === "hotels") {
-      params.set("type", "hotels");
-      if (hotelLocation) params.set("location", hotelLocation);
-      if (hotelCheckIn) params.set("checkIn", format(hotelCheckIn, "yyyy-MM-dd"));
-      if (hotelCheckOut) params.set("checkOut", format(hotelCheckOut, "yyyy-MM-dd"));
-      params.set("adults", hotelGuests.toString());
-      params.set("rooms", "1");
-    } else if (searchType === "flights") {
-      params.set("type", "flights");
-      if (origin) params.set("origin", origin);
-      if (destination) params.set("destination", destination);
-      if (departureDate) params.set("departureDate", format(departureDate, "yyyy-MM-dd"));
-      if (returnDate) params.set("returnDate", format(returnDate, "yyyy-MM-dd"));
-      params.set("adults", passengers.toString());
-    } else if (searchType === "cars") {
-      params.set("type", "cars");
-      if (pickupLocation) params.set("pickup", pickupLocation);
-      if (dropoffLocation) params.set("dropoff", dropoffLocation);
-      if (pickupDate) params.set("pickupDate", format(pickupDate, "yyyy-MM-dd"));
-      if (returnDateCar) params.set("returnDate", format(returnDateCar, "yyyy-MM-dd"));
-    }
+    if (location) params.set("location", location);
+    if (checkInDate) params.set("checkIn", format(checkInDate, "yyyy-MM-dd"));
+    if (checkOutDate) params.set("checkOut", format(checkOutDate, "yyyy-MM-dd"));
+    params.set("adults", guests.adults.toString());
+    params.set("children", guests.children.toString());
+    params.set("infants", guests.infants.toString());
 
     setOpen(false);
     navigate(`/search-results?${params.toString()}`);
@@ -72,218 +67,226 @@ export const CompactHeaderSearch = () => {
           className="hidden md:flex items-center gap-2 px-4 h-12 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background"
         >
           <div className="flex items-center gap-3 text-sm">
-            <span className="font-medium">Anywhere</span>
+            <span className="font-medium">{location || "Where"}</span>
             <div className="h-6 w-px bg-border" />
-            <span className="font-medium">Any week</span>
+            <span className="font-medium">{checkInDate ? format(checkInDate, "MMM d") : "When"}</span>
             <div className="h-6 w-px bg-border" />
-            <span className="text-muted-foreground">Add guests</span>
+            <span className="font-medium">{searchType === "hotels" ? "Hotels" : searchType === "flights" ? "Flights" : "Cars"}</span>
+            <div className="h-6 w-px bg-border" />
+            <span className="text-muted-foreground">{totalGuests > 0 ? getGuestText() : "Who"}</span>
           </div>
           <div className="ml-2 p-2 bg-primary rounded-full">
             <Search className="h-3 w-3 text-primary-foreground" />
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-5xl">
         <div className="space-y-6">
-          <Tabs value={searchType} onValueChange={(v) => setSearchType(v as any)}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="hotels" className="gap-2">
-                <Hotel className="h-4 w-4" />
-                Hotels
-              </TabsTrigger>
-              <TabsTrigger value="flights" className="gap-2">
-                <Plane className="h-4 w-4" />
-                Flights
-              </TabsTrigger>
-              <TabsTrigger value="cars" className="gap-2">
-                <Car className="h-4 w-4" />
-                Cars
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {searchType === "hotels" && (
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Where</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search destinations"
-                    value={hotelLocation}
-                    onChange={(e) => setHotelLocation(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Check in</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !hotelCheckIn && "text-muted-foreground")}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {hotelCheckIn ? format(hotelCheckIn, "PP") : "Add date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent mode="single" selected={hotelCheckIn} onSelect={setHotelCheckIn} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Check out</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !hotelCheckOut && "text-muted-foreground")}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {hotelCheckOut ? format(hotelCheckOut, "PP") : "Add date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent mode="single" selected={hotelCheckOut} onSelect={setHotelCheckOut} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Guests</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    min="1"
-                    value={hotelGuests}
-                    onChange={(e) => setHotelGuests(parseInt(e.target.value) || 1)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+          <div className="grid grid-cols-4 gap-4 bg-muted/50 p-4 rounded-2xl">
+            {/* Where */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground">Where</label>
+              <Input
+                placeholder="Search destinations"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="border-0 bg-background"
+              />
             </div>
-          )}
 
-          {searchType === "flights" && (
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">From</label>
-                <AirportAutocomplete
-                  value={origin}
-                  onChange={setOrigin}
-                  placeholder="Origin airport"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">To</label>
-                <AirportAutocomplete
-                  value={destination}
-                  onChange={setDestination}
-                  placeholder="Destination airport"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Departure</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !departureDate && "text-muted-foreground")}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {departureDate ? format(departureDate, "PP") : "Add date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent mode="single" selected={departureDate} onSelect={setDepartureDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Return</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !returnDate && "text-muted-foreground")}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {returnDate ? format(returnDate, "PP") : "Add date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent mode="single" selected={returnDate} onSelect={setReturnDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Passengers</label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="number"
-                    min="1"
-                    value={passengers}
-                    onChange={(e) => setPassengers(parseInt(e.target.value) || 1)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+            {/* When - Check in */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground">Check in</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className={cn("w-full justify-start text-left font-normal h-10 px-3 hover:bg-background bg-background", !checkInDate && "text-muted-foreground")}>
+                    {checkInDate ? format(checkInDate, "MMM d") : "Add dates"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent mode="single" selected={checkInDate} onSelect={setCheckInDate} className="pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
             </div>
-          )}
 
-          {searchType === "cars" && (
-            <div className="grid gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Pick-up location</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="City or airport"
-                    value={pickupLocation}
-                    onChange={(e) => setPickupLocation(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Drop-off location</label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="City or airport"
-                    value={dropoffLocation}
-                    onChange={(e) => setDropoffLocation(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Pick-up</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !pickupDate && "text-muted-foreground")}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {pickupDate ? format(pickupDate, "PP") : "Add date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent mode="single" selected={pickupDate} onSelect={setPickupDate} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Return</label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button variant="outline" className={cn("w-full justify-start text-left font-normal", !returnDateCar && "text-muted-foreground")}>
-                        <Calendar className="mr-2 h-4 w-4" />
-                        {returnDateCar ? format(returnDateCar, "PP") : "Add date"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <CalendarComponent mode="single" selected={returnDateCar} onSelect={setReturnDateCar} />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
+            {/* When - Check out */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground">Check out</label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className={cn("w-full justify-start text-left font-normal h-10 px-3 hover:bg-background bg-background", !checkOutDate && "text-muted-foreground")}>
+                    {checkOutDate ? format(checkOutDate, "MMM d") : "Add dates"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <CalendarComponent mode="single" selected={checkOutDate} onSelect={setCheckOutDate} className="pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
             </div>
-          )}
+
+            {/* Who */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-muted-foreground">Who</label>
+              <Popover open={showGuestPopover} onOpenChange={setShowGuestPopover}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" className="w-full justify-start text-left font-normal h-10 px-3 hover:bg-background bg-background text-muted-foreground">
+                    {totalGuests > 0 ? `${totalGuests} guest${totalGuests > 1 ? 's' : ''}` : "Add guests"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80 p-0" align="end">
+                  <div className="p-4 space-y-4">
+                    {/* Adults */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">Adults</div>
+                        <div className="text-sm text-muted-foreground">Ages 13 or above</div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, adults: Math.max(0, prev.adults - 1) }))}
+                          disabled={guests.adults === 0}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-8 text-center">{guests.adults}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, adults: prev.adults + 1 }))}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Children */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">Children</div>
+                        <div className="text-sm text-muted-foreground">Ages 2-12</div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, children: Math.max(0, prev.children - 1) }))}
+                          disabled={guests.children === 0}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-8 text-center">{guests.children}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, children: prev.children + 1 }))}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Infants */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">Infants</div>
+                        <div className="text-sm text-muted-foreground">Under 2</div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, infants: Math.max(0, prev.infants - 1) }))}
+                          disabled={guests.infants === 0}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-8 text-center">{guests.infants}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, infants: prev.infants + 1 }))}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Separator />
+
+                    {/* Pets */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="font-medium">Pets</div>
+                        <div className="text-sm text-muted-foreground">Bringing a service animal?</div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, pets: Math.max(0, prev.pets - 1) }))}
+                          disabled={guests.pets === 0}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-8 text-center">{guests.pets}</span>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 rounded-full"
+                          onClick={() => setGuests(prev => ({ ...prev, pets: prev.pets + 1 }))}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {/* Type of Service Selector */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Type of Service</label>
+            <Select value={searchType} onValueChange={(v) => setSearchType(v as any)}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hotels">
+                  <div className="flex items-center gap-2">
+                    <Hotel className="h-4 w-4" />
+                    <span>Hotels & Stays</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="flights">
+                  <div className="flex items-center gap-2">
+                    <Plane className="h-4 w-4" />
+                    <span>Flights</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="cars">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-4 w-4" />
+                    <span>Car Rentals</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
           <Button onClick={handleSearch} className="w-full" size="lg">
             <Search className="mr-2 h-4 w-4" />
