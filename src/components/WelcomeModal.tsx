@@ -22,13 +22,13 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             {/* Feature 1 */}
             <div className="flex gap-3 items-start">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <MessageCircle className="h-5 w-5 text-primary" />
+                <Sparkles className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-base">Ask anything. Plan everything.</h3>
+                <h3 className="font-semibold text-base">AI-powered search & planning.</h3>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Whether it's about where to go, when to go or how to get there, 
-                  Goldsainte.Ai is your go-to helper for luxury travel planning.
+                  Search flights, hotels, restaurants, events, and packages in one conversation. 
+                  Get personalized recommendations tailored to your style.
                 </p>
               </div>
             </div>
@@ -36,27 +36,27 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             {/* Feature 2 */}
             <div className="flex gap-3 items-start">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-primary" />
+                <Briefcase className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-base">Your whole trip in one smart chat.</h3>
+                <h3 className="font-semibold text-base">Expert travel agents on demand.</h3>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Goldsainte.Ai can search flights, hotels, restaurants, events, cars, 
-                  vacation packages or all of the above, in a single conversation.
+                  Post complex trips to our marketplace and get matched with certified agents. 
+                  Real-time chat, milestones, and secure payments included.
                 </p>
               </div>
             </div>
 
-            {/* Feature 3 - Travel Agent Marketplace */}
+            {/* Feature 3 */}
             <div className="flex gap-3 items-start">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Briefcase className="h-5 w-5 text-primary" />
+                <Heart className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-base">Expert agents for complex journeys.</h3>
+                <h3 className="font-semibold text-base">Instant booking with smart pricing.</h3>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Planning a multi-city adventure or intricate itinerary? Post your trip 
-                  to our marketplace and let certified travel experts craft your perfect journey.
+                  Book instantly with AI-powered price insights and market analysis. 
+                  Flexible cancellation policies and transparent pricing every time.
                 </p>
               </div>
             </div>
@@ -64,13 +64,13 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             {/* Feature 4 */}
             <div className="flex gap-3 items-start">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Heart className="h-5 w-5 text-primary" />
+                <FileCheck className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-base">Personalized recommendations.</h3>
+                <h3 className="font-semibold text-base">Complete itinerary management.</h3>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Goldsainte.Ai learns your preferences and finds luxury 
-                  travel options perfectly tailored to your style.
+                  Build day-by-day itineraries, upload travel docs, sync calendars, 
+                  and share your plans with travel companions effortlessly.
                 </p>
               </div>
             </div>
@@ -78,13 +78,13 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             {/* Feature 5 */}
             <div className="flex gap-3 items-start">
               <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <FileCheck className="h-5 w-5 text-primary" />
+                <MessageCircle className="h-5 w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-base">Everything organized in one place.</h3>
+                <h3 className="font-semibold text-base">Real-time communication hub.</h3>
                 <p className="text-muted-foreground text-xs leading-relaxed">
-                  Save your travel plans, share itineraries with companions, and keep 
-                  all booking details seamlessly organized in one secure location.
+                  Chat instantly with agents, get notifications, use quick replies, 
+                  and keep all your travel conversations in one secure place.
                 </p>
               </div>
             </div>
