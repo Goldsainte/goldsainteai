@@ -47,7 +47,7 @@ import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
 import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
 import cardAiSearch from "@/assets/card-ai-search.jpg";
 import cardExpertAgents from "@/assets/card-expert-agents.jpg";
-import cardInstantBooking from "@/assets/card-instant-booking.jpg";
+import cardInstantBooking from "@/assets/card-instant-booking-phone.png";
 import cardItinerary from "@/assets/card-itinerary.jpg";
 import cardMessaging from "@/assets/card-messaging-chatting.png";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
