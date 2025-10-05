@@ -21,6 +21,8 @@ import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalenda
 import { AgentAnalyticsDashboard } from "@/components/AgentAnalyticsDashboard";
 import { AgentVerificationUpload } from "@/components/AgentVerificationUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager";
+import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 
 export default function AgentDashboard() {
   const { user } = useAuth();
@@ -42,6 +44,8 @@ export default function AgentDashboard() {
     insurance_verified: false,
     trust_score: 0,
   });
+  const [selectedBidForDetails, setSelectedBidForDetails] = useState<any>(null);
+  const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -333,7 +337,7 @@ export default function AgentDashboard() {
                       </div>
                       <p className="text-sm mt-2">{bid.proposal_details}</p>
                       
-                      {bid.status === 'accepted' && (
+                       {bid.status === 'accepted' && (
                         <div className="flex gap-2 mt-4">
                           <Button 
                             onClick={() => {
@@ -345,6 +349,18 @@ export default function AgentDashboard() {
                           >
                             <MessageSquare className="h-4 w-4 mr-2" />
                             Message Customer
+                          </Button>
+                          
+                          <Button 
+                            onClick={() => {
+                              setSelectedBidForDetails(bid);
+                              setBidDetailsOpen(true);
+                            }}
+                            className="flex-1"
+                            variant="outline"
+                          >
+                            <DollarSign className="h-4 w-4 mr-2" />
+                            Payment Details
                           </Button>
                           
                           {bid.marketplace_jobs?.status === 'in_progress' && (
@@ -480,6 +496,72 @@ export default function AgentDashboard() {
             }}
           />
         )}
+
+        {/* Payment & Milestone Management Dialog */}
+        <Dialog open={bidDetailsOpen} onOpenChange={setBidDetailsOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-chiffon">
+                Payment Management: {selectedBidForDetails?.marketplace_jobs?.title}
+              </DialogTitle>
+              <DialogDescription>
+                Manage milestones and invoices for this job
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {selectedBidForDetails?.marketplace_jobs && (
+                <>
+                  {/* Job Summary */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Job Summary</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Status:</span>
+                        <Badge>{selectedBidForDetails.marketplace_jobs.status}</Badge>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Your Bid:</span>
+                        <span className="font-semibold">
+                          {selectedBidForDetails.currency} {selectedBidForDetails.proposed_price}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">Your Payout:</span>
+                        <span className="font-semibold text-green-600">
+                          {selectedBidForDetails.currency} {selectedBidForDetails.agent_payout_amount?.toFixed(2)}
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Payment Milestones */}
+                  {(selectedBidForDetails.marketplace_jobs.status === 'in_progress' || 
+                    selectedBidForDetails.marketplace_jobs.status === 'completed') && 
+                   selectedBidForDetails.marketplace_jobs.total_paid_amount && (
+                    <PaymentMilestonesManager
+                      jobId={selectedBidForDetails.marketplace_jobs.id}
+                      totalAmount={selectedBidForDetails.marketplace_jobs.total_paid_amount}
+                      currency={selectedBidForDetails.currency || 'USD'}
+                      isAgent={true}
+                    />
+                  )}
+
+                  {/* Invoice Generator */}
+                  {selectedBidForDetails.marketplace_jobs.status === 'completed' && (
+                    <InvoiceGenerator
+                      jobId={selectedBidForDetails.marketplace_jobs.id}
+                      customerId={selectedBidForDetails.marketplace_jobs.user_id}
+                      agentId={agent?.id}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
 
       <Footer />

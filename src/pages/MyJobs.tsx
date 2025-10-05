@@ -13,6 +13,8 @@ import { Input } from "@/components/ui/input";
 import { Briefcase, Clock, CheckCircle, XCircle, AlertTriangle, DollarSign, Search, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function MyJobs() {
   const { user } = useAuth();
@@ -23,6 +25,8 @@ export default function MyJobs() {
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<string>("newest");
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -318,7 +322,10 @@ export default function MyJobs() {
                     </div>
                     
                     <Button
-                      onClick={() => navigate('/marketplace')}
+                      onClick={() => {
+                        setSelectedJob(job);
+                        setViewDetailsOpen(true);
+                      }}
                       variant="outline"
                       size="sm"
                     >
@@ -333,6 +340,85 @@ export default function MyJobs() {
       </main>
 
       <Footer />
+      
+      {/* Job Details Modal */}
+      <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-chiffon">{selectedJob?.title}</DialogTitle>
+            <DialogDescription>
+              <div className="flex items-center gap-4 mt-2">
+                {selectedJob && getStatusBadge(selectedJob.status)}
+                <span className="text-sm">
+                  Posted: {selectedJob && format(new Date(selectedJob.created_at), 'MMM d, yyyy')}
+                </span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold mb-2">Job Details</h3>
+              <p className="text-sm text-muted-foreground mb-4">{selectedJob?.description}</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Destination</p>
+                  <p className="font-medium">{selectedJob?.destination}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Budget Range</p>
+                  <p className="font-medium">
+                    {selectedJob?.currency} {selectedJob?.budget_min} - {selectedJob?.budget_max}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Milestones */}
+            {(selectedJob?.status === 'in_progress' || 
+              selectedJob?.status === 'completed' || 
+              selectedJob?.status === 'pending_approval') && 
+             selectedJob?.total_paid_amount && (
+              <PaymentMilestonesManager
+                jobId={selectedJob.id}
+                totalAmount={selectedJob.total_paid_amount}
+                currency={selectedJob.currency || 'USD'}
+                isAgent={false}
+              />
+            )}
+
+            {selectedJob?.travel_agents && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Assigned Agent</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">{selectedJob.travel_agents.agency_name}</p>
+                      {selectedJob.travel_agents.rating && (
+                        <p className="text-sm text-muted-foreground">
+                          Rating: {selectedJob.travel_agents.rating}/5
+                        </p>
+                      )}
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setViewDetailsOpen(false);
+                        navigate('/marketplace');
+                      }}
+                      variant="outline"
+                      size="sm"
+                    >
+                      View Full Details
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

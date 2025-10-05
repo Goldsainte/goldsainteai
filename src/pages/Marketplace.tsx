@@ -18,6 +18,10 @@ import { JobApprovalModal } from "@/components/JobApprovalModal";
 import { ReviewModal } from "@/components/ReviewModal";
 import { DisputeResolutionModal } from "@/components/DisputeResolutionModal";
 import { JobFileUpload } from "@/components/JobFileUpload";
+import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager";
+import { InvoiceGenerator } from "@/components/InvoiceGenerator";
+import { PaymentPlanSelector } from "@/components/PaymentPlanSelector";
+import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
 
 export default function Marketplace() {
   const { user } = useAuth();
@@ -502,6 +506,55 @@ export default function Marketplace() {
                 jobId={selectedJob.id}
                 attachments={jobAttachments[selectedJob.id] || []}
                 onUploadComplete={() => fetchAttachments(selectedJob.id)}
+              />
+            )}
+
+            {/* Payment Milestones - Show for in_progress and completed jobs */}
+            {(selectedJob?.status === 'in_progress' || selectedJob?.status === 'completed' || selectedJob?.status === 'pending_approval') && selectedJob?.total_paid_amount && (
+              <PaymentMilestonesManager
+                jobId={selectedJob.id}
+                totalAmount={selectedJob.total_paid_amount}
+                currency={selectedJob.currency || 'USD'}
+                isAgent={false}
+              />
+            )}
+
+            {/* Payment Plan Option - Show for open/assigned jobs */}
+            {(selectedJob?.status === 'open' || selectedJob?.status === 'assigned') && 
+             !selectedJob?.payment_plan_enabled && 
+             selectedJob?.budget_max && (
+              <PaymentPlanSelector
+                jobId={selectedJob.id}
+                totalAmount={selectedJob.budget_max}
+                currency={selectedJob.currency || 'USD'}
+                onPlanCreated={() => {
+                  fetchJobs();
+                  toast.success('Payment plan created successfully');
+                }}
+              />
+            )}
+
+            {/* Refund Guarantee - Show for assigned jobs without guarantee */}
+            {selectedJob?.status === 'assigned' && 
+             !selectedJob?.refund_guarantee_enabled && 
+             selectedJob?.total_paid_amount && (
+              <RefundGuaranteeCard
+                jobId={selectedJob.id}
+                totalAmount={selectedJob.total_paid_amount}
+                currency={selectedJob.currency || 'USD'}
+                onGuaranteeAdded={() => {
+                  fetchJobs();
+                  toast.success('Refund protection added');
+                }}
+              />
+            )}
+
+            {/* Invoice Generation - Show for completed jobs */}
+            {selectedJob?.status === 'completed' && selectedJob?.assigned_agent_id && (
+              <InvoiceGenerator
+                jobId={selectedJob.id}
+                customerId={selectedJob.user_id}
+                agentId={selectedJob.assigned_agent_id}
               />
             )}
 
