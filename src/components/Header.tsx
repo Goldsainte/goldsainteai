@@ -85,7 +85,7 @@ export const Header = () => {
           {/* Logo - Left */}
           <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity flex-shrink-0">
             <img src={logomark} alt="Logo" className="h-7 w-7 md:h-8 md:w-8" />
-            <span className="text-base md:text-lg font-bold font-chiffon text-primary hidden sm:block">Goldsainte.Ai</span>
+            <span className="text-base md:text-lg font-bold font-secondary text-primary hidden sm:block">Goldsainte.Ai</span>
           </a>
 
           {/* Compact Search Bar - Center (desktop and mobile) */}
