@@ -825,7 +825,7 @@ const Index = () => {
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-chiffon font-bold text-secondary">
                     How it Works
                   </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-4xl mx-auto leading-relaxed">
+                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-6xl mx-auto leading-relaxed">
                     Chat with us to start planning your next adventure. Ask for recommendations for any destination or request a full itinerary tailored to you. The more specific you are about the experiences you enjoy, the better we can personalize your trip—or take our quiz to discover your unique travel style.
                   </p>
                 </div>
@@ -992,7 +992,7 @@ const Index = () => {
 
             {/* Inspiration Content - Far below the fold */}
             <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-12 sm:pt-16 md:pt-20">
-              <div className="w-full max-w-7xl mx-auto space-y-5 sm:space-y-6">
+              <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-4">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
