@@ -79,42 +79,74 @@ const handler = async (req: Request): Promise<Response> => {
     
     if (bookingType === 'hotel') {
       const hotelName = bookingData.hotel?.name || bookingData.hotelName || 'Hotel';
+      const hotelAddress = bookingData.hotel?.address?.lines?.[0] || bookingData.hotelAddress || 'Hotel Address';
       const roomType = bookingData.room?.description?.text || bookingData.roomType || 'Standard Room';
       const bedType = bookingData.room?.typeEstimated?.bedType || bookingData.bedType || 'Not specified';
+      const guests = bookingData.guests || bookingData.adults || 2;
+      const nights = bookingData.nights || 1;
       
       emailSubject = `Hotel Booking Confirmed - ${hotelName}`;
       
+      // Build booking information section (matching flight's ticket info)
+      const bookingDate = new Date();
+      const issueDate = bookingDate.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: '2-digit' }).toUpperCase();
+      const bookingNumber = bookingReference.replace(/[^0-9]/g, '').padStart(13, '0');
+      
+      const bookingInfo = `
+        <h2>Booking Information</h2>
+        <div class="info-box">
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Booking Number</td>
+                <td class="info-value">${bookingNumber}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Booking Date</td>
+                <td class="info-value">${issueDate}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Status</td>
+                <td class="info-value">Confirmed</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      `;
+      
       bookingDetails = `
+        ${bookingInfo}
+        
         <h2>Reservation details</h2>
         <div class="info-box">
           <div class="info-row">
             <table>
               <tr>
                 <td class="info-label">Property</td>
-                <td class="info-value">${hotelName}</td>
+                <td class="info-value"><strong>${hotelName}</strong></td>
               </tr>
             </table>
           </div>
           <div class="info-row">
             <table>
               <tr>
-                <td class="info-label">Room type</td>
-                <td class="info-value">${roomType}</td>
+                <td class="info-label">Address</td>
+                <td class="info-value">${hotelAddress}</td>
               </tr>
             </table>
           </div>
           <div class="info-row">
             <table>
               <tr>
-                <td class="info-label">Bed type</td>
-                <td class="info-value">${bedType}</td>
-              </tr>
-            </table>
-          </div>
-          <div class="info-row">
-            <table>
-              <tr>
-                <td class="info-label">Check-in</td>
+                <td class="info-label">Check-in date</td>
                 <td class="info-value">${checkInDate || 'TBD'}</td>
               </tr>
             </table>
@@ -122,10 +154,48 @@ const handler = async (req: Request): Promise<Response> => {
           <div class="info-row">
             <table>
               <tr>
-                <td class="info-label">Check-out</td>
+                <td class="info-label">Check-out date</td>
                 <td class="info-value">${checkOutDate || 'TBD'}</td>
               </tr>
             </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Duration</td>
+                <td class="info-value">${nights} ${nights === 1 ? 'night' : 'nights'}</td>
+              </tr>
+            </table>
+          </div>
+          <div class="info-row">
+            <table>
+              <tr>
+                <td class="info-label">Guests</td>
+                <td class="info-value">${guests} ${guests === 1 ? 'guest' : 'guests'}</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+        
+        <h2>Room details</h2>
+        <div class="flight-segment">
+          <div class="segment-header">Your Accommodation</div>
+          <div class="passenger-item">
+            <div class="passenger-name">${roomType}</div>
+            <div class="passenger-details">Bed Type: ${bedType}</div>
+          </div>
+        </div>
+        
+        <div class="warning-box">
+          <div class="warning-title">⚠ Important Hotel Information</div>
+          <div class="warning-text">
+            <strong>Check-in Time:</strong> Standard check-in is at 3:00 PM. Early check-in may be available upon request and subject to availability.<br><br>
+            <strong>Check-out Time:</strong> Standard check-out is at 11:00 AM. Late check-out may be available upon request and subject to additional charges.<br><br>
+            <strong>Identification:</strong> A valid government-issued photo ID and credit card will be required at check-in for incidental charges.<br><br>
+            <strong>Payment:</strong> The hotel will place a hold on your credit card for incidental charges. This hold will be released upon check-out.<br><br>
+            <strong>Cancellation:</strong> Free cancellation may be available up to 24-48 hours before check-in. Please review your rate's cancellation policy.<br><br>
+            <strong>Special Requests:</strong> Special requests such as room location, high floor, or bed type preferences are subject to availability and cannot be guaranteed.<br><br>
+            <strong>Contact Property:</strong> For any special requests or questions about your stay, please contact the property directly using the confirmation number above.
           </div>
         </div>
         
@@ -693,11 +763,19 @@ const handler = async (req: Request): Promise<Response> => {
               
               <p>We're excited to be part of your upcoming journey! Your reservation has been confirmed. Please review the details below and save this email for your records.</p>
               
-              <p>You can check in for your flight using your confirmation number either at the airline's self-service kiosks at the airport (typically available up to 6 hours before departure), or online or via the airline's mobile app starting 24 hours prior to your flight.</p>
-              
-              <p>Please note that boarding priority is determined by the airline and may vary based on travel date, fare class, and other factors. If you're flying on a standby basis, seats are subject to availability and will be assigned at the gate. Standby travel is generally allowed only on flights operated by the airline listed on your itinerary.</p>
-              
-              <p>For the most accurate information, be sure to check your airline's specific policies and mobile tools before you travel.</p>
+              ${bookingType === 'hotel' ? `
+                <p>Your room will be ready for check-in at the standard time of 3:00 PM. If you need early check-in, please contact the property directly using your confirmation number.</p>
+                
+                <p>Please bring a valid government-issued photo ID and a credit card for incidentals at check-in. The hotel will place an authorization hold on your card which will be released upon check-out.</p>
+                
+                <p>For any special requests or questions about your stay, please contact the property directly. We're here to make your stay comfortable and memorable.</p>
+              ` : `
+                <p>You can check in for your flight using your confirmation number either at the airline's self-service kiosks at the airport (typically available up to 6 hours before departure), or online or via the airline's mobile app starting 24 hours prior to your flight.</p>
+                
+                <p>Please note that boarding priority is determined by the airline and may vary based on travel date, fare class, and other factors. If you're flying on a standby basis, seats are subject to availability and will be assigned at the gate. Standby travel is generally allowed only on flights operated by the airline listed on your itinerary.</p>
+                
+                <p>For the most accurate information, be sure to check your airline's specific policies and mobile tools before you travel.</p>
+              `}
               
               <div class="conf-box">
                 <div class="conf-label">Confirmation Number</div>
