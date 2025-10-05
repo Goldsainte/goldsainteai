@@ -794,10 +794,8 @@ const Index = () => {
                       <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
                         Start chatting with us.
                       </h2>
-                      <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-                        Ask us for suggestions for any destination or ask us for an entire itinerary. 
-                        Be as specific as you can about the types of experiences that you like or take 
-                        our quiz to determine your travel style.
+                      <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-secondary">
+                        Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
                       </p>
                     </div>
                   </div>
