@@ -765,7 +765,7 @@ const Index = () => {
                 <div className="relative pt-2 md:pt-3 px-2 md:px-0">
                   <Input
                     placeholder={rotatingMessages[currentMessageIndex]}
-                    className="w-full h-14 md:h-16 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72] placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500"
+                    className="w-full h-14 md:h-16 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72] placeholder:text-sm sm:placeholder:text-sm md:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 touch-manipulation"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -775,7 +775,7 @@ const Index = () => {
                     onClick={() => handleSearch()}
                     size="icon"
                     variant="ghost"
-                    className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 h-11 w-11 md:h-10 md:w-10 rounded-full hover:bg-muted"
+                    className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 h-12 w-12 md:h-10 md:w-10 rounded-full hover:bg-muted touch-manipulation min-h-[44px] min-w-[44px]"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -792,7 +792,7 @@ const Index = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowWelcomeModal(true)}
-                    className="rounded-full gap-2 h-10 md:h-9 px-4 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72]"
+                    className="rounded-full gap-2 h-11 md:h-10 px-4 sm:px-5 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72] touch-manipulation min-h-[44px] text-sm sm:text-base"
                   >
                     <Sparkles className="h-4 w-4" />
                     What Goldsainte.Ai can do
@@ -819,40 +819,40 @@ const Index = () => {
             </div>
 
             {/* How it Works Section - Horizontal Scrolling */}
-            <div className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-background via-muted/10 to-background">
-              <div className="w-full max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
+            <div className="px-4 sm:px-6 py-10 sm:py-14 md:py-18 bg-gradient-to-b from-background via-muted/10 to-background">
+              <div className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 md:space-y-10">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-chiffon font-bold text-secondary">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-chiffon font-bold text-secondary leading-tight">
                     How it Works
                   </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed">
+                  <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed">
                     Chat with us to start planning your next adventure. Ask for recommendations for any destination or request a full itinerary tailored to you. The more specific you are about the experiences you enjoy, the better we can personalize your trip—or take our quiz to discover your unique travel style.
                   </p>
                 </div>
 
                 {/* Horizontal Scrolling Container */}
-                <div className="relative -mx-4 sm:-mx-6">
+                <div className="relative -mx-4 sm:-mx-6 touch-manipulation">
                   <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-                    <div className="flex gap-4 sm:gap-6 px-4 sm:px-6 pb-4 min-w-min">
+                    <div className="flex gap-3 sm:gap-5 md:gap-6 px-4 sm:px-6 pb-4 min-w-min">
                       {/* Card 1 - AI Search */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-48 sm:h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
                             src={cardAiSearch} 
                             alt="AI-Powered Search" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-5 sm:p-6 space-y-3">
-                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
                             AI-Powered Search
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
                             Search across flights, hotels, restaurants, events, and curated packages in one conversation
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                               setTimeout(() => {
@@ -867,24 +867,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 2 - Expert Agents */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-48 sm:h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
                             src={cardExpertAgents} 
                             alt="Expert Travel Agents" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-5 sm:p-6 space-y-3">
-                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
                             Expert Travel Agents
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
                             Post complex trips to our marketplace and get matched with certified luxury travel agents
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => navigate('/browse-agents')}
                           >
                             Find an Agent
@@ -893,24 +893,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 3 - Real-Time Messaging */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-48 sm:h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
                             src={cardMessaging} 
                             alt="Real-Time Messaging" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-5 sm:p-6 space-y-3">
-                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
                             Real-Time Messaging
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
                             Chat instantly with agents and manage all your travel conversations in one secure place
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                               setTimeout(() => {
@@ -925,24 +925,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 4 - Itinerary Builder */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-48 sm:h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
                             src={cardItinerary} 
                             alt="Itinerary Management" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-5 sm:p-6 space-y-3">
-                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
                             Itinerary Management
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
                             Build day-by-day itineraries, upload travel docs, and sync with your calendar
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => navigate('/dashboard')}
                           >
                             Build Itinerary
