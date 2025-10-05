@@ -28,7 +28,7 @@ export const Hero = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-            Find your next stay
+            Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-primary-foreground/90">
             Search deals on hotels, homes, and much more...
