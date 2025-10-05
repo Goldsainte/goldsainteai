@@ -20,6 +20,9 @@ export default function BrowseAgents() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterSpecialization, setFilterSpecialization] = useState("all");
   const [sortBy, setSortBy] = useState("rating");
+  const [minRating, setMinRating] = useState<number>(0);
+  const [experienceRange, setExperienceRange] = useState<"all" | "0-2" | "3-5" | "5+">("all");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
 
   useEffect(() => {
     fetchAgents();
@@ -27,7 +30,7 @@ export default function BrowseAgents() {
 
   useEffect(() => {
     applyFilters();
-  }, [agents, searchQuery, filterSpecialization, sortBy]);
+  }, [agents, searchQuery, filterSpecialization, sortBy, minRating, experienceRange, selectedLanguage]);
 
   const fetchAgents = async () => {
     try {
@@ -70,6 +73,29 @@ export default function BrowseAgents() {
       );
     }
 
+    // Rating filter
+    if (minRating > 0) {
+      filtered = filtered.filter(agent => (agent.rating || 0) >= minRating);
+    }
+
+    // Experience filter
+    if (experienceRange !== "all") {
+      filtered = filtered.filter(agent => {
+        const exp = agent.experience_years || 0;
+        if (experienceRange === "0-2") return exp <= 2;
+        if (experienceRange === "3-5") return exp >= 3 && exp <= 5;
+        if (experienceRange === "5+") return exp > 5;
+        return true;
+      });
+    }
+
+    // Language filter
+    if (selectedLanguage !== "all") {
+      filtered = filtered.filter(agent =>
+        agent.languages?.includes(selectedLanguage)
+      );
+    }
+
     // Sort
     filtered.sort((a, b) => {
       if (sortBy === "rating") {
@@ -85,9 +111,13 @@ export default function BrowseAgents() {
     setFilteredAgents(filtered);
   };
 
-  // Get unique specializations
+  // Get unique specializations and languages
   const allSpecializations = Array.from(
     new Set(agents.flatMap(agent => agent.specializations || []))
+  );
+  
+  const allLanguages = Array.from(
+    new Set(agents.flatMap(agent => agent.languages || []))
   );
 
   if (loading) {
@@ -123,39 +153,90 @@ export default function BrowseAgents() {
         {/* Filters */}
         <Card className="mb-6">
           <CardContent className="pt-6">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search agents..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-9"
-                />
+            <div className="space-y-4">
+              {/* Primary Filters */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search agents..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-9"
+                  />
+                </div>
+
+                <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Specialization" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Specializations</SelectItem>
+                    {allSpecializations.map(spec => (
+                      <SelectItem key={spec} value={spec}>{spec}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rating">Highest Rated</SelectItem>
+                    <SelectItem value="reviews">Most Reviews</SelectItem>
+                    <SelectItem value="experience">Most Experience</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Specialization" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Specializations</SelectItem>
-                  {allSpecializations.map(spec => (
-                    <SelectItem key={spec} value={spec}>{spec}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {/* Advanced Filters */}
+              <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Minimum Rating</label>
+                  <Select value={minRating.toString()} onValueChange={(v) => setMinRating(Number(v))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">Any Rating</SelectItem>
+                      <SelectItem value="3">3+ Stars</SelectItem>
+                      <SelectItem value="4">4+ Stars</SelectItem>
+                      <SelectItem value="4.5">4.5+ Stars</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="rating">Highest Rated</SelectItem>
-                  <SelectItem value="reviews">Most Reviews</SelectItem>
-                  <SelectItem value="experience">Most Experience</SelectItem>
-                </SelectContent>
-              </Select>
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Experience</label>
+                  <Select value={experienceRange} onValueChange={(v: any) => setExperienceRange(v)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any Experience</SelectItem>
+                      <SelectItem value="0-2">0-2 Years</SelectItem>
+                      <SelectItem value="3-5">3-5 Years</SelectItem>
+                      <SelectItem value="5+">5+ Years</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Language</label>
+                  <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any Language</SelectItem>
+                      {allLanguages.map(lang => (
+                        <SelectItem key={lang} value={lang}>{lang}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

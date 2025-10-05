@@ -610,11 +610,13 @@ export type Database = {
           bio: string | null
           country: string | null
           created_at: string
+          email_notifications: boolean | null
           first_name: string | null
           id: string
           last_name: string | null
           phone: string | null
           preferences: Json | null
+          sms_notifications: boolean | null
           updated_at: string
           username: string | null
         }
@@ -623,11 +625,13 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          email_notifications?: boolean | null
           first_name?: string | null
           id: string
           last_name?: string | null
           phone?: string | null
           preferences?: Json | null
+          sms_notifications?: boolean | null
           updated_at?: string
           username?: string | null
         }
@@ -636,11 +640,13 @@ export type Database = {
           bio?: string | null
           country?: string | null
           created_at?: string
+          email_notifications?: boolean | null
           first_name?: string | null
           id?: string
           last_name?: string | null
           phone?: string | null
           preferences?: Json | null
+          sms_notifications?: boolean | null
           updated_at?: string
           username?: string | null
         }

@@ -21,6 +21,9 @@ verify_jwt = false
 [functions.tripadvisor-search-restaurants]
 verify_jwt = false
 
+[functions.notify-agents-new-job]
+verify_jwt = false
+
 [functions.amadeus-search-flights]
 verify_jwt = false
 
