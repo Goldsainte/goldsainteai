@@ -761,6 +761,140 @@ const Index = () => {
               </div>
             </div>
 
+            {/* How Goldsainte.AI Works Section */}
+            <div className="px-6 py-20 bg-gradient-to-b from-background via-accent/5 to-background">
+              <div className="w-full max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                  {/* Left side - Text content */}
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon leading-tight">
+                        Start chatting with us.
+                      </h2>
+                      <p className="text-lg text-muted-foreground leading-relaxed">
+                        Ask us for suggestions for any destination or ask us for an entire itinerary. 
+                        Be as specific as you can about the types of experiences that you like or take 
+                        our quiz to determine your travel style.
+                      </p>
+                    </div>
+                    
+                    {/* Feature highlights */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
+                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-accent/20">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
+                            <Sparkles className="h-4 w-4 text-accent" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm mb-1">AI-Powered</h3>
+                          <p className="text-xs text-muted-foreground">Personalized recommendations based on your preferences</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-primary/20">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            <MapPin className="h-4 w-4 text-primary" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm mb-1">Any Destination</h3>
+                          <p className="text-xs text-muted-foreground">From hotels to full itineraries, we've got you</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-accent/20">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center">
+                            <Hotel className="h-4 w-4 text-accent" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm mb-1">Luxury Focus</h3>
+                          <p className="text-xs text-muted-foreground">Curated premium experiences worldwide</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3 p-4 rounded-xl bg-card/50 border border-primary/20">
+                        <div className="flex-shrink-0 mt-1">
+                          <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center">
+                            <Plane className="h-4 w-4 text-primary" />
+                          </div>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-sm mb-1">Instant Booking</h3>
+                          <p className="text-xs text-muted-foreground">Seamless reservations in seconds</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Right side - Visual category showcase */}
+                  <div className="relative h-[500px] lg:h-[600px]">
+                    {/* Central profile circle */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                      <div className="h-32 w-32 rounded-full bg-gradient-to-br from-accent to-primary p-1">
+                        <div className="h-full w-full rounded-full bg-background flex items-center justify-center">
+                          <img src={logomark} alt="Goldsainte AI" className="h-16 w-16" />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Floating category cards */}
+                    <div className="absolute top-8 left-4 animate-float">
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
+                        <Hotel className="h-4 w-4 text-accent" />
+                        <span className="text-sm font-medium">Luxury Resorts</span>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute top-24 right-8 animate-float" style={{ animationDelay: '0.5s' }}>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-primary/30 shadow-lg backdrop-blur-sm">
+                        <UtensilsCrossed className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">Fine Dining</span>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute top-1/3 left-0 animate-float" style={{ animationDelay: '1s' }}>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
+                        <MapPin className="h-4 w-4 text-accent" />
+                        <span className="text-sm font-medium">Beach Getaways</span>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute bottom-32 left-8 animate-float" style={{ animationDelay: '1.5s' }}>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-primary/30 shadow-lg backdrop-blur-sm">
+                        <Ticket className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">Cultural Tours</span>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute top-2/3 right-4 animate-float" style={{ animationDelay: '2s' }}>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
+                        <Plane className="h-4 w-4 text-accent" />
+                        <span className="text-sm font-medium">First Class Travel</span>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute bottom-12 right-12 animate-float" style={{ animationDelay: '2.5s' }}>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-primary/30 shadow-lg backdrop-blur-sm">
+                        <Car className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium">Luxury Cars</span>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute top-1/2 right-0 animate-float" style={{ animationDelay: '3s' }}>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card border border-accent/30 shadow-lg backdrop-blur-sm">
+                        <Star className="h-4 w-4 text-accent" />
+                        <span className="text-sm font-medium">Spa & Wellness</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Inspiration Content - Far below the fold */}
             <div className="px-6 pb-12 pt-20">
               <div className="w-full max-w-7xl mx-auto space-y-6">

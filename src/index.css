@@ -144,4 +144,18 @@ All colors MUST be HSL.
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }
+
+  /* Floating animation for category cards */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
 }
