@@ -789,21 +789,55 @@ const Index = () => {
               <div className="w-full max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                   {/* Left side - Text content only */}
-                  <div className="space-y-6 lg:pr-8 pt-8">
-                    <div className="space-y-4">
-                      <h2 className="text-4xl md:text-5xl lg:text-6xl font-chiffon font-bold leading-tight text-secondary">
-                        Start chatting with us.
-                      </h2>
-                      <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-secondary">
-                        Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
-                      </p>
-                      <ul className="space-y-3 text-base md:text-lg text-muted-foreground font-secondary list-disc list-inside">
-                        <li>AI-powered search across flights, hotels, restaurants, events, and curated packages in one conversation</li>
-                        <li>Post complex trips to our marketplace and get matched with certified luxury travel agents</li>
-                        <li>Instant booking with transparent pricing, flexible cancellations, and smart price insights</li>
-                        <li>Build day-by-day itineraries, upload travel docs, and sync with your calendar</li>
-                        <li>Real-time messaging hub to chat with agents and manage all bookings in one place</li>
-                      </ul>
+                  <div className="space-y-8 lg:pr-12 pt-12">
+                    <div className="space-y-8">
+                      {/* Header Section */}
+                      <div className="space-y-6 pb-6 border-b border-secondary/20">
+                        <h2 className="text-4xl md:text-5xl lg:text-6xl font-chiffon font-bold leading-tight text-secondary">
+                          Start chatting with us.
+                        </h2>
+                        <p className="text-xl md:text-2xl text-foreground/80 leading-relaxed font-secondary max-w-2xl">
+                          Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
+                        </p>
+                      </div>
+
+                      {/* Luxury Features List */}
+                      <div className="space-y-6 pt-4">
+                        <div className="flex gap-4 items-start group">
+                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary mt-2.5 ring-4 ring-secondary/10 group-hover:ring-secondary/20 transition-all"></div>
+                          <p className="text-base md:text-lg text-foreground/70 leading-relaxed font-secondary">
+                            AI-powered search across flights, hotels, restaurants, events, and curated packages in one conversation
+                          </p>
+                        </div>
+                        
+                        <div className="flex gap-4 items-start group">
+                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary mt-2.5 ring-4 ring-secondary/10 group-hover:ring-secondary/20 transition-all"></div>
+                          <p className="text-base md:text-lg text-foreground/70 leading-relaxed font-secondary">
+                            Post complex trips to our marketplace and get matched with certified luxury travel agents
+                          </p>
+                        </div>
+                        
+                        <div className="flex gap-4 items-start group">
+                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary mt-2.5 ring-4 ring-secondary/10 group-hover:ring-secondary/20 transition-all"></div>
+                          <p className="text-base md:text-lg text-foreground/70 leading-relaxed font-secondary">
+                            Instant booking with transparent pricing, flexible cancellations, and smart price insights
+                          </p>
+                        </div>
+                        
+                        <div className="flex gap-4 items-start group">
+                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary mt-2.5 ring-4 ring-secondary/10 group-hover:ring-secondary/20 transition-all"></div>
+                          <p className="text-base md:text-lg text-foreground/70 leading-relaxed font-secondary">
+                            Build day-by-day itineraries, upload travel docs, and sync with your calendar
+                          </p>
+                        </div>
+                        
+                        <div className="flex gap-4 items-start group">
+                          <div className="flex-shrink-0 w-2 h-2 rounded-full bg-secondary mt-2.5 ring-4 ring-secondary/10 group-hover:ring-secondary/20 transition-all"></div>
+                          <p className="text-base md:text-lg text-foreground/70 leading-relaxed font-secondary">
+                            Real-time messaging hub to chat with agents and manage all bookings in one place
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   
