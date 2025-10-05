@@ -14,110 +14,353 @@ export default function EmailPreview() {
       <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Lato:wght@300;400&display=swap');
-          body { font-family: 'Lato', sans-serif; line-height: 1.8; color: #2C2C2C; margin: 0; padding: 0; background-color: #F5F5F0; }
-          .container { max-width: 650px; margin: 40px auto; background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-          .header { background: linear-gradient(135deg, #1A1F2C 0%, #2C3444 100%); padding: 50px 40px; text-align: center; border-top: 5px solid #C9A55B; }
-          .logo { color: #C9A55B; font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-          .tagline { color: #E5D5B7; font-size: 14px; letter-spacing: 4px; text-transform: uppercase; margin-top: 10px; font-weight: 300; }
-          .header-subtitle { color: #E5D5B7; font-size: 16px; margin-top: 20px; font-weight: 300; letter-spacing: 1px; }
-          .content { padding: 50px 40px; background: white; }
-          .greeting { font-family: 'Playfair Display', serif; font-size: 28px; color: #1A1F2C; margin-bottom: 20px; font-weight: 600; }
-          .intro-text { color: #5A5A5A; font-size: 16px; margin-bottom: 30px; line-height: 1.8; }
-          .booking-ref { background: linear-gradient(135deg, #C9A55B 0%, #B8944A 100%); color: white; padding: 25px; text-align: center; font-size: 24px; font-weight: 400; margin: 30px 0; border-radius: 8px; letter-spacing: 3px; box-shadow: 0 4px 15px rgba(201,165,91,0.3); font-family: 'Playfair Display', serif; }
-          .booking-ref-label { font-size: 12px; letter-spacing: 2px; opacity: 0.9; margin-bottom: 5px; text-transform: uppercase; }
-          .details { background: #FAFAF8; padding: 30px; margin: 30px 0; border-radius: 8px; border-left: 4px solid #C9A55B; }
-          .section-title { font-family: 'Playfair Display', serif; color: #C9A55B; font-size: 20px; margin: 30px 0 15px 0; font-weight: 600; letter-spacing: 1px; }
-          .detail-item { padding: 12px 0; border-bottom: 1px solid #E5E5E0; display: flex; justify-content: space-between; }
-          .detail-label { color: #5A5A5A; font-weight: 400; }
-          .detail-value { color: #2C2C2C; font-weight: 400; text-align: right; }
-          .total-price { font-size: 28px; font-weight: 700; color: #C9A55B; text-align: center; padding: 30px; margin: 30px 0; background: linear-gradient(135deg, #F8F6F0 0%, #FAF8F2 100%); border-radius: 8px; border: 2px solid #C9A55B; font-family: 'Playfair Display', serif; }
-          .total-label { font-size: 14px; letter-spacing: 2px; color: #5A5A5A; margin-bottom: 10px; text-transform: uppercase; }
-          .info-box { background: linear-gradient(135deg, #F8F6F0 0%, #FAF8F2 100%); padding: 25px; margin: 30px 0; border-radius: 8px; border: 1px solid #E5D5B7; }
-          .info-title { font-family: 'Playfair Display', serif; color: #C9A55B; font-size: 18px; margin-bottom: 15px; font-weight: 600; }
-          .info-text { color: #5A5A5A; font-size: 14px; line-height: 1.8; margin: 8px 0; }
-          .footer { background: #1A1F2C; text-align: center; padding: 40px 20px; color: #B8B8B8; font-size: 13px; }
-          .footer-divider { width: 60px; height: 2px; background: #C9A55B; margin: 20px auto; }
-          .signature { font-style: italic; color: #E5D5B7; margin-top: 30px; font-size: 15px; }
+          <style>
+            @import url('https://fonts.googleapis.com/css2?family=Gupter:wght@400;500;700&display=swap');
+            @font-face {
+              font-family: 'Chiffon';
+              src: url('/fonts/Chiffon.otf') format('opentype');
+            }
+            body {
+              font-family: 'Gupter', BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+              background-color: #E5DFC6;
+            }
+            .container {
+              max-width: 640px;
+              margin: 0 auto;
+              background: #ffffff;
+            }
+            .header {
+              background: transparent;
+              padding: 24px;
+              text-align: center;
+            }
+            .logo {
+              max-width: 280px;
+              height: auto;
+            }
+            .hero-image {
+              width: 100%;
+              height: 200px;
+              object-fit: cover;
+              object-position: center center;
+              display: block;
+            }
+          .content {
+            padding: 0 8px;
+          }
+            h1 {
+              font-family: 'Chiffon', serif;
+              font-size: 32px;
+              line-height: 40px;
+              font-weight: normal;
+              color: #0c4d47;
+              margin: 32px 0 16px 0;
+              padding: 0 8px;
+            }
+            h2 {
+              font-family: 'Chiffon', serif;
+              font-size: 22px;
+              line-height: 28px;
+              font-weight: normal;
+              color: #0c4d47;
+              margin: 16px 0;
+              padding: 0 8px;
+            }
+          p {
+            font-size: 16px;
+            line-height: 24px;
+            color: #333333;
+            margin: 16px 0;
+            padding: 0 8px;
+          }
+            .conf-box {
+              border: 2px solid #bfad72;
+              border-radius: 4px;
+              padding: 16px;
+              margin: 16px 8px;
+              text-align: center;
+              background: #f9f8f5;
+            }
+            .conf-label {
+              font-size: 12px;
+              color: #8d8d8d;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              margin-bottom: 4px;
+            }
+            .conf-number {
+              font-size: 28px;
+              font-weight: 700;
+              color: #0A2225;
+              letter-spacing: 2px;
+              font-family: monospace;
+            }
+          .info-box {
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            margin: 16px 8px;
+          }
+          .info-row {
+            border-top: 1px solid #e7e7e7;
+            padding: 16px;
+            display: table;
+            width: 100%;
+          }
+          .info-row:first-child {
+            border-top: none;
+          }
+          .info-label {
+            display: table-cell;
+            width: 224px;
+            font-size: 16px;
+            line-height: 24px;
+            color: #595959;
+            vertical-align: top;
+          }
+          .info-value {
+            display: table-cell;
+            font-size: 16px;
+            line-height: 24px;
+            color: #333333;
+            vertical-align: top;
+          }
+          .flight-segment {
+            background: #f5f5f5;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 12px 8px;
+          }
+            .segment-header {
+              font-size: 14px;
+              font-weight: 600;
+              color: #0c4d47;
+              margin-bottom: 12px;
+              text-transform: uppercase;
+            }
+          .passenger-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #e7e7e7;
+          }
+          .passenger-item:last-child {
+            border-bottom: none;
+          }
+          .passenger-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+          }
+          .passenger-details {
+            font-size: 14px;
+            color: #595959;
+            margin-top: 4px;
+          }
+          .warning-box {
+            border: 1px solid #FFE08A;
+            background: #FEFBF0;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px 8px;
+          }
+          .warning-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333333;
+            margin-bottom: 8px;
+          }
+          .warning-text {
+            font-size: 14px;
+            line-height: 20px;
+            color: #333333;
+          }
+          .price-box {
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 24px 8px;
+          }
+          .price-total {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 0 0 0;
+            margin-top: 8px;
+            border-top: 2px solid #e7e7e7;
+            font-size: 20px;
+            font-weight: 700;
+            color: #333333;
+          }
+            .footer {
+              background: #BFAD72;
+              text-align: center;
+              padding: 24px;
+              color: #0A2225;
+              font-size: 12px;
+              margin-top: 32px;
+            }
+          @media only screen and (max-width: 639px) {
+            .info-label, .info-value {
+              display: block;
+              width: 100%;
+            }
+            .info-label {
+              padding-bottom: 4px;
+            }
+          }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <div class="logo-container">
-              <h1 class="logo">Goldstone</h1>
-              <div class="tagline">Luxury Travel</div>
-            </div>
-            <div class="header-subtitle">Booking Confirmation</div>
+            <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
           </div>
           
+          <img src="/email-hero-luxury.jpg?v=5" alt="Luxury Travel" class="hero-image" />
+          
           <div class="content">
-            <h1 class="greeting">Welcome, John Smith</h1>
-            <p class="intro-text">
-              Thank you for choosing Goldstone. We are delighted to confirm your reservation 
-              and look forward to providing you with an exceptional travel experience.
-            </p>
+            <h1>✓ Your reservation is confirmed</h1>
             
-            <div class="booking-ref">
-              <div class="booking-ref-label">Your Confirmation Code</div>
-              GS-HTL-2024-001234
+            <p>Dear John Smith,</p>
+            
+            <p>We're delighted to confirm your hotel reservation! Your booking has been successfully processed. Please review the details below and save this email for your records.</p>
+            
+            <p>You can check in at the hotel starting at 3:00 PM on your arrival date. Early check-in may be available upon request and subject to availability. Please contact the property directly if you require early check-in.</p>
+            
+            <p>A valid government-issued photo ID and credit card will be required at check-in for incidental charges. The hotel will place a hold on your credit card, which will be released upon check-out.</p>
+            
+            <p>For the most accurate information about amenities, policies, and services, please contact the property directly using the confirmation number below.</p>
+            
+            <div class="conf-box">
+              <div class="conf-label">Confirmation Number</div>
+              <div class="conf-number">HTL789456</div>
             </div>
             
-            <div class="details">
-              <div class="section-title">Hotel Details</div>
-              <div class="detail-item">
-                <span class="detail-label">Property</span>
-                <span class="detail-value">The Grand Luxury Hotel & Spa</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Room Type</span>
-                <span class="detail-value">Deluxe King Suite with Ocean View</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Bed Type</span>
-                <span class="detail-value">King Bed</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Check-in</span>
-                <span class="detail-value">March 15, 2024</span>
-              </div>
-              <div class="detail-item">
-                <span class="detail-label">Check-out</span>
-                <span class="detail-value">March 18, 2024</span>
-              </div>
-            </div>
-            
-            <div class="total-price">
-              <div class="total-label">Total Amount</div>
-              $1,725.00
-            </div>
-            
+            <h2>Booking Information</h2>
             <div class="info-box">
-              <div class="info-title">Important Information</div>
-              <div class="info-text">• Please keep this confirmation code for your records</div>
-              <div class="info-text">• Present this confirmation upon arrival or check-in</div>
-              <div class="info-text">• For any changes or inquiries, reference your confirmation code</div>
-              <div class="info-text">• Our concierge team is available 24/7 to assist you</div>
-              <div class="info-text">• Ensure all travel documents are valid and up to date</div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Booking Number</td>
+                    <td class="info-value">0078945600001</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Booking Date</td>
+                    <td class="info-value">07 JUL 24</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Status</td>
+                    <td class="info-value">Confirmed</td>
+                  </tr>
+                </table>
+              </div>
             </div>
             
-            <p class="intro-text">
-              Should you require any assistance, our dedicated team is at your service.
-              We look forward to making your journey unforgettable.
-            </p>
+            <h2>Reservation details</h2>
+            <div class="info-box">
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Property</td>
+                    <td class="info-value"><strong>The Grand Luxury Hotel & Spa</strong></td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Address</td>
+                    <td class="info-value">123 Ocean Drive, Miami Beach, FL 33139</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Check-in date</td>
+                    <td class="info-value">Saturday, March 15, 2024</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Check-out date</td>
+                    <td class="info-value">Tuesday, March 18, 2024</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Duration</td>
+                    <td class="info-value">3 nights</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-row">
+                <table>
+                  <tr>
+                    <td class="info-label">Guests</td>
+                    <td class="info-value">2 guests</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
             
-            <p class="signature">
-              With warm regards,<br>
-              The Goldstone Team
+            <h2>Room details</h2>
+            <div class="flight-segment">
+              <div class="segment-header">Your Accommodation</div>
+              <div class="passenger-item">
+                <div class="passenger-name">Deluxe King Suite with Ocean View</div>
+                <div class="passenger-details">Bed Type: King Bed</div>
+              </div>
+            </div>
+            
+            <div class="warning-box">
+              <div class="warning-title">⚠ Important Hotel Information</div>
+              <div class="warning-text">
+                <strong>Check-in Time:</strong> Standard check-in is at 3:00 PM. Early check-in may be available upon request and subject to availability.<br><br>
+                <strong>Check-out Time:</strong> Standard check-out is at 11:00 AM. Late check-out may be available upon request and subject to additional charges.<br><br>
+                <strong>Identification:</strong> A valid government-issued photo ID and credit card will be required at check-in for incidental charges.<br><br>
+                <strong>Payment:</strong> The hotel will place a hold on your credit card for incidental charges. This hold will be released upon check-out.<br><br>
+                <strong>Cancellation:</strong> Free cancellation may be available up to 24-48 hours before check-in. Please review your rate's cancellation policy.<br><br>
+                <strong>Special Requests:</strong> Special requests such as room location, high floor, or bed type preferences are subject to availability and cannot be guaranteed.<br><br>
+                <strong>Contact Property:</strong> For any special requests or questions about your stay, please contact the property directly using the confirmation number above.
+              </div>
+            </div>
+            
+            <h2>Price breakdown</h2>
+            <div class="price-box">
+              <div class="price-total">
+                <table>
+                  <tr>
+                    <td>Total paid</td>
+                    <td style="text-align: right;">USD 1,725.00</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+            
+            <p>If you have any questions or need to make changes to your reservation, please contact us or the property directly. We're here to help make your stay exceptional.</p>
+            
+            <p style="margin-top: 32px; padding: 0 8px;">
+              Safe travels,<br>
+              <strong>The GoldSainte Team</strong>
             </p>
           </div>
           
           <div class="footer">
-            <p style="margin: 0; color: #E5D5B7;">GOLDSTONE LUXURY TRAVEL</p>
-            <div class="footer-divider"></div>
-            <p style="margin: 5px 0;">This is an automated confirmation. Please retain for your records.</p>
-            <p style="margin: 20px 0 0 0; font-size: 11px;">&copy; 2025 Goldstone. All rights reserved.</p>
+            <p style="margin: 0 0 8px 0;">GOLDSAINTE LUXURY TRAVEL</p>
+            <p style="margin: 0;">This is a confirmation email. Please save for your records.</p>
+            <p style="margin: 16px 0 0 0; font-size: 11px;">&copy; 2025 GoldSainte Travel. All rights reserved.</p>
           </div>
         </div>
       </body>
