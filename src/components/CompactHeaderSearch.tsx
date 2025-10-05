@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Search, MapPin, Calendar, User, Plane, Hotel, Car, Plus, Minus, PawPrint } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, MapPin, Calendar, User, Plane, Hotel, Car, Plus, Minus, UtensilsCrossed } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useNavigate } from "react-router-dom";
@@ -12,15 +12,26 @@ import { format } from "date-fns";
 import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 import { cn } from "@/lib/utils";
 
-export const CompactHeaderSearch = () => {
+type SearchType = "flights" | "hotels" | "cars" | "restaurants";
+
+interface CompactHeaderSearchProps {
+  value?: SearchType;
+  onValueChange?: (v: SearchType) => void;
+}
+
+export const CompactHeaderSearch = ({ value, onValueChange }: CompactHeaderSearchProps) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [searchType, setSearchType] = useState<"flights" | "hotels" | "cars">("hotels");
+  const [searchType, setSearchType] = useState<SearchType>(value ?? "hotels");
   
   // Common fields
   const [location, setLocation] = useState("");
   const [checkInDate, setCheckInDate] = useState<Date>();
   const [checkOutDate, setCheckOutDate] = useState<Date>();
+  
+  useEffect(() => {
+    if (value && value !== searchType) setSearchType(value);
+  }, [value]);
   
   // Guest details (like Airbnb)
   const [guests, setGuests] = useState({
@@ -84,14 +95,14 @@ export const CompactHeaderSearch = () => {
         {/* Desktop Button - Full */}
         <Button
           variant="outline"
-          className="hidden md:flex items-center gap-2 px-4 h-12 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background"
+          className="hidden md:flex w-full max-w-3xl items-center gap-2 px-4 h-14 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background md:justify-between"
         >
           <div className="flex items-center gap-3 text-sm">
             <span className="font-medium">{location || "Where"}</span>
             <div className="h-6 w-px bg-border" />
             <span className="font-medium">{checkInDate ? format(checkInDate, "MMM d") : "When"}</span>
             <div className="h-6 w-px bg-border" />
-            <span className="font-medium">{searchType === "hotels" ? "Hotels" : searchType === "flights" ? "Flights" : "Cars"}</span>
+            <span className="font-medium">{searchType === "hotels" ? "Hotels" : searchType === "flights" ? "Flights" : searchType === "cars" ? "Cars" : "Restaurants"}</span>
             <div className="h-6 w-px bg-border" />
             <span className="text-muted-foreground">{totalGuests > 0 ? getGuestText() : "Who"}</span>
           </div>
@@ -281,7 +292,7 @@ export const CompactHeaderSearch = () => {
           {/* Type of Service Selector */}
           <div className="space-y-2">
             <label className="text-xs sm:text-sm font-semibold">Type of Service</label>
-            <Select value={searchType} onValueChange={(v) => setSearchType(v as any)}>
+            <Select value={searchType} onValueChange={(v) => { const val = v as SearchType; setSearchType(val); onValueChange?.(val); }}>
               <SelectTrigger className="w-full h-10">
                 <SelectValue />
               </SelectTrigger>
@@ -302,6 +313,12 @@ export const CompactHeaderSearch = () => {
                   <div className="flex items-center gap-2">
                     <Car className="h-4 w-4" />
                     <span>Car Rentals</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="restaurants">
+                  <div className="flex items-center gap-2">
+                    <PawPrint className="h-4 w-4" />
+                    <span>Restaurants</span>
                   </div>
                 </SelectItem>
               </SelectContent>
