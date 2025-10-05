@@ -107,12 +107,30 @@ serve(async (req) => {
       return { ok: true as const, data: json };
     };
 
+    // Helper to apply 15% markup to car rental results
+    const applyMarkup = (results: any[]) => {
+      const MARKUP_PERCENTAGE = 15;
+      return results.map((car: any) => {
+        const basePrice = parseFloat(car.price?.total || 0);
+        const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
+        
+        return {
+          ...car,
+          price: {
+            ...car.price,
+            total: markedUpPrice.toFixed(2),
+            base: basePrice.toFixed(2) // Store original price
+          }
+        };
+      });
+    };
+
     // Try the requested pickup first
     let attempt = await tryFetch(pickupCode);
     if (attempt.ok && attempt.data?.data?.length) {
       console.log('Car rentals found:', attempt.data.data.length);
       return new Response(JSON.stringify({
-        results: attempt.data.data || [],
+        results: applyMarkup(attempt.data.data || []),
         meta: { ...(attempt.data.meta || {}), pickupUsed: pickupCode }
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -127,7 +145,7 @@ serve(async (req) => {
       if (attempt.ok && attempt.data?.data?.length) {
         console.log('Car rentals fallback used:', fb, 'count:', attempt.data.data.length);
         return new Response(JSON.stringify({
-          results: attempt.data.data || [],
+          results: applyMarkup(attempt.data.data || []),
           meta: { ...(attempt.data.meta || {}), pickupUsed: fb, fallbackUsed: true }
         }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

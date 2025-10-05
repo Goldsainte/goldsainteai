@@ -101,8 +101,25 @@ serve(async (req) => {
     const data = await response.json();
     console.log('Flights found:', data.data?.length || 0);
 
+    // Apply 15% markup to all flight prices
+    const MARKUP_PERCENTAGE = 15;
+    const markedUpFlights = (data.data || []).map((flight: any) => {
+      const basePrice = parseFloat(flight.price?.total || 0);
+      const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
+      
+      return {
+        ...flight,
+        price: {
+          ...flight.price,
+          total: markedUpPrice.toFixed(2),
+          base: basePrice.toFixed(2), // Store original price
+          grandTotal: markedUpPrice.toFixed(2)
+        }
+      };
+    });
+
     return new Response(JSON.stringify({ 
-      results: data.data || [],
+      results: markedUpFlights,
       dictionaries: data.dictionaries,
       meta: data.meta
     }), {

@@ -122,7 +122,9 @@ serve(async (req) => {
     console.log('Flight order created:', bookingData.data.id);
 
     // Calculate pricing with additional fees
-    const basePrice = baseCost || parseFloat(flightOffer.price.total);
+    // Use base price if available (original from search), otherwise calculate from displayed price
+    const displayPrice = parseFloat(flightOffer.price.total);
+    const basePrice = parseFloat(flightOffer.price?.base || baseCost || displayPrice / (1 + MARKUP_PERCENTAGE));
     const markupAmount = basePrice * MARKUP_PERCENTAGE;
     const baggageFees = additionalFees.baggage || 0;
     const seatFees = additionalFees.seats || 0;
