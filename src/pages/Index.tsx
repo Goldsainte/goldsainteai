@@ -51,6 +51,7 @@ import cyclingTour from "@/assets/cycling-tour.jpg";
 import spaWellness from "@/assets/spa-wellness.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -708,7 +709,7 @@ const Index = () => {
           <div className="flex-1 flex flex-col">
             {/* Centered Search Area */}
             <div className="min-h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center px-4 py-6 md:py-8">
-              <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="w-full max-w-4xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
                   <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
@@ -717,33 +718,87 @@ const Index = () => {
                   </p>
                 </div>
 
-                {/* Main Search with rotating placeholder */}
-                <div className="relative pt-2 md:pt-3 px-2 md:px-0">
-                  <Input
-                    placeholder={rotatingMessages[currentMessageIndex]}
-                    className="w-full h-14 md:h-16 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72] placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    disabled={isLoading}
-                  />
-                  <Button
-                    onClick={() => handleSearch()}
-                    size="icon"
-                    variant="ghost"
-                    className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 h-11 w-11 md:h-10 md:w-10 rounded-full hover:bg-muted"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
-                    ) : (
-                      <Send className="h-5 w-5" />
-                    )}
-                  </Button>
+                {/* Quick Access Tabs */}
+                <div className="bg-card border border-border rounded-3xl shadow-lg p-2">
+                  <div className="grid grid-cols-4 gap-2">
+                    <button
+                      onClick={() => handleQuickAction('flights')}
+                      className={cn(
+                        "flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 rounded-2xl transition-all",
+                        "hover:bg-accent/50",
+                        activeQuickLink === 'flights' ? "bg-accent" : "bg-transparent"
+                      )}
+                    >
+                      <Plane className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                      <span className="text-xs md:text-sm font-medium">Flights</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('hotels')}
+                      className={cn(
+                        "flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 rounded-2xl transition-all",
+                        "hover:bg-accent/50",
+                        activeQuickLink === 'hotels' ? "bg-accent" : "bg-transparent"
+                      )}
+                    >
+                      <Hotel className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                      <span className="text-xs md:text-sm font-medium">Hotels</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('cars')}
+                      className={cn(
+                        "flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 rounded-2xl transition-all",
+                        "hover:bg-accent/50",
+                        activeQuickLink === 'cars' ? "bg-accent" : "bg-transparent"
+                      )}
+                    >
+                      <Car className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                      <span className="text-xs md:text-sm font-medium">Cars</span>
+                    </button>
+                    <button
+                      onClick={() => handleQuickAction('restaurants')}
+                      className={cn(
+                        "flex flex-col items-center gap-2 md:gap-3 p-4 md:p-6 rounded-2xl transition-all",
+                        "hover:bg-accent/50",
+                        activeQuickLink === 'restaurants' ? "bg-accent" : "bg-transparent"
+                      )}
+                    >
+                      <UtensilsCrossed className="h-8 w-8 md:h-10 md:w-10 text-primary" />
+                      <span className="text-xs md:text-sm font-medium">Restaurants</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Enhanced Search Bar */}
+                <div className="bg-card border-2 border-[#BFAD72] rounded-full shadow-xl p-2">
+                  <div className="relative flex items-center gap-2">
+                    <div className="flex-1 flex items-center gap-3 px-4">
+                      <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                      <Input
+                        placeholder={rotatingMessages[currentMessageIndex]}
+                        className="flex-1 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 h-12 md:h-14"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        disabled={isLoading}
+                      />
+                    </div>
+                    <Button
+                      onClick={() => handleSearch()}
+                      size="icon"
+                      className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-primary hover:bg-primary/90 flex-shrink-0"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" />
+                      ) : (
+                        <Send className="h-5 w-5 md:h-6 md:w-6" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* What Goldsainte.AI can do button */}
-                <div className="flex items-center justify-center px-2 md:px-0">
+                <div className="flex items-center justify-center">
                   <Button
                     variant="outline"
                     size="sm"
