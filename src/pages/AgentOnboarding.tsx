@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -114,8 +113,6 @@ export default function AgentOnboarding() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SimpleHeader />
-      
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <Button
           variant="ghost"

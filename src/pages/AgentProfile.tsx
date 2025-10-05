@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,7 +91,6 @@ export default function AgentProfile() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <SimpleHeader />
         <div className="container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
@@ -103,7 +101,6 @@ export default function AgentProfile() {
   if (!agent) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <SimpleHeader />
         <main className="flex-1 container mx-auto px-4 py-8">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
@@ -122,8 +119,6 @@ export default function AgentProfile() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SimpleHeader />
-      
       <main className="flex-1 container mx-auto px-4 py-8">
         <Button
           variant="ghost"

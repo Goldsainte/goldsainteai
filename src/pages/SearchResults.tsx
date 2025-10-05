@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { SimpleHeader } from "@/components/SimpleHeader";
 import { EnhancedSearchBar } from "@/components/EnhancedSearchBar";
 import { CompactHotelCard } from "@/components/CompactHotelCard";
 import { CompactFlightCard } from "@/components/CompactFlightCard";

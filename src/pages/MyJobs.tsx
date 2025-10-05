@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { SimpleHeader } from "@/components/SimpleHeader";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -148,7 +147,6 @@ export default function MyJobs() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <SimpleHeader />
         <main className="flex-1 container mx-auto px-4 py-8 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </main>
@@ -158,8 +156,6 @@ export default function MyJobs() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <SimpleHeader />
-      
       <main className="flex-1 container mx-auto px-4 py-8">
         <Button
           variant="ghost"
