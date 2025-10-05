@@ -898,7 +898,13 @@ const Index = () => {
                         <Button 
                           size="sm"
                           className="gap-2"
-                          onClick={() => navigate('/auth?redirect=/agent-onboarding')}
+                          onClick={() => {
+                            if (user) {
+                              navigate('/agent-onboarding');
+                            } else {
+                              navigate('/auth?redirect=/agent-onboarding');
+                            }
+                          }}
                         >
                           <Briefcase className="h-4 w-4" />
                           Apply Now
@@ -907,10 +913,10 @@ const Index = () => {
                           size="sm"
                           variant="outline"
                           className="gap-2"
-                          onClick={() => navigate('/marketplace')}
+                          onClick={() => navigate('/browse-agents')}
                         >
                           <MapPinned className="h-4 w-4" />
-                          Marketplace
+                          Browse Agents
                         </Button>
                       </div>
                     </div>
