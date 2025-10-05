@@ -810,7 +810,7 @@ const Index = () => {
             </div>
 
             {/* Hero Image Section */}
-            <div className="w-full overflow-hidden max-h-[400px] md:max-h-[600px] lg:max-h-none">
+            <div className="w-full overflow-hidden max-h-[600px] md:max-h-[700px] lg:max-h-none">
               <img 
                 src={heroAiConcierge} 
                 alt="Introducing Goldsainte AI Assist: AI Travel Concierge" 
