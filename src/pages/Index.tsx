@@ -695,24 +695,6 @@ const Index = () => {
   return (
     <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
       <div className="w-full h-full flex flex-col">
-        {/* Preferences Toggle - Upper Right Corner */}
-        {user && (
-          <div className="absolute top-4 right-4 z-50">
-            <Card className="p-3 shadow-lg border-primary/20">
-              <div className="flex items-center gap-3">
-                <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer">
-                  Use My Preferences
-                </Label>
-                <Switch
-                  id="preferences-toggle"
-                  checked={usePreferences}
-                  onCheckedChange={togglePreferences}
-                />
-              </div>
-            </Card>
-          </div>
-        )}
-        
         {!showChat ? (
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">

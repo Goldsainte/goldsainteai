@@ -1,14 +1,71 @@
+import { useState, useEffect } from "react";
 import { Heart, User, Globe, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import logomark from "@/assets/logomark-seal-gold.png";
 
 export const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { toast } = useToast();
+  const [usePreferences, setUsePreferences] = useState(true);
+
+  // Fetch user's preference setting
+  useEffect(() => {
+    const fetchPreferences = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('user_booking_preferences')
+        .select('use_preferences_in_search')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setUsePreferences(data.use_preferences_in_search ?? true);
+      }
+    };
+    
+    fetchPreferences();
+  }, [user]);
+
+  const togglePreferences = async (checked: boolean) => {
+    setUsePreferences(checked);
+    
+    if (!user) return;
+    
+    const { error } = await supabase
+      .from('user_booking_preferences')
+      .upsert({
+        user_id: user.id,
+        use_preferences_in_search: checked
+      }, {
+        onConflict: 'user_id'
+      });
+    
+    if (error) {
+      console.error('Error updating preference:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save preference",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: checked ? "Preferences enabled" : "Preferences disabled",
+        description: checked 
+          ? "Search results will match your saved preferences" 
+          : "Search results will show all available options",
+      });
+    }
+  };
 
   const handleServiceClick = (service: string) => {
     if (location.pathname === '/') {
@@ -100,7 +157,7 @@ export const Header = () => {
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-background border-border z-[100]">
+              <DropdownMenuContent align="end" className="w-64 bg-background border-border z-[100]">
                 {user ? (
                   <>
                     <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer">
@@ -116,7 +173,28 @@ export const Header = () => {
                     <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer">
                       Booking Preferences
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={signOut} className="cursor-pointer border-t mt-2 pt-2">
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <div className="px-2 py-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1">
+                          Use My Preferences
+                        </Label>
+                        <Switch
+                          id="preferences-toggle"
+                          checked={usePreferences}
+                          onCheckedChange={togglePreferences}
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Apply saved preferences to searches
+                      </p>
+                    </div>
+                    
+                    <DropdownMenuSeparator />
+                    
+                    <DropdownMenuItem onClick={signOut} className="cursor-pointer">
                       Sign Out
                     </DropdownMenuItem>
                   </>
