@@ -120,9 +120,14 @@ export const Header = () => {
                   <Car className="h-4 w-4 text-primary" />
                   <span>Car Rentals</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/browse-agents')} className="gap-3 cursor-pointer border-t mt-2 pt-2">
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/browse-agents')} className="gap-3 cursor-pointer">
                   <Briefcase className="h-4 w-4 text-primary" />
                   <span>Travel Agents</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/marketplace')} className="gap-3 cursor-pointer">
+                  <Briefcase className="h-4 w-4 text-primary" />
+                  <span>Marketplace</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -130,15 +135,6 @@ export const Header = () => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-1">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="hidden sm:flex gap-2 text-sm font-medium hover:bg-muted rounded-full"
-              onClick={() => navigate('/marketplace')}
-            >
-              Marketplace
-            </Button>
-            
             <Button 
               variant="ghost" 
               size="sm"
