@@ -50,7 +50,7 @@ export default function Marketplace() {
     }
 
     fetchJobs();
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   const fetchAttachments = async (jobId: string) => {
     try {

@@ -14,7 +14,7 @@ import { format } from "date-fns";
 
 export default function CommissionDashboard() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { isAdmin } = useUserRole();
   const [loading, setLoading] = useState(true);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -28,12 +28,13 @@ export default function CommissionDashboard() {
   });
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
     loadCommissionData();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   // Allow admins full access to commission data
 

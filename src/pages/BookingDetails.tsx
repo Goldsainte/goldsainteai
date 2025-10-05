@@ -26,13 +26,14 @@ export default function BookingDetails() {
   const { bookingId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [cancelling, setCancelling] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
@@ -40,7 +41,7 @@ export default function BookingDetails() {
     if (bookingId) {
       fetchBookingDetails();
     }
-  }, [user, bookingId, navigate]);
+  }, [user, authLoading, bookingId, navigate]);
 
   const fetchBookingDetails = async () => {
     try {

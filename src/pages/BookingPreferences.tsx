@@ -15,7 +15,7 @@ import { ComprehensivePreferencesForm } from "@/components/ComprehensivePreferen
 type Message = { role: "user" | "assistant"; content: string };
 
 export default function BookingPreferences() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -25,13 +25,14 @@ export default function BookingPreferences() {
   const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
 
     fetchPreferences();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchPreferences = async () => {
     try {

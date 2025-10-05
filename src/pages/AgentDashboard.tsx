@@ -26,7 +26,7 @@ import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager"
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 
 export default function AgentDashboard() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<any>(null);
@@ -50,13 +50,13 @@ export default function AgentDashboard() {
   const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
-
     fetchData();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   // Allow admins to access this page even if they're not agents
 

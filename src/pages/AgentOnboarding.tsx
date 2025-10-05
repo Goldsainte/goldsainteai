@@ -16,16 +16,17 @@ import { Briefcase, Upload, ArrowLeft } from "lucide-react";
 import { TermsDialog, PrivacyDialog, VendorDialog, InsuranceDialog } from "@/components/AgentLegalDocuments";
 
 export default function AgentOnboarding() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);

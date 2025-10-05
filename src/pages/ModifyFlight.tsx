@@ -25,7 +25,7 @@ import { cn } from "@/lib/utils";
 export default function ModifyFlight() {
   const { bookingId } = useParams();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [booking, setBooking] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
@@ -38,6 +38,7 @@ export default function ModifyFlight() {
   const [adults, setAdults] = useState("1");
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
@@ -45,7 +46,7 @@ export default function ModifyFlight() {
     if (bookingId) {
       fetchBookingDetails();
     }
-  }, [user, bookingId, navigate]);
+  }, [user, authLoading, bookingId, navigate]);
 
   const fetchBookingDetails = async () => {
     try {

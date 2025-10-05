@@ -14,17 +14,18 @@ import { toast } from "sonner";
 
 export default function MyBookings() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
     fetchBookings();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchBookings = async () => {
     try {

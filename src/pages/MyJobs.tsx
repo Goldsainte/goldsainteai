@@ -17,7 +17,7 @@ import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function MyJobs() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { isAdmin } = useUserRole();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
@@ -30,12 +30,13 @@ export default function MyJobs() {
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
     fetchJobs();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     applyFilters();
