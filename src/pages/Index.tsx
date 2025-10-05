@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase } from "lucide-react";
+import { Plane, Hotel, MapPin, UtensilsCrossed, Search, Send, Loader2, Sparkles, ArrowLeft, MapPinned, Star, FileCheck, Ticket, Car, Briefcase, Bike } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -802,7 +802,8 @@ const Index = () => {
                       <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={spaWellness} 
-                          alt="Spa & Wellness" 
+                          alt="Luxury spa massage treatment - Spa & Wellness" 
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
@@ -922,7 +923,8 @@ const Index = () => {
                       <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
                         <img 
                           src={cyclingTour} 
-                          alt="Cycling" 
+                          alt="Professional road bike race - Tour de France style" 
+                          loading="lazy"
                           className="w-full h-full object-cover"
                         />
                         <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
