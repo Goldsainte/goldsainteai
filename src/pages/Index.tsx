@@ -43,6 +43,7 @@ import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
+import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
 import swissAlps from "@/assets/swiss-alps.jpg";
 import maldivesTropical from "@/assets/maldives-tropical.jpg";
@@ -803,8 +804,26 @@ const Index = () => {
             </div>
 
             {/* How it Works Section - Horizontal Scrolling */}
-            <div className="px-6 py-20 bg-gradient-to-b from-background via-muted/10 to-background">
-              <div className="w-full max-w-7xl mx-auto space-y-12">
+            <div className="px-6 py-20 bg-gradient-to-b from-background via-muted/10 to-background relative overflow-hidden">
+              {/* Background luxury image */}
+              <div className="absolute inset-0 opacity-5">
+                <img 
+                  src={luxuryAiHero} 
+                  alt="Luxury AI Travel Concierge" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              <div className="w-full max-w-7xl mx-auto space-y-12 relative z-10">
+                {/* Hero Image Section */}
+                <div className="rounded-3xl overflow-hidden shadow-2xl border border-secondary/20 max-w-5xl mx-auto">
+                  <img 
+                    src={luxuryAiHero} 
+                    alt="Luxury AI Travel Concierge Experience" 
+                    className="w-full h-auto object-cover"
+                  />
+                </div>
+
                 <div className="text-center space-y-3">
                   <h2 className="text-4xl md:text-5xl font-chiffon font-bold text-secondary">
                     How it Works
@@ -819,8 +838,8 @@ const Index = () => {
                   <div className="overflow-x-auto scrollbar-hide">
                     <div className="flex gap-6 px-6 pb-4 min-w-min">
                       {/* Card 1 - AI Search */}
-                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
                               <Search className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
@@ -852,8 +871,8 @@ const Index = () => {
                       </Card>
 
                       {/* Card 2 - Expert Agents */}
-                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-accent/10 to-primary/10">
+                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-accent/10 to-primary/10">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
                               <Briefcase className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
@@ -879,8 +898,8 @@ const Index = () => {
                       </Card>
 
                       {/* Card 3 - Instant Booking */}
-                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
                               <Star className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
@@ -912,8 +931,8 @@ const Index = () => {
                       </Card>
 
                       {/* Card 4 - Itinerary Builder */}
-                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-accent/10 to-primary/10">
+                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-accent/10 to-primary/10">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
                               <MapPin className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
@@ -939,8 +958,8 @@ const Index = () => {
                       </Card>
 
                       {/* Card 5 - Messaging Hub */}
-                      <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
+                      <Card className="flex-shrink-0 w-64 md:w-72 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-52 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
                           <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative">
                               <Send className="h-24 w-24 text-secondary opacity-20 absolute -top-4 -left-4" />
