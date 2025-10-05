@@ -49,7 +49,7 @@ import cardAiSearch from "@/assets/card-ai-search.jpg";
 import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking.jpg";
 import cardItinerary from "@/assets/card-itinerary.jpg";
-import cardMessaging from "@/assets/card-messaging-updated.jpg";
+import cardMessaging from "@/assets/card-messaging-chatting.png";
 import santoriniGreece from "@/assets/santorini-greece.jpg";
 import swissAlps from "@/assets/swiss-alps.jpg";
 import maldivesTropical from "@/assets/maldives-tropical.jpg";
