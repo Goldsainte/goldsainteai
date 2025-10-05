@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import logomark from "@/assets/logomark-seal-gold.png";
+import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -87,7 +88,12 @@ export const Header = () => {
             <span className="text-lg font-bold font-chiffon text-primary hidden sm:block">Goldsainte.Ai</span>
           </a>
 
-          {/* Services Dropdown - Center */}
+          {/* Compact Search Bar */}
+          <div className="flex-1 flex justify-center max-w-2xl mx-auto">
+            <CompactHeaderSearch />
+          </div>
+
+          {/* Services Dropdown - Right side */}
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
