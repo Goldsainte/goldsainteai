@@ -84,9 +84,9 @@ export const CompactHeaderSearch = () => {
         {/* Desktop Button - Full */}
         <Button
           variant="outline"
-          className="hidden md:flex items-center gap-2 px-4 h-12 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background"
+          className="hidden md:flex items-center gap-2 px-4 h-12 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background w-full max-w-3xl"
         >
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-3 text-sm w-full justify-between">
             <span className="font-medium">{location || "Where"}</span>
             <div className="h-6 w-px bg-border" />
             <span className="font-medium">{checkInDate ? format(checkInDate, "MMM d") : "When"}</span>
@@ -95,7 +95,7 @@ export const CompactHeaderSearch = () => {
             <div className="h-6 w-px bg-border" />
             <span className="text-muted-foreground">{totalGuests > 0 ? getGuestText() : "Who"}</span>
           </div>
-          <div className="ml-2 p-2 bg-primary rounded-full">
+          <div className="ml-2 p-2 bg-primary rounded-full flex-shrink-0">
             <Search className="h-3 w-3 text-primary-foreground" />
           </div>
         </Button>

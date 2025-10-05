@@ -82,7 +82,7 @@ export const Header = () => {
   return (
     <header className="bg-background border-b border-border sticky top-0 z-50">
       <div className="container mx-auto px-3 sm:px-6">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-4 h-16 md:h-20">
           {/* Logo - Left */}
           <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity flex-shrink-0">
             <img src={logomark} alt="Logo" className="h-7 w-7 md:h-8 md:w-8" />
@@ -90,7 +90,7 @@ export const Header = () => {
           </a>
 
           {/* Compact Search Bar - Center (desktop and mobile) */}
-          <div className="flex-1 flex justify-center mx-2 sm:mx-4 max-w-5xl">
+          <div className="flex justify-center">
             <CompactHeaderSearch />
           </div>
 
