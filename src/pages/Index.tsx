@@ -793,19 +793,33 @@ const Index = () => {
                     </div>
                     
                     {/* Category cards with images - positioned organically */}
-                    {/* Top left - Spa/Wellness */}
+                    {/* Top left - Spa/Wellness with image */}
                     <div className="absolute top-0 left-0 animate-float z-10">
-                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/95 backdrop-blur-sm shadow-lg border border-border">
-                        <Hotel className="h-4 w-4 text-accent" />
-                        <span className="text-sm font-medium whitespace-nowrap">Spa / Wellness</span>
+                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={baliSerenity} 
+                          alt="Spa & Wellness" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Hotel className="h-4 w-4 text-accent" />
+                          <span className="text-sm font-semibold">Spa / Wellness</span>
+                        </div>
                       </div>
                     </div>
                     
-                    {/* Top right - Theater */}
+                    {/* Top right - Theater with image */}
                     <div className="absolute top-4 right-8 animate-float z-10" style={{ animationDelay: '0.5s' }}>
-                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/95 backdrop-blur-sm shadow-lg border border-border">
-                        <Ticket className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Theater</span>
+                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={santoriniGreece} 
+                          alt="Theater" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 right-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Ticket className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-semibold">Theater</span>
+                        </div>
                       </div>
                     </div>
                     
@@ -899,11 +913,18 @@ const Index = () => {
                       </div>
                     </div>
                     
-                    {/* Bottom pill - Cycling */}
+                    {/* Bottom - Cycling with image */}
                     <div className="absolute bottom-4 left-1/2 -translate-x-1/2 animate-float z-10" style={{ animationDelay: '4s' }}>
-                      <div className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/95 backdrop-blur-sm shadow-lg border border-border">
-                        <Car className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium">Cycling</span>
+                      <div className="relative w-40 h-40 rounded-3xl overflow-hidden shadow-xl">
+                        <img 
+                          src={swissAlps} 
+                          alt="Cycling" 
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-3 left-3 flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 backdrop-blur-sm shadow-md">
+                          <Car className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-semibold">Cycling</span>
+                        </div>
                       </div>
                     </div>
                     </div>
