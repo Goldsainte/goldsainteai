@@ -81,29 +81,30 @@ export const Header = () => {
 
   return (
     <header className="bg-background border-b border-border sticky top-0 z-50">
-      <div className="container mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-3 items-center h-20 gap-4">
+      <div className="container mx-auto px-3 sm:px-6">
+        <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo - Left */}
-          <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity justify-start">
-            <img src={logomark} alt="Logo" className="h-8 w-8" />
-            <span className="text-lg font-bold font-chiffon text-primary hidden sm:block">Goldsainte.Ai</span>
+          <a href="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity flex-shrink-0">
+            <img src={logomark} alt="Logo" className="h-7 w-7 md:h-8 md:w-8" />
+            <span className="text-base md:text-lg font-bold font-chiffon text-primary hidden sm:block">Goldsainte.Ai</span>
           </a>
 
-          {/* Compact Search Bar - Center */}
-          <div className="flex justify-center">
+          {/* Compact Search Bar - Center (desktop and mobile) */}
+          <div className="flex-1 flex justify-center mx-2 sm:mx-4 max-w-2xl">
             <CompactHeaderSearch />
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-1 justify-end">
+          <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
-                  className="gap-2 text-sm font-medium hover:bg-muted"
+                  size="sm"
+                  className="gap-1 text-xs sm:text-sm font-medium hover:bg-muted hidden sm:flex"
                 >
-                  <Briefcase className="h-4 w-4" />
-                  Services
+                  <Briefcase className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Services</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="center" className="w-56 bg-background border-border z-[100]">
@@ -141,10 +142,11 @@ export const Header = () => {
             <Button 
               variant="ghost" 
               size="sm"
-              className="hidden sm:flex gap-2 text-sm font-medium hover:bg-muted rounded-full"
+              className="hidden lg:flex gap-2 text-xs sm:text-sm font-medium hover:bg-muted rounded-full px-2 sm:px-3"
               onClick={() => navigate('/agent-onboarding')}
             >
-              Become an Agent
+              <span className="hidden xl:inline">Become an Agent</span>
+              <span className="xl:hidden">Agent</span>
             </Button>
             
             <DropdownMenu>
@@ -152,9 +154,9 @@ export const Header = () => {
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="hover:bg-muted rounded-full"
+                  className="hover:bg-muted rounded-full h-9 w-9 md:h-10 md:w-10"
                 >
-                  <Globe className="h-5 w-5" />
+                  <Globe className="h-4 w-4 md:h-5 md:w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-background border-border z-[100]">
@@ -255,10 +257,10 @@ export const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
-                  className="gap-2 hover:bg-muted rounded-full border border-border shadow-sm px-3 h-10"
+                  className="gap-1.5 hover:bg-muted rounded-full border border-border shadow-sm px-2 sm:px-3 h-9 md:h-10"
                 >
-                  <Menu className="h-4 w-4" />
-                  <User className="h-5 w-5" />
+                  <Menu className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <User className="h-4 w-4 md:h-5 md:w-5" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64 bg-background border-border z-[100]">

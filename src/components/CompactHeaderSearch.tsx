@@ -62,6 +62,26 @@ export const CompactHeaderSearch = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
+        {/* Mobile Button - Compact */}
+        <Button
+          variant="outline"
+          className="flex md:hidden items-center gap-2 px-3 h-10 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background w-full max-w-[280px]"
+        >
+          <Search className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <div className="flex items-center gap-2 text-xs truncate">
+            <span className="font-medium truncate">{location || "Search"}</span>
+            {checkInDate && (
+              <>
+                <div className="h-4 w-px bg-border" />
+                <span className="text-muted-foreground">{format(checkInDate, "MMM d")}</span>
+              </>
+            )}
+          </div>
+        </Button>
+      </DialogTrigger>
+      
+      <DialogTrigger asChild>
+        {/* Desktop Button - Full */}
         <Button
           variant="outline"
           className="hidden md:flex items-center gap-2 px-4 h-12 rounded-full border-border shadow-sm hover:shadow-md transition-all bg-background"
@@ -80,9 +100,9 @@ export const CompactHeaderSearch = () => {
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-5xl">
-        <div className="space-y-6">
-          <div className="grid grid-cols-4 gap-4 bg-muted/50 p-4 rounded-2xl">
+      <DialogContent className="max-w-5xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto">
+        <div className="space-y-4 sm:space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 bg-muted/50 p-3 sm:p-4 rounded-2xl">
             {/* Where */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground">Where</label>
@@ -260,9 +280,9 @@ export const CompactHeaderSearch = () => {
 
           {/* Type of Service Selector */}
           <div className="space-y-2">
-            <label className="text-sm font-semibold">Type of Service</label>
+            <label className="text-xs sm:text-sm font-semibold">Type of Service</label>
             <Select value={searchType} onValueChange={(v) => setSearchType(v as any)}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -294,7 +314,7 @@ export const CompactHeaderSearch = () => {
             </Select>
           </div>
 
-          <Button onClick={handleSearch} className="w-full" size="lg">
+          <Button onClick={handleSearch} className="w-full h-11 sm:h-12 text-base" size="lg">
             <Search className="mr-2 h-4 w-4" />
             Search
           </Button>
