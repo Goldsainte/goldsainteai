@@ -810,49 +810,49 @@ const Index = () => {
             </div>
 
             {/* Hero Image Section */}
-            <div className="w-full overflow-hidden">
+            <div className="w-full overflow-hidden max-h-[400px] md:max-h-[600px] lg:max-h-none">
               <img 
                 src={heroAiConcierge} 
                 alt="Introducing Goldsainte AI Assist: AI Travel Concierge" 
-                className="w-full h-auto object-cover"
+                className="w-full h-full object-cover object-center"
               />
             </div>
 
             {/* How it Works Section - Horizontal Scrolling */}
-            <div className="px-6 py-20 bg-gradient-to-b from-background via-muted/10 to-background">
-              <div className="w-full max-w-7xl mx-auto space-y-12">
-                <div className="text-center space-y-3">
-                  <h2 className="text-4xl md:text-5xl font-chiffon font-bold text-secondary">
+            <div className="px-4 sm:px-6 py-12 sm:py-16 md:py-20 bg-gradient-to-b from-background via-muted/10 to-background">
+              <div className="w-full max-w-7xl mx-auto space-y-8 sm:space-y-10 md:space-y-12">
+                <div className="text-center space-y-2 sm:space-y-3 px-2">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-chiffon font-bold text-secondary">
                     How it Works
                   </h2>
-                  <p className="text-lg text-muted-foreground font-secondary max-w-2xl mx-auto">
+                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
                     Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
                   </p>
                 </div>
 
                 {/* Horizontal Scrolling Container */}
-                <div className="relative -mx-6">
-                  <div className="overflow-x-auto scrollbar-hide">
-                    <div className="flex gap-6 px-6 pb-4 min-w-min">
+                <div className="relative -mx-4 sm:-mx-6">
+                  <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
+                    <div className="flex gap-4 sm:gap-6 px-4 sm:px-6 pb-4 min-w-min">
                       {/* Card 1 - AI Search */}
-                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-48 sm:h-52 overflow-hidden">
                           <img 
                             src={cardAiSearch} 
                             alt="AI-Powered Search" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-6 space-y-3">
-                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-5 sm:p-6 space-y-3">
+                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
                             AI-Powered Search
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
                             Search across flights, hotels, restaurants, events, and curated packages in one conversation
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
                             onClick={() => {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                               setTimeout(() => {
@@ -867,24 +867,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 2 - Expert Agents */}
-                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-48 sm:h-52 overflow-hidden">
                           <img 
                             src={cardExpertAgents} 
                             alt="Expert Travel Agents" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-6 space-y-3">
-                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-5 sm:p-6 space-y-3">
+                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
                             Expert Travel Agents
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
                             Post complex trips to our marketplace and get matched with certified luxury travel agents
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
                             onClick={() => navigate('/browse-agents')}
                           >
                             Find an Agent
@@ -893,24 +893,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 3 - Real-Time Messaging */}
-                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-48 sm:h-52 overflow-hidden">
                           <img 
                             src={cardMessaging} 
                             alt="Real-Time Messaging" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-6 space-y-3">
-                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-5 sm:p-6 space-y-3">
+                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
                             Real-Time Messaging
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
                             Chat instantly with agents and manage all your travel conversations in one secure place
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
                             onClick={() => {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                               setTimeout(() => {
@@ -925,24 +925,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 4 - Itinerary Builder */}
-                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-48 sm:h-52 overflow-hidden">
                           <img 
                             src={cardItinerary} 
                             alt="Itinerary Management" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-6 space-y-3">
-                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-5 sm:p-6 space-y-3">
+                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
                             Itinerary Management
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
                             Build day-by-day itineraries, upload travel docs, and sync with your calendar
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
                             onClick={() => navigate('/dashboard')}
                           >
                             Build Itinerary
@@ -951,24 +951,24 @@ const Index = () => {
                       </Card>
 
                       {/* Card 5 - Instant Booking */}
-                      <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
+                        <div className="relative h-48 sm:h-52 overflow-hidden">
                           <img 
                             src={cardInstantBooking} 
                             alt="Instant Booking" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-6 space-y-3">
-                          <h3 className="text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-5 sm:p-6 space-y-3">
+                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
                             Instant Booking
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
                             Book instantly with transparent pricing, flexible cancellations, and smart price insights
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
                             onClick={() => {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                               setTimeout(() => {
@@ -991,18 +991,18 @@ const Index = () => {
             </div>
 
             {/* Inspiration Content - Far below the fold */}
-            <div className="px-6 pb-12 pt-20">
-              <div className="w-full max-w-7xl mx-auto space-y-6">
-                <div className="text-center space-y-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
+            <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-12 sm:pt-16 md:pt-20">
+              <div className="w-full max-w-7xl mx-auto space-y-5 sm:space-y-6">
+                <div className="text-center space-y-2 px-2">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Get Inspired
                   </h2>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     Discover your next dream destination
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                   {inspirationDestinations.map((destination, idx) => (
                     <InspirationCard
                       key={idx}
@@ -1017,17 +1017,17 @@ const Index = () => {
               </div>
 
               {/* Featured Restaurants */}
-              <div className="space-y-6 pt-12">
-                <div className="text-center space-y-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
+              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
+                <div className="text-center space-y-2 px-2">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
                     Fine Dining Experiences
                   </h2>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     Savor exceptional cuisine at world-renowned restaurants
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   {featuredRestaurants.map((restaurant, idx) => (
                     <Card
                       key={idx}
@@ -1071,17 +1071,17 @@ const Index = () => {
               </div>
 
               {/* Featured Flights */}
-              <div className="space-y-6 pt-12">
-                <div className="text-center space-y-2">
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
+              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
+                <div className="text-center space-y-2 px-2">
+                  <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
                     Premium Flight Services
                   </h2>
-                  <p className="text-muted-foreground">
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     Fly in comfort and style to destinations worldwide
                   </p>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
                   {featuredFlights.map((flight, idx) => (
                     <Card
                       key={idx}
