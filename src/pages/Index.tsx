@@ -835,7 +835,17 @@ const Index = () => {
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
                             Search across flights, hotels, restaurants, events, and curated packages in one conversation
                           </p>
-                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            onClick={() => {
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              setTimeout(() => {
+                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
+                                input?.focus();
+                              }, 500);
+                            }}
+                          >
                             Try it Now
                           </Button>
                         </CardContent>
@@ -858,7 +868,11 @@ const Index = () => {
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
                             Post complex trips to our marketplace and get matched with certified luxury travel agents
                           </p>
-                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            onClick={() => navigate('/browse-agents')}
+                          >
                             Find an Agent
                           </Button>
                         </CardContent>
@@ -881,7 +895,17 @@ const Index = () => {
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
                             Book instantly with transparent pricing, flexible cancellations, and smart price insights
                           </p>
-                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            onClick={() => {
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              setTimeout(() => {
+                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
+                                input?.focus();
+                              }, 500);
+                            }}
+                          >
                             Start Booking
                           </Button>
                         </CardContent>
@@ -904,7 +928,11 @@ const Index = () => {
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
                             Build day-by-day itineraries, upload travel docs, and sync with your calendar
                           </p>
-                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            onClick={() => navigate('/dashboard')}
+                          >
                             Build Itinerary
                           </Button>
                         </CardContent>
@@ -927,7 +955,17 @@ const Index = () => {
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
                             Chat instantly with agents and manage all your travel conversations in one secure place
                           </p>
-                          <Button variant="outline" className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground">
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-4 border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground"
+                            onClick={() => {
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              setTimeout(() => {
+                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
+                                input?.focus();
+                              }, 500);
+                            }}
+                          >
                             Start Chatting
                           </Button>
                         </CardContent>
