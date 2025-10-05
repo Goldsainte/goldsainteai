@@ -815,9 +815,9 @@ const Index = () => {
                 </div>
 
                 {/* Horizontal Scrolling Container */}
-                <div className="relative">
-                  <ScrollArea className="w-full whitespace-nowrap pb-4">
-                    <div className="flex gap-6 px-4">
+                <div className="relative -mx-6">
+                  <div className="overflow-x-auto scrollbar-hide">
+                    <div className="flex gap-6 px-6 pb-4 min-w-min">
                       {/* Card 1 - AI Search */}
                       <Card className="flex-shrink-0 w-80 md:w-96 overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-64 overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
@@ -932,8 +932,11 @@ const Index = () => {
                           </Button>
                         </CardContent>
                       </Card>
+
+                      {/* Padding element to ensure last card is fully visible */}
+                      <div className="flex-shrink-0 w-6" aria-hidden="true"></div>
                     </div>
-                  </ScrollArea>
+                  </div>
                 </div>
               </div>
             </div>
