@@ -215,7 +215,7 @@ export default function EmailPreview() {
             <img src="/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
           </div>
           
-          <img src="/email-hero-luxury.jpg?v=5" alt="Luxury Travel" class="hero-image" />
+          <img src="/email-hero-hotel.jpg" alt="Luxury Hotel" class="hero-image" />
           
           <div class="content">
             <h1>✓ Your reservation is confirmed</h1>

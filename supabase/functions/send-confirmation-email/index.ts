@@ -754,7 +754,7 @@ const handler = async (req: Request): Promise<Response> => {
               <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
             </div>
             
-            <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/email-hero-luxury.jpg" alt="Luxury Travel" class="hero-image" />
+            <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/${bookingType === 'hotel' ? 'email-hero-hotel.jpg' : 'email-hero-luxury.jpg'}" alt="${bookingType === 'hotel' ? 'Luxury Hotel' : 'Luxury Travel'}" class="hero-image" />
             
             <div class="content">
               <h1>✓ Your ${bookingType} is confirmed</h1>
