@@ -797,6 +797,13 @@ const Index = () => {
                       <p className="text-lg md:text-xl text-muted-foreground leading-relaxed font-secondary">
                         Chat for destinations, build full itineraries, or discover your style — tell us what you love, we'll do the rest.
                       </p>
+                      <ul className="space-y-3 text-base md:text-lg text-muted-foreground font-secondary list-disc list-inside">
+                        <li>AI-powered search across flights, hotels, restaurants, events, and curated packages in one conversation</li>
+                        <li>Post complex trips to our marketplace and get matched with certified luxury travel agents</li>
+                        <li>Instant booking with transparent pricing, flexible cancellations, and smart price insights</li>
+                        <li>Build day-by-day itineraries, upload travel docs, and sync with your calendar</li>
+                        <li>Real-time messaging hub to chat with agents and manage all bookings in one place</li>
+                      </ul>
                     </div>
                   </div>
                   
