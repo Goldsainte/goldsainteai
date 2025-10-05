@@ -10,7 +10,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import logomark from "@/assets/logomark-seal-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
-import { cn } from "@/lib/utils";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -19,7 +18,6 @@ export const Header = () => {
   const { toast } = useToast();
   const [usePreferences, setUsePreferences] = useState(true);
   const [selectedLanguage, setSelectedLanguage] = useState("English");
-  const [selectedType, setSelectedType] = useState<"flights" | "hotels" | "cars" | "restaurants">("hotels");
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -91,8 +89,10 @@ export const Header = () => {
             <span className="text-base md:text-lg font-bold font-chiffon text-primary hidden sm:block">Goldsainte.Ai</span>
           </a>
 
-          {/* Spacer to center top row like Airbnb (search moved below) */}
-          <div className="flex-1" />
+          {/* Compact Search Bar - Center (desktop and mobile) */}
+          <div className="flex-1 flex justify-center mx-2 sm:mx-4 max-w-2xl">
+            <CompactHeaderSearch />
+          </div>
 
           {/* Right side actions */}
           <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
@@ -317,56 +317,8 @@ export const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          </div>
-          {/* Quick access options and search below - AirBnB style */}
-          <div className="pb-3 md:pb-4">
-            <div className="flex justify-center">
-              <div className="inline-flex items-center gap-1 rounded-full border border-border bg-background p-1 shadow-sm">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn("rounded-full px-4 py-2", selectedType === "flights" ? "bg-muted" : "hover:bg-muted")}
-                  onClick={() => setSelectedType("flights")}
-                >
-                  <Plane className="mr-2 h-5 w-5 md:h-6 md:w-6" />
-                  <span className="text-sm md:text-base">Flights</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn("rounded-full px-4 py-2", selectedType === "hotels" ? "bg-muted" : "hover:bg-muted")}
-                  onClick={() => setSelectedType("hotels")}
-                >
-                  <Hotel className="mr-2 h-5 w-5 md:h-6 md:w-6" />
-                  <span className="text-sm md:text-base">Hotels</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn("rounded-full px-4 py-2", selectedType === "cars" ? "bg-muted" : "hover:bg-muted")}
-                  onClick={() => setSelectedType("cars")}
-                >
-                  <Car className="mr-2 h-5 w-5 md:h-6 md:w-6" />
-                  <span className="text-sm md:text-base">Cars</span>
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn("rounded-full px-4 py-2", selectedType === "restaurants" ? "bg-muted" : "hover:bg-muted")}
-                  onClick={() => setSelectedType("restaurants")}
-                >
-                  <UtensilsCrossed className="mr-2 h-5 w-5 md:h-6 md:w-6" />
-                  <span className="text-sm md:text-base">Restaurants</span>
-                </Button>
-              </div>
-            </div>
-            <div className="mt-3 md:mt-4 flex justify-center">
-              <div className="w-full max-w-3xl px-2">
-                <CompactHeaderSearch value={selectedType} onValueChange={setSelectedType} />
-              </div>
-            </div>
-          </div>
         </div>
+      </div>
     </header>
   );
 };
