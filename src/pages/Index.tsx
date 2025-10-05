@@ -882,21 +882,21 @@ const Index = () => {
                         </CardContent>
                       </Card>
 
-                      {/* Card 3 - Instant Booking */}
+                      {/* Card 3 - Real-Time Messaging */}
                       <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
-                            src={cardInstantBooking} 
-                            alt="Instant Booking" 
+                            src={cardMessaging} 
+                            alt="Real-Time Messaging" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
                         <CardContent className="p-6 space-y-3">
                           <h3 className="text-xl font-semibold font-secondary text-foreground">
-                            Instant Booking
+                            Real-Time Messaging
                           </h3>
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
-                            Book instantly with transparent pricing, flexible cancellations, and smart price insights
+                            Chat instantly with agents and manage all your travel conversations in one secure place
                           </p>
                           <Button 
                             variant="outline" 
@@ -909,7 +909,7 @@ const Index = () => {
                               }, 500);
                             }}
                           >
-                            Start Booking
+                            Start Chatting
                           </Button>
                         </CardContent>
                       </Card>
@@ -940,21 +940,21 @@ const Index = () => {
                         </CardContent>
                       </Card>
 
-                      {/* Card 5 - Messaging Hub */}
+                      {/* Card 5 - Instant Booking */}
                       <Card className="flex-shrink-0 w-[307px] md:w-[346px] overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
                         <div className="relative h-52 overflow-hidden">
                           <img 
-                            src={cardMessaging} 
-                            alt="Real-Time Messaging" 
+                            src={cardInstantBooking} 
+                            alt="Instant Booking" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
                         <CardContent className="p-6 space-y-3">
                           <h3 className="text-xl font-semibold font-secondary text-foreground">
-                            Real-Time Messaging
+                            Instant Booking
                           </h3>
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal">
-                            Chat instantly with agents and manage all your travel conversations in one secure place
+                            Book instantly with transparent pricing, flexible cancellations, and smart price insights
                           </p>
                           <Button 
                             variant="outline" 
@@ -967,7 +967,7 @@ const Index = () => {
                               }, 500);
                             }}
                           >
-                            Start Chatting
+                            Start Booking
                           </Button>
                         </CardContent>
                       </Card>
