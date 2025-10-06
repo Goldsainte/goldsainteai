@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,15 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const title = property.property?.name || property.name || property.title || "Hotel";
   const imageUrl = property.photos?.[0] || property.property?.photoUrls?.[0] || property.image;
@@ -172,7 +180,7 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
               <Button
                 size="sm"
                 variant="outline"
-                className="h-7 px-2 text-xs"
+                className="hidden md:flex h-7 px-2 text-xs"
                 onClick={() => setExpanded(!expanded)}
               >
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -189,8 +197,8 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
           </div>
         </div>
 
-        {/* Expanded Details */}
-        {expanded && (
+        {/* Expanded Details - Always show on mobile, conditional on desktop */}
+        {(isMobile || expanded) && (
           <div className="border-t border-border p-3 pt-3 bg-muted/30 animate-accordion-down">
             <div className="text-xs space-y-2">
               <p className="text-muted-foreground line-clamp-3">
