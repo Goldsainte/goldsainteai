@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 import { cn } from "@/lib/utils";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
 
 export const CompactHeaderSearch = () => {
   const navigate = useNavigate();
@@ -106,11 +107,11 @@ export const CompactHeaderSearch = () => {
             {/* Where */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-muted-foreground">Where</label>
-              <Input
-                placeholder="Search destinations"
+              <CityAutocomplete
+                placeholder="Where are you going? (City, hotel, or landmark)"
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="border-0 bg-background"
+                onChange={setLocation}
+                className="h-10 sm:h-12 bg-background"
               />
             </div>
 

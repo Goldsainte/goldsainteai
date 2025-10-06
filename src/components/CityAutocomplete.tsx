@@ -43,6 +43,7 @@ export const CityAutocomplete = ({
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<CitySuggestion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
   const controllerRef = useRef<AbortController | null>(null);
   const debounceRef = useRef<number | null>(null);
 
@@ -95,7 +96,7 @@ const isCityLike = (r: CitySuggestion) => {
         const data: CitySuggestion[] = await res.json();
         const filteredData = data.filter(isCityLike);
         setResults(filteredData);
-        setOpen(filteredData.length > 0);
+        setOpen(isFocused && filteredData.length > 0);
       } catch (e) {
         if ((e as any).name !== "AbortError") {
           console.warn("City autocomplete error", e);
@@ -111,7 +112,7 @@ const isCityLike = (r: CitySuggestion) => {
       if (debounceRef.current) window.clearTimeout(debounceRef.current);
       controllerRef.current?.abort();
     };
-  }, [value]);
+  }, [value, isFocused]);
 
   const handleSelect = (s: CitySuggestion) => {
     const label = getLabel(s) || s.display_name;
@@ -130,12 +131,13 @@ const isCityLike = (r: CitySuggestion) => {
               className={cn("pl-10 h-12 border-border text-base", className)}
               value={value}
               onChange={(e) => onChange(e.target.value)}
-              onFocus={() => results.length > 0 && setOpen(true)}
+              onFocus={() => { setIsFocused(true); if (results.length > 0) setOpen(true); }}
+              onBlur={() => { setTimeout(() => { setIsFocused(false); setOpen(false); }, 150); }}
               autoComplete="off"
             />
           </div>
         </PopoverTrigger>
-        <PopoverContent className="p-0 w-[400px]" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <PopoverContent className="p-0 w-[min(92vw,420px)]" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
           <Command>
             <CommandList>
               {loading ? (
@@ -151,8 +153,8 @@ const isCityLike = (r: CitySuggestion) => {
                         <div className="flex items-start gap-3 w-full">
                           <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-muted-foreground" />
                           <div className="flex-1 min-w-0">
-                            <div className="font-semibold truncate">{label}</div>
-                            <div className="text-xs text-muted-foreground truncate">{s.display_name}</div>
+                            <div className="font-semibold line-clamp-2 md:truncate">{label}</div>
+                            <div className="text-xs text-muted-foreground line-clamp-2 md:truncate">{s.display_name}</div>
                           </div>
                         </div>
                       </CommandItem>
