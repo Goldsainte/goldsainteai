@@ -12,6 +12,12 @@ interface CarCardProps {
 export const CarCard = ({ car }: CarCardProps) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   
+  // Add null checks to prevent crashes
+  if (!car || !car.vehicle || !car.price) {
+    console.warn('Invalid car data:', car);
+    return null;
+  }
+  
   const vehicle = car.vehicle;
   const price = parseFloat(car.price.total);
   const currency = car.price.currency;

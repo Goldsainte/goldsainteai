@@ -102,10 +102,6 @@ export const EnhancedSearchBar = () => {
   const [eventCategory, setEventCategory] = useState(searchParams.get("category") || "all");
 
   const [showPassengerPopover, setShowPassengerPopover] = useState(false);
-
-  // Controlled popovers for dates
-  const [openDepartPopover, setOpenDepartPopover] = useState(false);
-  const [openReturnPopover, setOpenReturnPopover] = useState(false);
   // Sync state with URL parameters when they change
   useEffect(() => {
     const params = new URLSearchParams(routeLocation.search);
@@ -324,59 +320,44 @@ export const EnhancedSearchBar = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {/* Departure Date */}
-        <Popover open={openDepartPopover} onOpenChange={setOpenDepartPopover} modal={false}>
+        <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !departureDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
               {departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0" align="start">
             <CalendarComponent
               mode="single"
               selected={departureDate}
               onSelect={(date) => {
                 if (!date) return;
                 setDepartureDate(date);
-                if (flightType === "round-trip") {
-                  const next = addDays(date, 1);
-                  if (!returnDate || date >= returnDate) {
-                    setReturnDate(next);
-                  }
-                  setOpenDepartPopover(false);
-                  setOpenReturnPopover(true);
-                } else {
-                  setOpenDepartPopover(false);
+                if (flightType === "round-trip" && (!returnDate || date >= returnDate)) {
+                  setReturnDate(addDays(date, 1));
                 }
               }}
-              initialFocus
               disabled={(date) => date < new Date()}
-              className={cn("pointer-events-auto")}
             />
           </PopoverContent>
         </Popover>
 
         {/* Return Date */}
         {flightType === "round-trip" && (
-          <Popover open={openReturnPopover} onOpenChange={setOpenReturnPopover} modal={false}>
+          <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDate && "text-muted-foreground")}> 
                 <Calendar className="mr-2 h-4 w-4" />
                 {returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+            <PopoverContent className="w-auto p-0" align="start">
               <CalendarComponent 
                 mode="single" 
                 selected={returnDate} 
-                onSelect={(date) => {
-                  if (!date) return; 
-                  setReturnDate(date); 
-                  setOpenReturnPopover(false);
-                }} 
-                initialFocus 
+                onSelect={setReturnDate}
                 disabled={(date) => date < (departureDate || new Date())}
-                className={cn("pointer-events-auto")}
               />
             </PopoverContent>
           </Popover>
@@ -684,70 +665,70 @@ export const EnhancedSearchBar = () => {
 
   // Car Search UI
   const renderCarSearch = () => (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-4 max-w-full">
+      <div className="flex gap-2">
         <Button
           type="button"
           variant={carTripType === "round-trip" ? "default" : "outline"}
           onClick={() => setCarTripType("round-trip")}
-          className="flex-1 min-w-[calc(50%-0.25rem)] h-11"
+          className="flex-1 h-11 text-sm"
         >
-          Return to same location
+          Same location
         </Button>
         <Button
           type="button"
           variant={carTripType === "one-way" ? "default" : "outline"}
           onClick={() => setCarTripType("one-way")}
-          className="flex-1 min-w-[calc(50%-0.25rem)] h-11"
+          className="flex-1 h-11 text-sm"
         >
-          Drop off at different location
+          Different location
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <AirportAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Pick-up airport or city" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-full">
+        <div className="min-w-0">
+          <AirportAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Pick-up location" />
+        </div>
         {carTripType === 'one-way' ? (
-          <AirportAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Drop-off airport or city" />
+          <div className="min-w-0">
+            <AirportAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Drop-off location" />
+          </div>
         ) : (
-          <Input value={pickupLocation} readOnly className="h-12 w-full truncate" aria-label="Drop-off same as pickup" />
+          <Input value={pickupLocation} readOnly className="h-12" aria-label="Drop-off same as pickup" />
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Popover modal={false}>
+        <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !pickupDateCar && "text-muted-foreground")}>
+            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal w-full", !pickupDateCar && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
               {pickupDateCar ? format(pickupDateCar, "MMM dd, yyyy") : "Pick-up date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0" align="start">
             <CalendarComponent 
               mode="single" 
               selected={pickupDateCar} 
-              onSelect={setPickupDateCar} 
-              initialFocus 
-              disabled={(date) => date < new Date()} 
-              className={cn("pointer-events-auto")}
+              onSelect={setPickupDateCar}
+              disabled={(date) => date < new Date()}
             />
           </PopoverContent>
         </Popover>
 
-        <Popover modal={false}>
+        <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDateCar && "text-muted-foreground")}>
+            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal w-full", !returnDateCar && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
               {returnDateCar ? format(returnDateCar, "MMM dd, yyyy") : "Return date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0" align="start">
             <CalendarComponent 
               mode="single" 
               selected={returnDateCar} 
-              onSelect={setReturnDateCar} 
-              initialFocus 
-              disabled={(date) => date < (pickupDateCar || new Date())} 
-              className={cn("pointer-events-auto")}
+              onSelect={setReturnDateCar}
+              disabled={(date) => date < (pickupDateCar || new Date())}
             />
           </PopoverContent>
         </Popover>
@@ -756,7 +737,7 @@ export const EnhancedSearchBar = () => {
   );
 
   return (
-    <div className="w-full max-w-full mx-auto px-4 overflow-x-hidden md:max-w-6xl md:px-0">
+    <div className="w-full mx-auto md:max-w-6xl">
       <div className="bg-card border border-border rounded-2xl shadow-lg p-4 md:p-6">
         {/* Mobile-first instruction */}
         <div className="mb-4 md:hidden">
