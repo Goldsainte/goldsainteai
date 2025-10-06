@@ -64,6 +64,23 @@ export function JobCompletionModal({
 
       if (jobError) throw jobError;
 
+      // Get submission ID
+      const { data: submission } = await supabase
+        .from("job_completion_submissions")
+        .select("id")
+        .eq("job_id", jobId)
+        .eq("agent_id", agentId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      // Send notification
+      if (submission) {
+        await supabase.functions.invoke('notify-job-completed', {
+          body: { jobId, submissionId: submission.id }
+        }).catch(err => console.error('Notification error:', err));
+      }
+
       toast({
         title: "Success",
         description: "Job completion submitted for review",

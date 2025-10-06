@@ -142,6 +142,23 @@ export default function AgentDashboard() {
 
       if (error) throw error;
 
+      // Get the created bid
+      const { data: newBid } = await supabase
+        .from('agent_bids')
+        .select('id')
+        .eq('job_id', selectedJob.id)
+        .eq('agent_id', agent.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Send notification
+      if (newBid) {
+        await supabase.functions.invoke('notify-new-bid', {
+          body: { bidId: newBid.id, jobId: selectedJob.id }
+        }).catch(err => console.error('Notification error:', err));
+      }
+
       toast.success('Bid placed successfully!');
       setIsBidDialogOpen(false);
       fetchData();

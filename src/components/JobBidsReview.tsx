@@ -67,9 +67,19 @@ export const JobBidsReview = ({ jobId, bids, jobStatus, onBidAccepted }: JobBids
 
       if (rejectError) throw rejectError;
 
+      // Send notifications
+      await supabase.functions.invoke('notify-bid-accepted', {
+        body: { 
+          bidId: selectedBid.id, 
+          jobId, 
+          customerId: selectedBid.travel_agents?.user_id,
+          agentId: selectedBid.agent_id 
+        }
+      }).catch(err => console.error('Notification error:', err));
+
       toast.success('Bid accepted successfully!');
       setShowAcceptDialog(false);
-      setShowPaymentModal(true); // Open payment modal after accepting bid
+      setShowPaymentModal(true);
       onBidAccepted();
     } catch (error: any) {
       console.error('Error accepting bid:', error);

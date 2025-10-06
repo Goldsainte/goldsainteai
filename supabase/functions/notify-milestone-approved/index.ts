@@ -1,0 +1,72 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { milestoneId, jobId } = await req.json();
+
+    // Get milestone details
+    const { data: milestone } = await supabaseClient
+      .from('payment_milestones')
+      .select('title, amount, currency')
+      .eq('id', milestoneId)
+      .single();
+
+    // Get job details
+    const { data: job } = await supabaseClient
+      .from('marketplace_jobs')
+      .select('title, assigned_agent_id')
+      .eq('id', jobId)
+      .single();
+
+    // Get agent details
+    const { data: agent } = await supabaseClient
+      .from('travel_agents')
+      .select('user_id')
+      .eq('id', job?.assigned_agent_id)
+      .single();
+
+    if (!milestone || !job) {
+      throw new Error('Milestone or job not found');
+    }
+
+    // Notify agent
+    if (agent?.user_id) {
+      await supabaseClient.from('notifications').insert({
+        user_id: agent.user_id,
+        notification_type: 'milestone_approved',
+        title: '✅ Milestone Approved!',
+        message: `Milestone "${milestone.title}" for "${job.title}" has been approved. Payment of ${milestone.currency} ${milestone.amount} will be released.`,
+        metadata: { milestoneId, jobId, amount: milestone.amount },
+        link: `/agent-dashboard`,
+      });
+    }
+
+    console.log(`Milestone approval notification sent for milestone ${milestoneId}`);
+
+    return new Response(
+      JSON.stringify({ success: true }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    );
+  } catch (error: any) {
+    console.error('Error in notify-milestone-approved:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+    );
+  }
+});
