@@ -308,7 +308,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                 <div key={index} className="p-4 border rounded-lg space-y-4">
                   <h4 className="font-semibold">Passenger {index + 1}</h4>
                   
-                  <div className="grid grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
                       <Label htmlFor={`title-${index}`}>Title *</Label>
                       <Select
@@ -355,7 +355,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div>
                       <Label htmlFor={`dob-${index}`}>Date of Birth *</Label>
                       <Input
@@ -402,7 +402,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         return isInternational ? " (Required for International Flights)" : " (Optional for Domestic Flights)";
                       })()}
                     </h5>
-                    <div className="grid grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
                         <Label htmlFor={`passport-${index}`}>
                           Passport Number
@@ -465,7 +465,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
                   <div className="border-t pt-4">
                     <h5 className="text-sm font-semibold mb-3">Optional Information</h5>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor={`ktn-${index}`}>Known Traveler Number / TSA PreCheck</Label>
                         <Input
@@ -562,7 +562,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
               <h4 className="font-semibold">Contact Information</h4>
               <p className="text-sm text-muted-foreground">All fields marked with * are required</p>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="email">Email *</Label>
                   <Input
@@ -617,7 +617,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="city">City *</Label>
                       <Input
@@ -638,7 +638,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <Label htmlFor="postalCode">Postal / Zip Code *</Label>
                       <Input
