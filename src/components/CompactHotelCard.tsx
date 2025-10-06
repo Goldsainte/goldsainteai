@@ -127,7 +127,7 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h3 className="font-semibold text-sm leading-tight line-clamp-2 sm:line-clamp-1 group-hover:text-primary transition-colors">
+                <h3 className="font-semibold text-sm leading-tight break-words line-clamp-3 md:line-clamp-2 lg:line-clamp-1 group-hover:text-primary transition-colors">
                   {title}
                 </h3>
                 <Button
@@ -159,10 +159,10 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
           </div>
 
           {/* Price & Actions */}
-          <div className="flex flex-col items-end justify-between min-w-[140px]">
+          <div className="flex flex-col items-end justify-between min-w-[120px] md:min-w-[140px]">
             {displayPrice > 0 && (
               <div className="text-right">
-                <div className="text-xl font-bold">
+                <div className="text-lg sm:text-xl font-bold">
                   {getCurrencySymbol(currency)}{Math.round(displayPrice)}
                 </div>
                 <div className="text-xs text-muted-foreground">per night</div>
