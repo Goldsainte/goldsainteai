@@ -128,7 +128,7 @@ const reservationUrl = restaurant.reservationUrl ||
               onClick={(e) => {
                 e.stopPropagation();
                 if (reservationUrl) {
-                  window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+                  window.open(buildReservationRedirect(reservationUrl), '_blank');
                 }
               }}
             >
@@ -252,7 +252,7 @@ const reservationUrl = restaurant.reservationUrl ||
             onClick={(e) => {
               e.stopPropagation();
               if (reservationUrl) {
-                window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+                window.open(buildReservationRedirect(reservationUrl), '_blank');
               }
             }}
           >
