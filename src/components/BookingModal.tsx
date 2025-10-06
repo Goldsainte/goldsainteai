@@ -420,11 +420,15 @@ export const BookingModal = ({
                 control={form.control}
                 name="needCrib"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 py-3 px-4 rounded-lg border border-border hover:bg-accent/50 transition-colors">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox 
+                        checked={field.value} 
+                        onCheckedChange={field.onChange}
+                        className="h-5 w-5"
+                      />
                     </FormControl>
-                    <FormLabel className="!mt-0 font-normal">I need a crib</FormLabel>
+                    <FormLabel className="!mt-0 font-normal cursor-pointer flex-1">I need a crib</FormLabel>
                   </FormItem>
                 )}
               />
@@ -433,11 +437,15 @@ export const BookingModal = ({
                 control={form.control}
                 name="needFlight"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 py-3 px-4 rounded-lg border border-border hover:bg-accent/50 transition-colors">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox 
+                        checked={field.value} 
+                        onCheckedChange={field.onChange}
+                        className="h-5 w-5"
+                      />
                     </FormControl>
-                    <FormLabel className="!mt-0 font-normal">I need to book a flight</FormLabel>
+                    <FormLabel className="!mt-0 font-normal cursor-pointer flex-1">I need to book a flight</FormLabel>
                   </FormItem>
                 )}
               />
@@ -446,11 +454,15 @@ export const BookingModal = ({
                 control={form.control}
                 name="needCarTransfer"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 py-3 px-4 rounded-lg border border-border hover:bg-accent/50 transition-colors">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox 
+                        checked={field.value} 
+                        onCheckedChange={field.onChange}
+                        className="h-5 w-5"
+                      />
                     </FormControl>
-                    <FormLabel className="!mt-0 font-normal">I need a car transfer</FormLabel>
+                    <FormLabel className="!mt-0 font-normal cursor-pointer flex-1">I need a car transfer</FormLabel>
                   </FormItem>
                 )}
               />
@@ -465,7 +477,7 @@ export const BookingModal = ({
                       <Textarea 
                         {...field} 
                         placeholder="Any special requests or notes..."
-                        className="h-20"
+                        className="h-24 text-base"
                       />
                     </FormControl>
                     <FormMessage />
@@ -484,11 +496,15 @@ export const BookingModal = ({
                 control={form.control}
                 name="paperlessConfirmation"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
+                  <FormItem className="flex items-center space-x-3 space-y-0 py-3 px-4 rounded-lg border border-border hover:bg-accent/50 transition-colors">
                     <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      <Checkbox 
+                        checked={field.value} 
+                        onCheckedChange={field.onChange}
+                        className="h-5 w-5"
+                      />
                     </FormControl>
-                    <FormLabel className="!mt-0 font-normal">I prefer paperless confirmation</FormLabel>
+                    <FormLabel className="!mt-0 font-normal cursor-pointer flex-1">I prefer paperless confirmation</FormLabel>
                   </FormItem>
                 )}
               />

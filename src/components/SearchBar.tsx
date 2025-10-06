@@ -1,9 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket } from "lucide-react";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
+import { DateRangePicker } from "@/components/DateRangePicker";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useSearchTracking } from "@/hooks/useSearchTracking";
@@ -15,9 +18,23 @@ export const SearchBar = () => {
   const { trackSearch } = useSearchTracking(); // database for authenticated users
   const [searchType, setSearchType] = useState(searchParams.get("type") || "hotels");
   const [location, setLocation] = useState(searchParams.get("location") || "");
-  const [checkIn, setCheckIn] = useState(searchParams.get("checkIn") || "");
-  const [checkOut, setCheckOut] = useState(searchParams.get("checkOut") || "");
   const [guests, setGuests] = useState(searchParams.get("guests") || "2");
+  
+  // Date range for hotels
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+    const checkInParam = searchParams.get("checkIn");
+    const checkOutParam = searchParams.get("checkOut");
+    if (checkInParam && checkOutParam) {
+      return {
+        from: new Date(checkInParam),
+        to: new Date(checkOutParam)
+      };
+    }
+    return undefined;
+  });
+  
+  // Single date for flights/events
+  const [singleDate, setSingleDate] = useState(searchParams.get("checkIn") || "");
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const rotatingMessages = [
@@ -46,6 +63,13 @@ export const SearchBar = () => {
   const handleSearch = () => {
     if (!location.trim()) return;
     
+    const checkIn = searchType === "hotels" && dateRange?.from 
+      ? format(dateRange.from, "yyyy-MM-dd")
+      : singleDate;
+    const checkOut = searchType === "hotels" && dateRange?.to 
+      ? format(dateRange.to, "yyyy-MM-dd")
+      : undefined;
+    
     const searchData = {
       type: searchType,
       location,
@@ -70,9 +94,9 @@ export const SearchBar = () => {
     const params = new URLSearchParams({
       type: searchType,
       location,
-      ...(searchType === "hotels" && { checkIn, checkOut, guests }),
-      ...(searchType === "flights" && { checkIn }),
-      ...(searchType === "events" && { checkIn })
+      ...(searchType === "hotels" && checkIn && checkOut && { checkIn, checkOut, guests }),
+      ...(searchType === "flights" && checkIn && { checkIn }),
+      ...(searchType === "events" && checkIn && { checkIn })
     });
     navigate(`/search?${params.toString()}`);
   };
@@ -144,31 +168,10 @@ export const SearchBar = () => {
 
           {searchType === "hotels" && (
             <>
-              <div className="relative">
-                <label htmlFor="check-in" className="sr-only">Check-in date</label>
-                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                <Input
-                  id="check-in"
-                  type="date"
-                  placeholder="Check-in"
-                  className="pl-12 h-16 border-border text-lg rounded-xl"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  aria-label="Check-in date"
-                />
-              </div>
-
-              <div className="relative">
-                <label htmlFor="check-out" className="sr-only">Check-out date</label>
-                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                <Input
-                  id="check-out"
-                  type="date"
-                  placeholder="Check-out"
-                  className="pl-12 h-16 border-border text-lg rounded-xl"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  aria-label="Check-out date"
+              <div className="md:col-span-2">
+                <DateRangePicker
+                  dateRange={dateRange}
+                  onDateRangeChange={setDateRange}
                 />
               </div>
 
@@ -199,8 +202,8 @@ export const SearchBar = () => {
                 type="date"
                 placeholder="Departure date"
                 className="pl-12 h-16 border-border text-lg rounded-xl"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
+                value={singleDate}
+                onChange={(e) => setSingleDate(e.target.value)}
                 aria-label="Departure date"
               />
             </div>
@@ -215,8 +218,8 @@ export const SearchBar = () => {
                 type="date"
                 placeholder="Event date"
                 className="pl-12 h-16 border-border text-lg rounded-xl"
-                value={checkIn}
-                onChange={(e) => setCheckIn(e.target.value)}
+                value={singleDate}
+                onChange={(e) => setSingleDate(e.target.value)}
                 aria-label="Event date"
               />
             </div>
