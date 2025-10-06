@@ -180,8 +180,23 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             }
           }
 
-          setResults(hotelResults);
-          setFilteredResults(hotelResults);
+          // Clean out test/dummy hotels and empty names
+          const cleanedHotels = (hotelResults || []).filter((h: any) => {
+            const raw = (h?.property?.name || h?.name || h?.title || '').toString().trim();
+            if (!raw) return false;
+            const lower = raw.toLowerCase();
+            return !(
+              lower.includes('test') ||
+              lower.includes('do not use') ||
+              lower.includes('dummy') ||
+              lower.includes('sample') ||
+              lower.includes('qa') ||
+              lower.includes('dev')
+            );
+          });
+
+          setResults(cleanedHotels);
+          setFilteredResults(cleanedHotels);
         } else if (searchType === "flights") {
           // Extract airport code from "CODE - City" format
           const originCode = origin.split(' - ')[0].trim();

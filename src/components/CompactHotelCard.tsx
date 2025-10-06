@@ -127,13 +127,13 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h3 className="font-semibold text-sm leading-tight break-words line-clamp-3 md:line-clamp-2 lg:line-clamp-1 group-hover:text-primary transition-colors">
+                <h3 className="font-semibold text-sm leading-tight whitespace-normal break-words line-clamp-4 sm:line-clamp-3 md:line-clamp-2 lg:line-clamp-1 group-hover:text-primary transition-colors">
                   {title}
                 </h3>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 flex-shrink-0"
+                  className="h-7 w-7 flex-shrink-0 hidden sm:inline-flex"
                   onClick={handleToggleFavorite}
                 >
                   <Heart className={`h-4 w-4 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
