@@ -756,7 +756,7 @@ export const EnhancedSearchBar = () => {
   );
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 md:px-0">
+    <div className="w-full max-w-full mx-auto px-4 overflow-x-hidden md:max-w-6xl md:px-0">
       <div className="bg-card border border-border rounded-2xl shadow-lg p-4 md:p-6">
         {/* Mobile-first instruction */}
         <div className="mb-4 md:hidden">
