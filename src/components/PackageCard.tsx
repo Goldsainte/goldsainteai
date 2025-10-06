@@ -192,56 +192,233 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
 
       {/* Package Contents */}
       <div className="p-6 space-y-4">
-        {/* Flight Info */}
+        {/* Flight Info - Enhanced */}
         {cheapestFlight && (
-          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Plane className="h-5 w-5 text-primary" />
-            </div>
-            <div className="flex-1 space-y-1">
-              <p className="font-semibold">Round-trip Flight</p>
-              <div className="text-sm text-muted-foreground space-y-0.5">
-                <p>
-                  <span className="font-medium">
-                    {cheapestFlight.itineraries?.[0]?.segments?.[0]?.carrierCode || 'Airline'} 
-                    {cheapestFlight.itineraries?.[0]?.segments?.[0]?.number && ` ${cheapestFlight.itineraries[0].segments[0].number}`}
-                  </span>
-                </p>
-                <div className="pt-1">
-                  <p className="font-medium">Outbound</p>
-                  <p>
-                    Depart: {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode || origin} 
-                    {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.at && 
-                      ` at ${new Date(cheapestFlight.itineraries[0].segments[0].departure.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-                  </p>
-                  <p>
-                    Arrive: {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.iataCode || destination}
-                    {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.at && 
-                      ` at ${new Date(cheapestFlight.itineraries[0].segments[cheapestFlight.itineraries[0].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-                  </p>
-                  <p>{cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'Nonstop' : `${cheapestFlight.itineraries[0].segments.length - 1} stop(s)`}</p>
-                </div>
-                {cheapestFlight.itineraries?.[1] && (
-                  <div className="pt-1 border-t mt-1">
-                    <p className="font-medium">Return</p>
-                    <p>
-                      Depart: {cheapestFlight.itineraries[1].segments?.[0]?.departure?.iataCode || destination}
-                      {cheapestFlight.itineraries[1].segments?.[0]?.departure?.at && 
-                        ` at ${new Date(cheapestFlight.itineraries[1].segments[0].departure.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-                    </p>
-                    <p>
-                      Arrive: {cheapestFlight.itineraries[1].segments?.[cheapestFlight.itineraries[1].segments.length - 1]?.arrival?.iataCode || origin}
-                      {cheapestFlight.itineraries[1].segments?.[cheapestFlight.itineraries[1].segments.length - 1]?.arrival?.at && 
-                        ` at ${new Date(cheapestFlight.itineraries[1].segments[cheapestFlight.itineraries[1].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-                    </p>
+          <div className="rounded-lg bg-muted/50 border border-border overflow-hidden">
+            <div className="p-4 space-y-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Plane className="h-4 w-4 text-primary" />
+                    <h4 className="font-semibold text-lg">Round-trip Flight</h4>
+                    <Badge variant="outline" className="text-xs">
+                      {cheapestFlight.itineraries?.[0]?.segments?.[0]?.carrierCode || 'Airline'}
+                      {cheapestFlight.itineraries?.[0]?.segments?.[0]?.number && ` ${cheapestFlight.itineraries[0].segments[0].number}`}
+                    </Badge>
                   </div>
-                )}
-                {flightCurrency !== currencyInfo.code && hasConversion && (
-                  <p className="text-xs italic opacity-75">Converted from {flightCurrency}</p>
-                )}
+                  
+                  {/* Outbound Journey */}
+                  <div className="space-y-3 mb-4 p-3 bg-background/50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Badge className="text-xs">Outbound</Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {cheapestFlight.itineraries?.[0]?.duration && 
+                          `Total Duration: ${cheapestFlight.itineraries[0].duration.replace('PT', '').replace('H', 'h ').replace('M', 'm')}`
+                        }
+                      </span>
+                    </div>
+                    
+                    {cheapestFlight.itineraries?.[0]?.segments?.map((segment: any, idx: number) => (
+                      <div key={idx}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold">{segment.departure?.iataCode}</span>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(segment.departure?.at).toLocaleTimeString('en-US', { 
+                                  hour: 'numeric', 
+                                  minute: '2-digit',
+                                  hour12: true 
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(segment.departure?.at).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </p>
+                          </div>
+                          
+                          <div className="flex-1 text-center px-4">
+                            <div className="flex items-center justify-center gap-2">
+                              <div className="h-px bg-border flex-1" />
+                              <Plane className="h-4 w-4 text-muted-foreground" />
+                              <div className="h-px bg-border flex-1" />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {segment.duration?.replace('PT', '').replace('H', 'h ').replace('M', 'm')}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {segment.carrierCode} {segment.number}
+                            </p>
+                            {segment.aircraft?.code && (
+                              <p className="text-xs text-muted-foreground">{segment.aircraft.code}</p>
+                            )}
+                          </div>
+                          
+                          <div className="flex-1 text-right">
+                            <div className="flex items-center justify-end gap-2 mb-1">
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(segment.arrival?.at).toLocaleTimeString('en-US', { 
+                                  hour: 'numeric', 
+                                  minute: '2-digit',
+                                  hour12: true 
+                                })}
+                              </span>
+                              <span className="font-semibold">{segment.arrival?.iataCode}</span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(segment.arrival?.at).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        {/* Layover time between segments */}
+                        {idx < cheapestFlight.itineraries[0].segments.length - 1 && (
+                          <div className="my-2 py-2 border-t border-dashed flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                            <Calendar className="h-3 w-3" />
+                            <span>
+                              Layover in {segment.arrival?.iataCode}: {
+                                (() => {
+                                  const nextSegment = cheapestFlight.itineraries[0].segments[idx + 1];
+                                  const layoverMs = new Date(nextSegment.departure.at).getTime() - new Date(segment.arrival.at).getTime();
+                                  const layoverHours = Math.floor(layoverMs / (1000 * 60 * 60));
+                                  const layoverMinutes = Math.floor((layoverMs % (1000 * 60 * 60)) / (1000 * 60));
+                                  return `${layoverHours}h ${layoverMinutes}m`;
+                                })()
+                              }
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Return Journey */}
+                  {cheapestFlight.itineraries?.[1] && (
+                    <div className="space-y-3 p-3 bg-background/50 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <Badge className="text-xs">Return</Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {cheapestFlight.itineraries[1].duration && 
+                            `Total Duration: ${cheapestFlight.itineraries[1].duration.replace('PT', '').replace('H', 'h ').replace('M', 'm')}`
+                          }
+                        </span>
+                      </div>
+                      
+                      {cheapestFlight.itineraries[1].segments?.map((segment: any, idx: number) => (
+                        <div key={idx}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="font-semibold">{segment.departure?.iataCode}</span>
+                                <span className="text-sm text-muted-foreground">
+                                  {new Date(segment.departure?.at).toLocaleTimeString('en-US', { 
+                                    hour: 'numeric', 
+                                    minute: '2-digit',
+                                    hour12: true 
+                                  })}
+                                </span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(segment.departure?.at).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                              </p>
+                            </div>
+                            
+                            <div className="flex-1 text-center px-4">
+                              <div className="flex items-center justify-center gap-2">
+                                <div className="h-px bg-border flex-1" />
+                                <Plane className="h-4 w-4 text-muted-foreground rotate-180" />
+                                <div className="h-px bg-border flex-1" />
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {segment.duration?.replace('PT', '').replace('H', 'h ').replace('M', 'm')}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {segment.carrierCode} {segment.number}
+                              </p>
+                              {segment.aircraft?.code && (
+                                <p className="text-xs text-muted-foreground">{segment.aircraft.code}</p>
+                              )}
+                            </div>
+                            
+                            <div className="flex-1 text-right">
+                              <div className="flex items-center justify-end gap-2 mb-1">
+                                <span className="text-sm text-muted-foreground">
+                                  {new Date(segment.arrival?.at).toLocaleTimeString('en-US', { 
+                                    hour: 'numeric', 
+                                    minute: '2-digit',
+                                    hour12: true 
+                                  })}
+                                </span>
+                                <span className="font-semibold">{segment.arrival?.iataCode}</span>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(segment.arrival?.at).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric' 
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          {/* Layover time between segments */}
+                          {idx < cheapestFlight.itineraries[1].segments.length - 1 && (
+                            <div className="my-2 py-2 border-t border-dashed flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                              <Calendar className="h-3 w-3" />
+                              <span>
+                                Layover in {segment.arrival?.iataCode}: {
+                                  (() => {
+                                    const nextSegment = cheapestFlight.itineraries[1].segments[idx + 1];
+                                    const layoverMs = new Date(nextSegment.departure.at).getTime() - new Date(segment.arrival.at).getTime();
+                                    const layoverHours = Math.floor(layoverMs / (1000 * 60 * 60));
+                                    const layoverMinutes = Math.floor((layoverMs % (1000 * 60 * 60)) / (1000 * 60));
+                                    return `${layoverHours}h ${layoverMinutes}m`;
+                                  })()
+                                }
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* Additional Flight Info */}
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {cheapestFlight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.cabin && (
+                      <Badge variant="outline" className="text-xs">
+                        {cheapestFlight.travelerPricings[0].fareDetailsBySegment[0].cabin}
+                      </Badge>
+                    )}
+                    {cheapestFlight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.includedCheckedBags && (
+                      <Badge variant="outline" className="text-xs">
+                        {cheapestFlight.travelerPricings[0].fareDetailsBySegment[0].includedCheckedBags.quantity || 0} checked bag(s)
+                      </Badge>
+                    )}
+                    <Badge variant="outline" className="text-xs">
+                      {cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'Nonstop' : `${cheapestFlight.itineraries[0].segments.length - 1} stop(s)`}
+                    </Badge>
+                  </div>
+                  
+                  {flightCurrency !== currencyInfo.code && hasConversion && (
+                    <p className="text-xs italic opacity-75 mt-2">Converted from {flightCurrency}</p>
+                  )}
+                </div>
+                
+                <div className="text-right">
+                  <p className="text-xl font-bold">{currencySymbol}{converted.flight.toFixed(2)}</p>
+                  <p className="text-xs text-muted-foreground">for {travelers} {travelers === 1 ? 'traveler' : 'travelers'}</p>
+                </div>
               </div>
             </div>
-            <p className="font-semibold text-right">{currencySymbol}{converted.flight.toFixed(2)}</p>
           </div>
         )}
 
