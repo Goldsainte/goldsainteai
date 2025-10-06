@@ -24,6 +24,13 @@ const parseLocalDate = (dateString: string | null): Date | undefined => {
   return new Date(year, month - 1, day);
 };
 
+// Add days to a date (preserving local time)
+const addDays = (date: Date, days: number): Date => {
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  d.setDate(d.getDate() + days);
+  return d;
+};
+
 export const EnhancedSearchBar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -96,6 +103,9 @@ export const EnhancedSearchBar = () => {
 
   const [showPassengerPopover, setShowPassengerPopover] = useState(false);
 
+  // Controlled popovers for dates
+  const [openDepartPopover, setOpenDepartPopover] = useState(false);
+  const [openReturnPopover, setOpenReturnPopover] = useState(false);
   // Sync state with URL parameters when they change
   useEffect(() => {
     const params = new URLSearchParams(routeLocation.search);
@@ -119,7 +129,7 @@ export const EnhancedSearchBar = () => {
     } else if (currentType === "events") {
       setEventLocation(loc);
       const date = params.get("date");
-      if (date) setEventDate(new Date(date));
+      if (date) setEventDate(parseLocalDate(date));
     } else if (currentType === "flights") {
       const origin = params.get("origin");
       const destination = params.get("destination");
@@ -128,8 +138,8 @@ export const EnhancedSearchBar = () => {
 
       if (origin) setOrigin(origin);
       if (destination) setDestination(destination);
-      if (departureDate) setDepartureDate(new Date(departureDate));
-      if (returnDate) setReturnDate(new Date(returnDate));
+      if (departureDate) setDepartureDate(parseLocalDate(departureDate));
+      if (returnDate) setReturnDate(parseLocalDate(returnDate));
     } else if (currentType === "cars") {
       const pu = params.get("pickup");
       const doLoc = params.get("dropoff");
@@ -138,8 +148,8 @@ export const EnhancedSearchBar = () => {
       const tt = (params.get("carTripType") as any) || "round-trip";
       if (pu) setPickupLocation(pu);
       if (doLoc) setDropoffLocation(doLoc);
-      if (puDate) setPickupDateCar(new Date(puDate));
-      if (rtDate) setReturnDateCar(new Date(rtDate));
+      if (puDate) setPickupDateCar(parseLocalDate(puDate));
+      if (rtDate) setReturnDateCar(parseLocalDate(rtDate));
       setCarTripType(tt);
     }
   }, [routeLocation.search]);
@@ -314,7 +324,7 @@ export const EnhancedSearchBar = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {/* Departure Date */}
-        <Popover>
+        <Popover open={openDepartPopover} onOpenChange={setOpenDepartPopover}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !departureDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -322,21 +332,52 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={departureDate} onSelect={setDepartureDate} initialFocus disabled={(date) => date < new Date()} />
+            <CalendarComponent
+              mode="single"
+              selected={departureDate}
+              onSelect={(date) => {
+                if (!date) return;
+                setDepartureDate(date);
+                if (flightType === "round-trip") {
+                  const next = addDays(date, 1);
+                  if (!returnDate || date >= returnDate) {
+                    setReturnDate(next);
+                  }
+                  setOpenDepartPopover(false);
+                  setOpenReturnPopover(true);
+                } else {
+                  setOpenDepartPopover(false);
+                }
+              }}
+              initialFocus
+              disabled={(date) => date < new Date()}
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
 
         {/* Return Date */}
         {flightType === "round-trip" && (
-          <Popover>
+          <Popover open={openReturnPopover} onOpenChange={setOpenReturnPopover}>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDate && "text-muted-foreground")}>
+              <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDate && "text-muted-foreground")}> 
                 <Calendar className="mr-2 h-4 w-4" />
                 {returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent mode="single" selected={returnDate} onSelect={setReturnDate} initialFocus disabled={(date) => date < (departureDate || new Date())} />
+              <CalendarComponent 
+                mode="single" 
+                selected={returnDate} 
+                onSelect={(date) => {
+                  if (!date) return; 
+                  setReturnDate(date); 
+                  setOpenReturnPopover(false);
+                }} 
+                initialFocus 
+                disabled={(date) => date < (departureDate || new Date())}
+                className={cn("pointer-events-auto")}
+              />
             </PopoverContent>
           </Popover>
         )}
