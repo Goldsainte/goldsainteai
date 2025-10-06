@@ -219,33 +219,48 @@ export default function Marketplace() {
 
       if (error) throw error;
 
-      // Notify agents about the new job
-      try {
-        const { data: jobData } = await supabase
-          .from('marketplace_jobs')
-          .select('id, title, description, destination, budget_min, budget_max')
-          .eq('user_id', user?.id!)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
+      // Get the newly created job
+      const { data: newJob } = await supabase
+        .from('marketplace_jobs')
+        .select('id, title, description, destination, budget_min, budget_max, booking_type')
+        .eq('user_id', user?.id!)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
 
-        if (jobData) {
+      if (newJob) {
+        // Trigger AI matching in background (non-blocking)
+        try {
+          await invokeEdgeFunction('ai-agent-matching', {
+            body: {
+              jobId: newJob.id,
+              generateScores: true
+            },
+            timeout: 20000,
+            showToastOnError: false,
+          });
+          console.log('AI matching triggered for job:', newJob.id);
+        } catch (matchError) {
+          console.error('Error triggering AI matching:', matchError);
+        }
+
+        // Notify agents about the new job
+        try {
           await invokeEdgeFunction('notify-agents-new-job', {
             body: {
-              jobId: jobData.id,
-              jobTitle: jobData.title,
-              jobDescription: jobData.description,
-              destination: jobData.destination || 'Not specified',
-              budgetMin: jobData.budget_min,
-              budgetMax: jobData.budget_max,
+              jobId: newJob.id,
+              jobTitle: newJob.title,
+              jobDescription: newJob.description,
+              destination: newJob.destination || 'Not specified',
+              budgetMin: newJob.budget_min,
+              budgetMax: newJob.budget_max,
             },
             timeout: 15000,
-            showToastOnError: false, // Silent failure for background task
+            showToastOnError: false,
           });
+        } catch (notifyError) {
+          console.error('Error notifying agents:', notifyError);
         }
-      } catch (notifyError) {
-        console.error('Error notifying agents:', notifyError);
-        // Don't fail the job posting if notification fails
       }
 
       toast.success('Job posted successfully! Agents have been notified.');

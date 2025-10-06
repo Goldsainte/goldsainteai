@@ -40,12 +40,26 @@ export const PaymentModal = ({
       if (error) throw error;
 
       // Redirect to Stripe Checkout
-      if (data.clientSecret) {
-        // In a real implementation, you'd use Stripe Elements here
-        // For now, we'll show a success message
-        toast.success('Payment processing initiated');
-        onSuccess();
-        onClose();
+      if (data?.clientSecret) {
+        // Create checkout session and redirect
+        const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+          body: { 
+            jobId, 
+            bidId,
+            amount,
+            currency
+          }
+        });
+
+        if (checkoutError) throw checkoutError;
+        
+        if (checkoutData?.url) {
+          // Redirect to Stripe Checkout
+          window.open(checkoutData.url, '_blank');
+          toast.success('Redirecting to secure payment...');
+          onSuccess();
+          onClose();
+        }
       }
     } catch (error: any) {
       console.error('Payment error:', error);
