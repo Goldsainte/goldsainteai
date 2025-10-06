@@ -21,8 +21,12 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
   const cuisine = restaurant.cuisine || "";
   const priceLevel = restaurant.price_level || "";
 
-  // Use the reservationUrl from backend (already optimized for Google Reservations)
-  const reservationUrl = restaurant.reservationUrl || restaurant.website || restaurant.web_url;
+  // Build reservation target: prefer backend-provided, then official website, else Google search
+  const websiteUrl = restaurant.website
+    ? (/^https?:\/\//i.test(restaurant.website) ? restaurant.website : `https://${restaurant.website}`)
+    : undefined;
+  const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${name} ${location} reservations`)}`;
+  const reservationUrl = restaurant.reservationUrl || websiteUrl || googleSearch;
 
   const getPriceLevelSymbol = (level: string) => {
     switch (level) {
@@ -124,8 +128,11 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
               className="h-8 px-3 text-xs gap-1.5 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
-                if (reservationUrl) {
-                  window.open(buildReservationRedirect(reservationUrl), '_blank');
+                if (!reservationUrl) return;
+                if (window.top === window.self) {
+                  window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+                } else {
+                  window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener,noreferrer');
                 }
               }}
             >
@@ -248,8 +255,11 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
             className="h-7 px-3 text-xs gap-1"
             onClick={(e) => {
               e.stopPropagation();
-              if (reservationUrl) {
-                window.open(buildReservationRedirect(reservationUrl), '_blank');
+              if (!reservationUrl) return;
+              if (window.top === window.self) {
+                window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+              } else {
+                window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener,noreferrer');
               }
             }}
           >

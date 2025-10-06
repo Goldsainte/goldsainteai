@@ -20,7 +20,14 @@ export default function Redirect() {
         'resy.com', 'www.resy.com',
         'sevenrooms.com', 'www.sevenrooms.com',
         'thefork.com', 'www.thefork.com', 'thefork.us', 'www.thefork.us',
-        'tock.com', 'www.tock.com', 'exploretock.com', 'www.exploretock.com'
+        'tock.com', 'www.tock.com', 'exploretock.com', 'www.exploretock.com',
+        // Additional common restaurant destinations
+        'facebook.com', 'www.facebook.com', 'm.facebook.com', 'fb.com',
+        'instagram.com', 'www.instagram.com',
+        'linktr.ee', 'www.linktr.ee',
+        'yelp.com', 'www.yelp.com',
+        'toasttab.com', 'www.toasttab.com',
+        'square.site', 'www.square.site'
       ];
       const target = new URL(decoded);
       const hostAllowed = allowedHosts.some(h => target.hostname === h || target.hostname.endsWith(`.${h}`));

@@ -69,10 +69,14 @@ export const RestaurantCard = ({
   const handleBookTable = (e: React.MouseEvent) => {
     e.stopPropagation();
     const websiteUrl = website ? (/^https?:\/\//i.test(website) ? website : `https://${website}`) : undefined;
-    const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${address}`)}`;
-    const target = reservationUrl || websiteUrl || web_url || mapsFallback;
-    const redirectUrl = buildReservationRedirect(target);
-    window.open(redirectUrl, '_blank', 'noopener');
+    const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${name} ${address} reservations`)}`;
+    const target = reservationUrl || websiteUrl || googleSearch;
+    if (window.top === window.self) {
+      window.open(target, '_blank', 'noopener,noreferrer');
+    } else {
+      const redirectUrl = buildReservationRedirect(target);
+      window.open(redirectUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const getPriceLevelSymbol = (level?: number) => {

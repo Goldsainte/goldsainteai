@@ -44,9 +44,11 @@ export const RestaurantDetailsModal = ({
     ? (/^https?:\/\//i.test(restaurant.website) ? restaurant.website : `https://${restaurant.website}`)
     : undefined;
 
-const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${restaurant.address}`)}`;
-const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web_url || mapsFallback;
-const reservationRedirect = buildReservationRedirect(reservationUrl);
+const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${restaurant.name} ${restaurant.address} reservations`)}`;
+const reservationTarget = restaurant.reservationUrl || websiteUrl || googleSearch;
+const reservationHref = (typeof window !== 'undefined' && window.top === window.self)
+  ? reservationTarget
+  : buildReservationRedirect(reservationTarget);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -198,7 +200,7 @@ const reservationRedirect = buildReservationRedirect(reservationUrl);
                 </Button>
               )}
 <Button asChild className="flex-1">
-  <a href={reservationRedirect} target="_blank" rel="noopener noreferrer">
+  <a href={reservationHref} target="_blank" rel="noopener noreferrer">
     <Calendar className="h-4 w-4 mr-2" />
     Make Reservation
   </a>
