@@ -32,12 +32,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setIsLoading(false);
-    });
+    // Then check for existing session with error handling
+    supabase.auth.getSession()
+      .then(({ data: { session }, error }) => {
+        if (error) {
+          console.error('Auth session error:', error);
+          // Clear corrupted auth data
+          localStorage.removeItem('supabase.auth.token');
+          setSession(null);
+          setUser(null);
+        } else {
+          setSession(session);
+          setUser(session?.user ?? null);
+        }
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error('Fatal auth error:', error);
+        // Clear all auth data on fatal error
+        localStorage.clear();
+        setSession(null);
+        setUser(null);
+        setIsLoading(false);
+      });
 
     return () => subscription.unsubscribe();
   }, []);
