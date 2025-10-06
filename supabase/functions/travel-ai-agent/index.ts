@@ -1511,12 +1511,14 @@ async function searchFlights(args: any) {
         'portland': 'PDX', 'san diego': 'SAN', 'austin': 'AUS',
         'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
         'boston': 'BOS', 'las vegas': 'LAS', 'philadelphia': 'PHL',
-        // European Cities
+        // Global Cities
         'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO',
         'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
         'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
         'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
-        // Swiss Cities & Destinations
+        // Japan (closest major airports for city names)
+        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
+        // Switzerland
         'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
         'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
         'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
@@ -1674,11 +1676,13 @@ async function searchCars(args: any) {
         'dallas': 'DFW', 'houston': 'IAH', 'detroit': 'DTW',
         'minneapolis': 'MSP', 'orlando': 'MCO', 'philadelphia': 'PHL',
         'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
-        // European Cities
+        // Global Cities
         'paris': 'CDG', 'london': 'LHR', 'tokyo': 'NRT',
         'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
         'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
         'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
+        // Japan (closest major airports for city names)
+        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
         // Swiss Cities & Destinations  
         'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
         'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',

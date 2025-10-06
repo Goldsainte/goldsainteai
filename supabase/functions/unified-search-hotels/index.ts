@@ -80,7 +80,9 @@ async function resolveCityCode(token: string, location: string): Promise<string>
     "houston": "HOU", "phoenix": "PHX", "denver": "DEN", "orlando": "ORL", "detroit": "DTW",
     "minneapolis": "MSP", "portland": "PDX", "san diego": "SAN", "austin": "AUS", "nashville": "BNA",
     "charlotte": "CLT", "boston": "BOS", "las vegas": "LAS",
-    "paris": "PAR", "london": "LON", "tokyo": "TYO", "dubai": "DXB", "singapore": "SIN",
+    "paris": "PAR", "london": "LON", "tokyo": "TYO",
+    // Japan specific city fallbacks
+    "kyoto": "UKY", "osaka": "OSA",
   };
   const cityName = base;
   return map[cityName] || (cityName.replace(/\s+/g, "").slice(0, 3).toUpperCase() || "NYC");
