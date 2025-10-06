@@ -663,8 +663,8 @@ const Index = () => {
 
     try {
       setActiveQuickLink(action as "hotels" | "flights" | "restaurants" | "events" | "cars");
-      const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
-        body: { 
+      const { data, error } = await invokeEdgeFunction('travel-ai-agent', {
+        body: {
           message: query,
           conversationHistory: [],
           isQuickLink: true, // Flag to indicate this is from a quick link
@@ -674,7 +674,9 @@ const Index = () => {
             latitude: userLocation.lat,
             longitude: userLocation.lng
           } : undefined
-        }
+        },
+        timeout: 45000,
+        showToastOnError: true,
       });
 
       if (error) throw error;
