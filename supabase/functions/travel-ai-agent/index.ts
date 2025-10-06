@@ -1032,7 +1032,13 @@ Always show results first with minimal text, ask questions later. Be conversatio
 
       console.log('Sending tool results back to AI for final response...');
       console.log('Tool results count:', toolResults.length);
-      console.log('Total message size:', JSON.stringify(finalMessages).length);
+      const messageSize = JSON.stringify(finalMessages).length;
+      console.log('Total message size:', messageSize);
+      
+      // If message is too large, log a warning
+      if (messageSize > 500000) {
+        console.warn('WARNING: Message size exceeds 500KB, may cause API issues');
+      }
 
       try {
         // Add timeout to prevent hanging
@@ -1079,10 +1085,30 @@ Always show results first with minimal text, ask questions later. Be conversatio
       } catch (finalError: any) {
         console.error('Error getting final AI response:', finalError);
         
-        // If the final AI call fails, still return the tool results with a generic message
-        const fallbackMessage = toolResults.length > 0 
+        // Check if tool results actually contain any data
+        const hasResults = toolResults.some(tr => {
+          const result = tr.result;
+          if (!result) return false;
+          
+          // Check if results array has items
+          if (Array.isArray(result.results) && result.results.length > 0) return true;
+          
+          // Check package results
+          if (result.type === 'package') {
+            return (result.flights?.length > 0) || 
+                   (result.hotels?.length > 0) || 
+                   (result.cars?.length > 0);
+          }
+          
+          // Check visa or other info results
+          if (result.information || result.requirement) return true;
+          
+          return false;
+        });
+        
+        const fallbackMessage = hasResults
           ? "I found some options for you! Check them out below."
-          : "I couldn't find any results matching your criteria. Please try adjusting your search parameters.";
+          : "I couldn't find any available options for those dates and location. This could be because:\n\n• The destination doesn't have an airport (like Zermatt - try searching for nearby cities like Geneva or Zurich)\n• No availability for the selected dates\n• The search parameters are too specific\n\nWould you like to try different dates or a nearby city?";
 
         return new Response(JSON.stringify({
           message: fallbackMessage,
@@ -1170,6 +1196,9 @@ async function searchHotels(args: any, apiKey: string) {
     }
 
     console.log(`After filters: ${hotels.length} hotels`);
+    
+    // LIMIT hotels to 15 max to prevent token overflow
+    hotels = hotels.slice(0, 15);
 
     return {
       type: 'hotels',
@@ -1553,7 +1582,7 @@ async function searchFlights(args: any) {
     const flightData = await flightResponse.json();
     console.log('Flights found:', flightData.results?.length || 0);
 
-    // Sort flights based on sortBy parameter
+    // Sort flights based on sortBy parameter and LIMIT to 15 results max
     let sortedFlights = flightData.results || [];
     
     if (sortBy && sortedFlights.length > 0) {
@@ -1601,6 +1630,9 @@ async function searchFlights(args: any) {
           break;
       }
     }
+    
+    // LIMIT results to prevent token overflow
+    sortedFlights = sortedFlights.slice(0, 15);
 
     return {
       type: 'flights',
@@ -1735,6 +1767,9 @@ async function searchCars(args: any) {
 
     const data = await response.json();
     console.log('Cars found:', data.data?.length || 0);
+    
+    // LIMIT cars to 10 max to prevent token overflow
+    const cars = (data.data || []).slice(0, 10);
 
     return {
       type: 'cars',
@@ -1742,7 +1777,7 @@ async function searchCars(args: any) {
       dropoffLocation: dropoffCode,
       pickupDate: pickupDateTime,
       returnDate: returnDateTime,
-      results: data.data || [],
+      results: cars,
       meta: data.meta
     };
 
@@ -1939,12 +1974,12 @@ async function searchPackages(args: any) {
 
     const results = await Promise.all(searches);
     
-    // Combine results
+    // Combine results with LIMITS to prevent token overflow
     const packageResult: any = {
       type: 'package',
-      flights: results[0]?.results || [],
-      hotels: includeHotel ? (results[1]?.results || []) : [],
-      cars: includeCar ? (results[includeHotel ? 2 : 1]?.results || []) : [],
+      flights: (results[0]?.results || []).slice(0, 10), // Max 10 flights
+      hotels: includeHotel ? ((results[1]?.results || []).slice(0, 10)) : [], // Max 10 hotels
+      cars: includeCar ? ((results[includeHotel ? 2 : 1]?.results || []).slice(0, 8)) : [], // Max 8 cars
       origin,
       destination,
       departureDate,
