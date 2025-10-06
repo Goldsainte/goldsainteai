@@ -62,7 +62,7 @@ export function DateRangePicker({
               setOpen(false);
             }
           }}
-          numberOfMonths={1}
+          numberOfMonths={2}
           disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
           className="pointer-events-auto"
         />
