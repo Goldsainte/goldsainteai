@@ -77,12 +77,35 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
       }
 
       mapboxgl.accessToken = mapboxToken;
-      
-      // Initialize map
+
+      // Precompute a sensible initial center from results to avoid NYC jump
+      const coords: [number, number][] = [];
+      results.forEach((result) => {
+        let lat: number | null = null;
+        let lng: number | null = null;
+        if (type === 'hotels') {
+          lat = Number(result.latitude || result.lat || result.coordinates?.latitude || result.coordinates?.lat || result.location?.lat || result.geoCode?.latitude || result.hotel?.latitude || result.property?.latitude);
+          lng = Number(result.longitude || result.lng || result.coordinates?.longitude || result.coordinates?.lng || result.location?.lng || result.geoCode?.longitude || result.hotel?.longitude || result.property?.longitude);
+        } else if (type === 'restaurants') {
+          lat = Number(result.latitude || result.lat || result.location?.latitude || result.location?.lat || result.coordinates?.latitude || result.coordinates?.lat || result.geometry?.location?.lat);
+          lng = Number(result.longitude || result.lng || result.location?.longitude || result.location?.lng || result.coordinates?.longitude || result.coordinates?.lng || result.geometry?.location?.lng);
+        } else {
+          lat = Number(result.latitude || result.lat);
+          lng = Number(result.longitude || result.lng);
+        }
+        if (lat && lng && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+          coords.push([lng, lat]);
+        }
+      });
+      let initialCenter: [number, number] = coords.length
+        ? [coords.reduce((s, c) => s + c[0], 0) / coords.length, coords.reduce((s, c) => s + c[1], 0) / coords.length]
+        : [-80.1936200, 25.7741728]; // default to Miami if no coords
+
+      // Initialize map centered on results (or Miami fallback)
       map.current = new mapboxgl.Map({
         container: mapContainer.current,
         style: 'mapbox://styles/mapbox/streets-v12',
-        center: [-73.935242, 40.730610], // Default to NYC
+        center: initialCenter,
         zoom: 12,
       });
 

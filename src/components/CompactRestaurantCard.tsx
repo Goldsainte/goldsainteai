@@ -38,7 +38,16 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
     }
   } catch {}
   const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${name} ${location} reservations`)}`;
-  const reservationUrl = restaurant.reservationUrl || googleSearch || websiteUrl;
+  const reservationUrl = (() => {
+    const badHosts = ['tripadvisor.com','yelp.com','facebook.com','m.facebook.com','instagram.com','linktr.ee'];
+    try {
+      const h = new URL(restaurant.reservationUrl || '').hostname.replace(/^www\./,'');
+      const isBad = badHosts.some(d => h === d || h.endsWith(`.${d}`));
+      return (!restaurant.reservationUrl || isBad) ? (googleSearch || websiteUrl) : restaurant.reservationUrl;
+    } catch {
+      return restaurant.reservationUrl || (googleSearch || websiteUrl);
+    }
+  })();
 
   const getPriceLevelSymbol = (level: string) => {
     switch (level) {

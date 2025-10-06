@@ -78,12 +78,15 @@ serve(async (req) => {
       allSearchResults.push(...page);
       console.log(`Fetched page with ${page.length} restaurants (total: ${allSearchResults.length})`);
 
-      // Stop after the first page to keep the function fast and reliable
-      break;
+      // Continue fetching pages until we reach ~30 or no more results
+      if (page.length < perPage || allSearchResults.length >= 30) {
+        break;
+      }
+      offset += perPage;
     }
 
     // Limit results for speed and reliability
-    const limitedResults = allSearchResults.slice(0, 8);
+    const limitedResults = allSearchResults.slice(0, 20);
 
     // Fetch detailed information for each restaurant (batched to limit concurrency)
     const batchSize = 5;

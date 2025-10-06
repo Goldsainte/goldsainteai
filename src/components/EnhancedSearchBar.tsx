@@ -598,7 +598,8 @@ export const EnhancedSearchBar = () => {
               const hour = Math.floor(i / 2);
               const minute = i % 2 === 0 ? "00" : "30";
               const time = `${hour.toString().padStart(2, "0")}:${minute}`;
-              return <SelectItem key={time} value={time}>{time}</SelectItem>;
+              const label = new Date(Date.UTC(2000, 0, 1, hour, parseInt(minute))).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' });
+              return <SelectItem key={time} value={time}>{label}</SelectItem>;
             })}
           </SelectContent>
         </Select>

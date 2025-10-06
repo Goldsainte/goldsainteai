@@ -92,6 +92,8 @@ export const RestaurantReservationModal = ({
 
       // Send confirmation email
       try {
+        const [h, m] = time.split(':').map((n) => parseInt(n, 10));
+        const time12 = new Date(Date.UTC(2000,0,1,h,m)).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'UTC'});
         await supabase.functions.invoke('send-confirmation-email', {
           body: {
             guestInfo: {
@@ -105,7 +107,7 @@ export const RestaurantReservationModal = ({
               restaurantName: restaurant.name,
               restaurantAddress: restaurant.address,
               date: format(date, 'PPP'),
-              time: time,
+              time: time12,
               guests: guests
             },
             bookingReference,
@@ -118,9 +120,11 @@ export const RestaurantReservationModal = ({
         // Don't fail the booking if email fails
       }
 
+      const [h, m] = time.split(':').map((n) => parseInt(n, 10));
+      const time12 = new Date(Date.UTC(2000,0,1,h,m)).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:'UTC'});
       toast({
         title: "Reservation confirmed!",
-        description: `Your table for ${guests} at ${restaurant.name} on ${format(date, 'PPP')} at ${time} has been confirmed. Check your email for details.`
+        description: `Your table for ${guests} at ${restaurant.name} on ${format(date, 'PPP')} at ${time12} has been confirmed. Check your email for details.`
       });
 
       onClose();
