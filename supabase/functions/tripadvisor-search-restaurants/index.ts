@@ -5,6 +5,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Sanitize text to fix encoding issues and replace problematic characters
+const sanitizeText = (text: string): string => {
+  if (!text) return text;
+  return text
+    .replace(/â€™/g, "'")
+    .replace(/â€œ/g, '"')
+    .replace(/â€/g, '"')
+    .replace(/â€"/g, '—')
+    .replace(/â€"/g, '–')
+    .replace(/Ã©/g, 'é')
+    .replace(/Ã¨/g, 'è')
+    .replace(/Ã /g, 'à')
+    .replace(/Ã±/g, 'ñ')
+    .replace(/Ã¼/g, 'ü')
+    .replace(/Ã¶/g, 'ö')
+    .replace(/Â´/g, "'")
+    .replace(/Â/g, '')
+    .replace(/[^\x00-\x7F]/g, (char) => {
+      const replacements: {[key: string]: string} = {
+        '\u2018': "'", '\u2019': "'", '\u201C': '"', '\u201D': '"',
+        '\u2014': '-', '\u2013': '-', '\u2026': '...', '\u2022': '*',
+        '\u2122': 'TM', '\u00A9': '(c)', '\u00AE': '(R)'
+      };
+      return replacements[char] || char;
+    });
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -125,10 +152,10 @@ serve(async (req) => {
 
           return {
             id: restaurant.location_id,
-            name: restaurant.name,
-            address: restaurant.address_obj?.address_string || '',
-            city: fallbackCity,
-            country: restaurant.address_obj?.country || '',
+            name: sanitizeText(restaurant.name),
+            address: sanitizeText(restaurant.address_obj?.address_string || ''),
+            city: sanitizeText(fallbackCity),
+            country: sanitizeText(restaurant.address_obj?.country || ''),
             rating: 0,
             num_reviews: 0,
             userRatingsTotal: 0,
@@ -138,14 +165,14 @@ serve(async (req) => {
             description: '',
             photos: photos.map((photo: any) => ({
               url: photo.images?.large?.url || photo.images?.original?.url,
-              caption: photo.caption || ''
+              caption: sanitizeText(photo.caption || '')
             })),
             photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
             reviews: reviews.map((review: any) => ({
               rating: review.rating || 0,
-              text: review.text || '',
+              text: sanitizeText(review.text || ''),
               published_date: review.published_date || '',
-              user: review.user?.username || 'Anonymous'
+              user: sanitizeText(review.user?.username || 'Anonymous')
             })),
             web_url: '',
             phone: '',
@@ -180,27 +207,27 @@ serve(async (req) => {
 
         return {
           id: restaurant.location_id,
-          name: details.name || restaurant.name,
-          address: details.address_obj?.address_string || '',
-          city: details.address_obj?.city || '',
-          country: details.address_obj?.country || '',
+          name: sanitizeText(details.name || restaurant.name),
+          address: sanitizeText(details.address_obj?.address_string || ''),
+          city: sanitizeText(details.address_obj?.city || ''),
+          country: sanitizeText(details.address_obj?.country || ''),
           rating: details.rating || 0,
           num_reviews: details.num_reviews || 0,
           userRatingsTotal: details.num_reviews || 0,
           price_level: details.price_level || '',
           priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
-          cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
-          description: details.description || '',
+          cuisine: sanitizeText(details.cuisine?.map((c: any) => c.name).join(', ') || ''),
+          description: sanitizeText(details.description || ''),
           photos: photos.map((photo: any) => ({
             url: photo.images?.large?.url || photo.images?.original?.url,
-            caption: photo.caption || ''
+            caption: sanitizeText(photo.caption || '')
           })),
           photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
           reviews: reviews.map((review: any) => ({
             rating: review.rating || 0,
-            text: review.text || '',
+            text: sanitizeText(review.text || ''),
             published_date: review.published_date || '',
-            user: review.user?.username || 'Anonymous'
+            user: sanitizeText(review.user?.username || 'Anonymous')
           })),
           web_url: details.web_url || '',
           phone: details.phone || '',
