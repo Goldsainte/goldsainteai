@@ -96,3 +96,27 @@ verify_jwt = true
 [functions.process-marketplace-payment]
 verify_jwt = true
 
+[functions.expire-jobs]
+verify_jwt = false
+
+[functions.update-agent-metrics]
+verify_jwt = false
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.notify-bid-accepted]
+verify_jwt = false
+
+[functions.notify-job-completed]
+verify_jwt = false
+
+[functions.notify-payment-received]
+verify_jwt = false
+
+[functions.notify-milestone-approved]
+verify_jwt = false
+
+[functions.notify-new-bid]
+verify_jwt = false
+
