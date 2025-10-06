@@ -16,7 +16,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
-
+import { DateRangePicker } from "@/components/DateRangePicker";
 // Helper to parse date strings as local dates (not UTC)
 const parseLocalDate = (dateString: string | null): Date | undefined => {
   if (!dateString) return undefined;
@@ -456,45 +456,17 @@ export const EnhancedSearchBar = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        {/* Check-in */}
-        <Popover modal={false}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !checkInDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
-            <CalendarComponent 
-              mode="single" 
-              selected={checkInDate} 
-              onSelect={setCheckInDate} 
-              initialFocus 
-              disabled={(date) => date < new Date()} 
-              className={cn("pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
-
-        {/* Check-out */}
-        <Popover modal={false}>
-          <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !checkOutDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
-            <CalendarComponent 
-              mode="single" 
-              selected={checkOutDate} 
-              onSelect={setCheckOutDate} 
-              initialFocus 
-              disabled={(date) => date < (checkInDate || new Date())} 
-              className={cn("pointer-events-auto")}
-            />
-          </PopoverContent>
-        </Popover>
+        {/* Dates: single range calendar */}
+        <div className="md:col-span-2">
+          <DateRangePicker
+            dateRange={{ from: checkInDate, to: checkOutDate }}
+            onDateRangeChange={(range) => {
+              setCheckInDate(range?.from);
+              setCheckOutDate(range?.to);
+            }}
+            className="h-12"
+          />
+        </div>
 
         {/* Guests & Rooms */}
         <Popover>
