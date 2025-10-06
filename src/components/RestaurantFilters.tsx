@@ -111,11 +111,11 @@ export const RestaurantFilters = ({
         
          <div className="flex items-center gap-3">
            <Select value={currentSort} onValueChange={onSortChange}>
-             <SelectTrigger className="w-[180px]">
+             <SelectTrigger className="w-[180px]" aria-label="Sort restaurants">
                <ArrowUpDown className="h-4 w-4 mr-2" />
                <SelectValue placeholder="Sort by" />
              </SelectTrigger>
-             <SelectContent>
+             <SelectContent className="bg-background z-[100]">
                <SelectItem value="rating">Rating</SelectItem>
                <SelectItem value="price_low">Price: Low to High</SelectItem>
                <SelectItem value="price_high">Price: High to Low</SelectItem>

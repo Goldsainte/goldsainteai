@@ -23,6 +23,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useAuth } from "@/contexts/AuthContext";
+import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -136,11 +137,20 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
         if (searchType === "hotels") {
           let hotelResults: any[] = [];
           try {
-            const { data, error } = await supabase.functions.invoke('unified-search-hotels', {
-              body: { location, checkIn, checkOut, guests: parseInt(guests) }
+            const { data, error } = await invokeEdgeFunction('unified-search-hotels', {
+              body: { location, checkIn, checkOut, guests: parseInt(guests) },
+              timeout: 30000,
+              showToastOnError: false, // Handle errors with fallback
             });
-            if (error) throw error;
-            hotelResults = data.results || [];
+            if (error && error.type === 'RATE_LIMIT') {
+              setError('Too many requests. Please wait a moment and try again.');
+              return;
+            }
+            if (error && error.type === 'PAYMENT_REQUIRED') {
+              setError('Service temporarily unavailable. Please try again later.');
+              return;
+            }
+            hotelResults = data?.results || [];
           } catch (e) {
             console.warn('Unified hotel search failed, attempting fallbacks:', e);
             // Fallback chain just in case
@@ -177,7 +187,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           const originCode = origin.split(' - ')[0].trim();
           const destCode = destination.split(' - ')[0].trim();
           
-          const { data, error } = await supabase.functions.invoke('unified-search-flights', {
+          const { data, error } = await invokeEdgeFunction('unified-search-flights', {
             body: { 
               origin: originCode,
               destination: destCode,
@@ -187,42 +197,65 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
               children: parseInt(children),
               infants: parseInt(infants),
               cabinClass
-            }
+            },
+            timeout: 30000,
+            showToastOnError: true,
           });
 
-          if (error) throw error;
+          if (error) {
+            if (error.type === 'RATE_LIMIT' || error.type === 'PAYMENT_REQUIRED' || error.type === 'TIMEOUT') {
+              setResults([]);
+              setFilteredResults([]);
+              return;
+            }
+            throw error;
+          }
           const flightResults = data.results || [];
           setResults(flightResults);
           setFilteredResults(flightResults);
           setFlightDictionaries(data.dictionaries || null);
         } else if (searchType === "destinations") {
-          const { data, error } = await supabase.functions.invoke('search-destinations', {
-            body: { query: location }
+          const { data, error } = await invokeEdgeFunction('search-destinations', {
+            body: { query: location },
+            timeout: 20000,
+            showToastOnError: true,
           });
 
-          if (error) throw error;
+          if (error) {
+            setResults([]);
+            setFilteredResults([]);
+            return;
+          }
           const destResults = data.results || [];
           setResults(destResults);
           setFilteredResults(destResults);
         } else if (searchType === "restaurants") {
-          const { data, error } = await supabase.functions.invoke('tripadvisor-search-restaurants', {
-            body: { location }
+          const { data, error } = await invokeEdgeFunction('tripadvisor-search-restaurants', {
+            body: { location },
+            timeout: 20000,
+            showToastOnError: true,
           });
 
-          if (error) throw error;
+          if (error) {
+            setResults([]);
+            setFilteredResults([]);
+            return;
+          }
           const restaurantResults = data.results || [];
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "cars") {
           try {
-            const { data, error } = await supabase.functions.invoke('amadeus-search-cars', {
+            const { data, error } = await invokeEdgeFunction('amadeus-search-cars', {
               body: {
                 pickupLocation: pickup,
                 pickupDate: pickupDateCar,
                 dropoffDate: returnDateCar,
                 dropoffLocation: dropoff || pickup,
                 currencyCode: 'USD'
-              }
+              },
+              timeout: 25000,
+              showToastOnError: false,
             });
             if (error) {
               console.warn('Car rental search error:', error);

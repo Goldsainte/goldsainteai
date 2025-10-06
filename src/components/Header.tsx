@@ -101,6 +101,7 @@ export const Header = () => {
                   variant="ghost" 
                   size="sm"
                   className="gap-1 text-xs sm:text-sm font-medium hover:bg-muted hidden sm:flex h-10 sm:h-11 px-2 sm:px-3"
+                  aria-label="Services menu"
                 >
                   <Briefcase className="h-4 w-4 sm:h-4 sm:w-4" />
                   <span className="hidden md:inline">Services</span>
@@ -153,12 +154,13 @@ export const Header = () => {
                 <Button 
                   variant="ghost" 
                   className="gap-1 sm:gap-1.5 hover:bg-muted rounded-full border border-border shadow-sm px-2 sm:px-3 h-10 sm:h-11 min-w-[44px]"
+                  aria-label="User menu"
                 >
                   <Menu className="h-4 w-4 md:h-4 md:w-4" />
                   <User className="h-5 w-5 md:h-5 md:w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-background border-border z-[100] touch-manipulation">
+              <DropdownMenuContent align="end" className="w-64 bg-background border-border z-[100] touch-manipulation" aria-label="User navigation menu">
                 {user ? (
                   <>
                     <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer min-h-[44px] text-sm">
@@ -187,6 +189,7 @@ export const Header = () => {
                           checked={usePreferences}
                           onCheckedChange={togglePreferences}
                           className="flex-shrink-0"
+                          aria-label="Toggle search preferences"
                         />
                       </div>
                       <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">

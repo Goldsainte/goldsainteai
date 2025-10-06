@@ -76,6 +76,7 @@ import cyclingTour from "@/assets/cycling-tour.jpg";
 import spaWellness from "@/assets/spa-wellness.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
+import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -401,7 +402,7 @@ const Index = () => {
     setSearchQuery("");
 
     try {
-      const { data, error } = await supabase.functions.invoke('travel-ai-agent', {
+      const { data, error } = await invokeEdgeFunction('travel-ai-agent', {
         body: { 
           message: finalQuery,
           conversationHistory,
@@ -412,10 +413,16 @@ const Index = () => {
             latitude: userLocation.lat,
             longitude: userLocation.lng
           } : undefined
-        }
+        },
+        timeout: 45000, // 45 second timeout for AI calls
+        showToastOnError: true,
       });
 
-      if (error) throw error;
+      if (error) {
+        // Error already handled by invokeEdgeFunction
+        setIsLoading(false);
+        return;
+      }
 
       // Ignore stale responses
       if (requestId !== lastRequestIdRef.current) return;
@@ -536,11 +543,14 @@ const Index = () => {
     } catch (err: any) {
       console.error('AI Agent error:', err);
       console.error('Error details:', JSON.stringify(err, null, 2));
-      toast({
-        title: "Error",
-        description: err.message || err.error?.message || "Failed to process your request. Please try again.",
-        variant: "destructive",
-      });
+      // Only show generic error if not already handled by invokeEdgeFunction
+      if (!err.type) {
+        toast({
+          title: "Error",
+          description: err.message || err.error?.message || "Failed to process your request. Please try again.",
+          variant: "destructive",
+        });
+      }
     } finally {
       if (requestId === lastRequestIdRef.current) setIsLoading(false);
     }

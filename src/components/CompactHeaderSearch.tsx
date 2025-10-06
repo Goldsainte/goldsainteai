@@ -308,7 +308,7 @@ export const CompactHeaderSearch = () => {
             </Select>
           </div>
 
-          <Button onClick={handleSearch} className="w-full h-11 sm:h-12 text-base" size="lg">
+          <Button onClick={handleSearch} className="w-full h-11 sm:h-12 text-base" size="lg" aria-label="Search for accommodations">
             <Search className="mr-2 h-4 w-4" />
             Search
           </Button>

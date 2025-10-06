@@ -22,6 +22,7 @@ import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { PaymentPlanSelector } from "@/components/PaymentPlanSelector";
 import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
 import { AIAgentMatching } from "@/components/AIAgentMatching";
+import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 export default function Marketplace() {
   const { user, isLoading } = useAuth();
@@ -229,7 +230,7 @@ export default function Marketplace() {
           .single();
 
         if (jobData) {
-          await supabase.functions.invoke('notify-agents-new-job', {
+          await invokeEdgeFunction('notify-agents-new-job', {
             body: {
               jobId: jobData.id,
               jobTitle: jobData.title,
@@ -237,7 +238,9 @@ export default function Marketplace() {
               destination: jobData.destination || 'Not specified',
               budgetMin: jobData.budget_min,
               budgetMax: jobData.budget_max,
-            }
+            },
+            timeout: 15000,
+            showToastOnError: false, // Silent failure for background task
           });
         }
       } catch (notifyError) {
