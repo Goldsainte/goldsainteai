@@ -430,7 +430,20 @@ const Index = () => {
       setMessages(prev => [...prev, { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }]);
       
       if (data.toolResults && data.toolResults.length > 0) {
-        setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+        const filteredResults = data.toolResults.filter((r: any) => {
+          if (r?.type === 'package') {
+            const total = (r.flights?.length || 0) + (r.hotels?.length || 0) + (r.cars?.length || 0);
+            return total > 0;
+          }
+          if (Array.isArray(r?.results)) {
+            return r.results.length > 0;
+          }
+          if (r?.type === 'visa') {
+            return !!(r.information || r.requirement);
+          }
+          return false;
+        });
+        setSearchResults(filteredResults);
         setActiveQuickLink(null);
         
         // Check for visa results
@@ -675,7 +688,20 @@ const Index = () => {
       ]);
       
       if (data.toolResults && data.toolResults.length > 0) {
-        setSearchResults(data.toolResults.filter((r: any) => r.results && r.results.length > 0));
+        const filteredResults = data.toolResults.filter((r: any) => {
+          if (r?.type === 'package') {
+            const total = (r.flights?.length || 0) + (r.hotels?.length || 0) + (r.cars?.length || 0);
+            return total > 0;
+          }
+          if (Array.isArray(r?.results)) {
+            return r.results.length > 0;
+          }
+          if (r?.type === 'visa') {
+            return !!(r.information || r.requirement);
+          }
+          return false;
+        });
+        setSearchResults(filteredResults);
         setActiveQuickLink(null);
       }
       
