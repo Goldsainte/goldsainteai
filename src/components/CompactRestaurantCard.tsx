@@ -30,11 +30,18 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
     }
   };
 
-// Build reservation URL - prioritize backend data
-const reservationUrl = restaurant.reservationUrl || 
-  restaurant.website || 
-  restaurant.web_url || 
-  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${location}`)}&query_place_id=${restaurant.id || ''}`;
+// Prefer Google Maps deep link to surface "Reserve with Google" when available
+const placeId = restaurant.place_id || restaurant.googlePlaceId || restaurant.google_place_id;
+const lat = restaurant.latitude || restaurant.lat || restaurant.location?.lat;
+const lng = restaurant.longitude || restaurant.lng || restaurant.location?.lng;
+const googleUrl = placeId
+  ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(name)}&query_place_id=${encodeURIComponent(placeId)}`
+  : (lat && lng)
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${lat},${lng}`)}`
+    : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${location}`)}`;
+
+// Final reservation target prioritizes Google; fallbacks to known sources
+const reservationUrl = googleUrl || restaurant.reservationUrl || restaurant.website || restaurant.web_url;
 
   const favoriteId = isFavorite('restaurant', restaurant);
   
