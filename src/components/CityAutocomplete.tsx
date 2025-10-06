@@ -95,8 +95,17 @@ const isCityLike = (r: CitySuggestion) => {
         if (!res.ok) throw new Error("Geocoding failed");
         const data: CitySuggestion[] = await res.json();
         const filteredData = data.filter(isCityLike);
-        setResults(filteredData);
-        setOpen(isFocused && filteredData.length > 0);
+        
+        // Deduplicate by label to avoid showing identical entries
+        const uniqueData = filteredData.reduce((acc: CitySuggestion[], curr) => {
+          const label = getLabel(curr);
+          const exists = acc.some(item => getLabel(item) === label);
+          if (!exists) acc.push(curr);
+          return acc;
+        }, []);
+        
+        setResults(uniqueData);
+        setOpen(isFocused && uniqueData.length > 0);
       } catch (e) {
         if ((e as any).name !== "AbortError") {
           console.warn("City autocomplete error", e);
