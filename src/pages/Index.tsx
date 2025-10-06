@@ -118,7 +118,7 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState<{ type: "hotel" | "flight"; context: string } | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState<{ type: "hotel" | "flight"; context: string; suggestedDate?: Date } | null>(null);
   const [pendingFlightDates, setPendingFlightDates] = useState<{ departureDate: string; returnDate?: string } | null>(null);
   const [visaModalData, setVisaModalData] = useState<{ 
     open: boolean; 
@@ -495,7 +495,8 @@ const Index = () => {
                    aiMessage.includes('rental')) {
           type = 'flight'; // Use flight type for car rentals (handles single dates)
         }
-        setTimeout(() => setShowDatePicker({ type, context: 'quicklink' }), 500);
+        const suggestedDate = extractSuggestedDate();
+        setTimeout(() => setShowDatePicker({ type, context: 'quicklink', suggestedDate }), 500);
       }
 
       // Check if AI is asking about budget and show price slider
@@ -556,13 +557,45 @@ const Index = () => {
     }
   };
 
+  // Helper to extract year/date from recent messages
+  const extractSuggestedDate = (): Date | undefined => {
+    // Look at the last few user and AI messages for date mentions
+    const recentMessages = [...conversationHistory, ...messages].slice(-5);
+    const conversationText = recentMessages.map(m => m.content).join(' ');
+    
+    // Match year patterns (2024, 2025, 2026, etc.)
+    const yearMatch = conversationText.match(/\b(202[4-9]|203[0-9])\b/);
+    
+    // Match month patterns (January, Jan, July, etc.)
+    const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+    const monthShort = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    let monthIndex = -1;
+    
+    for (let i = 0; i < monthNames.length; i++) {
+      if (conversationText.toLowerCase().includes(monthNames[i]) || conversationText.toLowerCase().includes(monthShort[i])) {
+        monthIndex = i;
+        break;
+      }
+    }
+    
+    // If we found a year or month, create a suggested date
+    if (yearMatch || monthIndex !== -1) {
+      const year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
+      const month = monthIndex !== -1 ? monthIndex : new Date().getMonth();
+      return new Date(year, month, 1);
+    }
+    
+    return undefined;
+  };
+
   const handleDatePickerRequest = (type: "hotel" | "flight", context: string) => {
     console.log('Quick action date picker requested:', { type, context });
     toast({
       title: type === "hotel" ? "Select your stay dates" : "Select your flight dates",
       description: "Pick dates to continue.",
     });
-    setShowDatePicker({ type, context });
+    const suggestedDate = extractSuggestedDate();
+    setShowDatePicker({ type, context, suggestedDate });
   };
 
   const handleDatesSelected = async (dates: { checkIn?: string; checkOut?: string; departureDate?: string; returnDate?: string }) => {
@@ -655,7 +688,8 @@ const Index = () => {
         let type: 'hotel' | 'flight' = 'flight';
         if (aiMessage.includes('stay') || aiMessage.includes('hotel') || aiMessage.includes('check')) type = 'hotel';
         else if (aiMessage.includes('pick up') || aiMessage.includes('pickup') || aiMessage.includes('car') || aiMessage.includes('rental')) type = 'flight';
-        setTimeout(() => setShowDatePicker((prev) => prev ?? { type, context: 'quicklink' }), 500);
+        const suggestedDate = extractSuggestedDate();
+        setTimeout(() => setShowDatePicker((prev) => prev ?? { type, context: 'quicklink', suggestedDate }), 500);
       }
 
       const budgetKeywords = {
@@ -1527,6 +1561,7 @@ const Index = () => {
               type={showDatePicker.type}
               onDatesSelected={handleDatesSelected}
               onCancel={() => setShowDatePicker(null)}
+              suggestedDate={showDatePicker.suggestedDate}
             />
           </div>
         )}

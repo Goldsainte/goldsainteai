@@ -10,9 +10,10 @@ interface ChatDatePickerProps {
   type: "hotel" | "flight";
   onDatesSelected: (dates: { checkIn?: string; checkOut?: string; departureDate?: string; returnDate?: string }) => void;
   onCancel: () => void;
+  suggestedDate?: Date;
 }
 
-export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePickerProps) => {
+export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate }: ChatDatePickerProps) => {
   const [tripType, setTripType] = useState<"round-trip" | "one-way" | null>(type === "hotel" ? "round-trip" : null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [singleDate, setSingleDate] = useState<Date>();
@@ -124,6 +125,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
               selected={singleDate}
               onSelect={handleSingleDateSelect}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              defaultMonth={suggestedDate}
               className="rounded-md border pointer-events-auto"
             />
           ) : (
@@ -132,6 +134,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel }: ChatDatePick
               selected={dateRange}
               onSelect={handleDateSelect}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              defaultMonth={suggestedDate}
               className="rounded-md border pointer-events-auto"
             />
           )}
