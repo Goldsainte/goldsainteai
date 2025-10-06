@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Heart, ChevronDown, ChevronUp, Calendar, DollarSign } from "lucide-react";
+import { MapPin, Star, Heart, Calendar, DollarSign } from "lucide-react";
 import { useFavorites } from "@/hooks/useFavorites";
 import { buildReservationRedirect } from "@/lib/urlHelpers";
 
@@ -11,7 +11,6 @@ interface CompactRestaurantCardProps {
 }
 
 export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps) => {
-  const [expanded, setExpanded] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   const name = restaurant.name || "Restaurant";
@@ -113,7 +112,7 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
             </div>
           </div>
 
-          {/* Bottom Row: Cuisine and Actions */}
+          {/* Bottom Row: Cuisine and Action */}
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
               {cuisine && (
@@ -122,29 +121,53 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
                 </p>
               )}
             </div>
-            <div className="flex gap-1.5 flex-shrink-0">
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 px-3 text-xs"
-                onClick={() => setExpanded(!expanded)}
-              >
-                {expanded ? <ChevronUp className="h-3 w-3 mr-1" /> : <ChevronDown className="h-3 w-3 mr-1" />}
-                {expanded ? 'Less' : 'More'}
-              </Button>
-              <Button
-                size="sm"
-                className="h-8 px-3 text-xs gap-1.5"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
-                }}
-              >
-                <Calendar className="h-3 w-3" />
-                Reserve
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              className="h-8 px-3 text-xs gap-1.5 flex-shrink-0"
+              onClick={(e) => {
+                e.stopPropagation();
+                try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
+              }}
+            >
+              <Calendar className="h-3 w-3" />
+              Reserve
+            </Button>
           </div>
+
+          {/* Additional Details - Always Visible */}
+          {(restaurant.description || restaurant.phone || restaurant.website || restaurant.hours?.weekday_text) && (
+            <div className="pt-3 border-t border-border space-y-2">
+              {restaurant.description && (
+                <p className="text-xs text-muted-foreground line-clamp-2">
+                  {restaurant.description}
+                </p>
+              )}
+              {restaurant.phone && (
+                <p className="text-xs text-muted-foreground">
+                  <strong>Phone:</strong> {restaurant.phone}
+                </p>
+              )}
+              {restaurant.website && (
+                <a 
+                  href={restaurant.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-primary hover:underline block"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Visit Website →
+                </a>
+              )}
+              {restaurant.hours?.weekday_text && restaurant.hours.weekday_text.length > 0 && (
+                <div className="text-xs">
+                  <strong>Hours:</strong>{' '}
+                  <span className="text-muted-foreground">
+                    {restaurant.hours.weekday_text[new Date().getDay()]?.replace(/^[^:]+:\s*/, '') || 'Not available'}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -219,38 +242,27 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col items-end justify-between min-w-[140px]">
-          <div className="flex gap-1">
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 px-2 text-xs"
-              onClick={() => setExpanded(!expanded)}
-            >
-              {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              {expanded ? 'Less' : 'More'}
-            </Button>
-            <Button
-              size="sm"
-              className="h-7 px-3 text-xs gap-1"
-              onClick={(e) => {
-                e.stopPropagation();
-                try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
-              }}
-            >
-              <Calendar className="h-3 w-3" />
-              Reserve
-            </Button>
-          </div>
+        <div className="flex items-start justify-end min-w-[100px]">
+          <Button
+            size="sm"
+            className="h-7 px-3 text-xs gap-1"
+            onClick={(e) => {
+              e.stopPropagation();
+              try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
+            }}
+          >
+            <Calendar className="h-3 w-3" />
+            Reserve
+          </Button>
         </div>
       </div>
 
-      {/* Expanded Details */}
-      {expanded && (
-        <div className="border-t border-border p-3 pt-3 bg-muted/30 animate-accordion-down">
+      {/* Additional Details - Always Visible on Desktop */}
+      {(restaurant.description || restaurant.phone || restaurant.website || restaurant.hours?.weekday_text) && (
+        <div className="border-t border-border p-3 pt-3 bg-muted/30">
           <div className="text-xs space-y-2">
             {restaurant.description && (
-              <p className="text-muted-foreground line-clamp-3">
+              <p className="text-muted-foreground line-clamp-2">
                 {restaurant.description}
               </p>
             )}
@@ -265,16 +277,17 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline block"
+                onClick={(e) => e.stopPropagation()}
               >
                 Visit Website →
               </a>
             )}
             {restaurant.hours?.weekday_text && restaurant.hours.weekday_text.length > 0 && (
               <div>
-                <strong>Hours:</strong>
-                <p className="text-muted-foreground mt-1">
+                <strong>Hours:</strong>{' '}
+                <span className="text-muted-foreground">
                   {restaurant.hours.weekday_text[new Date().getDay()]?.replace(/^[^:]+:\s*/, '') || 'Not available'}
-                </p>
+                </span>
               </div>
             )}
           </div>
