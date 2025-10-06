@@ -37,8 +37,11 @@ export const AirportAutocomplete = ({
   }, [value]);
 
   const handleSelect = (airport: Airport) => {
-    onChange(`${airport.code} - ${airport.city}`);
+    const formatted = `${airport.code} - ${airport.city}`;
+    onChange(formatted);
     setOpen(false);
+    // Blur input to close keyboard on mobile
+    inputRef.current?.blur();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +72,7 @@ export const AirportAutocomplete = ({
           </div>
         </PopoverTrigger>
         <PopoverContent 
-          className="p-0 w-[400px]" 
+          className="p-0 w-[min(92vw,420px)]" 
           align="start"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
@@ -84,9 +87,11 @@ export const AirportAutocomplete = ({
                       key={`${airport.code}-${index}`}
                       value={airport.code}
                       onSelect={() => handleSelect(airport)}
-                      className="cursor-pointer"
+                      onClick={() => handleSelect(airport)}
+                      onPointerDown={(e) => e.preventDefault()}
+                      className="cursor-pointer touch-manipulation active:bg-accent"
                     >
-                      <div className="flex items-start gap-3 w-full">
+                      <div className="flex items-start gap-3 w-full pointer-events-none">
                         <Plane className="h-4 w-4 mt-1 flex-shrink-0 text-muted-foreground" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">

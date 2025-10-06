@@ -254,16 +254,24 @@ export const EnhancedSearchBar = () => {
   // Flight Search UI
   const renderFlightSearch = () => (
     <div className="space-y-4">
-      <RadioGroup value={flightType} onValueChange={(value: any) => setFlightType(value)} className="flex gap-4">
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="round-trip" id="round-trip" />
-          <Label htmlFor="round-trip" className="cursor-pointer">Round-trip</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="one-way" id="one-way" />
-          <Label htmlFor="one-way" className="cursor-pointer">One-way</Label>
-        </div>
-      </RadioGroup>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant={flightType === "round-trip" ? "default" : "outline"}
+          onClick={() => setFlightType("round-trip")}
+          className="flex-1 h-11"
+        >
+          Round-trip
+        </Button>
+        <Button
+          type="button"
+          variant={flightType === "one-way" ? "default" : "outline"}
+          onClick={() => setFlightType("one-way")}
+          className="flex-1 h-11"
+        >
+          One-way
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
         {/* Origin */}
