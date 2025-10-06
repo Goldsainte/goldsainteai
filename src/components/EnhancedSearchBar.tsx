@@ -324,7 +324,7 @@ export const EnhancedSearchBar = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {/* Departure Date */}
-        <Popover open={openDepartPopover} onOpenChange={setOpenDepartPopover}>
+        <Popover open={openDepartPopover} onOpenChange={setOpenDepartPopover} modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !departureDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -358,7 +358,7 @@ export const EnhancedSearchBar = () => {
 
         {/* Return Date */}
         {flightType === "round-trip" && (
-          <Popover open={openReturnPopover} onOpenChange={setOpenReturnPopover}>
+          <Popover open={openReturnPopover} onOpenChange={setOpenReturnPopover} modal={false}>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDate && "text-muted-foreground")}> 
                 <Calendar className="mr-2 h-4 w-4" />
@@ -472,7 +472,7 @@ export const EnhancedSearchBar = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         {/* Check-in */}
-        <Popover>
+        <Popover modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !checkInDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -492,7 +492,7 @@ export const EnhancedSearchBar = () => {
         </Popover>
 
         {/* Check-out */}
-        <Popover>
+        <Popover modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !checkOutDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -585,7 +585,7 @@ export const EnhancedSearchBar = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <Popover>
+        <Popover modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !restaurantDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -646,7 +646,7 @@ export const EnhancedSearchBar = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Popover>
+        <Popover modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !eventDate && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -685,12 +685,12 @@ export const EnhancedSearchBar = () => {
   // Car Search UI
   const renderCarSearch = () => (
     <div className="space-y-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           variant={carTripType === "round-trip" ? "default" : "outline"}
           onClick={() => setCarTripType("round-trip")}
-          className="flex-1 h-11"
+          className="flex-1 min-w-[calc(50%-0.25rem)] h-11"
         >
           Return to same location
         </Button>
@@ -698,7 +698,7 @@ export const EnhancedSearchBar = () => {
           type="button"
           variant={carTripType === "one-way" ? "default" : "outline"}
           onClick={() => setCarTripType("one-way")}
-          className="flex-1 h-11"
+          className="flex-1 min-w-[calc(50%-0.25rem)] h-11"
         >
           Drop off at different location
         </Button>
@@ -714,7 +714,7 @@ export const EnhancedSearchBar = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Popover>
+        <Popover modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !pickupDateCar && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
@@ -733,7 +733,7 @@ export const EnhancedSearchBar = () => {
           </PopoverContent>
         </Popover>
 
-        <Popover>
+        <Popover modal={false}>
           <PopoverTrigger asChild>
             <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDateCar && "text-muted-foreground")}>
               <Calendar className="mr-2 h-4 w-4" />
