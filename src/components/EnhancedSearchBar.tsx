@@ -671,7 +671,7 @@ export const EnhancedSearchBar = () => {
           type="button"
           variant={carTripType === "round-trip" ? "default" : "outline"}
           onClick={() => setCarTripType("round-trip")}
-          className="flex-1 h-11 text-xs sm:text-sm px-2 min-w-0 whitespace-nowrap overflow-hidden text-ellipsis"
+          className="flex-1 h-auto py-2 text-xs sm:text-sm px-2 whitespace-normal text-center leading-tight"
         >
           Same location
         </Button>
@@ -679,7 +679,7 @@ export const EnhancedSearchBar = () => {
           type="button"
           variant={carTripType === "one-way" ? "default" : "outline"}
           onClick={() => setCarTripType("one-way")}
-          className="flex-1 h-11 text-xs sm:text-sm px-2 min-w-0 whitespace-nowrap overflow-hidden text-ellipsis"
+          className="flex-1 h-auto py-2 text-xs sm:text-sm px-2 whitespace-normal text-center leading-tight"
         >
           Different location
         </Button>
