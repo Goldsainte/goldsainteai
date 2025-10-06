@@ -55,6 +55,8 @@ export default function HotelBooking() {
                       bookingData.property?.photoUrls || 
                       [];
   
+  console.log('Hotel photos available:', hotelPhotos.length, hotelPhotos);
+  
   const galleryImages = hotelPhotos.length > 0 
     ? hotelPhotos 
     : getHotelImages(
@@ -103,6 +105,11 @@ export default function HotelBooking() {
     const displayPrice = parseFloat(offer.price?.total || bookingData.totalPrice || 200);
     const basePrice = parseFloat(offer.price?.base || bookingData.basePrice || displayPrice / 1.15);
     
+    // Use hotel photos for room images if no specific room images
+    const roomImage = offer.room?.images?.[0] || 
+                      (galleryImages.length > index ? galleryImages[index] : galleryImages[0]) || 
+                      '';
+    
     return {
       id: offer.id || `room-${index}`,
       name: offer.roomInformation?.typeEstimated?.category || offer.room?.typeEstimated?.category || 'Standard Room',
@@ -112,7 +119,7 @@ export default function HotelBooking() {
       price: displayPrice, // Customer-facing price with markup
       basePrice: basePrice, // Original price for backend
       currency: offer.price?.currency || bookingData.currency || 'USD',
-      image: offer.room?.images?.[0] || galleryImages[0] || '',
+      image: roomImage,
       amenities: ['Free WiFi', 'Air conditioning', 'TV', 'Private bathroom'],
       cancellation: offer.policies?.refundable?.cancellationRefund === 'REFUNDABLE_UP_TO_DEADLINE' ? 'Free cancellation' : 'Non-refundable',
     };
@@ -208,16 +215,32 @@ export default function HotelBooking() {
                   <Card key={room.id} className="overflow-hidden hover:shadow-lg transition-all">
                     <div className="grid md:grid-cols-[280px_1fr] gap-6 p-6">
                       {/* Room Image */}
-                      <div className="aspect-[4/3] relative overflow-hidden rounded-lg">
-<img 
-                          src={room.image}
-                          alt={room.name}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display = 'none';
-                          }}
-                        />
+                      <div className="aspect-[4/3] relative overflow-hidden rounded-lg bg-muted">
+                        {room.image ? (
+                          <img 
+                            src={room.image}
+                            alt={room.name}
+                            loading="lazy"
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // If image fails, show placeholder with icon
+                              const parent = e.currentTarget.parentElement;
+                              if (parent) {
+                                parent.innerHTML = `
+                                  <div class="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                                    <p class="text-xs mt-2">Photo unavailable</p>
+                                  </div>
+                                `;
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-muted-foreground">
+                            <Bed className="h-12 w-12 mb-2" />
+                            <p className="text-xs">No photo available</p>
+                          </div>
+                        )}
                         {room.cancellation.includes('Free') && (
                           <Badge className="absolute top-3 left-3 bg-green-600">
                             Free cancellation

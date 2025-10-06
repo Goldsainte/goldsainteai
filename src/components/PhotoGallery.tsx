@@ -39,7 +39,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
       {/* Grid Preview */}
       <div className="grid grid-cols-4 gap-2 h-[400px]">
         <div 
-          className="col-span-2 row-span-2 relative rounded-lg overflow-hidden cursor-pointer group"
+          className="col-span-2 row-span-2 relative rounded-lg overflow-hidden cursor-pointer group bg-muted"
           onClick={() => {
             setCurrentIndex(0);
             setIsOpen(true);
@@ -49,6 +49,18 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
             src={images[0]} 
             alt={`${hotelName} - Main`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              // Show placeholder on error
+              const parent = e.currentTarget.parentElement;
+              if (parent) {
+                parent.innerHTML = `
+                  <div class="w-full h-full flex flex-col items-center justify-center text-muted-foreground bg-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    <p class="text-sm mt-2">Photo loading...</p>
+                  </div>
+                `;
+              }
+            }}
           />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
@@ -56,7 +68,7 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
         {images.slice(1, 5).map((img, idx) => (
           <div 
             key={idx}
-            className="relative rounded-lg overflow-hidden cursor-pointer group"
+            className="relative rounded-lg overflow-hidden cursor-pointer group bg-muted"
             onClick={() => {
               setCurrentIndex(idx + 1);
               setIsOpen(true);
@@ -66,6 +78,16 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
               src={img} 
               alt={`${hotelName} - ${idx + 2}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center bg-muted">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+                    </div>
+                  `;
+                }
+              }}
             />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
             {idx === 3 && images.length > 5 && (
