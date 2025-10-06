@@ -56,9 +56,7 @@ serve(async (req) => {
       throw new Error('Agent payment account not set up');
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2025-08-27.basil',
-    });
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '');
 
     // Customer pays the customer_facing_price
     const customerAmount = Math.round(bid.customer_facing_price * 100); // Convert to cents

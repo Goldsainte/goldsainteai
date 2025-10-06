@@ -16,6 +16,7 @@ import { Loader2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCurrencySymbol } from "@/lib/currencyHelpers";
+import { useNavigate } from "react-router-dom";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -67,7 +68,8 @@ export const BookingModal = ({
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
-  
+  const navigate = useNavigate();
+
   const form = useForm<z.infer<typeof bookingFormSchema>>({
     resolver: zodResolver(bookingFormSchema),
     defaultValues: {
@@ -133,6 +135,17 @@ export const BookingModal = ({
 
   const onSubmit = async (values: z.infer<typeof bookingFormSchema>) => {
     setLoading(true);
+
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to complete checkout.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      navigate('/auth?redirect=checkout');
+      return;
+    }
 
     try {
       const { data: bookingResult, error: bookingError } = await supabase.functions.invoke('create-booking', {
