@@ -56,7 +56,7 @@ export const CompactHeaderSearch = () => {
     params.set("infants", guests.infants.toString());
 
     setOpen(false);
-    navigate(`/search-results?${params.toString()}`);
+    navigate(`/search?${params.toString()}`);
   };
 
   return (
