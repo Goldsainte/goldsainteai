@@ -331,7 +331,7 @@ export const EnhancedSearchBar = () => {
               {departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent
               mode="single"
               selected={departureDate}
@@ -365,7 +365,7 @@ export const EnhancedSearchBar = () => {
                 {returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
               <CalendarComponent 
                 mode="single" 
                 selected={returnDate} 
@@ -479,7 +479,7 @@ export const EnhancedSearchBar = () => {
               {checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={checkInDate} 
@@ -499,7 +499,7 @@ export const EnhancedSearchBar = () => {
               {checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={checkOutDate} 
@@ -592,7 +592,7 @@ export const EnhancedSearchBar = () => {
               {restaurantDate ? format(restaurantDate, "MMM dd, yyyy") : "Select date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={restaurantDate} 
@@ -653,7 +653,7 @@ export const EnhancedSearchBar = () => {
               {eventDate ? format(eventDate, "MMM dd, yyyy") : "Event date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={eventDate} 
@@ -709,7 +709,7 @@ export const EnhancedSearchBar = () => {
         {carTripType === 'one-way' ? (
           <AirportAutocomplete value={dropoffLocation} onChange={setDropoffLocation} placeholder="Drop-off airport or city" />
         ) : (
-          <Input value={pickupLocation} readOnly className="h-12" aria-label="Drop-off same as pickup" />
+          <Input value={pickupLocation} readOnly className="h-12 w-full truncate" aria-label="Drop-off same as pickup" />
         )}
       </div>
 
@@ -721,7 +721,7 @@ export const EnhancedSearchBar = () => {
               {pickupDateCar ? format(pickupDateCar, "MMM dd, yyyy") : "Pick-up date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={pickupDateCar} 
@@ -740,7 +740,7 @@ export const EnhancedSearchBar = () => {
               {returnDateCar ? format(returnDateCar, "MMM dd, yyyy") : "Return date"}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={returnDateCar} 
