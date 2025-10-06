@@ -10,6 +10,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
   try {
     const { query } = await req.json();
     
@@ -17,6 +20,7 @@ serve(async (req) => {
 
     const apiKey = Deno.env.get('BOOKING_API_KEY');
     if (!apiKey) {
+      clearTimeout(timeoutId);
       throw new Error('BOOKING_API_KEY not configured');
     }
 
@@ -27,11 +31,20 @@ serve(async (req) => {
         headers: {
           'x-rapidapi-key': apiKey,
           'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
+        },
+        signal: controller.signal
       }
     );
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later.", results: [] }), {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       throw new Error(`Destination search failed: ${response.statusText}`);
     }
 
@@ -44,9 +57,18 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('Error in search-destinations:', error);
+    
+    if (error instanceof Error && error.name === 'AbortError') {
+      return new Response(JSON.stringify({ error: "Request timed out. Please try again.", results: [] }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 408,
+      });
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: errorMessage, results: [] }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });

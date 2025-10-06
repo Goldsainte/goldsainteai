@@ -10,6 +10,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+
   try {
     const { location, cuisine, priceRange } = await req.json();
     
@@ -48,10 +51,23 @@ serve(async (req) => {
 
       const searchResponse = await fetch(
         `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-        { headers: { 'Accept': 'application/json' } }
+        { 
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal
+        }
       );
 
       if (!searchResponse.ok) {
+        if (searchResponse.status === 429) {
+          clearTimeout(timeoutId);
+          return new Response(JSON.stringify({ 
+            error: "Rate limit exceeded. Please try again later.",
+            results: [] 
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 429,
+          });
+        }
         const error = await searchResponse.text();
         console.error('TripAdvisor search error:', error);
         throw new Error(`Restaurant search failed: ${searchResponse.statusText}`);
@@ -225,6 +241,8 @@ serve(async (req) => {
       return hasPhoto && hasQuality;
     });
 
+    clearTimeout(timeoutId);
+
     return new Response(JSON.stringify({ 
       results: validRestaurants
     }), {
@@ -233,9 +251,21 @@ serve(async (req) => {
     });
 
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('Error in tripadvisor-search-restaurants:', error);
+    
+    if (error instanceof Error && error.name === 'AbortError') {
+      return new Response(JSON.stringify({ 
+        error: "Request timed out. Please try again.",
+        results: [] 
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 408,
+      });
+    }
+    
     const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: errorMessage, results: [] }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });

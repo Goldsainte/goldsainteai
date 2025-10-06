@@ -5,6 +5,27 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Simple in-memory cache with TTL
+const cache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getCacheKey(params: any): string {
+  return JSON.stringify(params);
+}
+
+function getFromCache(key: string): any | null {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  cache.delete(key);
+  return null;
+}
+
+function setCache(key: string, data: any): void {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+
 async function getAmadeusToken() {
   const apiKey = Deno.env.get("AMADEUS_API_KEY");
   const apiSecret = Deno.env.get("AMADEUS_API_SECRET");
@@ -236,13 +257,34 @@ async function enrichWithGooglePlaces(hotels: any[], location: string) {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
+  
   try {
     const { location, checkIn, checkOut, guests = 2 } = await req.json();
     if (!location || !checkIn || !checkOut) {
+      clearTimeout(timeoutId);
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
     }
 
     console.log("Unified hotel search:", { location, checkIn, checkOut, guests });
+
+    // Check cache first
+    const cacheKey = getCacheKey({ location, checkIn, checkOut, guests });
+    const cachedResult = getFromCache(cacheKey);
+    
+    if (cachedResult) {
+      clearTimeout(timeoutId);
+      console.log('Returning cached hotel results');
+      return new Response(JSON.stringify({ 
+        ...cachedResult,
+        cached: true 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     const token = await getAmadeusToken();
     const cityCode = await resolveCityCode(token, location);
@@ -314,12 +356,28 @@ serve(async (req) => {
       };
     });
 
-    return new Response(JSON.stringify({ results }), {
+    const responseData = { results };
+    
+    // Cache the result
+    setCache(cacheKey, responseData);
+    clearTimeout(timeoutId);
+
+    return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (e) {
+    clearTimeout(timeoutId);
     console.error("Error in unified-search-hotels:", e);
+    
+    // Check if it's a timeout error
+    if (e instanceof Error && e.name === 'AbortError') {
+      return new Response(JSON.stringify({ error: "Request timed out. Please try again.", results: [] }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 408,
+      });
+    }
+    
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error", results: [] }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

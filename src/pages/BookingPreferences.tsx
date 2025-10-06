@@ -11,6 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { MessageSquare, Send, Settings, ArrowLeft } from "lucide-react";
 import { ComprehensivePreferencesForm } from "@/components/ComprehensivePreferencesForm";
+import { invokeStreamingEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -80,59 +81,47 @@ export default function BookingPreferences() {
     let assistantContent = "";
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-assistant`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      const { error } = await invokeStreamingEdgeFunction('ai-booking-assistant', {
+        body: { messages: [...messages, userMsg] },
+        timeout: 65000, // 65s timeout (slightly longer than backend 60s)
+        showToastOnError: true,
+        onChunk: (chunk) => {
+          // Parse SSE chunks
+          const lines = chunk.split('\n');
+          for (const line of lines) {
+            if (!line.trim() || line.startsWith(':')) continue;
+            if (!line.startsWith('data: ')) continue;
+            
+            const jsonStr = line.slice(6).trim();
+            if (jsonStr === '[DONE]') continue;
+            
+            try {
+              const parsed = JSON.parse(jsonStr);
+              const content = parsed.choices?.[0]?.delta?.content;
+              if (content) {
+                assistantContent += content;
+                setMessages(prev => {
+                  const last = prev[prev.length - 1];
+                  if (last?.role === "assistant") {
+                    return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantContent } : m));
+                  }
+                  return [...prev, { role: "assistant", content: assistantContent }];
+                });
+              }
+            } catch (e) {
+              // Ignore parsing errors for incomplete chunks
+            }
+          }
         },
-        body: JSON.stringify({ messages: [...messages, userMsg] }),
+        onComplete: () => {
+          setIsLoading(false);
+        }
       });
 
-      if (!response.ok || !response.body) throw new Error("Failed to start stream");
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, newlineIndex);
-          buffer = buffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") break;
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content;
-            if (content) {
-              assistantContent += content;
-              setMessages(prev => {
-                const last = prev[prev.length - 1];
-                if (last?.role === "assistant") {
-                  return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantContent } : m));
-                }
-                return [...prev, { role: "assistant", content: assistantContent }];
-              });
-            }
-          } catch {
-            buffer = line + "\n" + buffer;
-            break;
-          }
-        }
+      if (error) {
+        // Error already handled by invokeStreamingEdgeFunction with toast
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     } catch (error) {
       console.error("Chat error:", error);
       toast.error("Failed to send message");
