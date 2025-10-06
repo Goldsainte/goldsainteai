@@ -132,6 +132,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       setLoading(true);
       setError(null);
       setResults([]); // Clear previous results immediately
+      setSearchPerformed(true); // Mark that a search was performed
 
       try {
         if (searchType === "hotels") {
@@ -342,6 +343,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       setLoading(false);
       setResults([]);
       setFilteredResults([]);
+      setSearchPerformed(false); // No search was performed
     }
   }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass, pickup, dropoff, pickupDateCar, returnDateCar, carTripType]);
 
@@ -493,7 +495,8 @@ if (minRating && searchType !== "restaurants") {
     setFilteredResults(filtered);
   }, [results, priceRange, minRating, sortBy, selectedAmenities, selectedPropertyTypes, selectedStarRatings, selectedCuisines, selectedDietary, selectedEventCategories]);
 
-  const [showSearchBar, setShowSearchBar] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(true);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -533,9 +536,13 @@ if (minRating && searchType !== "restaurants") {
           <div className="text-center py-12">
             <p className="text-destructive">{error}</p>
           </div>
-        ) : results.length === 0 ? (
+        ) : results.length === 0 && searchPerformed ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">No results found. Try a different search.</p>
+          </div>
+        ) : results.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground text-lg">Enter your search details above to find {searchType}</p>
           </div>
         ) : (
           <div className="space-y-4">
