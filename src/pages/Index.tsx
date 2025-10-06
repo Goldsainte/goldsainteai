@@ -559,30 +559,43 @@ const Index = () => {
 
   // Helper to extract year/date from recent messages
   const extractSuggestedDate = (): Date | undefined => {
-    // Look at the last few user and AI messages for date mentions
-    const recentMessages = [...conversationHistory, ...messages].slice(-5);
-    const conversationText = recentMessages.map(m => m.content).join(' ');
+    // Look at ALL messages including the most recent ones
+    const allMessages = [...conversationHistory, ...messages];
+    const conversationText = allMessages.map(m => m.content).join(' ').toLowerCase();
     
-    // Match year patterns (2024, 2025, 2026, etc.)
-    const yearMatch = conversationText.match(/\b(202[4-9]|203[0-9])\b/);
+    console.log('Extracting date from conversation:', conversationText);
+    
+    // Match year patterns (2024-2039) - look for the LAST occurrence
+    const yearMatches = conversationText.match(/\b(202[4-9]|203[0-9])\b/g);
+    const year = yearMatches ? parseInt(yearMatches[yearMatches.length - 1]) : new Date().getFullYear();
+    
+    console.log('Found year:', year);
     
     // Match month patterns (January, Jan, July, etc.)
     const monthNames = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
     const monthShort = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
     let monthIndex = -1;
     
-    for (let i = 0; i < monthNames.length; i++) {
-      if (conversationText.toLowerCase().includes(monthNames[i]) || conversationText.toLowerCase().includes(monthShort[i])) {
-        monthIndex = i;
-        break;
+    // Look for month mentions from most recent to oldest
+    for (let i = allMessages.length - 1; i >= 0; i--) {
+      const msgText = allMessages[i].content.toLowerCase();
+      for (let j = 0; j < monthNames.length; j++) {
+        if (msgText.includes(monthNames[j]) || msgText.includes(monthShort[j])) {
+          monthIndex = j;
+          break;
+        }
       }
+      if (monthIndex !== -1) break;
     }
     
+    console.log('Found month index:', monthIndex);
+    
     // If we found a year or month, create a suggested date
-    if (yearMatch || monthIndex !== -1) {
-      const year = yearMatch ? parseInt(yearMatch[0]) : new Date().getFullYear();
+    if (yearMatches || monthIndex !== -1) {
       const month = monthIndex !== -1 ? monthIndex : new Date().getMonth();
-      return new Date(year, month, 1);
+      const suggestedDate = new Date(year, month, 1);
+      console.log('Created suggested date:', suggestedDate);
+      return suggestedDate;
     }
     
     return undefined;
