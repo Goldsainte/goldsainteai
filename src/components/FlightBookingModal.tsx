@@ -231,9 +231,9 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Complete Your Flight Booking</DialogTitle>
+      <DialogContent className="max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogHeader className="pb-4">
+          <DialogTitle className="text-xl sm:text-2xl">Complete Your Flight Booking</DialogTitle>
         </DialogHeader>
 
         {/* Autofill Prompt */}
@@ -279,34 +279,34 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
           </div>
 
           {/* Step Indicator */}
-          <div className="flex items-center justify-center space-x-2 overflow-x-auto pb-2">
-            <div className={`flex items-center ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
-              <span className="ml-2 text-sm">Passengers</span>
+          <div className="flex items-center justify-between space-x-1 sm:space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+            <div className={`flex items-center flex-shrink-0 ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
+              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Passengers</span>
             </div>
-            <div className="w-8 h-px bg-border" />
-            <div className={`flex items-center ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>2</div>
-              <span className="ml-2 text-sm">Seats</span>
+            <div className="w-4 sm:w-8 h-px bg-border flex-shrink-0" />
+            <div className={`flex items-center flex-shrink-0 ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>2</div>
+              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Seats</span>
             </div>
-            <div className="w-8 h-px bg-border" />
-            <div className={`flex items-center ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>3</div>
-              <span className="ml-2 text-sm">Baggage</span>
+            <div className="w-4 sm:w-8 h-px bg-border flex-shrink-0" />
+            <div className={`flex items-center flex-shrink-0 ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>3</div>
+              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Baggage</span>
             </div>
-            <div className="w-8 h-px bg-border" />
-            <div className={`flex items-center ${step >= 4 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 4 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>4</div>
-              <span className="ml-2 text-sm">Payment</span>
+            <div className="w-4 sm:w-8 h-px bg-border flex-shrink-0" />
+            <div className={`flex items-center flex-shrink-0 ${step >= 4 ? 'text-primary' : 'text-muted-foreground'}`}>
+              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 4 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>4</div>
+              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Payment</span>
             </div>
           </div>
 
           {/* Step 1: Passenger Information */}
           {step === 1 && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {passengers.map((passenger, index) => (
-                <div key={index} className="p-4 border rounded-lg space-y-4">
-                  <h4 className="font-semibold">Passenger {index + 1}</h4>
+                <div key={index} className="p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-4">
+                  <h4 className="font-semibold text-sm sm:text-base">Passenger {index + 1}</h4>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
