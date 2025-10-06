@@ -1030,20 +1030,72 @@ Always show results first with minimal text, ask questions later. Be conversatio
         }))
       ];
 
-      const finalResponse = await fetch(OPENAI_URL, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-5-2025-08-07',
-          messages: finalMessages,
-        }),
-      });
+      console.log('Sending tool results back to AI for final response...');
+      console.log('Tool results count:', toolResults.length);
+      console.log('Total message size:', JSON.stringify(finalMessages).length);
 
-      const finalData = await finalResponse.json();
-      const finalMessage = finalData.choices[0].message.content;
+      try {
+        // Add timeout to prevent hanging
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+
+        const finalResponse = await fetch(OPENAI_URL, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-5-2025-08-07',
+            messages: finalMessages,
+            max_completion_tokens: 500, // Limit response size
+          }),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (!finalResponse.ok) {
+          const errorText = await finalResponse.text();
+          console.error('Final AI response error:', finalResponse.status, errorText);
+          throw new Error(`AI response failed: ${finalResponse.status}`);
+        }
+
+        const finalData = await finalResponse.json();
+        console.log('Final AI response received successfully');
+        const finalMessage = finalData.choices[0].message.content;
+
+        return new Response(JSON.stringify({
+          message: finalMessage,
+          toolResults: toolResults.map(tr => tr.result),
+          conversationHistory: [...conversationHistory, 
+            { role: 'user', content: message },
+            { role: 'assistant', content: finalMessage }
+          ]
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      } catch (finalError: any) {
+        console.error('Error getting final AI response:', finalError);
+        
+        // If the final AI call fails, still return the tool results with a generic message
+        const fallbackMessage = toolResults.length > 0 
+          ? "I found some options for you! Check them out below."
+          : "I couldn't find any results matching your criteria. Please try adjusting your search parameters.";
+
+        return new Response(JSON.stringify({
+          message: fallbackMessage,
+          toolResults: toolResults.map(tr => tr.result),
+          conversationHistory: [...conversationHistory, 
+            { role: 'user', content: message },
+            { role: 'assistant', content: fallbackMessage }
+          ]
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
 
       return new Response(JSON.stringify({
         message: finalMessage,
