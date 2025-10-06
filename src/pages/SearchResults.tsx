@@ -468,19 +468,35 @@ if (minRating && searchType !== "restaurants") {
     setFilteredResults(filtered);
   }, [results, priceRange, minRating, sortBy, selectedAmenities, selectedPropertyTypes, selectedStarRatings, selectedCuisines, selectedDietary, selectedEventCategories]);
 
+  const [showSearchBar, setShowSearchBar] = useState(false);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/')}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Search
-        </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/')}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Back to Search</span>
+            <span className="sm:hidden">Back</span>
+          </Button>
+          
+          {/* Mobile: Show/Hide search bar toggle */}
+          <Button
+            variant="outline"
+            onClick={() => setShowSearchBar(!showSearchBar)}
+            className="md:hidden gap-2"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            {showSearchBar ? 'Hide Search' : 'Modify Search'}
+          </Button>
+        </div>
         
-        <div className="mb-6">
+        {/* Search bar - hidden on mobile by default, always visible on desktop */}
+        <div className={`mb-6 ${showSearchBar ? 'block' : 'hidden md:block'}`}>
           <EnhancedSearchBar />
         </div>
 
