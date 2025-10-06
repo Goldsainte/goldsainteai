@@ -17,6 +17,13 @@ import { cn } from "@/lib/utils";
 import { AirportAutocomplete } from "@/components/AirportAutocomplete";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
 
+// Helper to parse date strings as local dates (not UTC)
+const parseLocalDate = (dateString: string | null): Date | undefined => {
+  if (!dateString) return undefined;
+  const [year, month, day] = dateString.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const EnhancedSearchBar = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -32,10 +39,10 @@ export const EnhancedSearchBar = () => {
   const [origin, setOrigin] = useState(searchParams.get("origin") || "");
   const [destination, setDestination] = useState(searchParams.get("destination") || "");
   const [departureDate, setDepartureDate] = useState<Date | undefined>(
-    searchParams.get("departureDate") ? new Date(searchParams.get("departureDate")!) : undefined
+    parseLocalDate(searchParams.get("departureDate"))
   );
   const [returnDate, setReturnDate] = useState<Date | undefined>(
-    searchParams.get("returnDate") ? new Date(searchParams.get("returnDate")!) : undefined
+    parseLocalDate(searchParams.get("returnDate"))
   );
   const [cabinClass, setCabinClass] = useState(searchParams.get("cabinClass") || "ECONOMY");
   const [flightPassengers, setFlightPassengers] = useState({
@@ -51,20 +58,20 @@ export const EnhancedSearchBar = () => {
   const [pickupLocation, setPickupLocation] = useState(searchParams.get("pickup") || "");
   const [dropoffLocation, setDropoffLocation] = useState(searchParams.get("dropoff") || "");
   const [pickupDateCar, setPickupDateCar] = useState<Date | undefined>(
-    searchParams.get("pickupDate") ? new Date(searchParams.get("pickupDate")!) : undefined
+    parseLocalDate(searchParams.get("pickupDate"))
   );
   const [returnDateCar, setReturnDateCar] = useState<Date | undefined>(
-    searchParams.get("returnDate") ? new Date(searchParams.get("returnDate")!) : undefined
+    parseLocalDate(searchParams.get("returnDate"))
   );
 
 
   // Hotel-specific states
   const [hotelLocation, setHotelLocation] = useState(searchParams.get("location") || "");
   const [checkInDate, setCheckInDate] = useState<Date | undefined>(
-    searchParams.get("checkIn") ? new Date(searchParams.get("checkIn")!) : undefined
+    parseLocalDate(searchParams.get("checkIn"))
   );
   const [checkOutDate, setCheckOutDate] = useState<Date | undefined>(
-    searchParams.get("checkOut") ? new Date(searchParams.get("checkOut")!) : undefined
+    parseLocalDate(searchParams.get("checkOut"))
   );
   const [rooms, setRooms] = useState(parseInt(searchParams.get("rooms") || "1"));
   const [hotelGuests, setHotelGuests] = useState({
@@ -75,7 +82,7 @@ export const EnhancedSearchBar = () => {
   // Restaurant states
   const [restaurantLocation, setRestaurantLocation] = useState(searchParams.get("location") || "");
   const [restaurantDate, setRestaurantDate] = useState<Date | undefined>(
-    searchParams.get("date") ? new Date(searchParams.get("date")!) : undefined
+    parseLocalDate(searchParams.get("date"))
   );
   const [partySize, setPartySize] = useState(parseInt(searchParams.get("partySize") || "2"));
   const [restaurantTime, setRestaurantTime] = useState(searchParams.get("time") || "19:00");
@@ -83,7 +90,7 @@ export const EnhancedSearchBar = () => {
   // Events states
   const [eventLocation, setEventLocation] = useState(searchParams.get("location") || "");
   const [eventDate, setEventDate] = useState<Date | undefined>(
-    searchParams.get("date") ? new Date(searchParams.get("date")!) : undefined
+    parseLocalDate(searchParams.get("date"))
   );
   const [eventCategory, setEventCategory] = useState(searchParams.get("category") || "all");
 
