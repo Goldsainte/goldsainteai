@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plane, Hotel, Car, Calendar, Users, Sparkles } from "lucide-react";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 import { useEffect, useMemo, useState } from "react";
-// Simple FX cache and conversion
+// Simple FX cache and conversion with better error handling
 const rateCache = new Map<string, number>();
 async function getRate(from: string, to: string): Promise<number> {
   if (!from || !to || from === to) return 1;
@@ -12,22 +12,27 @@ async function getRate(from: string, to: string): Promise<number> {
   const cached = rateCache.get(key);
   if (cached) return cached;
   try {
-    const res = await fetch(`https://api.exchangerate.host/latest?base=${encodeURIComponent(from)}&symbols=${encodeURIComponent(to)}`);
+    // Use exchangerate-api.com which is more reliable
+    const res = await fetch(`https://api.exchangerate-api.com/v4/latest/${encodeURIComponent(from)}`);
+    if (!res.ok) throw new Error('Rate fetch failed');
     const json = await res.json();
     const rate = json?.rates?.[to];
-    if (typeof rate === 'number') {
+    if (typeof rate === 'number' && rate > 0) {
       rateCache.set(key, rate);
       return rate;
     }
   } catch (e) {
-    console.error('FX rate fetch failed', e);
+    console.error('FX rate fetch failed, using 1:1', e);
   }
-  return 1;
+  return 1; // Fallback to 1:1 if fetch fails
 }
 async function convertAmount(amount: number, from: string, to: string): Promise<number> {
-  if (!amount) return 0;
+  if (!amount || amount === 0) return 0;
+  if (from === to) return amount;
   const rate = await getRate(from, to);
-  return amount * rate;
+  const converted = amount * rate;
+  console.log(`Converting ${amount} ${from} to ${to}: rate=${rate}, result=${converted}`);
+  return converted;
 }
 
 interface PackageCardProps {
@@ -58,13 +63,21 @@ export const PackageCard = ({ packageData, userCountry = 'US', onBook }: Package
   const cheapestHotel = hotels[0];
   const cheapestCar = cars[0];
   
-const flightPrice = cheapestFlight ? parseFloat(cheapestFlight.price?.total || 0) : 0;
-const hotelPrice = cheapestHotel ? parseFloat(cheapestHotel.offers?.[0]?.price?.total || 0) : 0;
-const carPrice = cheapestCar ? parseFloat(cheapestCar.price?.total || 0) : 0;
+// Extract prices - ensure we're getting valid numbers
+const flightPrice = cheapestFlight?.price?.total ? parseFloat(String(cheapestFlight.price.total)) : 0;
+const hotelPrice = cheapestHotel?.offers?.[0]?.price?.total ? parseFloat(String(cheapestHotel.offers[0].price.total)) : 0;
+const carPrice = cheapestCar?.price?.total ? parseFloat(String(cheapestCar.price.total)) : 0;
 
-const flightCurrency = cheapestFlight?.price?.currency || currencyInfo.code;
-const hotelCurrency = cheapestHotel?.offers?.[0]?.price?.currency || currencyInfo.code;
-const carCurrency = cheapestCar?.price?.currency || currencyInfo.code;
+const flightCurrency = cheapestFlight?.price?.currency || 'USD';
+const hotelCurrency = cheapestHotel?.offers?.[0]?.price?.currency || 'USD';
+const carCurrency = cheapestCar?.price?.currency || 'USD';
+
+console.log('Package prices:', { 
+  flight: { price: flightPrice, currency: flightCurrency },
+  hotel: { price: hotelPrice, currency: hotelCurrency },
+  car: { price: carPrice, currency: carCurrency },
+  targetCurrency: currencyInfo.code
+});
 
 const [converted, setConverted] = useState({ flight: flightPrice, hotel: hotelPrice, car: carPrice });
 
@@ -79,10 +92,23 @@ useEffect(() => {
   return () => { active = false; };
 }, [flightPrice, hotelPrice, carPrice, flightCurrency, hotelCurrency, carCurrency, currencyInfo.code]);
 
-const total = useMemo(() => converted.flight + converted.hotel + converted.car, [converted]);
+// Total is sum of all converted prices (flight is total for all travelers, hotel is total, car is total)
+const total = useMemo(() => {
+  const sum = converted.flight + converted.hotel + converted.car;
+  console.log('Total calculation:', { converted, sum });
+  return sum;
+}, [converted]);
+
 const packageSavings = useMemo(() => Math.floor(total * 0.1), [total]); // 10% package discount
 const finalPrice = useMemo(() => total - packageSavings, [total, packageSavings]);
-const perPerson = useMemo(() => (travelers > 0 ? finalPrice / travelers : finalPrice), [finalPrice, travelers]);
+
+// Per person price - divide total by number of travelers
+const perPerson = useMemo(() => {
+  const pp = travelers > 0 ? finalPrice / travelers : finalPrice;
+  console.log('Per person calculation:', { finalPrice, travelers, perPerson: pp });
+  return pp;
+}, [finalPrice, travelers]);
+
 const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency].some(c => c && c !== currencyInfo.code), [flightCurrency, hotelCurrency, carCurrency, currencyInfo.code]);
   
   const formatDate = (date: string) => {
@@ -148,20 +174,40 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
               <p className="font-semibold">Round-trip Flight</p>
               <div className="text-sm text-muted-foreground space-y-0.5">
                 <p>
-                  <span className="font-medium">{cheapestFlight.itineraries?.[0]?.segments?.[0]?.carrierCode || 'Airline'}</span>
-                  {cheapestFlight.itineraries?.[0]?.segments?.[0]?.number && ` ${cheapestFlight.itineraries[0].segments[0].number}`}
+                  <span className="font-medium">
+                    {cheapestFlight.itineraries?.[0]?.segments?.[0]?.carrierCode || 'Airline'} 
+                    {cheapestFlight.itineraries?.[0]?.segments?.[0]?.number && ` ${cheapestFlight.itineraries[0].segments[0].number}`}
+                  </span>
                 </p>
-                <p>
-                  Depart: {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode || origin} 
-                  {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.at && 
-                    ` at ${new Date(cheapestFlight.itineraries[0].segments[0].departure.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-                </p>
-                <p>
-                  Arrive: {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.iataCode || destination}
-                  {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.at && 
-                    ` at ${new Date(cheapestFlight.itineraries[0].segments[cheapestFlight.itineraries[0].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
-                </p>
-                <p>{cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'Nonstop' : `${cheapestFlight.itineraries[0].segments.length - 1} stop(s)`}</p>
+                <div className="pt-1">
+                  <p className="font-medium">Outbound</p>
+                  <p>
+                    Depart: {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode || origin} 
+                    {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.at && 
+                      ` at ${new Date(cheapestFlight.itineraries[0].segments[0].departure.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                  </p>
+                  <p>
+                    Arrive: {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.iataCode || destination}
+                    {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.at && 
+                      ` at ${new Date(cheapestFlight.itineraries[0].segments[cheapestFlight.itineraries[0].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                  </p>
+                  <p>{cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'Nonstop' : `${cheapestFlight.itineraries[0].segments.length - 1} stop(s)`}</p>
+                </div>
+                {cheapestFlight.itineraries?.[1] && (
+                  <div className="pt-1 border-t mt-1">
+                    <p className="font-medium">Return</p>
+                    <p>
+                      Depart: {cheapestFlight.itineraries[1].segments?.[0]?.departure?.iataCode || destination}
+                      {cheapestFlight.itineraries[1].segments?.[0]?.departure?.at && 
+                        ` at ${new Date(cheapestFlight.itineraries[1].segments[0].departure.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                    </p>
+                    <p>
+                      Arrive: {cheapestFlight.itineraries[1].segments?.[cheapestFlight.itineraries[1].segments.length - 1]?.arrival?.iataCode || origin}
+                      {cheapestFlight.itineraries[1].segments?.[cheapestFlight.itineraries[1].segments.length - 1]?.arrival?.at && 
+                        ` at ${new Date(cheapestFlight.itineraries[1].segments[cheapestFlight.itineraries[1].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                    </p>
+                  </div>
+                )}
                 {flightCurrency !== currencyInfo.code && hasConversion && (
                   <p className="text-xs italic opacity-75">Converted from {flightCurrency}</p>
                 )}
@@ -182,12 +228,16 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
               <div className="text-sm text-muted-foreground space-y-0.5">
                 {cheapestHotel.hotel?.cityCode && <p>Location: {cheapestHotel.hotel.cityCode}</p>}
                 {cheapestHotel.hotel?.address?.lines?.[0] && <p>{cheapestHotel.hotel.address.lines[0]}</p>}
-                <p>{nights} nights • {cheapestHotel.hotel?.rating || 'N/A'} stars</p>
+                <p>{nights} nights • {cheapestHotel.hotel?.rating ? `${cheapestHotel.hotel.rating} stars` : 'Rating N/A'}</p>
                 {cheapestHotel.offers?.[0]?.room?.description?.text && (
                   <p className="line-clamp-1">Room: {cheapestHotel.offers[0].room.description.text}</p>
                 )}
                 {cheapestHotel.offers?.[0]?.room?.typeEstimated?.category && (
                   <p>Category: {cheapestHotel.offers[0].room.typeEstimated.category}</p>
+                )}
+                <p>Check-in: {formatDate(departureDate)} • Check-out: {formatDate(returnDate)}</p>
+                {hotelCurrency !== currencyInfo.code && hasConversion && (
+                  <p className="text-xs italic opacity-75">Converted from {hotelCurrency}</p>
                 )}
               </div>
             </div>

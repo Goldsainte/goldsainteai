@@ -134,18 +134,17 @@ export const BookingModal = ({
   const currencySymbol = getCurrencySymbol(currency);
 
   const onSubmit = async (values: z.infer<typeof bookingFormSchema>) => {
-    setLoading(true);
-
     if (!user) {
       toast({
         title: "Sign in required",
-        description: "Please sign in to complete checkout.",
+        description: "Please sign in to complete your booking. You'll be redirected back to checkout.",
         variant: "destructive",
       });
-      setLoading(false);
       navigate('/auth?redirect=checkout');
       return;
     }
+
+    setLoading(true);
 
     try {
       const { data: bookingResult, error: bookingError } = await supabase.functions.invoke('create-booking', {
