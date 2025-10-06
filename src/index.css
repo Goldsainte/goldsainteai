@@ -26,7 +26,7 @@ All colors MUST be HSL.
     --secondary-foreground: 174 73% 17%;
 
     --muted: 210 30% 96%;
-    --muted-foreground: 215 15% 45%;
+    --muted-foreground: 215 15% 40%; /* Improved contrast from 45% to 40% for WCAG AA */
 
     --accent: 46 38% 60%;
     --accent-foreground: 174 73% 17%;

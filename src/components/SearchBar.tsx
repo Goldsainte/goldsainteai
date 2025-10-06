@@ -89,29 +89,33 @@ export const SearchBar = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4 md:px-0">
-      <div className="bg-card border border-border rounded-3xl shadow-lg p-6 md:p-8">
-        <div className="mb-6 text-center">
+      <div className="bg-card border border-border rounded-3xl shadow-lg p-6 md:p-8" role="search" aria-label="Travel search">
+        <div className="mb-6 text-center" aria-live="polite" aria-atomic="true">
           <p className="text-lg md:text-xl text-muted-foreground transition-opacity duration-500">
             {rotatingMessages[currentMessageIndex]}
           </p>
         </div>
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto">
-            <TabsTrigger value="hotels" className="gap-2 py-4 text-sm md:text-base">
-              <Hotel className="h-5 w-5 flex-shrink-0" />
+          <TabsList className="grid w-full grid-cols-4 h-auto" aria-label="Search type selection">
+            <TabsTrigger value="hotels" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search hotels">
+              <Hotel className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="hidden sm:inline">Hotels</span>
+              <span className="sm:hidden sr-only">Hotels</span>
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-2 py-4 text-sm md:text-base">
-              <Plane className="h-5 w-5 flex-shrink-0" />
+            <TabsTrigger value="flights" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search flights">
+              <Plane className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="hidden sm:inline">Flights</span>
+              <span className="sm:hidden sr-only">Flights</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-2 py-4 text-sm md:text-base">
-              <UtensilsCrossed className="h-5 w-5 flex-shrink-0" />
+            <TabsTrigger value="restaurants" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search restaurants">
+              <UtensilsCrossed className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="hidden sm:inline">Restaurants</span>
+              <span className="sm:hidden sr-only">Restaurants</span>
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2 py-4 text-sm md:text-base">
-              <Ticket className="h-5 w-5 flex-shrink-0" />
+            <TabsTrigger value="events" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search events">
+              <Ticket className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
               <span className="hidden sm:inline">Events</span>
+              <span className="sm:hidden sr-only">Events</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -141,35 +145,46 @@ export const SearchBar = () => {
           {searchType === "hotels" && (
             <>
               <div className="relative">
-                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+                <label htmlFor="check-in" className="sr-only">Check-in date</label>
+                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 <Input
+                  id="check-in"
                   type="date"
                   placeholder="Check-in"
                   className="pl-12 h-16 border-border text-lg rounded-xl"
                   value={checkIn}
                   onChange={(e) => setCheckIn(e.target.value)}
+                  aria-label="Check-in date"
                 />
               </div>
 
               <div className="relative">
-                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+                <label htmlFor="check-out" className="sr-only">Check-out date</label>
+                <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 <Input
+                  id="check-out"
                   type="date"
                   placeholder="Check-out"
                   className="pl-12 h-16 border-border text-lg rounded-xl"
                   value={checkOut}
                   onChange={(e) => setCheckOut(e.target.value)}
+                  aria-label="Check-out date"
                 />
               </div>
 
               <div className="relative">
-                <Users className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+                <label htmlFor="guests" className="sr-only">Number of guests</label>
+                <Users className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 <Input
+                  id="guests"
                   type="number"
+                  min="1"
+                  max="20"
                   placeholder="2 guests"
                   className="pl-12 h-16 border-border text-lg rounded-xl"
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
+                  aria-label="Number of guests"
                 />
               </div>
             </>
@@ -177,26 +192,32 @@ export const SearchBar = () => {
 
           {searchType === "flights" && (
             <div className="relative md:col-span-3">
-              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+              <label htmlFor="departure-date" className="sr-only">Departure date</label>
+              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
               <Input
+                id="departure-date"
                 type="date"
                 placeholder="Departure date"
                 className="pl-12 h-16 border-border text-lg rounded-xl"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
+                aria-label="Departure date"
               />
             </div>
           )}
 
           {searchType === "events" && (
             <div className="relative md:col-span-3">
-              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+              <label htmlFor="event-date" className="sr-only">Event date</label>
+              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
               <Input
+                id="event-date"
                 type="date"
                 placeholder="Event date"
                 className="pl-12 h-16 border-border text-lg rounded-xl"
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
+                aria-label="Event date"
               />
             </div>
           )}
@@ -207,10 +228,11 @@ export const SearchBar = () => {
         </div>
 
         <Button 
-          className="w-full mt-6 h-16 bg-primary text-primary-foreground hover:bg-primary/90 text-lg font-semibold rounded-xl"
+          className="w-full mt-6 h-16 bg-primary text-primary-foreground hover:bg-primary/90 text-lg font-semibold rounded-xl min-h-[48px]"
           onClick={handleSearch}
+          aria-label={`${getSearchButtonText()}`}
         >
-          <Search className="h-6 w-6 mr-2" />
+          <Search className="h-6 w-6 mr-2" aria-hidden="true" />
           {getSearchButtonText()}
         </Button>
       </div>

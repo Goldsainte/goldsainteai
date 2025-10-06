@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
+import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
@@ -40,34 +41,37 @@ function AppContent() {
 
   return (
     <div className="min-h-screen w-full flex flex-col">
+      <SkipNavigation />
       {showHeader && <Header />}
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/marketplace" element={<Marketplace />} />
-        <Route path="/browse-agents" element={<BrowseAgents />} />
-        <Route path="/agent/:agentId" element={<AgentProfile />} />
-        <Route path="/agent-onboarding" element={<AgentOnboarding />} />
-        <Route path="/agent-dashboard" element={<AgentDashboard />} />
-        <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
-        <Route path="/booking-preferences" element={<BookingPreferences />} />
-        <Route path="/commission-dashboard" element={<CommissionDashboard />} />
-        <Route path="/email-preview" element={<EmailPreview />} />
-        <Route path="/favorites" element={<Favorites />} />
-        <Route path="/my-bookings" element={<MyBookings />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
-        <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
-        <Route path="/search" element={<SearchResults />} />
-        <Route path="/hotel-booking" element={<HotelBooking />} />
-        <Route path="/booking-confirmation" element={<BookingConfirmation />} />
-        <Route path="/my-jobs" element={<MyJobs />} />
-        <Route path="/r" element={<Redirect />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <main id="main-content" className="flex-1" tabIndex={-1}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/browse-agents" element={<BrowseAgents />} />
+          <Route path="/agent/:agentId" element={<AgentProfile />} />
+          <Route path="/agent-onboarding" element={<AgentOnboarding />} />
+          <Route path="/agent-dashboard" element={<AgentDashboard />} />
+          <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
+          <Route path="/booking-preferences" element={<BookingPreferences />} />
+          <Route path="/commission-dashboard" element={<CommissionDashboard />} />
+          <Route path="/email-preview" element={<EmailPreview />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
+          <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
+          <Route path="/search" element={<SearchResults />} />
+          <Route path="/hotel-booking" element={<HotelBooking />} />
+          <Route path="/booking-confirmation" element={<BookingConfirmation />} />
+          <Route path="/my-jobs" element={<MyJobs />} />
+          <Route path="/r" element={<Redirect />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
     </div>
   );
 }
