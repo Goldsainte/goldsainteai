@@ -43,13 +43,15 @@ interface PackageCardProps {
     estimatedTotal?: number;
     savings?: number;
   };
+  userCountry?: string;
+  onBook?: (packageData: any) => void;
 }
 
-export const PackageCard = ({ packageData }: PackageCardProps) => {
+export const PackageCard = ({ packageData, userCountry = 'US', onBook }: PackageCardProps) => {
   const { flights, hotels, cars, origin, destination, departureDate, returnDate, travelers, estimatedTotal, savings } = packageData;
   
-  // Use origin location for currency (where user is booking from, not destination)
-  const currencyInfo = getCurrencyFromLocation(origin);
+  // Use detected user country for currency (where user is located)
+  const currencyInfo = getCurrencyFromLocation(userCountry);
   const currencySymbol = currencyInfo.symbol;
   
   const cheapestFlight = flights[0];
@@ -160,9 +162,12 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                     ` at ${new Date(cheapestFlight.itineraries[0].segments[cheapestFlight.itineraries[0].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
                 </p>
                 <p>{cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'Nonstop' : `${cheapestFlight.itineraries[0].segments.length - 1} stop(s)`}</p>
+                {flightCurrency !== currencyInfo.code && hasConversion && (
+                  <p className="text-xs italic opacity-75">Converted from {flightCurrency}</p>
+                )}
               </div>
             </div>
-            <p className="font-semibold text-right">{currencySymbol}{flightPrice.toFixed(2)}</p>
+            <p className="font-semibold text-right">{currencySymbol}{converted.flight.toFixed(2)}</p>
           </div>
         )}
 
@@ -186,7 +191,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                 )}
               </div>
             </div>
-            <p className="font-semibold text-right">{currencySymbol}{hotelPrice.toFixed(2)}</p>
+            <p className="font-semibold text-right">{currencySymbol}{converted.hotel.toFixed(2)}</p>
           </div>
         )}
 
@@ -205,7 +210,7 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                 <p>{nights} days rental</p>
               </div>
             </div>
-            <p className="font-semibold text-right">{currencySymbol}{carPrice.toFixed(2)}</p>
+            <p className="font-semibold text-right">{currencySymbol}{converted.car.toFixed(2)}</p>
           </div>
         )}
 
@@ -214,15 +219,24 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
             className="w-full" 
             size="lg"
             onClick={() => {
-              // TODO: Implement package booking flow
-              console.log('Package booking:', packageData);
-              alert('Package booking coming soon! You can currently book flights and hotels separately.');
+              if (onBook) {
+                onBook({
+                  ...packageData,
+                  finalPrice: perPerson,
+                  currencySymbol,
+                  currencyCode: currencyInfo.code,
+                  packageSavings
+                });
+              }
             }}
           >
-            Book Complete Package - {currencySymbol}{finalPrice.toFixed(2)}
+            Book Complete Package - {currencySymbol}{perPerson.toFixed(2)}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
-            Total for {travelers} {travelers === 1 ? 'traveler' : 'travelers'} • Save {currencySymbol}{packageSavings.toFixed(2)} vs booking separately
+            {currencySymbol}{perPerson.toFixed(2)} per person • Total {currencySymbol}{finalPrice.toFixed(2)} for {travelers} {travelers === 1 ? 'traveler' : 'travelers'}
+          </p>
+          <p className="text-xs text-center text-green-600 dark:text-green-400 font-medium">
+            💰 Save {currencySymbol}{packageSavings.toFixed(2)} vs booking separately
           </p>
         </div>
       </div>

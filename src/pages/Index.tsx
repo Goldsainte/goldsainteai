@@ -41,6 +41,7 @@ import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
@@ -118,6 +119,8 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userCountry, setUserCountry] = useState<string>('US'); // Default to US
+  const [packageBookingData, setPackageBookingData] = useState<any>(null);
   const [showDatePicker, setShowDatePicker] = useState<{ type: "hotel" | "flight"; context: string; suggestedDate?: Date } | null>(null);
   const [pendingFlightDates, setPendingFlightDates] = useState<{ departureDate: string; returnDate?: string } | null>(null);
   const [visaModalData, setVisaModalData] = useState<{ 
@@ -199,12 +202,24 @@ const Index = () => {
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          });
-          console.log('Location detected:', position.coords.latitude, position.coords.longitude);
+        async (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setUserLocation({ lat, lng });
+          console.log('Location detected:', lat, lng);
+          
+          // Reverse geocode to get country
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+            );
+            const data = await response.json();
+            const country = data.address?.country_code?.toUpperCase() || 'US';
+            setUserCountry(country);
+            console.log('Country detected:', country);
+          } catch (error) {
+            console.error('Failed to reverse geocode:', error);
+          }
         },
         (error) => {
           console.log("User denied location access or error:", error);
@@ -1509,18 +1524,22 @@ const Index = () => {
                           Save up to 10% when booking flights, hotels, and cars together
                         </p>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          <PackageCard packageData={{
-                            flights: result.flights || [],
-                            hotels: result.hotels || [],
-                            cars: result.cars || [],
-                            origin: typeof result.origin === 'string' ? result.origin : result.origin?.name || '',
-                            destination: typeof result.destination === 'string' ? result.destination : result.destination?.name || '',
-                            departureDate: result.departureDate || '',
-                            returnDate: result.returnDate || '',
-                            travelers: result.travelers || 1,
-                            estimatedTotal: result.estimatedTotal,
-                            savings: result.savings
-                          }} />
+                          <PackageCard 
+                            packageData={{
+                              flights: result.flights || [],
+                              hotels: result.hotels || [],
+                              cars: result.cars || [],
+                              origin: typeof result.origin === 'string' ? result.origin : result.origin?.name || '',
+                              destination: typeof result.destination === 'string' ? result.destination : result.destination?.name || '',
+                              departureDate: result.departureDate || '',
+                              returnDate: result.returnDate || '',
+                              travelers: result.travelers || 1,
+                              estimatedTotal: result.estimatedTotal,
+                              savings: result.savings
+                            }}
+                            userCountry={userCountry}
+                            onBook={(pkg) => setPackageBookingData(pkg)}
+                          />
                         </div>
                       </div>
                     )}
@@ -1594,6 +1613,29 @@ const Index = () => {
           open={showWelcomeModal}
           onClose={handleCloseWelcome}
         />
+
+        {/* Package Booking Modal */}
+        {packageBookingData && (
+          <BookingModal
+            open={!!packageBookingData}
+            onClose={() => setPackageBookingData(null)}
+            bookingType="hotel"
+            bookingData={{
+              packageDetails: packageBookingData,
+              type: 'package',
+              flights: packageBookingData.flights,
+              hotels: packageBookingData.hotels,
+              cars: packageBookingData.cars,
+              origin: packageBookingData.origin,
+              destination: packageBookingData.destination,
+              departureDate: packageBookingData.departureDate,
+              returnDate: packageBookingData.returnDate,
+              travelers: packageBookingData.travelers
+            }}
+            totalPrice={packageBookingData.finalPrice || 0}
+            currency={packageBookingData.currencyCode || 'USD'}
+          />
+        )}
 
         {/* Date Picker Modal */}
         {showDatePicker && (
