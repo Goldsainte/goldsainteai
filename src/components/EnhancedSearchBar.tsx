@@ -480,7 +480,14 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={checkInDate} onSelect={setCheckInDate} initialFocus disabled={(date) => date < new Date()} />
+            <CalendarComponent 
+              mode="single" 
+              selected={checkInDate} 
+              onSelect={setCheckInDate} 
+              initialFocus 
+              disabled={(date) => date < new Date()} 
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
 
@@ -493,7 +500,14 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={checkOutDate} onSelect={setCheckOutDate} initialFocus disabled={(date) => date < (checkInDate || new Date())} />
+            <CalendarComponent 
+              mode="single" 
+              selected={checkOutDate} 
+              onSelect={setCheckOutDate} 
+              initialFocus 
+              disabled={(date) => date < (checkInDate || new Date())} 
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
 
@@ -579,7 +593,14 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={restaurantDate} onSelect={setRestaurantDate} initialFocus disabled={(date) => date < new Date()} />
+            <CalendarComponent 
+              mode="single" 
+              selected={restaurantDate} 
+              onSelect={setRestaurantDate} 
+              initialFocus 
+              disabled={(date) => date < new Date()} 
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
 
@@ -633,7 +654,14 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={eventDate} onSelect={setEventDate} initialFocus disabled={(date) => date < new Date()} />
+            <CalendarComponent 
+              mode="single" 
+              selected={eventDate} 
+              onSelect={setEventDate} 
+              initialFocus 
+              disabled={(date) => date < new Date()} 
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
 
@@ -686,7 +714,14 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={pickupDateCar} onSelect={setPickupDateCar} initialFocus disabled={(date) => date < new Date()} />
+            <CalendarComponent 
+              mode="single" 
+              selected={pickupDateCar} 
+              onSelect={setPickupDateCar} 
+              initialFocus 
+              disabled={(date) => date < new Date()} 
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
 
@@ -698,7 +733,14 @@ export const EnhancedSearchBar = () => {
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent mode="single" selected={returnDateCar} onSelect={setReturnDateCar} initialFocus disabled={(date) => date < (pickupDateCar || new Date())} />
+            <CalendarComponent 
+              mode="single" 
+              selected={returnDateCar} 
+              onSelect={setReturnDateCar} 
+              initialFocus 
+              disabled={(date) => date < (pickupDateCar || new Date())} 
+              className={cn("pointer-events-auto")}
+            />
           </PopoverContent>
         </Popover>
       </div>
@@ -707,31 +749,60 @@ export const EnhancedSearchBar = () => {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 md:px-0">
-      <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
+      <div className="bg-card border border-border rounded-2xl shadow-lg p-4 md:p-6">
+        {/* Mobile-first instruction */}
+        <div className="mb-4 md:hidden">
+          <p className="text-sm text-muted-foreground text-center">
+            Step 1: Select service type
+          </p>
+        </div>
+        
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
-          <TabsList className="grid w-full grid-cols-5 h-auto bg-muted gap-1">
-            <TabsTrigger value="hotels" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+          <TabsList className="grid w-full grid-cols-5 h-auto bg-muted gap-1 p-1">
+            <TabsTrigger 
+              value="hotels" 
+              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+            >
               <Hotel className="h-5 w-5 flex-shrink-0" />
-              <span className="hidden sm:inline">Hotels</span>
+              <span className="text-xs md:text-sm">Hotels</span>
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+            <TabsTrigger 
+              value="flights" 
+              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+            >
               <Plane className="h-5 w-5 flex-shrink-0" />
-              <span className="hidden sm:inline">Flights</span>
+              <span className="text-xs md:text-sm">Flights</span>
             </TabsTrigger>
-            <TabsTrigger value="cars" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+            <TabsTrigger 
+              value="cars" 
+              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+            >
               <Car className="h-5 w-5 flex-shrink-0" />
-              <span className="hidden sm:inline">Cars</span>
+              <span className="text-xs md:text-sm">Cars</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+            <TabsTrigger 
+              value="restaurants" 
+              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+            >
               <UtensilsCrossed className="h-5 w-5 flex-shrink-0" />
-              <span className="hidden sm:inline">Restaurants</span>
+              <span className="text-xs md:text-sm">Dining</span>
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+            <TabsTrigger 
+              value="events" 
+              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+            >
               <Ticket className="h-5 w-5 flex-shrink-0" />
-              <span className="hidden sm:inline">Events</span>
+              <span className="text-xs md:text-sm">Events</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
+
+        {/* Mobile-first instruction for form */}
+        <div className="mb-4 md:hidden">
+          <p className="text-sm text-muted-foreground text-center">
+            Step 2: Fill in your details
+          </p>
+        </div>
 
         {searchType === "flights" && renderFlightSearch()}
         {searchType === "hotels" && renderHotelSearch()}
