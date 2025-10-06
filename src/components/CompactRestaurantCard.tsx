@@ -72,7 +72,7 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-sm leading-tight line-clamp-2 sm:line-clamp-1 group-hover:text-primary transition-colors">
                 {name}
               </h3>
               <Button

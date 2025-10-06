@@ -24,8 +24,8 @@ export const CarCard = ({ car }: CarCardProps) => {
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Car className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-lg">
+                <Car className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-semibold text-lg line-clamp-2 sm:line-clamp-1">
                   {vehicle.make} {vehicle.model}
                 </span>
               </div>
