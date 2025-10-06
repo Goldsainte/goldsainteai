@@ -384,6 +384,10 @@ const Index = () => {
   const handleSearch = async (query?: string) => {
     const queryToSend = query || searchQuery;
     if (!queryToSend.trim()) return;
+    if (isLoading) {
+      toast({ title: "Still working", description: "Please wait for the current response to finish." });
+      return;
+    }
     const requestId = ++lastRequestIdRef.current;
 
     // Close Trip Type modal if the user typed the answer directly
@@ -429,7 +433,7 @@ const Index = () => {
             longitude: userLocation.lng
           } : undefined
         },
-        timeout: 45000, // 45 second timeout for AI calls
+        timeout: 60000, // 60 second timeout for AI calls
         showToastOnError: true,
       });
 
@@ -690,7 +694,7 @@ const Index = () => {
             longitude: userLocation.lng
           } : undefined
         },
-        timeout: 45000,
+        timeout: 60000,
         showToastOnError: true,
       });
 

@@ -95,10 +95,13 @@ export async function invokeEdgeFunction<T = any>(
       }
     } catch (err: any) {
       const isLastAttempt = attempt === maxRetries - 1;
+      const msg = String(err?.message || '').toLowerCase();
       const isNetworkError =
-        err.message?.toLowerCase().includes('network') ||
-        err.message?.toLowerCase().includes('fetch') ||
-        err.message?.toLowerCase().includes('connection');
+        msg.includes('network') ||
+        msg.includes('fetch') ||
+        msg.includes('connection') ||
+        msg.includes('edge function') ||
+        msg.includes('failed to send a request');
 
       // If it's a network error and we should retry, wait and retry
       if (retryOnNetworkError && isNetworkError && !isLastAttempt) {
