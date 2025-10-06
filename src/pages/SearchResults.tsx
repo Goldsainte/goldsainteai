@@ -198,6 +198,16 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           setResults(cleanedHotels);
           setFilteredResults(cleanedHotels);
         } else if (searchType === "flights") {
+          // Check if we have the required flight parameters
+          if (!origin || !destination || !departureDate) {
+            console.warn('Missing required flight parameters:', { origin, destination, departureDate });
+            setError('Please enter flight details using the search form above');
+            setResults([]);
+            setFilteredResults([]);
+            setLoading(false);
+            return;
+          }
+          
           // Extract airport code from "CODE - City" format
           const originCode = origin.split(' - ')[0].trim();
           const destCode = destination.split(' - ')[0].trim();
