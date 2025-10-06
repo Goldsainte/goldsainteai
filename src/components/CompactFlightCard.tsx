@@ -7,6 +7,23 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
 import { formatCurrency } from "@/lib/currencyHelpers";
 
+const AirlineLogo = ({ carrierCode, className }: { carrierCode: string; className?: string }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  if (imageError) {
+    return <Plane className={className} />;
+  }
+  
+  return (
+    <img 
+      src={`https://images.kiwi.com/airlines/64/${carrierCode}.png`}
+      alt={carrierCode}
+      className={className}
+      onError={() => setImageError(true)}
+    />
+  );
+};
+
 interface CompactFlightCardProps {
   flight: any;
   dictionaries?: any;
@@ -76,8 +93,8 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
         <div className="flex flex-col sm:hidden gap-3 p-3">
           {/* Top Row: Route and Logo */}
           <div className="flex gap-3 items-center">
-            <div className="w-10 h-10 flex-shrink-0 rounded bg-muted flex items-center justify-center">
-              <Plane className="h-5 w-5 text-muted-foreground" />
+            <div className="w-10 h-10 flex-shrink-0 rounded bg-white flex items-center justify-center p-1.5">
+              <AirlineLogo carrierCode={firstSegment.carrierCode} className="w-full h-full object-contain" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -147,9 +164,9 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
 
         {/* Desktop Layout: Horizontal */}
         <div className="hidden sm:flex gap-3 p-3 items-center">
-          {/* Airline Logo placeholder */}
-          <div className="w-12 h-12 flex-shrink-0 rounded bg-muted flex items-center justify-center">
-            <Plane className="h-6 w-6 text-muted-foreground" />
+          {/* Airline Logo */}
+          <div className="w-12 h-12 flex-shrink-0 rounded bg-white flex items-center justify-center p-2">
+            <AirlineLogo carrierCode={firstSegment.carrierCode} className="w-full h-full object-contain" />
           </div>
 
           {/* Flight Route */}

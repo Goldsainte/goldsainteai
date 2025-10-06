@@ -7,6 +7,23 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { FlightBookingModal } from "./FlightBookingModal";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
+const AirlineLogo = ({ carrierCode, className }: { carrierCode: string; className?: string }) => {
+  const [imageError, setImageError] = useState(false);
+  
+  if (imageError) {
+    return <Plane className={className} />;
+  }
+  
+  return (
+    <img 
+      src={`https://images.kiwi.com/airlines/64/${carrierCode}.png`}
+      alt={carrierCode}
+      className={className}
+      onError={() => setImageError(true)}
+    />
+  );
+};
+
 interface FlightCardProps {
   flight: any;
   dictionaries?: any;
@@ -65,8 +82,10 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Plane className="h-5 w-5 text-primary flex-shrink-0" />
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0 rounded bg-white flex items-center justify-center p-1.5">
+                  <AirlineLogo carrierCode={firstSegment.carrierCode} className="w-full h-full object-contain" />
+                </div>
                 <span className="font-semibold text-base sm:text-lg truncate">
                   {firstSegment.departure.iataCode} → {lastSegment.arrival.iataCode}
                 </span>
