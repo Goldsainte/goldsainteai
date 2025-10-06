@@ -1096,18 +1096,6 @@ Always show results first with minimal text, ask questions later. Be conversatio
           status: 200,
         });
       }
-
-      return new Response(JSON.stringify({
-        message: finalMessage,
-        toolResults: toolResults.map(tr => tr.result),
-        conversationHistory: [...conversationHistory, 
-          { role: 'user', content: message },
-          { role: 'assistant', content: finalMessage }
-        ]
-      }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      });
     }
 
     // No tool calls - return conversational response
