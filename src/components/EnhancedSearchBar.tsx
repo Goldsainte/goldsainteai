@@ -653,26 +653,26 @@ export const EnhancedSearchBar = () => {
     <div className="w-full max-w-6xl mx-auto px-4 md:px-0">
       <div className="bg-card border border-border rounded-2xl shadow-lg p-6">
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
-          <TabsList className="grid w-full grid-cols-5 h-auto bg-muted">
-            <TabsTrigger value="hotels" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
-              <Hotel className="h-5 w-5" />
-              <span>Hotels</span>
+          <TabsList className="grid w-full grid-cols-5 h-auto bg-muted gap-1">
+            <TabsTrigger value="hotels" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <Hotel className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden sm:inline">Hotels</span>
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
-              <Plane className="h-5 w-5" />
-              <span>Flights</span>
+            <TabsTrigger value="flights" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <Plane className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden sm:inline">Flights</span>
             </TabsTrigger>
-            <TabsTrigger value="cars" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
-              <Car className="h-5 w-5" />
-              <span>Cars</span>
+            <TabsTrigger value="cars" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <Car className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden sm:inline">Cars</span>
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
-              <UtensilsCrossed className="h-5 w-5" />
-              <span>Restaurants</span>
+            <TabsTrigger value="restaurants" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <UtensilsCrossed className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden sm:inline">Restaurants</span>
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2 py-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
-              <Ticket className="h-5 w-5" />
-              <span>Events</span>
+            <TabsTrigger value="events" className="gap-1 sm:gap-2 py-3 px-2 sm:px-3 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors">
+              <Ticket className="h-5 w-5 flex-shrink-0" />
+              <span className="hidden sm:inline">Events</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
