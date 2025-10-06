@@ -11,27 +11,10 @@ export default function Redirect() {
 
     try {
       const decoded = atob(decodeURIComponent(toParam));
-      // Validate allowed hosts for safety
-      const allowedHosts = [
-        'google.com', 'www.google.com', 'maps.google.com',
-        'goo.gl', 'app.goo.gl', 'maps.app.goo.gl', 'g.co', 'g.page',
-        'tripadvisor.com', 'www.tripadvisor.com',
-        'opentable.com', 'www.opentable.com',
-        'resy.com', 'www.resy.com',
-        'sevenrooms.com', 'www.sevenrooms.com',
-        'thefork.com', 'www.thefork.com', 'thefork.us', 'www.thefork.us',
-        'tock.com', 'www.tock.com', 'exploretock.com', 'www.exploretock.com',
-        // Additional common restaurant destinations
-        'facebook.com', 'www.facebook.com', 'm.facebook.com', 'fb.com',
-        'instagram.com', 'www.instagram.com',
-        'linktr.ee', 'www.linktr.ee',
-        'yelp.com', 'www.yelp.com',
-        'toasttab.com', 'www.toasttab.com',
-        'square.site', 'www.square.site'
-      ];
+      // Validate protocol for safety (allow https/http/mail/phone)
       const target = new URL(decoded);
-      const hostAllowed = allowedHosts.some(h => target.hostname === h || target.hostname.endsWith(`.${h}`));
-      if (!hostAllowed) return;
+      const protocolAllowed = ['https:', 'http:', 'mailto:', 'tel:'].includes(target.protocol);
+      if (!protocolAllowed) return;
 
       // Replace current tab with the target URL
       window.location.replace(decoded);
@@ -49,25 +32,8 @@ export default function Redirect() {
   try {
     if (to) {
       decodedHref = atob(decodeURIComponent(to));
-      const allowedHosts = [
-        'google.com', 'www.google.com', 'maps.google.com',
-        'goo.gl', 'app.goo.gl', 'maps.app.goo.gl', 'g.co', 'g.page',
-        'tripadvisor.com', 'www.tripadvisor.com',
-        'opentable.com', 'www.opentable.com',
-        'resy.com', 'www.resy.com',
-        'sevenrooms.com', 'www.sevenrooms.com',
-        'thefork.com', 'www.thefork.com', 'thefork.us', 'www.thefork.us',
-        'tock.com', 'www.tock.com', 'exploretock.com', 'www.exploretock.com',
-        // Additional common restaurant destinations
-        'facebook.com', 'www.facebook.com', 'm.facebook.com', 'fb.com',
-        'instagram.com', 'www.instagram.com',
-        'linktr.ee', 'www.linktr.ee',
-        'yelp.com', 'www.yelp.com',
-        'toasttab.com', 'www.toasttab.com',
-        'square.site', 'www.square.site'
-      ];
       const tgt = new URL(decodedHref);
-      hostAllowedForManual = allowedHosts.some(h => tgt.hostname === h || tgt.hostname.endsWith(`.${h}`));
+      hostAllowedForManual = ['https:', 'http:', 'mailto:', 'tel:'].includes(tgt.protocol);
     }
   } catch {}
   
