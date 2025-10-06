@@ -133,6 +133,11 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       setError(null);
       setResults([]); // Clear previous results immediately
       setSearchPerformed(true); // Mark that a search was performed
+      
+      // Auto-hide search bar on mobile when search starts
+      if (window.innerWidth < 768) {
+        setShowSearchBar(false);
+      }
 
       try {
         if (searchType === "hotels") {

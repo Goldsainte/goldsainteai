@@ -72,7 +72,81 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
   return (
     <>
       <Card className="group hover:shadow-md transition-all overflow-hidden">
-        <div className="flex gap-3 p-3 items-center">
+        {/* Mobile Layout: Stack vertically */}
+        <div className="flex flex-col sm:hidden gap-3 p-3">
+          {/* Top Row: Route and Logo */}
+          <div className="flex gap-3 items-center">
+            <div className="w-10 h-10 flex-shrink-0 rounded bg-muted flex items-center justify-center">
+              <Plane className="h-5 w-5 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-bold text-base">{firstSegment.departure.iataCode}</span>
+                <div className="flex-1 h-px bg-border relative max-w-[60px]">
+                  <Plane className="h-3 w-3 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-primary" />
+                </div>
+                <span className="font-bold text-base">{lastSegment.arrival.iataCode}</span>
+              </div>
+              <div className="text-[10px] text-muted-foreground truncate">
+                {getAirlineName(firstSegment.carrierCode)}
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 flex-shrink-0"
+              onClick={handleToggleFavorite}
+            >
+              <Heart className={`h-4 w-4 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+            </Button>
+          </div>
+
+          {/* Middle Row: Times and Duration */}
+          <div className="flex items-center justify-between text-xs">
+            <div>
+              <div className="font-medium">{formatTime(firstSegment.departure.at)}</div>
+              <div className="text-[10px] text-muted-foreground">Depart</div>
+            </div>
+            <div className="text-center flex-1">
+              <div className="text-[10px] text-muted-foreground">{getDuration(flight.itineraries[0].duration)}</div>
+              <div className="text-[10px] text-muted-foreground">
+                {flight.itineraries[0].segments.length === 1 ? 'Direct' : `${flight.itineraries[0].segments.length - 1} stop`}
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-medium">{formatTime(lastSegment.arrival.at)}</div>
+              <div className="text-[10px] text-muted-foreground">Arrive</div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Price and Action Buttons */}
+          <div className="flex items-center justify-between gap-2 pt-2 border-t">
+            <div>
+              <div className="text-lg font-bold">{formatCurrency(parseFloat(markedUpPrice), currency)}</div>
+              <div className="text-[10px] text-muted-foreground">{getCabinClass()}</div>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-2"
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+              </Button>
+              <Button
+                size="sm"
+                className="h-8 px-4"
+                onClick={() => setBookingModalOpen(true)}
+              >
+                Select
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Layout: Horizontal */}
+        <div className="hidden sm:flex gap-3 p-3 items-center">
           {/* Airline Logo placeholder */}
           <div className="w-12 h-12 flex-shrink-0 rounded bg-muted flex items-center justify-center">
             <Plane className="h-6 w-6 text-muted-foreground" />
