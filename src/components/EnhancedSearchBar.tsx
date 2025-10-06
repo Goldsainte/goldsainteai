@@ -685,16 +685,24 @@ export const EnhancedSearchBar = () => {
   // Car Search UI
   const renderCarSearch = () => (
     <div className="space-y-4">
-      <RadioGroup value={carTripType} onValueChange={(v: any) => setCarTripType(v)} className="flex gap-4">
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="round-trip" id="car-round-trip" />
-          <Label htmlFor="car-round-trip" className="cursor-pointer">Return to same location</Label>
-        </div>
-        <div className="flex items-center space-x-2">
-          <RadioGroupItem value="one-way" id="car-one-way" />
-          <Label htmlFor="car-one-way" className="cursor-pointer">Drop off at different location</Label>
-        </div>
-      </RadioGroup>
+      <div className="flex gap-2">
+        <Button
+          type="button"
+          variant={carTripType === "round-trip" ? "default" : "outline"}
+          onClick={() => setCarTripType("round-trip")}
+          className="flex-1 h-11"
+        >
+          Return to same location
+        </Button>
+        <Button
+          type="button"
+          variant={carTripType === "one-way" ? "default" : "outline"}
+          onClick={() => setCarTripType("one-way")}
+          className="flex-1 h-11"
+        >
+          Drop off at different location
+        </Button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <AirportAutocomplete value={pickupLocation} onChange={setPickupLocation} placeholder="Pick-up airport or city" />

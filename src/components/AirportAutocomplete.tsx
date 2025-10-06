@@ -63,7 +63,7 @@ export const AirportAutocomplete = ({
             <Input
               ref={inputRef}
               placeholder={placeholder}
-              className={cn("pl-10 h-12 border-border text-base", className)}
+              className={cn("pl-10 h-12 border-border text-base w-full truncate", className)}
               value={value}
               onChange={handleInputChange}
               onFocus={handleInputFocus}

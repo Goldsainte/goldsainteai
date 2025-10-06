@@ -137,7 +137,7 @@ const isCityLike = (r: CitySuggestion) => {
             <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
             <Input
               placeholder={placeholder}
-              className={cn("pl-10 h-12 border-border text-base", className)}
+              className={cn("pl-10 h-12 border-border text-base w-full truncate", className)}
               value={value}
               onChange={(e) => onChange(e.target.value)}
               onFocus={() => { setIsFocused(true); if (results.length > 0) setOpen(true); }}
