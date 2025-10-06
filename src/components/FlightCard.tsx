@@ -60,30 +60,30 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
 
   return (
     <>
-      <Card className="p-6 hover:shadow-lg transition-all border-2 hover:border-primary">
-        <div className="space-y-4">
+      <Card className="p-4 sm:p-6 hover:shadow-lg transition-all border-2 hover:border-primary">
+        <div className="space-y-3 sm:space-y-4">
           {/* Header */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <Plane className="h-5 w-5 text-primary" />
-                <span className="font-semibold text-lg">
+                <Plane className="h-5 w-5 text-primary flex-shrink-0" />
+                <span className="font-semibold text-base sm:text-lg truncate">
                   {firstSegment.departure.iataCode} → {lastSegment.arrival.iataCode}
                 </span>
               </div>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
                 {getAirlineName(firstSegment.carrierCode)}
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-lg">
+            <div className="flex items-center justify-between sm:justify-end gap-2">
+              <Badge variant="secondary" className="text-base sm:text-lg whitespace-nowrap">
                 {currencySymbol}{markedUpPrice}
               </Badge>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleToggleFavorite}
-                className="hover:bg-primary/10"
+                className="hover:bg-primary/10 flex-shrink-0"
               >
                 <Heart className={`h-5 w-5 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
               </Button>
@@ -91,41 +91,41 @@ export const FlightCard = ({ flight, dictionaries }: FlightCardProps) => {
           </div>
 
           {/* Flight Details */}
-          <div className="grid grid-cols-3 gap-4 py-4 border-y">
-            <div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                <Calendar className="h-4 w-4" />
-                <span>Departure</span>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 py-3 sm:py-4 border-y">
+            <div className="min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs text-muted-foreground mb-1">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 hidden sm:block" />
+                <span className="text-[10px] sm:text-xs">Departure</span>
               </div>
-              <p className="font-semibold">{formatTime(firstSegment.departure.at)}</p>
-              <p className="text-sm text-muted-foreground">{formatDate(firstSegment.departure.at)}</p>
+              <p className="font-semibold text-sm sm:text-base truncate">{formatTime(firstSegment.departure.at)}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{formatDate(firstSegment.departure.at)}</p>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-1">
-                <Clock className="h-4 w-4" />
-                <span>Duration</span>
+            <div className="text-center min-w-0">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 text-xs text-muted-foreground mb-1">
+                <Clock className="h-3 w-3 sm:h-4 sm:w-4 hidden sm:block" />
+                <span className="text-[10px] sm:text-xs">Duration</span>
               </div>
-              <p className="font-semibold">{getDuration(flight.itineraries[0].duration)}</p>
-              <p className="text-sm text-muted-foreground">
+              <p className="font-semibold text-sm sm:text-base truncate">{getDuration(flight.itineraries[0].duration)}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground truncate">
                 {flight.itineraries[0].segments.length === 1 ? 'Direct' : `${flight.itineraries[0].segments.length - 1} stop(s)`}
               </p>
             </div>
-            <div className="text-right">
-              <div className="flex items-center justify-end gap-2 text-sm text-muted-foreground mb-1">
-                <Calendar className="h-4 w-4" />
-                <span>Arrival</span>
+            <div className="text-right min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-1 sm:gap-2 text-xs text-muted-foreground mb-1">
+                <Calendar className="h-3 w-3 sm:h-4 sm:w-4 hidden sm:block" />
+                <span className="text-[10px] sm:text-xs">Arrival</span>
               </div>
-              <p className="font-semibold">{formatTime(lastSegment.arrival.at)}</p>
-              <p className="text-sm text-muted-foreground">{formatDate(lastSegment.arrival.at)}</p>
+              <p className="font-semibold text-sm sm:text-base truncate">{formatTime(lastSegment.arrival.at)}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{formatDate(lastSegment.arrival.at)}</p>
             </div>
           </div>
 
           {/* Actions */}
           <Button 
-            className="w-full"
+            className="w-full text-sm sm:text-base"
             onClick={() => setBookingModalOpen(true)}
           >
-            Book Now - {currencySymbol}{markedUpPrice}
+            <span className="truncate">Select</span>
           </Button>
         </div>
       </Card>
