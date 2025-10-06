@@ -17,6 +17,14 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
   const [bookingModalOpen, setBookingModalOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
   
+  // Add null checks to prevent crashes
+  if (!flight || !flight.itineraries || flight.itineraries.length === 0 || 
+      !flight.itineraries[0].segments || flight.itineraries[0].segments.length === 0 ||
+      !flight.price) {
+    console.warn('Invalid flight data:', flight);
+    return null;
+  }
+  
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
   const basePrice = parseFloat(flight.price.total);
