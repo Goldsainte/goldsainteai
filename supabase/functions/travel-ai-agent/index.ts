@@ -1464,28 +1464,55 @@ async function searchFlights(args: any) {
       return { error: 'Supabase configuration missing', results: [] };
     }
 
-    // Convert city names to airport codes if needed (simple lookup)
+    // Convert city names to airport codes if needed (improved lookup)
     const getAirportCode = (location: string) => {
       // If already looks like an airport code (3 letters), use it
       if (/^[A-Z]{3}$/i.test(location.trim())) {
         return location.toUpperCase();
       }
 
-      // Simple city to code mapping for common cities
+      // Comprehensive city to code mapping
       const cityToCode: Record<string, string> = {
+        // US Cities
         'new york': 'NYC', 'los angeles': 'LAX', 'san francisco': 'SFO',
         'washington': 'WAS', 'chicago': 'CHI', 'miami': 'MIA',
         'seattle': 'SEA', 'atlanta': 'ATL', 'dallas': 'DFW',
         'houston': 'HOU', 'phoenix': 'PHX', 'denver': 'DEN',
-        'orlando': 'ORL', 'detroit': 'DTT', 'minneapolis': 'MSP',
+        'orlando': 'MCO', 'detroit': 'DTW', 'minneapolis': 'MSP',
         'portland': 'PDX', 'san diego': 'SAN', 'austin': 'AUS',
         'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
+        'boston': 'BOS', 'las vegas': 'LAS', 'philadelphia': 'PHL',
+        // European Cities
         'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO',
-        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG'
+        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
+        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
+        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
+        // Swiss Cities & Destinations
+        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
+        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
+        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
+        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
+        'grindelwald': 'ZRH', 'montreux': 'GVA'
       };
       
       const lowerLocation = location.toLowerCase().trim();
-      return cityToCode[lowerLocation] || location.toUpperCase().slice(0, 3);
+      
+      // Check exact match first
+      if (cityToCode[lowerLocation]) {
+        return cityToCode[lowerLocation];
+      }
+      
+      // Check if location contains any city name (for phrases like "ski destination in Zermatt")
+      for (const [city, code] of Object.entries(cityToCode)) {
+        if (lowerLocation.includes(city)) {
+          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
+          return code;
+        }
+      }
+      
+      // If no match found, try to use first 3 letters but log a warning
+      console.warn(`No airport mapping found for "${location}", using fallback code`);
+      return location.toUpperCase().slice(0, 3);
     };
 
     const originCode = getAirportCode(origin);
@@ -1605,8 +1632,9 @@ async function searchCars(args: any) {
         return location.toUpperCase();
       }
 
-      // Simple city to code mapping for common cities
+      // Comprehensive city to code mapping
       const cityToCode: Record<string, string> = {
+        // US Cities
         'new york': 'JFK', 'los angeles': 'LAX', 'san francisco': 'SFO',
         'washington': 'IAD', 'chicago': 'ORD', 'miami': 'MIA',
         'boston': 'BOS', 'seattle': 'SEA', 'atlanta': 'ATL',
@@ -1614,12 +1642,37 @@ async function searchCars(args: any) {
         'dallas': 'DFW', 'houston': 'IAH', 'detroit': 'DTW',
         'minneapolis': 'MSP', 'orlando': 'MCO', 'philadelphia': 'PHL',
         'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
+        // European Cities
         'paris': 'CDG', 'london': 'LHR', 'tokyo': 'NRT',
-        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG'
+        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
+        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
+        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
+        // Swiss Cities & Destinations  
+        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
+        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
+        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
+        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
+        'grindelwald': 'ZRH', 'montreux': 'GVA'
       };
       
       const lowerLocation = location.toLowerCase().trim();
-      return cityToCode[lowerLocation] || location.toUpperCase().slice(0, 3);
+      
+      // Check exact match first
+      if (cityToCode[lowerLocation]) {
+        return cityToCode[lowerLocation];
+      }
+      
+      // Check if location contains any city name (for phrases)
+      for (const [city, code] of Object.entries(cityToCode)) {
+        if (lowerLocation.includes(city)) {
+          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
+          return code;
+        }
+      }
+      
+      // If no match found, try to use first 3 letters but log a warning
+      console.warn(`No airport mapping found for "${location}", using fallback code`);
+      return location.toUpperCase().slice(0, 3);
     };
 
     const pickupCode = getAirportCode(pickupLocation);
