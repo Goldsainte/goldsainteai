@@ -3,6 +3,32 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plane, Hotel, Car, Calendar, Users, Sparkles } from "lucide-react";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
+import { useEffect, useMemo, useState } from "react";
+// Simple FX cache and conversion
+const rateCache = new Map<string, number>();
+async function getRate(from: string, to: string): Promise<number> {
+  if (!from || !to || from === to) return 1;
+  const key = `${from}_${to}`;
+  const cached = rateCache.get(key);
+  if (cached) return cached;
+  try {
+    const res = await fetch(`https://api.exchangerate.host/latest?base=${encodeURIComponent(from)}&symbols=${encodeURIComponent(to)}`);
+    const json = await res.json();
+    const rate = json?.rates?.[to];
+    if (typeof rate === 'number') {
+      rateCache.set(key, rate);
+      return rate;
+    }
+  } catch (e) {
+    console.error('FX rate fetch failed', e);
+  }
+  return 1;
+}
+async function convertAmount(amount: number, from: string, to: string): Promise<number> {
+  if (!amount) return 0;
+  const rate = await getRate(from, to);
+  return amount * rate;
+}
 
 interface PackageCardProps {
   packageData: {
@@ -30,13 +56,32 @@ export const PackageCard = ({ packageData }: PackageCardProps) => {
   const cheapestHotel = hotels[0];
   const cheapestCar = cars[0];
   
-  const flightPrice = cheapestFlight ? parseFloat(cheapestFlight.price?.total || 0) : 0;
-  const hotelPrice = cheapestHotel ? parseFloat(cheapestHotel.offers?.[0]?.price?.total || 0) : 0;
-  const carPrice = cheapestCar ? parseFloat(cheapestCar.price?.total || 0) : 0;
-  
-  const total = flightPrice + hotelPrice + carPrice;
-  const packageSavings = Math.floor(total * 0.1); // 10% package discount
-  const finalPrice = total - packageSavings;
+const flightPrice = cheapestFlight ? parseFloat(cheapestFlight.price?.total || 0) : 0;
+const hotelPrice = cheapestHotel ? parseFloat(cheapestHotel.offers?.[0]?.price?.total || 0) : 0;
+const carPrice = cheapestCar ? parseFloat(cheapestCar.price?.total || 0) : 0;
+
+const flightCurrency = cheapestFlight?.price?.currency || currencyInfo.code;
+const hotelCurrency = cheapestHotel?.offers?.[0]?.price?.currency || currencyInfo.code;
+const carCurrency = cheapestCar?.price?.currency || currencyInfo.code;
+
+const [converted, setConverted] = useState({ flight: flightPrice, hotel: hotelPrice, car: carPrice });
+
+useEffect(() => {
+  let active = true;
+  (async () => {
+    const f = await convertAmount(flightPrice, flightCurrency, currencyInfo.code);
+    const h = await convertAmount(hotelPrice, hotelCurrency, currencyInfo.code);
+    const c = await convertAmount(carPrice, carCurrency, currencyInfo.code);
+    if (active) setConverted({ flight: f, hotel: h, car: c });
+  })();
+  return () => { active = false; };
+}, [flightPrice, hotelPrice, carPrice, flightCurrency, hotelCurrency, carCurrency, currencyInfo.code]);
+
+const total = useMemo(() => converted.flight + converted.hotel + converted.car, [converted]);
+const packageSavings = useMemo(() => Math.floor(total * 0.1), [total]); // 10% package discount
+const finalPrice = useMemo(() => total - packageSavings, [total, packageSavings]);
+const perPerson = useMemo(() => (travelers > 0 ? finalPrice / travelers : finalPrice), [finalPrice, travelers]);
+const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency].some(c => c && c !== currencyInfo.code), [flightCurrency, hotelCurrency, carCurrency, currencyInfo.code]);
   
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', { 
@@ -79,10 +124,10 @@ export const PackageCard = ({ packageData }: PackageCardProps) => {
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground line-through">
-              {currencySymbol}{total.toFixed(2)}
+              {currencySymbol}{(total / Math.max(travelers,1)).toFixed(2)}
             </p>
             <p className="text-3xl font-bold text-primary">
-              {currencySymbol}{finalPrice.toFixed(2)}
+              {currencySymbol}{perPerson.toFixed(2)}
             </p>
             <p className="text-xs text-muted-foreground">per person</p>
           </div>
