@@ -40,7 +40,7 @@ export const CompactHeaderSearch = () => {
 
       <DialogContent className="max-w-5xl w-[95vw] sm:w-full max-h-[90vh] overflow-y-auto p-0">
         {/* Render the unified search experience */}
-        <div className="p-4 sm:p-6">
+        <div className="p-4 sm:p-6 max-w-full overflow-x-hidden">
           <EnhancedSearchBar />
         </div>
       </DialogContent>
