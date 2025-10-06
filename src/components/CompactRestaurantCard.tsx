@@ -49,7 +49,107 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
 
   return (
     <Card className="group hover:shadow-md transition-all overflow-hidden">
-      <div className="flex gap-3 p-3">
+      {/* Mobile Layout */}
+      <div className="sm:hidden">
+        <div className="flex flex-col gap-3 p-3">
+          {/* Top Row: Image and Info */}
+          <div className="flex gap-3">
+            <div className="relative w-24 h-24 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={name}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect fill='%23f3f4f6' width='200' height='200'/%3E%3Ctext fill='%239ca3af' font-family='sans-serif' font-size='48' x='50%25' y='50%25' text-anchor='middle' dy='.3em'%3E🍽️%3C/text%3E%3C/svg%3E";
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-4xl">
+                  🍽️
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+                  {name}
+                </h3>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 flex-shrink-0"
+                  onClick={handleToggleFavorite}
+                >
+                  <Heart className={`h-4 w-4 ${favoriteId ? 'fill-primary text-primary' : 'text-muted-foreground'}`} />
+                </Button>
+              </div>
+              
+              <p className="text-xs text-muted-foreground flex items-center gap-1 mb-2">
+                <MapPin className="h-3 w-3 flex-shrink-0" />
+                <span className="line-clamp-1">{location}</span>
+              </p>
+              
+              <div className="flex items-center gap-2 flex-wrap">
+                {rating > 0 && (
+                  <>
+                    <Badge variant="secondary" className="text-xs px-2 py-0.5 font-bold flex items-center gap-1">
+                      <Star className="h-3 w-3 fill-current" />
+                      {rating.toFixed(1)}
+                    </Badge>
+                    {numReviews > 0 && (
+                      <span className="text-xs text-muted-foreground">({numReviews})</span>
+                    )}
+                  </>
+                )}
+                {priceLevel && (
+                  <Badge variant="outline" className="text-xs px-2 py-0.5 flex items-center gap-1">
+                    <DollarSign className="h-3 w-3" />
+                    {getPriceLevelSymbol(priceLevel)}
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Cuisine and Actions */}
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              {cuisine && (
+                <p className="text-xs text-muted-foreground line-clamp-1">
+                  {cuisine}
+                </p>
+              )}
+            </div>
+            <div className="flex gap-1.5 flex-shrink-0">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-8 px-3 text-xs"
+                onClick={() => setExpanded(!expanded)}
+              >
+                {expanded ? <ChevronUp className="h-3 w-3 mr-1" /> : <ChevronDown className="h-3 w-3 mr-1" />}
+                {expanded ? 'Less' : 'More'}
+              </Button>
+              <Button
+                size="sm"
+                className="h-8 px-3 text-xs gap-1.5"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
+                }}
+              >
+                <Calendar className="h-3 w-3" />
+                Reserve
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="hidden sm:flex gap-3 p-3">
         {/* Image */}
         <div className="relative w-32 h-24 flex-shrink-0 rounded-md overflow-hidden bg-muted">
           {imageUrl ? (
@@ -72,7 +172,7 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
         <div className="flex-1 min-w-0 flex flex-col justify-between">
           <div>
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="font-semibold text-sm leading-tight line-clamp-2 sm:line-clamp-1 group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-sm leading-tight line-clamp-1 group-hover:text-primary transition-colors">
                 {name}
               </h3>
               <Button

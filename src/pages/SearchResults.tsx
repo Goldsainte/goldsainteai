@@ -261,18 +261,30 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           setResults(destResults);
           setFilteredResults(destResults);
         } else if (searchType === "restaurants") {
+          if (!location || !location.trim()) {
+            console.warn('Missing location for restaurant search');
+            setError('Please enter a location to search for restaurants');
+            setResults([]);
+            setFilteredResults([]);
+            setLoading(false);
+            return;
+          }
+          
+          console.log('Searching restaurants in:', location);
           const { data, error } = await invokeEdgeFunction('tripadvisor-search-restaurants', {
-            body: { location },
+            body: { location: location.trim() },
             timeout: 20000,
             showToastOnError: true,
           });
 
           if (error) {
+            console.error('Restaurant search error:', error);
             setResults([]);
             setFilteredResults([]);
             return;
           }
-          const restaurantResults = data.results || [];
+          console.log('Restaurant results:', data?.results?.length || 0, 'restaurants found');
+          const restaurantResults = data?.results || [];
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "cars") {

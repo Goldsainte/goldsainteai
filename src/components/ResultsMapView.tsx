@@ -126,8 +126,28 @@ export const ResultsMapView = ({ location, results, type = 'hotels' }: ResultsMa
             result.hotel?.longitude ||
             result.property?.longitude
           );
+        } else if (type === 'restaurants') {
+          // Restaurant coordinates from TripAdvisor/Google Places
+          lat = Number(
+            result.latitude || 
+            result.lat || 
+            result.location?.latitude ||
+            result.location?.lat ||
+            result.coordinates?.latitude ||
+            result.coordinates?.lat ||
+            result.geometry?.location?.lat
+          );
+          lng = Number(
+            result.longitude || 
+            result.lng || 
+            result.location?.longitude ||
+            result.location?.lng ||
+            result.coordinates?.longitude ||
+            result.coordinates?.lng ||
+            result.geometry?.location?.lng
+          );
         } else {
-          // Other types (restaurants, events) use standard latitude/longitude
+          // Other types (events) use standard latitude/longitude
           lat = Number(result.latitude || result.lat);
           lng = Number(result.longitude || result.lng);
         }
