@@ -1796,16 +1796,16 @@ async function checkVisaRequirements(args: any) {
     const { fromCountry, toCountry } = args;
     console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     
-    if (!LOVABLE_API_KEY) {
+    if (!OPENAI_API_KEY) {
       return { 
         error: 'Visa check service not configured',
         requirement: 'unknown'
       };
     }
 
-    // Use Lovable AI to get accurate visa information
+    // Use OpenAI to get accurate visa information
     const prompt = `Provide accurate and up-to-date visa requirements for a traveler from ${fromCountry} visiting ${toCountry}. Include:
     
 1. Visa requirement status (visa required, visa-free, visa on arrival, eVisa available, etc.)
@@ -1831,28 +1831,27 @@ If visa is required, mention that Goldsainte can assist with the application pro
 
 Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-5-2025-08-07',
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.3,
-        max_tokens: 1000
+        max_completion_tokens: 1000
       }),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Lovable AI error:', response.status, errorText);
+      console.error('OpenAI error:', response.status, errorText);
       return { 
         error: `Visa information lookup failed: ${response.statusText}`,
         requirement: 'unknown'
