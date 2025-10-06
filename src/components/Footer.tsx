@@ -44,7 +44,7 @@ export const Footer = () => {
               <a href="#" className="text-muted-foreground hover:text-accent transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-accent transition-colors">
+              <a href="https://www.instagram.com/goldsainte/?hl=en" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-accent transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
             </div>
