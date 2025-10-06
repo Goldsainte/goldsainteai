@@ -30,10 +30,11 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
     }
   };
 
-// Build a best-effort reservation URL prioritizing official sources
-const websiteUrl = restaurant.website && /^https?:\/\//i.test(restaurant.website) ? restaurant.website : (restaurant.website ? `https://${restaurant.website}` : undefined);
-const mapsFallback = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${location}`)}`;
-const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web_url || mapsFallback;
+// Build reservation URL - prioritize backend data
+const reservationUrl = restaurant.reservationUrl || 
+  restaurant.website || 
+  restaurant.web_url || 
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${location}`)}&query_place_id=${restaurant.id || ''}`;
 
   const favoriteId = isFavorite('restaurant', restaurant);
   
@@ -126,7 +127,9 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
               className="h-8 px-3 text-xs gap-1.5 flex-shrink-0"
               onClick={(e) => {
                 e.stopPropagation();
-                try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
+                if (reservationUrl) {
+                  window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+                }
               }}
             >
               <Calendar className="h-3 w-3" />
@@ -248,7 +251,9 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
             className="h-7 px-3 text-xs gap-1"
             onClick={(e) => {
               e.stopPropagation();
-              try { window.open(buildReservationRedirect(reservationUrl), '_blank', 'noopener'); } catch {}
+              if (reservationUrl) {
+                window.open(reservationUrl, '_blank', 'noopener,noreferrer');
+              }
             }}
           >
             <Calendar className="h-3 w-3" />
