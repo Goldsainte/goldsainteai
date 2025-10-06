@@ -36,8 +36,9 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
 
   return (
     <>
-      {/* Grid Preview */}
-      <div className="grid grid-cols-4 gap-2 h-[400px]">
+      {/* Grid Preview - Mobile Optimized */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 h-[300px] md:h-[400px]">
+        {/* Main large image - full height on mobile, spans 2 rows on desktop */}
         <div 
           className="col-span-2 row-span-2 relative rounded-lg overflow-hidden cursor-pointer group bg-muted"
           onClick={() => {
@@ -50,7 +51,6 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
             alt={`${hotelName} - Main`}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             onError={(e) => {
-              // Show placeholder on error
               const parent = e.currentTarget.parentElement;
               if (parent) {
                 parent.innerHTML = `
@@ -65,10 +65,11 @@ export const PhotoGallery = ({ images, hotelName }: PhotoGalleryProps) => {
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
         </div>
         
+        {/* Thumbnail images - better proportions on mobile */}
         {images.slice(1, 5).map((img, idx) => (
           <div 
             key={idx}
-            className="relative rounded-lg overflow-hidden cursor-pointer group bg-muted"
+            className="relative rounded-lg overflow-hidden cursor-pointer group bg-muted h-[145px] md:h-auto"
             onClick={() => {
               setCurrentIndex(idx + 1);
               setIsOpen(true);
