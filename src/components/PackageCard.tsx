@@ -22,7 +22,8 @@ interface PackageCardProps {
 export const PackageCard = ({ packageData }: PackageCardProps) => {
   const { flights, hotels, cars, origin, destination, departureDate, returnDate, travelers, estimatedTotal, savings } = packageData;
   
-  const currencyInfo = getCurrencyFromLocation(destination);
+  // Use origin location for currency (where user is booking from, not destination)
+  const currencyInfo = getCurrencyFromLocation(origin);
   const currencySymbol = currencyInfo.symbol;
   
   const cheapestFlight = flights[0];
@@ -58,11 +59,9 @@ export const PackageCard = ({ packageData }: PackageCardProps) => {
                 <Sparkles className="h-3 w-3" />
                 Complete Package
               </Badge>
-              {savings && (
-                <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
-                  Save {currencySymbol}{packageSavings}
-                </Badge>
-              )}
+              <Badge variant="secondary" className="bg-green-500/10 text-green-700 dark:text-green-400">
+                Save {currencySymbol}{packageSavings.toFixed(2)}
+              </Badge>
             </div>
             <h3 className="text-2xl font-bold mb-1">
               {origin} → {destination}
@@ -94,59 +93,91 @@ export const PackageCard = ({ packageData }: PackageCardProps) => {
       <div className="p-6 space-y-4">
         {/* Flight Info */}
         {cheapestFlight && (
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border">
             <div className="p-2 rounded-lg bg-primary/10">
               <Plane className="h-5 w-5 text-primary" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <p className="font-semibold">Round-trip Flight</p>
-              <p className="text-sm text-muted-foreground">
-                {cheapestFlight.itineraries?.[0]?.segments?.[0]?.carrierCode || 'Airline'} • 
-                {cheapestFlight.itineraries?.[0]?.segments?.length || 1} {cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'stop' : 'stops'}
-              </p>
+              <div className="text-sm text-muted-foreground space-y-0.5">
+                <p>
+                  <span className="font-medium">{cheapestFlight.itineraries?.[0]?.segments?.[0]?.carrierCode || 'Airline'}</span>
+                  {cheapestFlight.itineraries?.[0]?.segments?.[0]?.number && ` ${cheapestFlight.itineraries[0].segments[0].number}`}
+                </p>
+                <p>
+                  Depart: {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode || origin} 
+                  {cheapestFlight.itineraries?.[0]?.segments?.[0]?.departure?.at && 
+                    ` at ${new Date(cheapestFlight.itineraries[0].segments[0].departure.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                </p>
+                <p>
+                  Arrive: {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.iataCode || destination}
+                  {cheapestFlight.itineraries?.[0]?.segments?.[cheapestFlight.itineraries[0].segments.length - 1]?.arrival?.at && 
+                    ` at ${new Date(cheapestFlight.itineraries[0].segments[cheapestFlight.itineraries[0].segments.length - 1].arrival.at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`}
+                </p>
+                <p>{cheapestFlight.itineraries?.[0]?.segments?.length === 1 ? 'Nonstop' : `${cheapestFlight.itineraries[0].segments.length - 1} stop(s)`}</p>
+              </div>
             </div>
-            <p className="font-semibold">{currencySymbol}{flightPrice.toFixed(2)}</p>
+            <p className="font-semibold text-right">{currencySymbol}{flightPrice.toFixed(2)}</p>
           </div>
         )}
 
         {/* Hotel Info */}
         {cheapestHotel && (
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border">
             <div className="p-2 rounded-lg bg-primary/10">
               <Hotel className="h-5 w-5 text-primary" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <p className="font-semibold">{cheapestHotel.hotel?.name || 'Hotel Accommodation'}</p>
-              <p className="text-sm text-muted-foreground">
-                {nights} nights • {cheapestHotel.hotel?.rating || 'Rated'} stars
-              </p>
+              <div className="text-sm text-muted-foreground space-y-0.5">
+                {cheapestHotel.hotel?.cityCode && <p>Location: {cheapestHotel.hotel.cityCode}</p>}
+                {cheapestHotel.hotel?.address?.lines?.[0] && <p>{cheapestHotel.hotel.address.lines[0]}</p>}
+                <p>{nights} nights • {cheapestHotel.hotel?.rating || 'N/A'} stars</p>
+                {cheapestHotel.offers?.[0]?.room?.description?.text && (
+                  <p className="line-clamp-1">Room: {cheapestHotel.offers[0].room.description.text}</p>
+                )}
+                {cheapestHotel.offers?.[0]?.room?.typeEstimated?.category && (
+                  <p>Category: {cheapestHotel.offers[0].room.typeEstimated.category}</p>
+                )}
+              </div>
             </div>
-            <p className="font-semibold">{currencySymbol}{hotelPrice.toFixed(2)}</p>
+            <p className="font-semibold text-right">{currencySymbol}{hotelPrice.toFixed(2)}</p>
           </div>
         )}
 
         {/* Car Info */}
         {cheapestCar && (
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+          <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 border border-border">
             <div className="p-2 rounded-lg bg-primary/10">
               <Car className="h-5 w-5 text-primary" />
             </div>
-            <div className="flex-1">
+            <div className="flex-1 space-y-1">
               <p className="font-semibold">Car Rental</p>
-              <p className="text-sm text-muted-foreground">
-                {cheapestCar.vehicle?.category || 'Compact'} • {nights} days
-              </p>
+              <div className="text-sm text-muted-foreground space-y-0.5">
+                <p>{cheapestCar.vehicle?.make || ''} {cheapestCar.vehicle?.model || cheapestCar.vehicle?.category || 'Standard'}</p>
+                <p>Pickup: {cheapestCar.pickupLocation?.address?.cityName || destination}</p>
+                {cheapestCar.provider?.name && <p>Provider: {cheapestCar.provider.name}</p>}
+                <p>{nights} days rental</p>
+              </div>
             </div>
-            <p className="font-semibold">{currencySymbol}{carPrice.toFixed(2)}</p>
+            <p className="font-semibold text-right">{currencySymbol}{carPrice.toFixed(2)}</p>
           </div>
         )}
 
         <div className="pt-4 space-y-2">
-          <Button className="w-full" size="lg">
+          <Button 
+            className="w-full" 
+            size="lg"
+            onClick={() => {
+              // TODO: Implement package booking flow
+              console.log('Package booking:', packageData);
+              alert('Package booking coming soon! You can currently book flights and hotels separately.');
+            }}
+          >
             Book Complete Package - {currencySymbol}{finalPrice.toFixed(2)}
           </Button>
           <p className="text-xs text-center text-muted-foreground">
-            All components can be customized before booking
+            Total for {travelers} {travelers === 1 ? 'traveler' : 'travelers'} • Save {currencySymbol}{packageSavings.toFixed(2)} vs booking separately
           </p>
         </div>
       </div>
