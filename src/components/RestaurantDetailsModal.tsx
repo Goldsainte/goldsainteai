@@ -45,7 +45,20 @@ export const RestaurantDetailsModal = ({
     : undefined;
 
 const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${restaurant.name} ${restaurant.address} reservations`)}`;
-const reservationTarget = restaurant.reservationUrl || websiteUrl || googleSearch;
+const filteredWebsiteUrl = (() => {
+  let u = websiteUrl;
+  try {
+    if (u) {
+      const host = new URL(u).hostname.replace(/^www\./, '');
+      const deprioritized = [
+        'tripadvisor.com','yelp.com','facebook.com','m.facebook.com','instagram.com','linktr.ee'
+      ];
+      if (deprioritized.some(d => host === d || host.endsWith(`.${d}`))) u = undefined;
+    }
+  } catch {}
+  return u;
+})();
+const reservationTarget = restaurant.reservationUrl || googleSearch || filteredWebsiteUrl;
 const reservationHref = (typeof window !== 'undefined' && window.top === window.self)
   ? reservationTarget
   : buildReservationRedirect(reservationTarget);

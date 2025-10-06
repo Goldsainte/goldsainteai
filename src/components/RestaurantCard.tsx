@@ -68,9 +68,21 @@ export const RestaurantCard = ({
 
   const handleBookTable = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const websiteUrl = website ? (/^https?:\/\//i.test(website) ? website : `https://${website}`) : undefined;
+    const rawWebsite = website ? (/^https?:\/\//i.test(website) ? website : `https://${website}`) : undefined;
+    let websiteUrl = rawWebsite;
+    try {
+      if (rawWebsite) {
+        const host = new URL(rawWebsite).hostname.replace(/^www\./, '');
+        const deprioritized = [
+          'tripadvisor.com','yelp.com','facebook.com','m.facebook.com','instagram.com','linktr.ee'
+        ];
+        if (deprioritized.some(d => host === d || host.endsWith(`.${d}`))) {
+          websiteUrl = undefined;
+        }
+      }
+    } catch {}
     const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${name} ${address} reservations`)}`;
-    const target = reservationUrl || websiteUrl || googleSearch;
+    const target = reservationUrl || googleSearch || websiteUrl;
     if (window.top === window.self) {
       window.open(target, '_blank', 'noopener,noreferrer');
     } else {

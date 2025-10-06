@@ -22,11 +22,23 @@ export const CompactRestaurantCard = ({ restaurant }: CompactRestaurantCardProps
   const priceLevel = restaurant.price_level || "";
 
   // Build reservation target: prefer backend-provided, then official website, else Google search
-  const websiteUrl = restaurant.website
+  const rawWebsite = restaurant.website
     ? (/^https?:\/\//i.test(restaurant.website) ? restaurant.website : `https://${restaurant.website}`)
     : undefined;
+  let websiteUrl = rawWebsite;
+  try {
+    if (rawWebsite) {
+      const host = new URL(rawWebsite).hostname.replace(/^www\./, '');
+      const deprioritized = [
+        'tripadvisor.com', 'yelp.com', 'facebook.com', 'm.facebook.com', 'instagram.com', 'linktr.ee'
+      ];
+      if (deprioritized.some(d => host === d || host.endsWith(`.${d}`))) {
+        websiteUrl = undefined;
+      }
+    }
+  } catch {}
   const googleSearch = `https://www.google.com/search?q=${encodeURIComponent(`${name} ${location} reservations`)}`;
-  const reservationUrl = restaurant.reservationUrl || websiteUrl || googleSearch;
+  const reservationUrl = restaurant.reservationUrl || googleSearch || websiteUrl;
 
   const getPriceLevelSymbol = (level: string) => {
     switch (level) {
