@@ -259,7 +259,7 @@ const reservationUrl = restaurant.reservationUrl || websiteUrl || restaurant.web
 
       {/* Additional Details - Always Visible on Desktop */}
       {(restaurant.description || restaurant.phone || restaurant.website || restaurant.hours?.weekday_text) && (
-        <div className="border-t border-border p-3 pt-3 bg-muted/30">
+        <div className="hidden sm:block border-t border-border p-3 pt-3 bg-muted/30">
           <div className="text-xs space-y-2">
             {restaurant.description && (
               <p className="text-muted-foreground line-clamp-2">
