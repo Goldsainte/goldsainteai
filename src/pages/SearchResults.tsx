@@ -370,10 +370,22 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
     // Apply price filter
     if (searchType === "restaurants") {
-      // For restaurants, filter by price range if set
-      if (priceRange[0] !== 0 || priceRange[1] !== 200) {
+      // For restaurants, only apply price filter if user adjusted it from the default wide range
+      const userAdjusted = priceRange[1] <= 1000; // default is very high for non-restaurants
+      if (userAdjusted) {
+        const toEstimate = (level: any) => {
+          const val = (level || '').toString().trim();
+          switch (val) {
+            case '$': return 25;
+            case '$$': return 50;
+            case '$$-$$$': return 75;
+            case '$$$': return 100;
+            case '$$$$': return 200;
+            default: return 50;
+          }
+        };
         filtered = filtered.filter((item) => {
-          const price = item.price_level ? (item.price_level * 50) : 50; // Estimate $ = 50, $$ = 100, etc.
+          const price = toEstimate(item.price_level);
           return price >= priceRange[0] && price <= priceRange[1];
         });
       }
