@@ -22,10 +22,13 @@ import { InvoiceGenerator } from "@/components/InvoiceGenerator";
 import { PaymentPlanSelector } from "@/components/PaymentPlanSelector";
 import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
 import { AIAgentMatching } from "@/components/AIAgentMatching";
+import { AgentBidForm } from "@/components/AgentBidForm";
+import { useUserRole } from "@/hooks/useUserRole";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 export default function Marketplace() {
   const { user, isLoading } = useAuth();
+  const { isAgent } = useUserRole();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<any[]>([]);
@@ -42,6 +45,7 @@ export default function Marketplace() {
   const [reviewAgentName, setReviewAgentName] = useState<string>("");
   const [disputeJobId, setDisputeJobId] = useState<string | null>(null);
   const [jobAttachments, setJobAttachments] = useState<Record<string, any[]>>({});
+  const [hasExistingBid, setHasExistingBid] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -123,6 +127,26 @@ export default function Marketplace() {
     // If job is pending approval, fetch completion submission
     if (job.status === 'pending_approval') {
       await fetchCompletionSubmission(job.id);
+    }
+
+    // Check if agent already submitted a bid
+    if (isAgent && user) {
+      const { data: agentData } = await supabase
+        .from('travel_agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+
+      if (agentData) {
+        const { data: existingBid } = await supabase
+          .from('agent_bids')
+          .select('id')
+          .eq('job_id', job.id)
+          .eq('agent_id', agentData.id)
+          .maybeSingle();
+
+        setHasExistingBid(!!existingBid);
+      }
     }
     
     setIsViewJobDialogOpen(true);
@@ -486,14 +510,41 @@ export default function Marketplace() {
               </div>
             </div>
 
-            {/* AI Agent Matching - Show for open jobs */}
-            {selectedJob?.status === 'open' && (
+            {/* AI Agent Matching - Show for open jobs (customers only) */}
+            {selectedJob?.status === 'open' && !isAgent && (
               <AIAgentMatching
                 jobId={selectedJob.id}
                 onSelectAgent={(agentId) => {
                   navigate(`/agents/${agentId}`);
                 }}
               />
+            )}
+
+            {/* Agent Bid Form - Show for agents on open jobs */}
+            {selectedJob?.status === 'open' && isAgent && !hasExistingBid && (
+              <AgentBidForm
+                jobId={selectedJob.id}
+                jobTitle={selectedJob.title}
+                budgetMin={selectedJob.budget_min}
+                budgetMax={selectedJob.budget_max}
+                currency={selectedJob.currency}
+                onBidSubmitted={() => {
+                  fetchJobBids(selectedJob.id);
+                  setHasExistingBid(true);
+                  toast.success("Your bid has been submitted!");
+                }}
+              />
+            )}
+
+            {/* Show message if agent already bid */}
+            {selectedJob?.status === 'open' && isAgent && hasExistingBid && (
+              <Card>
+                <CardContent className="pt-6">
+                  <p className="text-center text-muted-foreground">
+                    You have already submitted a bid for this job.
+                  </p>
+                </CardContent>
+              </Card>
             )}
 
             <JobBidsReview
