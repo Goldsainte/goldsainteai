@@ -997,7 +997,12 @@ Always show results first with minimal text, ask questions later. Be conversatio
         let toolResult;
         
         if (functionName === 'search_packages') {
-          toolResult = await searchPackages(functionArgs);
+          const fullResult = await searchPackages(functionArgs);
+          // Trim data for AI but keep full data for user
+          toolResult = {
+            forAI: trimPackageDataForAI(fullResult),
+            forUser: fullResult
+          };
         } else if (functionName === 'search_hotels') {
           toolResult = await searchHotels(functionArgs, BOOKING_API_KEY);
         } else if (functionName === 'search_destinations') {
@@ -1026,7 +1031,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
         ...toolResults.map(tr => ({
           role: "tool",
           tool_call_id: tr.tool_call_id,
-          content: JSON.stringify(tr.result)
+          // Use trimmed data for AI if available, otherwise full result
+          content: JSON.stringify(tr.result.forAI || tr.result)
         }))
       ];
 
@@ -1073,7 +1079,8 @@ Always show results first with minimal text, ask questions later. Be conversatio
 
         return new Response(JSON.stringify({
           message: finalMessage,
-          toolResults: toolResults.map(tr => tr.result),
+          // Return full data to user (forUser if available, otherwise full result)
+          toolResults: toolResults.map(tr => tr.result.forUser || tr.result),
           conversationHistory: [...conversationHistory, 
             { role: 'user', content: message },
             { role: 'assistant', content: finalMessage }
@@ -1923,6 +1930,34 @@ async function searchEvents(args: any) {
     console.error('Error in searchEvents:', error);
     return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
   }
+}
+
+// Helper to trim down package data for AI response
+function trimPackageDataForAI(packageData: any) {
+  return {
+    type: packageData.type,
+    origin: packageData.origin,
+    destination: packageData.destination,
+    departureDate: packageData.departureDate,
+    returnDate: packageData.returnDate,
+    travelers: packageData.travelers,
+    estimatedTotal: packageData.estimatedTotal,
+    savings: packageData.savings,
+    flightCount: packageData.flights?.length || 0,
+    hotelCount: packageData.hotels?.length || 0,
+    carCount: packageData.cars?.length || 0,
+    // Only include summary of cheapest options
+    cheapestFlight: packageData.flights?.[0] ? {
+      price: packageData.flights[0].price?.total,
+      airline: packageData.flights[0].validatingAirlineCodes?.[0],
+      duration: packageData.flights[0].itineraries?.[0]?.duration
+    } : null,
+    cheapestHotel: packageData.hotels?.[0] ? {
+      name: packageData.hotels[0].name,
+      price: packageData.hotels[0].offers?.[0]?.price?.total,
+      rating: packageData.hotels[0].rating
+    } : null
+  };
 }
 
 async function searchPackages(args: any) {
