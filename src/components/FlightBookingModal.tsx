@@ -78,17 +78,17 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
         .from('profiles')
         .select('*')
         .eq('id', session.user.id)
-        .single();
+        .maybeSingle();
 
       // Fetch preferences
       const { data: preferences } = await supabase
         .from('user_booking_preferences')
         .select('*')
         .eq('user_id', session.user.id)
-        .single();
+        .maybeSingle();
 
       if (profile || preferences) {
-        setUserProfile({ profile, preferences });
+        setUserProfile({ profile, preferences, session });
         setShowAutofillPrompt(true);
       }
     };
@@ -99,42 +99,103 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
   const handleAutofill = () => {
     if (!userProfile) return;
 
-    const { profile, preferences } = userProfile;
+    const { profile, preferences, session } = userProfile;
     const updated = [...passengers];
     
+    let filledFields = [];
+    
     // Autofill first passenger with user data
-    updated[0] = {
-      ...updated[0],
-      title: profile?.first_name ? "MR" : updated[0].title,
-      firstName: profile?.first_name || updated[0].firstName,
-      middleName: updated[0].middleName,
-      lastName: profile?.last_name || updated[0].lastName,
-      dateOfBirth: updated[0].dateOfBirth,
-      gender: updated[0].gender,
-      nationality: preferences?.nationality || updated[0].nationality,
-      passportNumber: preferences?.passport_number || updated[0].passportNumber,
-      passportExpiry: preferences?.passport_expiry || updated[0].passportExpiry,
-      passportCountry: preferences?.passport_issuing_country || updated[0].passportCountry,
-      knownTravelerNumber: updated[0].knownTravelerNumber,
-      frequentFlyerNumber: updated[0].frequentFlyerNumber
-    };
-
+    const newPassenger = { ...updated[0] };
+    
+    if (profile?.first_name) {
+      newPassenger.firstName = profile.first_name;
+      filledFields.push('first name');
+    }
+    
+    if (profile?.last_name) {
+      newPassenger.lastName = profile.last_name;
+      filledFields.push('last name');
+    }
+    
+    if (preferences?.date_of_birth) {
+      newPassenger.dateOfBirth = preferences.date_of_birth;
+      filledFields.push('date of birth');
+    }
+    
+    if (preferences?.gender) {
+      newPassenger.gender = preferences.gender;
+      filledFields.push('gender');
+    }
+    
+    if (preferences?.nationality) {
+      newPassenger.nationality = preferences.nationality;
+      filledFields.push('nationality');
+    }
+    
+    if (preferences?.passport_number) {
+      newPassenger.passportNumber = preferences.passport_number;
+      filledFields.push('passport number');
+    }
+    
+    if (preferences?.passport_expiry) {
+      newPassenger.passportExpiry = preferences.passport_expiry;
+      filledFields.push('passport expiry');
+    }
+    
+    if (preferences?.passport_issuing_country) {
+      newPassenger.passportCountry = preferences.passport_issuing_country;
+      filledFields.push('passport country');
+    }
+    
+    updated[0] = newPassenger;
     setPassengers(updated);
 
     // Autofill contact info
-    setContactInfo({
-      email: profile?.email || contactInfo.email,
-      phone: profile?.phone || contactInfo.phone,
-      countryCode: contactInfo.countryCode,
-      address: contactInfo.address,
-      city: contactInfo.city,
-      state: contactInfo.state,
-      postalCode: contactInfo.postalCode,
-      country: profile?.country || preferences?.nationality || contactInfo.country
-    });
-
+    const newContactInfo = { ...contactInfo };
+    
+    if (session?.user?.email) {
+      newContactInfo.email = session.user.email;
+      filledFields.push('email');
+    }
+    
+    if (profile?.phone) {
+      newContactInfo.phone = profile.phone;
+      filledFields.push('phone');
+    }
+    
+    if (preferences?.home_address) {
+      newContactInfo.address = preferences.home_address;
+      filledFields.push('address');
+    }
+    
+    if (preferences?.home_city) {
+      newContactInfo.city = preferences.home_city;
+      filledFields.push('city');
+    }
+    
+    if (preferences?.home_state) {
+      newContactInfo.state = preferences.home_state;
+      filledFields.push('state');
+    }
+    
+    if (preferences?.home_postal_code) {
+      newContactInfo.postalCode = preferences.home_postal_code;
+      filledFields.push('postal code');
+    }
+    
+    if (profile?.country || preferences?.nationality) {
+      newContactInfo.country = profile?.country || preferences?.nationality;
+      filledFields.push('country');
+    }
+    
+    setContactInfo(newContactInfo);
     setShowAutofillPrompt(false);
-    toast.success("Information autofilled from your profile");
+    
+    if (filledFields.length > 0) {
+      toast.success(`Autofilled: ${filledFields.join(', ')}`);
+    } else {
+      toast.info("No profile information available to autofill. Please complete your profile in settings.");
+    }
   };
 
   const handleBooking = async () => {
