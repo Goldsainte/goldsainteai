@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import logomark from "@/assets/logomark-seal-gold.png";
 import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
+import { WakeWordDetector } from "@/utils/WakeWordDetector";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -21,15 +22,17 @@ export const AIBookingConcierge = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge. How may I assist you with your travel plans today? Feel free to say something like 'Book me a trip to France' or 'Find me hotels in Paris for next month.'"
+      content: "Hello! I'm your Goldsainte AI Concierge. How may I assist you with your travel plans today? Feel free to say 'Hey Goldsainte' to activate voice mode, or type your request."
     }
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const [wakeWordActive, setWakeWordActive] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
+  const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -148,9 +151,40 @@ export const AIBookingConcierge = () => {
     }
   };
 
+  const startWakeWordDetection = async () => {
+    try {
+      wakeWordDetectorRef.current = new WakeWordDetector(() => {
+        console.log('Wake word triggered!');
+        if (!voiceMode) {
+          toggleVoiceMode();
+        }
+      });
+
+      const started = await wakeWordDetectorRef.current.start();
+      if (started) {
+        setWakeWordActive(true);
+        toast({
+          title: "Wake Word Active",
+          description: "Say 'Hey Goldsainte' to activate voice mode",
+        });
+      }
+    } catch (error) {
+      console.error('Wake word error:', error);
+      toast({
+        title: "Wake Word Unavailable",
+        description: "Please use the microphone button instead",
+        variant: "destructive",
+      });
+    }
+  };
+
   useEffect(() => {
+    // Start wake word detection on mount
+    startWakeWordDetection();
+
     return () => {
       voiceChatRef.current?.disconnect();
+      wakeWordDetectorRef.current?.stop();
     };
   }, []);
 
@@ -184,10 +218,17 @@ export const AIBookingConcierge = () => {
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src={logomark} alt="Goldsainte" className="w-8 h-8 object-contain" />
+          <div className="relative">
+            <img src={logomark} alt="Goldsainte" className="w-8 h-8 object-contain" />
+            {wakeWordActive && !voiceMode && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+            )}
+          </div>
           <div>
             <h3 className="font-serif text-lg font-bold text-primary-foreground">AI Concierge</h3>
-            <p className="text-xs text-primary-foreground/80">Powered by Goldsainte</p>
+            <p className="text-xs text-primary-foreground/80">
+              {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
