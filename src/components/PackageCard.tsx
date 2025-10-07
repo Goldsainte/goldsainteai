@@ -1,10 +1,27 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Plane, Hotel, Car, Calendar, Users, Sparkles, Star, MapPin, Wifi, Coffee, Utensils, ParkingCircle, Wind, Dumbbell } from "lucide-react";
+import { Plane, Hotel, Car, Calendar, Users, Sparkles, Star, MapPin, Wifi, Coffee, Utensils, ParkingCircle, Wind, Dumbbell, ChevronLeft, ChevronRight, MessageSquare } from "lucide-react";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 // Simple FX cache and conversion with better error handling
 const rateCache = new Map<string, number>();
 async function getRate(from: string, to: string): Promise<number> {
@@ -439,22 +456,31 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
         {/* Hotel Info - Enhanced */}
         {cheapestHotel && (
           <div className="rounded-lg bg-muted/50 border border-border overflow-hidden">
-            {/* Hotel Photos */}
+            {/* Hotel Photo Carousel */}
             {(cheapestHotel?.photos?.length > 0 || (hotelDetails?.photos && hotelDetails.photos.length > 0)) && (
-              <div className="relative h-48 bg-gray-200">
-                <img 
-                  src={(cheapestHotel?.photos?.[0]) || hotelDetails?.photos?.[0]?.url_max} 
-                  alt={cheapestHotel.hotel?.name || cheapestHotel?.name || 'Hotel photo'}
-                  className="w-full h-full object-cover"
-                />
-                {(() => {
-                  const count = (cheapestHotel?.photos?.length || hotelDetails?.photos?.length || 0);
-                  return count > 1 ? (
-                    <Badge className="absolute bottom-2 right-2 bg-black/70 text-white">
-                      +{count - 1} photos
-                    </Badge>
-                  ) : null;
-                })()}
+              <div className="relative">
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {((cheapestHotel?.photos || []).concat(
+                      (hotelDetails?.photos || []).map((p: any) => p.url_max || p)
+                    ).filter((url: any) => !!url).slice(0, 12)).map((photoUrl: string, idx: number) => (
+                      <CarouselItem key={idx}>
+                        <div className="relative h-64 bg-gray-200">
+                          <img 
+                            src={photoUrl}
+                            alt={`${cheapestHotel.hotel?.name || cheapestHotel?.name || 'Hotel'} - Photo ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </Carousel>
+                <Badge className="absolute bottom-2 right-2 bg-black/70 text-white">
+                  {((cheapestHotel?.photos?.length || 0) + (hotelDetails?.photos?.length || 0))} photos
+                </Badge>
               </div>
             )}
             
@@ -504,6 +530,60 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                       </div>
                     )}
                   </div>
+                  
+                  {/* Reviews Drawer Button */}
+                  {((cheapestHotel?.reviews && cheapestHotel.reviews.length > 0) || (cheapestHotel?.property?.reviews && cheapestHotel.property.reviews.length > 0)) && (
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <Button variant="outline" size="sm" className="gap-2 mb-2">
+                          <MessageSquare className="h-4 w-4" />
+                          Read Reviews
+                        </Button>
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <DrawerHeader>
+                          <DrawerTitle>{cheapestHotel.hotel?.name || cheapestHotel?.name} Reviews</DrawerTitle>
+                          <DrawerDescription>
+                            Guest reviews and ratings
+                          </DrawerDescription>
+                        </DrawerHeader>
+                        <div className="px-4 pb-4 max-h-[60vh] overflow-y-auto space-y-4">
+                          {(cheapestHotel?.reviews || cheapestHotel?.property?.reviews || []).map((review: any, idx: number) => (
+                            <div key={idx} className="border-b pb-3 last:border-b-0">
+                              <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-sm">{review.author || review.authorAttribution?.displayName || 'Guest'}</span>
+                                  <div className="flex items-center gap-1">
+                                    {Array.from({ length: 5 }).map((_, i) => (
+                                      <Star
+                                        key={i}
+                                        className={`h-3 w-3 ${
+                                          i < (review.rating || 0)
+                                            ? 'fill-yellow-400 text-yellow-400'
+                                            : 'text-gray-300'
+                                        }`}
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                {(review.date || review.relativeTime) && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {review.relativeTime || new Date(review.date).toLocaleDateString()}
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">{review.text || review.comment || 'No review text'}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <DrawerFooter>
+                          <DrawerClose asChild>
+                            <Button variant="outline">Close</Button>
+                          </DrawerClose>
+                        </DrawerFooter>
+                      </DrawerContent>
+                    </Drawer>
+                  )}
                   
                   {/* Room Type */}
                   <p className="text-sm mb-2">
