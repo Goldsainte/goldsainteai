@@ -41,16 +41,28 @@ export class WakeWordDetector {
 
     this.recognition.onerror = (event: any) => {
       console.error('Speech recognition error:', event?.error || event);
-      // Do not immediately restart on 'aborted' to avoid loops; onend will handle restart
-      if (event?.error === 'no-speech' || event?.error === 'audio-capture') {
-        this.safeRestart(800);
+      
+      // Don't restart on aborted errors - they usually mean we're stopping intentionally
+      if (event?.error === 'aborted') {
+        this.isStarting = false;
+        return;
+      }
+      
+      // Only restart on recoverable errors
+      if (event?.error === 'no-speech') {
+        this.safeRestart(1000);
+      } else if (event?.error === 'audio-capture') {
+        // Audio capture failed - likely mic in use, don't keep retrying
+        console.warn('Microphone unavailable, wake word detection paused');
+        this.isListening = false;
+        this.isStarting = false;
       }
     };
 
     this.recognition.onend = () => {
       console.log('Wake word recognition ended');
-      if (this.isListening) {
-        this.safeRestart(250);
+      if (this.isListening && !this.isStarting) {
+        this.safeRestart(500);
       } else {
         this.isStarting = false;
       }
@@ -61,17 +73,20 @@ export class WakeWordDetector {
     if (!this.isListening || this.isStarting) return;
     this.isStarting = true;
     setTimeout(() => {
-      if (!this.isListening) {
+      if (!this.isListening || this.isStarting === false) {
         this.isStarting = false;
         return;
       }
       try {
         this.recognition.start();
-      } catch (e) {
-        console.warn('Recognition start failed (retrying):', e);
+      } catch (e: any) {
+        console.warn('Recognition start failed:', e?.message || e);
         this.isStarting = false;
-        // try again later
-        setTimeout(() => this.safeRestart(300), 300);
+        // Don't retry indefinitely - stop after failed restart
+        if (e?.message?.includes('already started')) {
+          // Already running, we're good
+          return;
+        }
       }
     }, delayMs);
   }
