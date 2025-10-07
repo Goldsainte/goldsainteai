@@ -211,11 +211,11 @@ export const AIBookingConcierge = () => {
       >
         <div className="relative">
           <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
-          <div className="relative bg-gradient-to-br from-primary to-accent p-4 rounded-full shadow-2xl hover:scale-110 transition-transform">
+          <div className="relative bg-gradient-to-br from-primary to-accent p-4 md:p-5 rounded-full shadow-2xl hover:scale-110 transition-transform">
             <img 
               src={logomark} 
               alt="Goldsainte AI Concierge" 
-              className="w-8 h-8 object-contain"
+              className="w-10 h-10 md:w-8 md:h-8 object-contain"
             />
           </div>
         </div>
@@ -226,20 +226,20 @@ export const AIBookingConcierge = () => {
   return (
     <Card 
       className={`fixed bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
-        isMinimized ? 'w-80' : 'w-96'
-      } ${isMinimized ? 'h-16' : 'h-[600px]'}`}
+        isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
+      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[600px]'}`}
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
-            <img src={logomark} alt="Goldsainte" className="w-8 h-8 object-contain" />
+            <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
             {wakeWordActive && !voiceMode && (
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
             )}
           </div>
           <div>
-            <h3 className="font-serif text-lg font-bold text-primary-foreground">AI Concierge</h3>
+            <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
               {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
             </p>
@@ -268,7 +268,7 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(600px-140px)] p-4" ref={scrollRef}>
+          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-4" ref={scrollRef}>
             <div className="space-y-4">
               {messages.map((msg, idx) => (
                 <div
@@ -291,7 +291,7 @@ export const AIBookingConcierge = () => {
                         : 'bg-muted text-foreground'
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                    <p className="text-sm md:text-base whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 </div>
               ))}
@@ -322,22 +322,22 @@ export const AIBookingConcierge = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your travel request..."
-                    className="flex-1"
+                    className="flex-1 text-base"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
                     size="icon"
-                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-12 w-12 md:h-10 md:w-10"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5 md:h-4 md:w-4" />
                   </Button>
                 </>
               )}
               {voiceMode && (
-                <div className="flex-1 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <div className="flex-1 flex items-center justify-center gap-2 text-sm md:text-base text-muted-foreground">
+                  <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
                   Voice mode active - speak naturally
                 </div>
               )}
@@ -345,13 +345,17 @@ export const AIBookingConcierge = () => {
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode ? "default" : "outline"}
-                className={voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}
+                className={`h-12 w-12 md:h-10 md:w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}`}
                 disabled={voiceStatus === 'connecting'}
                 title={voiceMode ? "End voice conversation" : "Start voice conversation"}
               >
-                {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                {voiceMode ? <MicOff className="h-5 w-5 md:h-4 md:w-4" /> : <Mic className="h-5 w-5 md:h-4 md:w-4" />}
               </Button>
             </div>
+            {/* Mobile helper text */}
+            <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
+              {wakeWordActive ? "Say 'Hey Goldsainte' or tap mic button" : "Tap mic button to start voice chat"}
+            </p>
           </div>
         </>
       )}
