@@ -103,10 +103,57 @@ serve(async (req) => {
       });
     }
 
-    // Update booking status and process Expedia booking if payment succeeded
+    // Update booking status and process external booking if payment succeeded
     if (session.payment_status === 'paid') {
+      // For flight bookings, create actual Amadeus booking
+      if (booking.booking_type === 'flight' && booking.booking_data?.flight_offer) {
+        try {
+          console.log('Processing Amadeus flight booking...');
+          
+          const flightData = booking.booking_data;
+          
+          const amadeusBookingResult = await supabaseClient.functions.invoke('amadeus-book-flight', {
+            body: {
+              flightOffer: flightData.flight_offer,
+              passengers: flightData.passengers,
+              contactInfo: flightData.contact,
+              baseCost: booking.base_cost,
+              selectedSeats: flightData.selected_seats || [],
+              selectedBaggage: flightData.selected_baggage || [],
+              additionalFees: flightData.fees || { baggage: 0, seats: 0 },
+              bookingId: bookingId // Pass booking ID to update instead of create
+            }
+          });
+          
+          if (amadeusBookingResult.error) {
+            console.error('Amadeus booking error:', amadeusBookingResult.error);
+            // Update booking with error status
+            await supabaseClient
+              .from('bookings')
+              .update({
+                status: 'payment_received_booking_failed',
+                booking_data: {
+                  ...booking.booking_data,
+                  amadeus_error: amadeusBookingResult.error
+                }
+              })
+              .eq('id', bookingId);
+          } else {
+            console.log('Amadeus booking successful');
+            // Status will be updated by amadeus-book-flight function
+          }
+        } catch (flightError) {
+          console.error('Failed to create Amadeus booking:', flightError);
+          await supabaseClient
+            .from('bookings')
+            .update({
+              status: 'payment_received_booking_failed'
+            })
+            .eq('id', bookingId);
+        }
+      }
       // For hotel bookings with Expedia data, create the actual Expedia booking
-      if (booking.booking_type === 'hotel' && booking.booking_data?.rooms) {
+      else if (booking.booking_type === 'hotel' && booking.booking_data?.rooms) {
         try {
           console.log('Processing Expedia hotel booking...');
           

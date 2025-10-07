@@ -276,33 +276,55 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
       const seatTotal = selectedSeats.reduce((total, s) => total + (s.price || 0), 0);
 
-      const { data, error } = await supabase.functions.invoke('amadeus-book-flight', {
-        body: {
-          flightOffer: flight,
-          passengers: passengers,
-          contactInfo: contactInfo,
-          baseCost: basePrice,
-          selectedSeats: selectedSeats,
-          selectedBaggage: selectedBaggage,
-          additionalFees: {
-            baggage: baggageTotal,
-            seats: seatTotal
+      // Create pending booking record first (before payment)
+      const pendingBookingResponse = await supabase
+        .from('bookings')
+        .insert({
+          user_id: session.user.id,
+          booking_type: 'flight',
+          status: 'pending_payment',
+          base_cost: basePrice,
+          markup_amount: basePrice * 0.15,
+          markup_percentage: 15,
+          total_price: markedUpPrice + baggageTotal + seatTotal,
+          currency: flight.price.currency,
+          booking_data: {
+            flight_offer: flight,
+            passengers: passengers,
+            contact: contactInfo,
+            selected_seats: selectedSeats,
+            selected_baggage: selectedBaggage,
+            fees: {
+              baggage: baggageTotal,
+              seats: seatTotal
+            }
           }
+        })
+        .select()
+        .single();
+
+      if (pendingBookingResponse.error) {
+        throw new Error('Failed to create booking record');
+      }
+
+      const bookingId = pendingBookingResponse.data.id;
+
+      // Create Stripe checkout session
+      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+        body: {
+          bookingId: bookingId,
+          amount: markedUpPrice + baggageTotal + seatTotal,
+          currency: flight.price.currency,
+          guestEmail: contactInfo.email
         }
       });
 
-      if (error) throw error;
+      if (checkoutError || !checkoutData?.url) {
+        throw new Error(checkoutError?.message || 'Failed to create payment session');
+      }
 
-      toast.success("Flight booked successfully!");
-      onOpenChange(false);
-      
-      // Navigate to confirmation page
-      navigate('/booking-confirmation', { 
-        state: { 
-          booking: data.booking,
-          type: 'flight'
-        } 
-      });
+      // Redirect to Stripe checkout
+      window.location.href = checkoutData.url;
 
     } catch (error: any) {
       console.error('Booking error:', error);

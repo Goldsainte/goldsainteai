@@ -38,7 +38,7 @@ serve(async (req) => {
   }
 
   try {
-    const { flightOffer, passengers, contactInfo, baseCost, selectedSeats = [], selectedBaggage = [], additionalFees = { baggage: 0, seats: 0 } } = await req.json();
+    const { flightOffer, passengers, contactInfo, baseCost, selectedSeats = [], selectedBaggage = [], additionalFees = { baggage: 0, seats: 0 }, bookingId = null } = await req.json();
     
     console.log('Flight booking request:', { 
       flightOffer: flightOffer?.id,
@@ -46,22 +46,29 @@ serve(async (req) => {
       baseCost,
       selectedSeats: selectedSeats.length,
       selectedBaggage: selectedBaggage.length,
-      additionalFees
+      additionalFees,
+      existingBookingId: bookingId
     });
 
-    // Authenticate user
-    const supabaseClient = createClient(
+    // Authenticate user using anon key first
+    const anonClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
     );
 
     const authHeader = req.headers.get('Authorization')!;
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
+    const { data: { user } } = await anonClient.auth.getUser(token);
 
     if (!user) {
       throw new Error('User not authenticated');
     }
+
+    // Use service role client for database operations to bypass RLS
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     const token_amadeus = await getAmadeusToken();
 
@@ -130,42 +137,79 @@ serve(async (req) => {
     const seatFees = additionalFees.seats || 0;
     const totalPrice = basePrice + markupAmount + baggageFees + seatFees;
 
-    // Store booking in database
-    const { data: booking, error: bookingError } = await supabaseClient
-      .from('bookings')
-      .insert({
-        user_id: user.id,
-        booking_type: 'flight',
-        booking_reference: bookingData.data.id,
-        status: 'confirmed',
-        base_cost: basePrice,
-        markup_amount: markupAmount,
-        markup_percentage: MARKUP_PERCENTAGE * 100,
-        total_price: totalPrice,
-        currency: flightOffer.price.currency,
-        booking_data: {
-          amadeus_booking_id: bookingData.data.id,
-          flight_offer: flightOffer,
-          passengers: passengers,
-          contact: contactInfo,
-          booking_response: bookingData.data,
-          selected_seats: selectedSeats,
-          selected_baggage: selectedBaggage,
-          fees: {
-            baggage: baggageFees,
-            seats: seatFees
+    // Store or update booking in database
+    let booking;
+    if (bookingId) {
+      // Update existing booking with Amadeus confirmation
+      const { data: updatedBooking, error: updateError } = await supabaseClient
+        .from('bookings')
+        .update({
+          booking_reference: bookingData.data.id,
+          status: 'confirmed',
+          booking_data: {
+            amadeus_booking_id: bookingData.data.id,
+            flight_offer: flightOffer,
+            passengers: passengers,
+            contact: contactInfo,
+            booking_response: bookingData.data,
+            selected_seats: selectedSeats,
+            selected_baggage: selectedBaggage,
+            fees: {
+              baggage: baggageFees,
+              seats: seatFees
+            }
           }
-        }
-      })
-      .select()
-      .single();
+        })
+        .eq('id', bookingId)
+        .select()
+        .single();
 
-    if (bookingError) {
-      console.error('Database booking error:', bookingError);
-      throw new Error('Failed to store booking in database');
+      if (updateError) {
+        console.error('Database booking update error:', updateError);
+        throw new Error('Failed to update booking in database');
+      }
+      
+      booking = updatedBooking;
+      console.log('Booking updated in database:', booking.id);
+    } else {
+      // Create new booking (legacy flow - shouldn't happen anymore)
+      const { data: newBooking, error: bookingError } = await supabaseClient
+        .from('bookings')
+        .insert({
+          user_id: user.id,
+          booking_type: 'flight',
+          booking_reference: bookingData.data.id,
+          status: 'confirmed',
+          base_cost: basePrice,
+          markup_amount: markupAmount,
+          markup_percentage: MARKUP_PERCENTAGE * 100,
+          total_price: totalPrice,
+          currency: flightOffer.price.currency,
+          booking_data: {
+            amadeus_booking_id: bookingData.data.id,
+            flight_offer: flightOffer,
+            passengers: passengers,
+            contact: contactInfo,
+            booking_response: bookingData.data,
+            selected_seats: selectedSeats,
+            selected_baggage: selectedBaggage,
+            fees: {
+              baggage: baggageFees,
+              seats: seatFees
+            }
+          }
+        })
+        .select()
+        .single();
+
+      if (bookingError) {
+        console.error('Database booking error:', bookingError);
+        throw new Error('Failed to store booking in database');
+      }
+
+      booking = newBooking;
+      console.log('Booking stored in database:', booking.id);
     }
-
-    console.log('Booking stored in database:', booking.id);
 
     // Send confirmation email in background
     supabaseClient.functions.invoke('send-confirmation-email', {
