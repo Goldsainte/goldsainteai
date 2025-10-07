@@ -1528,7 +1528,7 @@ const Index = () => {
 
                 {/* Price Slider */}
                 {showPriceSlider && (
-                  <div className="animate-in fade-in slide-in-from-bottom-4">
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
                     <PriceSlider
                       type={showPriceSlider.type}
                       onPriceSelected={handlePriceSelected}
