@@ -105,9 +105,20 @@ export const AIBookingConcierge = () => {
         }
         
         const getSessionToken = async () => {
-          const { data, error } = await supabase.functions.invoke('realtime-voice-session');
-          if (error) throw error;
-          return data.client_secret.value;
+          try {
+            const { data, error } = await supabase.functions.invoke('realtime-voice-session');
+            if (error) {
+              console.error('Session token error:', error);
+              throw new Error('Failed to connect to voice service. Please try again.');
+            }
+            if (!data?.client_secret?.value) {
+              throw new Error('Invalid session token received');
+            }
+            return data.client_secret.value;
+          } catch (err) {
+            console.error('Token fetch error:', err);
+            throw new Error('Unable to connect to voice service');
+          }
         };
 
         let currentAssistantMessage = '';
@@ -147,14 +158,30 @@ export const AIBookingConcierge = () => {
           title: "Voice Mode Active",
           description: "You can now speak naturally with the AI concierge",
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Voice error:', error);
         setVoiceStatus('error');
+        
+        // Provide specific error messages
+        let errorMessage = "Failed to start voice mode";
+        if (error?.message) {
+          errorMessage = error.message;
+        } else if (error?.name === 'NotAllowedError') {
+          errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
+        } else if (error?.name === 'NotFoundError') {
+          errorMessage = "No microphone found. Please connect a microphone and try again.";
+        } else if (error?.name === 'NotReadableError') {
+          errorMessage = "Microphone is being used by another application. Please close other apps using the microphone.";
+        }
+        
         toast({
           title: "Voice Error",
-          description: "Failed to start voice mode",
+          description: errorMessage,
           variant: "destructive",
         });
+        
+        // Resume wake word detection if voice mode fails
+        startWakeWordDetection();
       }
     } else {
       voiceChatRef.current?.disconnect();
