@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star } from "lucide-react";
+import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star, Mic } from "lucide-react";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -23,7 +23,23 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
           </div>
 
           <div className="space-y-3 sm:space-y-4">
-            {/* Feature 1 */}
+            {/* Feature 1 - Voice AI */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+                <Mic className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">
+                  Voice AI Concierge with "Hey Goldsainte" wake word.
+                </h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Just say "Hey Goldsainte" from anywhere on the site to instantly activate our advanced voice AI. 
+                  Have natural conversations about flights, hotels, dining, and more—hands-free.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 2 - AI Search */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -37,7 +53,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 2 */}
+            {/* Feature 3 - Expert Agents */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -51,7 +67,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 3 */}
+            {/* Feature 4 - Group Bookings */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -65,7 +81,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 4 */}
+            {/* Feature 5 - Itinerary Management */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -79,7 +95,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 5 */}
+            {/* Feature 6 - Communication Hub */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -89,20 +105,6 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
                   Chat instantly with agents, get notifications, use quick replies, 
                   and keep all your travel conversations in one secure place.
-                </p>
-              </div>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="flex gap-2.5 sm:gap-3 items-start">
-              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Star className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              </div>
-              <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Personalized recommendations.</h3>
-                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Goldsainte.Ai learns your preferences and finds luxury travel options 
-                  perfectly tailored to your style.
                 </p>
               </div>
             </div>
