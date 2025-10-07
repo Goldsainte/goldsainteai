@@ -36,7 +36,7 @@ export default function AgentProfile() {
       // Fetch agent details
       const { data: agentData, error: agentError } = await supabase
         .from('travel_agents')
-        .select('*, profiles(*)')
+        .select('*')
         .eq('id', agentId)
         .single();
 
@@ -46,7 +46,7 @@ export default function AgentProfile() {
       // Fetch reviews
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('agent_reviews')
-        .select('*, profiles(first_name, last_name, avatar_url)')
+        .select('*')
         .eq('agent_id', agentId)
         .order('created_at', { ascending: false });
 
@@ -332,7 +332,9 @@ export default function AgentProfile() {
                             </Avatar>
                             <div>
                               <p className="font-medium text-sm">
-                                {review.profiles?.first_name} {review.profiles?.last_name}
+                                {review.profiles?.first_name
+                                  ? `${review.profiles.first_name} ${review.profiles.last_name ?? ''}`
+                                  : 'Customer'}
                               </p>
                               <p className="text-xs text-muted-foreground">
                                 {new Date(review.created_at).toLocaleDateString()}
