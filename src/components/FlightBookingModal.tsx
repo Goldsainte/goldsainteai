@@ -153,23 +153,42 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
         return;
       }
 
-      // Check if international flight (simple heuristic: different country codes or long distance)
-      const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-      const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-      const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2); // Different country codes
+      // Determine if flight is international by checking airport countries
+      const originSegment = flight.itineraries?.[0]?.segments?.[0];
+      const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+      
+      // Use the country code from the flight data if available
+      const originCountry = originSegment?.departure?.address?.countryCode;
+      const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+      
+      // Only require passport if we can confirm it's international
+      const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
 
       // Validate passenger info
       for (let i = 0; i < passengers.length; i++) {
         const p = passengers[i];
-        if (!p.title || !p.firstName || !p.lastName || !p.dateOfBirth || !p.gender || !p.nationality) {
+        
+        // Trim all string values to handle whitespace
+        const trimmedTitle = p.title?.trim();
+        const trimmedFirstName = p.firstName?.trim();
+        const trimmedLastName = p.lastName?.trim();
+        const trimmedDOB = p.dateOfBirth?.trim();
+        const trimmedGender = p.gender?.trim();
+        const trimmedNationality = p.nationality?.trim();
+        
+        if (!trimmedTitle || !trimmedFirstName || !trimmedLastName || !trimmedDOB || !trimmedGender || !trimmedNationality) {
           toast.error(`Please complete all required fields for passenger ${i + 1}`);
           setLoading(false);
           return;
         }
         
-        // Require passport for international flights
+        // Only require passport for confirmed international flights
         if (isInternational) {
-          if (!p.passportNumber || !p.passportExpiry || !p.passportCountry) {
+          const trimmedPassportNumber = p.passportNumber?.trim();
+          const trimmedPassportExpiry = p.passportExpiry?.trim();
+          const trimmedPassportCountry = p.passportCountry?.trim();
+          
+          if (!trimmedPassportNumber || !trimmedPassportExpiry || !trimmedPassportCountry) {
             toast.error(`Passport information is required for international flights (Passenger ${i + 1})`);
             setLoading(false);
             return;
@@ -396,9 +415,11 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                     <h5 className="text-sm font-semibold mb-3">
                       Passport Information 
                       {(() => {
-                        const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                        const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-                        const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+                        const originSegment = flight.itineraries?.[0]?.segments?.[0];
+                        const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+                        const originCountry = originSegment?.departure?.address?.countryCode;
+                        const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+                        const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
                         return isInternational ? " (Required for International Flights)" : " (Optional for Domestic Flights)";
                       })()}
                     </h5>
@@ -407,9 +428,11 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         <Label htmlFor={`passport-${index}`}>
                           Passport Number
                           {(() => {
-                            const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                            const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-                            const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
+                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+                            const originCountry = originSegment?.departure?.address?.countryCode;
+                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
                             return isInternational ? " *" : "";
                           })()}
                         </Label>
@@ -418,9 +441,11 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                           value={passenger.passportNumber}
                           onChange={(e) => updatePassenger(index, 'passportNumber', e.target.value)}
                           placeholder={(() => {
-                            const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                            const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-                            const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
+                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+                            const originCountry = originSegment?.departure?.address?.countryCode;
+                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
                             return isInternational ? "Required" : "Optional";
                           })()}
                         />
@@ -429,9 +454,11 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         <Label htmlFor={`passportExpiry-${index}`}>
                           Expiry Date
                           {(() => {
-                            const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                            const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-                            const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
+                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+                            const originCountry = originSegment?.departure?.address?.countryCode;
+                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
                             return isInternational ? " *" : "";
                           })()}
                         </Label>
@@ -446,9 +473,11 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         <Label htmlFor={`passportCountry-${index}`}>
                           Issuing Country
                           {(() => {
-                            const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                            const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-                            const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
+                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+                            const originCountry = originSegment?.departure?.address?.countryCode;
+                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
                             return isInternational ? " *" : "";
                           })()}
                         </Label>
