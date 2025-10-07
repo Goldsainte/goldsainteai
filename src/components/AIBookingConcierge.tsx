@@ -220,14 +220,16 @@ export const AIBookingConcierge = () => {
   };
 
   useEffect(() => {
-    // Start wake word detection on mount
-    startWakeWordDetection();
+    // Start wake word detection when widget is opened (user interaction)
+    if (isOpen && !wakeWordDetectorRef.current) {
+      startWakeWordDetection();
+    }
 
     return () => {
       voiceChatRef.current?.disconnect();
       wakeWordDetectorRef.current?.stop();
     };
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) {
     return (
