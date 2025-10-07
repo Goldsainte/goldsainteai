@@ -3,8 +3,9 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Loader2, XCircle } from "lucide-react";
+import { CheckCircle, Loader2, XCircle, Plane, Mail, Calendar, User } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
+import { format } from "date-fns";
 
 const BookingConfirmation = () => {
   const [searchParams] = useSearchParams();
@@ -42,88 +43,209 @@ const BookingConfirmation = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <img src={logomark} alt="Logo" className="h-20 w-20 mx-auto animate-pulse" />
+          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <p className="text-muted-foreground">Confirming your booking...</p>
+        </div>
       </div>
     );
   }
 
-  const isSuccess = paymentStatus === 'paid';
+  const isSuccess = paymentStatus === 'paid' && booking?.status !== 'cancelled';
+  const flightData = booking?.booking_data;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex items-center justify-center p-6">
-      <Card className="max-w-2xl w-full p-8 space-y-6">
-        <div className="flex flex-col items-center text-center space-y-4">
-          <img src={logomark} alt="Logo" className="h-16 w-16" />
-          
+    <main className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <img src={logomark} alt="Logo" className="h-24 w-24 mx-auto mb-6" />
           {isSuccess ? (
-            <>
-              <CheckCircle className="h-16 w-16 text-green-500" />
-              <h1 className="text-3xl font-bold text-foreground">Booking Confirmed!</h1>
-              <p className="text-muted-foreground">
-                Your booking has been successfully confirmed and payment received.
+            <div className="space-y-3">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
+                <CheckCircle className="h-12 w-12 text-primary" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif text-foreground mb-2">
+                Booking Confirmed
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Your luxury travel experience is confirmed. Prepare for an unforgettable journey.
               </p>
-            </>
+            </div>
           ) : (
-            <>
-              <XCircle className="h-16 w-16 text-destructive" />
-              <h1 className="text-3xl font-bold text-foreground">Payment Failed</h1>
-              <p className="text-muted-foreground">
-                Unfortunately, your payment could not be processed. Please try again.
+            <div className="space-y-3">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-destructive/10 mb-4">
+                <XCircle className="h-12 w-12 text-destructive" />
+              </div>
+              <h1 className="text-4xl md:text-5xl font-serif text-foreground mb-2">
+                Booking Unsuccessful
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                We encountered an issue processing your booking. Please try again or contact our concierge team.
               </p>
-            </>
+            </div>
           )}
         </div>
 
         {booking && isSuccess && (
-          <div className="space-y-4 pt-6 border-t">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground">Booking Reference</p>
-                <p className="font-semibold text-lg">{booking.booking_reference}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Booking Type</p>
-                <p className="font-semibold capitalize">{booking.booking_type}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Total Amount</p>
-                <p className="font-semibold">{booking.currency} {booking.total_price}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Status</p>
-                <p className="font-semibold text-green-600 capitalize">{booking.status}</p>
-              </div>
-            </div>
-
-            {booking.guests && (
-              <div className="pt-4 border-t">
-                <p className="text-sm text-muted-foreground mb-2">Guest Information</p>
-                <p className="font-medium">
-                  {booking.guests.first_name} {booking.guests.last_name}
+          <Card className="border-accent/20 shadow-xl bg-card/50 backdrop-blur">
+            <div className="p-8 space-y-8">
+              {/* Booking Reference */}
+              <div className="text-center pb-6 border-b border-accent/20">
+                <p className="text-sm uppercase tracking-widest text-muted-foreground mb-2">
+                  Confirmation Number
                 </p>
-                <p className="text-sm text-muted-foreground">{booking.guests.email}</p>
+                <p className="text-3xl font-serif text-primary tracking-wider">
+                  {booking.booking_reference || bookingId?.slice(0, 8).toUpperCase()}
+                </p>
               </div>
-            )}
 
-            <div className="pt-4">
-              <p className="text-sm text-muted-foreground">
-                A confirmation email has been sent to your email address with all the booking details.
-              </p>
+              {/* Flight Details */}
+              {booking.booking_type === 'flight' && flightData?.flight_offer && (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 text-foreground">
+                    <div className="p-3 rounded-full bg-primary/10">
+                      <Plane className="h-6 w-6 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-serif">Flight Information</h2>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {flightData.flight_offer.itineraries?.map((itinerary: any, idx: number) => (
+                      <div key={idx} className="p-6 rounded-lg bg-accent/5 border border-accent/20">
+                        <p className="text-sm uppercase tracking-wide text-muted-foreground mb-4">
+                          {idx === 0 ? 'Departure' : 'Return'}
+                        </p>
+                        {itinerary.segments?.map((segment: any, segIdx: number) => (
+                          <div key={segIdx} className="space-y-3">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="text-2xl font-semibold text-foreground">
+                                  {segment.departure.iataCode}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {segment.departure.at ? format(new Date(segment.departure.at), 'MMM dd, HH:mm') : ''}
+                                </p>
+                              </div>
+                              <div className="flex-1 px-4">
+                                <div className="border-t-2 border-dashed border-accent/30" />
+                              </div>
+                              <div className="text-right">
+                                <p className="text-2xl font-semibold text-foreground">
+                                  {segment.arrival.iataCode}
+                                </p>
+                                <p className="text-sm text-muted-foreground">
+                                  {segment.arrival.at ? format(new Date(segment.arrival.at), 'MMM dd, HH:mm') : ''}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {segment.carrierCode} {segment.number} • {segment.aircraft?.code}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Passenger Information */}
+              {flightData?.passengers && flightData.passengers.length > 0 && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 text-foreground">
+                    <div className="p-3 rounded-full bg-primary/10">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <h2 className="text-2xl font-serif">Passenger Details</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {flightData.passengers.map((passenger: any, idx: number) => (
+                      <div key={idx} className="p-4 rounded-lg bg-accent/5 border border-accent/20">
+                        <p className="font-semibold text-foreground">
+                          {passenger.firstName} {passenger.lastName}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Passenger {idx + 1}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Payment Summary */}
+              <div className="space-y-4 pt-6 border-t border-accent/20">
+                <div className="flex items-center gap-3 text-foreground mb-4">
+                  <div className="p-3 rounded-full bg-primary/10">
+                    <Calendar className="h-6 w-6 text-primary" />
+                  </div>
+                  <h2 className="text-2xl font-serif">Payment Summary</h2>
+                </div>
+                <div className="space-y-3 p-6 rounded-lg bg-accent/5">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Booking Type</span>
+                    <span className="capitalize font-medium text-foreground">{booking.booking_type}</span>
+                  </div>
+                  {flightData?.fees?.baggage > 0 && (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Baggage Fees</span>
+                      <span className="font-medium text-foreground">{booking.currency} {flightData.fees.baggage}</span>
+                    </div>
+                  )}
+                  {flightData?.fees?.seats > 0 && (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Seat Selection</span>
+                      <span className="font-medium text-foreground">{booking.currency} {flightData.fees.seats}</span>
+                    </div>
+                  )}
+                  <div className="border-t border-accent/20 pt-3 mt-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-foreground">Total Paid</span>
+                      <span className="text-2xl font-bold text-primary">
+                        {booking.currency} {Number(booking.total_price).toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Confirmation Email Notice */}
+              <div className="flex items-start gap-4 p-6 rounded-lg bg-primary/5 border border-primary/20">
+                <Mail className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold text-foreground mb-1">Confirmation Email Sent</p>
+                  <p className="text-sm text-muted-foreground">
+                    A detailed confirmation with your complete itinerary has been sent to your email address. 
+                    Please check your inbox and spam folder.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+          </Card>
         )}
 
-        <div className="pt-6 space-y-3">
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <Button 
+            onClick={() => navigate('/my-bookings')} 
+            variant="outline"
+            size="lg"
+            className="min-w-[200px]"
+          >
+            View My Bookings
+          </Button>
           <Button 
             onClick={() => navigate('/')} 
-            className="w-full"
-            variant={isSuccess ? "default" : "destructive"}
+            size="lg"
+            className="min-w-[200px]"
           >
-            {isSuccess ? 'Back to Home' : 'Try Again'}
+            Return Home
           </Button>
         </div>
-      </Card>
+      </div>
     </main>
   );
 };

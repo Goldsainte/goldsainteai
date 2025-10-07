@@ -73,7 +73,7 @@ serve(async (req) => {
     // SECURITY: Verify booking exists and belongs to authenticated user
     const { data: booking, error: bookingError } = await supabaseClient
       .from('bookings')
-      .select('id, total_price, currency, user_id')
+      .select('id, total_price, currency, user_id, booking_type')
       .eq('id', bookingId)
       .single();
 
@@ -128,7 +128,7 @@ serve(async (req) => {
       throw new Error('Failed to create payment record');
     }
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with custom branding
     const session = await stripe.checkout.sessions.create({
       customer_email: guestEmail,
       line_items: [
@@ -136,8 +136,8 @@ serve(async (req) => {
           price_data: {
             currency: currency.toLowerCase(),
             product_data: {
-              name: 'Travel Booking',
-              description: `Booking reference: ${bookingId}`
+              name: 'Luxury Travel Booking',
+              description: `Premium ${booking.booking_type} reservation`
             },
             unit_amount: Math.round(amount * 100), // Convert to cents
           },
@@ -147,6 +147,13 @@ serve(async (req) => {
       mode: "payment",
       success_url: `${req.headers.get("origin")}/booking-confirmation?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}`,
       cancel_url: `${req.headers.get("origin")}/booking-cancelled`,
+      payment_method_types: ['card'],
+      billing_address_collection: 'required',
+      custom_text: {
+        submit: {
+          message: 'Complete your luxury travel booking'
+        }
+      },
       metadata: {
         booking_id: bookingId,
         payment_id: payment.id

@@ -50,18 +50,18 @@ serve(async (req) => {
       existingBookingId: bookingId
     });
 
-    // Authenticate user using anon key first
-    const anonClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
-
-    const authHeader = req.headers.get('Authorization')!;
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user } } = await anonClient.auth.getUser(token);
-
-    if (!user) {
-      throw new Error('User not authenticated');
+    // Authenticate user (optional when called from server-side functions)
+    let user = null;
+    const authHeader = req.headers.get('Authorization');
+    
+    if (authHeader) {
+      const anonClient = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      );
+      const token = authHeader.replace('Bearer ', '');
+      const { data } = await anonClient.auth.getUser(token);
+      user = data.user;
     }
 
     // Use service role client for database operations to bypass RLS
@@ -172,7 +172,12 @@ serve(async (req) => {
       booking = updatedBooking;
       console.log('Booking updated in database:', booking.id);
     } else {
-      // Create new booking (legacy flow - shouldn't happen anymore)
+      // No bookingId provided - this should not happen in the current flow
+      if (!user) {
+        throw new Error('User authentication required for new bookings');
+      }
+      
+      // Create new booking (legacy flow - for backward compatibility only)
       const { data: newBooking, error: bookingError } = await supabaseClient
         .from('bookings')
         .insert({
