@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
-const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
-
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -503,8 +501,8 @@ serve(async (req) => {
 
     try {
       const { messages } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
 
     const systemPrompt = `You are a luxury travel booking assistant for Goldsainte AI with full booking capabilities.
 
@@ -537,14 +535,14 @@ Example: "I found 5 flights from JFK to LAX. The best option is..."
 Example: "Would you like me to book the Ritz Paris for $450/night (March 15-20)? I'll need your full name, email, and phone number."`;
 
       // First API call with tools
-      const response = await fetch(AI_URL, {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gpt-5-2025-08-07",
           messages: [
             { role: "system", content: systemPrompt },
             ...messages,
@@ -607,14 +605,14 @@ Example: "Would you like me to book the Ritz Paris for $450/night (March 15-20)?
           ...toolResults
         ];
 
-        const streamResponse = await fetch(AI_URL, {
+        const streamResponse = await fetch("https://api.openai.com/v1/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            Authorization: `Bearer ${OPENAI_API_KEY}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "gpt-5-2025-08-07",
             messages: updatedMessages,
             stream: true,
           }),

@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
 // Shared helper: Map common city abbreviations and airport codes to full names
 function getCityVariations(location: string): string[] {
@@ -127,11 +127,11 @@ serve(async (req) => {
     }
     console.log('Has location:', !!userLocation);
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
+    if (!OPENAI_API_KEY) {
+      throw new Error('OPENAI_API_KEY not configured');
     }
     if (!BOOKING_API_KEY) {
       throw new Error('BOOKING_API_KEY not configured');
@@ -951,16 +951,16 @@ Always show results first with minimal text, ask questions later. Be conversatio
       }
     ];
 
-    console.log('Calling AI with tools...');
+    console.log('Calling OpenAI with tools...');
 
-    const aiResponse = await fetch(AI_URL, {
+    const aiResponse = await fetch(OPENAI_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-5-2025-08-07',
         messages,
         tools,
         tool_choice: 'auto',
@@ -1043,18 +1043,18 @@ Always show results first with minimal text, ask questions later. Be conversatio
       try {
         // Add timeout to prevent hanging
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout for faster responses
+        const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
 
-        const finalResponse = await fetch(AI_URL, {
+        const finalResponse = await fetch(OPENAI_URL, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Authorization': `Bearer ${OPENAI_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.5-flash',
+            model: 'gpt-5-2025-08-07',
             messages: finalMessages,
-            max_tokens: 500, // Limit response size
+            max_completion_tokens: 500, // Limit response size
           }),
           signal: controller.signal,
         });
@@ -1796,9 +1796,9 @@ async function checkVisaRequirements(args: any) {
     const { fromCountry, toCountry } = args;
     console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
 
-    const LOVABLE_API_KEY_LOCAL = Deno.env.get('LOVABLE_API_KEY');
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     
-    if (!LOVABLE_API_KEY_LOCAL) {
+    if (!OPENAI_API_KEY) {
       return { 
         error: 'Visa check service not configured',
         requirement: 'unknown'
@@ -1831,21 +1831,21 @@ If visa is required, mention that Goldsainte can assist with the application pro
 
 Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
 
-    const response = await fetch(AI_URL, {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY_LOCAL}`,
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'gpt-5-2025-08-07',
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ],
-        max_tokens: 1000
+        max_completion_tokens: 1000
       }),
     });
 
