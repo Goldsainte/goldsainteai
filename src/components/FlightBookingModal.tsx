@@ -282,7 +282,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
         .insert({
           user_id: session.user.id,
           booking_type: 'flight',
-          status: 'pending_payment',
+          status: 'pending',
           base_cost: basePrice,
           markup_amount: basePrice * 0.15,
           markup_percentage: 15,

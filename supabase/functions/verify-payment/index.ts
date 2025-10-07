@@ -131,7 +131,7 @@ serve(async (req) => {
             await supabaseClient
               .from('bookings')
               .update({
-                status: 'payment_received_booking_failed',
+                status: 'cancelled',
                 booking_data: {
                   ...booking.booking_data,
                   amadeus_error: amadeusBookingResult.error
@@ -147,7 +147,7 @@ serve(async (req) => {
           await supabaseClient
             .from('bookings')
             .update({
-              status: 'payment_received_booking_failed'
+              status: 'cancelled'
             })
             .eq('id', bookingId);
         }
@@ -209,7 +209,7 @@ serve(async (req) => {
               await supabaseClient
                 .from('bookings')
                 .update({
-                  status: 'payment_received_booking_failed',
+                  status: 'cancelled',
                   booking_data: {
                     ...booking.booking_data,
                     expedia_error: expediaBookingResult.error
@@ -225,7 +225,7 @@ serve(async (req) => {
           await supabaseClient
             .from('bookings')
             .update({
-              status: 'payment_received_booking_failed'
+              status: 'cancelled'
             })
             .eq('id', bookingId);
         }
