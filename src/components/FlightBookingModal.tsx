@@ -143,10 +143,13 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
       // Check if user is authenticated
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        toast.error("Please log in to book a flight", {
+        const returnTo = window.location.pathname + window.location.search;
+        // Redirect immediately to login for reliability on all devices
+        navigate(`/auth?returnTo=${encodeURIComponent(returnTo)}`);
+        toast.error("Please log in to continue", {
           action: {
-            label: "Log In",
-            onClick: () => navigate('/auth')
+            label: "Open Login",
+            onClick: () => navigate(`/auth?returnTo=${encodeURIComponent(returnTo)}`)
           }
         });
         setLoading(false);
