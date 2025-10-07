@@ -369,7 +369,13 @@ export default function Marketplace() {
                         <span className="text-sm">{new Date(job.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
-                    <Button variant="outline" className="w-full">View Details & Bid</Button>
+                    <Button 
+                      onClick={() => handleViewJob(job)} 
+                      variant="outline" 
+                      className="w-full"
+                    >
+                      View Details & Bid
+                    </Button>
                   </CardContent>
                 </Card>
               ))
