@@ -82,6 +82,7 @@ import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  searchResults?: SearchResult[];
 }
 
 interface SearchResult {
@@ -115,7 +116,6 @@ const Index = () => {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [conversationHistory, setConversationHistory] = useState<Message[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -416,7 +416,6 @@ const Index = () => {
     }
     
     setIsLoading(true);
-    setSearchResults([]);
     setMessages(prev => [...prev, { role: 'user', content: queryToSend }]);
     setSearchQuery("");
 
@@ -446,10 +445,10 @@ const Index = () => {
       // Ignore stale responses
       if (requestId !== lastRequestIdRef.current) return;
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }]);
-      
+      // Filter and attach search results to the assistant message
+      let filteredResults: SearchResult[] = [];
       if (data.toolResults && data.toolResults.length > 0) {
-        const filteredResults = data.toolResults.filter((r: any) => {
+        filteredResults = data.toolResults.filter((r: any) => {
           if (r?.type === 'package') {
             const total = (r.flights?.length || 0) + (r.hotels?.length || 0) + (r.cars?.length || 0);
             return total > 0;
@@ -462,35 +461,41 @@ const Index = () => {
           }
           return false;
         });
-        setSearchResults(filteredResults);
-        setActiveQuickLink(null);
+      }
+
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: data.message, 
+        searchResults: filteredResults.length > 0 ? filteredResults : undefined,
+        ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) 
+      }]);
+      setActiveQuickLink(null);
         
-        // Check for visa results
-        const visaResult = data.toolResults.find((r: any) => r.type === 'visa');
-        if (visaResult && visaResult.fromCountry && visaResult.toCountry) {
-          // Store visa data for potential service request
-          const isVisaRequired = visaResult.information && 
-            (visaResult.information.toLowerCase().includes('visa required') || 
-             visaResult.information.toLowerCase().includes('visa is required') ||
-             visaResult.information.toLowerCase().includes('must obtain'));
-          
-          // Check if AI suggests visa assistance or user asks for help
-          const userWantsHelp = queryToSend.toLowerCase().includes('help') || 
-                               queryToSend.toLowerCase().includes('assist') ||
-                               queryToSend.toLowerCase().includes('yes') ||
-                               data.message.toLowerCase().includes('assist you with your visa');
-          
-          if (isVisaRequired && userWantsHelp) {
-            // Show the visa service modal
-            setTimeout(() => {
-              setVisaModalData({
-                open: true,
-                fromCountry: visaResult.fromCountry,
-                toCountry: visaResult.toCountry,
-                visaInformation: visaResult
-              });
-            }, 1000); // Small delay so user can read the AI message first
-          }
+      // Check for visa results
+      const visaResult = data.toolResults?.find((r: any) => r.type === 'visa');
+      if (visaResult && visaResult.fromCountry && visaResult.toCountry) {
+        // Store visa data for potential service request
+        const isVisaRequired = visaResult.information && 
+          (visaResult.information.toLowerCase().includes('visa required') || 
+           visaResult.information.toLowerCase().includes('visa is required') ||
+           visaResult.information.toLowerCase().includes('must obtain'));
+        
+        // Check if AI suggests visa assistance or user asks for help
+        const userWantsHelp = queryToSend.toLowerCase().includes('help') || 
+                             queryToSend.toLowerCase().includes('assist') ||
+                             queryToSend.toLowerCase().includes('yes') ||
+                             data.message.toLowerCase().includes('assist you with your visa');
+        
+        if (isVisaRequired && userWantsHelp) {
+          // Show the visa service modal
+          setTimeout(() => {
+            setVisaModalData({
+              open: true,
+              fromCountry: visaResult.fromCountry,
+              toCountry: visaResult.toCountry,
+              visaInformation: visaResult
+            });
+          }, 1000); // Small delay so user can read the AI message first
         }
       }
 
@@ -675,7 +680,6 @@ const Index = () => {
     console.log('Quick action selected:', action, '->', query);
     
     setIsLoading(true);
-    setSearchResults([]);
     setMessages([{ role: 'user', content: query }]);
 
     const requestId = ++lastRequestIdRef.current;
@@ -703,13 +707,9 @@ const Index = () => {
       // Ignore stale responses
       if (requestId !== lastRequestIdRef.current) return;
 
-      setMessages([
-        { role: 'user', content: query },
-        { role: 'assistant', content: data.message, ...(data.quickLinkState && { quickLinkState: data.quickLinkState }) }
-      ]);
-      
+      let filteredResults: SearchResult[] = [];
       if (data.toolResults && data.toolResults.length > 0) {
-        const filteredResults = data.toolResults.filter((r: any) => {
+        filteredResults = data.toolResults.filter((r: any) => {
           if (r?.type === 'package') {
             const total = (r.flights?.length || 0) + (r.hotels?.length || 0) + (r.cars?.length || 0);
             return total > 0;
@@ -722,9 +722,18 @@ const Index = () => {
           }
           return false;
         });
-        setSearchResults(filteredResults);
-        setActiveQuickLink(null);
       }
+
+      setMessages([
+        { role: 'user', content: query },
+        { 
+          role: 'assistant', 
+          content: data.message,
+          searchResults: filteredResults.length > 0 ? filteredResults : undefined,
+          ...(data.quickLinkState && { quickLinkState: data.quickLinkState })
+        }
+      ]);
+      setActiveQuickLink(null);
       
       if (data.conversationHistory) {
         setConversationHistory(data.conversationHistory);
@@ -808,7 +817,6 @@ const Index = () => {
 
   const resetChat = () => {
     setMessages([]);
-    setSearchResults([]);
     setConversationHistory([]);
     setPendingFlightDates(null);
     setShowDatePicker(null);
@@ -1296,25 +1304,225 @@ const Index = () => {
             <ScrollArea className="flex-1 px-6">
               <div className="py-6 space-y-6 max-w-4xl mx-auto">
                 {messages.map((msg, idx) => (
-                  <div key={idx} className={`flex gap-3 animate-in fade-in slide-in-from-bottom-2 ${
-                    msg.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}>
-                    {msg.role === 'assistant' && (
-                      <div className="flex-shrink-0">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center p-1">
-                          <img src={logomark} alt="Goldsainte" className="h-full w-full object-contain" />
+                  <div key={idx} className="space-y-4">
+                    <div className={`flex gap-3 animate-in fade-in slide-in-from-bottom-2 ${
+                      msg.role === 'user' ? 'justify-end' : 'justify-start'
+                    }`}>
+                      {msg.role === 'assistant' && (
+                        <div className="flex-shrink-0">
+                          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center p-1">
+                            <img src={logomark} alt="Goldsainte" className="h-full w-full object-contain" />
+                          </div>
                         </div>
+                      )}
+                      <div className={`max-w-[80%] ${msg.role === 'user' ? 'order-first' : ''}`}>
+                        <Card className={`p-4 ${
+                          msg.role === 'user' 
+                            ? 'bg-primary text-primary-foreground border-primary' 
+                            : 'bg-card border-border'
+                        }`}>
+                          <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                        </Card>
                       </div>
-                    )}
-                    <div className={`max-w-[80%] ${msg.role === 'user' ? 'order-first' : ''}`}>
-                      <Card className={`p-4 ${
-                        msg.role === 'user' 
-                          ? 'bg-primary text-primary-foreground border-primary' 
-                          : 'bg-card border-border'
-                      }`}>
-                        <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-                      </Card>
                     </div>
+
+                    {/* Render search results attached to this message */}
+                    {msg.searchResults && msg.searchResults.map((result, resultIdx) => (
+                      <div key={`msg-${idx}-result-${resultIdx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                        {result.type === 'hotels' && result.results.length > 0 && (
+                          <div className="space-y-4">
+                            <HotelFilters
+                              resultsCount={result.results.length}
+                              currentSort={result.filters?.sortBy}
+                              currentMinRating={result.filters?.minRating}
+                              onSortChange={(sortBy) => {
+                                handleSearch(`Show me hotels sorted by ${sortBy === 'price' ? 'lowest price' : sortBy === 'review_score' ? 'highest rating' : 'popularity'} in ${result.location?.name}`);
+                              }}
+                              onMinRatingChange={(rating) => {
+                                const baseQuery = `Show me hotels in ${result.location?.name}`;
+                                const sortQuery = result.filters?.sortBy ? ` sorted by ${result.filters.sortBy}` : '';
+                                const ratingQuery = rating ? ` with minimum rating ${rating}` : '';
+                                handleSearch(baseQuery + sortQuery + ratingQuery);
+                              }}
+                            />
+                            <div className="space-y-4">
+                              {result.results.map((hotel: any, hotelIdx: number) => (
+                                <SimplePropertyCard
+                                  key={hotel.hotel_id || hotelIdx}
+                                  property={hotel}
+                                  type="hotels"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.type === 'destinations' && result.results.length > 0 && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-semibold text-foreground">
+                              🌍 Destinations
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {result.results.slice(0, 6).map((dest: any, destIdx: number) => (
+                                <Card key={dest.dest_id || destIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary">
+                                  <h4 className="font-semibold text-foreground mb-1">{dest.label}</h4>
+                                  <p className="text-sm text-muted-foreground">{dest.region || dest.dest_type}</p>
+                                </Card>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.type === 'restaurants' && result.results.length > 0 && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-semibold text-foreground">
+                              🍽️ Restaurants Nearby
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {result.results.map((restaurant: any, restIdx: number) => (
+                                <RestaurantCard
+                                  key={restaurant.id || restIdx}
+                                  id={restaurant.id}
+                                  name={restaurant.name}
+                                  rating={restaurant.rating}
+                                  userRatingsTotal={restaurant.userRatingsTotal}
+                                  priceLevel={restaurant.priceLevel}
+                                  address={restaurant.address}
+                                  photoUrl={restaurant.photoUrl}
+                                  openNow={restaurant.openNow}
+                                  phone={restaurant.phone}
+                                  website={restaurant.website}
+                                  hours={restaurant.hours}
+                                  photos={restaurant.photos}
+                                  cuisine={restaurant.cuisine}
+                                  description={restaurant.description}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.type === 'flights' && result.results && result.results.length > 0 && (
+                          <div className="space-y-4">
+                            <div>
+                              <h3 className="text-xl font-semibold text-foreground mb-4">
+                                ✈️ Flights from {typeof result.origin === 'string' ? result.origin : result.origin?.name} to {typeof result.destination === 'string' ? result.destination : result.destination?.name}
+                              </h3>
+                              <FlightFilters
+                                resultsCount={result.results.length}
+                                currentSort={result.filters?.sortBy || 'best'}
+                                onSortChange={(sortBy) => {
+                                  const origin = typeof result.origin === 'string' ? result.origin : result.origin?.name;
+                                  const destination = typeof result.destination === 'string' ? result.destination : result.destination?.name;
+                                  const departureDate = result.departureDate;
+                                  const returnDate = result.returnDate;
+                                  
+                                  const sortLabels = {
+                                    'best': 'best available',
+                                    'price': 'lowest price',
+                                    'duration': 'shortest duration',
+                                    'departure_early': 'earliest departure',
+                                    'departure_late': 'latest departure'
+                                  };
+                                  
+                                  let query = `Show me flights from ${origin} to ${destination}`;
+                                  if (departureDate) {
+                                    query += ` departing ${departureDate}`;
+                                  }
+                                  if (returnDate) {
+                                    query += ` returning ${returnDate}`;
+                                  }
+                                  query += ` sorted by ${sortLabels[sortBy as keyof typeof sortLabels]}`;
+                                  
+                                  handleSearch(query);
+                                }}
+                                onClearFilters={() => {
+                                  const origin = typeof result.origin === 'string' ? result.origin : result.origin?.name;
+                                  const destination = typeof result.destination === 'string' ? result.destination : result.destination?.name;
+                                  const departureDate = result.departureDate;
+                                  const returnDate = result.returnDate;
+                                  
+                                  let query = `Show me flights from ${origin} to ${destination}`;
+                                  if (departureDate) {
+                                    query += ` departing ${departureDate}`;
+                                  }
+                                  if (returnDate) {
+                                    query += ` returning ${returnDate}`;
+                                  }
+                                  
+                                  handleSearch(query);
+                                }}
+                              />
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {result.results.map((flight: any, flightIdx: number) => (
+                                <FlightCard
+                                  key={flight.id || flightIdx}
+                                  flight={flight}
+                                  dictionaries={result.dictionaries}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.type === 'events' && result.results.length > 0 && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-semibold text-foreground">
+                              🎫 Upcoming Events
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {result.results.map((event: any, eventIdx: number) => (
+                                <EventCard
+                                  key={event.id || eventIdx}
+                                  event={event}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.type === 'cars' && result.results && result.results.length > 0 && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-semibold text-foreground">🚗 Rental Cars</h3>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              {result.results.map((car: any, carIdx: number) => (
+                                <CarCard key={car.id || carIdx} car={car} />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {result.type === 'package' && result.flights && result.hotels && (
+                          <div className="space-y-4">
+                            <h3 className="text-xl font-semibold text-foreground">
+                              ✨ Complete Travel Packages
+                            </h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                              Save up to 10% when booking flights, hotels, and cars together
+                            </p>
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                              <PackageCard 
+                                packageData={{
+                                  flights: result.flights || [],
+                                  hotels: result.hotels || [],
+                                  cars: result.cars || [],
+                                  origin: typeof result.origin === 'string' ? result.origin : result.origin?.name || '',
+                                  destination: typeof result.destination === 'string' ? result.destination : result.destination?.name || '',
+                                  departureDate: result.departureDate || '',
+                                  returnDate: result.returnDate || '',
+                                  travelers: result.travelers || 1,
+                                  estimatedTotal: result.estimatedTotal,
+                                  savings: result.savings
+                                }}
+                                userCountry={userCountry}
+                                onBook={(pkg) => setPackageBookingData(pkg)}
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 ))}
 
@@ -1351,204 +1559,6 @@ const Index = () => {
                     />
                   </div>
                 )}
-
-                {/* Search Results */}
-                {searchResults.map((result, idx) => (
-                  <div key={`result-${idx}`} className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                    {result.type === 'hotels' && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <HotelFilters
-                          resultsCount={result.results.length}
-                          currentSort={result.filters?.sortBy}
-                          currentMinRating={result.filters?.minRating}
-                          onSortChange={(sortBy) => {
-                            handleSearch(`Show me hotels sorted by ${sortBy === 'price' ? 'lowest price' : sortBy === 'review_score' ? 'highest rating' : 'popularity'} in ${result.location?.name}`);
-                          }}
-                          onMinRatingChange={(rating) => {
-                            const baseQuery = `Show me hotels in ${result.location?.name}`;
-                            const sortQuery = result.filters?.sortBy ? ` sorted by ${result.filters.sortBy}` : '';
-                            const ratingQuery = rating ? ` with minimum rating ${rating}` : '';
-                            handleSearch(baseQuery + sortQuery + ratingQuery);
-                          }}
-                        />
-                        <div className="space-y-4">
-                          {result.results.map((hotel: any, hotelIdx: number) => (
-                            <SimplePropertyCard
-                              key={hotel.hotel_id || hotelIdx}
-                              property={hotel}
-                              type="hotels"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {result.type === 'destinations' && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground">
-                          🌍 Destinations
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {result.results.slice(0, 6).map((dest: any, destIdx: number) => (
-                            <Card key={dest.dest_id || destIdx} className="p-4 hover:shadow-lg transition-all cursor-pointer border-2 hover:border-primary">
-                              <h4 className="font-semibold text-foreground mb-1">{dest.label}</h4>
-                              <p className="text-sm text-muted-foreground">{dest.region || dest.dest_type}</p>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {result.type === 'restaurants' && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground">
-                          🍽️ Restaurants Nearby
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {result.results.map((restaurant: any, restIdx: number) => (
-                            <RestaurantCard
-                              key={restaurant.id || restIdx}
-                              id={restaurant.id}
-                              name={restaurant.name}
-                              rating={restaurant.rating}
-                              userRatingsTotal={restaurant.userRatingsTotal}
-                              priceLevel={restaurant.priceLevel}
-                              address={restaurant.address}
-                              photoUrl={restaurant.photoUrl}
-                              openNow={restaurant.openNow}
-                              phone={restaurant.phone}
-                              website={restaurant.website}
-                              hours={restaurant.hours}
-                              photos={restaurant.photos}
-                              cuisine={restaurant.cuisine}
-                              description={restaurant.description}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {result.type === 'flights' && result.results && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <div>
-                          <h3 className="text-xl font-semibold text-foreground mb-4">
-                            ✈️ Flights from {typeof result.origin === 'string' ? result.origin : result.origin?.name} to {typeof result.destination === 'string' ? result.destination : result.destination?.name}
-                          </h3>
-                          <FlightFilters
-                            resultsCount={result.results.length}
-                            currentSort={result.filters?.sortBy || 'best'}
-                            onSortChange={(sortBy) => {
-                              const origin = typeof result.origin === 'string' ? result.origin : result.origin?.name;
-                              const destination = typeof result.destination === 'string' ? result.destination : result.destination?.name;
-                              const departureDate = result.departureDate;
-                              const returnDate = result.returnDate;
-                              
-                              const sortLabels = {
-                                'best': 'best available',
-                                'price': 'lowest price',
-                                'duration': 'shortest duration',
-                                'departure_early': 'earliest departure',
-                                'departure_late': 'latest departure'
-                              };
-                              
-                              let query = `Show me flights from ${origin} to ${destination}`;
-                              if (departureDate) {
-                                query += ` departing ${departureDate}`;
-                              }
-                              if (returnDate) {
-                                query += ` returning ${returnDate}`;
-                              }
-                              query += ` sorted by ${sortLabels[sortBy as keyof typeof sortLabels]}`;
-                              
-                              handleSearch(query);
-                            }}
-                            onClearFilters={() => {
-                              const origin = typeof result.origin === 'string' ? result.origin : result.origin?.name;
-                              const destination = typeof result.destination === 'string' ? result.destination : result.destination?.name;
-                              const departureDate = result.departureDate;
-                              const returnDate = result.returnDate;
-                              
-                              let query = `Show me flights from ${origin} to ${destination}`;
-                              if (departureDate) {
-                                query += ` departing ${departureDate}`;
-                              }
-                              if (returnDate) {
-                                query += ` returning ${returnDate}`;
-                              }
-                              
-                              handleSearch(query);
-                            }}
-                          />
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {result.results.map((flight: any, flightIdx: number) => (
-                            <FlightCard
-                              key={flight.id || flightIdx}
-                              flight={flight}
-                              dictionaries={result.dictionaries}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {result.type === 'events' && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground">
-                          🎫 Upcoming Events
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                          {result.results.map((event: any, eventIdx: number) => (
-                            <EventCard
-                              key={event.id || eventIdx}
-                              event={event}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {result.type === 'cars' && result.results && result.results.length > 0 && (
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground">🚗 Rental Cars</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {result.results.map((car: any, carIdx: number) => (
-                            <CarCard key={car.id || carIdx} car={car} />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {result.type === 'package' && result.flights && result.hotels && (
-                      <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground">
-                          ✨ Complete Travel Packages
-                        </h3>
-                        <p className="text-sm text-muted-foreground mb-4">
-                          Save up to 10% when booking flights, hotels, and cars together
-                        </p>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                          <PackageCard 
-                            packageData={{
-                              flights: result.flights || [],
-                              hotels: result.hotels || [],
-                              cars: result.cars || [],
-                              origin: typeof result.origin === 'string' ? result.origin : result.origin?.name || '',
-                              destination: typeof result.destination === 'string' ? result.destination : result.destination?.name || '',
-                              departureDate: result.departureDate || '',
-                              returnDate: result.returnDate || '',
-                              travelers: result.travelers || 1,
-                              estimatedTotal: result.estimatedTotal,
-                              savings: result.savings
-                            }}
-                            userCountry={userCountry}
-                            onBook={(pkg) => setPackageBookingData(pkg)}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
 
                 {/* Loading indicator */}
                 {isLoading && (
