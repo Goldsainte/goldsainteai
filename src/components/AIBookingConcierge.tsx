@@ -295,8 +295,8 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-4" ref={scrollRef}>
-            <div className="space-y-4">
+          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
+            <div className="space-y-3">
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
@@ -307,18 +307,18 @@ export const AIBookingConcierge = () => {
                       <img 
                         src={logomark} 
                         alt="Goldsainte" 
-                        className="w-8 h-8 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                        className="w-6 h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
                       />
                     </div>
                   )}
                   <div
-                    className={`max-w-[75%] rounded-lg p-3 ${
+                    className={`max-w-[80%] rounded-lg px-3 py-2 ${
                       msg.role === 'user'
                         ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
                         : 'bg-muted text-foreground'
                     }`}
                   >
-                    <p className="text-sm md:text-base whitespace-pre-wrap">{msg.content}</p>
+                    <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                   </div>
                 </div>
               ))}
@@ -328,10 +328,10 @@ export const AIBookingConcierge = () => {
                     <img 
                       src={logomark} 
                       alt="Goldsainte" 
-                      className="w-8 h-8 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                      className="w-6 h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
                     />
                   </div>
-                  <div className="bg-muted rounded-lg p-3">
+                  <div className="bg-muted rounded-lg px-3 py-2">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
                 </div>
@@ -340,7 +340,7 @@ export const AIBookingConcierge = () => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-4 border-t border-border">
+          <div className="p-3 border-t border-border">
             <div className="flex gap-2">
               {!voiceMode && (
                 <>
@@ -349,22 +349,22 @@ export const AIBookingConcierge = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your travel request..."
-                    className="flex-1 text-base"
+                    className="flex-1 text-sm h-10"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
                     size="icon"
-                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-12 w-12 md:h-10 md:w-10"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-10 w-10"
                   >
-                    <Send className="h-5 w-5 md:h-4 md:w-4" />
+                    <Send className="h-4 w-4" />
                   </Button>
                 </>
               )}
               {voiceMode && (
-                <div className="flex-1 flex items-center justify-center gap-2 text-sm md:text-base text-muted-foreground">
-                  <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+                <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
+                  <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                   Voice mode active - speak naturally
                 </div>
               )}
@@ -372,11 +372,11 @@ export const AIBookingConcierge = () => {
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode ? "default" : "outline"}
-                className={`h-12 w-12 md:h-10 md:w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}`}
+                className={`h-10 w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}`}
                 disabled={voiceStatus === 'connecting'}
                 title={voiceMode ? "Stop listening" : "Start listening"}
               >
-                {voiceMode ? <Mic className="h-5 w-5 md:h-4 md:w-4" /> : <MicOff className="h-5 w-5 md:h-4 md:w-4" />}
+                {voiceMode ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
               </Button>
             </div>
             {/* Mobile helper text */}
