@@ -1,14 +1,13 @@
 export class WakeWordDetector {
   private recognition: any;
   private isListening = false;
+  private isStarting = false;
   private onWakeWordDetected: () => void;
 
   constructor(onWakeWordDetected: () => void) {
     this.onWakeWordDetected = onWakeWordDetected;
-    
-    // @ts-ignore - Web Speech API
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    
+    // @ts-ignore - Web Speech API prefixes
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       throw new Error('Speech recognition not supported in this browser');
     }
@@ -18,17 +17,21 @@ export class WakeWordDetector {
     this.recognition.interimResults = false;
     this.recognition.lang = 'en-US';
 
+    this.recognition.onstart = () => {
+      console.log('Wake word recognition started');
+      this.isStarting = false;
+    };
+
     this.recognition.onresult = (event: any) => {
       const last = event.results.length - 1;
-      const transcript = event.results[last][0].transcript.toLowerCase().trim();
-      
+      const transcript: string = String(event.results[last][0].transcript || '').toLowerCase().trim();
+      if (!transcript) return;
       console.log('Heard:', transcript);
-
-      // Check for wake word variations
       if (
         transcript.includes('hey goldsainte') ||
         transcript.includes('hey gold saint') ||
         transcript.includes('hey gold sante') ||
+        transcript.includes('gold saint') ||
         transcript.includes('goldsainte')
       ) {
         console.log('Wake word detected!');
@@ -37,48 +40,67 @@ export class WakeWordDetector {
     };
 
     this.recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
-      if (event.error === 'no-speech' || event.error === 'audio-capture') {
-        // Auto-restart on these errors
-        setTimeout(() => {
-          if (this.isListening) {
-            this.recognition.start();
-          }
-        }, 1000);
+      console.error('Speech recognition error:', event?.error || event);
+      // Do not immediately restart on 'aborted' to avoid loops; onend will handle restart
+      if (event?.error === 'no-speech' || event?.error === 'audio-capture') {
+        this.safeRestart(800);
       }
     };
 
     this.recognition.onend = () => {
-      // Auto-restart if still supposed to be listening
+      console.log('Wake word recognition ended');
       if (this.isListening) {
-        setTimeout(() => {
-          try {
-            this.recognition.start();
-          } catch (error) {
-            console.log('Recognition already started');
-          }
-        }, 100);
+        this.safeRestart(250);
+      } else {
+        this.isStarting = false;
       }
     };
   }
 
+  private safeRestart(delayMs: number) {
+    if (!this.isListening || this.isStarting) return;
+    this.isStarting = true;
+    setTimeout(() => {
+      if (!this.isListening) {
+        this.isStarting = false;
+        return;
+      }
+      try {
+        this.recognition.start();
+      } catch (e) {
+        console.warn('Recognition start failed (retrying):', e);
+        this.isStarting = false;
+        // try again later
+        setTimeout(() => this.safeRestart(300), 300);
+      }
+    }, delayMs);
+  }
+
   async start() {
     try {
-      // Request microphone permission
+      // Request mic permission once to avoid prompt later
       await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      this.isListening = true;
+    } catch (e) {
+      console.error('Microphone permission error:', e);
+      // Still attempt to start recognition; some browsers allow without explicit stream
+    }
+
+    this.isListening = true;
+    this.isStarting = true;
+    try {
       this.recognition.start();
       console.log('Wake word detection started');
       return true;
     } catch (error) {
       console.error('Failed to start wake word detection:', error);
+      this.isStarting = false;
       return false;
     }
   }
 
   stop() {
     this.isListening = false;
+    this.isStarting = false;
     try {
       this.recognition.stop();
     } catch (error) {

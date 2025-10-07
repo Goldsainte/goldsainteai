@@ -97,6 +97,12 @@ export const AIBookingConcierge = () => {
     if (!voiceMode) {
       try {
         setVoiceStatus('connecting');
+
+        // Pause wake word while in active voice call to avoid mic conflicts
+        if (wakeWordDetectorRef.current) {
+          wakeWordDetectorRef.current.stop();
+          setWakeWordActive(false);
+        }
         
         const getSessionToken = async () => {
           const { data, error } = await supabase.functions.invoke('realtime-voice-session');
@@ -148,6 +154,8 @@ export const AIBookingConcierge = () => {
       voiceChatRef.current?.disconnect();
       setVoiceMode(false);
       setVoiceStatus('disconnected');
+      // Resume wake word listening after call ends
+      startWakeWordDetection();
     }
   };
 
@@ -335,6 +343,20 @@ export const AIBookingConcierge = () => {
                 disabled={voiceStatus === 'connecting'}
               >
                 {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+              </Button>
+              <Button
+                onClick={async () => {
+                  if (wakeWordActive) {
+                    wakeWordDetectorRef.current?.stop();
+                    setWakeWordActive(false);
+                    toast({ title: "Wake Word Disabled" });
+                  } else {
+                    await startWakeWordDetection();
+                  }
+                }}
+                variant={wakeWordActive ? "default" : "outline"}
+              >
+                {wakeWordActive ? "Wake On" : "Enable Wake"}
               </Button>
             </div>
           </div>
