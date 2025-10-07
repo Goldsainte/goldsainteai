@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight } from "lucide-react";
+import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star } from "lucide-react";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -89,6 +89,20 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
                   Chat instantly with agents, get notifications, use quick replies, 
                   and keep all your travel conversations in one secure place.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 6 */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Star className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">Personalized recommendations.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Goldsainte.Ai learns your preferences and finds luxury travel options 
+                  perfectly tailored to your style.
                 </p>
               </div>
             </div>
