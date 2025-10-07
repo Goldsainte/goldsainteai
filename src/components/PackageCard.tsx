@@ -67,13 +67,23 @@ export const PackageCard = ({ packageData, userCountry = 'US', onBook }: Package
   const [hotelDetails, setHotelDetails] = useState<any>(null);
   const [loadingHotelDetails, setLoadingHotelDetails] = useState(false);
   
-// Extract prices - ensure we're getting valid numbers
+// Extract prices - ensure we're getting valid numbers and support multiple hotel data shapes
 const flightPrice = cheapestFlight?.price?.total ? parseFloat(String(cheapestFlight.price.total)) : 0;
-const hotelPrice = cheapestHotel?.offers?.[0]?.price?.total ? parseFloat(String(cheapestHotel.offers[0].price.total)) : 0;
+const hotelPrice = (() => {
+  // Amadeus shape
+  if (cheapestHotel?.offers?.[0]?.price?.total) return parseFloat(String(cheapestHotel.offers[0].price.total));
+  // Unified hotels shape
+  if (cheapestHotel?.priceBreakdown?.totalPrice?.value) return parseFloat(String(cheapestHotel.priceBreakdown.totalPrice.value));
+  // Fallback
+  if (cheapestHotel?.price?.total) return parseFloat(String(cheapestHotel.price.total));
+  return 0;
+})();
 const carPrice = cheapestCar?.price?.total ? parseFloat(String(cheapestCar.price.total)) : 0;
 
 const flightCurrency = cheapestFlight?.price?.currency || 'USD';
-const hotelCurrency = cheapestHotel?.offers?.[0]?.price?.currency || 'USD';
+const hotelCurrency = cheapestHotel?.offers?.[0]?.price?.currency 
+  || cheapestHotel?.priceBreakdown?.totalPrice?.currency 
+  || 'USD';
 const carCurrency = cheapestCar?.price?.currency || 'USD';
 
 console.log('Package prices:', { 
@@ -99,12 +109,16 @@ useEffect(() => {
 // Fetch detailed hotel information
 useEffect(() => {
   const fetchHotelDetails = async () => {
-    if (!cheapestHotel?.hotel?.hotelId) return;
+    const selectedHotelId = cheapestHotel?.hotel?.hotelId 
+      || cheapestHotel?.amadeusData?.hotelId 
+      || cheapestHotel?.hotel_id 
+      || cheapestHotel?.id;
+    if (!selectedHotelId) return;
     
     setLoadingHotelDetails(true);
     try {
       const { data, error } = await supabase.functions.invoke('get-hotel-details', {
-        body: { hotelId: cheapestHotel.hotel.hotelId }
+        body: { hotelId: selectedHotelId }
       });
       
       if (!error && data?.data) {
@@ -118,7 +132,7 @@ useEffect(() => {
   };
   
   fetchHotelDetails();
-}, [cheapestHotel?.hotel?.hotelId]);
+}, [cheapestHotel?.hotel?.hotelId, cheapestHotel?.amadeusData?.hotelId, cheapestHotel?.hotel_id, cheapestHotel?.id]);
 
 // Total is sum of all converted prices (flight is total for all travelers, hotel is total, car is total)
 const total = useMemo(() => {
@@ -426,18 +440,21 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
         {cheapestHotel && (
           <div className="rounded-lg bg-muted/50 border border-border overflow-hidden">
             {/* Hotel Photos */}
-            {hotelDetails?.photos && hotelDetails.photos.length > 0 && (
+            {(cheapestHotel?.photos?.length > 0 || (hotelDetails?.photos && hotelDetails.photos.length > 0)) && (
               <div className="relative h-48 bg-gray-200">
                 <img 
-                  src={hotelDetails.photos[0].url_max} 
-                  alt={cheapestHotel.hotel?.name}
+                  src={(cheapestHotel?.photos?.[0]) || hotelDetails?.photos?.[0]?.url_max} 
+                  alt={cheapestHotel.hotel?.name || cheapestHotel?.name || 'Hotel photo'}
                   className="w-full h-full object-cover"
                 />
-                {hotelDetails.photos.length > 1 && (
-                  <Badge className="absolute bottom-2 right-2 bg-black/70 text-white">
-                    +{hotelDetails.photos.length - 1} photos
-                  </Badge>
-                )}
+                {(() => {
+                  const count = (cheapestHotel?.photos?.length || hotelDetails?.photos?.length || 0);
+                  return count > 1 ? (
+                    <Badge className="absolute bottom-2 right-2 bg-black/70 text-white">
+                      +{count - 1} photos
+                    </Badge>
+                  ) : null;
+                })()}
               </div>
             )}
             
@@ -446,14 +463,14 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Hotel className="h-4 w-4 text-primary" />
-                    <h4 className="font-semibold text-lg">{cheapestHotel.hotel?.name || hotelDetails?.hotel_name || 'Hotel Accommodation'}</h4>
+                    <h4 className="font-semibold text-lg">{cheapestHotel.hotel?.name || cheapestHotel?.name || hotelDetails?.hotel_name || 'Hotel Accommodation'}</h4>
                   </div>
                   
                   {/* Location */}
-                  {(cheapestHotel.hotel?.address?.lines?.[0] || hotelDetails?.address) && (
+                  {(cheapestHotel.hotel?.address?.lines?.[0] || cheapestHotel?.address || cheapestHotel?.city || hotelDetails?.address) && (
                     <div className="flex items-start gap-1 text-sm text-muted-foreground mb-2">
                       <MapPin className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                      <span>{cheapestHotel.hotel?.address?.lines?.[0] || hotelDetails?.address}</span>
+                      <span>{cheapestHotel.hotel?.address?.lines?.[0] || cheapestHotel?.address || `${cheapestHotel?.city || ''}` || hotelDetails?.address}</span>
                     </div>
                   )}
                   
@@ -464,21 +481,24 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                         <Star
                           key={i}
                           className={`h-3 w-3 ${
-                            i < (cheapestHotel.hotel?.rating || hotelDetails?.star_rating || 0)
+                            i < (cheapestHotel?.rating || cheapestHotel.hotel?.rating || hotelDetails?.star_rating || 0)
                               ? 'fill-yellow-400 text-yellow-400'
                               : 'text-gray-300'
                           }`}
                         />
                       ))}
                     </div>
-                    {hotelDetails?.review_score && (
-                      <div className="flex items-center gap-1">
-                        <Badge variant="secondary" className="text-xs">
-                          {hotelDetails.review_score}/10
-                        </Badge>
-                        {hotelDetails.review_nr && (
+                    {(hotelDetails?.review_score || cheapestHotel?.num_reviews) && (
+                      <div className="flex items-center gap-2">
+                        {hotelDetails?.review_score && (
+                          <Badge variant="secondary" className="text-xs">{hotelDetails.review_score}/10</Badge>
+                        )}
+                        {typeof cheapestHotel?.rating === 'number' && (
+                          <Badge variant="secondary" className="text-xs">{cheapestHotel.rating.toFixed(1)}/5</Badge>
+                        )}
+                        {(hotelDetails?.review_nr || cheapestHotel?.num_reviews) && (
                           <span className="text-xs text-muted-foreground">
-                            ({hotelDetails.review_nr} reviews)
+                            ({hotelDetails?.review_nr || cheapestHotel?.num_reviews} reviews)
                           </span>
                         )}
                       </div>
@@ -488,8 +508,8 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                   {/* Room Type */}
                   <p className="text-sm mb-2">
                     <span className="font-medium">{nights} nights</span>
-                    {cheapestHotel.offers?.[0]?.room?.description?.text && (
-                      <span className="text-muted-foreground"> • {cheapestHotel.offers[0].room.description.text}</span>
+                    {(cheapestHotel?.description || cheapestHotel?.offers?.[0]?.room?.description?.text) && (
+                      <span className="text-muted-foreground"> • {cheapestHotel?.description || cheapestHotel?.offers?.[0]?.room?.description?.text}</span>
                     )}
                   </p>
                   
@@ -499,9 +519,10 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                   </p>
                   
                   {/* Top Amenities */}
-                  {hotelDetails?.facilities && hotelDetails.facilities.length > 0 && (
+                  {( (hotelDetails?.facilities && hotelDetails.facilities.length > 0) || (Array.isArray(cheapestHotel?.amenities) && cheapestHotel.amenities.length > 0) ) && (
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {hotelDetails.facilities.slice(0, 6).map((facility: string, idx: number) => {
+                      {(hotelDetails?.facilities || cheapestHotel?.amenities || []).slice(0, 6).map((facility: any, idx: number) => {
+                        const label = typeof facility === 'string' ? facility : String(facility?.name || facility);
                         const getIcon = (name: string) => {
                           const lower = name.toLowerCase();
                           if (lower.includes('wifi') || lower.includes('internet')) return <Wifi className="h-3 w-3" />;
@@ -515,8 +536,8 @@ const hasConversion = useMemo(() => [flightCurrency, hotelCurrency, carCurrency]
                         
                         return (
                           <Badge key={idx} variant="outline" className="text-xs gap-1">
-                            {getIcon(facility)}
-                            {facility}
+                            {getIcon(label)}
+                            {label}
                           </Badge>
                         );
                       })}
