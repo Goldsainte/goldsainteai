@@ -43,10 +43,10 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
                 <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Expert travel agents on demand.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">Expert agents with milestone payments.</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Post complex trips to our marketplace and get matched with certified agents. 
-                  Real-time chat, milestones, and secure payments included.
+                  Post complex trips to our marketplace and get AI-matched with certified agents. 
+                  Pay in milestones, track progress, and chat in real-time with full transparency.
                 </p>
               </div>
             </div>
@@ -57,10 +57,10 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Instant booking with smart pricing.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">Group bookings & split payments.</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Book instantly with AI-powered price insights and market analysis. 
-                  Flexible cancellation policies and transparent pricing every time.
+                  Organize group trips with ease. Split costs among travelers with secure payment links, 
+                  track who's paid, and get instant notifications when payments complete.
                 </p>
               </div>
             </div>
