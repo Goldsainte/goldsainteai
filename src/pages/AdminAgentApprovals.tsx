@@ -35,14 +35,29 @@ interface VerificationRequest {
   };
 }
 
+interface AgentProfile {
+  id: string;
+  user_id: string;
+  agency_name: string;
+  email: string;
+  bio: string;
+  is_verified: boolean;
+  is_active: boolean;
+  created_at: string;
+  business_type: string;
+  phone: string;
+}
+
 export default function AdminAgentApprovals() {
   const { user } = useAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [requests, setRequests] = useState<VerificationRequest[]>([]);
+  const [pendingAgents, setPendingAgents] = useState<AgentProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState<VerificationRequest | null>(null);
+  const [selectedAgent, setSelectedAgent] = useState<AgentProfile | null>(null);
   const [reviewNotes, setReviewNotes] = useState("");
   const [processing, setProcessing] = useState(false);
 
@@ -58,7 +73,27 @@ export default function AdminAgentApprovals() {
       return;
     }
     loadRequests();
+    loadPendingAgents();
   }, [user, isAdmin, roleLoading, navigate]);
+
+  const loadPendingAgents = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("travel_agents")
+        .select('*')
+        .or('is_verified.eq.false,is_active.eq.false')
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setPendingAgents(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error loading agents",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   const loadRequests = async () => {
     try {
@@ -187,6 +222,69 @@ export default function AdminAgentApprovals() {
     }
   };
 
+  const handleApproveAgent = async () => {
+    if (!selectedAgent) return;
+
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from("travel_agents")
+        .update({
+          is_verified: true,
+          is_active: true,
+        })
+        .eq("id", selectedAgent.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Agent approved",
+        description: `${selectedAgent.agency_name} is now verified and active`,
+      });
+
+      setSelectedAgent(null);
+      loadPendingAgents();
+    } catch (error: any) {
+      toast({
+        title: "Approval failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleRejectAgent = async () => {
+    if (!selectedAgent) return;
+
+    setProcessing(true);
+    try {
+      const { error } = await supabase
+        .from("travel_agents")
+        .delete()
+        .eq("id", selectedAgent.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Agent rejected",
+        description: "Agent profile has been removed",
+      });
+
+      setSelectedAgent(null);
+      loadPendingAgents();
+    } catch (error: any) {
+      toast({
+        title: "Rejection failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
       pending: "secondary",
@@ -254,7 +352,63 @@ export default function AdminAgentApprovals() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1 container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-6">Agent Verification Approvals</h1>
+        <h1 className="text-3xl font-bold mb-6">Agent Management</h1>
+
+        {/* Pending Agent Profiles Section */}
+        {pendingAgents.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>New Agent Applications ({pendingAgents.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {pendingAgents.map((agent) => (
+                  <Card key={agent.id}>
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{agent.agency_name}</CardTitle>
+                          <p className="text-sm text-muted-foreground">{agent.email}</p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant={agent.is_active ? "default" : "secondary"}>
+                            {agent.is_active ? "Active" : "Inactive"}
+                          </Badge>
+                          <Badge variant={agent.is_verified ? "default" : "outline"}>
+                            {agent.is_verified ? "Verified" : "Unverified"}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <p className="text-sm">
+                          <span className="font-medium">Type:</span> {agent.business_type}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Phone:</span> {agent.phone}
+                        </p>
+                        <p className="text-sm">
+                          <span className="font-medium">Applied:</span>{" "}
+                          {new Date(agent.created_at).toLocaleDateString()}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setSelectedAgent(agent)}
+                          className="w-full mt-2"
+                        >
+                          <Eye className="mr-2 h-4 w-4" />
+                          Review Application
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue="pending" className="space-y-4">
           <TabsList>
@@ -389,6 +543,79 @@ export default function AdminAgentApprovals() {
                   </DialogFooter>
                 </>
               )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Agent Application Review Dialog */}
+      <Dialog open={!!selectedAgent} onOpenChange={() => setSelectedAgent(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Review Agent Application</DialogTitle>
+          </DialogHeader>
+
+          {selectedAgent && (
+            <div className="space-y-4">
+              <div>
+                <Label>Agency Name</Label>
+                <p className="text-sm mt-1">{selectedAgent.agency_name}</p>
+              </div>
+
+              <div>
+                <Label>Business Type</Label>
+                <p className="text-sm mt-1">{selectedAgent.business_type}</p>
+              </div>
+
+              <div>
+                <Label>Email</Label>
+                <p className="text-sm mt-1">{selectedAgent.email}</p>
+              </div>
+
+              <div>
+                <Label>Phone</Label>
+                <p className="text-sm mt-1">{selectedAgent.phone}</p>
+              </div>
+
+              <div>
+                <Label>Bio</Label>
+                <p className="text-sm mt-1">{selectedAgent.bio}</p>
+              </div>
+
+              <div>
+                <Label>Current Status</Label>
+                <div className="flex gap-2 mt-1">
+                  <Badge variant={selectedAgent.is_active ? "default" : "secondary"}>
+                    {selectedAgent.is_active ? "Active" : "Inactive"}
+                  </Badge>
+                  <Badge variant={selectedAgent.is_verified ? "default" : "outline"}>
+                    {selectedAgent.is_verified ? "Verified" : "Unverified"}
+                  </Badge>
+                </div>
+              </div>
+
+              <DialogFooter>
+                <Button
+                  variant="destructive"
+                  onClick={handleRejectAgent}
+                  disabled={processing}
+                >
+                  {processing ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <XCircle className="mr-2 h-4 w-4" />
+                  )}
+                  Reject & Delete
+                </Button>
+                <Button onClick={handleApproveAgent} disabled={processing}>
+                  {processing ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                  )}
+                  Approve & Activate
+                </Button>
+              </DialogFooter>
             </div>
           )}
         </DialogContent>
