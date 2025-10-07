@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import logomark from "@/assets/logomark-seal-gold.png";
 import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
 import { WakeWordDetector } from "@/utils/WakeWordDetector";
+import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -30,9 +31,11 @@ export const AIBookingConcierge = () => {
   const [voiceMode, setVoiceMode] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [wakeWordActive, setWakeWordActive] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
   const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
+  const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -41,6 +44,29 @@ export const AIBookingConcierge = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Initialize hold music generator
+  useEffect(() => {
+    holdMusicRef.current = new HoldMusicGenerator();
+    
+    return () => {
+      if (holdMusicRef.current) {
+        holdMusicRef.current.cleanup();
+        holdMusicRef.current = null;
+      }
+    };
+  }, []);
+
+  // Play/stop hold music based on processing state
+  useEffect(() => {
+    if (!holdMusicRef.current || !voiceMode) return;
+    
+    if (isProcessing) {
+      holdMusicRef.current.play();
+    } else {
+      holdMusicRef.current.stop();
+    }
+  }, [isProcessing, voiceMode]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -128,24 +154,35 @@ export const AIBookingConcierge = () => {
           (message) => {
             console.log('Voice message:', message);
             
-            if (message.type === 'response.audio_transcript.delta') {
-              if (!isAssistantSpeaking) {
-                isAssistantSpeaking = true;
-                currentAssistantMessage = '';
-              }
-              currentAssistantMessage += message.delta;
-              setMessages(prev => {
-                const filtered = prev.filter(m => !(m.role === 'assistant' && m.content === ''));
-                const lastMsg = filtered[filtered.length - 1];
-                if (lastMsg?.role === 'assistant' && isAssistantSpeaking) {
-                  return [...filtered.slice(0, -1), { role: 'assistant', content: currentAssistantMessage }];
+            if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
+              // AI is responding - stop processing state
+              setIsProcessing(false);
+              
+              if (message.type === 'response.audio_transcript.delta') {
+                if (!isAssistantSpeaking) {
+                  isAssistantSpeaking = true;
+                  currentAssistantMessage = '';
                 }
-                return [...filtered, { role: 'assistant', content: currentAssistantMessage }];
-              });
+                currentAssistantMessage += message.delta;
+                setMessages(prev => {
+                  const filtered = prev.filter(m => !(m.role === 'assistant' && m.content === ''));
+                  const lastMsg = filtered[filtered.length - 1];
+                  if (lastMsg?.role === 'assistant' && isAssistantSpeaking) {
+                    return [...filtered.slice(0, -1), { role: 'assistant', content: currentAssistantMessage }];
+                  }
+                  return [...filtered, { role: 'assistant', content: currentAssistantMessage }];
+                });
+              }
             } else if (message.type === 'response.audio_transcript.done') {
               isAssistantSpeaking = false;
+              setIsProcessing(false);
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
+              // User finished speaking - start processing state
+              setIsProcessing(true);
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
+            } else if (message.type === 'input_audio_buffer.speech_stopped') {
+              // User stopped speaking - start processing
+              setIsProcessing(true);
             }
           },
           (status) => setVoiceStatus(status as any)
@@ -187,6 +224,11 @@ export const AIBookingConcierge = () => {
       voiceChatRef.current?.disconnect();
       setVoiceMode(false);
       setVoiceStatus('disconnected');
+      setIsProcessing(false);
+      // Stop hold music
+      if (holdMusicRef.current) {
+        holdMusicRef.current.stop();
+      }
       // Resume wake word listening after call ends
       startWakeWordDetection();
     }
@@ -367,7 +409,7 @@ export const AIBookingConcierge = () => {
               {voiceMode && (
                 <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
                   <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                  Voice mode active - speak naturally
+                  {isProcessing ? 'Processing your request...' : 'Voice mode active - speak naturally'}
                 </div>
               )}
               <Button
