@@ -10,9 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star, MapPin, Briefcase, Search, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+
 
 export default function BrowseAgents() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [agents, setAgents] = useState<any[]>([]);
   const [filteredAgents, setFilteredAgents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,7 @@ export default function BrowseAgents() {
   const [minRating, setMinRating] = useState<number>(0);
   const [experienceRange, setExperienceRange] = useState<"all" | "0-2" | "3-5" | "5+">("all");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
+  const [myAgentProfile, setMyAgentProfile] = useState<any | null>(null);
 
   useEffect(() => {
     fetchAgents();
@@ -30,6 +34,23 @@ export default function BrowseAgents() {
   useEffect(() => {
     applyFilters();
   }, [agents, searchQuery, filterSpecialization, sortBy, minRating, experienceRange, selectedLanguage]);
+
+  // Fetch my agent profile for current user (to guide onboarding/visibility)
+  useEffect(() => {
+    const fetchMyProfile = async () => {
+      if (!user) {
+        setMyAgentProfile(null);
+        return;
+      }
+      const { data } = await supabase
+        .from('travel_agents')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      setMyAgentProfile(data || null);
+    };
+    fetchMyProfile();
+  }, [user]);
 
   const fetchAgents = async () => {
     try {
@@ -146,6 +167,38 @@ export default function BrowseAgents() {
           <h1 className="text-4xl font-chiffon text-primary mb-2">Browse Travel Agents</h1>
           <p className="text-muted-foreground">Find the perfect agent for your travel needs</p>
         </div>
+
+        {user && !myAgentProfile && (
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground mb-3">
+                You're not listed yet. Complete agent onboarding to appear here and bid on jobs.
+              </p>
+              <Button onClick={() => navigate('/agent-onboarding')}>Complete Agent Onboarding</Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {user && myAgentProfile && (!myAgentProfile.is_active || !myAgentProfile.is_verified) && (
+          <Card className="mb-6">
+            <CardContent className="pt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div>
+                  <p className="text-sm">Your profile status</p>
+                  <div className="flex gap-2 mt-1">
+                    <Badge variant={myAgentProfile.is_active ? 'secondary' : 'destructive'}>
+                      Active: {myAgentProfile.is_active ? 'Yes' : 'No'}
+                    </Badge>
+                    <Badge variant={myAgentProfile.is_verified ? 'secondary' : 'outline'}>
+                      Verified: {myAgentProfile.is_verified ? 'Yes' : 'Pending'}
+                    </Badge>
+                  </div>
+                </div>
+                <Button variant="outline" onClick={() => navigate('/agent-dashboard')}>Manage Profile</Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Filters */}
         <Card className="mb-6">
