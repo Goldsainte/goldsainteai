@@ -30,6 +30,7 @@ import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
+import TestGroupPayment from "./pages/TestGroupPayment";
 
 const queryClient = new QueryClient();
 
@@ -67,6 +68,7 @@ function AppContent() {
           <Route path="/hotel-booking" element={<HotelBooking />} />
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
           <Route path="/my-jobs" element={<MyJobs />} />
+          <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
