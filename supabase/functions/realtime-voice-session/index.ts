@@ -28,8 +28,8 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "shimmer",
-        instructions: `You are Goldsainte's luxury travel AI concierge. You are sophisticated, warm, and attentive. 
+        voice: "nova",
+        instructions: `You are Goldsainte's luxury travel AI concierge. You are sophisticated, warm, and attentive. Speak at a natural, conversational pace - not too fast, not too slow.
         
 Your role is to help users with:
 - Flight bookings and searches
@@ -41,7 +41,14 @@ Your role is to help users with:
 Be conversational and ask clarifying questions. Guide users through their travel planning with elegance and expertise.
 When users ask about availability or bookings, let them know you're checking and will provide options.
 
-Always maintain a refined, professional tone befitting a luxury travel service.`
+Always maintain a refined, professional tone befitting a luxury travel service.`,
+        modalities: ["text", "audio"],
+        turn_detection: {
+          type: "server_vad",
+          threshold: 0.5,
+          prefix_padding_ms: 300,
+          silence_duration_ms: 1000
+        }
       }),
     });
 

@@ -22,7 +22,7 @@ export const AIBookingConcierge = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge. How may I assist you with your travel plans today? Feel free to say 'Hey Goldsainte' to activate voice mode, or type your request."
+      content: "Hello! I'm your Goldsainte AI Concierge. Say 'Hey Goldsainte' anytime to chat with me by voice, or type your request below."
     }
   ]);
   const [input, setInput] = useState("");
@@ -111,22 +111,28 @@ export const AIBookingConcierge = () => {
         };
 
         let currentAssistantMessage = '';
+        let isAssistantSpeaking = false;
 
         voiceChatRef.current = new RealtimeVoiceChat(
           (message) => {
             console.log('Voice message:', message);
             
             if (message.type === 'response.audio_transcript.delta') {
+              if (!isAssistantSpeaking) {
+                isAssistantSpeaking = true;
+                currentAssistantMessage = '';
+              }
               currentAssistantMessage += message.delta;
               setMessages(prev => {
-                const lastMsg = prev[prev.length - 1];
-                if (lastMsg?.role === 'assistant' && lastMsg.content === currentAssistantMessage.slice(0, -message.delta.length)) {
-                  return [...prev.slice(0, -1), { role: 'assistant', content: currentAssistantMessage }];
+                const filtered = prev.filter(m => !(m.role === 'assistant' && m.content === ''));
+                const lastMsg = filtered[filtered.length - 1];
+                if (lastMsg?.role === 'assistant' && isAssistantSpeaking) {
+                  return [...filtered.slice(0, -1), { role: 'assistant', content: currentAssistantMessage }];
                 }
-                return [...prev, { role: 'assistant', content: currentAssistantMessage }];
+                return [...filtered, { role: 'assistant', content: currentAssistantMessage }];
               });
             } else if (message.type === 'response.audio_transcript.done') {
-              currentAssistantMessage = '';
+              isAssistantSpeaking = false;
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
             }
@@ -341,22 +347,9 @@ export const AIBookingConcierge = () => {
                 variant={voiceMode ? "default" : "outline"}
                 className={voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}
                 disabled={voiceStatus === 'connecting'}
+                title={voiceMode ? "End voice conversation" : "Start voice conversation"}
               >
                 {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-              </Button>
-              <Button
-                onClick={async () => {
-                  if (wakeWordActive) {
-                    wakeWordDetectorRef.current?.stop();
-                    setWakeWordActive(false);
-                    toast({ title: "Wake Word Disabled" });
-                  } else {
-                    await startWakeWordDetection();
-                  }
-                }}
-                variant={wakeWordActive ? "default" : "outline"}
-              >
-                {wakeWordActive ? "Wake On" : "Enable Wake"}
               </Button>
             </div>
           </div>
