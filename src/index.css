@@ -112,6 +112,19 @@ All colors MUST be HSL.
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
   }
+  
+  /* Improve text readability on mobile */
+  @media (max-width: 640px) {
+    body {
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    
+    /* Better spacing on mobile */
+    p + p {
+      margin-top: 1rem;
+    }
+  }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
   .scrollbar-hide::-webkit-scrollbar {
@@ -152,10 +165,17 @@ All colors MUST be HSL.
     @apply touch-manipulation;
   }
   
-  /* Minimum touch target size for important interactive elements */
-  button:not(.p-0):not([class*="icon"]), 
-  a[role="button"]:not(.p-0) {
-    min-height: 44px; /* iOS recommended touch target */
+  /* Minimum touch target size for accessibility (WCAG 2.5.5) */
+  button:not([class*="p-0"]):not([class*="icon"]), 
+  a[role="button"]:not([class*="p-0"]) {
+    min-height: 44px; /* iOS and WCAG recommended touch target */
+    min-width: 44px;
+  }
+  
+  /* Improve tap feedback on mobile */
+  button:active, a[role="button"]:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
   }
 
   /* Improve scrolling on mobile */
@@ -163,9 +183,14 @@ All colors MUST be HSL.
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Better focus for accessibility and mobile */
+  /* Better focus for accessibility (WCAG 2.4.7) */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
+  }
+  
+  /* Skip to main content for screen readers (WCAG 2.4.1) */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md;
   }
 
   /* Floating animation for category cards */
