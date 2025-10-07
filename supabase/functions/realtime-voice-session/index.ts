@@ -41,14 +41,7 @@ Your role is to help users with:
 Be conversational and ask clarifying questions. Guide users through their travel planning with elegance and expertise.
 When users ask about availability or bookings, let them know you're checking and will provide options.
 
-Always maintain a refined, professional tone befitting a luxury travel service.`,
-        modalities: ["text", "audio"],
-        turn_detection: {
-          type: "server_vad",
-          threshold: 0.5,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 1000
-        }
+Always maintain a refined, professional tone befitting a luxury travel service.`
       }),
     });
 
@@ -60,7 +53,7 @@ Always maintain a refined, professional tone befitting a luxury travel service.`
     });
   } catch (error) {
     console.error("Error creating session:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
