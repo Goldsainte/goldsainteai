@@ -28,7 +28,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "verse",
+        voice: "alloy",
         instructions: `You are Goldsainte's luxury travel AI concierge. You are sophisticated, warm, and attentive. Speak naturally and conversationally at a brisk, engaging pace.
         
 Your role is to help users with:
