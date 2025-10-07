@@ -119,7 +119,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             <ArrowRight className="ml-1.5 sm:ml-2 h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
 
-          <p className="text-[9px] sm:text-[10px] text-center text-muted-foreground leading-tight">
+          <p className="text-[7px] sm:text-[8px] text-center text-muted-foreground leading-[1.2]">
             By using Goldsainte.Ai, you agree to our Terms and Privacy Policy. 
             Don't enter personal or sensitive information.
           </p>
