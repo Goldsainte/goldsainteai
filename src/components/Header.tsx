@@ -182,7 +182,7 @@ export const Header = () => {
                     {isAdmin && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/admin-agent-approvals')} className="cursor-pointer min-h-[44px] text-sm font-medium text-primary">
+                        <DropdownMenuItem onClick={() => navigate('/admin/agent-approvals')} className="cursor-pointer min-h-[44px] text-sm font-medium text-primary">
                           Admin Panel
                         </DropdownMenuItem>
                       </>
