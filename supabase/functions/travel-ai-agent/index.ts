@@ -1094,7 +1094,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
         
         // Check if tool results actually contain any data
         const hasResults = toolResults.some(tr => {
-          const result = tr.result;
+          const result = tr.result.forUser || tr.result;
           if (!result) return false;
           
           // Check if results array has items
@@ -1119,7 +1119,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
 
         return new Response(JSON.stringify({
           message: fallbackMessage,
-          toolResults: toolResults.map(tr => tr.result),
+          toolResults: toolResults.map(tr => tr.result.forUser || tr.result),
           conversationHistory: [...conversationHistory, 
             { role: 'user', content: message },
             { role: 'assistant', content: fallbackMessage }
