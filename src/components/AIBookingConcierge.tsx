@@ -374,9 +374,9 @@ export const AIBookingConcierge = () => {
                 variant={voiceMode ? "default" : "outline"}
                 className={`h-12 w-12 md:h-10 md:w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}`}
                 disabled={voiceStatus === 'connecting'}
-                title={voiceMode ? "End voice conversation" : "Start voice conversation"}
+                title={voiceMode ? "Stop listening" : "Start listening"}
               >
-                {voiceMode ? <MicOff className="h-5 w-5 md:h-4 md:w-4" /> : <Mic className="h-5 w-5 md:h-4 md:w-4" />}
+                {voiceMode ? <Mic className="h-5 w-5 md:h-4 md:w-4" /> : <MicOff className="h-5 w-5 md:h-4 md:w-4" />}
               </Button>
             </div>
             {/* Mobile helper text */}
