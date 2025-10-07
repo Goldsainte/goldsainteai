@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import HotelBooking from "./pages/HotelBooking";
@@ -74,6 +75,7 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <AIBookingConcierge />
     </div>
   );
 }
