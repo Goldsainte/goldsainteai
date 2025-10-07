@@ -23,12 +23,10 @@ import { PaymentPlanSelector } from "@/components/PaymentPlanSelector";
 import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
 import { AIAgentMatching } from "@/components/AIAgentMatching";
 import { AgentBidForm } from "@/components/AgentBidForm";
-import { useUserRole } from "@/hooks/useUserRole";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 export default function Marketplace() {
   const { user, isLoading } = useAuth();
-  const { isAgent } = useUserRole();
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [myJobs, setMyJobs] = useState<any[]>([]);
@@ -45,6 +43,8 @@ export default function Marketplace() {
   const [reviewAgentName, setReviewAgentName] = useState<string>("");
   const [disputeJobId, setDisputeJobId] = useState<string | null>(null);
   const [jobAttachments, setJobAttachments] = useState<Record<string, any[]>>({});
+  const [isAgent, setIsAgent] = useState(false);
+  const [agentId, setAgentId] = useState<string | null>(null);
   const [hasExistingBid, setHasExistingBid] = useState(false);
 
   useEffect(() => {
@@ -54,8 +54,28 @@ export default function Marketplace() {
       return;
     }
 
+    checkAgentStatus();
     fetchJobs();
   }, [user, isLoading, navigate]);
+
+  const checkAgentStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('travel_agents')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!error && data) {
+        setIsAgent(true);
+        setAgentId(data.id);
+      }
+    } catch (error) {
+      console.error('Error checking agent status:', error);
+    }
+  };
 
   const fetchAttachments = async (jobId: string) => {
     try {
@@ -130,23 +150,15 @@ export default function Marketplace() {
     }
 
     // Check if agent already submitted a bid
-    if (isAgent && user) {
-      const { data: agentData } = await supabase
-        .from('travel_agents')
+    if (isAgent && agentId) {
+      const { data: existingBid } = await supabase
+        .from('agent_bids')
         .select('id')
-        .eq('user_id', user.id)
-        .single();
+        .eq('job_id', job.id)
+        .eq('agent_id', agentId)
+        .maybeSingle();
 
-      if (agentData) {
-        const { data: existingBid } = await supabase
-          .from('agent_bids')
-          .select('id')
-          .eq('job_id', job.id)
-          .eq('agent_id', agentData.id)
-          .maybeSingle();
-
-        setHasExistingBid(!!existingBid);
-      }
+      setHasExistingBid(!!existingBid);
     }
     
     setIsViewJobDialogOpen(true);
