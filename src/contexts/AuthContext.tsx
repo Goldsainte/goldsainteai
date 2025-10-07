@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "You've successfully signed in.",
       });
       
-      navigate('/');
+      // Do not navigate here; let calling page handle post-login redirect
       return { error: null };
     } catch (error: any) {
       return { error };

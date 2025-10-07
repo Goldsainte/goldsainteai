@@ -34,7 +34,15 @@ const Auth = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      // Check if user has preferences set
+      // Prefer returning to the page that triggered login
+      const params = new URLSearchParams(window.location.search);
+      const returnTo = params.get('returnTo');
+      if (returnTo && returnTo.startsWith('/')) {
+        navigate(returnTo, { replace: true });
+        return;
+      }
+
+      // Otherwise fallback to preferences-based routing
       const checkPreferences = async () => {
         const { data } = await supabase
           .from('user_booking_preferences')
@@ -43,9 +51,9 @@ const Auth = () => {
           .maybeSingle();
         
         if (data) {
-          navigate('/');
+          navigate('/', { replace: true });
         } else {
-          navigate('/onboarding');
+          navigate('/onboarding', { replace: true });
         }
       };
       checkPreferences();
