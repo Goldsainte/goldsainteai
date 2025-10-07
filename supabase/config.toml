@@ -120,3 +120,9 @@ verify_jwt = false
 [functions.notify-new-bid]
 verify_jwt = false
 
+[functions.create-group-payment-links]
+verify_jwt = true
+
+[functions.verify-group-payment]
+verify_jwt = false
+

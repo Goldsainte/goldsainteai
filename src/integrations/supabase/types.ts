@@ -668,6 +668,36 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          messages: Json
+          preview: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          messages?: Json
+          preview?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          messages?: Json
+          preview?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       currency_exchange_rates: {
         Row: {
           created_at: string
@@ -858,6 +888,65 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      group_booking_travelers: {
+        Row: {
+          amount_owed: number
+          created_at: string
+          currency: string
+          id: string
+          job_id: string
+          paid_at: string | null
+          payment_intent_id: string | null
+          payment_reminder_sent_at: string | null
+          payment_status: string
+          stripe_payment_link: string | null
+          traveler_email: string
+          traveler_name: string
+          traveler_number: number
+          updated_at: string
+        }
+        Insert: {
+          amount_owed: number
+          created_at?: string
+          currency?: string
+          id?: string
+          job_id: string
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_reminder_sent_at?: string | null
+          payment_status?: string
+          stripe_payment_link?: string | null
+          traveler_email: string
+          traveler_name: string
+          traveler_number: number
+          updated_at?: string
+        }
+        Update: {
+          amount_owed?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          job_id?: string
+          paid_at?: string | null
+          payment_intent_id?: string | null
+          payment_reminder_sent_at?: string | null
+          payment_status?: string
+          stripe_payment_link?: string | null
+          traveler_email?: string
+          traveler_name?: string
+          traveler_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_booking_travelers_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
             referencedColumns: ["id"]
           },
         ]
@@ -1199,13 +1288,17 @@ export type Database = {
           expires_at: string
           funds_released: boolean | null
           funds_released_at: string | null
+          group_organizer_email: string | null
+          group_payment_mode: string | null
           id: string
           installment_plan_id: string | null
+          is_group_booking: boolean | null
           number_of_travelers: number | null
           paid_at: string | null
           payment_intent_id: string | null
           payment_plan_enabled: boolean | null
           payment_status: string | null
+          payments_collected: number | null
           refund_guarantee_enabled: boolean | null
           refund_guarantee_id: string | null
           rejection_reason: string | null
@@ -1215,6 +1308,7 @@ export type Database = {
           success_fee_collected: number | null
           title: string
           total_paid_amount: number | null
+          total_travelers: number | null
           travel_dates: Json | null
           updated_at: string
           user_id: string
@@ -1241,13 +1335,17 @@ export type Database = {
           expires_at?: string
           funds_released?: boolean | null
           funds_released_at?: string | null
+          group_organizer_email?: string | null
+          group_payment_mode?: string | null
           id?: string
           installment_plan_id?: string | null
+          is_group_booking?: boolean | null
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_intent_id?: string | null
           payment_plan_enabled?: boolean | null
           payment_status?: string | null
+          payments_collected?: number | null
           refund_guarantee_enabled?: boolean | null
           refund_guarantee_id?: string | null
           rejection_reason?: string | null
@@ -1257,6 +1355,7 @@ export type Database = {
           success_fee_collected?: number | null
           title: string
           total_paid_amount?: number | null
+          total_travelers?: number | null
           travel_dates?: Json | null
           updated_at?: string
           user_id: string
@@ -1283,13 +1382,17 @@ export type Database = {
           expires_at?: string
           funds_released?: boolean | null
           funds_released_at?: string | null
+          group_organizer_email?: string | null
+          group_payment_mode?: string | null
           id?: string
           installment_plan_id?: string | null
+          is_group_booking?: boolean | null
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_intent_id?: string | null
           payment_plan_enabled?: boolean | null
           payment_status?: string | null
+          payments_collected?: number | null
           refund_guarantee_enabled?: boolean | null
           refund_guarantee_id?: string | null
           rejection_reason?: string | null
@@ -1299,6 +1402,7 @@ export type Database = {
           success_fee_collected?: number | null
           title?: string
           total_paid_amount?: number | null
+          total_travelers?: number | null
           travel_dates?: Json | null
           updated_at?: string
           user_id?: string
