@@ -101,17 +101,25 @@ export const AIBookingConcierge = () => {
           return data.client_secret.value;
         };
 
+        let currentAssistantMessage = '';
+
         voiceChatRef.current = new RealtimeVoiceChat(
           (message) => {
             console.log('Voice message:', message);
+            
             if (message.type === 'response.audio_transcript.delta') {
+              currentAssistantMessage += message.delta;
               setMessages(prev => {
                 const lastMsg = prev[prev.length - 1];
-                if (lastMsg?.role === 'assistant') {
-                  return [...prev.slice(0, -1), { role: 'assistant', content: lastMsg.content + message.delta }];
+                if (lastMsg?.role === 'assistant' && lastMsg.content === currentAssistantMessage.slice(0, -message.delta.length)) {
+                  return [...prev.slice(0, -1), { role: 'assistant', content: currentAssistantMessage }];
                 }
-                return [...prev, { role: 'assistant', content: message.delta }];
+                return [...prev, { role: 'assistant', content: currentAssistantMessage }];
               });
+            } else if (message.type === 'response.audio_transcript.done') {
+              currentAssistantMessage = '';
+            } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
+              setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
             }
           },
           (status) => setVoiceStatus(status as any)
@@ -210,10 +218,19 @@ export const AIBookingConcierge = () => {
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
-                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
+                  {msg.role === 'assistant' && (
+                    <div className="flex-shrink-0">
+                      <img 
+                        src={logomark} 
+                        alt="Goldsainte" 
+                        className="w-8 h-8 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                      />
+                    </div>
+                  )}
                   <div
-                    className={`max-w-[80%] rounded-lg p-3 ${
+                    className={`max-w-[75%] rounded-lg p-3 ${
                       msg.role === 'user'
                         ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
                         : 'bg-muted text-foreground'
@@ -224,7 +241,14 @@ export const AIBookingConcierge = () => {
                 </div>
               ))}
               {isLoading && (
-                <div className="flex justify-start">
+                <div className="flex justify-start gap-2">
+                  <div className="flex-shrink-0">
+                    <img 
+                      src={logomark} 
+                      alt="Goldsainte" 
+                      className="w-8 h-8 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                    />
+                  </div>
                   <div className="bg-muted rounded-lg p-3">
                     <Loader2 className="h-4 w-4 animate-spin text-primary" />
                   </div>
