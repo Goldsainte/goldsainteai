@@ -8,6 +8,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useUserRole } from "@/hooks/useUserRole";
 import logomark from "@/assets/logomark-seal-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 
@@ -16,6 +17,7 @@ export const Header = () => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const { isAdmin } = useUserRole();
   const [usePreferences, setUsePreferences] = useState(true);
 
   // Fetch user's preference setting
@@ -176,6 +178,15 @@ export const Header = () => {
                     <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer min-h-[44px] text-sm">
                       Booking Preferences
                     </DropdownMenuItem>
+                    
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => navigate('/admin-agent-approvals')} className="cursor-pointer min-h-[44px] text-sm font-medium text-primary">
+                          Admin Panel
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     
                     <DropdownMenuSeparator />
                     
