@@ -520,26 +520,40 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
               <Button 
                 onClick={() => {
-                  // Validate passenger info before proceeding
-                  const origin = flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode;
-                  const destination = flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode;
-                  const isInternational = origin?.slice(0, 2) !== destination?.slice(0, 2);
+                  // Validate passenger info before proceeding (consistent with handleBooking)
+                  const originSegment = flight.itineraries?.[0]?.segments?.[0];
+                  const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
+                  const originCountry = originSegment?.departure?.address?.countryCode;
+                  const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
+                  const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
 
                   for (let i = 0; i < passengers.length; i++) {
                     const p = passengers[i];
-                    if (!p.title || !p.firstName || !p.lastName || !p.dateOfBirth || !p.gender || !p.nationality) {
-                      toast.error(`Please complete all required fields for passenger ${i + 1}`);
-                      return;
-                    }
-                    
+
+                    const title = p.title?.trim();
+                    const firstName = p.firstName?.trim();
+                    const lastName = p.lastName?.trim();
+                    const dateOfBirth = p.dateOfBirth?.trim();
+                    const gender = p.gender?.trim();
+                    const nationality = p.nationality?.trim();
+
+                    if (!title) { toast.error(`Passenger ${i + 1}: Title is required`); return; }
+                    if (!firstName) { toast.error(`Passenger ${i + 1}: First name is required`); return; }
+                    if (!lastName) { toast.error(`Passenger ${i + 1}: Last name is required`); return; }
+                    if (!dateOfBirth) { toast.error(`Passenger ${i + 1}: Date of birth is required`); return; }
+                    if (!gender) { toast.error(`Passenger ${i + 1}: Gender is required`); return; }
+                    if (!nationality) { toast.error(`Passenger ${i + 1}: Nationality is required`); return; }
+
                     if (isInternational) {
-                      if (!p.passportNumber || !p.passportExpiry || !p.passportCountry) {
-                        toast.error(`Passport information is required for international flights (Passenger ${i + 1})`);
+                      const passportNumber = p.passportNumber?.trim();
+                      const passportExpiry = p.passportExpiry?.trim();
+                      const passportCountry = p.passportCountry?.trim();
+                      if (!passportNumber || !passportExpiry || !passportCountry) {
+                        toast.error(`Passport details are required for international flights (Passenger ${i + 1})`);
                         return;
                       }
                     }
                   }
-                  
                   setStep(2);
                 }} 
                 className="w-full"
