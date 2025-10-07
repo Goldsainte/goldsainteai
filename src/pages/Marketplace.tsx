@@ -527,7 +527,7 @@ export default function Marketplace() {
               <AIAgentMatching
                 jobId={selectedJob.id}
                 onSelectAgent={(agentId) => {
-                  navigate(`/agents/${agentId}`);
+                  navigate(`/agent/${agentId}`);
                 }}
               />
             )}
