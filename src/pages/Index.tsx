@@ -948,22 +948,46 @@ const Index = () => {
   const showChat = messages.length > 0;
 
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full">
-        {/* Show sidebar only for logged in users and when in chat mode */}
-        {user && showChat && (
-          <SearchHistorySidebar
-            currentConversationId={currentConversationId}
-            onSelectConversation={loadConversation}
-            onNewChat={resetChat}
-          />
-        )}
-        
-        <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
-          <div className="w-full h-full flex flex-col">
-            {!showChat ? (
-              // Initial search view - ChatGPT style centered
-              <div className="flex-1 flex flex-col">
+    <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="w-full h-full flex flex-col">
+        {!showChat ? (
+          // Initial search view - ChatGPT style centered
+          <div className="flex-1 flex flex-col">
+        <SidebarProvider>
+          <div className="flex min-h-screen w-full">
+            {/* Sidebar - hidden on mobile, visible on desktop */}
+            <div className="hidden lg:block">
+              <SearchHistorySidebar
+                currentConversationId={currentConversationId}
+                onSelectConversation={loadConversation}
+                onNewChat={resetChat}
+              />
+            </div>
+            
+            <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+              <div className="w-full h-full flex flex-col">
+                {/* Chat view */}
+                <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
+                  {/* Header */}
+                  <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                    <div className="flex items-center justify-between px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        {/* Sidebar toggle - only on desktop */}
+                        <div className="hidden lg:block">
+                          <SidebarTrigger className="h-8 w-8" />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={resetChat}
+                          className="rounded-full"
+                        >
+                          <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <img src={logomark} alt="Logo" className="h-8 w-8" />
+                      </div>
+                    </div>
+                  </div>
             {/* Centered Search Area */}
             <div className="min-h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center px-4 py-6 md:py-8">
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1383,27 +1407,39 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          // Chat view - full screen
-          <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
-            {/* Header */}
-            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-              <div className="flex items-center justify-between px-6 py-4">
-                <div className="flex items-center gap-3">
-                  {user && (
-                    <SidebarTrigger className="h-8 w-8" />
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={resetChat}
-                    className="rounded-full"
-                  >
-                    <ArrowLeft className="h-5 w-5" />
-                  </Button>
-                  <img src={logomark} alt="Logo" className="h-8 w-8" />
+          // Chat view with sidebar for logged-in users
+          user ? (
+            <SidebarProvider>
+              <div className="flex min-h-screen w-full">
+                {/* Sidebar - hidden on mobile */}
+                <div className="hidden lg:block">
+                  <SearchHistorySidebar
+                    currentConversationId={currentConversationId}
+                    onSelectConversation={loadConversation}
+                    onNewChat={resetChat}
+                  />
                 </div>
-              </div>
-            </div>
+                
+                <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
+                  {/* Header */}
+                  <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                    <div className="flex items-center justify-between px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="hidden lg:block">
+                          <SidebarTrigger className="h-8 w-8" />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={resetChat}
+                          className="rounded-full"
+                        >
+                          <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <img src={logomark} alt="Logo" className="h-8 w-8" />
+                      </div>
+                    </div>
+                  </div>
 
             {/* Messages */}
             <ScrollArea className="flex-1 px-6">
@@ -1767,11 +1803,28 @@ const Index = () => {
             />
           </div>
         )}
-        </div>
-      </main>
-    </div>
-  </SidebarProvider>
-  );
+                </div>
+              </div>
+            </SidebarProvider>
+          ) : (
+            // Chat view for non-logged-in users (no sidebar)
+            <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
+              {/* Header */}
+              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+                <div className="flex items-center justify-between px-6 py-4">
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={resetChat}
+                      className="rounded-full"
+                    >
+                      <ArrowLeft className="h-5 w-5" />
+                    </Button>
+                    <img src={logomark} alt="Logo" className="h-8 w-8" />
+                  </div>
+                </div>
+              </div>
 };
 
 export default Index;
