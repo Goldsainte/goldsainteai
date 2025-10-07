@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Minimize2, Maximize2 } from "lucide-react";
+import { X, Send, Loader2, Minimize2, Maximize2, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import logomark from "@/assets/logomark-seal-gold.png";
+import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -25,7 +26,10 @@ export const AIBookingConcierge = () => {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const scrollRef = useRef<HTMLDivElement>(null);
+  const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -85,6 +89,62 @@ export const AIBookingConcierge = () => {
       handleSend();
     }
   };
+
+  const toggleVoiceMode = async () => {
+    if (!voiceMode) {
+      try {
+        setVoiceStatus('connecting');
+        
+        const getSessionToken = async () => {
+          const { data, error } = await supabase.functions.invoke('realtime-voice-session');
+          if (error) throw error;
+          return data.client_secret.value;
+        };
+
+        voiceChatRef.current = new RealtimeVoiceChat(
+          (message) => {
+            console.log('Voice message:', message);
+            if (message.type === 'response.audio_transcript.delta') {
+              setMessages(prev => {
+                const lastMsg = prev[prev.length - 1];
+                if (lastMsg?.role === 'assistant') {
+                  return [...prev.slice(0, -1), { role: 'assistant', content: lastMsg.content + message.delta }];
+                }
+                return [...prev, { role: 'assistant', content: message.delta }];
+              });
+            }
+          },
+          (status) => setVoiceStatus(status as any)
+        );
+
+        await voiceChatRef.current.init(getSessionToken);
+        setVoiceMode(true);
+        
+        toast({
+          title: "Voice Mode Active",
+          description: "You can now speak naturally with the AI concierge",
+        });
+      } catch (error) {
+        console.error('Voice error:', error);
+        setVoiceStatus('error');
+        toast({
+          title: "Voice Error",
+          description: "Failed to start voice mode",
+          variant: "destructive",
+        });
+      }
+    } else {
+      voiceChatRef.current?.disconnect();
+      setVoiceMode(false);
+      setVoiceStatus('disconnected');
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      voiceChatRef.current?.disconnect();
+    };
+  }, []);
 
   if (!isOpen) {
     return (
@@ -176,21 +236,40 @@ export const AIBookingConcierge = () => {
           {/* Input Area */}
           <div className="p-4 border-t border-border">
             <div className="flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                placeholder="Type your travel request..."
-                className="flex-1"
-                disabled={isLoading}
-              />
+              {!voiceMode && (
+                <>
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Type your travel request..."
+                    className="flex-1"
+                    disabled={isLoading}
+                  />
+                  <Button
+                    onClick={handleSend}
+                    disabled={isLoading || !input.trim()}
+                    size="icon"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+              {voiceMode && (
+                <div className="flex-1 flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                  <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                  Voice mode active - speak naturally
+                </div>
+              )}
               <Button
-                onClick={handleSend}
-                disabled={isLoading || !input.trim()}
+                onClick={toggleVoiceMode}
                 size="icon"
-                className="bg-gradient-to-r from-primary to-accent hover:opacity-90"
+                variant={voiceMode ? "default" : "outline"}
+                className={voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}
+                disabled={voiceStatus === 'connecting'}
               >
-                <Send className="h-4 w-4" />
+                {voiceMode ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
               </Button>
             </div>
           </div>
