@@ -19,8 +19,6 @@ import {
   Bike, 
   MessageCircle 
 } from "lucide-react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { SearchHistorySidebar } from "@/components/SearchHistorySidebar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -147,8 +145,6 @@ const Index = () => {
   const [usePreferences, setUsePreferences] = useState(true);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [isSavingConversation, setIsSavingConversation] = useState(false);
 
   const handleCloseWelcome = () => {
     setShowWelcomeModal(false);
@@ -829,94 +825,7 @@ const Index = () => {
     setShowTripTypeSelector(false);
     setSelectedTripType(null);
     selectedTripTypeRef.current = null;
-    setCurrentConversationId(null);
   };
-
-  const saveConversation = async () => {
-    if (!user || messages.length === 0 || isSavingConversation) return;
-
-    setIsSavingConversation(true);
-    
-    // Generate title from first user message
-    const firstUserMessage = messages.find(m => m.role === 'user');
-    const title = firstUserMessage 
-      ? firstUserMessage.content.substring(0, 100) 
-      : 'New Conversation';
-    
-    // Generate preview from first assistant message
-    const firstAssistantMessage = messages.find(m => m.role === 'assistant');
-    const preview = firstAssistantMessage 
-      ? firstAssistantMessage.content.substring(0, 150) 
-      : null;
-
-    try {
-      if (currentConversationId) {
-        // Update existing conversation
-        const { error } = await supabase
-          .from('conversations')
-          .update({
-            title,
-            preview,
-            messages: JSON.stringify(messages),
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', currentConversationId);
-
-        if (error) throw error;
-      } else {
-        // Create new conversation
-        const { data, error } = await supabase
-          .from('conversations')
-          .insert({
-            user_id: user.id,
-            title,
-            preview,
-            messages: JSON.stringify(messages),
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        if (data) setCurrentConversationId(data.id);
-      }
-    } catch (error) {
-      console.error('Error saving conversation:', error);
-    } finally {
-      setIsSavingConversation(false);
-    }
-  };
-
-  const loadConversation = (conversation: any) => {
-    try {
-      const parsedMessages = typeof conversation.messages === 'string' 
-        ? JSON.parse(conversation.messages) 
-        : conversation.messages;
-      
-      setMessages(parsedMessages);
-      setCurrentConversationId(conversation.id);
-      
-      // Scroll to top to show chat
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) {
-      console.error('Error loading conversation:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load conversation",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Save conversation whenever messages change
-  useEffect(() => {
-    if (messages.length > 0 && user) {
-      const timeoutId = setTimeout(() => {
-        saveConversation();
-      }, 2000); // Debounce saves by 2 seconds
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [messages, user]);
 
   const handlePriceSelected = (price: number) => {
     setShowPriceSlider(null);
@@ -953,41 +862,6 @@ const Index = () => {
         {!showChat ? (
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
-        <SidebarProvider>
-          <div className="flex min-h-screen w-full">
-            {/* Sidebar - hidden on mobile, visible on desktop */}
-            <div className="hidden lg:block">
-              <SearchHistorySidebar
-                currentConversationId={currentConversationId}
-                onSelectConversation={loadConversation}
-                onNewChat={resetChat}
-              />
-            </div>
-            
-            <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
-              <div className="w-full h-full flex flex-col">
-                {/* Chat view */}
-                <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
-                  {/* Header */}
-                  <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-                    <div className="flex items-center justify-between px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        {/* Sidebar toggle - only on desktop */}
-                        <div className="hidden lg:block">
-                          <SidebarTrigger className="h-8 w-8" />
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={resetChat}
-                          className="rounded-full"
-                        >
-                          <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                        <img src={logomark} alt="Logo" className="h-8 w-8" />
-                      </div>
-                    </div>
-                  </div>
             {/* Centered Search Area */}
             <div className="min-h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center px-4 py-6 md:py-8">
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1407,39 +1281,24 @@ const Index = () => {
             </div>
           </div>
         ) : (
-          // Chat view with sidebar for logged-in users
-          user ? (
-            <SidebarProvider>
-              <div className="flex min-h-screen w-full">
-                {/* Sidebar - hidden on mobile */}
-                <div className="hidden lg:block">
-                  <SearchHistorySidebar
-                    currentConversationId={currentConversationId}
-                    onSelectConversation={loadConversation}
-                    onNewChat={resetChat}
-                  />
+          // Chat view - full screen
+          <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+              <div className="flex items-center justify-between px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={resetChat}
+                    className="rounded-full"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                  </Button>
+                  <img src={logomark} alt="Logo" className="h-8 w-8" />
                 </div>
-                
-                <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
-                  {/* Header */}
-                  <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-                    <div className="flex items-center justify-between px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="hidden lg:block">
-                          <SidebarTrigger className="h-8 w-8" />
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={resetChat}
-                          className="rounded-full"
-                        >
-                          <ArrowLeft className="h-5 w-5" />
-                        </Button>
-                        <img src={logomark} alt="Logo" className="h-8 w-8" />
-                      </div>
-                    </div>
-                  </div>
+              </div>
+            </div>
 
             {/* Messages */}
             <ScrollArea className="flex-1 px-6">
@@ -1803,28 +1662,9 @@ const Index = () => {
             />
           </div>
         )}
-                </div>
-              </div>
-            </SidebarProvider>
-          ) : (
-            // Chat view for non-logged-in users (no sidebar)
-            <div className="flex-1 flex flex-col max-w-7xl w-full mx-auto">
-              {/* Header */}
-              <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-                <div className="flex items-center justify-between px-6 py-4">
-                  <div className="flex items-center gap-3">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={resetChat}
-                      className="rounded-full"
-                    >
-                      <ArrowLeft className="h-5 w-5" />
-                    </Button>
-                    <img src={logomark} alt="Logo" className="h-8 w-8" />
-                  </div>
-                </div>
-              </div>
+      </div>
+    </main>
+  );
 };
 
 export default Index;
