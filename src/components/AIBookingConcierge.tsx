@@ -25,7 +25,7 @@ export const AIBookingConcierge = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge. Say 'Hey Goldsainte' anytime to chat with me by voice, or type your request below."
+      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, restaurants, events, and check visa requirements. What are you planning today?"
     }
   ]);
   const [input, setInput] = useState("");
