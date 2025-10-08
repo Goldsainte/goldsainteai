@@ -61,9 +61,13 @@ export const AIBookingConcierge = () => {
   useEffect(() => {
     if (!holdMusicRef.current || !voiceMode) return;
     
+    console.log('Hold music state change:', { isProcessing, voiceMode });
+    
     if (isProcessing) {
+      console.log('Starting hold music');
       holdMusicRef.current.play();
     } else {
+      console.log('Stopping hold music');
       holdMusicRef.current.stop();
     }
   }, [isProcessing, voiceMode]);
@@ -156,6 +160,7 @@ export const AIBookingConcierge = () => {
             
             if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
               // AI is responding - stop processing state
+              console.log('AI is responding, stopping processing state');
               setIsProcessing(false);
               
               if (message.type === 'response.audio_transcript.delta') {
@@ -174,14 +179,21 @@ export const AIBookingConcierge = () => {
                 });
               }
             } else if (message.type === 'response.audio_transcript.done') {
+              console.log('AI finished speaking');
               isAssistantSpeaking = false;
               setIsProcessing(false);
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
               // User finished speaking - start processing state
+              console.log('User finished speaking, starting processing state');
               setIsProcessing(true);
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
             } else if (message.type === 'input_audio_buffer.speech_stopped') {
               // User stopped speaking - start processing
+              console.log('Speech stopped, starting processing state');
+              setIsProcessing(true);
+            } else if (message.type === 'response.created') {
+              // AI is starting to respond - might help catch the processing state earlier
+              console.log('Response created, AI is thinking');
               setIsProcessing(true);
             }
           },

@@ -11,8 +11,13 @@ export class HoldMusicGenerator {
   }
 
   play() {
-    if (this.isPlaying || !this.audioContext) return;
+    if (this.isPlaying || !this.audioContext) {
+      console.log('Hold music already playing or no audio context');
+      return;
+    }
 
+    console.log('Creating hold music oscillators');
+    
     // Create two oscillators for a richer ambient sound
     this.oscillator1 = this.audioContext.createOscillator();
     this.oscillator2 = this.audioContext.createOscillator();
@@ -37,6 +42,8 @@ export class HoldMusicGenerator {
     // Start the oscillators
     this.oscillator1.start();
     this.oscillator2.start();
+
+    console.log('Hold music oscillators started, fading in');
 
     // Fade in over 0.5 seconds
     this.gainNode.gain.linearRampToValueAtTime(
