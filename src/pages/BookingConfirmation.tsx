@@ -18,8 +18,15 @@ const BookingConfirmation = () => {
   const bookingId = searchParams.get("booking_id");
 
   useEffect(() => {
-    if (sessionId && bookingId) {
-      verifyPayment();
+    // Handle both old flow (verify-payment) and new flow (verify-booking-payment)
+    if (sessionId) {
+      if (bookingId) {
+        // Old flow
+        verifyPayment();
+      } else {
+        // New flow from AI chat
+        verifyAIChatBooking();
+      }
     }
   }, [sessionId, bookingId]);
 
@@ -35,6 +42,28 @@ const BookingConfirmation = () => {
       setBooking(data.booking);
     } catch (error) {
       console.error('Payment verification error:', error);
+      setPaymentStatus('failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const verifyAIChatBooking = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-booking-payment', {
+        body: { sessionId }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setPaymentStatus('paid');
+        setBooking(data.booking);
+      } else {
+        setPaymentStatus('failed');
+      }
+    } catch (error) {
+      console.error('AI chat booking verification error:', error);
       setPaymentStatus('failed');
     } finally {
       setLoading(false);

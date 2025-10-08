@@ -397,6 +397,21 @@ export const AIBookingConcierge = () => {
                   
                   {/* Display hotel results if available */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
+                    // Handle payment link from booking
+                    if (result.url && result.sessionId) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8">
+                          <Button 
+                            onClick={() => window.open(result.url, '_blank')}
+                            className="w-full bg-primary hover:bg-primary/90"
+                          >
+                            Complete Payment to Confirm Booking
+                          </Button>
+                        </div>
+                      );
+                    }
+                    
+                    // Display search results
                     if (result.results && Array.isArray(result.results) && result.results.length > 0) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8 space-y-2">
