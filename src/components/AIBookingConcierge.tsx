@@ -62,6 +62,27 @@ export const AIBookingConcierge = () => {
     }
   }, [messages]);
 
+  // Prevent body scroll when modal is open on mobile
+  useEffect(() => {
+    if (isOpen && !isMinimized) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, [isOpen, isMinimized]);
+
   // Handle hold music during voice processing
   useEffect(() => {
     if (voiceMode && isProcessing) {
@@ -518,12 +539,12 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
-        isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
-      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[600px]'}`}
+      className={`fixed md:bottom-6 md:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all
+        ${isMinimized ? 'w-80 md:w-80 bottom-6 right-6 rounded-lg' : 'inset-0 md:inset-auto md:bottom-6 md:right-6 md:w-96 md:max-w-md md:rounded-lg rounded-none'}
+        ${isMinimized ? 'h-16' : 'h-[100dvh] md:h-[600px] md:max-h-[600px]'}`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
+      <div className="bg-gradient-to-r from-primary to-accent p-4 md:rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
             <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
@@ -579,7 +600,7 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
+          <ScrollArea className="h-[calc(100dvh-180px)] md:h-[calc(600px-140px)] p-3 md:p-4" ref={scrollRef}>
             <div className="space-y-3">
               {messages.map((msg, idx) => (
                 <div key={idx}>
@@ -750,7 +771,7 @@ export const AIBookingConcierge = () => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-3 border-t border-border">
+          <div className="p-3 md:p-4 border-t border-border pb-[max(0.75rem,env(safe-area-inset-bottom))]">
             <div className="flex gap-2">
               {!voiceMode && (
                 <>
