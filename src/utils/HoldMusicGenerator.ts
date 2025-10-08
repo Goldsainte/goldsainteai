@@ -1,93 +1,105 @@
-// Generate elegant ambient hold music using Web Audio API
+// Play elegant hold music using actual audio file
 export class HoldMusicGenerator {
-  private audioContext: AudioContext | null = null;
-  private oscillator1: OscillatorNode | null = null;
-  private oscillator2: OscillatorNode | null = null;
-  private gainNode: GainNode | null = null;
+  private audio: HTMLAudioElement | null = null;
   private isPlaying = false;
+  private fadeInterval: NodeJS.Timeout | null = null;
 
   constructor() {
-    this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    // Use a royalty-free smooth jazz track
+    this.audio = new Audio('https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3');
+    this.audio.loop = true;
+    this.audio.volume = 0;
+    this.audio.preload = 'auto';
   }
 
-  play() {
-    if (this.isPlaying || !this.audioContext) {
-      console.log('Hold music already playing or no audio context');
+  async play() {
+    if (this.isPlaying || !this.audio) {
+      console.log('Hold music already playing or no audio element');
       return;
     }
 
-    console.log('Creating hold music oscillators');
+    console.log('Starting hold music');
     
-    // Create two oscillators for a richer ambient sound
-    this.oscillator1 = this.audioContext.createOscillator();
-    this.oscillator2 = this.audioContext.createOscillator();
-    this.gainNode = this.audioContext.createGain();
+    try {
+      // Start playing
+      await this.audio.play();
+      this.isPlaying = true;
 
-    // Set frequencies for a calming, elegant tone (C and E notes)
-    this.oscillator1.frequency.value = 261.63; // C4
-    this.oscillator2.frequency.value = 329.63; // E4
-    
-    // Use sine waves for smooth, pleasant sound
-    this.oscillator1.type = 'sine';
-    this.oscillator2.type = 'sine';
+      // Fade in over 1 second
+      const targetVolume = 0.15; // Low volume for subtle background
+      const steps = 20;
+      const stepDuration = 50; // 50ms per step = 1 second total
+      const volumeIncrement = targetVolume / steps;
+      
+      let currentStep = 0;
+      this.fadeInterval = setInterval(() => {
+        if (!this.audio) return;
+        
+        currentStep++;
+        this.audio.volume = Math.min(volumeIncrement * currentStep, targetVolume);
+        
+        if (currentStep >= steps) {
+          if (this.fadeInterval) {
+            clearInterval(this.fadeInterval);
+            this.fadeInterval = null;
+          }
+        }
+      }, stepDuration);
 
-    // Set initial volume to 0 for fade in
-    this.gainNode.gain.value = 0;
-
-    // Connect the audio nodes
-    this.oscillator1.connect(this.gainNode);
-    this.oscillator2.connect(this.gainNode);
-    this.gainNode.connect(this.audioContext.destination);
-
-    // Start the oscillators
-    this.oscillator1.start();
-    this.oscillator2.start();
-
-    console.log('Hold music oscillators started, fading in');
-
-    // Fade in over 0.5 seconds
-    this.gainNode.gain.linearRampToValueAtTime(
-      0.08, // Low volume for subtle background
-      this.audioContext.currentTime + 0.5
-    );
-
-    this.isPlaying = true;
+      console.log('Hold music playing and fading in');
+    } catch (error) {
+      console.error('Error playing hold music:', error);
+      this.isPlaying = false;
+    }
   }
 
   stop() {
-    if (!this.isPlaying || !this.audioContext || !this.gainNode) return;
+    if (!this.isPlaying || !this.audio) return;
+
+    console.log('Stopping hold music');
+    
+    // Clear any existing fade interval
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval);
+      this.fadeInterval = null;
+    }
 
     // Fade out over 0.5 seconds
-    this.gainNode.gain.linearRampToValueAtTime(
-      0,
-      this.audioContext.currentTime + 0.5
-    );
-
-    // Stop and clean up after fade out
-    setTimeout(() => {
-      if (this.oscillator1) {
-        this.oscillator1.stop();
-        this.oscillator1.disconnect();
-        this.oscillator1 = null;
+    const steps = 10;
+    const stepDuration = 50;
+    const volumeDecrement = this.audio.volume / steps;
+    
+    let currentStep = 0;
+    this.fadeInterval = setInterval(() => {
+      if (!this.audio) return;
+      
+      currentStep++;
+      this.audio.volume = Math.max(this.audio.volume - volumeDecrement, 0);
+      
+      if (currentStep >= steps || this.audio.volume === 0) {
+        if (this.fadeInterval) {
+          clearInterval(this.fadeInterval);
+          this.fadeInterval = null;
+        }
+        if (this.audio) {
+          this.audio.pause();
+          this.audio.currentTime = 0;
+        }
+        this.isPlaying = false;
       }
-      if (this.oscillator2) {
-        this.oscillator2.stop();
-        this.oscillator2.disconnect();
-        this.oscillator2 = null;
-      }
-      if (this.gainNode) {
-        this.gainNode.disconnect();
-        this.gainNode = null;
-      }
-      this.isPlaying = false;
-    }, 500);
+    }, stepDuration);
   }
 
   cleanup() {
     this.stop();
-    if (this.audioContext) {
-      this.audioContext.close();
-      this.audioContext = null;
+    if (this.fadeInterval) {
+      clearInterval(this.fadeInterval);
+      this.fadeInterval = null;
+    }
+    if (this.audio) {
+      this.audio.pause();
+      this.audio.src = '';
+      this.audio = null;
     }
   }
 }
