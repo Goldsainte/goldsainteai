@@ -200,6 +200,10 @@ export const AIBookingConcierge = () => {
       try {
         setVoiceStatus('connecting');
 
+        // Ensure audio is unlocked for hold music
+        initHoldMusic();
+        await holdMusicRef.current?.unlock?.();
+
         // Pause wake word while in active voice call to avoid mic conflicts
         if (wakeWordDetectorRef.current) {
           wakeWordDetectorRef.current.stop();
@@ -365,7 +369,7 @@ export const AIBookingConcierge = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={() => { setIsOpen(true); initHoldMusic(); holdMusicRef.current?.unlock?.(); }}
             className="fixed bottom-6 right-6 z-50 group"
             aria-label="Open AI Booking Concierge"
           >
