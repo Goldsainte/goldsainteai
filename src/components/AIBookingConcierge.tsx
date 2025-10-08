@@ -327,18 +327,18 @@ export const AIBookingConcierge = () => {
         console.error('Voice error:', error);
         setVoiceStatus('error');
         
-        // Provide specific error messages
+        // Provide specific error messages (prioritize iOS AVAudioSession mapping)
         let errorMessage = "Failed to start voice mode";
-        const errorStr = error?.toString() || '';
-        
-        if (error?.message) {
-          errorMessage = error.message;
+        const errorStr = (error?.toString?.() || '') + ' ' + (error?.message || '') + ' ' + (error?.name || '');
+
+        if (errorStr.includes('AVAudioSession') || error?.name === 'NotFoundError') {
+          errorMessage = "Microphone unavailable on iOS. Please: 1) Allow mic in Safari, 2) Close apps using the mic (calls/voice memos), 3) Try again.";
         } else if (error?.name === 'NotAllowedError') {
-          errorMessage = "Microphone access denied. Please allow microphone access in Settings > Safari > Microphone.";
-        } else if (error?.name === 'NotFoundError' || errorStr.includes('AVAudioSession')) {
-          errorMessage = "No microphone available. Please make sure another app isn't using it and try again.";
+          errorMessage = "Microphone access denied. Please allow in Settings > Safari > Microphone and reload.";
         } else if (error?.name === 'NotReadableError') {
           errorMessage = "Microphone is being used by another app. Please close other apps and try again.";
+        } else if (error?.message) {
+          errorMessage = error.message;
         }
         
         toast({
