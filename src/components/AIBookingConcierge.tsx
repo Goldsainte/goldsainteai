@@ -15,6 +15,7 @@ import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  toolResults?: any[]; // Add tool results to messages
 }
 
 export const AIBookingConcierge = () => {
@@ -100,9 +101,11 @@ export const AIBookingConcierge = () => {
         return;
       }
 
+      // Add assistant message with tool results if any
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: data.message
+        content: data.message,
+        toolResults: data.toolResults || []
       }]);
     } catch (error) {
       console.error('Error:', error);
@@ -354,28 +357,65 @@ export const AIBookingConcierge = () => {
           <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
             <div className="space-y-3">
               {messages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  {msg.role === 'assistant' && (
-                    <div className="flex-shrink-0">
-                      <img 
-                        src={logomark} 
-                        alt="Goldsainte" 
-                        className="w-6 h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
-                      />
-                    </div>
-                  )}
+                <div key={idx}>
                   <div
-                    className={`max-w-[80%] rounded-lg px-3 py-2 ${
-                      msg.role === 'user'
-                        ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
-                        : 'bg-muted text-foreground'
-                    }`}
+                    className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    {msg.role === 'assistant' && (
+                      <div className="flex-shrink-0">
+                        <img 
+                          src={logomark} 
+                          alt="Goldsainte" 
+                          className="w-6 h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                        />
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                        msg.role === 'user'
+                          ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
+                          : 'bg-muted text-foreground'
+                      }`}
+                    >
+                      <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                    </div>
                   </div>
+                  
+                  {/* Display hotel results if available */}
+                  {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
+                    if (result.results && Array.isArray(result.results) && result.results.length > 0) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                          {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
+                            <div key={hotelIdx} className="bg-card border border-border rounded-lg p-3 text-xs">
+                              <div className="flex gap-3">
+                                {hotel.photos && hotel.photos[0] && (
+                                  <img 
+                                    src={hotel.photos[0]} 
+                                    alt={hotel.name}
+                                    className="w-20 h-20 object-cover rounded"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-sm truncate">{hotel.name}</h4>
+                                  <p className="text-muted-foreground truncate">{hotel.city}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    {hotel.rating > 0 && (
+                                      <span className="text-yellow-500">★ {hotel.rating.toFixed(1)}</span>
+                                    )}
+                                    <span className="font-semibold text-primary">
+                                      ${hotel.price?.toFixed(2)}/night
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
                 </div>
               ))}
               {isLoading && (
