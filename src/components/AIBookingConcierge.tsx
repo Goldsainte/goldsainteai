@@ -449,8 +449,21 @@ export const AIBookingConcierge = () => {
                     </div>
                   </div>
                   
-                  {/* Display hotel results if available */}
+                  {/* Display tool results */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
+                    // Handle agent inquiry confirmation
+                    if (result.success && result.inquiryId) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8">
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                            <p className="text-sm text-green-800 font-medium">
+                              ✓ {result.message || "Your request has been received! A Goldsainte agent will contact you shortly."}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    }
+                    
                     // Handle payment link from booking
                     if (result.url && result.sessionId) {
                       return (

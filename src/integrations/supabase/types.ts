@@ -201,6 +201,78 @@ export type Database = {
           },
         ]
       }
+      agent_inquiries: {
+        Row: {
+          ai_match_score: number | null
+          assigned_agent_id: string | null
+          contacted_at: string | null
+          conversation_data: Json
+          converted_to_job_id: string | null
+          created_at: string
+          guest_email: string | null
+          guest_name: string | null
+          guest_phone: string | null
+          id: string
+          inquiry_source: string
+          notes: string | null
+          priority: string | null
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          ai_match_score?: number | null
+          assigned_agent_id?: string | null
+          contacted_at?: string | null
+          conversation_data?: Json
+          converted_to_job_id?: string | null
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: string
+          inquiry_source?: string
+          notes?: string | null
+          priority?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          ai_match_score?: number | null
+          assigned_agent_id?: string | null
+          contacted_at?: string | null
+          conversation_data?: Json
+          converted_to_job_id?: string | null
+          created_at?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          guest_phone?: string | null
+          id?: string
+          inquiry_source?: string
+          notes?: string | null
+          priority?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_inquiries_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_inquiries_converted_to_job_id_fkey"
+            columns: ["converted_to_job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_performance_metrics: {
         Row: {
           acceptance_rate_percentage: number | null

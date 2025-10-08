@@ -81,6 +81,33 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "request_agent_contact",
+          description: "When user requests to be contacted by a Goldsainte travel agent instead of booking directly. Save their information and conversation.",
+          parameters: {
+            type: "object",
+            properties: {
+              travelerInfo: {
+                type: "object",
+                description: "Traveler contact information",
+                properties: {
+                  name: { type: "string" },
+                  email: { type: "string" },
+                  phone: { type: "string" }
+                },
+                required: ["name", "email"]
+              },
+              travelDetails: {
+                type: "object",
+                description: "Travel preferences and requirements discussed"
+              }
+            },
+            required: ["travelerInfo"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "search_restaurants",
           description: "Search for restaurants in a location. Returns restaurant recommendations with cuisine types, ratings, and availability.",
           parameters: {
@@ -313,7 +340,8 @@ Remember: You're a full-service AI concierge that can complete bookings end-to-e
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_events': 'search-events',
             'check_visa_requirements': 'check-visa-requirements',
-            'book_selection': 'create-booking-payment'
+            'book_selection': 'create-booking-payment',
+            'request_agent_contact': 'create-agent-inquiry'
           };
           
           const edgeFunctionName = functionMap[functionName];

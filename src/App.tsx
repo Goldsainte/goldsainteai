@@ -19,6 +19,7 @@ import Marketplace from "./pages/Marketplace";
 import AgentOnboarding from "./pages/AgentOnboarding";
 import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
+import AdminInquiries from "./pages/AdminInquiries";
 import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
 import MyJobs from "./pages/MyJobs";
@@ -57,6 +58,7 @@ function AppContent() {
           <Route path="/agent-onboarding" element={<AgentOnboarding />} />
           <Route path="/agent-dashboard" element={<AgentDashboard />} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
+          <Route path="/admin/inquiries" element={<AdminInquiries />} />
           <Route path="/booking-preferences" element={<BookingPreferences />} />
           <Route path="/commission-dashboard" element={<CommissionDashboard />} />
           <Route path="/email-preview" element={<EmailPreview />} />
