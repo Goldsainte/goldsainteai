@@ -34,6 +34,8 @@ export const AIBookingConcierge = () => {
   const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [wakeWordActive, setWakeWordActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
+  const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
   const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
@@ -348,6 +350,40 @@ export const AIBookingConcierge = () => {
     }
   };
 
+  const handlePushToTalkStart = async () => {
+    if (isPushToTalkActive || voiceMode) return;
+    
+    setIsPushToTalkActive(true);
+    
+    // Stop wake word detection while push-to-talk is active
+    if (wakeWordDetectorRef.current) {
+      wakeWordDetectorRef.current.stop();
+      setWakeWordActive(false);
+    }
+    
+    // Start voice mode
+    await toggleVoiceMode();
+  };
+
+  const handlePushToTalkEnd = () => {
+    if (!isPushToTalkActive) return;
+    
+    setIsPushToTalkActive(false);
+    
+    // Add a small delay before ending to ensure last audio is captured
+    if (pushToTalkTimerRef.current) {
+      clearTimeout(pushToTalkTimerRef.current);
+    }
+    
+    pushToTalkTimerRef.current = setTimeout(() => {
+      if (voiceMode) {
+        toggleVoiceMode();
+      }
+      // Resume wake word detection
+      startWakeWordDetection();
+    }, 500);
+  };
+
   useEffect(() => {
     // Start wake word detection when widget is opened (user interaction)
     if (isOpen && !wakeWordDetectorRef.current) {
@@ -357,6 +393,9 @@ export const AIBookingConcierge = () => {
     return () => {
       voiceChatRef.current?.disconnect();
       wakeWordDetectorRef.current?.stop();
+      if (pushToTalkTimerRef.current) {
+        clearTimeout(pushToTalkTimerRef.current);
+      }
     };
   }, [isOpen]);
 
@@ -565,26 +604,54 @@ export const AIBookingConcierge = () => {
                   </Button>
                 </>
               )}
-              {voiceMode && (
+              {voiceMode && !isPushToTalkActive && (
                 <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
                   <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                   {isProcessing ? 'Processing your request...' : 'Voice mode active - speak naturally'}
                 </div>
               )}
+              {isPushToTalkActive && (
+                <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-primary font-medium">
+                  <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+                  {isProcessing ? 'Processing...' : 'Listening - Release to send'}
+                </div>
+              )}
+              
+              {/* Push-to-talk button */}
+              <Button
+                onMouseDown={handlePushToTalkStart}
+                onMouseUp={handlePushToTalkEnd}
+                onMouseLeave={handlePushToTalkEnd}
+                onTouchStart={handlePushToTalkStart}
+                onTouchEnd={handlePushToTalkEnd}
+                size="icon"
+                variant={isPushToTalkActive ? "default" : "outline"}
+                className={`h-10 w-10 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-110" : ""} transition-all`}
+                disabled={voiceStatus === 'connecting' || (voiceMode && !isPushToTalkActive)}
+                title="Hold to speak"
+              >
+                <Mic className={`h-4 w-4 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
+              </Button>
+              
+              {/* Toggle always-on voice mode */}
               <Button
                 onClick={toggleVoiceMode}
                 size="icon"
-                variant={voiceMode ? "default" : "outline"}
-                className={`h-10 w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}`}
-                disabled={voiceStatus === 'connecting'}
-                title={voiceMode ? "Stop listening" : "Start listening"}
+                variant={voiceMode && !isPushToTalkActive ? "default" : "outline"}
+                className={`h-10 w-10 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-primary to-accent" : ""}`}
+                disabled={voiceStatus === 'connecting' || isPushToTalkActive}
+                title={voiceMode ? "Stop continuous listening" : "Start continuous listening"}
               >
-                {voiceMode ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                {voiceMode && !isPushToTalkActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
               </Button>
             </div>
-            {/* Mobile helper text */}
-            <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {wakeWordActive ? "Say 'Hey Goldsainte' or tap mic button" : "Tap mic button to start voice chat"}
+            {/* Helper text */}
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              {isPushToTalkActive 
+                ? "Release to stop recording"
+                : wakeWordActive 
+                  ? "Say 'Hey Goldsainte', hold mic to speak, or tap to listen continuously" 
+                  : "Hold mic to speak or tap to listen continuously"}
             </p>
           </div>
         </>
