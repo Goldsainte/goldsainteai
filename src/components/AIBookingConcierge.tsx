@@ -33,6 +33,7 @@ export const AIBookingConcierge = () => {
   const [voiceMode, setVoiceMode] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [wakeWordActive, setWakeWordActive] = useState(false);
+  const [isWakeWordListening, setIsWakeWordListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -228,10 +229,7 @@ export const AIBookingConcierge = () => {
         await holdMusicRef.current?.unlock?.();
 
         // Pause wake word while in active voice call to avoid mic conflicts
-        if (wakeWordDetectorRef.current) {
-          wakeWordDetectorRef.current.stop();
-          setWakeWordActive(false);
-        }
+        await stopWakeWordDetection();
         
         const getSessionToken = async () => {
           try {
@@ -351,11 +349,20 @@ export const AIBookingConcierge = () => {
   };
 
   const startWakeWordDetection = async () => {
+    if (wakeWordActive || isWakeWordListening) {
+      console.log('Wake word already active or starting');
+      return;
+    }
+    
     try {
+      console.log('Starting wake word detection...');
+      setIsWakeWordListening(true);
+      
       // Try Picovoice first (works on iOS)
       const { PicovoiceWakeWordDetector } = await import('@/utils/PicovoiceWakeWordDetector');
       const picoDetector = new PicovoiceWakeWordDetector(() => {
-        console.log('Wake word triggered!');
+        console.log('Wake word triggered via Picovoice!');
+        stopWakeWordDetection();
         if (!voiceMode) {
           toggleVoiceMode();
         }
@@ -365,6 +372,8 @@ export const AIBookingConcierge = () => {
       if (started) {
         wakeWordDetectorRef.current = picoDetector as any;
         setWakeWordActive(true);
+        setIsWakeWordListening(false);
+        console.log('Picovoice wake word active');
         toast({
           title: "Wake Word Active",
           description: "Say 'Hey Sainte' to activate voice mode",
@@ -379,7 +388,8 @@ export const AIBookingConcierge = () => {
     try {
       const { WakeWordDetector } = await import('@/utils/WakeWordDetector');
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
-        console.log('Wake word triggered!');
+        console.log('Wake word triggered via Web Speech API!');
+        stopWakeWordDetection();
         if (!voiceMode) {
           toggleVoiceMode();
         }
@@ -388,6 +398,8 @@ export const AIBookingConcierge = () => {
       const started = await wakeWordDetectorRef.current.start();
       if (started) {
         setWakeWordActive(true);
+        setIsWakeWordListening(false);
+        console.log('Web Speech API wake word active');
         toast({
           title: "Wake Word Active",
           description: "Say 'Hey Sainte' to activate voice mode",
@@ -395,12 +407,30 @@ export const AIBookingConcierge = () => {
       }
     } catch (error) {
       console.error('Wake word error:', error);
+      setIsWakeWordListening(false);
       toast({
         title: "Wake Word Unavailable",
         description: "Please use the microphone button instead",
         variant: "destructive",
       });
     }
+  };
+
+  const stopWakeWordDetection = async () => {
+    console.log('Stopping wake word detection...');
+    
+    if (wakeWordDetectorRef.current) {
+      try {
+        await wakeWordDetectorRef.current.stop();
+        wakeWordDetectorRef.current = null;
+        console.log('Wake word detector stopped');
+      } catch (error) {
+        console.error('Error stopping wake word detector:', error);
+      }
+    }
+    
+    setWakeWordActive(false);
+    setIsWakeWordListening(false);
   };
 
   useEffect(() => {
@@ -461,11 +491,27 @@ export const AIBookingConcierge = () => {
           <div>
             <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
-              {wakeWordActive && !voiceMode ? "Listening for 'Hey Sainte'" : "Powered by Goldsainte"}
+              {isWakeWordListening ? "Initializing..." : wakeWordActive && !voiceMode ? "Say 'Hey Sainte'" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              if (wakeWordActive || isWakeWordListening) {
+                stopWakeWordDetection();
+              } else {
+                startWakeWordDetection();
+              }
+            }}
+            className="text-primary-foreground hover:bg-white/10"
+            disabled={isWakeWordListening && !wakeWordActive}
+            title={wakeWordActive ? "Disable wake word" : "Enable wake word"}
+          >
+            {wakeWordActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -700,7 +746,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {wakeWordActive ? "🎙️ Say 'Hey Sainte' or tap mic button" : "Tap mic button to start voice chat"}
+              {isWakeWordListening ? "⏳ Initializing wake word..." : wakeWordActive ? "🎙️ Say 'Hey Sainte' or tap mic button" : "Tap mic button to start voice chat"}
             </p>
           </div>
         </>
