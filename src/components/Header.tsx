@@ -90,7 +90,7 @@ export const Header = () => {
             {/* Mobile: Show logomark only */}
             <img src={logomark} alt="Goldsainte" className="h-8 w-8 md:hidden" />
             {/* Desktop: Show horizontal wordmark */}
-            <img src={wordmark} alt="Goldsainte" className="h-6 hidden md:block" />
+            <img src={wordmark} alt="Goldsainte" className="h-7 hidden md:block" />
           </a>
 
           {/* Compact Search Bar - Center (desktop and mobile) */}
