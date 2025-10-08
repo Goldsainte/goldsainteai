@@ -72,24 +72,51 @@ export const AIBookingConcierge = () => {
       const content = lastMessage.content.toLowerCase();
       const holdPhrases = [
         'hold on',
+        'hold please',
+        'please hold',
         'one moment',
         'just a moment',
+        'one sec',
+        'just a sec',
+        'give me a moment',
+        "i'll be back shortly",
+        'ill be back shortly',
+        'be back shortly',
+        'be right back',
         'let me search',
         'searching for',
         'looking for',
         'checking',
-        'finding'
+        'checking availability',
+        'retrieving rates',
+        'finding',
+        'curating options',
+        'gathering options',
+        'bringing back options',
+        'options to consider'
+      ];
+
+      const stopPhrases = [
+        "here are",
+        "here's",
+        "i found",
+        "i've found",
+        'results',
+        'top options',
+        'option 1',
+        'option one'
       ];
       
       const shouldPlayMusic = holdPhrases.some(phrase => content.includes(phrase));
+      const shouldStopMusic = stopPhrases.some(phrase => content.includes(phrase)) || content.length > 50;
       
       if (shouldPlayMusic) {
         console.log('Detected hold phrase, starting music');
         initHoldMusic();
         holdMusicRef.current?.play();
-      } else if (content.length > 50) {
-        // If assistant gives a substantial response, stop the music
-        console.log('Substantial response detected, stopping music');
+      } else if (shouldStopMusic) {
+        // If assistant gives a substantial response or stop phrase, stop the music
+        console.log('Stop phrase or substantial response detected, stopping music');
         holdMusicRef.current?.stop();
       }
     }
@@ -170,6 +197,8 @@ export const AIBookingConcierge = () => {
             const parsed = JSON.parse(jsonStr);
             const content = parsed.choices?.[0]?.delta?.content as string | undefined;
             if (content) {
+              // Assistant started responding - stop hold music
+              holdMusicRef.current?.stop?.();
               accumulatedContent += content;
               // Update the last message with accumulated content
               setMessages(prev => {
@@ -250,9 +279,10 @@ export const AIBookingConcierge = () => {
             console.log('Voice message:', message);
             
             if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
-              // AI is responding - stop processing state
+              // AI is responding - stop processing state and any hold music
               console.log('AI is responding, stopping processing state');
               setIsProcessing(false);
+              holdMusicRef.current?.stop?.();
               
               if (message.type === 'response.audio_transcript.delta') {
                 if (!isAssistantSpeaking) {
@@ -274,6 +304,7 @@ export const AIBookingConcierge = () => {
               console.log('AI finished speaking');
               isAssistantSpeaking = false;
               setIsProcessing(false);
+              holdMusicRef.current?.stop?.();
               saveConversationData();
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
               // User finished speaking - start processing state
