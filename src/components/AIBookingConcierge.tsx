@@ -27,7 +27,7 @@ export const AIBookingConcierge = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Tap the phone icon first, then say 'Hey Goldsainte' to start voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -106,11 +106,7 @@ export const AIBookingConcierge = () => {
     saveConversationData();
 
     try {
-      // Add placeholder for assistant message
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
-
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
-      
       const resp = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
@@ -119,67 +115,31 @@ export const AIBookingConcierge = () => {
         },
         body: JSON.stringify({ 
           messages: [...messages, { role: 'user', content: userMessage }],
-          stream: true 
+          stream: false
         }),
       });
 
-      if (!resp.ok || !resp.body) {
-        throw new Error("Failed to start stream");
-      }
-
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let textBuffer = "";
-      let streamDone = false;
-      let accumulatedContent = "";
-
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              accumulatedContent += content;
-              // Update the last message with accumulated content
-              setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1] = {
-                  ...newMessages[newMessages.length - 1],
-                  content: accumulatedContent
-                };
-                return newMessages;
-              });
-            }
-          } catch {
-            textBuffer = line + "\n" + textBuffer;
-            break;
-          }
+      if (!resp.ok) {
+        if (resp.status === 429) {
+          toast({ title: "Rate limited", description: "Too many requests. Please try again shortly.", variant: "destructive" });
+        } else if (resp.status === 402) {
+          toast({ title: "Service unavailable", description: "Please add credits to continue AI usage.", variant: "destructive" });
         }
+        throw new Error("Failed to get response");
       }
+
+      const data = await resp.json();
+      const assistantContent = data.message || '';
+      const toolResults = data.toolResults || [];
+
+      setMessages(prev => [
+        ...prev,
+        { role: 'assistant', content: assistantContent, toolResults }
+      ]);
 
       saveConversationData();
     } catch (error) {
       console.error('Error:', error);
-      // Remove the empty assistant message on error
-      setMessages(prev => prev.slice(0, -1));
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",
@@ -342,10 +302,10 @@ export const AIBookingConcierge = () => {
       console.log('Wake word detection started:', started);
       if (started) {
         setWakeWordActive(true);
-        toast({
-          title: "Wake Word Active",
-          description: "Say 'Hey Goldsainte' to activate voice mode",
-        });
+          toast({
+            title: "Wake Word Active",
+            description: "Tap phone icon first, then say 'Hey Goldsainte'",
+          });
       }
     } catch (error) {
       console.error('❌ Wake word error:', error);
@@ -502,7 +462,7 @@ export const AIBookingConcierge = () => {
                           : 'bg-muted text-foreground'
                       }`}
                     >
-                      <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      <p className="text-[11px] md:text-[13px] whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
                   </div>
                   
