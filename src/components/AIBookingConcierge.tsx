@@ -642,7 +642,7 @@ export const AIBookingConcierge = () => {
               {isPushToTalkActive 
                 ? "Release to stop recording"
                 : wakeWordActive 
-                  ? "Say 'Hey Goldsainte', press & hold radio icon, or tap phone icon for voice call" 
+                  ? "Tap phone icon first, then say 'Hey Goldsainte' • Press & hold radio for push-to-talk" 
                   : "Press & hold radio icon to speak, or tap phone icon for voice call"}
             </p>
           </div>
