@@ -78,8 +78,25 @@ serve(async (req) => {
     // Apply 15% markup to all prices
     const MARKUP_PERCENTAGE = 15;
     
+    // Filter out test/demo hotels
+    const filteredProperties = (data.properties || []).filter((property: any) => {
+      const name = (property.name || '').toLowerCase();
+      const description = (property.rooms?.[0]?.descriptions?.overview || '').toLowerCase();
+      const lat = property.location?.coordinates?.latitude || 0;
+      const lon = property.location?.coordinates?.longitude || 0;
+      
+      // Exclude test hotels, demo hotels, "do not use" hotels, and fake coordinates
+      const isTestHotel = /test|demo|do not use|sample|fake/i.test(name) || 
+                          /test|demo|do not use|sample|fake/i.test(description) ||
+                          (lat === 0 && lon === 0);
+      
+      return !isTestHotel;
+    });
+    
+    console.log(`Filtered out ${(data.properties || []).length - filteredProperties.length} test/demo hotels`);
+    
     // Transform Expedia response to match our format with markup
-    const hotels = (data.properties || []).map((property: any) => {
+    const hotels = filteredProperties.map((property: any) => {
       const basePrice = property.rooms?.[0]?.rates?.[0]?.totals?.inclusive?.billable_currency?.value || 0;
       const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
       

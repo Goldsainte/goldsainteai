@@ -296,9 +296,26 @@ serve(async (req) => {
 
     const enriched = await enrichWithGooglePlaces(amadeusHotels, location);
 
+    // Filter out test/demo hotels
+    const filteredHotels = enriched.filter((h: any) => {
+      const name = (h.hotel?.name || '').toLowerCase();
+      const description = (h.offers?.[0]?.room?.description?.text || '').toLowerCase();
+      const lat = h.hotel?.latitude || 0;
+      const lon = h.hotel?.longitude || 0;
+      
+      // Exclude test hotels, demo hotels, "do not use" hotels, and fake coordinates
+      const isTestHotel = /test|demo|do not use|sample|fake/i.test(name) || 
+                          /test|demo|do not use|sample|fake/i.test(description) ||
+                          (lat === 0 && lon === 0);
+      
+      return !isTestHotel;
+    });
+    
+    console.log(`Filtered out ${enriched.length - filteredHotels.length} test/demo hotels`);
+
     // Transform result to UI-friendly structure
     const nights = Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)));
-    const results = enriched.map((h: any) => {
+    const results = filteredHotels.map((h: any) => {
       const info = h.hotel || {};
       const offer = h.offers?.[0] || {};
       const total = offer.price?.total ? parseFloat(offer.price.total) : 0;

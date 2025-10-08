@@ -130,11 +130,17 @@ serve(async (req) => {
     
     // Filter to only include hotels with available offers and apply markup
     const availableHotels = (offersData.data || []).filter((hotel: any) => {
-      const name = hotel.hotel?.name || '';
-      const lat = hotel.hotel?.latitude;
-      const lon = hotel.hotel?.longitude;
-      const looksFake = /test/i.test(name) || (lat === 0 && lon === 0);
-      return hotel.available === true && hotel.offers && hotel.offers.length > 0 && !looksFake;
+      const name = (hotel.hotel?.name || '').toLowerCase();
+      const description = (hotel.offers?.[0]?.room?.description?.text || '').toLowerCase();
+      const lat = hotel.hotel?.latitude || 0;
+      const lon = hotel.hotel?.longitude || 0;
+      
+      // Exclude test hotels, demo hotels, "do not use" hotels, and fake coordinates
+      const isTestHotel = /test|demo|do not use|sample|fake/i.test(name) || 
+                          /test|demo|do not use|sample|fake/i.test(description) ||
+                          (lat === 0 && lon === 0);
+      
+      return hotel.available === true && hotel.offers && hotel.offers.length > 0 && !isTestHotel;
     }).map((hotel: any) => {
       // Apply markup to each offer
       const updatedOffers = hotel.offers.map((offer: any) => {
