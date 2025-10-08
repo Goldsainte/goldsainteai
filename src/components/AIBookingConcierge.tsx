@@ -22,10 +22,14 @@ interface Message {
 export const AIBookingConcierge = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const isIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Mac') && 'ontouchend' in document));
+  
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Sainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+      content: isIOS 
+        ? "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Tap the microphone button below to activate voice mode\n2. Or type your travel request\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+        : "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Sainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -41,7 +45,6 @@ export const AIBookingConcierge = () => {
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
-  const isIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Mac') && 'ontouchend' in document));
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -506,22 +509,24 @@ export const AIBookingConcierge = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              if (wakeWordActive || isWakeWordListening) {
-                stopWakeWordDetection();
-              } else {
-                startWakeWordDetection();
-              }
-            }}
-            className="text-primary-foreground hover:bg-white/10"
-            disabled={voiceMode || (isWakeWordListening && !wakeWordActive)}
-            title={wakeWordActive ? "Disable wake word" : voiceMode ? "Voice mode active" : "Enable wake word"}
-          >
-            {wakeWordActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-          </Button>
+          {!isIOS && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (wakeWordActive || isWakeWordListening) {
+                  stopWakeWordDetection();
+                } else {
+                  startWakeWordDetection();
+                }
+              }}
+              className="text-primary-foreground hover:bg-white/10"
+              disabled={voiceMode || (isWakeWordListening && !wakeWordActive)}
+              title={wakeWordActive ? "Disable wake word" : voiceMode ? "Voice mode active" : "Enable wake word"}
+            >
+              {wakeWordActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
