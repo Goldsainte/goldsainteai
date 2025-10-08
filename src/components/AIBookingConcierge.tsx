@@ -429,27 +429,27 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
-        isMinimized ? 'w-72 sm:w-80' : 'w-[calc(100vw-2rem)] sm:w-[calc(100vw-3rem)] md:w-96 max-w-md'
-      } ${isMinimized ? 'h-16 sm:h-18' : 'h-[80vh] sm:h-[75vh] md:h-[600px] max-h-[600px]'}`}
+      className={`fixed bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+        isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
+      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[600px]'}`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-accent p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-          <div className="relative flex-shrink-0">
-            <img src={logomark} alt="Goldsainte" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+      <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
             {wakeWordActive && !voiceMode && (
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
             )}
           </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-serif text-base sm:text-lg md:text-xl font-bold text-primary-foreground truncate">AI Concierge</h3>
-            <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate">
+          <div>
+            <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
+            <p className="text-xs text-primary-foreground/80">
               {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="icon"
@@ -472,8 +472,8 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(80vh-140px)] sm:h-[calc(75vh-140px)] md:h-[calc(600px-140px)] p-2 sm:p-3" ref={scrollRef}>
-            <div className="space-y-2 sm:space-y-3">
+          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
+            <div className="space-y-3">
               {messages.map((msg, idx) => (
                 <div key={idx}>
                   <div
@@ -567,8 +567,8 @@ export const AIBookingConcierge = () => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-2.5 sm:p-3 border-t border-border bg-background">
-            <div className="flex gap-1.5 sm:gap-2 items-center">
+          <div className="p-3 border-t border-border">
+            <div className="flex gap-2">
               {!voiceMode && (
                 <>
                   <Input
@@ -576,33 +576,33 @@ export const AIBookingConcierge = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your travel request..."
-                    className="flex-1 text-sm h-11 sm:h-12"
+                    className="flex-1 text-sm h-10"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
                     size="icon"
-                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-11 w-11 sm:h-12 sm:w-12 flex-shrink-0"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-10 w-10"
                   >
-                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Send className="h-4 w-4" />
                   </Button>
                 </>
               )}
               {voiceMode && !isPushToTalkActive && (
-                <div className="flex-1 flex items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground px-2">
-                  <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
-                  <span className="text-center">{isProcessing ? 'Processing...' : 'Voice active - speak'}</span>
+                <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
+                  <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                  {isProcessing ? 'Processing your request...' : 'Voice mode active - speak naturally'}
                 </div>
               )}
               {isPushToTalkActive && (
-                <div className="flex-1 flex items-center justify-center gap-2 text-xs sm:text-sm text-primary font-medium px-2">
-                  <div className="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500 animate-pulse flex-shrink-0" />
-                  <span className="text-center">{isProcessing ? 'Processing...' : 'Release to send'}</span>
+                <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-primary font-medium">
+                  <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
+                  {isProcessing ? 'Processing...' : 'Listening - Release to send'}
                 </div>
               )}
               
-              {/* Push-to-talk button - Always visible */}
+              {/* Push-to-talk button */}
               <Button
                 onMouseDown={handlePushToTalkStart}
                 onMouseUp={handlePushToTalkEnd}
@@ -611,34 +611,32 @@ export const AIBookingConcierge = () => {
                 onTouchEnd={handlePushToTalkEnd}
                 size="icon"
                 variant={isPushToTalkActive ? "default" : "outline"}
-                className={`h-11 w-11 sm:h-12 sm:w-12 flex-shrink-0 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-105" : ""} transition-all`}
+                className={`h-10 w-10 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-110" : ""} transition-all`}
                 disabled={voiceStatus === 'connecting' || (voiceMode && !isPushToTalkActive)}
                 title="Hold to speak"
-                aria-label="Push to talk"
               >
-                <Mic className={`h-5 w-5 sm:h-6 sm:w-6 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
+                <Mic className={`h-4 w-4 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
               </Button>
               
-              {/* Toggle always-on voice mode - Always visible */}
+              {/* Toggle always-on voice mode */}
               <Button
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode && !isPushToTalkActive ? "default" : "outline"}
-                className={`h-11 w-11 sm:h-12 sm:w-12 flex-shrink-0 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-primary to-accent" : ""}`}
+                className={`h-10 w-10 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-primary to-accent" : ""}`}
                 disabled={voiceStatus === 'connecting' || isPushToTalkActive}
                 title={voiceMode ? "Stop continuous listening" : "Start continuous listening"}
-                aria-label={voiceMode ? "Stop voice mode" : "Start voice mode"}
               >
-                {voiceMode && !isPushToTalkActive ? <Mic className="h-5 w-5 sm:h-6 sm:w-6" /> : <MicOff className="h-5 w-5 sm:h-6 sm:w-6" />}
+                {voiceMode && !isPushToTalkActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
               </Button>
             </div>
             {/* Helper text */}
-            <p className="text-[10px] sm:text-xs text-muted-foreground mt-2 text-center leading-tight px-1">
+            <p className="text-xs text-muted-foreground mt-2 text-center">
               {isPushToTalkActive 
                 ? "Release to stop recording"
                 : wakeWordActive 
-                  ? "Say 'Hey Goldsainte' or hold mic to speak" 
-                  : "Hold mic to speak or tap mic icon"}
+                  ? "Say 'Hey Goldsainte', hold mic to speak, or tap to listen continuously" 
+                  : "Hold mic to speak or tap to listen continuously"}
             </p>
           </div>
         </>
