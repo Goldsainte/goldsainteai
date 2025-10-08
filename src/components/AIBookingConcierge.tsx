@@ -65,20 +65,35 @@ export const AIBookingConcierge = () => {
     };
   }, []);
 
-  // Play/stop hold music based on processing state (voice) and loading state (text)
+  // Detect "hold on" phrases in assistant messages to trigger hold music
   useEffect(() => {
-    console.log('Hold music state change:', { isProcessing, isLoading, hasHoldMusic: !!holdMusicRef.current });
-
-    const shouldPlay = isProcessing || isLoading;
-    if (shouldPlay) {
-      initHoldMusic();
-      console.log('Starting hold music');
-      holdMusicRef.current?.play();
-    } else {
-      console.log('Stopping hold music');
-      holdMusicRef.current?.stop();
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === 'assistant') {
+      const content = lastMessage.content.toLowerCase();
+      const holdPhrases = [
+        'hold on',
+        'one moment',
+        'just a moment',
+        'let me search',
+        'searching for',
+        'looking for',
+        'checking',
+        'finding'
+      ];
+      
+      const shouldPlayMusic = holdPhrases.some(phrase => content.includes(phrase));
+      
+      if (shouldPlayMusic) {
+        console.log('Detected hold phrase, starting music');
+        initHoldMusic();
+        holdMusicRef.current?.play();
+      } else if (content.length > 50) {
+        // If assistant gives a substantial response, stop the music
+        console.log('Substantial response detected, stopping music');
+        holdMusicRef.current?.stop();
+      }
     }
-  }, [isProcessing, isLoading]);
+  }, [messages]);
 
   // Save conversation data to localStorage for seamless handoff
   const saveConversationData = () => {
