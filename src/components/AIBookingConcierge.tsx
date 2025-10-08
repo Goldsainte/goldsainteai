@@ -22,15 +22,10 @@ interface Message {
 export const AIBookingConcierge = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  // Detect if we're on mobile
-  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: isMobileDevice 
-        ? "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Tap the microphone button 🎤 below to activate voice mode\n2. Or type your travel request\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
-        : "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -405,8 +400,7 @@ export const AIBookingConcierge = () => {
 
   useEffect(() => {
     // Start wake word detection when widget is opened (user interaction)
-    // Skip on mobile devices where Web Speech API support is poor
-    if (isOpen && !wakeWordDetectorRef.current && !isMobileDevice) {
+    if (isOpen && !wakeWordDetectorRef.current) {
       startWakeWordDetection();
     }
 
@@ -631,9 +625,7 @@ export const AIBookingConcierge = () => {
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode ? "default" : "outline"}
-                className={`h-10 w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""} ${
-                  isMobileDevice && !voiceMode ? "animate-pulse" : ""
-                }`}
+                className={`h-10 w-10 ${voiceMode ? "bg-gradient-to-r from-primary to-accent" : ""}`}
                 disabled={voiceStatus === 'connecting'}
                 title={voiceMode ? "Stop listening" : "Start listening"}
               >
@@ -642,7 +634,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              Tap the microphone button above to start voice chat
+              {wakeWordActive ? "Say 'Hey Goldsainte' or tap mic button" : "Tap mic button to start voice chat"}
             </p>
           </div>
         </>
