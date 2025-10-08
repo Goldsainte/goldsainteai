@@ -12,6 +12,8 @@ import logomark from "@/assets/logomark-seal-gold.png";
 import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
 import { WakeWordDetector } from "@/utils/WakeWordDetector";
 import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
+import { CompactFlightCard } from "./CompactFlightCard";
+import { CompactHotelCard } from "./CompactHotelCard";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -514,52 +516,37 @@ export const AIBookingConcierge = () => {
                       );
                     }
                     
-                    // Handle payment link from booking
-                    if (result.url && result.sessionId) {
-                      return (
-                        <div key={resultIdx} className="mt-2 ml-8">
-                          <Button 
-                            onClick={() => window.open(result.url, '_blank')}
-                            className="w-full bg-primary hover:bg-primary/90"
-                          >
-                            Complete Payment to Confirm Booking
-                          </Button>
-                        </div>
-                      );
-                    }
-                    
-                    // Display search results
-                    if (result.results && Array.isArray(result.results) && result.results.length > 0) {
+                    // Display flight search results
+                    if (result.data && Array.isArray(result.data) && result.data.length > 0 && result.data[0].itineraries) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8 space-y-2">
-                          {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
-                            <div key={hotelIdx} className="bg-card border border-border rounded-lg p-3 text-xs">
-                              <div className="flex gap-3">
-                                {hotel.photos && hotel.photos[0] && (
-                                  <img 
-                                    src={hotel.photos[0]} 
-                                    alt={hotel.name}
-                                    className="w-20 h-20 object-cover rounded"
-                                  />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-semibold text-sm truncate">{hotel.name}</h4>
-                                  <p className="text-muted-foreground truncate">{hotel.city}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    {hotel.rating > 0 && (
-                                      <span className="text-yellow-500">★ {hotel.rating.toFixed(1)}</span>
-                                    )}
-                                    <span className="font-semibold text-primary">
-                                      ${hotel.price?.toFixed(2)}/night
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
+                          <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.data.length)} flight options:</p>
+                          {result.data.slice(0, 3).map((flight: any, flightIdx: number) => (
+                            <CompactFlightCard 
+                              key={flightIdx} 
+                              flight={flight} 
+                              dictionaries={result.dictionaries}
+                            />
                           ))}
                         </div>
                       );
                     }
+                    
+                    // Display hotel search results
+                    if (result.results && Array.isArray(result.results) && result.results.length > 0) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                          <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.results.length)} hotel options:</p>
+                          {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
+                            <CompactHotelCard 
+                              key={hotelIdx} 
+                              property={hotel}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    
                     return null;
                   })}
                 </div>
