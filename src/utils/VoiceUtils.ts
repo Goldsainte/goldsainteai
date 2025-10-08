@@ -92,16 +92,18 @@ export class RealtimeVoiceChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track
+      // Add local audio track - use iOS-compatible constraints
       const ms = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          sampleRate: 24000,
-          channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
+          autoGainControl: true
         } 
       });
-      this.pc.addTrack(ms.getTracks()[0]);
+      
+      const audioTrack = ms.getTracks()[0];
+      console.log('Audio track settings:', audioTrack.getSettings());
+      this.pc.addTrack(audioTrack);
 
       // Set up data channel for events
       this.dc = this.pc.createDataChannel("oai-events");

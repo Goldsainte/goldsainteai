@@ -315,14 +315,16 @@ export const AIBookingConcierge = () => {
         
         // Provide specific error messages
         let errorMessage = "Failed to start voice mode";
+        const errorStr = error?.toString() || '';
+        
         if (error?.message) {
           errorMessage = error.message;
         } else if (error?.name === 'NotAllowedError') {
-          errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
-        } else if (error?.name === 'NotFoundError') {
-          errorMessage = "No microphone found. Please connect a microphone and try again.";
+          errorMessage = "Microphone access denied. Please allow microphone access in Settings > Safari > Microphone.";
+        } else if (error?.name === 'NotFoundError' || errorStr.includes('AVAudioSession')) {
+          errorMessage = "No microphone available. Please make sure another app isn't using it and try again.";
         } else if (error?.name === 'NotReadableError') {
-          errorMessage = "Microphone is being used by another application. Please close other apps using the microphone.";
+          errorMessage = "Microphone is being used by another app. Please close other apps and try again.";
         }
         
         toast({
