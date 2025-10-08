@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
-import logomark from "@/assets/logomark-seal-gold.png";
+import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 
 export const Header = () => {
@@ -85,9 +85,8 @@ export const Header = () => {
       <div className="container mx-auto px-3 sm:px-4 md:px-6">
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
           {/* Logo - Left */}
-          <a href="/" className="flex items-center gap-1.5 sm:gap-2 hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px] min-w-[44px]">
-            <img src={logomark} alt="Logo" className="h-8 w-8 sm:h-7 sm:w-7 md:h-8 md:w-8" />
-            <span className="text-xs md:text-sm font-bold font-secondary text-[#8d8d8d] hidden sm:block">Goldsainte.Ai</span>
+          <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
+            <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
           </a>
 
           {/* Compact Search Bar - Center (desktop and mobile) */}
