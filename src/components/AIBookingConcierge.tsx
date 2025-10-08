@@ -258,15 +258,17 @@ export const AIBookingConcierge = () => {
     try {
       if (typeof navigator === 'undefined') return false;
       const ua = navigator.userAgent || '';
-      // Detect Safari but not Chrome (Chrome also has "Safari" in UA)
-      return /^((?!chrome|android).)*safari/i.test(ua);
+      // Detect Safari but explicitly exclude Chrome, CriOS (Chrome iOS), and Chromium
+      const isChrome = /chrome|chromium|crios/i.test(ua);
+      const isSafariBrowser = /safari/i.test(ua);
+      return isSafariBrowser && !isChrome;
     } catch {
       return false;
     }
   })();
 
   const toggleVoiceMode = async () => {
-    // Show Safari disclaimer for Safari users
+    // Show Safari disclaimer ONLY for Safari users (not Chrome)
     if (!voiceMode && isSafari) {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
