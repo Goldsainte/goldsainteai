@@ -47,6 +47,18 @@ export const AIBookingConcierge = () => {
     }
   }, [messages]);
 
+  // Handle hold music during voice processing
+  useEffect(() => {
+    if (voiceMode && isProcessing) {
+      console.log('Processing voice input, starting hold music');
+      initHoldMusic();
+      holdMusicRef.current?.play();
+    } else if (!isProcessing) {
+      console.log('Processing complete, stopping hold music');
+      holdMusicRef.current?.stop();
+    }
+  }, [isProcessing, voiceMode]);
+
   // Initialize hold music generator lazily on first use
   const initHoldMusic = () => {
     if (!holdMusicRef.current) {
@@ -660,7 +672,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {wakeWordActive ? "Say 'Hey Sainte' or tap mic button" : "Tap mic button to start voice chat"}
+              {wakeWordActive ? "🎙️ Say 'Hey Sainte' or tap mic button" : "Tap mic button to start voice chat"}
             </p>
           </div>
         </>
