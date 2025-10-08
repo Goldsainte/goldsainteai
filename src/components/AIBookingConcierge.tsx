@@ -233,7 +233,27 @@ export const AIBookingConcierge = () => {
     }
   };
 
+  const isSafari = (() => {
+    try {
+      if (typeof navigator === 'undefined') return false;
+      const ua = navigator.userAgent || '';
+      // Detect Safari but not Chrome (Chrome also has "Safari" in UA)
+      return /^((?!chrome|android).)*safari/i.test(ua);
+    } catch {
+      return false;
+    }
+  })();
+
   const toggleVoiceMode = async () => {
+    // Show Safari disclaimer for Safari users
+    if (!voiceMode && isSafari) {
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "⚠️ **Browser Compatibility Notice**\n\nGoldsainte AI voice features work best on Google Chrome. Safari has limited support for real-time voice interaction.\n\n**For the best experience:**\n• Download Google Chrome from the App Store\n• Visit Goldsainte.com in Chrome\n\nYou can still use text chat here in Safari! Just type your requests below." 
+      }]);
+      return;
+    }
+    
     if (!voiceMode) {
       try {
         setVoiceStatus('connecting');
