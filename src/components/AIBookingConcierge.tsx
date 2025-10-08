@@ -47,12 +47,18 @@ export const AIBookingConcierge = () => {
     }
   }, [messages]);
 
-  // Initialize hold music generator
+  // Initialize hold music generator lazily on first use
+  const initHoldMusic = () => {
+    if (!holdMusicRef.current) {
+      console.log('Initializing hold music generator');
+      holdMusicRef.current = new HoldMusicGenerator();
+    }
+  };
+
   useEffect(() => {
-    holdMusicRef.current = new HoldMusicGenerator();
-    
     return () => {
       if (holdMusicRef.current) {
+        console.log('Cleaning up hold music');
         holdMusicRef.current.cleanup();
         holdMusicRef.current = null;
       }
@@ -61,16 +67,21 @@ export const AIBookingConcierge = () => {
 
   // Play/stop hold music based on processing state
   useEffect(() => {
-    if (!holdMusicRef.current || !voiceMode) return;
+    if (!voiceMode) return;
     
-    console.log('Hold music state change:', { isProcessing, voiceMode });
+    console.log('Hold music state change:', { isProcessing, voiceMode, hasHoldMusic: !!holdMusicRef.current });
     
     if (isProcessing) {
+      initHoldMusic();
       console.log('Starting hold music');
-      holdMusicRef.current.play();
+      if (holdMusicRef.current) {
+        holdMusicRef.current.play();
+      }
     } else {
       console.log('Stopping hold music');
-      holdMusicRef.current.stop();
+      if (holdMusicRef.current) {
+        holdMusicRef.current.stop();
+      }
     }
   }, [isProcessing, voiceMode]);
 
