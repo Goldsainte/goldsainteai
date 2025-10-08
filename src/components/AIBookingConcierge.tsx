@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Minimize2, Maximize2, Mic, MicOff } from "lucide-react";
+import { X, Send, Loader2, Minimize2, Maximize2, Mic, MicOff, Radio, Phone, PhoneOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -613,9 +613,9 @@ export const AIBookingConcierge = () => {
                 variant={isPushToTalkActive ? "default" : "outline"}
                 className={`h-10 w-10 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-110" : ""} transition-all`}
                 disabled={voiceStatus === 'connecting' || (voiceMode && !isPushToTalkActive)}
-                title="Hold to speak"
+                title="Press & hold to speak"
               >
-                <Mic className={`h-4 w-4 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
+                <Radio className={`h-4 w-4 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
               </Button>
               
               {/* Toggle always-on voice mode */}
@@ -623,11 +623,11 @@ export const AIBookingConcierge = () => {
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode && !isPushToTalkActive ? "default" : "outline"}
-                className={`h-10 w-10 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-primary to-accent" : ""}`}
+                className={`h-10 w-10 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
                 disabled={voiceStatus === 'connecting' || isPushToTalkActive}
-                title={voiceMode ? "Stop continuous listening" : "Start continuous listening"}
+                title={voiceMode ? "End voice call" : "Start voice call"}
               >
-                {voiceMode && !isPushToTalkActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
+                {voiceMode && !isPushToTalkActive ? <Phone className="h-4 w-4" /> : <PhoneOff className="h-4 w-4" />}
               </Button>
             </div>
             {/* Helper text */}
@@ -635,8 +635,8 @@ export const AIBookingConcierge = () => {
               {isPushToTalkActive 
                 ? "Release to stop recording"
                 : wakeWordActive 
-                  ? "Say 'Hey Goldsainte', hold mic to speak, or tap to listen continuously" 
-                  : "Hold mic to speak or tap to listen continuously"}
+                  ? "Say 'Hey Goldsainte', press & hold radio icon, or tap phone icon for voice call" 
+                  : "Press & hold radio icon to speak, or tap phone icon for voice call"}
             </p>
           </div>
         </>
