@@ -73,6 +73,15 @@ export const AIBookingConcierge = () => {
     }
   }, [isProcessing, voiceMode]);
 
+  // Save conversation data to localStorage for seamless handoff
+  const saveConversationData = () => {
+    const conversationData = {
+      messages,
+      timestamp: new Date().toISOString(),
+    };
+    localStorage.setItem('aiConciergeConversation', JSON.stringify(conversationData));
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -80,6 +89,7 @@ export const AIBookingConcierge = () => {
     setInput("");
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
+    saveConversationData();
 
     try {
       const { data, error } = await supabase.functions.invoke('ai-booking-concierge', {
@@ -107,6 +117,7 @@ export const AIBookingConcierge = () => {
         content: data.message,
         toolResults: data.toolResults || []
       }]);
+      saveConversationData();
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -180,16 +191,19 @@ export const AIBookingConcierge = () => {
                   }
                   return [...filtered, { role: 'assistant', content: currentAssistantMessage }];
                 });
+                saveConversationData();
               }
             } else if (message.type === 'response.audio_transcript.done') {
               console.log('AI finished speaking');
               isAssistantSpeaking = false;
               setIsProcessing(false);
+              saveConversationData();
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
               // User finished speaking - start processing state
               console.log('User finished speaking, starting processing state');
               setIsProcessing(true);
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
+              saveConversationData();
             } else if (message.type === 'input_audio_buffer.speech_stopped') {
               // User stopped speaking - start processing
               console.log('Speech stopped, starting processing state');
