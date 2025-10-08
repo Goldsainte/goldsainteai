@@ -30,10 +30,10 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm sm:text-base">
-                  Voice AI Concierge with "Hey Goldsainte" wake word.
+                  Voice AI Concierge with "Hey Sainte" wake word.
                 </h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Just say "Hey Goldsainte" from anywhere on the site to instantly activate our advanced voice AI. 
+                  Just say "Hey Sainte" from anywhere on the site to instantly activate our advanced voice AI. 
                   Have natural conversations about flights, hotels, dining, and more—hands-free.
                 </p>
               </div>

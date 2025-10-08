@@ -25,7 +25,7 @@ export const AIBookingConcierge = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Sainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -423,7 +423,7 @@ export const AIBookingConcierge = () => {
         setWakeWordActive(true);
         toast({
           title: "Wake Word Active",
-          description: "Say 'Hey Goldsainte' to activate voice mode",
+          description: "Say 'Hey Sainte' to activate voice mode",
         });
       }
     } catch (error) {
