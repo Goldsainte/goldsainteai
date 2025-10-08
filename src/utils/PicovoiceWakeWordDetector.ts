@@ -21,25 +21,36 @@ export class PicovoiceWakeWordDetector {
 
       console.log('Initializing Picovoice wake word detection...');
 
-      // Initialize Porcupine with built-in "Porcupine" keyword
-      // User can later train "Hey Goldsainte" in Picovoice Console
+      // Initialize Porcupine with custom "Hey Sainte" keyword
+      // Fetch the custom model file
+      const modelResponse = await fetch('/models/Hey-Sainte_en_ios_v3_0_0.ppn');
+      const modelBlob = await modelResponse.blob();
+      const modelArrayBuffer = await modelBlob.arrayBuffer();
+      const modelBase64 = btoa(
+        String.fromCharCode(...new Uint8Array(modelArrayBuffer))
+      );
+      
       this.porcupineWorker = await PorcupineWorker.create(
         accessKey,
-        [{ builtin: BuiltInKeyword.Porcupine, sensitivity: 0.5 }],
+        [{ 
+          label: 'Hey Sainte',
+          base64: modelBase64,
+          sensitivity: 0.5 
+        }],
         (detection) => {
           if (detection.label) {
             console.log('Wake word detected:', detection.label);
             this.onWakeWordDetected();
           }
         },
-        { base64: '', publicPath: '', forceWrite: true } // Default model config
+        { base64: '', publicPath: '', forceWrite: true }
       );
 
       // Start WebVoiceProcessor with the porcupine worker
       await WebVoiceProcessor.subscribe(this.porcupineWorker);
       this.isListening = true;
       
-      console.log('Picovoice wake word detection started - say "Porcupine" to activate');
+      console.log('Picovoice wake word detection started - say "Hey Sainte" to activate');
       return true;
     } catch (error) {
       console.error('Failed to start Picovoice wake word detection:', error);

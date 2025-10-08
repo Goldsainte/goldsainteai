@@ -388,7 +388,7 @@ export const AIBookingConcierge = () => {
         setWakeWordActive(true);
         toast({
           title: "Wake Word Active",
-          description: "Say 'Porcupine' to activate voice mode",
+          description: "Say 'Hey Sainte' to activate voice mode",
         });
         return;
       }
@@ -482,7 +482,7 @@ export const AIBookingConcierge = () => {
           <div>
             <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
-              {wakeWordActive && !voiceMode ? "Listening for 'Porcupine'" : "Powered by Goldsainte"}
+              {wakeWordActive && !voiceMode ? "Listening for 'Hey Sainte'" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
@@ -660,7 +660,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {wakeWordActive ? "Say 'Porcupine' or tap mic button" : "Tap mic button to start voice chat"}
+              {wakeWordActive ? "Say 'Hey Sainte' or tap mic button" : "Tap mic button to start voice chat"}
             </p>
           </div>
         </>
