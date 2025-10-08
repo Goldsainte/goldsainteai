@@ -171,63 +171,30 @@ export const AIBookingConcierge = () => {
         },
         body: JSON.stringify({ 
           messages: [...messages, { role: 'user', content: userMessage }],
-          stream: true 
+          stream: false  // Disable streaming to allow tool execution
         }),
       });
 
-      if (!resp.ok || !resp.body) {
-        throw new Error("Failed to start stream");
+      if (!resp.ok) {
+        throw new Error("Failed to get response");
       }
 
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let textBuffer = "";
-      let streamDone = false;
-      let accumulatedContent = "";
-
-      while (!streamDone) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        textBuffer += decoder.decode(value, { stream: true });
-
-        let newlineIndex: number;
-        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
-          let line = textBuffer.slice(0, newlineIndex);
-          textBuffer = textBuffer.slice(newlineIndex + 1);
-
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (line.startsWith(":") || line.trim() === "") continue;
-          if (!line.startsWith("data: ")) continue;
-
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") {
-            streamDone = true;
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (content) {
-              // Assistant started responding - stop hold music
-              holdMusicRef.current?.stop?.();
-              accumulatedContent += content;
-              // Update the last message with accumulated content
-              setMessages(prev => {
-                const newMessages = [...prev];
-                newMessages[newMessages.length - 1] = {
-                  ...newMessages[newMessages.length - 1],
-                  content: accumulatedContent
-                };
-                return newMessages;
-              });
-            }
-          } catch {
-            textBuffer = line + "\n" + textBuffer;
-            break;
-          }
-        }
-      }
+      // Parse complete response (non-streaming)
+      const data = await resp.json();
+      
+      // Stop hold music when we get a response
+      holdMusicRef.current?.stop?.();
+      
+      // Update the assistant message with the response
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          role: 'assistant',
+          content: data.message || 'I apologize, but I encountered an error.',
+          toolResults: data.toolResults // Include tool results for display
+        };
+        return newMessages;
+      });
 
       saveConversationData();
     } catch (error) {
@@ -563,45 +530,106 @@ export const AIBookingConcierge = () => {
                       );
                     }
                     
-                    // Handle payment link from booking
+                    // Handle payment link from booking - MAKE IT VERY PROMINENT
                     if (result.url && result.sessionId) {
                       return (
-                        <div key={resultIdx} className="mt-2 ml-8">
-                          <Button 
-                            onClick={() => window.open(result.url, '_blank')}
-                            className="w-full bg-primary hover:bg-primary/90"
-                          >
-                            Complete Payment to Confirm Booking
-                          </Button>
+                        <div key={resultIdx} className="mt-3 ml-8">
+                          <div className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary rounded-lg p-4 space-y-3">
+                            <p className="text-sm font-semibold text-foreground">
+                              💳 Payment Ready
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Click below to complete your secure payment and confirm your booking:
+                            </p>
+                            <Button 
+                              onClick={() => window.open(result.url, '_blank')}
+                              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 font-semibold shadow-lg"
+                              size="lg"
+                            >
+                              Complete Payment →
+                            </Button>
+                            <p className="text-xs text-center text-muted-foreground">
+                              Secure payment via Stripe
+                            </p>
+                          </div>
                         </div>
                       );
                     }
                     
-                    // Display search results
+                    // Display flight results
+                    if (result.flights && Array.isArray(result.flights) && result.flights.length > 0) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                          <p className="text-xs font-semibold text-muted-foreground mb-1">
+                            ✈️ Found {result.flights.length} flight options:
+                          </p>
+                          {result.flights.slice(0, 3).map((flight: any, flightIdx: number) => (
+                            <div key={flightIdx} className="bg-card border border-border rounded-lg p-3 text-xs">
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <h4 className="font-semibold text-sm">{flight.airline || 'Flight'}</h4>
+                                  <p className="text-muted-foreground mt-1">
+                                    {flight.origin} → {flight.destination}
+                                  </p>
+                                  {flight.departure && (
+                                    <p className="text-muted-foreground">
+                                      🛫 {new Date(flight.departure).toLocaleString('en-US', { 
+                                        month: 'short', 
+                                        day: 'numeric', 
+                                        hour: '2-digit', 
+                                        minute: '2-digit' 
+                                      })}
+                                    </p>
+                                  )}
+                                  {flight.duration && (
+                                    <p className="text-muted-foreground">
+                                      ⏱️ {flight.duration}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-bold text-primary text-base">
+                                    ${flight.price?.toFixed(2) || 'N/A'}
+                                  </p>
+                                  {flight.stops !== undefined && (
+                                    <p className="text-xs text-muted-foreground">
+                                      {flight.stops === 0 ? 'Direct' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    }
+                    
+                    // Display hotel results
                     if (result.results && Array.isArray(result.results) && result.results.length > 0) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                          <p className="text-xs font-semibold text-muted-foreground mb-1">
+                            🏨 Found {result.results.length} hotel options:
+                          </p>
                           {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
-                            <div key={hotelIdx} className="bg-card border border-border rounded-lg p-3 text-xs">
-                              <div className="flex gap-3">
-                                {hotel.photos && hotel.photos[0] && (
-                                  <img 
-                                    src={hotel.photos[0]} 
-                                    alt={hotel.name}
-                                    className="w-20 h-20 object-cover rounded"
-                                  />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <h4 className="font-semibold text-sm truncate">{hotel.name}</h4>
-                                  <p className="text-muted-foreground truncate">{hotel.city}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    {hotel.rating > 0 && (
-                                      <span className="text-yellow-500">★ {hotel.rating.toFixed(1)}</span>
-                                    )}
-                                    <span className="font-semibold text-primary">
-                                      ${hotel.price?.toFixed(2)}/night
-                                    </span>
-                                  </div>
+                            <div key={hotelIdx} className="bg-card border border-border rounded-lg overflow-hidden">
+                              {hotel.photos && hotel.photos[0] && (
+                                <img 
+                                  src={hotel.photos[0]} 
+                                  alt={hotel.name}
+                                  className="w-full h-32 object-cover"
+                                />
+                              )}
+                              <div className="p-3 text-xs">
+                                <h4 className="font-semibold text-sm truncate">{hotel.name}</h4>
+                                <p className="text-muted-foreground truncate">{hotel.city}</p>
+                                <div className="flex items-center justify-between mt-2">
+                                  {hotel.rating > 0 && (
+                                    <span className="text-yellow-500">★ {hotel.rating.toFixed(1)}</span>
+                                  )}
+                                  <span className="font-bold text-primary text-base">
+                                    ${hotel.price?.toFixed(2)}/night
+                                  </span>
                                 </div>
                               </div>
                             </div>

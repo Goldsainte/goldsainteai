@@ -58,12 +58,15 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "book_selection",
-          description: "Book a selected flight or hotel. Call this when user confirms they want to book a specific option. Returns payment link.",
+          description: "Book a selected flight or hotel. Call this when user confirms they want to book a specific option. Returns payment link. IMPORTANT: Include full booking details so user can review before payment.",
           parameters: {
             type: "object",
             properties: {
               bookingType: { type: "string", description: "Type of booking: 'flight' or 'hotel'" },
-              selectedOption: { type: "object", description: "The complete booking details from the search results" },
+              selectedOption: { 
+                type: "object", 
+                description: "The complete booking details from the search results - include ALL fields like name, price, dates, airline/hotel name, etc."
+              },
               travelerInfo: { 
                 type: "object", 
                 description: "Traveler contact information",
@@ -71,7 +74,8 @@ serve(async (req) => {
                   name: { type: "string" },
                   email: { type: "string" },
                   phone: { type: "string" }
-                }
+                },
+                required: ["name", "email"]
               }
             },
             required: ["bookingType", "selectedOption", "travelerInfo"]
@@ -195,25 +199,33 @@ CRITICAL RULES:
 1. I CAN SEARCH, RECOMMEND, AND BOOK directly - I have full booking capabilities with secure payment processing
    - In voice mode, SAY THIS: "I can help you search and book flights, hotels, rental cars, restaurants, and events - plus check visa requirements."
 2. ALWAYS collect complete details before searching: dates, location, number of guests, preferences
-3. When showing search results, describe TOP 2-3 options in detail: name, location, price, rating, amenities
-4. After showing options, ask: "Which option would you like?" then STOP and WAIT for response
+3. When showing search results:
+   - Present TOP 2-3 options with ALL key details
+   - Include: name, price, rating, key features
+   - For flights: airline, times, duration, stops, price
+   - For hotels: name, location, rating, amenities, price per night
+4. After showing options, ask: "Which option would you like to book?" then STOP and WAIT for response
    - DO NOT continue with more questions or actions until user responds
-5. When user selects an option to book, collect: full name, email, phone number
-6. After collecting info, use the book_selection tool to initiate booking and payment
-7. Provide the payment link and explain: "I've prepared your booking. Please complete payment through this secure link, and your reservation will be confirmed immediately."
-8. Keep responses concise and natural - avoid long lists
-9. WAIT FOR USER RESPONSE - Never ask a question and then immediately continue talking or taking actions
+5. When user selects an option, REPEAT THE FULL BOOKING DETAILS back to them:
+   - "Let me confirm: You want to book [specific hotel/flight name] for [dates] at [total price]. Is that correct?"
+   - WAIT for their confirmation
+6. Only after they confirm, collect: full name, email, phone number (if not already collected)
+7. Use book_selection tool with COMPLETE booking details
+8. IMMEDIATELY after calling book_selection, say: "I've prepared your booking payment. Please use the payment button below to complete your reservation securely."
+9. Keep responses concise and natural - avoid long lists
+10. WAIT FOR USER RESPONSE after EVERY question - Never ask a question and then immediately continue talking
 
 CONVERSATION FLOW:
 1. Greet warmly and ask what they're planning
-2. Gather essential details (destination, dates, guests, budget, preferences) - ONE QUESTION AT A TIME
+2. Gather essential details (destination, dates, guests, budget) - ONE QUESTION AT A TIME
 3. Use search tools to find options
-4. Present TOP 2-3 options with key details (name, price, highlights)
+4. Present TOP 2-3 options with complete details
 5. Ask "Which option would you like?" - THEN STOP AND WAIT
-6. When they respond, collect: full name, email, phone number
-7. Use book_selection tool to create the booking
-8. Provide payment link: "Here's your secure payment link. Once completed, you'll receive confirmation immediately."
-9. Alternatively, if they prefer, offer to pass to an agent or direct to AI Agent/search
+6. When they respond, REPEAT the full booking details back: "Just to confirm - you'd like to book [name] for [dates] at [price]. Is that correct?"
+7. WAIT for confirmation
+8. Collect traveler info: full name, email, phone
+9. Use book_selection tool with COMPLETE details
+10. Say: "Please use the payment button below to complete your booking securely"
 
 CRITICAL: After asking ANY question, STOP. Do not continue with additional questions or actions. Wait for the user's response.
 
@@ -308,7 +320,7 @@ Remember: You're a full-service AI concierge that can complete bookings end-to-e
         const functionName = toolCall.function.name;
         const args = JSON.parse(toolCall.function.arguments);
         
-        console.log(`Executing tool: ${functionName}`, args);
+        console.log(`[AI Concierge] Executing tool: ${functionName}`, JSON.stringify(args, null, 2));
         
         // Call the appropriate Supabase edge function
         let result;
@@ -328,8 +340,10 @@ Remember: You're a full-service AI concierge that can complete bookings end-to-e
           
           const edgeFunctionName = functionMap[functionName];
           if (!edgeFunctionName) {
+            console.error(`[AI Concierge] Unknown function: ${functionName}`);
             result = { error: `Unknown function: ${functionName}` };
           } else {
+            console.log(`[AI Concierge] Calling edge function: ${edgeFunctionName}`);
             const toolResponse = await fetch(`${supabaseUrl}/functions/v1/${edgeFunctionName}`, {
               method: 'POST',
               headers: {
@@ -340,9 +354,10 @@ Remember: You're a full-service AI concierge that can complete bookings end-to-e
             });
             
             result = await toolResponse.json();
+            console.log(`[AI Concierge] Tool result from ${functionName}:`, JSON.stringify(result, null, 2));
           }
         } catch (error) {
-          console.error(`Error calling ${functionName}:`, error);
+          console.error(`[AI Concierge] Error calling ${functionName}:`, error);
           result = { error: error instanceof Error ? error.message : 'Unknown error' };
         }
         
