@@ -41,6 +41,7 @@ export const AIBookingConcierge = () => {
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const isIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Mac') && 'ontouchend' in document));
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -230,6 +231,8 @@ export const AIBookingConcierge = () => {
 
         // Pause wake word while in active voice call to avoid mic conflicts
         await stopWakeWordDetection();
+        // Give iOS a moment to release the audio session
+        await new Promise((r) => setTimeout(r, 300));
         
         const getSessionToken = async () => {
           try {
@@ -334,7 +337,7 @@ export const AIBookingConcierge = () => {
         });
         
         // Resume wake word detection if voice mode fails
-        startWakeWordDetection();
+        if (!isIOS) startWakeWordDetection();
       }
     } else {
       voiceChatRef.current?.disconnect();
@@ -346,7 +349,7 @@ export const AIBookingConcierge = () => {
         holdMusicRef.current.stop();
       }
       // Resume wake word listening after call ends
-      startWakeWordDetection();
+      if (!isIOS) setTimeout(() => startWakeWordDetection(), 400);
     }
   };
 
@@ -438,7 +441,12 @@ export const AIBookingConcierge = () => {
   useEffect(() => {
     // Start wake word detection when widget is opened (user interaction)
     if (isOpen && !wakeWordDetectorRef.current) {
-      startWakeWordDetection();
+      if (!isIOS) {
+        startWakeWordDetection();
+      } else {
+        setWakeWordActive(false);
+        setIsWakeWordListening(false);
+      }
     }
 
     return () => {
@@ -493,7 +501,7 @@ export const AIBookingConcierge = () => {
           <div>
             <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
-              {isWakeWordListening ? "Initializing..." : wakeWordActive && !voiceMode ? "Say 'Hey Sainte'" : "Powered by Goldsainte"}
+              {isWakeWordListening ? "Initializing..." : wakeWordActive && !voiceMode ? "Say 'Hey Sainte'" : isIOS ? "Tap mic to start" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
@@ -509,8 +517,8 @@ export const AIBookingConcierge = () => {
               }
             }}
             className="text-primary-foreground hover:bg-white/10"
-            disabled={isWakeWordListening && !wakeWordActive}
-            title={wakeWordActive ? "Disable wake word" : "Enable wake word"}
+            disabled={voiceMode || (isWakeWordListening && !wakeWordActive)}
+            title={wakeWordActive ? "Disable wake word" : voiceMode ? "Voice mode active" : "Enable wake word"}
           >
             {wakeWordActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
           </Button>
@@ -748,7 +756,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {isWakeWordListening ? "⏳ Initializing wake word..." : wakeWordActive ? "🎙️ Say 'Hey Sainte' or tap mic button" : "Tap mic button to start voice chat"}
+              {isWakeWordListening ? "⏳ Initializing wake word..." : wakeWordActive ? "🎙️ Say 'Hey Sainte' or tap mic button" : isIOS ? "Tap mic button to start voice chat" : "Tap mic or say 'Hey Sainte' to start"}
             </p>
           </div>
         </>
