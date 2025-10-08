@@ -373,6 +373,32 @@ export const AIBookingConcierge = () => {
 
   const startWakeWordDetection = async () => {
     try {
+      // Try Picovoice first (works on iOS)
+      const { PicovoiceWakeWordDetector } = await import('@/utils/PicovoiceWakeWordDetector');
+      const picoDetector = new PicovoiceWakeWordDetector(() => {
+        console.log('Wake word triggered!');
+        if (!voiceMode) {
+          toggleVoiceMode();
+        }
+      });
+
+      const started = await picoDetector.start();
+      if (started) {
+        wakeWordDetectorRef.current = picoDetector as any;
+        setWakeWordActive(true);
+        toast({
+          title: "Wake Word Active",
+          description: "Say 'Porcupine' to activate voice mode",
+        });
+        return;
+      }
+    } catch (picoError) {
+      console.log('Picovoice not available, falling back to Web Speech API:', picoError);
+    }
+
+    // Fallback to Web Speech API
+    try {
+      const { WakeWordDetector } = await import('@/utils/WakeWordDetector');
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
         console.log('Wake word triggered!');
         if (!voiceMode) {
@@ -456,7 +482,7 @@ export const AIBookingConcierge = () => {
           <div>
             <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
-              {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
+              {wakeWordActive && !voiceMode ? "Listening for 'Porcupine'" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
@@ -634,7 +660,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {wakeWordActive ? "Say 'Hey Goldsainte' or tap mic button" : "Tap mic button to start voice chat"}
+              {wakeWordActive ? "Say 'Porcupine' or tap mic button" : "Tap mic button to start voice chat"}
             </p>
           </div>
         </>
