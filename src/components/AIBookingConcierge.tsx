@@ -65,25 +65,20 @@ export const AIBookingConcierge = () => {
     };
   }, []);
 
-  // Play/stop hold music based on processing state
+  // Play/stop hold music based on processing state (voice) and loading state (text)
   useEffect(() => {
-    if (!voiceMode) return;
-    
-    console.log('Hold music state change:', { isProcessing, voiceMode, hasHoldMusic: !!holdMusicRef.current });
-    
-    if (isProcessing) {
+    console.log('Hold music state change:', { isProcessing, isLoading, hasHoldMusic: !!holdMusicRef.current });
+
+    const shouldPlay = isProcessing || isLoading;
+    if (shouldPlay) {
       initHoldMusic();
       console.log('Starting hold music');
-      if (holdMusicRef.current) {
-        holdMusicRef.current.play();
-      }
+      holdMusicRef.current?.play();
     } else {
       console.log('Stopping hold music');
-      if (holdMusicRef.current) {
-        holdMusicRef.current.stop();
-      }
+      holdMusicRef.current?.stop();
     }
-  }, [isProcessing, voiceMode]);
+  }, [isProcessing, isLoading]);
 
   // Save conversation data to localStorage for seamless handoff
   const saveConversationData = () => {
@@ -100,6 +95,11 @@ export const AIBookingConcierge = () => {
     const userMessage = input.trim();
     setInput("");
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+
+    // Ensure audio is unlocked for hold music during text processing
+    initHoldMusic();
+    try { await holdMusicRef.current?.unlock?.(); } catch {}
+
     setIsLoading(true);
     saveConversationData();
 

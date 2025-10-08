@@ -55,9 +55,11 @@ export class HoldMusicGenerator {
     console.log('Hold music oscillators started, fading in');
 
     // Fade in over 0.5 seconds
+    const now = this.audioContext.currentTime;
+    this.gainNode.gain.setValueAtTime(0, now);
     this.gainNode.gain.linearRampToValueAtTime(
       0.08, // Low volume for subtle background
-      this.audioContext.currentTime + 0.5
+      now + 0.5
     );
 
     this.isPlaying = true;
