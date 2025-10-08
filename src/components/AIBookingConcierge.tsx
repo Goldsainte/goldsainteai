@@ -230,20 +230,6 @@ export const AIBookingConcierge = () => {
 
         // Pause wake word while in active voice call to avoid mic conflicts
         await stopWakeWordDetection();
-
-        // iOS Safari mic preflight: ensure at least one audioinput device and trigger permission if needed
-        try {
-          const devices = await navigator.mediaDevices.enumerateDevices();
-          const hasMic = devices.some((d) => d.kind === 'audioinput');
-          if (!hasMic) {
-            // Trigger permission prompt with simplest constraints
-            const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            testStream.getTracks().forEach(t => t.stop());
-          }
-        } catch (permErr) {
-          console.warn('Microphone preflight failed:', permErr);
-          throw new Error('Microphone permission is required. Please allow access and try again.');
-        }
         
         const getSessionToken = async () => {
           try {
@@ -332,12 +318,12 @@ export const AIBookingConcierge = () => {
         const errorStr = (error?.toString?.() || '') + ' ' + (error?.message || '') + ' ' + (error?.name || '');
 
         if (errorStr.includes('AVAudioSession') || error?.name === 'NotFoundError') {
-          errorMessage = "Microphone unavailable on iOS. Please: 1) Allow mic in Safari, 2) Close apps using the mic (calls/voice memos), 3) Try again.";
+          errorMessage = "iOS microphone issue: Please close any apps using the microphone (phone calls, voice memos, other browsers) and try again. If that doesn't work, reload this page.";
         } else if (error?.name === 'NotAllowedError') {
-          errorMessage = "Microphone access denied. Please allow in Settings > Safari > Microphone and reload.";
+          errorMessage = "Microphone access denied. Go to Settings > Safari > Microphone, enable it, then reload this page.";
         } else if (error?.name === 'NotReadableError') {
-          errorMessage = "Microphone is being used by another app. Please close other apps and try again.";
-        } else if (error?.message) {
+          errorMessage = "Microphone is busy. Close other apps using it and try again.";
+        } else if (error?.message && !error.message.includes('voice service')) {
           errorMessage = error.message;
         }
         

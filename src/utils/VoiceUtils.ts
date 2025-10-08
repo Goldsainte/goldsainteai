@@ -95,23 +95,11 @@ export class RealtimeVoiceChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track - robust iOS-compatible flow
-      let ms: MediaStream | null = null;
-      try {
-        ms = await navigator.mediaDevices.getUserMedia({ audio: true });
-      } catch (e1) {
-        console.warn('getUserMedia basic failed, retrying with constraints', e1);
-        ms = await navigator.mediaDevices.getUserMedia({ 
-          audio: {
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          }
-        });
-      }
-
+      // Add local audio track - iOS Safari needs simplest possible constraints
+      const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
+      
       const audioTrack = ms.getTracks()[0];
-      console.log('Audio track settings:', audioTrack.getSettings());
+      console.log('Audio track acquired:', audioTrack.label, audioTrack.getSettings());
       this.pc.addTrack(audioTrack);
 
       // Set up data channel for events
