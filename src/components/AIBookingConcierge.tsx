@@ -69,15 +69,13 @@ export const AIBookingConcierge = () => {
     };
   }, []);
 
-  // Play/stop hold music based on processing state
+  // Play/stop hold music continuously throughout voice conversation
   useEffect(() => {
-    if (!voiceMode) return;
+    console.log('Hold music state change:', { voiceMode, hasHoldMusic: !!holdMusicRef.current });
     
-    console.log('Hold music state change:', { isProcessing, voiceMode, hasHoldMusic: !!holdMusicRef.current });
-    
-    if (isProcessing) {
+    if (voiceMode) {
       initHoldMusic();
-      console.log('Starting hold music');
+      console.log('Starting continuous hold music');
       if (holdMusicRef.current) {
         holdMusicRef.current.play();
       }
@@ -87,7 +85,7 @@ export const AIBookingConcierge = () => {
         holdMusicRef.current.stop();
       }
     }
-  }, [isProcessing, voiceMode]);
+  }, [voiceMode]);
 
   // Save conversation data to localStorage for seamless handoff
   const saveConversationData = () => {
