@@ -254,34 +254,7 @@ export const AIBookingConcierge = () => {
     }
   };
 
-  const isMobileSafari = (() => {
-    try {
-      if (typeof navigator === 'undefined') return false;
-      const ua = navigator.userAgent || '';
-      // Check if it's a mobile device first
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(ua) || 
-                      (ua.includes('Mac') && (navigator as any).maxTouchPoints > 1);
-      // Detect Safari but explicitly exclude Chrome, CriOS (Chrome iOS), and Chromium
-      const isChrome = /chrome|chromium|crios/i.test(ua);
-      const isSafariBrowser = /safari/i.test(ua);
-      const isSafariOnly = isSafariBrowser && !isChrome;
-      
-      return isMobile && isSafariOnly;
-    } catch {
-      return false;
-    }
-  })();
-
   const toggleVoiceMode = async () => {
-    // Show Safari disclaimer ONLY for mobile Safari users (not Chrome, not desktop)
-    if (!voiceMode && isMobileSafari) {
-      setMessages(prev => [...prev, { 
-        role: 'assistant', 
-        content: "⚠️ **Browser Compatibility Notice**\n\nGoldsainte AI voice features work best on Google Chrome. Safari has limited support for real-time voice interaction.\n\n**For the best experience:**\n• Download Google Chrome from the App Store\n\nYou can still use text chat here in Safari! Just type your requests below." 
-      }]);
-      return;
-    }
-    
     if (!voiceMode) {
       try {
         setVoiceStatus('connecting');
