@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -304,22 +305,29 @@ export const AIBookingConcierge = () => {
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 group"
-        aria-label="Open AI Booking Concierge"
-      >
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
-          <div className="relative bg-gradient-to-br from-primary to-accent p-4 md:p-5 rounded-full shadow-2xl hover:scale-110 transition-transform">
-            <img 
-              src={logomark} 
-              alt="Goldsainte AI Concierge" 
-              className="w-10 h-10 md:w-8 md:h-8 object-contain"
-            />
-          </div>
-        </div>
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={() => setIsOpen(true)}
+            className="fixed bottom-6 right-6 z-50 group"
+            aria-label="Open AI Booking Concierge"
+          >
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
+              <div className="relative bg-gradient-to-br from-primary to-accent p-4 md:p-5 rounded-full shadow-2xl hover:scale-110 transition-transform">
+                <img 
+                  src={logomark} 
+                  alt="Goldsainte AI Concierge" 
+                  className="w-10 h-10 md:w-8 md:h-8 object-contain"
+                />
+              </div>
+            </div>
+          </button>
+        </TooltipTrigger>
+        <TooltipContent side="left">
+          <p>Ask Goldsainte AI Mode</p>
+        </TooltipContent>
+      </Tooltip>
     );
   }
 
