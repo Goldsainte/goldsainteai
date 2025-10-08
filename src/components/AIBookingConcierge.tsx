@@ -200,10 +200,12 @@ export const AIBookingConcierge = () => {
   const toggleVoiceMode = async () => {
     if (!voiceMode) {
       try {
+        console.log('📞 Starting voice mode...');
         setVoiceStatus('connecting');
 
         // Pause wake word while in active voice call to avoid mic conflicts
         if (wakeWordDetectorRef.current) {
+          console.log('⏸️ Pausing wake word detection during voice call');
           wakeWordDetectorRef.current.stop();
           setWakeWordActive(false);
         }
@@ -279,10 +281,11 @@ export const AIBookingConcierge = () => {
 
         await voiceChatRef.current.init(getSessionToken);
         setVoiceMode(true);
+        console.log('✅ Voice mode activated successfully');
         
         toast({
           title: "Voice Mode Active",
-          description: "You can now speak naturally with the AI concierge",
+          description: "Speak naturally - no need to say 'Hey Goldsainte'",
         });
       } catch (error: any) {
         console.error('Voice error:', error);
@@ -310,6 +313,7 @@ export const AIBookingConcierge = () => {
         startWakeWordDetection();
       }
     } else {
+      console.log('📴 Ending voice mode...');
       voiceChatRef.current?.disconnect();
       setVoiceMode(false);
       setVoiceStatus('disconnected');
@@ -319,20 +323,23 @@ export const AIBookingConcierge = () => {
         holdMusicRef.current.stop();
       }
       // Resume wake word listening after call ends
+      console.log('▶️ Resuming wake word detection');
       startWakeWordDetection();
     }
   };
 
   const startWakeWordDetection = async () => {
     try {
+      console.log('🎤 Starting wake word detection...');
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
-        console.log('Wake word triggered!');
+        console.log('🎉 Wake word "Hey Goldsainte" detected! Activating voice mode...');
         if (!voiceMode) {
           toggleVoiceMode();
         }
       });
 
       const started = await wakeWordDetectorRef.current.start();
+      console.log('Wake word detection started:', started);
       if (started) {
         setWakeWordActive(true);
         toast({
@@ -341,7 +348,7 @@ export const AIBookingConcierge = () => {
         });
       }
     } catch (error) {
-      console.error('Wake word error:', error);
+      console.error('❌ Wake word error:', error);
       toast({
         title: "Wake Word Unavailable",
         description: "Please use the microphone button instead",
