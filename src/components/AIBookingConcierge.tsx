@@ -429,27 +429,27 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
-        isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
-      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[600px]'}`}
+      className={`fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+        isMinimized ? 'w-72 sm:w-80' : 'w-[calc(100vw-2rem)] sm:w-[calc(100vw-3rem)] md:w-96 max-w-md'
+      } ${isMinimized ? 'h-16 sm:h-18' : 'h-[80vh] sm:h-[75vh] md:h-[600px] max-h-[600px]'}`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
+      <div className="bg-gradient-to-r from-primary to-accent p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="relative flex-shrink-0">
+            <img src={logomark} alt="Goldsainte" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
             {wakeWordActive && !voiceMode && (
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
             )}
           </div>
-          <div>
-            <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
-            <p className="text-xs text-primary-foreground/80">
+          <div className="min-w-0 flex-1">
+            <h3 className="font-serif text-base sm:text-lg md:text-xl font-bold text-primary-foreground truncate">AI Concierge</h3>
+            <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate">
               {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
           <Button
             variant="ghost"
             size="icon"
@@ -472,8 +472,8 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
-            <div className="space-y-3">
+          <ScrollArea className="h-[calc(80vh-140px)] sm:h-[calc(75vh-140px)] md:h-[calc(600px-140px)] p-2 sm:p-3" ref={scrollRef}>
+            <div className="space-y-2 sm:space-y-3">
               {messages.map((msg, idx) => (
                 <div key={idx}>
                   <div

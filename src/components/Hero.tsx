@@ -25,22 +25,22 @@ export const Hero = () => {
   };
 
   return (
-    <section className="bg-gradient-hero text-primary-foreground py-12 sm:py-16 md:py-24" aria-label="Hero section with search form">
-      <div className="container mx-auto px-4">
+    <section className="bg-gradient-hero text-primary-foreground py-8 sm:py-12 md:py-16 lg:py-24 px-3 sm:px-4" aria-label="Hero section with search form">
+      <div className="container mx-auto">
         <div className="max-w-4xl">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 leading-tight tracking-tight">
             Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-3xl">
+          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 text-primary-foreground/90 max-w-3xl leading-relaxed">
             AI-powered search, expert agents on demand, or full control — the choice is yours.
           </p>
 
           <form 
-            className="bg-card rounded-lg shadow-xl p-4 sm:p-6" 
+            className="bg-card rounded-lg sm:rounded-xl shadow-xl p-3 sm:p-4 md:p-6" 
             onSubmit={handleSearch}
             aria-label="Hotel search form"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 sm:gap-3 md:gap-4">
               <div className="sm:col-span-2 lg:col-span-1 relative">
                 <label htmlFor="location" className="sr-only">Destination</label>
                 <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
@@ -99,7 +99,7 @@ export const Hero = () => {
 
               <Button 
                 type="submit"
-                className="h-12 px-6 sm:px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold w-full min-h-[48px]"
+                className="h-12 sm:h-13 md:h-14 px-6 sm:px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold w-full min-h-[48px] text-base sm:text-lg"
                 aria-label="Search hotels"
               >
                 Search

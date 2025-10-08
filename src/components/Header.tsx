@@ -84,15 +84,15 @@ export const Header = () => {
   };
 
   return (
-    <header className="bg-background border-b border-border sticky top-0 z-50 touch-manipulation">
-      <div className="container mx-auto px-3 sm:px-4 md:px-6">
-        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
+    <header className="bg-background border-b border-border sticky top-0 z-50 touch-manipulation backdrop-blur-sm bg-background/95">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-16 sm:h-18 md:h-20">
           {/* Logo - Left */}
-          <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
+          <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[48px] py-2">
             <img 
               src={isMobile ? logomark : logoWordmark} 
               alt="Goldsainte Logo" 
-              className={isMobile ? "h-8 w-8" : "h-6 sm:h-7 md:h-8 w-auto"} 
+              className={isMobile ? "h-9 w-9 sm:h-10 sm:w-10" : "h-7 sm:h-8 md:h-9 w-auto"} 
             />
           </a>
 
@@ -102,47 +102,47 @@ export const Header = () => {
           </div>
 
           {/* Right side actions */}
-          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  className="gap-1 text-xs sm:text-sm font-medium hover:bg-muted hidden sm:flex h-10 sm:h-11 px-2 sm:px-3"
+                  className="gap-1.5 text-sm font-medium hover:bg-muted hidden sm:flex h-11 md:h-12 px-3 md:px-4"
                   aria-label="Services menu"
                 >
-                  <Briefcase className="h-4 w-4 sm:h-4 sm:w-4" />
+                  <Briefcase className="h-4 w-4" />
                   <span className="hidden md:inline">Services</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56 bg-background border-border z-[100] touch-manipulation">
-                <DropdownMenuItem onClick={() => handleServiceClick('hotels')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Hotel className="h-4 w-4 text-primary flex-shrink-0" />
+              <DropdownMenuContent align="center" className="w-56 sm:w-60 bg-background border-border z-[100] touch-manipulation p-1">
+                <DropdownMenuItem onClick={() => handleServiceClick('hotels')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <Hotel className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Hotels & Stays</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleServiceClick('flights')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Plane className="h-4 w-4 text-primary flex-shrink-0" />
+                <DropdownMenuItem onClick={() => handleServiceClick('flights')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <Plane className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Flights</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleServiceClick('restaurants')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <UtensilsCrossed className="h-4 w-4 text-primary flex-shrink-0" />
+                <DropdownMenuItem onClick={() => handleServiceClick('restaurants')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <UtensilsCrossed className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Restaurants</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleServiceClick('events')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Ticket className="h-4 w-4 text-primary flex-shrink-0" />
+                <DropdownMenuItem onClick={() => handleServiceClick('events')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <Ticket className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Events</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleServiceClick('cars')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Car className="h-4 w-4 text-primary flex-shrink-0" />
+                <DropdownMenuItem onClick={() => handleServiceClick('cars')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <Car className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Car Rentals</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/browse-agents')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
+                <DropdownMenuItem onClick={() => navigate('/browse-agents')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Travel Agents</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/marketplace')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
+                <DropdownMenuItem onClick={() => navigate('/marketplace')} className="gap-3 cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                  <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
                   <span>Marketplace</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -150,7 +150,7 @@ export const Header = () => {
             <Button 
               variant="ghost" 
               size="sm"
-              className="hidden lg:flex gap-2 text-xs sm:text-sm font-medium hover:bg-muted rounded-full px-2 sm:px-3 h-10 sm:h-11"
+              className="hidden lg:flex gap-2 text-sm font-medium hover:bg-muted rounded-full px-3 md:px-4 h-11 md:h-12"
               onClick={() => navigate('/agent-onboarding')}
             >
               <span className="hidden xl:inline">Become an Agent</span>
@@ -161,34 +161,34 @@ export const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
-                  className="gap-1 sm:gap-1.5 hover:bg-muted rounded-full border border-border shadow-sm px-2 sm:px-3 h-10 sm:h-11 min-w-[44px]"
+                  className="gap-1.5 sm:gap-2 hover:bg-muted rounded-full border border-border shadow-sm px-2.5 sm:px-3 md:px-4 h-11 md:h-12 min-w-[48px]"
                   aria-label="User menu"
                 >
-                  <Menu className="h-4 w-4 md:h-4 md:w-4" />
-                  <User className="h-5 w-5 md:h-5 md:w-5" />
+                  <Menu className="h-4 w-4" />
+                  <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-background border-border z-[100] touch-manipulation" aria-label="User navigation menu">
+              <DropdownMenuContent align="end" className="w-64 sm:w-72 bg-background border-border z-[100] touch-manipulation p-1" aria-label="User navigation menu">
                 {user ? (
                   <>
-                    <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer min-h-[44px] text-sm">
+                    <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
                       Dashboard
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer min-h-[44px] text-sm">
+                    <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
                       My Bookings
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/favorites')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
-                      <Heart className="h-4 w-4 flex-shrink-0" />
+                    <DropdownMenuItem onClick={() => navigate('/favorites')} className="cursor-pointer gap-2 min-h-[48px] text-sm sm:text-base py-3 rounded-md">
+                      <Heart className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                       Favorites
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer min-h-[44px] text-sm">
+                    <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
                       Booking Preferences
                     </DropdownMenuItem>
                     
                     {isAdmin && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/admin/agent-approvals')} className="cursor-pointer min-h-[44px] text-sm font-medium text-primary">
+                        <DropdownMenuItem onClick={() => navigate('/admin/agent-approvals')} className="cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md font-medium text-primary">
                           Admin Panel
                         </DropdownMenuItem>
                       </>
@@ -196,9 +196,9 @@ export const Header = () => {
                     
                     <DropdownMenuSeparator />
                     
-                    <div className="px-2 py-3 min-h-[60px]">
+                    <div className="px-3 py-3 min-h-[64px]">
                       <div className="flex items-center justify-between gap-3">
-                        <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
+                        <Label htmlFor="preferences-toggle" className="text-sm sm:text-base font-medium cursor-pointer flex-1 leading-tight">
                           Use My Preferences
                         </Label>
                         <Switch
@@ -209,23 +209,23 @@ export const Header = () => {
                           aria-label="Toggle search preferences"
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-1.5 leading-relaxed">
                         Apply saved preferences to searches
                       </p>
                     </div>
                     
                     <DropdownMenuSeparator />
                     
-                    <DropdownMenuItem onClick={signOut} className="cursor-pointer min-h-[44px] text-sm">
+                    <DropdownMenuItem onClick={signOut} className="cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
                       Sign Out
                     </DropdownMenuItem>
                   </>
                 ) : (
                   <>
-                    <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer font-medium min-h-[44px] text-sm">
+                    <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer font-medium min-h-[48px] text-sm sm:text-base py-3 rounded-md">
                       Sign In
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer min-h-[44px] text-sm">
+                    <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer min-h-[48px] text-sm sm:text-base py-3 rounded-md">
                       Sign Up
                     </DropdownMenuItem>
                   </>
