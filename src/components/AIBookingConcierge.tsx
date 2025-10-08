@@ -93,34 +93,80 @@ export const AIBookingConcierge = () => {
     saveConversationData();
 
     try {
-      const { data, error } = await supabase.functions.invoke('ai-booking-concierge', {
-        body: {
-          messages: [
-            ...messages,
-            { role: 'user', content: userMessage }
-          ]
-        }
+      // Add placeholder for assistant message
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+      const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
+      
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          messages: [...messages, { role: 'user', content: userMessage }],
+          stream: true 
+        }),
       });
 
-      if (error) {
-        console.error('Concierge error:', error);
-        toast({
-          title: "Error",
-          description: "Failed to get response. Please try again.",
-          variant: "destructive",
-        });
-        return;
+      if (!resp.ok || !resp.body) {
+        throw new Error("Failed to start stream");
       }
 
-      // Add assistant message with tool results if any
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: data.message,
-        toolResults: data.toolResults || []
-      }]);
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let streamDone = false;
+      let accumulatedContent = "";
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              accumulatedContent += content;
+              // Update the last message with accumulated content
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1] = {
+                  ...newMessages[newMessages.length - 1],
+                  content: accumulatedContent
+                };
+                return newMessages;
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
+
       saveConversationData();
     } catch (error) {
       console.error('Error:', error);
+      // Remove the empty assistant message on error
+      setMessages(prev => prev.slice(0, -1));
       toast({
         title: "Error",
         description: "Something went wrong. Please try again.",

@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, stream = false } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -241,6 +241,7 @@ Remember: You're a full-service AI concierge that can complete bookings end-to-e
         tools,
         tool_choice: "auto",
         temperature: 0.7,
+        stream: stream, // Enable streaming if requested
       }),
     });
 
@@ -260,6 +261,13 @@ Remember: You're a full-service AI concierge that can complete bookings end-to-e
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       throw new Error("AI service error");
+    }
+
+    // If streaming is requested, return the stream directly
+    if (stream) {
+      return new Response(response.body, {
+        headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      });
     }
 
     const data = await response.json();
