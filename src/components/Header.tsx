@@ -9,7 +9,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useIsMobile } from "@/hooks/use-mobile";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
+import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 
 export const Header = () => {
@@ -18,6 +20,7 @@ export const Header = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
+  const isMobile = useIsMobile();
   const [usePreferences, setUsePreferences] = useState(true);
 
   // Fetch user's preference setting
@@ -86,7 +89,11 @@ export const Header = () => {
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
           {/* Logo - Left */}
           <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
-            <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
+            <img 
+              src={isMobile ? logomark : logoWordmark} 
+              alt="Goldsainte Logo" 
+              className={isMobile ? "h-8 w-8" : "h-6 sm:h-7 md:h-8 w-auto"} 
+            />
           </a>
 
           {/* Compact Search Bar - Center (desktop and mobile) */}
