@@ -22,7 +22,17 @@ interface Message {
 export const AIBookingConcierge = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const isIOS = typeof navigator !== 'undefined' && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.userAgent.includes('Mac') && 'ontouchend' in document));
+  const isIOS = (() => {
+    try {
+      if (typeof navigator === 'undefined') return false;
+      const ua = navigator.userAgent || '';
+      // iPadOS on Mac reports Mac, detect via maxTouchPoints
+      const isIpadOsOnMac = ua.includes('Mac') && (navigator as any).maxTouchPoints > 1;
+      return /iPad|iPhone|iPod/.test(ua) || isIpadOsOnMac;
+    } catch {
+      return false;
+    }
+  })();
   
   const [messages, setMessages] = useState<Message[]>([
     {
