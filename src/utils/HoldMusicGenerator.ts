@@ -10,19 +10,10 @@ export class HoldMusicGenerator {
     this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
   }
 
-  async play() {
+  play() {
     if (this.isPlaying || !this.audioContext) {
       console.log('Hold music already playing or no audio context');
       return;
-    }
-
-    try {
-      if (this.audioContext.state === 'suspended') {
-        console.log('Resuming AudioContext before starting hold music');
-        await this.audioContext.resume();
-      }
-    } catch (e) {
-      console.warn('AudioContext resume failed in play()', e);
     }
 
     console.log('Creating hold music oscillators');
@@ -55,26 +46,12 @@ export class HoldMusicGenerator {
     console.log('Hold music oscillators started, fading in');
 
     // Fade in over 0.5 seconds
-    const now = this.audioContext.currentTime;
-    this.gainNode.gain.setValueAtTime(0, now);
     this.gainNode.gain.linearRampToValueAtTime(
       0.08, // Low volume for subtle background
-      now + 0.5
+      this.audioContext.currentTime + 0.5
     );
 
     this.isPlaying = true;
-  }
-
-  async unlock() {
-    if (!this.audioContext) return;
-    if (this.audioContext.state === 'suspended') {
-      try {
-        console.log('Manually unlocking AudioContext from user gesture');
-        await this.audioContext.resume();
-      } catch (e) {
-        console.warn('AudioContext resume failed in unlock()', e);
-      }
-    }
   }
 
   stop() {

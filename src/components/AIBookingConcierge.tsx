@@ -22,24 +22,10 @@ interface Message {
 export const AIBookingConcierge = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const isIOS = (() => {
-    try {
-      if (typeof navigator === 'undefined') return false;
-      const ua = navigator.userAgent || '';
-      // iPadOS on Mac reports Mac, detect via maxTouchPoints
-      const isIpadOsOnMac = ua.includes('Mac') && (navigator as any).maxTouchPoints > 1;
-      return /iPad|iPhone|iPod/.test(ua) || isIpadOsOnMac;
-    } catch {
-      return false;
-    }
-  })();
-  
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: isIOS 
-        ? "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Tap the microphone button below to activate voice mode\n2. Or type your travel request\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
-        : "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Sainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
     }
   ]);
   const [input, setInput] = useState("");
@@ -47,7 +33,6 @@ export const AIBookingConcierge = () => {
   const [voiceMode, setVoiceMode] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [wakeWordActive, setWakeWordActive] = useState(false);
-  const [isWakeWordListening, setIsWakeWordListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -61,39 +46,6 @@ export const AIBookingConcierge = () => {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
-
-  // Prevent body scroll when modal is open on mobile
-  useEffect(() => {
-    if (isOpen && !isMinimized) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-    };
-  }, [isOpen, isMinimized]);
-
-  // Handle hold music during voice processing
-  useEffect(() => {
-    if (voiceMode && isProcessing) {
-      console.log('Processing voice input, starting hold music');
-      initHoldMusic();
-      holdMusicRef.current?.play();
-    } else if (!isProcessing) {
-      console.log('Processing complete, stopping hold music');
-      holdMusicRef.current?.stop();
-    }
-  }, [isProcessing, voiceMode]);
 
   // Initialize hold music generator lazily on first use
   const initHoldMusic = () => {
@@ -113,62 +65,25 @@ export const AIBookingConcierge = () => {
     };
   }, []);
 
-  // Detect "hold on" phrases in assistant messages to trigger hold music
+  // Play/stop hold music based on processing state
   useEffect(() => {
-    const lastMessage = messages[messages.length - 1];
-    if (lastMessage?.role === 'assistant') {
-      const content = lastMessage.content.toLowerCase();
-      const holdPhrases = [
-        'hold on',
-        'hold please',
-        'please hold',
-        'one moment',
-        'just a moment',
-        'one sec',
-        'just a sec',
-        'give me a moment',
-        "i'll be back shortly",
-        'ill be back shortly',
-        'be back shortly',
-        'be right back',
-        'let me search',
-        'searching for',
-        'looking for',
-        'checking',
-        'checking availability',
-        'retrieving rates',
-        'finding',
-        'curating options',
-        'gathering options',
-        'bringing back options',
-        'options to consider'
-      ];
-
-      const stopPhrases = [
-        "here are",
-        "here's",
-        "i found",
-        "i've found",
-        'results',
-        'top options',
-        'option 1',
-        'option one'
-      ];
-      
-      const shouldPlayMusic = holdPhrases.some(phrase => content.includes(phrase));
-      const shouldStopMusic = stopPhrases.some(phrase => content.includes(phrase)) || content.length > 50;
-      
-      if (shouldPlayMusic) {
-        console.log('Detected hold phrase, starting music');
-        initHoldMusic();
-        holdMusicRef.current?.play();
-      } else if (shouldStopMusic) {
-        // If assistant gives a substantial response or stop phrase, stop the music
-        console.log('Stop phrase or substantial response detected, stopping music');
-        holdMusicRef.current?.stop();
+    if (!voiceMode) return;
+    
+    console.log('Hold music state change:', { isProcessing, voiceMode, hasHoldMusic: !!holdMusicRef.current });
+    
+    if (isProcessing) {
+      initHoldMusic();
+      console.log('Starting hold music');
+      if (holdMusicRef.current) {
+        holdMusicRef.current.play();
+      }
+    } else {
+      console.log('Stopping hold music');
+      if (holdMusicRef.current) {
+        holdMusicRef.current.stop();
       }
     }
-  }, [messages]);
+  }, [isProcessing, voiceMode]);
 
   // Save conversation data to localStorage for seamless handoff
   const saveConversationData = () => {
@@ -185,11 +100,6 @@ export const AIBookingConcierge = () => {
     const userMessage = input.trim();
     setInput("");
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
-
-    // Ensure audio is unlocked for hold music during text processing
-    initHoldMusic();
-    try { await holdMusicRef.current?.unlock?.(); } catch {}
-
     setIsLoading(true);
     saveConversationData();
 
@@ -207,30 +117,61 @@ export const AIBookingConcierge = () => {
         },
         body: JSON.stringify({ 
           messages: [...messages, { role: 'user', content: userMessage }],
-          stream: false  // Disable streaming to allow tool execution
+          stream: true 
         }),
       });
 
-      if (!resp.ok) {
-        throw new Error("Failed to get response");
+      if (!resp.ok || !resp.body) {
+        throw new Error("Failed to start stream");
       }
 
-      // Parse complete response (non-streaming)
-      const data = await resp.json();
-      
-      // Stop hold music when we get a response
-      holdMusicRef.current?.stop?.();
-      
-      // Update the assistant message with the response
-      setMessages(prev => {
-        const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = {
-          role: 'assistant',
-          content: data.message || 'I apologize, but I encountered an error.',
-          toolResults: data.toolResults // Include tool results for display
-        };
-        return newMessages;
-      });
+      const reader = resp.body.getReader();
+      const decoder = new TextDecoder();
+      let textBuffer = "";
+      let streamDone = false;
+      let accumulatedContent = "";
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf("\n")) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith("\r")) line = line.slice(0, -1);
+          if (line.startsWith(":") || line.trim() === "") continue;
+          if (!line.startsWith("data: ")) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === "[DONE]") {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content as string | undefined;
+            if (content) {
+              accumulatedContent += content;
+              // Update the last message with accumulated content
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1] = {
+                  ...newMessages[newMessages.length - 1],
+                  content: accumulatedContent
+                };
+                return newMessages;
+              });
+            }
+          } catch {
+            textBuffer = line + "\n" + textBuffer;
+            break;
+          }
+        }
+      }
 
       saveConversationData();
     } catch (error) {
@@ -259,14 +200,11 @@ export const AIBookingConcierge = () => {
       try {
         setVoiceStatus('connecting');
 
-        // Ensure audio is unlocked for hold music
-        initHoldMusic();
-        await holdMusicRef.current?.unlock?.();
-
         // Pause wake word while in active voice call to avoid mic conflicts
-        await stopWakeWordDetection();
-        // Give iOS a moment to release the audio session
-        await new Promise((r) => setTimeout(r, 300));
+        if (wakeWordDetectorRef.current) {
+          wakeWordDetectorRef.current.stop();
+          setWakeWordActive(false);
+        }
         
         const getSessionToken = async () => {
           try {
@@ -293,10 +231,9 @@ export const AIBookingConcierge = () => {
             console.log('Voice message:', message);
             
             if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
-              // AI is responding - stop processing state and any hold music
+              // AI is responding - stop processing state
               console.log('AI is responding, stopping processing state');
               setIsProcessing(false);
-              holdMusicRef.current?.stop?.();
               
               if (message.type === 'response.audio_transcript.delta') {
                 if (!isAssistantSpeaking) {
@@ -318,7 +255,6 @@ export const AIBookingConcierge = () => {
               console.log('AI finished speaking');
               isAssistantSpeaking = false;
               setIsProcessing(false);
-              holdMusicRef.current?.stop?.();
               saveConversationData();
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
               // User finished speaking - start processing state
@@ -350,18 +286,16 @@ export const AIBookingConcierge = () => {
         console.error('Voice error:', error);
         setVoiceStatus('error');
         
-        // Provide specific error messages (prioritize iOS AVAudioSession mapping)
+        // Provide specific error messages
         let errorMessage = "Failed to start voice mode";
-        const errorStr = (error?.toString?.() || '') + ' ' + (error?.message || '') + ' ' + (error?.name || '');
-
-        if (errorStr.includes('AVAudioSession') || error?.name === 'NotFoundError') {
-          errorMessage = "iOS microphone issue: Please close any apps using the microphone (phone calls, voice memos, other browsers) and try again. If that doesn't work, reload this page.";
-        } else if (error?.name === 'NotAllowedError') {
-          errorMessage = "Microphone access denied. Go to Settings > Safari > Microphone, enable it, then reload this page.";
-        } else if (error?.name === 'NotReadableError') {
-          errorMessage = "Microphone is busy. Close other apps using it and try again.";
-        } else if (error?.message && !error.message.includes('voice service')) {
+        if (error?.message) {
           errorMessage = error.message;
+        } else if (error?.name === 'NotAllowedError') {
+          errorMessage = "Microphone access denied. Please allow microphone access in your browser settings.";
+        } else if (error?.name === 'NotFoundError') {
+          errorMessage = "No microphone found. Please connect a microphone and try again.";
+        } else if (error?.name === 'NotReadableError') {
+          errorMessage = "Microphone is being used by another application. Please close other apps using the microphone.";
         }
         
         toast({
@@ -371,7 +305,7 @@ export const AIBookingConcierge = () => {
         });
         
         // Resume wake word detection if voice mode fails
-        if (!isIOS) startWakeWordDetection();
+        startWakeWordDetection();
       }
     } else {
       voiceChatRef.current?.disconnect();
@@ -383,52 +317,14 @@ export const AIBookingConcierge = () => {
         holdMusicRef.current.stop();
       }
       // Resume wake word listening after call ends
-      if (!isIOS) setTimeout(() => startWakeWordDetection(), 400);
+      startWakeWordDetection();
     }
   };
 
   const startWakeWordDetection = async () => {
-    if (wakeWordActive || isWakeWordListening) {
-      console.log('Wake word already active or starting');
-      return;
-    }
-    
     try {
-      console.log('Starting wake word detection...');
-      setIsWakeWordListening(true);
-      
-      // Try Picovoice first (works on iOS)
-      const { PicovoiceWakeWordDetector } = await import('@/utils/PicovoiceWakeWordDetector');
-      const picoDetector = new PicovoiceWakeWordDetector(() => {
-        console.log('Wake word triggered via Picovoice!');
-        stopWakeWordDetection();
-        if (!voiceMode) {
-          toggleVoiceMode();
-        }
-      });
-
-      const started = await picoDetector.start();
-      if (started) {
-        wakeWordDetectorRef.current = picoDetector as any;
-        setWakeWordActive(true);
-        setIsWakeWordListening(false);
-        console.log('Picovoice wake word active');
-        toast({
-          title: "Wake Word Active",
-          description: "Say 'Hey Sainte' to activate voice mode",
-        });
-        return;
-      }
-    } catch (picoError) {
-      console.log('Picovoice not available, falling back to Web Speech API:', picoError);
-    }
-
-    // Fallback to Web Speech API
-    try {
-      const { WakeWordDetector } = await import('@/utils/WakeWordDetector');
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
-        console.log('Wake word triggered via Web Speech API!');
-        stopWakeWordDetection();
+        console.log('Wake word triggered!');
         if (!voiceMode) {
           toggleVoiceMode();
         }
@@ -437,16 +333,13 @@ export const AIBookingConcierge = () => {
       const started = await wakeWordDetectorRef.current.start();
       if (started) {
         setWakeWordActive(true);
-        setIsWakeWordListening(false);
-        console.log('Web Speech API wake word active');
         toast({
           title: "Wake Word Active",
-          description: "Say 'Hey Sainte' to activate voice mode",
+          description: "Say 'Hey Goldsainte' to activate voice mode",
         });
       }
     } catch (error) {
       console.error('Wake word error:', error);
-      setIsWakeWordListening(false);
       toast({
         title: "Wake Word Unavailable",
         description: "Please use the microphone button instead",
@@ -455,32 +348,10 @@ export const AIBookingConcierge = () => {
     }
   };
 
-  const stopWakeWordDetection = async () => {
-    console.log('Stopping wake word detection...');
-    
-    if (wakeWordDetectorRef.current) {
-      try {
-        await wakeWordDetectorRef.current.stop();
-        wakeWordDetectorRef.current = null;
-        console.log('Wake word detector stopped');
-      } catch (error) {
-        console.error('Error stopping wake word detector:', error);
-      }
-    }
-    
-    setWakeWordActive(false);
-    setIsWakeWordListening(false);
-  };
-
   useEffect(() => {
     // Start wake word detection when widget is opened (user interaction)
     if (isOpen && !wakeWordDetectorRef.current) {
-      if (!isIOS) {
-        startWakeWordDetection();
-      } else {
-        setWakeWordActive(false);
-        setIsWakeWordListening(false);
-      }
+      startWakeWordDetection();
     }
 
     return () => {
@@ -494,7 +365,7 @@ export const AIBookingConcierge = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <button
-            onClick={() => { setIsOpen(true); initHoldMusic(); holdMusicRef.current?.unlock?.(); }}
+            onClick={() => setIsOpen(true)}
             className="fixed bottom-6 right-6 z-50 group"
             aria-label="Open AI Booking Concierge"
           >
@@ -519,12 +390,12 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed md:bottom-6 md:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all
-        ${isMinimized ? 'w-80 md:w-80 bottom-6 right-6 rounded-lg' : 'inset-0 md:inset-auto md:bottom-6 md:right-6 md:w-96 md:max-w-md md:rounded-lg rounded-none'}
-        ${isMinimized ? 'h-16' : 'h-[100dvh] md:h-[600px] md:max-h-[600px]'}`}
+      className={`fixed bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+        isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
+      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[600px]'}`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-accent p-4 md:rounded-t-lg flex items-center justify-between">
+      <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
             <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
@@ -535,29 +406,11 @@ export const AIBookingConcierge = () => {
           <div>
             <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
-              {isWakeWordListening ? "Initializing..." : wakeWordActive && !voiceMode ? "Say 'Hey Sainte'" : isIOS ? "Tap mic to start" : "Powered by Goldsainte"}
+              {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {!isIOS && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => {
-                if (wakeWordActive || isWakeWordListening) {
-                  stopWakeWordDetection();
-                } else {
-                  startWakeWordDetection();
-                }
-              }}
-              className="text-primary-foreground hover:bg-white/10"
-              disabled={voiceMode || (isWakeWordListening && !wakeWordActive)}
-              title={wakeWordActive ? "Disable wake word" : voiceMode ? "Voice mode active" : "Enable wake word"}
-            >
-              {wakeWordActive ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
-            </Button>
-          )}
           <Button
             variant="ghost"
             size="icon"
@@ -580,7 +433,7 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(100dvh-180px)] md:h-[calc(600px-140px)] p-3 md:p-4" ref={scrollRef}>
+          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
             <div className="space-y-3">
               {messages.map((msg, idx) => (
                 <div key={idx}>
@@ -622,106 +475,45 @@ export const AIBookingConcierge = () => {
                       );
                     }
                     
-                    // Handle payment link from booking - MAKE IT VERY PROMINENT
+                    // Handle payment link from booking
                     if (result.url && result.sessionId) {
                       return (
-                        <div key={resultIdx} className="mt-3 ml-8">
-                          <div className="bg-gradient-to-r from-primary/10 to-accent/10 border-2 border-primary rounded-lg p-4 space-y-3">
-                            <p className="text-sm font-semibold text-foreground">
-                              💳 Payment Ready
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Click below to complete your secure payment and confirm your booking:
-                            </p>
-                            <Button 
-                              onClick={() => window.open(result.url, '_blank')}
-                              className="w-full bg-gradient-to-r from-primary to-accent hover:opacity-90 font-semibold shadow-lg"
-                              size="lg"
-                            >
-                              Complete Payment →
-                            </Button>
-                            <p className="text-xs text-center text-muted-foreground">
-                              Secure payment via Stripe
-                            </p>
-                          </div>
+                        <div key={resultIdx} className="mt-2 ml-8">
+                          <Button 
+                            onClick={() => window.open(result.url, '_blank')}
+                            className="w-full bg-primary hover:bg-primary/90"
+                          >
+                            Complete Payment to Confirm Booking
+                          </Button>
                         </div>
                       );
                     }
                     
-                    // Display flight results
-                    if (result.flights && Array.isArray(result.flights) && result.flights.length > 0) {
-                      return (
-                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
-                          <p className="text-xs font-semibold text-muted-foreground mb-1">
-                            ✈️ Found {result.flights.length} flight options:
-                          </p>
-                          {result.flights.slice(0, 3).map((flight: any, flightIdx: number) => (
-                            <div key={flightIdx} className="bg-card border border-border rounded-lg p-3 text-xs">
-                              <div className="flex items-start justify-between">
-                                <div className="flex-1">
-                                  <h4 className="font-semibold text-sm">{flight.airline || 'Flight'}</h4>
-                                  <p className="text-muted-foreground mt-1">
-                                    {flight.origin} → {flight.destination}
-                                  </p>
-                                  {flight.departure && (
-                                    <p className="text-muted-foreground">
-                                      🛫 {new Date(flight.departure).toLocaleString('en-US', { 
-                                        month: 'short', 
-                                        day: 'numeric', 
-                                        hour: '2-digit', 
-                                        minute: '2-digit' 
-                                      })}
-                                    </p>
-                                  )}
-                                  {flight.duration && (
-                                    <p className="text-muted-foreground">
-                                      ⏱️ {flight.duration}
-                                    </p>
-                                  )}
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-bold text-primary text-base">
-                                    ${flight.price?.toFixed(2) || 'N/A'}
-                                  </p>
-                                  {flight.stops !== undefined && (
-                                    <p className="text-xs text-muted-foreground">
-                                      {flight.stops === 0 ? 'Direct' : `${flight.stops} stop${flight.stops > 1 ? 's' : ''}`}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      );
-                    }
-                    
-                    // Display hotel results
+                    // Display search results
                     if (result.results && Array.isArray(result.results) && result.results.length > 0) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8 space-y-2">
-                          <p className="text-xs font-semibold text-muted-foreground mb-1">
-                            🏨 Found {result.results.length} hotel options:
-                          </p>
                           {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
-                            <div key={hotelIdx} className="bg-card border border-border rounded-lg overflow-hidden">
-                              {hotel.photos && hotel.photos[0] && (
-                                <img 
-                                  src={hotel.photos[0]} 
-                                  alt={hotel.name}
-                                  className="w-full h-32 object-cover"
-                                />
-                              )}
-                              <div className="p-3 text-xs">
-                                <h4 className="font-semibold text-sm truncate">{hotel.name}</h4>
-                                <p className="text-muted-foreground truncate">{hotel.city}</p>
-                                <div className="flex items-center justify-between mt-2">
-                                  {hotel.rating > 0 && (
-                                    <span className="text-yellow-500">★ {hotel.rating.toFixed(1)}</span>
-                                  )}
-                                  <span className="font-bold text-primary text-base">
-                                    ${hotel.price?.toFixed(2)}/night
-                                  </span>
+                            <div key={hotelIdx} className="bg-card border border-border rounded-lg p-3 text-xs">
+                              <div className="flex gap-3">
+                                {hotel.photos && hotel.photos[0] && (
+                                  <img 
+                                    src={hotel.photos[0]} 
+                                    alt={hotel.name}
+                                    className="w-20 h-20 object-cover rounded"
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="font-semibold text-sm truncate">{hotel.name}</h4>
+                                  <p className="text-muted-foreground truncate">{hotel.city}</p>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    {hotel.rating > 0 && (
+                                      <span className="text-yellow-500">★ {hotel.rating.toFixed(1)}</span>
+                                    )}
+                                    <span className="font-semibold text-primary">
+                                      ${hotel.price?.toFixed(2)}/night
+                                    </span>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -751,7 +543,7 @@ export const AIBookingConcierge = () => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-3 md:p-4 border-t border-border pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <div className="p-3 border-t border-border">
             <div className="flex gap-2">
               {!voiceMode && (
                 <>
@@ -792,7 +584,7 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Mobile helper text */}
             <p className="text-xs text-muted-foreground mt-2 md:hidden text-center">
-              {isWakeWordListening ? "⏳ Initializing wake word..." : wakeWordActive ? "🎙️ Say 'Hey Sainte' or tap mic button" : isIOS ? "Tap mic button to start voice chat" : "Tap mic or say 'Hey Sainte' to start"}
+              {wakeWordActive ? "Say 'Hey Goldsainte' or tap mic button" : "Tap mic button to start voice chat"}
             </p>
           </div>
         </>

@@ -70,9 +70,6 @@ export class RealtimeVoiceChat {
   ) {
     this.audioEl = document.createElement("audio");
     this.audioEl.autoplay = true;
-    // iOS Safari requires playsInline for autoplay without fullscreen
-    // @ts-ignore - playsInline not in older TS lib
-    this.audioEl.playsInline = true;
   }
 
   async init(getSessionToken: () => Promise<string>) {
@@ -95,12 +92,16 @@ export class RealtimeVoiceChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track - iOS Safari needs simplest possible constraints
-      const ms = await navigator.mediaDevices.getUserMedia({ audio: true });
-      
-      const audioTrack = ms.getTracks()[0];
-      console.log('Audio track acquired:', audioTrack.label, audioTrack.getSettings());
-      this.pc.addTrack(audioTrack);
+      // Add local audio track
+      const ms = await navigator.mediaDevices.getUserMedia({ 
+        audio: {
+          sampleRate: 24000,
+          channelCount: 1,
+          echoCancellation: true,
+          noiseSuppression: true,
+        } 
+      });
+      this.pc.addTrack(ms.getTracks()[0]);
 
       // Set up data channel for events
       this.dc = this.pc.createDataChannel("oai-events");
