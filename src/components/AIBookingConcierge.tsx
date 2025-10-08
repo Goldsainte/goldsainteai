@@ -492,7 +492,7 @@ export const AIBookingConcierge = () => {
             )}
           </div>
           <div>
-            <h3 className="font-secondary text-lg md:text-xl font-bold text-primary-foreground">Goldsainte Ai Concierge</h3>
+            <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
             <p className="text-xs text-primary-foreground/80">
               {wakeWordActive && !voiceMode ? "Listening for 'Hey Sainte'" : "Powered by Goldsainte"}
             </p>
