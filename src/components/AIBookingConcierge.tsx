@@ -431,7 +431,7 @@ export const AIBookingConcierge = () => {
     <Card 
       className={`fixed bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
         isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
-      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[600px]'}`}
+      } ${isMinimized ? 'h-16' : 'h-[80vh] md:h-[600px] max-h-[80vh] md:max-h-[600px]'}`}
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
@@ -472,7 +472,7 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-140px)] md:h-[calc(600px-140px)] p-3" ref={scrollRef}>
+          <ScrollArea className="h-[calc(80vh-180px)] md:h-[calc(600px-180px)] p-3" ref={scrollRef}>
             <div className="space-y-3">
               {messages.map((msg, idx) => (
                 <div key={idx}>
@@ -567,8 +567,8 @@ export const AIBookingConcierge = () => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-3 border-t border-border">
-            <div className="flex gap-2">
+          <div className="p-4 md:p-3 border-t border-border bg-background">
+            <div className="flex gap-2 mb-3">
               {!voiceMode && (
                 <>
                   <Input
@@ -576,16 +576,16 @@ export const AIBookingConcierge = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your travel request..."
-                    className="flex-1 text-sm h-10"
+                    className="flex-1 text-sm h-12 md:h-11"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
                     size="icon"
-                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-10 w-10"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-12 w-12 md:h-11 md:w-11 shrink-0"
                   >
-                    <Send className="h-4 w-4" />
+                    <Send className="h-5 w-5" />
                   </Button>
                 </>
               )}
@@ -611,11 +611,11 @@ export const AIBookingConcierge = () => {
                 onTouchEnd={handlePushToTalkEnd}
                 size="icon"
                 variant={isPushToTalkActive ? "default" : "outline"}
-                className={`h-10 w-10 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-110" : ""} transition-all`}
+                className={`h-14 w-14 md:h-12 md:w-12 shrink-0 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-110" : ""} transition-all`}
                 disabled={voiceStatus === 'connecting' || (voiceMode && !isPushToTalkActive)}
                 title="Press & hold to speak"
               >
-                <Radio className={`h-4 w-4 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
+                <Radio className={`h-6 w-6 md:h-5 md:w-5 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
               </Button>
               
               {/* Toggle always-on voice mode */}
@@ -623,15 +623,15 @@ export const AIBookingConcierge = () => {
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode && !isPushToTalkActive ? "default" : "outline"}
-                className={`h-10 w-10 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
+                className={`h-14 w-14 md:h-12 md:w-12 shrink-0 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
                 disabled={voiceStatus === 'connecting' || isPushToTalkActive}
                 title={voiceMode ? "End voice call" : "Start voice call"}
               >
-                {voiceMode && !isPushToTalkActive ? <Phone className="h-4 w-4" /> : <PhoneOff className="h-4 w-4" />}
+                {voiceMode && !isPushToTalkActive ? <Phone className="h-6 w-6 md:h-5 md:w-5" /> : <PhoneOff className="h-6 w-6 md:h-5 md:w-5" />}
               </Button>
             </div>
             {/* Helper text */}
-            <p className="text-xs text-muted-foreground mt-2 text-center">
+            <p className="text-[11px] leading-tight text-muted-foreground text-center px-2">
               {isPushToTalkActive 
                 ? "Release to stop recording"
                 : wakeWordActive 
