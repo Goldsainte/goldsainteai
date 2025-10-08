@@ -70,6 +70,9 @@ export class RealtimeVoiceChat {
   ) {
     this.audioEl = document.createElement("audio");
     this.audioEl.autoplay = true;
+    // iOS Safari requires playsInline for autoplay without fullscreen
+    // @ts-ignore - playsInline not in older TS lib
+    this.audioEl.playsInline = true;
   }
 
   async init(getSessionToken: () => Promise<string>) {
@@ -92,15 +95,21 @@ export class RealtimeVoiceChat {
         this.audioEl.srcObject = e.streams[0];
       };
 
-      // Add local audio track - use iOS-compatible constraints
-      const ms = await navigator.mediaDevices.getUserMedia({ 
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        } 
-      });
-      
+      // Add local audio track - robust iOS-compatible flow
+      let ms: MediaStream | null = null;
+      try {
+        ms = await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (e1) {
+        console.warn('getUserMedia basic failed, retrying with constraints', e1);
+        ms = await navigator.mediaDevices.getUserMedia({ 
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          }
+        });
+      }
+
       const audioTrack = ms.getTracks()[0];
       console.log('Audio track settings:', audioTrack.getSettings());
       this.pc.addTrack(audioTrack);

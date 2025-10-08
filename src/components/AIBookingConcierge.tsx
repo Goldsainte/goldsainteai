@@ -230,6 +230,20 @@ export const AIBookingConcierge = () => {
 
         // Pause wake word while in active voice call to avoid mic conflicts
         await stopWakeWordDetection();
+
+        // iOS Safari mic preflight: ensure at least one audioinput device and trigger permission if needed
+        try {
+          const devices = await navigator.mediaDevices.enumerateDevices();
+          const hasMic = devices.some((d) => d.kind === 'audioinput');
+          if (!hasMic) {
+            // Trigger permission prompt with simplest constraints
+            const testStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            testStream.getTracks().forEach(t => t.stop());
+          }
+        } catch (permErr) {
+          console.warn('Microphone preflight failed:', permErr);
+          throw new Error('Microphone permission is required. Please allow access and try again.');
+        }
         
         const getSessionToken = async () => {
           try {
