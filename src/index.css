@@ -103,8 +103,8 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-secondary;
-    /* Improved mobile readability and touch optimization */
-    font-size: 16px; /* Prevents zoom on iOS */
+    /* Industry standard body text: 14-16px mobile, 16-18px desktop */
+    font-size: 14px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -113,13 +113,16 @@ All colors MUST be HSL.
     touch-action: manipulation;
   }
   
-  /* Improve text readability on mobile */
-  @media (max-width: 640px) {
+  /* Desktop body text */
+  @media (min-width: 640px) {
     body {
       font-size: 16px;
-      line-height: 1.65;
+      line-height: 1.6;
     }
-    
+  }
+  
+  /* Improve text readability on mobile */
+  @media (max-width: 640px) {
     /* Better spacing on mobile */
     p + p {
       margin-top: 1rem;
@@ -142,22 +145,44 @@ All colors MUST be HSL.
     line-height: 1.2;
   }
 
-  /* Mobile-first typography with better readability */
+  /* Industry standard typography - mobile first */
   h1 {
-    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+    @apply text-[28px] sm:text-4xl md:text-5xl;
   }
 
   h2 {
-    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
+    @apply text-2xl sm:text-3xl md:text-4xl;
   }
 
   h3 {
-    @apply text-base sm:text-lg md:text-xl lg:text-2xl;
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+
+  h4 {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+
+  h5 {
+    @apply text-base sm:text-lg md:text-xl;
+  }
+
+  h6 {
+    @apply text-sm sm:text-base md:text-lg;
   }
   
-  /* Improved paragraph spacing for mobile */
+  /* Body text - 14-16px mobile, 16-18px desktop */
   p {
-    @apply leading-relaxed;
+    @apply text-sm sm:text-base leading-relaxed;
+  }
+
+  /* Small text utility */
+  .text-small {
+    @apply text-xs sm:text-sm;
+  }
+
+  /* Caption text */
+  .text-caption {
+    @apply text-xs;
   }
 
   /* Touch-friendly interactive elements */
