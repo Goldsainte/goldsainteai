@@ -123,10 +123,10 @@ export const Header = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => handleServiceClick(category.service)}
-                      className="flex items-center gap-2 shrink-0 rounded-full px-4 h-9"
+                      className="flex items-center gap-2 shrink-0 rounded-full px-4 h-9 border-2 border-secondary hover:bg-secondary/10 hover:border-secondary transition-all duration-300"
                     >
-                      <category.icon className="h-4 w-4" />
-                      <span className="text-sm">{category.label}</span>
+                      <category.icon className="h-4 w-4 text-secondary" />
+                      <span className="text-sm font-medium">{category.label}</span>
                     </Button>
                   ))}
                 </div>
