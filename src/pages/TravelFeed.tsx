@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Upload, ChevronLeft, Settings, User, PlusSquare } from "lucide-react";
+import { Upload, ChevronLeft, Settings, User, PlusSquare, Home, Search as SearchIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TravelVideoCard from "@/components/TravelVideoCard";
 import VideoUploadModal from "@/components/VideoUploadModal";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import { ClearSampleDataButton } from "@/components/ClearSampleDataButton";
+import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
 
 interface TravelPost {
@@ -38,6 +39,7 @@ const TravelFeed = () => {
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [isPersonalized, setIsPersonalized] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isAdmin } = useUserRole();
 
   useEffect(() => {
     fetchPosts();
