@@ -1,6 +1,7 @@
-import { Heart, MapPin, Star } from "lucide-react";
+import { Heart, MapPin, Star, Shield, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface PropertyCardProps {
   image: string;
@@ -50,6 +51,18 @@ export const PropertyCard = ({
         <div className="flex items-center gap-1 text-muted-foreground text-sm mb-2">
           <MapPin className="h-4 w-4" />
           <span>{location}</span>
+        </div>
+
+        {/* Trust badges */}
+        <div className="flex items-center gap-2 mb-3">
+          <Badge variant="secondary" className="text-xs flex items-center gap-1">
+            <Shield className="w-3 h-3" />
+            Verified
+          </Badge>
+          <Badge variant="outline" className="text-xs flex items-center gap-1">
+            <CheckCircle className="w-3 h-3 text-green-500" />
+            Instant Book
+          </Badge>
         </div>
 
         <p className="text-sm text-muted-foreground mb-3">
