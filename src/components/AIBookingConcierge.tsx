@@ -500,12 +500,12 @@ export const AIBookingConcierge = () => {
             data-tour="ai-widget"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
-              <div className="relative bg-gradient-to-br from-primary to-accent p-4 md:p-5 rounded-full shadow-2xl hover:scale-110 transition-transform">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-md opacity-60 group-hover:opacity-80 transition-opacity" />
+              <div className="relative bg-gradient-to-br from-primary to-accent p-2.5 md:p-3 rounded-full shadow-xl hover:scale-110 transition-transform">
                 <img 
                   src={logomark} 
                   alt="Goldsainte AI Concierge" 
-                  className="w-10 h-10 md:w-8 md:h-8 object-contain"
+                  className="w-7 h-7 md:w-6 md:h-6 object-contain"
                 />
               </div>
             </div>
