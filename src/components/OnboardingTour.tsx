@@ -111,16 +111,13 @@ export const OnboardingTour = () => {
         }
         .__floater { 
           filter: none !important; 
-          position: fixed !important;
         }
         .__floater__body { 
-          transform: none !important; 
-          position: fixed !important;
+          /* Allow Joyride to control transforms/positioning for accurate centering */
         }
         @media (max-width: 768px) {
           .__floater__body {
-            left: 16px !important;
-            right: 16px !important;
+            /* Constrain width only; don't force left/right so centering works */
             max-width: calc(100vw - 32px) !important;
           }
         }
