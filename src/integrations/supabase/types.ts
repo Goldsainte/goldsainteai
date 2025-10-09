@@ -2223,6 +2223,7 @@ export type Database = {
           created_at: string
           email_notifications: boolean | null
           first_name: string | null
+          full_name: string | null
           id: string
           is_verified: boolean | null
           last_name: string | null
@@ -2242,6 +2243,7 @@ export type Database = {
           created_at?: string
           email_notifications?: boolean | null
           first_name?: string | null
+          full_name?: string | null
           id: string
           is_verified?: boolean | null
           last_name?: string | null
@@ -2261,6 +2263,7 @@ export type Database = {
           created_at?: string
           email_notifications?: boolean | null
           first_name?: string | null
+          full_name?: string | null
           id?: string
           is_verified?: boolean | null
           last_name?: string | null

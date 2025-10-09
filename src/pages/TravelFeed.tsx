@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Upload, ChevronLeft } from "lucide-react";
+import { Upload, ChevronLeft, Settings, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TravelVideoCard from "@/components/TravelVideoCard";
 import VideoUploadModal from "@/components/VideoUploadModal";
+import { ClearSampleDataButton } from "@/components/ClearSampleDataButton";
 import { toast } from "sonner";
 
 interface TravelPost {
@@ -131,14 +132,17 @@ const TravelFeed = () => {
     <div className="relative h-screen w-full bg-black overflow-hidden">
       {/* Top Navigation - Minimal */}
       <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/')}
-          className="text-white hover:bg-white/20"
-        >
-          <ChevronLeft className="h-6 w-6" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="text-white hover:bg-white/20"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <ClearSampleDataButton />
+        </div>
         
         {isPersonalized && (
           <div className="absolute left-1/2 -translate-x-1/2 top-4 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
@@ -146,16 +150,26 @@ const TravelFeed = () => {
           </div>
         )}
         
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/travel-profile')}
-          className="text-white hover:bg-white/20"
-        >
-          <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold border-2 border-white">
-            {user?.email?.[0]?.toUpperCase() || 'U'}
-          </div>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/travel-settings')}
+            className="text-white hover:bg-white/20"
+          >
+            <Settings className="h-5 h-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/travel-profile')}
+            className="text-white hover:bg-white/20"
+          >
+            <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold border-2 border-white">
+              {user?.email?.[0]?.toUpperCase() || 'U'}
+            </div>
+          </Button>
+        </div>
       </div>
 
       {/* Floating Upload Button (FAB) */}

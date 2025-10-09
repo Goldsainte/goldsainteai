@@ -46,7 +46,7 @@ const TravelSettings = () => {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, full_name')
         .eq('id', user?.id)
         .single();
 
