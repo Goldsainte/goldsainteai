@@ -77,6 +77,7 @@ const TravelFeed = () => {
   };
 
   const fetchChronologicalPosts = async () => {
+    console.log('Fetching chronological posts...');
     const { data, error } = await supabase
       .from('travel_posts')
       .select('*')
@@ -84,7 +85,12 @@ const TravelFeed = () => {
       .order('created_at', { ascending: false })
       .limit(20);
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching posts:', error);
+      throw error;
+    }
+    
+    console.log('Found posts:', data?.length || 0);
     
     // Fetch profile data separately with maybeSingle to handle missing profiles
     const postsWithProfiles = await Promise.all(
@@ -102,6 +108,7 @@ const TravelFeed = () => {
       })
     );
     
+    console.log('Posts with profiles:', postsWithProfiles.length);
     setPosts(postsWithProfiles);
   };
 

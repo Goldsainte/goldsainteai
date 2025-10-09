@@ -84,6 +84,7 @@ const TravelProfile = () => {
 
   const fetchUserPosts = async () => {
     try {
+      console.log('Fetching posts for user:', profileUserId);
       const { data, error } = await supabase
         .from('travel_posts')
         .select('id, video_url, thumbnail_url, caption, view_count, like_count')
@@ -91,10 +92,16 @@ const TravelProfile = () => {
         .eq('status', 'active')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error in fetchUserPosts:', error);
+        throw error;
+      }
+      
+      console.log('Fetched posts:', data?.length || 0, 'posts');
       setUserPosts(data || []);
     } catch (error) {
       console.error('Error fetching user posts:', error);
+      toast.error('Failed to load posts');
     } finally {
       setLoading(false);
     }
