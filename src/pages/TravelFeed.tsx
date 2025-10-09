@@ -232,7 +232,7 @@ const TravelFeed = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/travel-profile')}
               className="text-white hover:bg-white/20 h-9 w-9"
               aria-label="Home"
             >
