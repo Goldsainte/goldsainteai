@@ -45,15 +45,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           <div>
             <Label className="text-base mb-3 block">What types of trips do you enjoy?</Label>
             <p className="text-sm text-muted-foreground mb-4">Pick as many as you like</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Leisure', 'Business', 'Adventure', 'Cultural', 'Nature-focused', 'Relaxation / Wellness'].map(type => (
-                <div key={type} className="flex items-center space-x-2">
+                <div key={type} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`trip-${type}`}
                     checked={preferences.general?.tripTypes?.includes(type) || false}
                     onCheckedChange={() => toggleArrayValue('general', 'tripTypes', type)}
                   />
-                  <Label htmlFor={`trip-${type}`} className="cursor-pointer">{type}</Label>
+                  <Label htmlFor={`trip-${type}`} className="cursor-pointer text-sm sm:text-base">{type}</Label>
                 </div>
               ))}
             </div>
@@ -61,15 +61,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">Who's your usual travel crew?</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Solo', 'Partner', 'Friends', 'Family', 'Group Tours'].map(companion => (
-                <div key={companion} className="flex items-center space-x-2">
+                <div key={companion} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`companion-${companion}`}
                     checked={preferences.general?.travelCompanions?.includes(companion) || false}
                     onCheckedChange={() => toggleArrayValue('general', 'travelCompanions', companion)}
                   />
-                  <Label htmlFor={`companion-${companion}`} className="cursor-pointer">{companion}</Label>
+                  <Label htmlFor={`companion-${companion}`} className="cursor-pointer text-sm sm:text-base">{companion}</Label>
                 </div>
               ))}
             </div>
@@ -80,11 +80,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.general?.idealTripLength}
               onValueChange={(value) => updatePreference('general', 'idealTripLength', value)}
+              className="space-y-2"
             >
               {['Weekend (1–3 days)', 'Short (4–7 days)', 'Medium (8–14 days)', 'Long (2+ weeks)'].map(length => (
-                <div key={length} className="flex items-center space-x-2">
+                <div key={length} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={length} id={`length-${length}`} />
-                  <Label htmlFor={`length-${length}`} className="cursor-pointer">{length}</Label>
+                  <Label htmlFor={`length-${length}`} className="cursor-pointer text-sm sm:text-base">{length}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -533,61 +534,61 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
   const progress = ((currentStep + 1) / steps.length) * 100;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
+        <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
           <span>Step {currentStep + 1} of {steps.length}</span>
           <span>{Math.round(progress)}% complete</span>
         </div>
         <Progress value={progress} className="h-2" />
       </div>
 
-      <Card className="p-8">
-        <div className="text-center mb-8">
-          <div className="mb-4 flex justify-center">
+      <Card className="p-4 sm:p-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="mb-3 sm:mb-4 flex justify-center">
             {(() => {
               const IconComponent = steps[currentStep].icon;
-              return <IconComponent className="h-12 w-12 text-primary" strokeWidth={1.5} />;
+              return <IconComponent className="h-10 w-10 sm:h-12 sm:w-12 text-primary" strokeWidth={1.5} />;
             })()}
           </div>
-          <h2 className="text-2xl font-chiffon mb-2">{steps[currentStep].title}</h2>
-          <p className="text-muted-foreground">{steps[currentStep].subtitle}</p>
+          <h2 className="text-xl sm:text-2xl font-chiffon mb-2">{steps[currentStep].title}</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">{steps[currentStep].subtitle}</p>
         </div>
 
         {steps[currentStep].content}
       </Card>
 
-      <div className="flex justify-between">
+      <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0">
         <Button
           variant="outline"
           onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
           disabled={currentStep === 0}
-          className="h-10 px-5 py-2 text-sm"
+          className="h-12 sm:h-10 px-6 sm:px-5 py-3 sm:py-2 text-base sm:text-sm w-full sm:w-auto order-2 sm:order-1"
         >
-          <ChevronLeft className="w-4 h-4 mr-2" />
+          <ChevronLeft className="w-5 h-5 sm:w-4 sm:h-4 mr-2" />
           Back
         </Button>
 
         <Button
           onClick={() => setCurrentStep(prev => Math.min(steps.length - 1, prev + 1))}
-          className="h-10 px-5 py-2 text-sm"
+          className="h-12 sm:h-10 px-6 sm:px-5 py-3 sm:py-2 text-base sm:text-sm w-full sm:w-auto order-1 sm:order-2"
         >
           {currentStep === steps.length - 1 ? (
             <>
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-5 h-5 sm:w-4 sm:h-4 mr-2" />
               All Set!
             </>
           ) : (
             <>
               Next
-              <ChevronRight className="w-4 h-4 ml-2" />
+              <ChevronRight className="w-5 h-5 sm:w-4 sm:h-4 ml-2" />
             </>
           )}
         </Button>
       </div>
 
       {currentStep < steps.length - 1 && (
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-xs sm:text-sm text-muted-foreground py-2">
           Feel free to skip questions - you can always update these later
         </p>
       )}

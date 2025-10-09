@@ -157,50 +157,50 @@ export default function AIAgentOnboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20 py-6 sm:py-12 px-4">
       <div className="container mx-auto max-w-4xl">
-        <div className="flex flex-col items-center mb-8">
-          <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
-          <h1 className="text-4xl font-chiffon text-primary mb-2">Build Your AI Travel Agent</h1>
-          <p className="text-muted-foreground text-center">
+        <div className="flex flex-col items-center mb-6 sm:mb-8">
+          <img src={logomark} alt="Logo" className="h-12 w-12 sm:h-16 sm:w-16 mb-3 sm:mb-4" />
+          <h1 className="text-2xl sm:text-4xl font-chiffon text-primary mb-2 text-center">Build Your AI Travel Agent</h1>
+          <p className="text-sm sm:text-base text-muted-foreground text-center">
             Step {currentStep} of {totalSteps}
           </p>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Progress value={progress} className="h-2" />
         </div>
 
         {renderStep()}
 
-        <div className="flex justify-between mt-8">
+        <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-0 mt-6 sm:mt-8">
           <Button
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 1 || isSaving}
-            className="h-10 px-5 py-2 text-sm"
+            className="h-12 sm:h-10 px-6 sm:px-5 py-3 sm:py-2 text-base sm:text-sm w-full sm:w-auto order-2 sm:order-1"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ArrowLeft className="h-5 w-5 sm:h-4 sm:w-4 mr-2" />
             Back
           </Button>
 
           {currentStep < totalSteps ? (
-            <Button onClick={handleNext} disabled={isSaving} className="h-10 px-5 py-2 text-sm">
+            <Button onClick={handleNext} disabled={isSaving} className="h-12 sm:h-10 px-6 sm:px-5 py-3 sm:py-2 text-base sm:text-sm w-full sm:w-auto order-1 sm:order-2">
               Next
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ArrowRight className="h-5 w-5 sm:h-4 sm:w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleComplete} disabled={isSaving} className="h-10 px-5 py-2 text-sm">
+            <Button onClick={handleComplete} disabled={isSaving} className="h-12 sm:h-10 px-6 sm:px-5 py-3 sm:py-2 text-base sm:text-sm w-full sm:w-auto order-1 sm:order-2">
               {isSaving ? "Creating..." : "Complete Setup"}
-              <Check className="h-4 w-4 ml-2" />
+              <Check className="h-5 w-5 sm:h-4 sm:w-4 ml-2" />
             </Button>
           )}
         </div>
 
-        <div className="text-center mt-6">
+        <div className="text-center mt-4 sm:mt-6">
           <button
             onClick={() => navigate('/')}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-xs sm:text-sm text-muted-foreground hover:text-foreground transition-colors py-2 px-4"
             disabled={isSaving}
           >
             Skip for now (you can set this up later)
