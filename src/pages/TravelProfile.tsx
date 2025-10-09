@@ -318,7 +318,7 @@ const TravelProfile = () => {
       <div className="px-4 pt-4 pb-2 space-y-4">
         <div className="flex items-start justify-between">
           <div className="relative">
-            <Avatar className="h-20 w-20 ring-2 ring-offset-2 ring-primary/20">
+            <Avatar className="h-20 w-20">
               <AvatarImage src={profile?.avatar_url || undefined} />
               <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                 {profile?.username?.[0]?.toUpperCase() || 'U'}
