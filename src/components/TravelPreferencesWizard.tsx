@@ -562,6 +562,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           variant="outline"
           onClick={() => setCurrentStep(prev => Math.max(0, prev - 1))}
           disabled={currentStep === 0}
+          className="h-10 px-5 py-2 text-sm"
         >
           <ChevronLeft className="w-4 h-4 mr-2" />
           Back
@@ -569,6 +570,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
         <Button
           onClick={() => setCurrentStep(prev => Math.min(steps.length - 1, prev + 1))}
+          className="h-10 px-5 py-2 text-sm"
         >
           {currentStep === steps.length - 1 ? (
             <>

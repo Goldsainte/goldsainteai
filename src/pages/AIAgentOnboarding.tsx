@@ -178,18 +178,19 @@ export default function AIAgentOnboarding() {
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 1 || isSaving}
+            className="h-10 px-5 py-2 text-sm"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back
           </Button>
 
           {currentStep < totalSteps ? (
-            <Button onClick={handleNext} disabled={isSaving}>
+            <Button onClick={handleNext} disabled={isSaving} className="h-10 px-5 py-2 text-sm">
               Next
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleComplete} disabled={isSaving}>
+            <Button onClick={handleComplete} disabled={isSaving} className="h-10 px-5 py-2 text-sm">
               {isSaving ? "Creating..." : "Complete Setup"}
               <Check className="h-4 w-4 ml-2" />
             </Button>
