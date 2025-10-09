@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -423,12 +423,25 @@ export const Header = () => {
       {/* Mobile Search Sheet */}
       {isMobile && (
         <Sheet open={searchSheetOpen} onOpenChange={setSearchSheetOpen}>
-          <SheetContent side="bottom" className="h-[90vh] p-0">
-            <SheetHeader className="p-6 pb-4">
-              <SheetTitle>Search Travel</SheetTitle>
-            </SheetHeader>
-            <div className="overflow-y-auto h-[calc(90vh-5rem)] px-4 pb-6">
-              <SearchBar />
+          <SheetContent side="bottom" className="h-full max-h-[100dvh] p-0 rounded-t-3xl">
+            <div className="flex flex-col h-full">
+              <SheetHeader className="px-6 py-4 border-b border-border flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <button 
+                    onClick={() => setSearchSheetOpen(false)}
+                    className="flex items-center gap-2 text-foreground hover:opacity-70 transition-opacity"
+                    aria-label="Close search"
+                  >
+                    <ArrowLeft className="h-5 w-5" />
+                    <span className="text-sm font-medium">Back to Search</span>
+                  </button>
+                </div>
+              </SheetHeader>
+              <div className="flex-1 overflow-y-auto pb-20">
+                <div className="p-6">
+                  <SearchBar />
+                </div>
+              </div>
             </div>
           </SheetContent>
         </Sheet>

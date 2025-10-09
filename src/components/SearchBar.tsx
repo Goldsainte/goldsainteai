@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket } from "lucide-react";
+import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket, Car } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -105,6 +105,7 @@ export const SearchBar = () => {
     switch (searchType) {
       case "hotels": return "Search hotels";
       case "flights": return "Search flights";
+      case "cars": return "Search cars";
       case "restaurants": return "Search restaurants";
       case "events": return "Search events";
       default: return "Search";
@@ -112,53 +113,63 @@ export const SearchBar = () => {
   };
 
   return (
-    <div className="w-full max-w-5xl mx-auto px-4 md:px-0">
-      <div className="bg-card border border-border rounded-3xl shadow-lg p-6 md:p-8" role="search" aria-label="Travel search">
-        <div className="mb-6 text-center" aria-live="polite" aria-atomic="true">
-          <p className="text-lg md:text-xl text-muted-foreground transition-opacity duration-500">
-            {rotatingMessages[currentMessageIndex]}
-          </p>
-        </div>
-        <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
-          <TabsList className="grid w-full grid-cols-4 h-auto" aria-label="Search type selection">
-            <TabsTrigger value="hotels" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search hotels">
-              <Hotel className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">Hotels</span>
-              <span className="sm:hidden sr-only">Hotels</span>
+    <div className="w-full">
+      <div className="bg-background" role="search" aria-label="Travel search">
+        <Tabs value={searchType} onValueChange={setSearchType} className="mb-4">
+          <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto rounded-xl" aria-label="Search type selection">
+            <TabsTrigger 
+              value="hotels" 
+              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
+              aria-label="Search hotels"
+            >
+              <Hotel className="h-4 w-4" aria-hidden="true" />
             </TabsTrigger>
-            <TabsTrigger value="flights" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search flights">
-              <Plane className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">Flights</span>
-              <span className="sm:hidden sr-only">Flights</span>
+            <TabsTrigger 
+              value="flights" 
+              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
+              aria-label="Search flights"
+            >
+              <Plane className="h-4 w-4" aria-hidden="true" />
             </TabsTrigger>
-            <TabsTrigger value="restaurants" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search restaurants">
-              <UtensilsCrossed className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">Restaurants</span>
-              <span className="sm:hidden sr-only">Restaurants</span>
+            <TabsTrigger 
+              value="cars" 
+              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
+              aria-label="Search cars"
+            >
+              <Car className="h-4 w-4" aria-hidden="true" />
             </TabsTrigger>
-            <TabsTrigger value="events" className="gap-2 py-4 text-sm md:text-base min-h-[48px]" aria-label="Search events">
-              <Ticket className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">Events</span>
-              <span className="sm:hidden sr-only">Events</span>
+            <TabsTrigger 
+              value="restaurants" 
+              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
+              aria-label="Search restaurants"
+            >
+              <UtensilsCrossed className="h-4 w-4" aria-hidden="true" />
+            </TabsTrigger>
+            <TabsTrigger 
+              value="events" 
+              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
+              aria-label="Search events"
+            >
+              <Ticket className="h-4 w-4" aria-hidden="true" />
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5">
+        <div className="space-y-3">
           <div className="relative">
             {searchType === "restaurants" ? (
               <CityAutocomplete
                 placeholder="City, restaurant name, or cuisine"
-                className="h-16 text-lg rounded-xl pl-12"
+                className="h-14 text-base rounded-xl pl-12 bg-muted/30 border-muted"
                 value={location}
                 onChange={setLocation}
               />
             ) : (
               <>
-                <MapPin className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" />
+                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
                 <Input
-                  placeholder={searchType === "flights" ? "From where?" : "Where to?"}
-                  className="pl-12 h-16 border-border text-lg rounded-xl"
+                  placeholder={searchType === "flights" ? "From where?" : searchType === "cars" ? "Pick-up location" : "Where to?"}
+                  className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
@@ -168,7 +179,7 @@ export const SearchBar = () => {
 
           {searchType === "hotels" && (
             <>
-              <div className="md:col-span-2">
+              <div>
                 <DateRangePicker
                   dateRange={dateRange}
                   onDateRangeChange={setDateRange}
@@ -177,65 +188,64 @@ export const SearchBar = () => {
 
               <div className="relative">
                 <label htmlFor="guests" className="sr-only">Number of guests</label>
-                <Users className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
                 <Input
                   id="guests"
-                  type="number"
-                  min="1"
-                  max="20"
-                  placeholder="2 guests"
-                  className="pl-12 h-16 border-border text-lg rounded-xl"
-                  value={guests}
-                  onChange={(e) => setGuests(e.target.value)}
-                  aria-label="Number of guests"
+                  type="text"
+                  placeholder="1 Guest, 1 Room"
+                  className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
+                  value={guests ? `${guests} Guest${parseInt(guests) > 1 ? 's' : ''}, 1 Room` : ""}
+                  onChange={(e) => {
+                    const match = e.target.value.match(/\d+/);
+                    if (match) setGuests(match[0]);
+                  }}
+                  aria-label="Number of guests and rooms"
                 />
               </div>
             </>
           )}
 
-          {searchType === "flights" && (
-            <div className="relative md:col-span-3">
-              <label htmlFor="departure-date" className="sr-only">Departure date</label>
-              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+          {(searchType === "flights" || searchType === "cars") && (
+            <div className="relative">
+              <label htmlFor="departure-date" className="sr-only">
+                {searchType === "cars" ? "Pick-up date" : "Departure date"}
+              </label>
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
               <Input
                 id="departure-date"
                 type="date"
-                placeholder="Departure date"
-                className="pl-12 h-16 border-border text-lg rounded-xl"
+                placeholder={searchType === "cars" ? "Pick-up date" : "Departure date"}
+                className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
                 value={singleDate}
                 onChange={(e) => setSingleDate(e.target.value)}
-                aria-label="Departure date"
+                aria-label={searchType === "cars" ? "Pick-up date" : "Departure date"}
               />
             </div>
           )}
 
           {searchType === "events" && (
-            <div className="relative md:col-span-3">
+            <div className="relative">
               <label htmlFor="event-date" className="sr-only">Event date</label>
-              <Calendar className="absolute left-4 top-4.5 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
               <Input
                 id="event-date"
                 type="date"
                 placeholder="Event date"
-                className="pl-12 h-16 border-border text-lg rounded-xl"
+                className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
                 value={singleDate}
                 onChange={(e) => setSingleDate(e.target.value)}
                 aria-label="Event date"
               />
             </div>
           )}
-
-          {searchType === "restaurants" && (
-            <div className="md:col-span-3" />
-          )}
         </div>
 
         <Button 
-          className="w-full mt-6 h-16 bg-primary text-primary-foreground hover:bg-primary/90 text-lg font-semibold rounded-xl min-h-[48px]"
+          className="w-full mt-4 h-14 bg-primary text-primary-foreground hover:bg-primary/90 text-base font-semibold rounded-xl min-h-[48px] shadow-lg"
           onClick={handleSearch}
           aria-label={`${getSearchButtonText()}`}
         >
-          <Search className="h-6 w-6 mr-2" aria-hidden="true" />
+          <Search className="h-5 w-5 mr-2" aria-hidden="true" />
           {getSearchButtonText()}
         </Button>
       </div>
