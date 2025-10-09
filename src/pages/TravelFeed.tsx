@@ -203,15 +203,15 @@ const TravelFeed = () => {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {posts.map((post) => (
-                    <div key={post.id} className="border-b border-border pb-8">
-                      <TravelVideoCard
-                        post={post}
-                        isActive={true}
-                        onUpdate={fetchPosts}
-                      />
-                    </div>
+                    <TravelVideoCard
+                      key={post.id}
+                      post={post}
+                      isActive={true}
+                      onUpdate={fetchPosts}
+                      layout="desktop"
+                    />
                   ))}
                 </div>
               )}

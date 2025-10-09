@@ -34,9 +34,10 @@ interface TravelVideoCardProps {
   };
   isActive: boolean;
   onUpdate: () => void;
+  layout?: 'mobile' | 'desktop';
 }
 
-const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => {
+const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: TravelVideoCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
@@ -194,6 +195,153 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
     );
   };
 
+  // Desktop Instagram-style layout
+  if (layout === 'desktop') {
+    return (
+      <div className="bg-card rounded-lg overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4">
+          <div 
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+          >
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={post.profiles?.avatar_url || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <p className="font-semibold text-sm">{post.profiles?.username || 'Anonymous'}</p>
+                {post.profiles?.is_verified && (
+                  <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                )}
+              </div>
+              {post.location && (
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3" />
+                  {post.location}
+                </div>
+              )}
+            </div>
+          </div>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+        </div>
+
+        {/* Video/Image */}
+        <div className="relative bg-black aspect-square">
+          {videoLoading && !videoError && post.video_url && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-white text-sm">Loading video...</div>
+            </div>
+          )}
+          
+          {videoError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+              <div className="text-center space-y-2 p-4">
+                <p className="text-white text-sm">Video unavailable</p>
+              </div>
+            </div>
+          )}
+          
+          {post.video_url ? (
+            <video
+              ref={videoRef}
+              src={post.video_url}
+              className="w-full h-full object-cover"
+              loop
+              playsInline
+              muted={false}
+              crossOrigin="anonymous"
+              onLoadedData={() => setVideoLoading(false)}
+              onError={() => {
+                setVideoError(true);
+                setVideoLoading(false);
+              }}
+            />
+          ) : post.embed_url ? (
+            getEmbedComponent()
+          ) : null}
+        </div>
+
+        {/* Actions */}
+        <div className="p-4 space-y-3">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleLike}
+              className="transition-transform active:scale-90"
+            >
+              <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+            </button>
+            <button
+              onClick={() => setCommentsOpen(true)}
+              className="transition-transform active:scale-90"
+            >
+              <MessageCircle className="h-6 w-6" />
+            </button>
+            <button
+              onClick={handleShare}
+              className="transition-transform active:scale-90"
+            >
+              <Share2 className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Like count */}
+          <div className="text-sm font-semibold">
+            {formatCount(localLikeCount)} likes
+          </div>
+
+          {/* Caption */}
+          <div className="text-sm">
+            <span className="font-semibold mr-2">{post.profiles?.username || 'Anonymous'}</span>
+            {post.caption && (
+              <span>
+                {renderTextWithHashtags(post.caption, (hashtag) => 
+                  navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
+                ).map((part, idx) => 
+                  typeof part === 'string' ? part : <span key={idx} {...part.props}>{part.props.children}</span>
+                )}
+              </span>
+            )}
+          </div>
+
+          {/* Original Creator Attribution */}
+          {post.original_creator && (
+            <div className="text-xs text-muted-foreground">
+              Original: {post.original_creator}
+            </div>
+          )}
+
+          {/* View all comments */}
+          {localCommentCount > 0 && (
+            <button 
+              onClick={() => setCommentsOpen(true)}
+              className="text-sm text-muted-foreground"
+            >
+              View all {formatCount(localCommentCount)} comments
+            </button>
+          )}
+        </div>
+
+        {/* Comments Sheet */}
+        <CommentsSheet
+          open={commentsOpen}
+          onOpenChange={setCommentsOpen}
+          postId={post.id}
+          onCommentAdded={() => {
+            setLocalCommentCount(prev => prev + 1);
+            onUpdate();
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Mobile TikTok-style layout
   return (
     <div className="relative h-full w-full bg-black">
       {/* Loading State */}
