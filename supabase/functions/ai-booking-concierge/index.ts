@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, stream = false } = await req.json();
+    const { messages, stream = false, agentProfile } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -129,7 +129,33 @@ serve(async (req) => {
       }
     ];
 
-    const systemPrompt = `You are Goldsainte's AI Booking Concierge - a sophisticated luxury travel assistant specializing in high-end travel experiences.
+    // Build personalized system prompt
+    let systemPrompt = `You are ${agentProfile?.agent_name || "Goldsainte's AI Booking Concierge"} - a sophisticated luxury travel assistant specializing in high-end travel experiences.`;
+    
+    // Add custom personality if provided
+    if (agentProfile?.personality_instructions) {
+      systemPrompt += `\n\nYOUR PERSONALITY AND APPROACH:\n${agentProfile.personality_instructions}`;
+    }
+
+    // Add communication style
+    const communicationStyles: Record<string, string> = {
+      professional: "- Maintain a professional, detailed, and informative tone\n- Provide comprehensive explanations and options\n- Be thorough and precise in your recommendations",
+      casual: "- Keep the conversation friendly and relaxed\n- Use casual language and be conversational\n- Make the planning process feel effortless and fun",
+      concise: "- Get straight to the point\n- Provide brief, clear answers\n- Focus on essential information only",
+      enthusiastic: "- Show excitement about travel opportunities\n- Use enthusiastic language and express genuine interest\n- Make every trip sound like an adventure"
+    };
+
+    if (agentProfile?.communication_style && communicationStyles[agentProfile.communication_style as string]) {
+      systemPrompt += `\n\nCOMMUNICATION STYLE:\n${communicationStyles[agentProfile.communication_style as string]}`;
+    }
+
+    // Add custom knowledge base
+    if (agentProfile?.custom_knowledge && Array.isArray(agentProfile.custom_knowledge) && agentProfile.custom_knowledge.length > 0) {
+      systemPrompt += `\n\nIMPORTANT USER INFORMATION TO REMEMBER:\n${agentProfile.custom_knowledge.map((item: string, i: number) => `${i + 1}. ${item}`).join('\n')}`;
+    }
+
+    // Add the rest of the system prompt
+    systemPrompt += `
 
 ABOUT GOLDSAINTE (when asked):
 - Goldsainte is a luxury travel concierge platform that combines AI technology with expert human travel agents

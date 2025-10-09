@@ -42,10 +42,10 @@ const Auth = () => {
         return;
       }
 
-      // Otherwise fallback to preferences-based routing
-      const checkPreferences = async () => {
+      // Check if user has AI agent profile
+      const checkAIAgent = async () => {
         const { data } = await supabase
-          .from('user_booking_preferences')
+          .from('ai_agent_profiles')
           .select('id')
           .eq('user_id', user.id)
           .maybeSingle();
@@ -53,10 +53,10 @@ const Auth = () => {
         if (data) {
           navigate('/', { replace: true });
         } else {
-          navigate('/onboarding', { replace: true });
+          navigate('/ai-agent-setup', { replace: true });
         }
       };
-      checkPreferences();
+      checkAIAgent();
     }
   }, [user, navigate]);
 
@@ -126,9 +126,9 @@ const Auth = () => {
     } else {
       toast({
         title: "Account created!",
-        description: "Let's set up your travel preferences.",
+        description: "Let's create your personalized AI travel agent.",
       });
-      navigate('/onboarding');
+      navigate('/ai-agent-setup');
     }
     
     setIsLoading(false);

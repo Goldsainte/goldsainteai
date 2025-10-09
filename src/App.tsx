@@ -13,6 +13,7 @@ import HotelBooking from "./pages/HotelBooking";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
+import AIAgentOnboarding from "./pages/AIAgentOnboarding";
 import Favorites from "./pages/Favorites";
 import Dashboard from "./pages/Dashboard";
 import Marketplace from "./pages/Marketplace";
@@ -54,6 +55,7 @@ function AppContent() {
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
+          <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/browse-agents" element={<BrowseAgents />} />

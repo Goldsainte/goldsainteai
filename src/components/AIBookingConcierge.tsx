@@ -24,12 +24,8 @@ interface Message {
 export const AIBookingConcierge = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'assistant',
-      content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
-    }
-  ]);
+  const [agentProfile, setAgentProfile] = useState<any>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
@@ -44,6 +40,36 @@ export const AIBookingConcierge = () => {
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+
+  // Load user's AI agent profile
+  useEffect(() => {
+    const loadAgentProfile = async () => {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('ai_agent_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        setAgentProfile(data);
+        // Set initial greeting with agent name
+        setMessages([{
+          role: 'assistant',
+          content: `Hello! I'm ${data.agent_name}.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+        }]);
+      } else {
+        // Default greeting if no agent profile
+        setMessages([{
+          role: 'assistant',
+          content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+        }]);
+      }
+    };
+
+    loadAgentProfile();
+  }, [user]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -119,7 +145,8 @@ export const AIBookingConcierge = () => {
         },
         body: JSON.stringify({ 
           messages: [...messages, { role: 'user', content: userMessage }],
-          stream: false  // Disable streaming to allow tool execution
+          stream: false,  // Disable streaming to allow tool execution
+          agentProfile: agentProfile  // Pass agent profile to backend
         }),
       });
 
@@ -176,7 +203,9 @@ export const AIBookingConcierge = () => {
         
         const getSessionToken = async () => {
           try {
-            const { data, error } = await supabase.functions.invoke('realtime-voice-session');
+            const { data, error } = await supabase.functions.invoke('realtime-voice-session', {
+              body: { agentProfile }
+            });
             if (error) {
               console.error('Session token error:', error);
               throw new Error('Failed to connect to voice service. Please try again.');
