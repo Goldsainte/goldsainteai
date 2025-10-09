@@ -117,7 +117,7 @@ const TravelSettings2 = () => {
         <div className="py-4">
           <div className="px-4 py-2">
             <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
-              How you use Places
+              How you use Create
             </h2>
           </div>
 

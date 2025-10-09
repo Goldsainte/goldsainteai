@@ -343,7 +343,7 @@ const TravelProfile = () => {
             <Grid3X3 className="h-5 w-5" />
           </TabsTrigger>
           <TabsTrigger 
-            value="reels"
+            value="journeys"
             className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
           >
             <Video className="h-5 w-5" />
@@ -358,11 +358,11 @@ const TravelProfile = () => {
           )}
         </TabsList>
 
-        <TabsContent value="reels" className="mt-0">
+        <TabsContent value="journeys" className="mt-0">
           <div className="flex items-center justify-center p-12 text-center">
             <div>
               <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Reels view coming soon</p>
+              <p className="text-muted-foreground">Journeys view coming soon</p>
             </div>
           </div>
         </TabsContent>

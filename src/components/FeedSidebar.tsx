@@ -10,7 +10,7 @@ export function FeedSidebar() {
     { to: "/", icon: Home, label: "Home" },
     { to: "/search", icon: Search, label: "Search" },
     { to: "/trending", icon: Compass, label: "Explore" },
-    { to: "/travel-feed", icon: Video, label: "Reels" },
+    { to: "/travel-feed", icon: Video, label: "Journeys" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
     { to: "/favorites", icon: Heart, label: "Notifications" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },

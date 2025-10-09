@@ -55,7 +55,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 3 - Goldsainte Places */}
+            {/* Feature 3 - Goldsainte Create */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
                 <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
