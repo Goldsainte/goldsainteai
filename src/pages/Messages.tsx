@@ -5,7 +5,7 @@ import { ConversationsList } from "@/components/ConversationsList";
 import { MessageThread } from "@/components/MessageThread";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Mail, Edit } from "lucide-react";
+import { Loader2, Mail, Edit, ArrowLeft } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -112,7 +112,17 @@ const Messages = () => {
         {/* Header */}
         <div className="p-4 border-b">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-xl font-semibold">{user.email?.split('@')[0] || 'Messages'}</h1>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate("/travel-feed")}
+                className="mr-1"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h1 className="text-xl font-semibold">{user.email?.split('@')[0] || 'Messages'}</h1>
+            </div>
             <Dialog open={newMessageDialogOpen} onOpenChange={setNewMessageDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="icon">
