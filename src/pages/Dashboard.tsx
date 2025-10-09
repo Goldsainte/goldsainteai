@@ -100,19 +100,30 @@ export default function Dashboard() {
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'MMM dd, yyyy');
+  const formatDate = (dateString: string | undefined | null) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    return format(date, 'MMM dd, yyyy');
   };
 
-  const upcomingBookings = bookings.filter(b => 
-    b.status !== 'cancelled' && 
-    new Date(b.booking_data?.departureDate || b.booking_data?.checkIn) > new Date()
-  );
+  const upcomingBookings = bookings.filter(b => {
+    if (b.status === 'cancelled') return false;
+    const dateStr = b.booking_data?.departureDate || b.booking_data?.checkIn;
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return false;
+    return date > new Date();
+  });
 
-  const pastBookings = bookings.filter(b => 
-    b.status === 'cancelled' ||
-    new Date(b.booking_data?.departureDate || b.booking_data?.checkIn) <= new Date()
-  );
+  const pastBookings = bookings.filter(b => {
+    if (b.status === 'cancelled') return true;
+    const dateStr = b.booking_data?.departureDate || b.booking_data?.checkIn;
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return false;
+    return date <= new Date();
+  });
 
   const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="hover:shadow-lg transition-shadow">
