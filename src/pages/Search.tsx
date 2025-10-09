@@ -141,7 +141,7 @@ export default function Search() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/travel-feed')}
               className="hover:bg-accent"
               aria-label="Back"
             >
