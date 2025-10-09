@@ -183,6 +183,7 @@ const Messages = () => {
                 userType={isAgent ? "agent" : "customer"}
                 selectedConversationId={selectedConversationId}
                 onSelectConversation={setSelectedConversationId}
+                conversationType="primary"
               />
             </TabsContent>
             
@@ -192,19 +193,28 @@ const Messages = () => {
                 userType={isAgent ? "agent" : "customer"}
                 selectedConversationId={selectedConversationId}
                 onSelectConversation={setSelectedConversationId}
+                conversationType="general"
               />
             </TabsContent>
             
             <TabsContent value="channels" className="mt-0">
-              <div className="p-8 text-center text-muted-foreground">
-                <p className="text-sm">No channels yet</p>
-              </div>
+              <ConversationsList
+                userId={user.id}
+                userType={isAgent ? "agent" : "customer"}
+                selectedConversationId={selectedConversationId}
+                onSelectConversation={setSelectedConversationId}
+                conversationType="channel"
+              />
             </TabsContent>
             
             <TabsContent value="requests" className="mt-0">
-              <div className="p-8 text-center text-muted-foreground">
-                <p className="text-sm">No message requests</p>
-              </div>
+              <ConversationsList
+                userId={user.id}
+                userType={isAgent ? "agent" : "customer"}
+                selectedConversationId={selectedConversationId}
+                onSelectConversation={setSelectedConversationId}
+                conversationType="request"
+              />
             </TabsContent>
           </Tabs>
         </div>

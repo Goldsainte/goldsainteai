@@ -23,6 +23,7 @@ interface ConversationsListProps {
   userType: 'customer' | 'agent';
   selectedConversationId?: string;
   onSelectConversation: (conversationId: string) => void;
+  conversationType?: 'primary' | 'general' | 'channel' | 'request';
 }
 
 export const ConversationsList = ({
@@ -30,6 +31,7 @@ export const ConversationsList = ({
   userType,
   selectedConversationId,
   onSelectConversation,
+  conversationType,
 }: ConversationsListProps) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,15 +40,25 @@ export const ConversationsList = ({
   useEffect(() => {
     fetchConversations();
     subscribeToConversations();
-  }, [userId, userType]);
+  }, [userId, userType, conversationType]);
 
   const fetchConversations = async () => {
     try {
       let query = (supabase as any)
         .from("user_conversations")
         .select("*")
-        .eq("status", "active")
         .order("last_message_at", { ascending: false, nullsFirst: false });
+
+      // Filter by conversation type
+      if (conversationType === 'request') {
+        query = query.eq("status", "pending");
+      } else if (conversationType === 'channel') {
+        query = query.eq("conversation_type", "channel").eq("status", "active");
+      } else if (conversationType) {
+        query = query.eq("conversation_type", conversationType).eq("status", "active");
+      } else {
+        query = query.eq("status", "active");
+      }
 
       if (userType === 'customer') {
         query = query.eq("customer_id", userId);

@@ -3548,6 +3548,7 @@ export type Database = {
         Row: {
           agent_id: string | null
           agent_unread_count: number | null
+          conversation_type: string
           created_at: string
           customer_id: string | null
           customer_unread_count: number | null
@@ -3560,6 +3561,7 @@ export type Database = {
         Insert: {
           agent_id?: string | null
           agent_unread_count?: number | null
+          conversation_type?: string
           created_at?: string
           customer_id?: string | null
           customer_unread_count?: number | null
@@ -3572,6 +3574,7 @@ export type Database = {
         Update: {
           agent_id?: string | null
           agent_unread_count?: number | null
+          conversation_type?: string
           created_at?: string
           customer_id?: string | null
           customer_unread_count?: number | null
