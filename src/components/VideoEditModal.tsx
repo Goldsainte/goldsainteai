@@ -63,16 +63,36 @@ const VideoEditModal = ({
     }
 
     const performCapture = () => {
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-      if (!width || !height) {
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      if (!videoWidth || !videoHeight) {
         toast.error('Please play the video briefly, then try again.');
         return;
       }
 
+      // Calculate the 9:16 crop that matches what's visible in the preview
+      const targetAspect = 9 / 16;
+      const videoAspect = videoWidth / videoHeight;
+      
+      let cropWidth, cropHeight, cropX, cropY;
+      
+      if (videoAspect > targetAspect) {
+        // Video is wider than 9:16, crop sides
+        cropHeight = videoHeight;
+        cropWidth = videoHeight * targetAspect;
+        cropX = (videoWidth - cropWidth) / 2;
+        cropY = 0;
+      } else {
+        // Video is taller than 9:16, crop top/bottom
+        cropWidth = videoWidth;
+        cropHeight = videoWidth / targetAspect;
+        cropX = 0;
+        cropY = (videoHeight - cropHeight) / 2;
+      }
+
       const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
       const ctx = canvas.getContext('2d');
       if (!ctx) {
         toast.error('Unable to capture frame.');
@@ -80,7 +100,12 @@ const VideoEditModal = ({
       }
 
       try {
-        ctx.drawImage(video, 0, 0, width, height);
+        // Draw only the cropped portion that matches what's visible
+        ctx.drawImage(
+          video,
+          cropX, cropY, cropWidth, cropHeight,  // Source rectangle
+          0, 0, cropWidth, cropHeight           // Destination rectangle
+        );
         canvas.toBlob((blob) => {
           if (!blob) {
             toast.error('Unable to capture frame. Ensure the video is fully loaded.');
