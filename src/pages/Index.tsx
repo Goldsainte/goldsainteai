@@ -1,11 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { TrustStatsSection } from "@/components/TrustStatsSection";
-import { SocialProofNotifications } from "@/components/SocialProofNotifications";
-import { AuthoritySignals } from "@/components/AuthoritySignals";
-import { SecuritySeals } from "@/components/SecuritySeals";
-import { TestimonialsSection } from "@/components/TestimonialsSection";
-import {
+import { 
   Plane, 
   Hotel, 
   MapPin, 
@@ -1107,18 +1102,6 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Trust Stats Section */}
-            <TrustStatsSection />
-
-            {/* Authority Signals */}
-            <AuthoritySignals />
-
-            {/* Testimonials */}
-            <TestimonialsSection />
-
-            {/* Security & Guarantees */}
-            <SecuritySeals />
-
             {/* Inspiration Content - Far below the fold */}
             <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
               <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-4">
@@ -1680,9 +1663,6 @@ const Index = () => {
           </div>
         )}
       </div>
-      
-      {/* Social Proof Notifications */}
-      <SocialProofNotifications />
     </main>
   );
 };
