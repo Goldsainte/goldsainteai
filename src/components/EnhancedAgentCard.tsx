@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Star, MapPin, Briefcase, CheckCircle2, Shield, Award, Clock, TrendingUp } from "lucide-react";
 import { TrustScoreVisualization } from "./TrustScoreVisualization";
+import { TransparencyBadges } from "./TransparencyBadges";
 import { Separator } from "@/components/ui/separator";
 import {
   Tooltip,
@@ -139,6 +140,14 @@ export const EnhancedAgentCard = ({ agent, metrics, badges, onClick }: EnhancedA
       <CardContent className="space-y-4">
         {/* Trust Score Visualization */}
         <TrustScoreVisualization score={trustScore} showLabel={false} />
+
+        {/* Transparency Features */}
+        <TransparencyBadges
+          avgResponseMinutes={metrics?.avg_response_time_minutes}
+          acceptanceRate={metrics?.acceptance_rate_percentage}
+          lastActiveAt={agent.last_active_at}
+          showMoneyBack={true}
+        />
 
         <Separator />
 

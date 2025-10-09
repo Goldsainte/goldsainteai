@@ -2375,6 +2375,7 @@ export type Database = {
           is_active: boolean | null
           is_verified: boolean | null
           languages: string[] | null
+          last_active_at: string | null
           license_number: string | null
           payment_processor: string | null
           phone: string | null
@@ -2444,6 +2445,7 @@ export type Database = {
           is_active?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
+          last_active_at?: string | null
           license_number?: string | null
           payment_processor?: string | null
           phone?: string | null
@@ -2513,6 +2515,7 @@ export type Database = {
           is_active?: boolean | null
           is_verified?: boolean | null
           languages?: string[] | null
+          last_active_at?: string | null
           license_number?: string | null
           payment_processor?: string | null
           phone?: string | null
@@ -2667,6 +2670,186 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_photos: {
+        Row: {
+          agent_id: string | null
+          booking_id: string | null
+          caption: string | null
+          created_at: string | null
+          id: string
+          is_approved: boolean | null
+          location: string | null
+          photo_url: string
+          taken_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          booking_id?: string | null
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          location?: string | null
+          photo_url: string
+          taken_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          booking_id?: string | null
+          caption?: string | null
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          location?: string | null
+          photo_url?: string
+          taken_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_photos_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_photos_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_reports: {
+        Row: {
+          agent_id: string | null
+          booking_id: string
+          created_at: string | null
+          destination: string
+          id: string
+          is_approved: boolean | null
+          rating: number | null
+          report_content: string
+          title: string
+          trip_date: string
+          updated_at: string | null
+          user_id: string
+          would_recommend: boolean | null
+        }
+        Insert: {
+          agent_id?: string | null
+          booking_id: string
+          created_at?: string | null
+          destination: string
+          id?: string
+          is_approved?: boolean | null
+          rating?: number | null
+          report_content: string
+          title: string
+          trip_date: string
+          updated_at?: string | null
+          user_id: string
+          would_recommend?: boolean | null
+        }
+        Update: {
+          agent_id?: string | null
+          booking_id?: string
+          created_at?: string | null
+          destination?: string
+          id?: string
+          is_approved?: boolean | null
+          rating?: number | null
+          report_content?: string
+          title?: string
+          trip_date?: string
+          updated_at?: string | null
+          user_id?: string
+          would_recommend?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_reports_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_reports_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_videos: {
+        Row: {
+          agent_id: string | null
+          booking_id: string | null
+          created_at: string | null
+          description: string | null
+          duration_seconds: number | null
+          id: string
+          is_approved: boolean | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          video_url: string
+        }
+        Insert: {
+          agent_id?: string | null
+          booking_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_approved?: boolean | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          video_url: string
+        }
+        Update: {
+          agent_id?: string | null
+          booking_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          duration_seconds?: number | null
+          id?: string
+          is_approved?: boolean | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          video_url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_videos_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trip_videos_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
