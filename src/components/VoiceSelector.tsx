@@ -27,20 +27,16 @@ export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorPro
     setPlayingVoice(voiceId);
     
     try {
-      const sampleText = "Hello! I'm your personalized travel assistant. I'll help you plan amazing trips tailored to your preferences.";
-      
-      const response = await fetch('https://api.openai.com/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'tts-1',
-          input: sampleText,
-          voice: voiceId,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-voice-preview`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ voice: voiceId }),
+        }
+      );
 
       if (!response.ok) throw new Error('Failed to generate voice preview');
 
@@ -58,8 +54,8 @@ export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorPro
       console.error('Voice preview error:', error);
       toast({
         title: "Preview unavailable",
-        description: "Voice preview will be available once you complete setup.",
-        variant: "default",
+        description: "Unable to load voice preview. Please try again.",
+        variant: "destructive",
       });
       setPlayingVoice(null);
     }
