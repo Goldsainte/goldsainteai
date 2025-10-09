@@ -165,7 +165,19 @@ export const AIBookingConcierge = () => {
       if (!resp.ok) {
         const errorText = await resp.text();
         console.error('[AIBookingConcierge] Error response:', errorText);
-        throw new Error("Failed to get response");
+        
+        // Handle specific error codes
+        if (resp.status === 429) {
+          throw new Error("Rate limit exceeded. Please wait a moment and try again.");
+        }
+        if (resp.status === 402) {
+          throw new Error("Service temporarily unavailable. Please try again later.");
+        }
+        if (resp.status === 504 || resp.status === 524) {
+          throw new Error("Request timed out while searching. This can happen with complex travel searches. Please try again or simplify your request.");
+        }
+        
+        throw new Error("Failed to get response. Please try again.");
       }
 
       const data = await resp.json();
@@ -176,7 +188,7 @@ export const AIBookingConcierge = () => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
           ...newMessages[newMessages.length - 1],
-          content: data.message || "I apologize, I encountered an issue. Please try again."
+          content: data.content || data.message || "I apologize, I encountered an issue. Please try again."
         };
         return newMessages;
       });
@@ -184,11 +196,23 @@ export const AIBookingConcierge = () => {
       saveConversationData();
     } catch (error) {
       console.error('Error:', error);
-      // Remove the empty assistant message on error
-      setMessages(prev => prev.slice(0, -1));
+      const errorMessage = error instanceof Error ? error.message : "Something went wrong. Please try again.";
+      
+      // Update the assistant message with error
+      setMessages(prev => {
+        const newMessages = [...prev];
+        if (newMessages[newMessages.length - 1]?.role === 'assistant' && !newMessages[newMessages.length - 1].content) {
+          newMessages[newMessages.length - 1] = {
+            role: 'assistant',
+            content: `I apologize, but ${errorMessage.toLowerCase()}`
+          };
+        }
+        return newMessages;
+      });
+      
       toast({
         title: "Error",
-        description: "Something went wrong. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
