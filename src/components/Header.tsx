@@ -188,9 +188,9 @@ export const Header = () => {
                     
                     <DropdownMenuSeparator />
                     
-                    {/* Horizon Section */}
+                    {/* Places Section */}
                     <div className="px-2 py-1.5">
-                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Horizon</p>
+                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Places</p>
                     </div>
                     <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
                       <Video className="h-4 w-4 text-primary flex-shrink-0" />
@@ -328,10 +328,10 @@ export const Header = () => {
             <button
               onClick={() => navigate('/travel-feed')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Horizon"
+              aria-label="Places"
             >
               <Video className="h-5 w-5" />
-              <span className="text-xs">Horizon</span>
+              <span className="text-xs">Places</span>
             </button>
             
             <button

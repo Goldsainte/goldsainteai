@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Search as SearchIcon, ChevronLeft, MapPin, CheckCircle2, Loader2 } from "lucide-react";
-import { Header } from "@/components/Header";
 import { toast } from "sonner";
 
 interface SearchUser {
@@ -111,8 +110,6 @@ export default function Search() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <div className="container mx-auto px-4 py-6 max-w-2xl">
         {/* Search Bar */}
         <form onSubmit={handleSearch} className="mb-6">
