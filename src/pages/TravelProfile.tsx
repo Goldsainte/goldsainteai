@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Profile {
@@ -15,6 +15,7 @@ interface Profile {
   first_name: string | null;
   last_name: string | null;
   bio: string | null;
+  is_verified?: boolean;
 }
 
 interface Post {
@@ -179,9 +180,9 @@ const TravelProfile = () => {
           <h1 className="text-xl font-bold">{profile?.username || 'Profile'}</h1>
           {isOwnProfile && (
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
-              onClick={() => navigate('/settings')}
+              onClick={() => navigate('/travel-settings')}
             >
               <Settings className="h-6 w-6" />
             </Button>
@@ -201,11 +202,16 @@ const TravelProfile = () => {
           </Avatar>
           
           <div className="flex-1">
-            <h2 className="text-2xl font-bold">
-              {profile?.first_name && profile?.last_name
-                ? `${profile.first_name} ${profile.last_name}`
-                : profile?.username || 'User'}
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-2xl font-bold">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : profile?.username || 'User'}
+              </h2>
+              {profile?.is_verified && (
+                <CheckCircle2 className="h-6 w-6 text-blue-500 fill-blue-500" />
+              )}
+            </div>
             <p className="text-muted-foreground">@{profile?.username || 'user'}</p>
           </div>
         </div>

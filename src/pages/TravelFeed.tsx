@@ -22,6 +22,7 @@ interface TravelPost {
   profiles?: {
     username: string | null;
     avatar_url: string | null;
+    is_verified?: boolean;
   };
 }
 
@@ -54,13 +55,13 @@ const TravelFeed = () => {
         (data || []).map(async (post) => {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('username, avatar_url')
+            .select('username, avatar_url, is_verified')
             .eq('id', post.user_id)
             .maybeSingle();
           
           return {
             ...post,
-            profiles: profile || { username: 'TravelExplorer', avatar_url: null }
+            profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false }
           };
         })
       );

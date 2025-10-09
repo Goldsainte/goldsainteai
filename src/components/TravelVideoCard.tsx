@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -19,9 +19,10 @@ interface TravelVideoCardProps {
     like_count: number;
     comment_count: number;
     profiles?: {
-      username: string | null;
-      avatar_url: string | null;
-    };
+    username: string | null;
+    avatar_url: string | null;
+    is_verified?: boolean;
+  };
   };
   isActive: boolean;
   onUpdate: () => void;
@@ -202,7 +203,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-semibold">{post.profiles?.username || 'Anonymous'}</p>
+                <div className="flex items-center gap-1">
+                  <p className="font-semibold">{post.profiles?.username || 'Anonymous'}</p>
+                  {post.profiles?.is_verified && (
+                    <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                  )}
+                </div>
                 {post.location && (
                   <div className="flex items-center gap-1 text-xs text-white/80">
                     <MapPin className="h-3 w-3" />

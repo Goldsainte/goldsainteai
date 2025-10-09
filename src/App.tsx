@@ -38,6 +38,7 @@ import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
 import TravelFeed from "./pages/TravelFeed";
 import TravelProfile from "./pages/TravelProfile";
+import TravelSettings from "./pages/TravelSettings";
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/travel-profile" element={<TravelProfile />} />
           <Route path="/travel-profile/:userId" element={<TravelProfile />} />
+          <Route path="/travel-settings" element={<TravelSettings />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />

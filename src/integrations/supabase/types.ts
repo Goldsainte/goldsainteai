@@ -2186,6 +2186,7 @@ export type Database = {
           email_notifications: boolean | null
           first_name: string | null
           id: string
+          is_verified: boolean | null
           last_name: string | null
           phone: string | null
           preferences: Json | null
@@ -2204,6 +2205,7 @@ export type Database = {
           email_notifications?: boolean | null
           first_name?: string | null
           id: string
+          is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
           preferences?: Json | null
@@ -2222,6 +2224,7 @@ export type Database = {
           email_notifications?: boolean | null
           first_name?: string | null
           id?: string
+          is_verified?: boolean | null
           last_name?: string | null
           phone?: string | null
           preferences?: Json | null
@@ -3487,6 +3490,39 @@ export type Database = {
           created_at?: string
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      verification_subscriptions: {
+        Row: {
+          created_at: string | null
+          current_period_end: string | null
+          id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_period_end?: string | null
+          id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
