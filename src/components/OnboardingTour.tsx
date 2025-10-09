@@ -16,7 +16,7 @@ export const OnboardingTour = () => {
   const steps: Step[] = [
     {
       target: "body",
-      content: "Welcome to Goldsainte.Ai! Let's take a quick tour of the key features that make travel planning effortless.",
+      content: "Welcome to Goldsainte.AI — your intelligent travel companion. Let's take a brief tour of the features that make planning your journey seamless and effortless.",
       placement: "center",
       disableBeacon: true,
     },
