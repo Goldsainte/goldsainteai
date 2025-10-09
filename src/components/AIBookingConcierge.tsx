@@ -686,45 +686,23 @@ export const AIBookingConcierge = () => {
                   </Button>
                 </>
               )}
-              {voiceMode && !isPushToTalkActive && (
+              {voiceMode && (
                 <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
                   <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                   {isProcessing ? 'Processing your request...' : 'Voice mode active - speak naturally'}
                 </div>
               )}
-              {isPushToTalkActive && (
-                <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-primary font-medium">
-                  <div className="h-3 w-3 rounded-full bg-red-500 animate-pulse" />
-                  {isProcessing ? 'Processing...' : 'Listening - Release to send'}
-                </div>
-              )}
               
-              {/* Push-to-talk button */}
-              <Button
-                onMouseDown={handlePushToTalkStart}
-                onMouseUp={handlePushToTalkEnd}
-                onMouseLeave={handlePushToTalkEnd}
-                onTouchStart={handlePushToTalkStart}
-                onTouchEnd={handlePushToTalkEnd}
-                size="icon"
-                variant={isPushToTalkActive ? "default" : "outline"}
-                className={`h-14 w-14 md:h-12 md:w-12 shrink-0 ${isPushToTalkActive ? "bg-gradient-to-r from-red-500 to-red-600 scale-110" : ""} transition-all`}
-                disabled={voiceStatus === 'connecting' || (voiceMode && !isPushToTalkActive)}
-                title="Press & hold to speak"
-              >
-                <Radio className={`h-6 w-6 md:h-5 md:w-5 ${isPushToTalkActive ? "animate-pulse" : ""}`} />
-              </Button>
-              
-              {/* Toggle always-on voice mode */}
+              {/* Voice mode toggle (microphone) */}
               <Button
                 onClick={toggleVoiceMode}
                 size="icon"
-                variant={voiceMode && !isPushToTalkActive ? "default" : "outline"}
-                className={`h-14 w-14 md:h-12 md:w-12 shrink-0 ${voiceMode && !isPushToTalkActive ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
-                disabled={voiceStatus === 'connecting' || isPushToTalkActive}
-                title={voiceMode ? "End voice call" : "Start voice call"}
+                variant={voiceMode ? "default" : "outline"}
+                className={`h-14 w-14 md:h-12 md:w-12 shrink-0 ${voiceMode ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
+                disabled={voiceStatus === 'connecting'}
+                title={voiceMode ? "End voice" : "Start voice"}
               >
-                {voiceMode && !isPushToTalkActive ? <Phone className="h-6 w-6 md:h-5 md:w-5" /> : <PhoneOff className="h-6 w-6 md:h-5 md:w-5" />}
+                {voiceMode ? <MicOff className="h-6 w-6 md:h-5 md:w-5" /> : <Mic className="h-6 w-6 md:h-5 md:w-5" />}
               </Button>
             </div>
             {/* Helper text */}
