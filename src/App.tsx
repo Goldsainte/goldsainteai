@@ -39,6 +39,7 @@ import TestGroupPayment from "./pages/TestGroupPayment";
 import TravelFeed from "./pages/TravelFeed";
 import TravelProfile from "./pages/TravelProfile";
 import TravelSettings from "./pages/TravelSettings";
+import TravelSettings2 from "./pages/TravelSettings2";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Search from "./pages/Search";
 import Trending from "./pages/Trending";
@@ -50,7 +51,7 @@ function AppContent() {
   const location = useLocation();
   
   // Don't show header on these pages as they have their own custom headers
-  const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile'];
+  const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];
   const showHeader = !hideHeaderPages.some(page => location.pathname.startsWith(page));
 
   return (
@@ -79,7 +80,8 @@ function AppContent() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/travel-profile" element={<TravelProfile />} />
           <Route path="/travel-profile/:userId" element={<TravelProfile />} />
-          <Route path="/travel-settings" element={<TravelSettings />} />
+          <Route path="/travel-settings" element={<TravelSettings2 />} />
+          <Route path="/travel-settings/edit" element={<TravelSettings />} />
           <Route path="/creator-dashboard" element={<CreatorDashboard />} />
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />

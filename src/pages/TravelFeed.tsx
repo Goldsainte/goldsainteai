@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Upload, ChevronLeft, Settings, User } from "lucide-react";
+import { Upload, ChevronLeft, Settings, User, PlusSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import TravelVideoCard from "@/components/TravelVideoCard";
 import VideoUploadModal from "@/components/VideoUploadModal";
+import CreateContentSheet from "@/components/CreateContentSheet";
 import { ClearSampleDataButton } from "@/components/ClearSampleDataButton";
 import { toast } from "sonner";
 
@@ -34,6 +35,7 @@ const TravelFeed = () => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [isPersonalized, setIsPersonalized] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -117,6 +119,14 @@ const TravelFeed = () => {
     setUploadModalOpen(false);
   };
 
+  const handleCreateContent = (type: string) => {
+    if (type === "reel" || type === "post") {
+      setUploadModalOpen(true);
+    } else {
+      toast.info(`${type} feature coming soon!`);
+    }
+  };
+
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -174,11 +184,11 @@ const TravelFeed = () => {
 
       {/* Floating Upload Button (FAB) */}
       <Button
-        onClick={() => setUploadModalOpen(true)}
-        className="absolute bottom-28 right-4 z-20 h-12 w-12 rounded-full shadow-lg bg-white text-black hover:bg-white/90"
+        onClick={() => setCreateSheetOpen(true)}
+        className="absolute bottom-28 right-4 z-20 h-14 w-14 rounded-full shadow-2xl bg-primary text-primary-foreground hover:bg-primary/90"
         size="icon"
       >
-        <Upload className="h-5 w-5" />
+        <PlusSquare className="h-6 w-6" />
       </Button>
 
       {/* Video Feed - Full Screen Vertical Scroll */}
@@ -223,6 +233,13 @@ const TravelFeed = () => {
           ))
         )}
       </div>
+
+      {/* Create Content Sheet */}
+      <CreateContentSheet
+        open={createSheetOpen}
+        onOpenChange={setCreateSheetOpen}
+        onSelectType={handleCreateContent}
+      />
 
       {/* Upload Modal */}
       <VideoUploadModal

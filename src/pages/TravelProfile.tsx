@@ -5,10 +5,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
 
 import FollowButton from "@/components/FollowButton";
+import StoryHighlights from "@/components/StoryHighlights";
 
 interface Profile {
   id: string;
@@ -176,99 +178,174 @@ const TravelProfile = () => {
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => navigate(-1)}
+            className="gap-1 hover:bg-transparent"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-bold">{profile?.username || 'Profile'}</h1>
-          {isOwnProfile && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => navigate('/travel-settings')}
-            >
-              <Settings className="h-6 w-6" />
-            </Button>
-          )}
-          {!isOwnProfile && <div className="w-10" />}
+          <button className="flex items-center gap-1 font-semibold hover:opacity-70 transition-opacity">
+            <span>{profile?.username || 'Profile'}</span>
+            <ChevronDown className="h-4 w-4" />
+          </button>
+          <div className="flex items-center gap-2">
+            {isOwnProfile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/travel-settings')}
+                className="hover:bg-transparent"
+              >
+                <Settings className="h-6 w-6" />
+              </Button>
+            )}
+            {!isOwnProfile && <div className="w-10" />}
+          </div>
         </div>
       </div>
 
       {/* Profile Info */}
-      <div className="p-6 space-y-4">
-        <div className="flex items-start gap-4">
-          <Avatar className="h-20 w-20 border-2 border-primary">
-            <AvatarImage src={profile?.avatar_url || undefined} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-              {profile?.username?.[0]?.toUpperCase() || 'U'}
-            </AvatarFallback>
-          </Avatar>
+      <div className="px-4 pt-4 pb-2 space-y-4">
+        <div className="flex items-start justify-between">
+          <div className="relative">
+            <Avatar className="h-20 w-20 ring-2 ring-offset-2 ring-primary/20">
+              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                {profile?.username?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            {isOwnProfile && (
+              <button className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 ring-2 ring-background">
+                <PlusCircle className="h-4 w-4" />
+              </button>
+            )}
+          </div>
           
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h2 className="text-2xl font-bold">
-                {profile?.first_name && profile?.last_name
-                  ? `${profile.first_name} ${profile.last_name}`
-                  : profile?.username || 'User'}
-              </h2>
-              {profile?.is_verified && (
-                <CheckCircle2 className="h-6 w-6 text-blue-500 fill-blue-500" />
-              )}
+          <div className="flex items-center gap-8 pt-2">
+            <button className="text-center">
+              <div className="text-xl font-bold">{formatNumber(stats.postsCount)}</div>
+              <div className="text-xs text-muted-foreground">posts</div>
+            </button>
+            <button className="text-center">
+              <div className="text-xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
+              <div className="text-xs text-muted-foreground">followers</div>
+            </button>
+            <button className="text-center">
+              <div className="text-xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
+              <div className="text-xs text-muted-foreground">following</div>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <h2 className="font-semibold text-sm">
+              {profile?.first_name && profile?.last_name
+                ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
+                : (profile?.username || 'User').toUpperCase()}
+            </h2>
+            {profile?.is_verified && (
+              <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+            )}
+          </div>
+          {profile?.bio && (
+            <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+          )}
+        </div>
+
+        {/* Dashboard Card for own profile */}
+        {isOwnProfile && stats.viewsCount > 0 && (
+          <Card className="p-3 bg-muted/50 border-muted">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-semibold text-sm">Your dashboard</p>
+                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                  <TrendingUp className="h-3 w-3" />
+                  {formatNumber(stats.viewsCount)} views in the last 30 days.
+                </p>
+              </div>
             </div>
-            <p className="text-muted-foreground">@{profile?.username || 'user'}</p>
-          </div>
+          </Card>
+        )}
+
+        {/* Action Buttons */}
+        <div className="flex gap-2">
+          {isOwnProfile ? (
+            <>
+              <Button
+                variant="secondary"
+                className="flex-1 h-8 text-sm font-semibold"
+                onClick={() => navigate('/travel-settings/edit')}
+              >
+                Edit profile
+              </Button>
+              <Button
+                variant="secondary"
+                className="flex-1 h-8 text-sm font-semibold"
+              >
+                Share profile
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-8 w-8"
+              >
+                <Share2 className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              {user && <FollowButton targetUserId={profileUserId!} />}
+              <Button
+                variant="secondary"
+                size="icon"
+                className="h-8 w-8"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+            </>
+          )}
         </div>
 
-        {profile?.bio && (
-          <p className="text-sm">{profile.bio}</p>
-        )}
-
-        {/* Stats */}
-        <div className="flex items-center gap-8 pt-2">
-          <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(stats.postsCount)}</div>
-            <div className="text-xs text-muted-foreground">Posts</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
-            <div className="text-xs text-muted-foreground">Followers</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
-            <div className="text-xs text-muted-foreground">Following</div>
-          </div>
-        </div>
-
-        {isOwnProfile && (
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => navigate('/travel-settings')}
-          >
-            Edit Profile
-          </Button>
-        )}
-
-        {!isOwnProfile && user && (
-          <FollowButton targetUserId={profileUserId!} />
-        )}
+        {/* Story Highlights */}
+        <StoryHighlights 
+          isOwnProfile={isOwnProfile}
+          onAddNew={() => toast.info("Story highlights coming soon!")}
+        />
       </div>
 
       {/* Content Tabs */}
-      <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="w-full grid grid-cols-2 rounded-none border-b">
-          <TabsTrigger value="posts" className="gap-2">
-            <Video className="h-4 w-4" />
-            Posts
+      <Tabs defaultValue="posts" className="w-full mt-2">
+        <TabsList className="w-full grid grid-cols-3 rounded-none border-t h-11 bg-transparent">
+          <TabsTrigger 
+            value="posts" 
+            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+          >
+            <Grid3X3 className="h-5 w-5" />
+          </TabsTrigger>
+          <TabsTrigger 
+            value="reels"
+            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+          >
+            <Video className="h-5 w-5" />
           </TabsTrigger>
           {isOwnProfile && (
-            <TabsTrigger value="liked" className="gap-2">
-              <Heart className="h-4 w-4" />
-              Liked
+            <TabsTrigger 
+              value="liked"
+              className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+            >
+              <Heart className="h-5 w-5" />
             </TabsTrigger>
           )}
         </TabsList>
+
+        <TabsContent value="reels" className="mt-0">
+          <div className="flex items-center justify-center p-12 text-center">
+            <div>
+              <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">Reels view coming soon</p>
+            </div>
+          </div>
+        </TabsContent>
 
         <TabsContent value="posts" className="mt-0">
           {loading ? (
