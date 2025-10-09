@@ -33,8 +33,6 @@ import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
 import { EventCard } from "@/components/EventCard";
 import { PackageCard } from "@/components/PackageCard";
-import { TripPhotosGallery } from "@/components/TripPhotosGallery";
-import { TripReportsSection } from "@/components/TripReportsSection";
 import { ChatDatePicker } from "@/components/ChatDatePicker";
 import { PriceSlider } from "@/components/PriceSlider";
 import { CuisineSelector } from "@/components/CuisineSelector";
@@ -1221,32 +1219,6 @@ const Index = () => {
                     </Card>
                   ))}
                 </div>
-              </div>
-
-              {/* Real Trip Photos Gallery */}
-              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
-                <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
-                    Real Trips, Real Memories
-                  </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
-                    See authentic photos from our travelers' adventures around the world
-                  </p>
-                </div>
-                <TripPhotosGallery limit={8} />
-              </div>
-
-              {/* Trip Reports & Testimonials */}
-              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
-                <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
-                    Traveler Stories
-                  </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
-                    Discover detailed trip reports and experiences from real customers
-                  </p>
-                </div>
-                <TripReportsSection limit={4} />
               </div>
 
               {/* Become a Travel Agent CTA */}
