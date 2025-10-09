@@ -154,76 +154,118 @@ export const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-10 w-10 sm:h-11 sm:w-11"
+                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-secondary/10 transition-all duration-300"
                       aria-label="Main menu"
                       data-tour="navigation"
                     >
                       <Menu className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-72 bg-background border-border z-[100]">
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-80 bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                  >
                     {/* Travel Section */}
-                    <div className="px-2 py-1.5">
-                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Travel</p>
+                    <div className="px-4 py-3 border-b border-border/50">
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em] letterspacing-wide">Travel</p>
                     </div>
-                    <DropdownMenuItem onClick={() => handleServiceClick('hotels')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Hotel className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Hotels & Stays</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleServiceClick('flights')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Plane className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Flights</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleServiceClick('restaurants')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <UtensilsCrossed className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Restaurants</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleServiceClick('events')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Ticket className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Events</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => handleServiceClick('cars')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Car className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Car Rentals</span>
-                    </DropdownMenuItem>
+                    <div className="py-2">
+                      <DropdownMenuItem 
+                        onClick={() => handleServiceClick('hotels')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Hotel className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Hotels & Stays</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleServiceClick('flights')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Flights</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleServiceClick('restaurants')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <UtensilsCrossed className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Restaurants</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleServiceClick('events')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Ticket className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Events</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleServiceClick('cars')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Car className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Car Rentals</span>
+                      </DropdownMenuItem>
+                    </div>
                     
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="bg-border/50" />
                     
                     {/* Places Section */}
-                    <div className="px-2 py-1.5">
-                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Places</p>
+                    <div className="px-4 py-3 border-b border-border/50">
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Places</p>
                     </div>
-                    <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Video className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Travel Feed</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/trending')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <TrendingUp className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Trending</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/search')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Search className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Explore</span>
-                    </DropdownMenuItem>
+                    <div className="py-2">
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/travel-feed')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Travel Feed</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/trending')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <TrendingUp className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Trending</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/search')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Search className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Explore</span>
+                      </DropdownMenuItem>
+                    </div>
                     
-                    <DropdownMenuSeparator />
+                    <DropdownMenuSeparator className="bg-border/50" />
                     
                     {/* Travel Agent Marketplace Section */}
-                    <div className="px-2 py-1.5">
-                      <p className="text-xs font-semibold text-primary uppercase tracking-wider">Agent Marketplace</p>
+                    <div className="px-4 py-3 border-b border-border/50">
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Agent Marketplace</p>
                     </div>
-                    <DropdownMenuItem onClick={() => navigate('/browse-agents')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Browse Agents</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/marketplace')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Marketplace</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/agent-onboarding')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                      <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
-                      <span>Become an Agent</span>
-                    </DropdownMenuItem>
+                    <div className="py-2 pb-3">
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/browse-agents')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Browse Agents</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/marketplace')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Marketplace</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/agent-onboarding')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Become an Agent</span>
+                      </DropdownMenuItem>
+                    </div>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
@@ -232,50 +274,78 @@ export const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      className="gap-1 sm:gap-1.5 hover:bg-muted rounded-full border border-border shadow-sm px-2 sm:px-3 h-10 sm:h-11 min-w-[44px]"
+                      className="gap-1 sm:gap-1.5 hover:bg-secondary/10 rounded-full border border-border shadow-sm px-2 sm:px-3 h-10 sm:h-11 min-w-[44px] transition-all duration-300"
                       aria-label="User menu"
                     >
                       <Menu className="h-4 w-4 md:h-4 md:w-4" />
                       <User className="h-5 w-5 md:h-5 md:w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-64 bg-background border-border z-[100]">
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-72 bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                  >
                     {user ? (
                       <>
-                        <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer min-h-[44px] text-sm">
-                          Dashboard
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer min-h-[44px] text-sm">
-                          My Bookings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/favorites')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
-                          <Heart className="h-4 w-4 flex-shrink-0" />
-                          Favorites
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer min-h-[44px] text-sm">
-                          Booking Preferences
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
-                          <Video className="h-4 w-4 flex-shrink-0" />
-                          Travel Feed
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/creator-dashboard')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
-                          <TrendingUp className="h-4 w-4 flex-shrink-0" />
-                          Creator Dashboard
-                        </DropdownMenuItem>
+                        <div className="py-2">
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/dashboard')} 
+                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                          >
+                            <span className="text-sm font-medium">Dashboard</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/my-bookings')} 
+                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                          >
+                            <span className="text-sm font-medium">My Bookings</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/favorites')} 
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                          >
+                            <Heart className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Favorites</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/booking-preferences')} 
+                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                          >
+                            <span className="text-sm font-medium">Booking Preferences</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/travel-feed')} 
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                          >
+                            <Video className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Travel Feed</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/creator-dashboard')} 
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                          >
+                            <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Creator Dashboard</span>
+                          </DropdownMenuItem>
+                        </div>
                         
                         {isAdmin && (
                           <>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => navigate('/admin/agent-approvals')} className="cursor-pointer min-h-[44px] text-sm font-medium text-primary">
-                              Admin Panel
-                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-border/50" />
+                            <div className="py-2">
+                              <DropdownMenuItem 
+                                onClick={() => navigate('/admin/agent-approvals')} 
+                                className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                              >
+                                <span className="text-sm font-semibold text-secondary">Admin Panel</span>
+                              </DropdownMenuItem>
+                            </div>
                           </>
                         )}
                         
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="bg-border/50" />
                         
-                        <div className="px-2 py-3 min-h-[60px]">
+                        <div className="px-4 py-4">
                           <div className="flex items-center justify-between gap-3">
                             <Label htmlFor="preferences-toggle" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
                               Use My Preferences
@@ -293,21 +363,32 @@ export const Header = () => {
                           </p>
                         </div>
                         
-                        <DropdownMenuSeparator />
+                        <DropdownMenuSeparator className="bg-border/50" />
                         
-                        <DropdownMenuItem onClick={signOut} className="cursor-pointer min-h-[44px] text-sm">
-                          Sign Out
-                        </DropdownMenuItem>
+                        <div className="py-2 pb-3">
+                          <DropdownMenuItem 
+                            onClick={signOut} 
+                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-destructive/10 hover:text-destructive"
+                          >
+                            <span className="text-sm font-medium">Sign Out</span>
+                          </DropdownMenuItem>
+                        </div>
                       </>
                     ) : (
-                      <>
-                        <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer font-medium min-h-[44px] text-sm">
-                          Sign In
+                      <div className="py-2">
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/auth')} 
+                          className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                        >
+                          <span className="text-sm font-semibold">Sign In</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer min-h-[44px] text-sm">
-                          Sign Up
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/auth')} 
+                          className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                        >
+                          <span className="text-sm font-medium">Sign Up</span>
                         </DropdownMenuItem>
-                      </>
+                      </div>
                     )}
                   </DropdownMenuContent>
                 </DropdownMenu>
