@@ -49,18 +49,18 @@ const TravelFeed = () => {
 
       if (error) throw error;
       
-      // Fetch profile data separately
+      // Fetch profile data separately with maybeSingle to handle missing profiles
       const postsWithProfiles = await Promise.all(
         (data || []).map(async (post) => {
           const { data: profile } = await supabase
             .from('profiles')
             .select('username, avatar_url')
             .eq('id', post.user_id)
-            .single();
+            .maybeSingle();
           
           return {
             ...post,
-            profiles: profile || { username: null, avatar_url: null }
+            profiles: profile || { username: 'TravelExplorer', avatar_url: null }
           };
         })
       );

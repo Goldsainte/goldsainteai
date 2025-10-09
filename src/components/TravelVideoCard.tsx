@@ -34,6 +34,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
   const [localLikeCount, setLocalLikeCount] = useState(post.like_count);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasViewed, setHasViewed] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(true);
 
   useEffect(() => {
     checkIfLiked();
@@ -147,6 +149,23 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
 
   return (
     <div className="relative h-full w-full bg-black">
+      {/* Loading State */}
+      {videoLoading && !videoError && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="text-white text-sm">Loading video...</div>
+        </div>
+      )}
+      
+      {/* Error State */}
+      {videoError && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+          <div className="text-center space-y-2 p-4">
+            <p className="text-white text-sm">Video unavailable</p>
+            <p className="text-white/60 text-xs">Demo video - replace with real content</p>
+          </div>
+        </div>
+      )}
+      
       {/* Video */}
       <video
         ref={videoRef}
@@ -155,6 +174,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         loop
         playsInline
         muted={false}
+        crossOrigin="anonymous"
+        onLoadedData={() => setVideoLoading(false)}
+        onError={() => {
+          setVideoError(true);
+          setVideoLoading(false);
+          console.error('Video failed to load:', post.video_url);
+        }}
       />
 
       {/* Gradient Overlay */}
