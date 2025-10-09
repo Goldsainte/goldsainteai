@@ -37,6 +37,7 @@ import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
 import TravelFeed from "./pages/TravelFeed";
+import TravelProfile from "./pages/TravelProfile";
 
 const queryClient = new QueryClient();
 
@@ -44,8 +45,9 @@ const queryClient = new QueryClient();
 function AppContent() {
   const location = useLocation();
   
-  // Don't show header on auth page
-  const showHeader = location.pathname !== '/auth';
+  // Don't show header on these pages as they have their own custom headers
+  const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile'];
+  const showHeader = !hideHeaderPages.some(page => location.pathname.startsWith(page));
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -71,6 +73,8 @@ function AppContent() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/travel-profile" element={<TravelProfile />} />
+          <Route path="/travel-profile/:userId" element={<TravelProfile />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />

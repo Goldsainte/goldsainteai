@@ -114,7 +114,16 @@ const TravelFeed = () => {
           <ChevronLeft className="h-6 w-6" />
         </Button>
         <h1 className="text-xl font-bold">Travel Feed</h1>
-        <div className="w-10" /> {/* Spacer for centering */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => navigate('/travel-profile')}
+          className="text-foreground"
+        >
+          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+            {user?.email?.[0]?.toUpperCase() || 'U'}
+          </div>
+        </Button>
       </div>
 
       {/* Floating Upload Button (FAB) */}

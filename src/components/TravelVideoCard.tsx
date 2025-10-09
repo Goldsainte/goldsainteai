@@ -191,7 +191,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
           <div className="flex-1 space-y-2">
-            <div className="flex items-center gap-2">
+            <div 
+              className="flex items-center gap-2 cursor-pointer"
+              onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+            >
               <Avatar className="h-10 w-10 border-2 border-white">
                 <AvatarImage src={post.profiles?.avatar_url || undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground">
