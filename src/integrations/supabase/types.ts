@@ -929,6 +929,44 @@ export type Database = {
           },
         ]
       }
+      creator_rewards: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          post_id: string | null
+          reward_type: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          post_id?: string | null
+          reward_type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          post_id?: string | null
+          reward_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_rewards_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       currency_exchange_rates: {
         Row: {
           created_at: string
@@ -2797,15 +2835,19 @@ export type Database = {
           comment_count: number | null
           created_at: string | null
           duration_seconds: number | null
+          embed_platform: string | null
+          embed_url: string | null
           id: string
           is_featured: boolean | null
           like_count: number | null
           location: string | null
+          original_creator: string | null
+          share_count: number | null
           status: string | null
           thumbnail_url: string | null
           updated_at: string | null
           user_id: string
-          video_url: string
+          video_url: string | null
           view_count: number | null
         }
         Insert: {
@@ -2813,15 +2855,19 @@ export type Database = {
           comment_count?: number | null
           created_at?: string | null
           duration_seconds?: number | null
+          embed_platform?: string | null
+          embed_url?: string | null
           id?: string
           is_featured?: boolean | null
           like_count?: number | null
           location?: string | null
+          original_creator?: string | null
+          share_count?: number | null
           status?: string | null
           thumbnail_url?: string | null
           updated_at?: string | null
           user_id: string
-          video_url: string
+          video_url?: string | null
           view_count?: number | null
         }
         Update: {
@@ -2829,15 +2875,19 @@ export type Database = {
           comment_count?: number | null
           created_at?: string | null
           duration_seconds?: number | null
+          embed_platform?: string | null
+          embed_url?: string | null
           id?: string
           is_featured?: boolean | null
           like_count?: number | null
           location?: string | null
+          original_creator?: string | null
+          share_count?: number | null
           status?: string | null
           thumbnail_url?: string | null
           updated_at?: string | null
           user_id?: string
-          video_url?: string
+          video_url?: string | null
           view_count?: number | null
         }
         Relationships: []
@@ -3714,6 +3764,10 @@ export type Database = {
           success_fee_pct?: number
         }
         Returns: Json
+      }
+      calculate_creator_earnings: {
+        Args: { post_uuid: string }
+        Returns: number
       }
       calculate_loyalty_tier: {
         Args: { lifetime_points_value: number }

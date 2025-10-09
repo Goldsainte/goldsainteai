@@ -3,7 +3,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -11,18 +12,23 @@ interface TravelVideoCardProps {
   post: {
     id: string;
     user_id: string;
-    video_url: string;
+    video_url?: string;
+    embed_url?: string;
+    embed_platform?: string;
+    original_creator?: string;
     thumbnail_url: string | null;
     caption: string | null;
     location: string | null;
     view_count: number;
     like_count: number;
     comment_count: number;
+    share_count?: number;
+    is_featured?: boolean;
     profiles?: {
-    username: string | null;
-    avatar_url: string | null;
-    is_verified?: boolean;
-  };
+      username: string | null;
+      avatar_url: string | null;
+      is_verified?: boolean;
+    };
   };
   isActive: boolean;
   onUpdate: () => void;
@@ -43,10 +49,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
   }, [post.id]);
 
   useEffect(() => {
-    if (isActive && videoRef.current) {
+    if (isActive && videoRef.current && post.video_url) {
       videoRef.current.play().catch(e => console.log('Autoplay prevented:', e));
       
-      // Track view after 3 seconds
       if (!hasViewed) {
         const viewTimer = setTimeout(() => {
           trackView();
@@ -127,6 +132,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
   const handleShare = async () => {
     const url = `${window.location.origin}/post/${post.id}`;
     
+    // Track share
+    try {
+      await supabase
+        .from('travel_posts')
+        .update({ share_count: (post.share_count || 0) + 1 })
+        .eq('id', post.id);
+    } catch (error) {
+      console.error('Error tracking share:', error);
+    }
+    
     if (navigator.share) {
       try {
         await navigator.share({
@@ -148,10 +163,37 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
     return count.toString();
   };
 
+  const getEmbedComponent = () => {
+    if (!post.embed_url) return null;
+
+    return (
+      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+        <div className="text-center p-6 space-y-4">
+          <ExternalLink className="w-16 h-16 mx-auto text-white" />
+          <div>
+            <p className="text-white text-lg font-semibold mb-2">
+              View on {post.embed_platform}
+            </p>
+            {post.original_creator && (
+              <p className="text-white/80 text-sm mb-4">
+                By {post.original_creator}
+              </p>
+            )}
+          </div>
+          <Button asChild variant="secondary" size="lg">
+            <a href={post.embed_url} target="_blank" rel="noopener noreferrer">
+              Open Original
+            </a>
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="relative h-full w-full bg-black">
       {/* Loading State */}
-      {videoLoading && !videoError && (
+      {videoLoading && !videoError && post.video_url && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-white text-sm">Loading video...</div>
         </div>
@@ -162,29 +204,31 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
           <div className="text-center space-y-2 p-4">
             <p className="text-white text-sm">Video unavailable</p>
-            <p className="text-white/60 text-xs">Demo video - replace with real content</p>
           </div>
         </div>
       )}
       
-      {/* Video - Full Screen */}
-      <video
-        ref={videoRef}
-        src={post.video_url}
-        className="absolute inset-0 w-full h-full object-cover"
-        loop
-        playsInline
-        muted={false}
-        crossOrigin="anonymous"
-        onLoadedData={() => setVideoLoading(false)}
-        onError={() => {
-          setVideoError(true);
-          setVideoLoading(false);
-          console.error('Video failed to load:', post.video_url);
-        }}
-      />
+      {/* Video or Embed */}
+      {post.video_url ? (
+        <video
+          ref={videoRef}
+          src={post.video_url}
+          className="absolute inset-0 w-full h-full object-cover"
+          loop
+          playsInline
+          muted={false}
+          crossOrigin="anonymous"
+          onLoadedData={() => setVideoLoading(false)}
+          onError={() => {
+            setVideoError(true);
+            setVideoLoading(false);
+          }}
+        />
+      ) : post.embed_url ? (
+        getEmbedComponent()
+      ) : null}
 
-      {/* Gradient Overlay - Bottom only */}
+      {/* Gradient Overlay */}
       <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
 
       {/* Bottom Content */}
@@ -192,6 +236,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
           <div className="flex-1 space-y-2">
+            {/* Featured Badge */}
+            {post.is_featured && (
+              <Badge className="mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-0">
+                ⭐ Featured
+              </Badge>
+            )}
+
             <div 
               className="flex items-center gap-2 cursor-pointer"
               onClick={() => navigate(`/travel-profile/${post.user_id}`)}
@@ -217,6 +268,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
                 )}
               </div>
             </div>
+
+            {/* Original Creator Attribution */}
+            {post.original_creator && (
+              <p className="text-xs text-white/70">
+                Original: {post.original_creator}
+              </p>
+            )}
+
             {post.caption && (
               <p className="text-sm line-clamp-2">{post.caption}</p>
             )}
