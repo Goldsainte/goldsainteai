@@ -2186,6 +2186,47 @@ export type Database = {
         }
         Relationships: []
       }
+      post_collaborators: {
+        Row: {
+          collaborator_id: string
+          created_at: string
+          id: string
+          invited_at: string
+          invited_by: string
+          post_id: string
+          responded_at: string | null
+          status: string
+        }
+        Insert: {
+          collaborator_id: string
+          created_at?: string
+          id?: string
+          invited_at?: string
+          invited_by: string
+          post_id: string
+          responded_at?: string | null
+          status?: string
+        }
+        Update: {
+          collaborator_id?: string
+          created_at?: string
+          id?: string
+          invited_at?: string
+          invited_by?: string
+          post_id?: string
+          responded_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_collaborators_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_comments: {
         Row: {
           comment_text: string

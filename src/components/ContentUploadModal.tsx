@@ -16,6 +16,7 @@ import { Upload, Loader2, Link2, Image } from "lucide-react";
 import { toast } from "sonner";
 import { extractMentions } from "@/lib/mentionHelpers";
 import { extractHashtags } from "@/lib/hashtagHelpers";
+import { CollaboratorSelector } from "./CollaboratorSelector";
 
 interface ContentUploadModalProps {
   open: boolean;
@@ -35,6 +36,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string>("");
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
+  const [collaborators, setCollaborators] = useState<string[]>([]);
   const videoRef = useState<HTMLVideoElement | null>(null)[0];
 
   const detectPlatform = (url: string): string | null => {
@@ -152,12 +154,25 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         });
       }
 
+      // Send collaboration invites
+      if (collaborators.length > 0 && postData) {
+        const invites = collaborators.map(collaboratorId => ({
+          post_id: postData.id,
+          collaborator_id: collaboratorId,
+          invited_by: user.id,
+        }));
+
+        await supabase.from('post_collaborators').insert(invites);
+        toast.success(`Collaboration invites sent!`);
+      }
+
       toast.success(`${photoFiles.length} photo${photoFiles.length > 1 ? 's' : ''} uploaded successfully!`);
       
       setPhotoFiles([]);
       setPhotoPreviewUrls([]);
       setCaption("");
       setLocation("");
+      setCollaborators([]);
       
       onOpenChange(false);
       onSuccess();
@@ -358,6 +373,18 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         });
       }
 
+      // Send collaboration invites
+      if (collaborators.length > 0 && postData) {
+        const invites = collaborators.map(collaboratorId => ({
+          post_id: postData.id,
+          collaborator_id: collaboratorId,
+          invited_by: user.id,
+        }));
+
+        await supabase.from('post_collaborators').insert(invites);
+        toast.success(`Collaboration invites sent!`);
+      }
+
       toast.success('Video uploaded successfully!');
       
       setVideoFile(null);
@@ -365,6 +392,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
       setLocation("");
       setThumbnailFile(null);
       setVideoPreviewUrl("");
+      setCollaborators([]);
       
       onOpenChange(false);
       onSuccess();
@@ -447,6 +475,11 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                 disabled={uploading}
               />
             </div>
+
+            <CollaboratorSelector
+              selectedCollaborators={collaborators}
+              onCollaboratorsChange={setCollaborators}
+            />
 
             <Button
               onClick={handlePhotoUpload}
@@ -566,6 +599,11 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                 disabled={uploading}
               />
             </div>
+
+            <CollaboratorSelector
+              selectedCollaborators={collaborators}
+              onCollaboratorsChange={setCollaborators}
+            />
 
             <Button
               onClick={handleUpload}

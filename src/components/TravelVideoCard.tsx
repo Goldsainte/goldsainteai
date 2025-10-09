@@ -27,6 +27,8 @@ interface TravelVideoCardProps {
     embed_platform?: string;
     original_creator?: string;
     thumbnail_url: string | null;
+    image_urls?: string[];
+    media_type?: string;
     caption: string | null;
     location: string | null;
     view_count: number;
@@ -59,11 +61,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
+  const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
 
   const isOwnPost = user?.id === post.user_id;
 
   useEffect(() => {
     checkIfLiked();
+    fetchCollaborators();
   }, [post.id]);
 
   useEffect(() => {
@@ -97,6 +101,28 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       setIsLiked(!!data);
     } catch (error) {
       // Not liked
+    }
+  };
+
+  const fetchCollaborators = async () => {
+    try {
+      const { data } = await supabase
+        .from('post_collaborators')
+        .select('collaborator_id')
+        .eq('post_id', post.id)
+        .eq('status', 'accepted');
+      
+      if (data && data.length > 0) {
+        const collabIds = data.map(c => c.collaborator_id);
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username, avatar_url')
+          .in('id', collabIds);
+        
+        setCollaborators(profiles || []);
+      }
+    } catch (error) {
+      console.error('Error fetching collaborators:', error);
     }
   };
 
@@ -374,6 +400,30 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           {post.original_creator && (
             <div className="text-xs text-muted-foreground">
               Original: {post.original_creator}
+            </div>
+          )}
+
+          {/* Collaborators */}
+          {collaborators.length > 0 && (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-muted-foreground">with</span>
+              <div className="flex -space-x-2">
+                {collaborators.slice(0, 3).map(collab => (
+                  <Avatar
+                    key={collab.id}
+                    className="h-6 w-6 border-2 border-card cursor-pointer"
+                    onClick={() => navigate(`/travel-profile/${collab.id}`)}
+                  >
+                    <AvatarImage src={collab.avatar_url || undefined} />
+                    <AvatarFallback className="text-xs">
+                      {collab.username?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                ))}
+              </div>
+              <span className="text-muted-foreground font-medium">
+                {collaborators.map(c => c.username).join(', ')}
+              </span>
             </div>
           )}
 
