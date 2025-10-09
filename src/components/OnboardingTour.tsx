@@ -68,6 +68,23 @@ export const OnboardingTour = () => {
     }
   };
 
+  useEffect(() => {
+    if (run) {
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('react-joyride-active');
+    } else {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.classList.remove('react-joyride-active');
+    }
+    return () => {
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
+      document.body.classList.remove('react-joyride-active');
+    };
+  }, [run]);
+
   return (
     <>
       <style>{`
@@ -87,8 +104,17 @@ export const OnboardingTour = () => {
           padding: 0;
           text-align: center;
         }
-        .__floater { filter: none !important; }
-        .__floater__body { transform: none !important; }
+        .__floater { 
+          filter: none !important; 
+          position: fixed !important;
+        }
+        .__floater__body { 
+          transform: none !important; 
+          position: fixed !important;
+        }
+        body.react-joyride-active {
+          overflow: hidden !important;
+        }
       `}</style>
       <Joyride
         steps={steps}
@@ -99,6 +125,7 @@ export const OnboardingTour = () => {
         disableScrolling={true}
         disableScrollParentFix={true}
         spotlightClicks={false}
+        scrollToFirstStep={false}
         callback={handleJoyrideCallback}
         styles={{
           options: {

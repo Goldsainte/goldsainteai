@@ -156,18 +156,17 @@ const Index = () => {
   };
 
   useEffect(() => {
-    // Hide welcome modal if logged in, or if previously dismissed
-    if (user) {
-      setShowWelcomeModal(false);
-      return;
-    }
+    // Show welcome modal first for new users or if tour hasn't been seen yet
     try {
       const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
-      setShowWelcomeModal(!dismissed);
+      const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour') === 'true';
+      setShowWelcomeModal(!dismissed || !hasSeenTour);
     } catch {
       setShowWelcomeModal(true);
     }
-  }, [user]);
+    // Run only on mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const rotatingMessages = [
     "Where to next? Discover handpicked hotels tailored to your taste.",
