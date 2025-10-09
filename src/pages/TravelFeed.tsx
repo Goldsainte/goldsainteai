@@ -33,6 +33,7 @@ const TravelFeed = () => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [isPersonalized, setIsPersonalized] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,38 +42,62 @@ const TravelFeed = () => {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('travel_posts')
-        .select('*')
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(20);
-
-      if (error) throw error;
-      
-      // Fetch profile data separately with maybeSingle to handle missing profiles
-      const postsWithProfiles = await Promise.all(
-        (data || []).map(async (post) => {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('username, avatar_url, is_verified')
-            .eq('id', post.user_id)
-            .maybeSingle();
-          
-          return {
-            ...post,
-            profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false }
-          };
-        })
-      );
-      
-      setPosts(postsWithProfiles);
+      // Use personalized feed if user is logged in
+      if (user) {
+        const { data, error } = await supabase.functions.invoke('get-personalized-feed');
+        
+        if (error) {
+          console.error('Error fetching personalized feed:', error);
+          toast.error('Failed to load personalized feed, showing recent posts');
+          setIsPersonalized(false);
+          // Fallback to chronological feed
+          await fetchChronologicalPosts();
+          return;
+        }
+        
+        setPosts(data.posts || []);
+        setIsPersonalized(true);
+      } else {
+        // Show chronological feed for non-logged in users
+        setIsPersonalized(false);
+        await fetchChronologicalPosts();
+      }
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast.error('Failed to load feed');
+      setIsPersonalized(false);
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchChronologicalPosts = async () => {
+    const { data, error } = await supabase
+      .from('travel_posts')
+      .select('*')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+    
+    // Fetch profile data separately with maybeSingle to handle missing profiles
+    const postsWithProfiles = await Promise.all(
+      (data || []).map(async (post) => {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username, avatar_url, is_verified')
+          .eq('id', post.user_id)
+          .maybeSingle();
+        
+        return {
+          ...post,
+          profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false }
+        };
+      })
+    );
+    
+    setPosts(postsWithProfiles);
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
@@ -114,6 +139,13 @@ const TravelFeed = () => {
         >
           <ChevronLeft className="h-6 w-6" />
         </Button>
+        
+        {isPersonalized && (
+          <div className="absolute left-1/2 -translate-x-1/2 top-4 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
+            <p className="text-white text-xs font-medium">For You</p>
+          </div>
+        )}
+        
         <Button
           variant="ghost"
           size="icon"

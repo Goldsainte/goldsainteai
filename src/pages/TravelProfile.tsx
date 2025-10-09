@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 
+import FollowButton from "@/components/FollowButton";
+
 interface Profile {
   id: string;
   username: string | null;
@@ -16,6 +18,8 @@ interface Profile {
   last_name: string | null;
   bio: string | null;
   is_verified?: boolean;
+  followers_count?: number;
+  following_count?: number;
 }
 
 interface Post {
@@ -227,12 +231,12 @@ const TravelProfile = () => {
             <div className="text-xs text-muted-foreground">Posts</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(stats.likesCount)}</div>
-            <div className="text-xs text-muted-foreground">Likes</div>
+            <div className="text-2xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
+            <div className="text-xs text-muted-foreground">Followers</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold">{formatNumber(stats.viewsCount)}</div>
-            <div className="text-xs text-muted-foreground">Views</div>
+            <div className="text-2xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
+            <div className="text-xs text-muted-foreground">Following</div>
           </div>
         </div>
 
@@ -240,10 +244,14 @@ const TravelProfile = () => {
           <Button
             variant="outline"
             className="w-full"
-            onClick={() => navigate('/settings')}
+            onClick={() => navigate('/travel-settings')}
           >
             Edit Profile
           </Button>
+        )}
+
+        {!isOwnProfile && user && (
+          <FollowButton targetUserId={profileUserId!} />
         )}
       </div>
 
