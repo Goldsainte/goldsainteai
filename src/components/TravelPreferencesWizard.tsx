@@ -45,7 +45,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           <div>
             <Label className="text-base mb-3 block">What types of trips do you enjoy?</Label>
             <p className="text-sm text-muted-foreground mb-4">Pick as many as you like</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Leisure', 'Business', 'Adventure', 'Cultural', 'Nature-focused', 'Relaxation / Wellness'].map(type => (
                 <div key={type} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -61,7 +61,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">Who's your usual travel crew?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Solo', 'Partner', 'Friends', 'Family', 'Group Tours'].map(companion => (
                 <div key={companion} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -80,7 +80,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.general?.idealTripLength}
               onValueChange={(value) => updatePreference('general', 'idealTripLength', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Weekend (1–3 days)', 'Short (4–7 days)', 'Medium (8–14 days)', 'Long (2+ weeks)'].map(length => (
                 <div key={length} className="flex items-center space-x-2 min-h-[44px]">
@@ -101,7 +101,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">Do you prefer staying close to home or exploring abroad?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Domestic travel', 'International travel', 'No preference'].map(pref => (
                 <div key={pref} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -140,7 +140,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.destination?.returningPreference}
               onValueChange={(value) => updatePreference('destination', 'returningPreference', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Yes', 'No', 'Occasionally'].map(option => (
                 <div key={option} className="flex items-center space-x-2 min-h-[44px]">
@@ -161,7 +161,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">How do you like to travel?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Flights', 'Trains', 'Car (road trips)', 'Cruises'].map(method => (
                 <div key={method} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -180,7 +180,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.transportation?.flightClass}
               onValueChange={(value) => updatePreference('transportation', 'flightClass', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Economy', 'Premium Economy', 'Business', 'First Class'].map(flightClass => (
                 <div key={flightClass} className="flex items-center space-x-2 min-h-[44px]">
@@ -196,7 +196,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.transportation?.layoverPreference}
               onValueChange={(value) => updatePreference('transportation', 'layoverPreference', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               <div className="flex items-center space-x-2 min-h-[44px]">
                 <RadioGroupItem value="direct" id="direct" />
@@ -228,7 +228,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">What type of places do you prefer?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Hotels', 'Airbnb / Vacation Rentals', 'Hostels', 'Resorts', 'Boutique Hotels'].map(type => (
                 <div key={type} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -247,7 +247,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.accommodation?.class}
               onValueChange={(value) => updatePreference('accommodation', 'class', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Budget', 'Mid-range', 'Luxury'].map(accomClass => (
                 <div key={accomClass} className="flex items-center space-x-2 min-h-[44px]">
@@ -260,7 +260,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">Must-have amenities</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Fast Wi-Fi', 'Kitchenette', 'Workspace', 'Pool', 'Gym', 'Pet-friendly', 'Free breakfast'].map(amenity => (
                 <div key={amenity} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -293,7 +293,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">What kind of food experiences do you love?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Local street food', 'Upscale dining', 'Vegetarian/Vegan', 'Halal/Kosher', 'Seafood-focused'].map(pref => (
                 <div key={pref} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -312,7 +312,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.food?.foodExperiences}
               onValueChange={(value) => updatePreference('food', 'foodExperiences', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Yes', 'No', 'Sometimes'].map(option => (
                 <div key={option} className="flex items-center space-x-2 min-h-[44px]">
@@ -345,7 +345,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.timing?.peakPreference}
               onValueChange={(value) => updatePreference('timing', 'peakPreference', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['During off-peak times', 'During peak holiday seasons', 'Whenever a good deal comes up'].map(option => (
                 <div key={option} className="flex items-center space-x-2 min-h-[44px]">
@@ -361,7 +361,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.timing?.flexibility}
               onValueChange={(value) => updatePreference('timing', 'flexibility', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Very flexible', 'Somewhat flexible', 'Fixed dates only'].map(option => (
                 <div key={option} className="flex items-center space-x-2 min-h-[44px]">
@@ -377,7 +377,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.budget?.range}
               onValueChange={(value) => updatePreference('budget', 'range', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Under $500', '$500–$1,000', '$1,000–$3,000', '$3,000–$5,000', '$5,000+'].map(range => (
                 <div key={range} className="flex items-center space-x-2 min-h-[44px]">
@@ -391,7 +391,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           <div>
             <Label className="text-base mb-3 block">What matters most to you?</Label>
             <p className="text-sm text-muted-foreground mb-3">Pick your top priorities</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Comfort in accommodation', 'Flights and upgrades', 'Unique experiences', 'Food and dining', 'Convenience'].map(priority => (
                 <div key={priority} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -415,8 +415,8 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">What activities get you excited?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {['Hiking / Nature', 'Beaches / Relaxation', 'City tours / Museums', 'Cultural festivals', 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {['Hiking / Nature', 'Beaches / Relaxation', 'City tours / Museums', 'Cultural festivals',
                 'Shopping', 'Water sports / Diving', 'Adventure sports', 'Spa / Wellness', 'Nightlife / Bars'].map(activity => (
                 <div key={activity} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -435,7 +435,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.activities?.pace}
               onValueChange={(value) => updatePreference('activities', 'pace', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Fast (see as much as possible)', 'Balanced', 'Slow (fewer places, more depth)'].map(pace => (
                 <div key={pace} className="flex items-center space-x-2 min-h-[44px]">
@@ -466,7 +466,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">Are you open to destinations requiring:</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Visas', 'Vaccinations', 'Special permits'].map(requirement => (
                 <div key={requirement} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -482,7 +482,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">What should I help manage?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
               {['Visa checks', 'COVID or entry requirements', 'Currency conversions', 'Travel insurance'].map(service => (
                 <div key={service} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
@@ -509,7 +509,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.personalization?.learningMode}
               onValueChange={(value) => updatePreference('personalization', 'learningMode', value)}
-              className="space-y-2"
+              className="space-y-1"
             >
               {['Ask for feedback after each trip', 'Learn passively from choices', 'Let me update manually'].map(mode => (
                 <div key={mode} className="flex items-center space-x-2 min-h-[44px]">
@@ -522,8 +522,8 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">What kind of suggestions would you like?</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {['Deals based on your preferences', 'Destinations similar to past favorites', 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              {['Deals based on your preferences', 'Destinations similar to past favorites',
                 'Completely new ideas based on trends', 'Mystery or surprise travel ideas'].map(suggestion => (
                 <div key={suggestion} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
