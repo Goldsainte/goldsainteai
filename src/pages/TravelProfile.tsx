@@ -337,11 +337,13 @@ const TravelProfile = () => {
       {/* Profile Info */}
       <div className="px-4 pt-4 pb-2 space-y-4">
         <div className="flex items-start justify-between">
-          <Avatar className="h-20 w-20">
-            <AvatarImage src={profile?.avatar_url || undefined} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-              {profile?.username?.[0]?.toUpperCase() || 'U'}
-            </AvatarFallback>
+          <div className="relative">
+            <Avatar className="h-20 w-20">
+              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                {profile?.username?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
             {isOwnProfile && (
               <>
                 <input
@@ -355,7 +357,7 @@ const TravelProfile = () => {
                 <button
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                   disabled={uploadingAvatar}
-                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 ring-2 ring-background hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {uploadingAvatar ? (
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
@@ -365,18 +367,18 @@ const TravelProfile = () => {
                 </button>
               </>
             )}
-          </Avatar>
+          </div>
           
-          <div className="flex items-center gap-8 pt-2">
-            <button className="flex flex-col items-center justify-center">
+          <div className="flex items-start gap-8 pt-2">
+            <button className="flex flex-col items-center">
               <div className="text-xl font-bold">{formatNumber(stats.postsCount)}</div>
               <div className="text-xs text-muted-foreground">posts</div>
             </button>
-            <button className="flex flex-col items-center justify-center">
+            <button className="flex flex-col items-center">
               <div className="text-xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
               <div className="text-xs text-muted-foreground">followers</div>
             </button>
-            <button className="flex flex-col items-center justify-center">
+            <button className="flex flex-col items-center">
               <div className="text-xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
               <div className="text-xs text-muted-foreground">following</div>
             </button>
