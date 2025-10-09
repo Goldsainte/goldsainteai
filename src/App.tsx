@@ -30,6 +30,7 @@ import MyBookings from "./pages/MyBookings";
 import BookingDetails from "./pages/BookingDetails";
 import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
@@ -65,6 +66,7 @@ function AppContent() {
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search" element={<SearchResults />} />
