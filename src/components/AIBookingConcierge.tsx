@@ -502,7 +502,7 @@ export const AIBookingConcierge = () => {
                           : 'bg-muted text-foreground'
                       }`}
                     >
-                      <p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      <p className="text-[11px] md:text-xs whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
                   </div>
                   
