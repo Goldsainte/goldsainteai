@@ -66,8 +66,6 @@ const Messages = () => {
             selectedConversationId={selectedConversationId}
             onSelectConversation={setSelectedConversationId}
           />
-          
-          <NotificationCenter userId={user.id} />
         </div>
 
         {/* Main Chat Area */}

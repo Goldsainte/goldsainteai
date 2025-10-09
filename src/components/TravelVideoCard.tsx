@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { CommentsSheet } from "./CommentsSheet";
 
 interface TravelVideoCardProps {
   post: {
@@ -43,6 +44,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
   const [hasViewed, setHasViewed] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+  const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
 
   useEffect(() => {
     checkIfLiked();
@@ -294,13 +297,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
             </button>
 
             <button
-              onClick={() => toast.info('Comments coming soon!')}
+              onClick={() => setCommentsOpen(true)}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
               <div className="rounded-full bg-white/20 backdrop-blur-sm p-2">
                 <MessageCircle className="h-6 w-6" />
               </div>
-              <span className="text-xs font-semibold">{formatCount(post.comment_count)}</span>
+              <span className="text-xs font-semibold">{formatCount(localCommentCount)}</span>
             </button>
 
             <button
@@ -319,6 +322,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
           </div>
         </div>
       </div>
+
+      {/* Comments Sheet */}
+      <CommentsSheet
+        open={commentsOpen}
+        onOpenChange={setCommentsOpen}
+        postId={post.id}
+        onCommentAdded={() => {
+          setLocalCommentCount(prev => prev + 1);
+          onUpdate();
+        }}
+      />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -13,6 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -103,6 +104,19 @@ export const Header = () => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+            {user && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate("/search")}
+                  className="h-10 w-10 sm:h-11 sm:w-11"
+                >
+                  <Search className="h-5 w-5" />
+                </Button>
+                <NotificationCenter />
+              </>
+            )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
