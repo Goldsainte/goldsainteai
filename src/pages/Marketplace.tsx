@@ -329,15 +329,15 @@ export default function Marketplace() {
           Back to Home
         </Button>
         
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
           <div>
-            <h1 className="text-4xl font-chiffon text-primary mb-2">Travel Agent Marketplace</h1>
-            <p className="text-muted-foreground">Connect with expert travel agents for complex bookings</p>
+            <h1 className="text-2xl md:text-3xl font-chiffon text-primary mb-1 leading-tight">Travel Agent Marketplace</h1>
+            <p className="text-sm text-muted-foreground">Connect with expert travel agents for complex bookings</p>
           </div>
           
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2">
+              <Button className="gap-2 w-full md:w-auto" size="default">
                 <Plus className="h-4 w-4" />
                 Post a Job
               </Button>
@@ -381,33 +381,37 @@ export default function Marketplace() {
               jobs.map((job) => (
                 <Card key={job.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-xl font-chiffon">{job.title}</CardTitle>
-                        <CardDescription>{job.description}</CardDescription>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base md:text-lg font-chiffon line-clamp-1">{job.title}</CardTitle>
+                        <CardDescription className="text-xs md:text-sm line-clamp-2">{job.description}</CardDescription>
                       </div>
-                      <Badge>{job.booking_type}</Badge>
+                      <Badge className="shrink-0">{job.booking_type}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{job.destination}</span>
+                    <div className="flex flex-wrap gap-3 mb-4 text-xs md:text-sm text-muted-foreground">
+                      {job.destination && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" />
+                          <span>{job.destination}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-foreground">
+                          ${job.budget_min?.toLocaleString()} - ${job.budget_max?.toLocaleString()}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">${job.budget_min} - ${job.budget_max}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{new Date(job.created_at).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" />
+                        <span>{new Date(job.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <Button 
                       onClick={() => handleViewJob(job)} 
                       variant="outline" 
                       className="w-full"
+                      size="sm"
                     >
                       View Details & Bid
                     </Button>

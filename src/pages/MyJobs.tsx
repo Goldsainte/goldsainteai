@@ -169,9 +169,9 @@ export default function MyJobs() {
           Back
         </Button>
 
-        <div className="mb-8">
-          <h1 className="text-4xl font-chiffon text-primary mb-2">My Jobs</h1>
-          <p className="text-muted-foreground">Track and manage all your travel requests</p>
+        <div className="mb-6">
+          <h1 className="text-2xl md:text-3xl font-chiffon text-primary mb-1 leading-tight">My Jobs</h1>
+          <p className="text-sm text-muted-foreground">Track and manage all your travel requests</p>
         </div>
 
         {/* Stats Overview */}
@@ -292,13 +292,19 @@ export default function MyJobs() {
             {filteredJobs.map((job) => (
               <Card key={job.id} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="text-xl font-chiffon mb-2">{job.title}</CardTitle>
-                      <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-                        <span>{job.destination}</span>
-                        <span>•</span>
-                        <span>{job.currency} {job.budget_min} - {job.budget_max}</span>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-base md:text-lg font-chiffon mb-2 line-clamp-1">{job.title}</CardTitle>
+                      <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-muted-foreground">
+                        {job.destination && (
+                          <>
+                            <span>{job.destination}</span>
+                            <span>•</span>
+                          </>
+                        )}
+                        <span className="font-medium text-foreground">
+                          ${job.budget_min?.toLocaleString()} - ${job.budget_max?.toLocaleString()}
+                        </span>
                         <span>•</span>
                         <span>{format(new Date(job.created_at), 'MMM d, yyyy')}</span>
                       </div>
