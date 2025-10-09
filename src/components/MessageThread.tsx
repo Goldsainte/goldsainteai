@@ -15,10 +15,8 @@ interface Message {
   conversation_id: string;
   sender_id: string;
   sender_type: 'customer' | 'agent';
-  message_type: string;
-  content: string;
+  message_text: string;
   is_read: boolean;
-  read_at: string | null;
   created_at: string;
 }
 
@@ -62,9 +60,9 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
 
   const markMessagesAsRead = async () => {
     try {
-      await (supabase as any).rpc("mark_messages_as_read", {
+      await (supabase as any).rpc("mark_conversation_messages_read", {
         p_conversation_id: conversationId,
-        p_user_id: userId,
+        p_user_type: userType,
       });
     } catch (error) {
       console.error("Error marking messages as read:", error);
@@ -125,8 +123,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
           conversation_id: conversationId,
           sender_id: userId,
           sender_type: userType,
-          message_type: "text",
-          content: newMessage.trim(),
+          message_text: newMessage.trim(),
         });
 
       if (error) throw error;
@@ -199,7 +196,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
                     : "bg-muted"
                 )}
               >
-                <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+                <p className="text-sm whitespace-pre-wrap break-words">{message.message_text}</p>
                 <div
                   className={cn(
                     "flex items-center gap-1 mt-1 text-xs",

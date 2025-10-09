@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -114,7 +114,27 @@ export const Header = () => {
                 >
                   <Search className="h-5 w-5" />
                 </Button>
-                <NotificationCenter />
+          <NotificationCenter />
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/search")}
+            className="text-foreground hover:text-primary"
+            aria-label="Search"
+          >
+            <Search className="h-5 w-5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/trending")}
+            className="text-foreground hover:text-primary"
+            aria-label="Trending"
+          >
+            <TrendingUp className="h-5 w-5" />
+          </Button>
               </>
             )}
             <DropdownMenu>

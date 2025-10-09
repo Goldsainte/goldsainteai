@@ -8,6 +8,7 @@ import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, Exter
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
+import { renderTextWithHashtags } from "@/lib/hashtagHelpers";
 
 interface TravelVideoCardProps {
   post: {
@@ -280,7 +281,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
             )}
 
             {post.caption && (
-              <p className="text-sm line-clamp-2">{post.caption}</p>
+              <p className="text-sm line-clamp-2">
+                {renderTextWithHashtags(post.caption, (hashtag) => 
+                  navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
+                ).map((part, idx) => 
+                  typeof part === 'string' ? part : <span key={idx} {...part.props}>{part.props.children}</span>
+                )}
+              </p>
             )}
           </div>
 

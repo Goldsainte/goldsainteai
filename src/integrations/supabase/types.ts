@@ -858,6 +858,47 @@ export type Database = {
           },
         ]
       }
+      conversation_messages: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          message_text: string
+          metadata: Json | null
+          sender_id: string
+          sender_type: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message_text: string
+          metadata?: Json | null
+          sender_id: string
+          sender_type: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          message_text?: string
+          metadata?: Json | null
+          sender_id?: string
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "user_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -1250,6 +1291,30 @@ export type Database = {
           last_name?: string
           phone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      hashtags: {
+        Row: {
+          created_at: string
+          id: string
+          last_used_at: string | null
+          tag: string
+          use_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          tag: string
+          use_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_used_at?: string | null
+          tag?: string
+          use_count?: number | null
         }
         Relationships: []
       }
@@ -2146,6 +2211,42 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_hashtags: {
+        Row: {
+          created_at: string
+          hashtag_id: string
+          id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string
+          hashtag_id: string
+          id?: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string
+          hashtag_id?: string
+          id?: string
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_hashtags_hashtag_id_fkey"
+            columns: ["hashtag_id"]
+            isOneToOne: false
+            referencedRelation: "hashtags"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_hashtags_post_id_fkey"
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "travel_posts"
@@ -3443,6 +3544,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_conversations: {
+        Row: {
+          agent_id: string | null
+          agent_unread_count: number | null
+          created_at: string
+          customer_id: string | null
+          customer_unread_count: number | null
+          id: string
+          job_id: string | null
+          last_message_at: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          agent_unread_count?: number | null
+          created_at?: string
+          customer_id?: string | null
+          customer_unread_count?: number | null
+          id?: string
+          job_id?: string | null
+          last_message_at?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          agent_unread_count?: number | null
+          created_at?: string
+          customer_id?: string | null
+          customer_unread_count?: number | null
+          id?: string
+          job_id?: string | null
+          last_message_at?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_conversations_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_conversations_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_follows: {
         Row: {
           created_at: string | null
@@ -3788,6 +3943,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      extract_and_store_hashtags: {
+        Args: { p_caption: string; p_post_id: string }
+        Returns: undefined
+      }
       find_matching_agents: {
         Args: { limit_count?: number; target_job_id: string }
         Returns: {
@@ -3808,6 +3967,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      mark_conversation_messages_read: {
+        Args: { p_conversation_id: string; p_user_type: string }
+        Returns: undefined
       }
       search_marketplace_jobs: {
         Args: {

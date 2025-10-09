@@ -14,8 +14,8 @@ interface Conversation {
   agent_id: string;
   job_id: string;
   last_message_at: string | null;
-  unread_count_customer: number;
-  unread_count_agent: number;
+  customer_unread_count: number;
+  agent_unread_count: number;
   status: string;
 }
 
@@ -44,7 +44,7 @@ export const ConversationsList = ({
   const fetchConversations = async () => {
     try {
       let query = (supabase as any)
-        .from("conversations")
+        .from("user_conversations")
         .select("*")
         .eq("status", "active")
         .order("last_message_at", { ascending: false, nullsFirst: false });
@@ -83,7 +83,7 @@ export const ConversationsList = ({
         {
           event: "*",
           schema: "public",
-          table: "conversations",
+          table: "user_conversations",
         },
         () => {
           fetchConversations();
@@ -98,8 +98,8 @@ export const ConversationsList = ({
 
   const getUnreadCount = (conversation: Conversation) => {
     return userType === 'customer' 
-      ? conversation.unread_count_customer 
-      : conversation.unread_count_agent;
+      ? conversation.customer_unread_count 
+      : conversation.agent_unread_count;
   };
 
   const filteredConversations = conversations.filter((conv) =>

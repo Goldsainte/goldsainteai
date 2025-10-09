@@ -41,6 +41,7 @@ import TravelProfile from "./pages/TravelProfile";
 import TravelSettings from "./pages/TravelSettings";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Search from "./pages/Search";
+import Trending from "./pages/Trending";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ function AppContent() {
           <Route path="/travel-settings" element={<TravelSettings />} />
           <Route path="/creator-dashboard" element={<CreatorDashboard />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/trending" element={<Trending />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
