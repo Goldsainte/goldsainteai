@@ -89,7 +89,7 @@ const VideoEditModal = ({
           const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
           setThumbnailFile(file);
           setPreviewThumbnail(URL.createObjectURL(file));
-          toast.success('Frame captured as cover photo');
+          toast.success('Frame captured! Click "Save Changes" below to apply it.');
         }, 'image/jpeg', 0.9);
       } catch (e) {
         console.error('Capture error', e);
@@ -160,12 +160,12 @@ const VideoEditModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>Edit Post</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto flex-1 pr-2">
           {videoUrl && (
             <div className="space-y-2">
               <Label>Cover Photo</Label>
@@ -248,7 +248,10 @@ const VideoEditModal = ({
               disabled={saving}
             />
           </div>
+        </div>
 
+        {/* Sticky Save Button */}
+        <div className="border-t pt-4 mt-4 bg-background">
           <Button
             onClick={handleSave}
             disabled={saving}
