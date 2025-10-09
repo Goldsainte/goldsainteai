@@ -166,11 +166,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         </div>
       )}
       
-      {/* Video */}
+      {/* Video - Full Screen */}
       <video
         ref={videoRef}
         src={post.video_url}
-        className="absolute inset-0 w-full h-full object-contain"
+        className="absolute inset-0 w-full h-full object-cover"
         loop
         playsInline
         muted={false}
@@ -183,8 +183,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         }}
       />
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 pointer-events-none" />
+      {/* Gradient Overlay - Bottom only */}
+      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
 
       {/* Bottom Content */}
       <div className="absolute bottom-0 left-0 right-0 p-4 text-white">

@@ -102,25 +102,24 @@ const TravelFeed = () => {
   }
 
   return (
-    <div className="relative h-screen w-full bg-background overflow-hidden">
-      {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-center justify-between bg-gradient-to-b from-background/80 to-transparent">
+    <div className="relative h-screen w-full bg-black overflow-hidden">
+      {/* Top Navigation - Minimal */}
+      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4">
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate('/')}
-          className="text-foreground"
+          className="text-white hover:bg-white/20"
         >
           <ChevronLeft className="h-6 w-6" />
         </Button>
-        <h1 className="text-xl font-bold">Travel Feed</h1>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => navigate('/travel-profile')}
-          className="text-foreground"
+          className="text-white hover:bg-white/20"
         >
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+          <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold border-2 border-white">
             {user?.email?.[0]?.toUpperCase() || 'U'}
           </div>
         </Button>
@@ -129,17 +128,17 @@ const TravelFeed = () => {
       {/* Floating Upload Button (FAB) */}
       <Button
         onClick={() => setUploadModalOpen(true)}
-        className="absolute bottom-24 right-6 z-20 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+        className="absolute bottom-28 right-4 z-20 h-12 w-12 rounded-full shadow-lg bg-white text-black hover:bg-white/90"
         size="icon"
       >
-        <Upload className="h-6 w-6" />
+        <Upload className="h-5 w-5" />
       </Button>
 
-      {/* Video Feed - Vertical Scroll */}
+      {/* Video Feed - Full Screen Vertical Scroll */}
       <div
         ref={containerRef}
         onScroll={handleScroll}
-        className="h-full w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth"
+        className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         <style>{`
