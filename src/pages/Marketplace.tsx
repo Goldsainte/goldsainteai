@@ -383,8 +383,8 @@ export default function Marketplace() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-base md:text-lg font-chiffon line-clamp-1">{job.title}</CardTitle>
-                        <CardDescription className="text-xs md:text-sm line-clamp-2">{job.description}</CardDescription>
+                        <CardTitle className="text-sm md:text-base font-chiffon line-clamp-1">{job.title}</CardTitle>
+                        <CardDescription className="text-xs line-clamp-2">{job.description}</CardDescription>
                       </div>
                       <Badge className="shrink-0">{job.booking_type}</Badge>
                     </div>

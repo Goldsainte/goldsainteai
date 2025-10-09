@@ -65,17 +65,16 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            AI Agent Matching
-          </CardTitle>
+          <CardTitle className="text-lg">AI Agent Matching</CardTitle>
         </CardHeader>
         <CardContent className="text-center py-8">
-          <Sparkles className="h-12 w-12 mx-auto text-primary mb-4" />
-          <p className="text-muted-foreground mb-4">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <TrendingUp className="h-6 w-6 text-primary" />
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
             Use AI to find the best matching travel agents for this job
           </p>
-          <Button onClick={runMatching} disabled={loading}>
+          <Button onClick={runMatching} disabled={loading} size="sm">
             {loading ? "Analyzing..." : "Find Best Matches"}
           </Button>
         </CardContent>
@@ -87,10 +86,7 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            AI Recommended Agents ({matches.length})
-          </CardTitle>
+          <CardTitle className="text-lg">AI Recommended Agents ({matches.length})</CardTitle>
           <Button variant="outline" size="sm" onClick={runMatching} disabled={loading}>
             Refresh
           </Button>

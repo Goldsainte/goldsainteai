@@ -117,9 +117,11 @@ export const JobBidsReview = ({ jobId, bids, jobStatus, onBidAccepted }: JobBids
     return (
       <Card>
         <CardContent className="flex flex-col items-center justify-center py-12">
-          <DollarSign className="h-16 w-16 text-muted-foreground mb-4" />
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+            <Clock className="h-8 w-8 text-muted-foreground" />
+          </div>
           <h3 className="text-lg font-semibold mb-2">No bids yet</h3>
-          <p className="text-muted-foreground text-center">
+          <p className="text-sm text-muted-foreground text-center">
             Agents will place their bids here. You'll be notified when bids come in.
           </p>
         </CardContent>
