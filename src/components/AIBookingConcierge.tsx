@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Minimize2, Maximize2, Mic, MicOff, Radio, Phone, PhoneOff, Trash2 } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -729,11 +729,9 @@ export const AIBookingConcierge = () => {
             </div>
             {/* Helper text */}
             <p className="text-[11px] leading-tight text-muted-foreground text-center px-2">
-              {isPushToTalkActive 
-                ? "Release to stop recording"
-                : wakeWordActive 
-                  ? "Tap phone icon first, then say 'Hey Goldsainte' • Press & hold radio for push-to-talk" 
-                  : "Press & hold radio icon to speak, or tap phone icon for voice call"}
+              {voiceMode 
+                ? "Voice mode active — speak naturally"
+                : "Tap the microphone to talk, or type your request"}
             </p>
           </div>
         </>
