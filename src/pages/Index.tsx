@@ -1580,7 +1580,7 @@ const Index = () => {
             </ScrollArea>
 
             {/* Input */}
-            <div className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t">
+            <div className="sticky bottom-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t pb-16 sm:pb-0">
               <div className="px-6 py-4 max-w-4xl mx-auto">
                 <Card className="border-2 shadow-lg">
                   <div className="p-2">
