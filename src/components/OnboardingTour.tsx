@@ -58,84 +58,107 @@ export const OnboardingTour = () => {
   };
 
   return (
-    <Joyride
-      steps={steps}
-      run={run}
-      continuous
-      showProgress
-      showSkipButton
-      callback={handleJoyrideCallback}
-      styles={{
-        options: {
-          primaryColor: "hsl(var(--primary))",
-          textColor: "hsl(var(--foreground))",
-          backgroundColor: "transparent",
-          overlayColor: "rgba(0, 0, 0, 0.7)",
-          spotlightShadow: "0 0 60px rgba(0, 0, 0, 0.5), 0 0 100px hsl(var(--primary) / 0.15)",
-          zIndex: 10000,
-        },
-        tooltip: {
-          borderRadius: window.innerWidth < 768 ? "20px" : "24px",
-          padding: window.innerWidth < 768 ? "20px" : "28px 32px",
-          fontSize: window.innerWidth < 768 ? "14px" : "15px",
-          maxWidth: window.innerWidth < 768 ? "320px" : "440px",
-          backgroundColor: "rgba(255, 255, 255, 0.98)",
-          backdropFilter: "blur(24px) saturate(180%)",
-          border: "1px solid rgba(255, 255, 255, 0.8)",
-          boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)",
-        },
-        tooltipContainer: {
-          textAlign: "left" as const,
-        },
-        tooltipContent: {
-          fontSize: window.innerWidth < 768 ? "14px" : "15px",
-          lineHeight: "1.65",
-          padding: "0 0 16px 0",
-          color: "hsl(var(--foreground))",
-          fontWeight: "400",
-        },
-        tooltipFooter: {
-          marginTop: window.innerWidth < 768 ? "16px" : "20px",
-        },
-        buttonNext: {
-          backgroundColor: "hsl(var(--primary))",
-          color: "hsl(var(--primary-foreground))",
-          borderRadius: window.innerWidth < 768 ? "10px" : "12px",
-          padding: window.innerWidth < 768 ? "8px 20px" : "10px 24px",
-          fontSize: window.innerWidth < 768 ? "13px" : "14px",
-          fontWeight: "600",
-          border: "none",
-          boxShadow: "0 2px 8px hsl(var(--primary) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
-          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          letterSpacing: "0.01em",
-        },
-        buttonBack: {
-          color: "hsl(var(--foreground))",
-          padding: window.innerWidth < 768 ? "8px 16px" : "10px 20px",
-          fontSize: window.innerWidth < 768 ? "13px" : "14px",
-          fontWeight: "500",
-          borderRadius: window.innerWidth < 768 ? "10px" : "12px",
-          border: "1px solid hsl(var(--border))",
-          backgroundColor: "hsl(var(--background))",
-          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          letterSpacing: "0.01em",
-        },
-        buttonSkip: {
-          color: "hsl(var(--muted-foreground))",
-          padding: window.innerWidth < 768 ? "8px 16px" : "10px 20px",
-          fontSize: window.innerWidth < 768 ? "12px" : "13px",
-          fontWeight: "500",
-          transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-          letterSpacing: "0.01em",
-        },
-      }}
-      locale={{
-        back: "Back",
-        close: "Close",
-        last: "Finish",
-        next: "Next",
-        skip: "Skip tour",
-      }}
-    />
+    <>
+      <style>{`
+        .react-joyride__tooltip {
+          position: relative;
+        }
+        .react-joyride__tooltip__footer {
+          display: flex;
+          flex-direction: column-reverse;
+          gap: 12px;
+        }
+        .__floater__body > div > div:last-child > div:first-child {
+          font-size: 12px;
+          color: hsl(var(--muted-foreground));
+          font-weight: 500;
+          margin: 0;
+          padding: 0;
+          text-align: center;
+        }
+      `}</style>
+      <Joyride
+        steps={steps}
+        run={run}
+        continuous
+        showProgress
+        showSkipButton
+        callback={handleJoyrideCallback}
+        styles={{
+          options: {
+            primaryColor: "hsl(var(--primary))",
+            textColor: "hsl(var(--foreground))",
+            backgroundColor: "transparent",
+            overlayColor: "rgba(0, 0, 0, 0.7)",
+            spotlightShadow: "0 0 60px rgba(0, 0, 0, 0.5), 0 0 100px hsl(var(--primary) / 0.15)",
+            zIndex: 10000,
+          },
+          tooltip: {
+            borderRadius: window.innerWidth < 768 ? "20px" : "24px",
+            padding: window.innerWidth < 768 ? "20px" : "28px 32px",
+            fontSize: window.innerWidth < 768 ? "14px" : "15px",
+            maxWidth: window.innerWidth < 768 ? "320px" : "440px",
+            backgroundColor: "rgba(255, 255, 255, 0.98)",
+            backdropFilter: "blur(24px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)",
+          },
+          tooltipContainer: {
+            textAlign: "left" as const,
+          },
+          tooltipContent: {
+            fontSize: window.innerWidth < 768 ? "14px" : "15px",
+            lineHeight: "1.65",
+            padding: "0 0 16px 0",
+            color: "hsl(var(--foreground))",
+            fontWeight: "400",
+          },
+          tooltipFooter: {
+            marginTop: window.innerWidth < 768 ? "16px" : "20px",
+            display: "flex",
+            flexDirection: "column-reverse" as const,
+            gap: "12px",
+          },
+          buttonNext: {
+            backgroundColor: "hsl(var(--primary))",
+            color: "hsl(var(--primary-foreground))",
+            borderRadius: window.innerWidth < 768 ? "8px" : "10px",
+            padding: window.innerWidth < 768 ? "7px 18px" : "8px 20px",
+            fontSize: window.innerWidth < 768 ? "13px" : "14px",
+            fontWeight: "600",
+            border: "none",
+            boxShadow: "0 2px 8px hsl(var(--primary) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
+            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            letterSpacing: "0.01em",
+          },
+          buttonBack: {
+            color: "hsl(var(--foreground))",
+            padding: window.innerWidth < 768 ? "7px 14px" : "8px 16px",
+            fontSize: window.innerWidth < 768 ? "13px" : "14px",
+            fontWeight: "500",
+            borderRadius: window.innerWidth < 768 ? "8px" : "10px",
+            border: "1px solid hsl(var(--border))",
+            backgroundColor: "hsl(var(--background))",
+            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            letterSpacing: "0.01em",
+          },
+          buttonSkip: {
+            color: "hsl(var(--muted-foreground))",
+            padding: window.innerWidth < 768 ? "7px 14px" : "8px 16px",
+            fontSize: window.innerWidth < 768 ? "12px" : "13px",
+            fontWeight: "500",
+            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
+            letterSpacing: "0.01em",
+          },
+        }}
+        locale={{
+          back: "Back",
+          close: "Close",
+          last: "Finish",
+          next: "Next",
+          skip: "Skip tour",
+        }}
+      />
+    </>
   );
 };
