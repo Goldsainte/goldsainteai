@@ -7,7 +7,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Zap, Trash2, Edit2, Save, X } from "lucide-react";
+import { Plus, Zap, Trash2, Edit2, Save, X, Download } from "lucide-react";
+import { importDefaultTemplates } from "@/lib/defaultQuickReplies";
 
 interface QuickReply {
   id: string;
@@ -29,6 +30,7 @@ export const QuickReplyManager = ({ agentId, onSelectTemplate }: QuickReplyManag
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [importing, setImporting] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -161,6 +163,32 @@ export const QuickReplyManager = ({ agentId, onSelectTemplate }: QuickReplyManag
     }
   };
 
+  const handleImportDefaults = async () => {
+    setImporting(true);
+    try {
+      const result = await importDefaultTemplates(agentId, supabase);
+      
+      if (result.success) {
+        toast({
+          title: "Templates imported",
+          description: `${result.count} default templates have been added`,
+        });
+        fetchTemplates();
+      } else {
+        throw new Error(result.error || "Failed to import templates");
+      }
+    } catch (error) {
+      console.error("Error importing templates:", error);
+      toast({
+        title: "Error",
+        description: "Failed to import default templates. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setImporting(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -172,17 +200,30 @@ export const QuickReplyManager = ({ agentId, onSelectTemplate }: QuickReplyManag
             </CardTitle>
             <CardDescription>Manage your message templates</CardDescription>
           </div>
-          <Button
-            onClick={() => {
-              setShowAddForm(!showAddForm);
-              setEditingId(null);
-              setFormData({ title: "", content: "", category: "", shortcut: "" });
-            }}
-            size="sm"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Template
-          </Button>
+          <div className="flex gap-2">
+            {templates.length === 0 && (
+              <Button
+                onClick={handleImportDefaults}
+                disabled={importing}
+                size="sm"
+                variant="outline"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                {importing ? "Importing..." : "Import Defaults"}
+              </Button>
+            )}
+            <Button
+              onClick={() => {
+                setShowAddForm(!showAddForm);
+                setEditingId(null);
+                setFormData({ title: "", content: "", category: "", shortcut: "" });
+              }}
+              size="sm"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Template
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
