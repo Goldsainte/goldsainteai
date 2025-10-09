@@ -140,7 +140,7 @@ export const Header = () => {
               </a>
 
               {/* Compact Search Bar - Center */}
-              <div className="flex justify-center">
+              <div className="flex justify-center" data-tour="search">
                 <CompactHeaderSearch />
               </div>
 
@@ -156,6 +156,7 @@ export const Header = () => {
                       size="icon"
                       className="h-10 w-10 sm:h-11 sm:w-11"
                       aria-label="Main menu"
+                      data-tour="navigation"
                     >
                       <Menu className="h-5 w-5" />
                     </Button>
@@ -347,6 +348,7 @@ export const Header = () => {
               onClick={() => user ? navigate('/travel-profile') : navigate('/auth')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Profile"
+              data-tour="profile"
             >
               {user ? (
                 <Avatar className="h-6 w-6 ring-2 ring-primary/20">

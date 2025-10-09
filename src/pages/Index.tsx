@@ -41,6 +41,7 @@ import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
@@ -858,6 +859,7 @@ const Index = () => {
 
   return (
     <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+      <OnboardingTour />
       <div className="w-full h-full flex flex-col">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
@@ -1103,7 +1105,7 @@ const Index = () => {
             </div>
 
             {/* Inspiration Content - Far below the fold */}
-            <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
+            <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10" data-tour="explore">
               <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-4">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
                   <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">

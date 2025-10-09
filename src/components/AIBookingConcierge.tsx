@@ -497,6 +497,7 @@ export const AIBookingConcierge = () => {
             }}
             className="fixed bottom-24 md:bottom-6 right-6 z-50 group"
             aria-label="Open AI Booking Concierge"
+            data-tour="ai-widget"
           >
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-60 group-hover:opacity-80 transition-opacity" />
