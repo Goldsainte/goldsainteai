@@ -101,15 +101,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">Do you prefer staying close to home or exploring abroad?</Label>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Domestic travel', 'International travel', 'No preference'].map(pref => (
-                <div key={pref} className="flex items-center space-x-2">
+                <div key={pref} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`travel-${pref}`}
                     checked={preferences.destination?.travelScope?.includes(pref) || false}
                     onCheckedChange={() => toggleArrayValue('destination', 'travelScope', pref)}
                   />
-                  <Label htmlFor={`travel-${pref}`} className="cursor-pointer">{pref}</Label>
+                  <Label htmlFor={`travel-${pref}`} className="cursor-pointer text-sm sm:text-base">{pref}</Label>
                 </div>
               ))}
             </div>
@@ -121,7 +121,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
               placeholder="e.g., Japan, Mediterranean, Southeast Asia..."
               value={preferences.destination?.preferredRegions || ''}
               onChange={(e) => updatePreference('destination', 'preferredRegions', e.target.value)}
-              className="min-h-[80px]"
+              className="min-h-[80px] text-sm sm:text-base"
             />
           </div>
 
@@ -131,7 +131,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
               placeholder="No judgment here..."
               value={preferences.destination?.avoidRegions || ''}
               onChange={(e) => updatePreference('destination', 'avoidRegions', e.target.value)}
-              className="min-h-[80px]"
+              className="min-h-[80px] text-sm sm:text-base"
             />
           </div>
 
@@ -140,11 +140,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.destination?.returningPreference}
               onValueChange={(value) => updatePreference('destination', 'returningPreference', value)}
+              className="space-y-2"
             >
               {['Yes', 'No', 'Occasionally'].map(option => (
-                <div key={option} className="flex items-center space-x-2">
+                <div key={option} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={option} id={`return-${option}`} />
-                  <Label htmlFor={`return-${option}`} className="cursor-pointer">{option}</Label>
+                  <Label htmlFor={`return-${option}`} className="cursor-pointer text-sm sm:text-base">{option}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -160,15 +161,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">How do you like to travel?</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Flights', 'Trains', 'Car (road trips)', 'Cruises'].map(method => (
-                <div key={method} className="flex items-center space-x-2">
+                <div key={method} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`method-${method}`}
                     checked={preferences.transportation?.methods?.includes(method) || false}
                     onCheckedChange={() => toggleArrayValue('transportation', 'methods', method)}
                   />
-                  <Label htmlFor={`method-${method}`} className="cursor-pointer">{method}</Label>
+                  <Label htmlFor={`method-${method}`} className="cursor-pointer text-sm sm:text-base">{method}</Label>
                 </div>
               ))}
             </div>
@@ -179,11 +180,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.transportation?.flightClass}
               onValueChange={(value) => updatePreference('transportation', 'flightClass', value)}
+              className="space-y-2"
             >
               {['Economy', 'Premium Economy', 'Business', 'First Class'].map(flightClass => (
-                <div key={flightClass} className="flex items-center space-x-2">
+                <div key={flightClass} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={flightClass} id={`class-${flightClass}`} />
-                  <Label htmlFor={`class-${flightClass}`} className="cursor-pointer">{flightClass}</Label>
+                  <Label htmlFor={`class-${flightClass}`} className="cursor-pointer text-sm sm:text-base">{flightClass}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -194,14 +196,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.transportation?.layoverPreference}
               onValueChange={(value) => updatePreference('transportation', 'layoverPreference', value)}
+              className="space-y-2"
             >
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 min-h-[44px]">
                 <RadioGroupItem value="direct" id="direct" />
-                <Label htmlFor="direct" className="cursor-pointer">Direct flights only</Label>
+                <Label htmlFor="direct" className="cursor-pointer text-sm sm:text-base">Direct flights only</Label>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-2 min-h-[44px]">
                 <RadioGroupItem value="layovers" id="layovers" />
-                <Label htmlFor="layovers" className="cursor-pointer">Open to layovers for better deals</Label>
+                <Label htmlFor="layovers" className="cursor-pointer text-sm sm:text-base">Open to layovers for better deals</Label>
               </div>
             </RadioGroup>
           </div>
@@ -225,15 +228,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">What type of places do you prefer?</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Hotels', 'Airbnb / Vacation Rentals', 'Hostels', 'Resorts', 'Boutique Hotels'].map(type => (
-                <div key={type} className="flex items-center space-x-2">
+                <div key={type} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`accom-${type}`}
                     checked={preferences.accommodation?.types?.includes(type) || false}
                     onCheckedChange={() => toggleArrayValue('accommodation', 'types', type)}
                   />
-                  <Label htmlFor={`accom-${type}`} className="cursor-pointer">{type}</Label>
+                  <Label htmlFor={`accom-${type}`} className="cursor-pointer text-sm sm:text-base">{type}</Label>
                 </div>
               ))}
             </div>
@@ -244,11 +247,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.accommodation?.class}
               onValueChange={(value) => updatePreference('accommodation', 'class', value)}
+              className="space-y-2"
             >
               {['Budget', 'Mid-range', 'Luxury'].map(accomClass => (
-                <div key={accomClass} className="flex items-center space-x-2">
+                <div key={accomClass} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={accomClass} id={`accom-class-${accomClass}`} />
-                  <Label htmlFor={`accom-class-${accomClass}`} className="cursor-pointer">{accomClass}</Label>
+                  <Label htmlFor={`accom-class-${accomClass}`} className="cursor-pointer text-sm sm:text-base">{accomClass}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -256,15 +260,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">Must-have amenities</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Fast Wi-Fi', 'Kitchenette', 'Workspace', 'Pool', 'Gym', 'Pet-friendly', 'Free breakfast'].map(amenity => (
-                <div key={amenity} className="flex items-center space-x-2">
+                <div key={amenity} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`amenity-${amenity}`}
                     checked={preferences.accommodation?.amenities?.includes(amenity) || false}
                     onCheckedChange={() => toggleArrayValue('accommodation', 'amenities', amenity)}
                   />
-                  <Label htmlFor={`amenity-${amenity}`} className="cursor-pointer">{amenity}</Label>
+                  <Label htmlFor={`amenity-${amenity}`} className="cursor-pointer text-sm sm:text-base">{amenity}</Label>
                 </div>
               ))}
             </div>
@@ -289,15 +293,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">What kind of food experiences do you love?</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Local street food', 'Upscale dining', 'Vegetarian/Vegan', 'Halal/Kosher', 'Seafood-focused'].map(pref => (
-                <div key={pref} className="flex items-center space-x-2">
+                <div key={pref} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`food-${pref}`}
                     checked={preferences.food?.preferences?.includes(pref) || false}
                     onCheckedChange={() => toggleArrayValue('food', 'preferences', pref)}
                   />
-                  <Label htmlFor={`food-${pref}`} className="cursor-pointer">{pref}</Label>
+                  <Label htmlFor={`food-${pref}`} className="cursor-pointer text-sm sm:text-base">{pref}</Label>
                 </div>
               ))}
             </div>
@@ -308,11 +312,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.food?.foodExperiences}
               onValueChange={(value) => updatePreference('food', 'foodExperiences', value)}
+              className="space-y-2"
             >
               {['Yes', 'No', 'Sometimes'].map(option => (
-                <div key={option} className="flex items-center space-x-2">
+                <div key={option} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={option} id={`food-exp-${option}`} />
-                  <Label htmlFor={`food-exp-${option}`} className="cursor-pointer">{option}</Label>
+                  <Label htmlFor={`food-exp-${option}`} className="cursor-pointer text-sm sm:text-base">{option}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -340,11 +345,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.timing?.peakPreference}
               onValueChange={(value) => updatePreference('timing', 'peakPreference', value)}
+              className="space-y-2"
             >
               {['During off-peak times', 'During peak holiday seasons', 'Whenever a good deal comes up'].map(option => (
-                <div key={option} className="flex items-center space-x-2">
+                <div key={option} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={option} id={`peak-${option}`} />
-                  <Label htmlFor={`peak-${option}`} className="cursor-pointer">{option}</Label>
+                  <Label htmlFor={`peak-${option}`} className="cursor-pointer text-sm sm:text-base">{option}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -355,11 +361,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.timing?.flexibility}
               onValueChange={(value) => updatePreference('timing', 'flexibility', value)}
+              className="space-y-2"
             >
               {['Very flexible', 'Somewhat flexible', 'Fixed dates only'].map(option => (
-                <div key={option} className="flex items-center space-x-2">
+                <div key={option} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={option} id={`flex-${option}`} />
-                  <Label htmlFor={`flex-${option}`} className="cursor-pointer">{option}</Label>
+                  <Label htmlFor={`flex-${option}`} className="cursor-pointer text-sm sm:text-base">{option}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -370,11 +377,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.budget?.range}
               onValueChange={(value) => updatePreference('budget', 'range', value)}
+              className="space-y-2"
             >
               {['Under $500', '$500–$1,000', '$1,000–$3,000', '$3,000–$5,000', '$5,000+'].map(range => (
-                <div key={range} className="flex items-center space-x-2">
+                <div key={range} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={range} id={`budget-${range}`} />
-                  <Label htmlFor={`budget-${range}`} className="cursor-pointer">{range}</Label>
+                  <Label htmlFor={`budget-${range}`} className="cursor-pointer text-sm sm:text-base">{range}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -383,15 +391,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
           <div>
             <Label className="text-base mb-3 block">What matters most to you?</Label>
             <p className="text-sm text-muted-foreground mb-3">Pick your top priorities</p>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Comfort in accommodation', 'Flights and upgrades', 'Unique experiences', 'Food and dining', 'Convenience'].map(priority => (
-                <div key={priority} className="flex items-center space-x-2">
+                <div key={priority} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`priority-${priority}`}
                     checked={preferences.budget?.priorities?.includes(priority) || false}
                     onCheckedChange={() => toggleArrayValue('budget', 'priorities', priority)}
                   />
-                  <Label htmlFor={`priority-${priority}`} className="cursor-pointer">{priority}</Label>
+                  <Label htmlFor={`priority-${priority}`} className="cursor-pointer text-sm sm:text-base">{priority}</Label>
                 </div>
               ))}
             </div>
@@ -407,16 +415,16 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
         <div className="space-y-6">
           <div>
             <Label className="text-base mb-3 block">What activities get you excited?</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Hiking / Nature', 'Beaches / Relaxation', 'City tours / Museums', 'Cultural festivals', 
                 'Shopping', 'Water sports / Diving', 'Adventure sports', 'Spa / Wellness', 'Nightlife / Bars'].map(activity => (
-                <div key={activity} className="flex items-center space-x-2">
+                <div key={activity} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`activity-${activity}`}
                     checked={preferences.activities?.interests?.includes(activity) || false}
                     onCheckedChange={() => toggleArrayValue('activities', 'interests', activity)}
                   />
-                  <Label htmlFor={`activity-${activity}`} className="cursor-pointer">{activity}</Label>
+                  <Label htmlFor={`activity-${activity}`} className="cursor-pointer text-sm sm:text-base">{activity}</Label>
                 </div>
               ))}
             </div>
@@ -427,11 +435,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.activities?.pace}
               onValueChange={(value) => updatePreference('activities', 'pace', value)}
+              className="space-y-2"
             >
               {['Fast (see as much as possible)', 'Balanced', 'Slow (fewer places, more depth)'].map(pace => (
-                <div key={pace} className="flex items-center space-x-2">
+                <div key={pace} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={pace} id={`pace-${pace}`} />
-                  <Label htmlFor={`pace-${pace}`} className="cursor-pointer">{pace}</Label>
+                  <Label htmlFor={`pace-${pace}`} className="cursor-pointer text-sm sm:text-base">{pace}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -457,15 +466,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">Are you open to destinations requiring:</Label>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Visas', 'Vaccinations', 'Special permits'].map(requirement => (
-                <div key={requirement} className="flex items-center space-x-2">
+                <div key={requirement} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`req-${requirement}`}
                     checked={preferences.documentation?.openTo?.includes(requirement) || false}
                     onCheckedChange={() => toggleArrayValue('documentation', 'openTo', requirement)}
                   />
-                  <Label htmlFor={`req-${requirement}`} className="cursor-pointer">{requirement}</Label>
+                  <Label htmlFor={`req-${requirement}`} className="cursor-pointer text-sm sm:text-base">{requirement}</Label>
                 </div>
               ))}
             </div>
@@ -473,15 +482,15 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">What should I help manage?</Label>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Visa checks', 'COVID or entry requirements', 'Currency conversions', 'Travel insurance'].map(service => (
-                <div key={service} className="flex items-center space-x-2">
+                <div key={service} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`manage-${service}`}
                     checked={preferences.documentation?.aiManage?.includes(service) || false}
                     onCheckedChange={() => toggleArrayValue('documentation', 'aiManage', service)}
                   />
-                  <Label htmlFor={`manage-${service}`} className="cursor-pointer">{service}</Label>
+                  <Label htmlFor={`manage-${service}`} className="cursor-pointer text-sm sm:text-base">{service}</Label>
                 </div>
               ))}
             </div>
@@ -500,11 +509,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
             <RadioGroup
               value={preferences.personalization?.learningMode}
               onValueChange={(value) => updatePreference('personalization', 'learningMode', value)}
+              className="space-y-2"
             >
               {['Ask for feedback after each trip', 'Learn passively from choices', 'Let me update manually'].map(mode => (
-                <div key={mode} className="flex items-center space-x-2">
+                <div key={mode} className="flex items-center space-x-2 min-h-[44px]">
                   <RadioGroupItem value={mode} id={`learn-${mode}`} />
-                  <Label htmlFor={`learn-${mode}`} className="cursor-pointer">{mode}</Label>
+                  <Label htmlFor={`learn-${mode}`} className="cursor-pointer text-sm sm:text-base">{mode}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -512,16 +522,16 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
           <div>
             <Label className="text-base mb-3 block">What kind of suggestions would you like?</Label>
-            <div className="space-y-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {['Deals based on your preferences', 'Destinations similar to past favorites', 
                 'Completely new ideas based on trends', 'Mystery or surprise travel ideas'].map(suggestion => (
-                <div key={suggestion} className="flex items-center space-x-2">
+                <div key={suggestion} className="flex items-center space-x-2 min-h-[44px]">
                   <Checkbox
                     id={`suggest-${suggestion}`}
                     checked={preferences.personalization?.suggestionTypes?.includes(suggestion) || false}
                     onCheckedChange={() => toggleArrayValue('personalization', 'suggestionTypes', suggestion)}
                   />
-                  <Label htmlFor={`suggest-${suggestion}`} className="cursor-pointer">{suggestion}</Label>
+                  <Label htmlFor={`suggest-${suggestion}`} className="cursor-pointer text-sm sm:text-base">{suggestion}</Label>
                 </div>
               ))}
             </div>
