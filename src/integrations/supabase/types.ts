@@ -2283,6 +2283,35 @@ export type Database = {
           },
         ]
       }
+      post_user_tags: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          tagged_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          tagged_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          tagged_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_user_tags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_views: {
         Row: {
           created_at: string | null
@@ -2942,9 +2971,11 @@ export type Database = {
           embed_platform: string | null
           embed_url: string | null
           id: string
+          image_urls: string[] | null
           is_featured: boolean | null
           like_count: number | null
           location: string | null
+          media_type: string | null
           original_creator: string | null
           share_count: number | null
           status: string | null
@@ -2962,9 +2993,11 @@ export type Database = {
           embed_platform?: string | null
           embed_url?: string | null
           id?: string
+          image_urls?: string[] | null
           is_featured?: boolean | null
           like_count?: number | null
           location?: string | null
+          media_type?: string | null
           original_creator?: string | null
           share_count?: number | null
           status?: string | null
@@ -2982,9 +3015,11 @@ export type Database = {
           embed_platform?: string | null
           embed_url?: string | null
           id?: string
+          image_urls?: string[] | null
           is_featured?: boolean | null
           like_count?: number | null
           location?: string | null
+          media_type?: string | null
           original_creator?: string | null
           share_count?: number | null
           status?: string | null

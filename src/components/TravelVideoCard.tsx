@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { renderTextWithHashtags } from "@/lib/hashtagHelpers";
+import { renderTextWithMentionsAndHashtags } from "@/lib/mentionHelpers";
 
 interface TravelVideoCardProps {
   post: {
@@ -342,11 +343,29 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             <span className="font-semibold mr-2">{post.profiles?.username || 'Anonymous'}</span>
             {post.caption && (
               <span>
-                {renderTextWithHashtags(post.caption, (hashtag) => 
-                  navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
-                ).map((part, idx) => 
-                  typeof part === 'string' ? part : <span key={idx} {...part.props}>{part.props.children}</span>
-                )}
+                {renderTextWithMentionsAndHashtags(
+                  post.caption,
+                  (username) => navigate(`/travel-profile?user=${username}`),
+                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
+                ).map((part, idx) => {
+                  if (typeof part === 'string') return part;
+                  return (
+                    <span
+                      key={part.key}
+                      className="text-primary font-medium cursor-pointer hover:underline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (part.type === 'mention') {
+                          navigate(`/travel-profile?user=${part.value}`);
+                        } else {
+                          navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
+                        }
+                      }}
+                    >
+                      {part.type === 'mention' ? `@${part.value}` : `#${part.value}`}
+                    </span>
+                  );
+                })}
               </span>
             )}
           </div>
@@ -500,11 +519,29 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
             {post.caption && (
               <p className="text-base leading-relaxed drop-shadow-lg font-medium">
-                {renderTextWithHashtags(post.caption, (hashtag) => 
-                  navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
-                ).map((part, idx) => 
-                  typeof part === 'string' ? part : <span key={idx} {...part.props}>{part.props.children}</span>
-                )}
+                {renderTextWithMentionsAndHashtags(
+                  post.caption,
+                  (username) => navigate(`/travel-profile?user=${username}`),
+                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
+                ).map((part, idx) => {
+                  if (typeof part === 'string') return part;
+                  return (
+                    <span
+                      key={part.key}
+                      className="text-primary font-medium cursor-pointer hover:underline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (part.type === 'mention') {
+                          navigate(`/travel-profile?user=${part.value}`);
+                        } else {
+                          navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
+                        }
+                      }}
+                    >
+                      {part.type === 'mention' ? `@${part.value}` : `#${part.value}`}
+                    </span>
+                  );
+                })}
               </p>
             )}
           </div>

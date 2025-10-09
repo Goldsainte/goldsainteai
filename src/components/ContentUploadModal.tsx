@@ -12,25 +12,29 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Loader2, Link2 } from "lucide-react";
+import { Upload, Loader2, Link2, Image } from "lucide-react";
 import { toast } from "sonner";
+import { extractMentions } from "@/lib/mentionHelpers";
+import { extractHashtags } from "@/lib/hashtagHelpers";
 
-interface VideoUploadModalProps {
+interface ContentUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
 }
 
-const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalProps) => {
+const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModalProps) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [caption, setCaption] = useState("");
   const [location, setLocation] = useState("");
   const [embedUrl, setEmbedUrl] = useState("");
   const [originalCreator, setOriginalCreator] = useState("");
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string>("");
+  const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const videoRef = useState<HTMLVideoElement | null>(null)[0];
 
   const detectPlatform = (url: string): string | null => {
@@ -38,6 +42,131 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
     if (url.includes('instagram.com')) return 'instagram';
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
     return null;
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Limit to 10 photos
+    if (files.length > 10) {
+      toast.error('Maximum 10 photos allowed');
+      return;
+    }
+
+    // Validate file types and sizes
+    const validFiles = files.filter(file => {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image`);
+        return false;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error(`${file.name} is too large (max 10MB)`);
+        return false;
+      }
+      return true;
+    });
+
+    setPhotoFiles(validFiles);
+    
+    // Create preview URLs
+    const urls = validFiles.map(file => URL.createObjectURL(file));
+    setPhotoPreviewUrls(urls);
+  };
+
+  const handlePhotoUpload = async () => {
+    if (photoFiles.length === 0 || !user) {
+      toast.error('Please select at least one photo');
+      return;
+    }
+
+    setUploading(true);
+
+    try {
+      const uploadedUrls: string[] = [];
+
+      // Upload all photos
+      for (const photoFile of photoFiles) {
+        const fileExt = photoFile.name.split('.').pop();
+        const fileName = `${user.id}/photos/${Date.now()}-${Math.random()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('travel-videos')
+          .upload(fileName, photoFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('travel-videos')
+          .getPublicUrl(fileName);
+        
+        uploadedUrls.push(publicUrl);
+      }
+
+      // Extract mentions and hashtags
+      const mentions = extractMentions(caption);
+      const hashtags = extractHashtags(caption);
+
+      // Create post
+      const { data: postData, error: insertError } = await supabase
+        .from('travel_posts')
+        .insert([{
+          user_id: user.id,
+          image_urls: uploadedUrls,
+          media_type: 'photo',
+          thumbnail_url: uploadedUrls[0], // First photo as thumbnail
+          caption: caption || null,
+          location: location || null,
+          status: 'active',
+        }])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Tag mentioned users
+      if (mentions.length > 0 && postData) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('username', mentions);
+
+        if (profiles && profiles.length > 0) {
+          const tags = profiles.map(profile => ({
+            post_id: postData.id,
+            tagged_user_id: profile.id,
+          }));
+
+          await supabase.from('post_user_tags').insert(tags);
+        }
+      }
+
+      // Process hashtags (existing function will handle this)
+      if (hashtags.length > 0 && postData) {
+        await supabase.rpc('extract_and_store_hashtags', {
+          p_post_id: postData.id,
+          p_caption: caption,
+        });
+      }
+
+      toast.success(`${photoFiles.length} photo${photoFiles.length > 1 ? 's' : ''} uploaded successfully!`);
+      
+      setPhotoFiles([]);
+      setPhotoPreviewUrls([]);
+      setCaption("");
+      setLocation("");
+      
+      onOpenChange(false);
+      onSuccess();
+    } catch (error: any) {
+      console.error('Error uploading photos:', error);
+      toast.error(error.message || 'Failed to upload photos');
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,18 +312,51 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
         }
       }
 
-      const { error: insertError } = await supabase
+      // Extract mentions and hashtags
+      const mentions = extractMentions(caption);
+      const hashtags = extractHashtags(caption);
+
+      // Create post
+      const { data: postData, error: insertError } = await supabase
         .from('travel_posts')
         .insert([{
           user_id: user.id,
           video_url: publicUrl,
           thumbnail_url: thumbnailUrl,
+          media_type: 'video',
           caption: caption || null,
           location: location || null,
           status: 'active',
-        }]);
+        }])
+        .select()
+        .single();
 
       if (insertError) throw insertError;
+
+      // Tag mentioned users
+      if (mentions.length > 0 && postData) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('username', mentions);
+
+        if (profiles && profiles.length > 0) {
+          const tags = profiles.map(profile => ({
+            post_id: postData.id,
+            tagged_user_id: profile.id,
+          }));
+
+          await supabase.from('post_user_tags').insert(tags);
+        }
+      }
+
+      // Process hashtags
+      if (hashtags.length > 0 && postData) {
+        await supabase.rpc('extract_and_store_hashtags', {
+          p_post_id: postData.id,
+          p_caption: caption,
+        });
+      }
 
       toast.success('Video uploaded successfully!');
       
@@ -204,6 +366,7 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
       setThumbnailFile(null);
       setVideoPreviewUrl("");
       
+      onOpenChange(false);
       onSuccess();
     } catch (error: any) {
       console.error('Error uploading video:', error);
@@ -220,19 +383,91 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
           <DialogTitle>Share Content</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="upload" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="upload">
+        <Tabs defaultValue="photo" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="photo">
+              <Image className="w-4 h-4 mr-2" />
+              Photo
+            </TabsTrigger>
+            <TabsTrigger value="video">
               <Upload className="w-4 h-4 mr-2" />
-              Upload
+              Video
             </TabsTrigger>
             <TabsTrigger value="embed">
               <Link2 className="w-4 h-4 mr-2" />
-              Embed Link
+              Embed
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="upload" className="space-y-4 mt-4">
+          <TabsContent value="photo" className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label>Photos (up to 10)</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotoChange}
+                disabled={uploading}
+              />
+            </div>
+
+            {photoPreviewUrls.length > 0 && (
+              <div className="grid grid-cols-2 gap-2">
+                {photoPreviewUrls.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Preview ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg"
+                  />
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Label>Caption</Label>
+              <Textarea
+                placeholder="Tell us about your adventure... Use #hashtags and @mentions"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                disabled={uploading}
+                rows={3}
+              />
+              <p className="text-xs text-muted-foreground">
+                Tip: Use #hashtags to help others discover your content and @username to tag people
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Location</Label>
+              <Input
+                placeholder="Where was this taken?"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                disabled={uploading}
+              />
+            </div>
+
+            <Button
+              onClick={handlePhotoUpload}
+              disabled={photoFiles.length === 0 || uploading}
+              className="w-full"
+            >
+              {uploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Image className="mr-2 h-4 w-4" />
+                  Upload Photos
+                </>
+              )}
+            </Button>
+          </TabsContent>
+
+          <TabsContent value="video" className="space-y-4 mt-4">
             <div className="space-y-2">
               <Label>Video</Label>
               <div className="flex items-center gap-2">
@@ -311,12 +546,15 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
             <div className="space-y-2">
               <Label>Caption</Label>
               <Textarea
-                placeholder="Tell us about your adventure..."
+                placeholder="Tell us about your adventure... Use #hashtags and @mentions"
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
                 disabled={uploading}
                 rows={3}
               />
+              <p className="text-xs text-muted-foreground">
+                Tip: Use #hashtags and @username to tag people
+              </p>
             </div>
 
             <div className="space-y-2">
@@ -418,4 +656,4 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
   );
 };
 
-export default VideoUploadModal;
+export default ContentUploadModal;

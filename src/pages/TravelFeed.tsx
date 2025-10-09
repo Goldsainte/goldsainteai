@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, ChevronLeft, Settings, User, PlusSquare, Home, Search as SearchIcon } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import TravelVideoCard from "@/components/TravelVideoCard";
-import VideoUploadModal from "@/components/VideoUploadModal";
+import ContentUploadModal from "@/components/ContentUploadModal";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import { ClearSampleDataButton } from "@/components/ClearSampleDataButton";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -331,7 +331,7 @@ const TravelFeed = () => {
       />
 
       {/* Upload Modal */}
-      <VideoUploadModal
+      <ContentUploadModal
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleVideoUpload}
