@@ -11,17 +11,17 @@ interface VoiceSelectorProps {
 }
 
 const AVAILABLE_VOICES = [
-  { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced', hasPreview: true },
-  { id: 'ash', name: 'Ash', description: 'Smooth and conversational', hasPreview: false },
-  { id: 'ballad', name: 'Ballad', description: 'Melodic and soothing', hasPreview: false },
-  { id: 'coral', name: 'Coral', description: 'Vibrant and upbeat', hasPreview: false },
-  { id: 'echo', name: 'Echo', description: 'Clear and professional', hasPreview: true },
-  { id: 'fable', name: 'Fable', description: 'Warm and expressive', hasPreview: true },
-  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative', hasPreview: true },
-  { id: 'nova', name: 'Nova', description: 'Energetic and friendly', hasPreview: true },
-  { id: 'sage', name: 'Sage', description: 'Wise and thoughtful', hasPreview: false },
-  { id: 'shimmer', name: 'Shimmer', description: 'Bright and engaging', hasPreview: true },
-  { id: 'verse', name: 'Verse', description: 'Articulate and refined', hasPreview: false },
+  { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced' },
+  { id: 'ash', name: 'Ash', description: 'Smooth and conversational' },
+  { id: 'ballad', name: 'Ballad', description: 'Melodic and soothing' },
+  { id: 'coral', name: 'Coral', description: 'Vibrant and upbeat' },
+  { id: 'echo', name: 'Echo', description: 'Clear and professional' },
+  { id: 'fable', name: 'Fable', description: 'Warm and expressive' },
+  { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative' },
+  { id: 'nova', name: 'Nova', description: 'Energetic and friendly' },
+  { id: 'sage', name: 'Sage', description: 'Wise and thoughtful' },
+  { id: 'shimmer', name: 'Shimmer', description: 'Bright and engaging' },
+  { id: 'verse', name: 'Verse', description: 'Articulate and refined' },
 ];
 
 export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorProps) => {
@@ -102,8 +102,7 @@ export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorPro
                   e.stopPropagation();
                   previewVoice(voice.id);
                 }}
-                disabled={playingVoice === voice.id || !voice.hasPreview}
-                title={!voice.hasPreview ? 'Preview not available for this voice' : 'Play preview'}
+                disabled={playingVoice === voice.id}
               >
                 <Play className="h-5 w-5 md:h-4 md:w-4" />
               </Button>
