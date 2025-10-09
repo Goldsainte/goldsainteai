@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Minimize2, Maximize2, Mic, MicOff, Radio, Phone, PhoneOff } from "lucide-react";
+import { X, Send, Loader2, Minimize2, Maximize2, Mic, MicOff, Radio, Phone, PhoneOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -43,7 +43,7 @@ export const AIBookingConcierge = () => {
 
   console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
 
-  // Load user's AI agent profile
+  // Load user's AI agent profile and restore conversation
   useEffect(() => {
     const loadAgentProfile = async () => {
       if (!user) return;
@@ -54,19 +54,48 @@ export const AIBookingConcierge = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (data) {
-        setAgentProfile(data);
-        // Set initial greeting with agent name
-        setMessages([{
-          role: 'assistant',
-          content: `Hello! I'm ${data.agent_name}.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
-        }]);
-      } else {
-        // Default greeting if no agent profile
-        setMessages([{
-          role: 'assistant',
-          content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
-        }]);
+      setAgentProfile(data);
+
+      // Try to restore recent conversation from localStorage
+      const savedConversation = localStorage.getItem('aiConciergeConversation');
+      let shouldUseInitialGreeting = true;
+
+      if (savedConversation) {
+        try {
+          const parsed = JSON.parse(savedConversation);
+          const savedTime = new Date(parsed.timestamp).getTime();
+          const now = Date.now();
+          const hoursSinceLastMessage = (now - savedTime) / (1000 * 60 * 60);
+
+          // Restore conversation if less than 24 hours old and has messages
+          if (hoursSinceLastMessage < 24 && parsed.messages?.length > 0) {
+            setMessages(parsed.messages);
+            shouldUseInitialGreeting = false;
+            console.log('Restored conversation from localStorage');
+          } else {
+            // Clear old conversation
+            localStorage.removeItem('aiConciergeConversation');
+            console.log('Cleared old conversation');
+          }
+        } catch (e) {
+          console.error('Failed to parse saved conversation:', e);
+          localStorage.removeItem('aiConciergeConversation');
+        }
+      }
+
+      // Set initial greeting only if not restoring a conversation
+      if (shouldUseInitialGreeting) {
+        if (data) {
+          setMessages([{
+            role: 'assistant',
+            content: `Hello! I'm ${data.agent_name}.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+          }]);
+        } else {
+          setMessages([{
+            role: 'assistant',
+            content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+          }]);
+        }
       }
     };
 
@@ -122,6 +151,29 @@ export const AIBookingConcierge = () => {
       timestamp: new Date().toISOString(),
     };
     localStorage.setItem('aiConciergeConversation', JSON.stringify(conversationData));
+  };
+
+  // Clear conversation and start fresh
+  const clearConversation = () => {
+    localStorage.removeItem('aiConciergeConversation');
+    
+    // Reset to initial greeting
+    if (agentProfile) {
+      setMessages([{
+        role: 'assistant',
+        content: `Hello! I'm ${agentProfile.agent_name}.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+      }]);
+    } else {
+      setMessages([{
+        role: 'assistant',
+        content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
+      }]);
+    }
+
+    toast({
+      title: "Conversation Cleared",
+      description: "Starting fresh!",
+    });
   };
 
   const handleSend = async () => {
@@ -492,6 +544,21 @@ export const AIBookingConcierge = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={clearConversation}
+                className="text-primary-foreground hover:bg-white/10"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Clear conversation</p>
+            </TooltipContent>
+          </Tooltip>
           <Button
             variant="ghost"
             size="icon"
