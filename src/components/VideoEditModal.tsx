@@ -56,26 +56,56 @@ const VideoEditModal = ({
   };
 
   const captureVideoFrame = () => {
-    if (!videoRef.current) {
+    const video = videoRef.current;
+    if (!video) {
       toast.error('Video not loaded');
       return;
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    
-    if (ctx) {
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      canvas.toBlob((blob) => {
-        if (blob) {
+    const performCapture = () => {
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      if (!width || !height) {
+        toast.error('Please play the video briefly, then try again.');
+        return;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        toast.error('Unable to capture frame.');
+        return;
+      }
+
+      try {
+        ctx.drawImage(video, 0, 0, width, height);
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            toast.error('Unable to capture frame. Ensure the video is fully loaded.');
+            return;
+          }
           const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
           setThumbnailFile(file);
           setPreviewThumbnail(URL.createObjectURL(file));
           toast.success('Frame captured as cover photo');
-        }
-      }, 'image/jpeg', 0.9);
+        }, 'image/jpeg', 0.9);
+      } catch (e) {
+        console.error('Capture error', e);
+        toast.error('Capture blocked by browser (CORS). Try reloading, then capture again.');
+      }
+    };
+
+    if (video.readyState < 2) {
+      const onLoad = () => {
+        video.removeEventListener('loadeddata', onLoad);
+        performCapture();
+      };
+      video.addEventListener('loadeddata', onLoad, { once: true } as any);
+      video.load();
+    } else {
+      performCapture();
     }
   };
 
@@ -155,6 +185,8 @@ const VideoEditModal = ({
                   className="w-full rounded-lg bg-black"
                   controls
                   preload="metadata"
+                  crossOrigin="anonymous"
+                  playsInline
                 />
                 <div className="flex gap-2">
                   <Button
