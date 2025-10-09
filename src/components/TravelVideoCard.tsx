@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -597,42 +597,43 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col items-center gap-5 pb-2">
+          <div className="flex flex-col items-center gap-4 pb-2">
             <button
               onClick={handleLike}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <div className={`rounded-full p-3 shadow-xl ${isLiked ? 'bg-red-500' : 'bg-black/40 backdrop-blur-md'}`}>
-                <Heart className={`h-7 w-7 ${isLiked ? 'fill-white' : ''}`} />
-              </div>
-              <span className="text-sm font-bold drop-shadow-lg">{formatCount(localLikeCount)}</span>
-            </button>
-
-            <button
-              onClick={() => setCommentsOpen(true)}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
-            >
-              <div className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl">
-                <MessageCircle className="h-7 w-7" />
-              </div>
-              <span className="text-sm font-bold drop-shadow-lg">{formatCount(localCommentCount)}</span>
+              <Heart className={`h-7 w-7 text-white drop-shadow-lg ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <span className="text-xs font-semibold drop-shadow-lg">{formatCount(localLikeCount)}</span>
             </button>
 
             <button
               onClick={handleShare}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <div className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl">
-                <Share2 className="h-7 w-7" />
-              </div>
-              <span className="text-xs font-bold drop-shadow-lg">Share</span>
+              <Repeat2 className="h-7 w-7 text-white drop-shadow-lg" />
+              <span className="text-xs font-semibold drop-shadow-lg">0</span>
+            </button>
+
+            <button
+              onClick={() => setCommentsOpen(true)}
+              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            >
+              <MessageCircle className="h-7 w-7 text-white drop-shadow-lg" />
+              <span className="text-xs font-semibold drop-shadow-lg">{formatCount(localCommentCount)}</span>
+            </button>
+
+            <button
+              onClick={handleShare}
+              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            >
+              <Send className="h-7 w-7 text-white drop-shadow-lg" />
             </button>
 
             {isOwnPost && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-transform active:scale-90">
-                    <MoreVertical className="h-7 w-7" />
+                  <button className="transition-transform active:scale-90 mt-2">
+                    <MoreVertical className="h-7 w-7 text-white drop-shadow-lg" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">

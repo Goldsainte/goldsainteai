@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Upload, ChevronLeft, Settings, User, PlusSquare, Home, Search as SearchIcon } from "lucide-react";
+import { Upload, ChevronLeft, Settings, User, PlusSquare, Home, Search as SearchIcon, Plus } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import TravelVideoCard from "@/components/TravelVideoCard";
 import ContentUploadModal from "@/components/ContentUploadModal";
@@ -248,7 +248,7 @@ const TravelFeed = () => {
               </div>
             )}
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="icon"
@@ -264,17 +264,16 @@ const TravelFeed = () => {
               >
                 Profile
               </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCreateSheetOpen(true)}
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-10 w-10"
+              >
+                <Plus className="h-5 w-5" />
+              </Button>
             </div>
           </div>
-
-          {/* Floating Upload Button (FAB) */}
-          <Button
-            onClick={() => setCreateSheetOpen(true)}
-            className="absolute bottom-28 right-4 z-20 h-14 w-14 rounded-full shadow-2xl bg-primary text-primary-foreground hover:bg-primary/90"
-            size="icon"
-          >
-            <PlusSquare className="h-6 w-6" />
-          </Button>
 
           {/* Video Feed - Full Screen Vertical Scroll */}
           <div
