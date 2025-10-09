@@ -228,22 +228,19 @@ const TravelFeed = () => {
         /* Mobile Layout - Full Screen Vertical Scroll */
         <div className="relative h-screen w-full bg-black overflow-hidden">
           {/* Top Navigation - Minimal */}
-          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4">
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('/')}
-                className="text-white hover:bg-white/20"
-                aria-label="Home"
-              >
-                <Home className="h-6 w-6" />
-              </Button>
-              <ClearSampleDataButton />
-            </div>
+          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-3 py-2 safe-top">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="text-white hover:bg-white/20 h-9 w-9"
+              aria-label="Home"
+            >
+              <Home className="h-5 w-5" />
+            </Button>
             
             {isPersonalized && (
-              <div className="absolute left-1/2 -translate-x-1/2 top-4 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
+              <div className="absolute left-1/2 -translate-x-1/2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
                 <p className="text-white text-xs font-medium">For You</p>
               </div>
             )}
@@ -253,14 +250,15 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-settings')}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-10 w-10"
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9"
               >
                 <Settings className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
+                size="sm"
                 onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-4 h-10 font-semibold text-sm"
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-3 h-9 font-semibold text-xs"
               >
                 Profile
               </Button>
@@ -268,7 +266,7 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-10 w-10"
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9"
               >
                 <Plus className="h-5 w-5" />
               </Button>
