@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -56,6 +56,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -270,20 +271,34 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
           )}
           
           {post.video_url ? (
-            <video
-              ref={videoRef}
-              src={post.video_url}
-              className="w-full h-full object-cover"
-              loop
-              playsInline
-              muted={false}
-              crossOrigin="anonymous"
-              onLoadedData={() => setVideoLoading(false)}
-              onError={() => {
-                setVideoError(true);
-                setVideoLoading(false);
-              }}
-            />
+            <>
+              <video
+                ref={videoRef}
+                src={post.video_url}
+                className="w-full h-full object-cover"
+                loop
+                playsInline
+                muted={isMuted}
+                crossOrigin="anonymous"
+                onLoadedData={() => setVideoLoading(false)}
+                onError={() => {
+                  setVideoError(true);
+                  setVideoLoading(false);
+                }}
+              />
+              {/* Mute Button */}
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110"
+                aria-label={isMuted ? "Unmute" : "Mute"}
+              >
+                {isMuted ? (
+                  <VolumeX className="h-5 w-5 text-white" />
+                ) : (
+                  <Volume2 className="h-5 w-5 text-white" />
+                )}
+              </button>
+            </>
           ) : post.embed_url ? (
             getEmbedComponent()
           ) : null}
@@ -396,20 +411,34 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
       
       {/* Video or Embed */}
       {post.video_url ? (
-        <video
-          ref={videoRef}
-          src={post.video_url}
-          className="absolute inset-0 w-full h-full object-cover"
-          loop
-          playsInline
-          muted={false}
-          crossOrigin="anonymous"
-          onLoadedData={() => setVideoLoading(false)}
-          onError={() => {
-            setVideoError(true);
-            setVideoLoading(false);
-          }}
-        />
+        <>
+          <video
+            ref={videoRef}
+            src={post.video_url}
+            className="absolute inset-0 w-full h-full object-cover"
+            loop
+            playsInline
+            muted={isMuted}
+            crossOrigin="anonymous"
+            onLoadedData={() => setVideoLoading(false)}
+            onError={() => {
+              setVideoError(true);
+              setVideoLoading(false);
+            }}
+          />
+          {/* Mute Button */}
+          <button
+            onClick={() => setIsMuted(!isMuted)}
+            className="absolute top-20 right-4 rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
+            aria-label={isMuted ? "Unmute" : "Mute"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-6 w-6 text-white" />
+            ) : (
+              <Volume2 className="h-6 w-6 text-white" />
+            )}
+          </button>
+        </>
       ) : post.embed_url ? (
         getEmbedComponent()
       ) : null}
