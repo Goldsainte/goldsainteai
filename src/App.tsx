@@ -38,6 +38,7 @@ import TestGroupPayment from "./pages/TestGroupPayment";
 
 const queryClient = new QueryClient();
 
+// Main app content with routing
 function AppContent() {
   const location = useLocation();
   
