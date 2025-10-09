@@ -867,7 +867,7 @@ const Index = () => {
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
             {/* Centered Search Area */}
-            <div className="min-h-[calc(100vh-4rem)] md:min-h-screen flex items-center justify-center px-4 py-6 md:py-8">
+            <div className="min-h-screen flex items-center justify-center px-4 py-8">
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
