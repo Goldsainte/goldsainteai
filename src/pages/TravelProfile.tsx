@@ -198,8 +198,9 @@ const TravelProfile = () => {
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/')}
             className="gap-1 hover:bg-transparent"
+            aria-label="Home"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
