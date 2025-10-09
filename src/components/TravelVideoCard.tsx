@@ -100,15 +100,19 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
 
   const trackView = async () => {
     try {
+      // Track the view in post_views table
       await supabase.from('post_views').insert({
         post_id: post.id,
         user_id: user?.id || null,
       });
 
-      await supabase
-        .from('travel_posts')
-        .update({ view_count: post.view_count + 1 })
-        .eq('id', post.id);
+      // Only increment view_count if viewer is NOT the creator (for earnings calculation)
+      if (!isOwnPost) {
+        await supabase
+          .from('travel_posts')
+          .update({ view_count: post.view_count + 1 })
+          .eq('id', post.id);
+      }
     } catch (error) {
       console.error('Error tracking view:', error);
     }
