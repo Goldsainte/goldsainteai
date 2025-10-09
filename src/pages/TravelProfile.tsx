@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/card";
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
 import VideoEditModal from "@/components/VideoEditModal";
+import { CollaborationInvites } from "@/components/CollaborationInvites";
 
 interface Profile {
   id: string;
@@ -54,6 +55,8 @@ const TravelProfile = () => {
   });
   const [editOpen, setEditOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
+  const [unreadCollabCount, setUnreadCollabCount] = useState(0);
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -65,8 +68,25 @@ const TravelProfile = () => {
       fetchVideoPosts();
       fetchLikedPosts();
       fetchStats();
+      
+      // Fetch collaboration invites count only for own profile
+      if (isOwnProfile && user) {
+        fetchCollabCount();
+      }
     }
-  }, [profileUserId]);
+  }, [profileUserId, isOwnProfile, user]);
+
+  const fetchCollabCount = async () => {
+    if (!user) return;
+    
+    const { count } = await supabase
+      .from('post_collaborators')
+      .select('*', { count: 'exact', head: true })
+      .eq('collaborator_id', user.id)
+      .eq('status', 'pending');
+    
+    setUnreadCollabCount(count || 0);
+  };
 
   const fetchProfile = async () => {
     try {
@@ -416,6 +436,20 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 size="icon"
+                className="relative h-8 w-8"
+                onClick={() => setCollaborationSheetOpen(true)}
+                aria-label="Collaboration invites"
+              >
+                <Video className="h-4 w-4" />
+                {unreadCollabCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
+                    {unreadCollabCount}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
                 className="h-8 w-8"
               >
                 <Share2 className="h-4 w-4" />
@@ -665,6 +699,18 @@ const TravelProfile = () => {
           }}
         />
       )}
+
+      {/* Collaboration Invites Sheet */}
+      <CollaborationInvites
+        open={collaborationSheetOpen}
+        onOpenChange={setCollaborationSheetOpen}
+        onUpdate={() => {
+          // Refresh collab count
+          if (user) {
+            fetchCollabCount();
+          }
+        }}
+      />
     </div>
   );
 };

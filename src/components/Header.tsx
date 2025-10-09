@@ -16,7 +16,6 @@ import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 import { NotificationCenter } from "@/components/NotificationCenter";
-import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 
@@ -29,8 +28,6 @@ export const Header = () => {
   const isMobile = useIsMobile();
   const [usePreferences, setUsePreferences] = useState(true);
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
-  const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
-  const [unreadCollabCount, setUnreadCollabCount] = useState(0);
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -48,20 +45,7 @@ export const Header = () => {
       }
     };
 
-    const fetchCollabCount = async () => {
-      if (!user) return;
-      
-      const { count } = await supabase
-        .from('post_collaborators')
-        .select('*', { count: 'exact', head: true })
-        .eq('collaborator_id', user.id)
-        .eq('status', 'pending');
-      
-      setUnreadCollabCount(count || 0);
-    };
-    
     fetchPreferences();
-    fetchCollabCount();
   }, [user]);
 
   const togglePreferences = async (checked: boolean) => {
@@ -126,22 +110,7 @@ export const Header = () => {
                   <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
                 </a>
                 {user && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setCollaborationSheetOpen(true)}
-                      className="relative h-9 w-9 hover:bg-secondary/10"
-                    >
-                      <Video className="h-4 w-4" />
-                      {unreadCollabCount > 0 && (
-                        <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
-                          {unreadCollabCount}
-                        </span>
-                      )}
-                    </Button>
-                    <NotificationCenter />
-                  </div>
+                  <NotificationCenter />
                 )}
               </div>
               
@@ -302,26 +271,8 @@ export const Header = () => {
                   </DropdownMenuContent>
                  </DropdownMenu>
 
-                {/* Notifications & Collaborations */}
-                {user && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setCollaborationSheetOpen(true)}
-                      className="relative h-10 w-10 hover:bg-secondary/10 rounded-full transition-all duration-300"
-                      aria-label="Collaboration invites"
-                    >
-                      <Video className="h-5 w-5" />
-                      {unreadCollabCount > 0 && (
-                        <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-                          {unreadCollabCount}
-                        </span>
-                      )}
-                    </Button>
-                    <NotificationCenter />
-                  </div>
-                )}
+                {/* Notifications */}
+                {user && <NotificationCenter />}
 
                 {/* User Menu */}
                 <DropdownMenu>
@@ -534,22 +485,6 @@ export const Header = () => {
         </Sheet>
       )}
 
-      {/* Collaboration Invites Sheet */}
-      <CollaborationInvites
-        open={collaborationSheetOpen}
-        onOpenChange={setCollaborationSheetOpen}
-        onUpdate={() => {
-          // Refresh collab count
-          if (user) {
-            supabase
-              .from('post_collaborators')
-              .select('*', { count: 'exact', head: true })
-              .eq('collaborator_id', user.id)
-              .eq('status', 'pending')
-              .then(({ count }) => setUnreadCollabCount(count || 0));
-          }
-        }}
-      />
     </>
   );
 };
