@@ -1,114 +1,166 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Loader2, TrendingUp, Hash } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Loader2, ChevronLeft, Heart, Play } from "lucide-react";
+import { toast } from "sonner";
 
-interface Hashtag {
+interface ExplorePost {
   id: string;
-  tag: string;
-  use_count: number;
-  last_used_at: string;
+  user_id: string;
+  video_url: string;
+  thumbnail_url: string | null;
+  caption: string | null;
+  view_count: number;
+  like_count: number;
+  comment_count: number;
+  profiles?: {
+    username: string | null;
+  };
 }
 
 const Trending = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [hashtags, setHashtags] = useState<Hashtag[]>([]);
+  const [posts, setPosts] = useState<ExplorePost[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTrendingHashtags();
+    fetchExplorePosts();
   }, []);
 
-  const fetchTrendingHashtags = async () => {
+  const fetchExplorePosts = async () => {
     try {
+      // Fetch posts ordered by engagement (likes + views)
       const { data, error } = await supabase
-        .from("hashtags")
-        .select("*")
-        .order("use_count", { ascending: false })
-        .limit(50);
+        .from("travel_posts")
+        .select("id, user_id, video_url, thumbnail_url, caption, view_count, like_count, comment_count")
+        .eq('status', 'active')
+        .order("like_count", { ascending: false })
+        .limit(30);
 
       if (error) throw error;
-      setHashtags(data || []);
+
+      // Fetch profiles separately
+      const postsWithProfiles = await Promise.all(
+        (data || []).map(async (post) => {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('username')
+            .eq('id', post.user_id)
+            .maybeSingle();
+
+          return {
+            ...post,
+            profiles: profile,
+          };
+        })
+      );
+
+      setPosts(postsWithProfiles);
     } catch (error: any) {
-      console.error("Error fetching trending hashtags:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load trending hashtags",
-        variant: "destructive",
-      });
+      console.error("Error fetching explore posts:", error);
+      toast.error("Failed to load explore content");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleHashtagClick = (tag: string) => {
-    navigate(`/search?q=${encodeURIComponent(`#${tag}`)}&tab=posts`);
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <TrendingUp className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Trending</h1>
+    <div className="min-h-screen bg-background">
+      {/* Header with Back Button */}
+      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
+        <div className="flex items-center gap-4 p-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/travel-feed')}
+            className="hover:bg-transparent"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <h1 className="text-xl font-bold">Explore</h1>
         </div>
-        <p className="text-muted-foreground">
-          Discover what's popular in the travel community
-        </p>
       </div>
 
-      {hashtags.length === 0 ? (
-        <Card className="p-12 text-center">
-          <Hash className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-lg text-muted-foreground">
-            No trending hashtags yet
-          </p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Start using hashtags in your posts to see trends
-          </p>
-        </Card>
-      ) : (
-        <div className="grid gap-4">
-          {hashtags.map((hashtag, index) => (
-            <Card
-              key={hashtag.id}
-              className="p-6 cursor-pointer hover:bg-accent/50 transition-colors"
-              onClick={() => handleHashtagClick(hashtag.tag)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
-                    <span className="text-lg font-bold text-primary">
-                      {index + 1}
-                    </span>
+      {/* Explore Grid */}
+      <div className="p-1">
+        {posts.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <Play className="h-16 w-16 text-muted-foreground mb-4" />
+            <p className="text-lg text-muted-foreground">No posts to explore yet</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Check back later for trending content
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-1">
+            {posts.map((post, index) => {
+              // Create varied grid sizing for visual interest (Instagram-style)
+              const isFeatured = index % 7 === 0;
+              const isWide = index % 11 === 0;
+              
+              return (
+                <div
+                  key={post.id}
+                  className={`relative cursor-pointer group overflow-hidden ${
+                    isFeatured ? 'col-span-2 row-span-2' : 
+                    isWide && index % 3 === 0 ? 'col-span-2' : ''
+                  }`}
+                  onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
+                  style={{ aspectRatio: isFeatured ? '1/1' : isWide ? '2/1' : '1/1' }}
+                >
+                  {post.thumbnail_url ? (
+                    <img
+                      src={post.thumbnail_url}
+                      alt={post.caption || 'Video'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+                      <Play className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+                  
+                  {/* Hover overlay with stats */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="text-white flex items-center gap-4">
+                      <div className="flex items-center gap-1">
+                        <Heart className="h-5 w-5 fill-white" />
+                        <span className="font-semibold">{formatNumber(post.like_count)}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Play className="h-5 w-5 fill-white" />
+                        <span className="font-semibold">{formatNumber(post.view_count)}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-xl font-semibold">#{hashtag.tag}</h3>
-                    <p className="text-sm text-muted-foreground">
-                      {hashtag.use_count} {hashtag.use_count === 1 ? 'post' : 'posts'}
-                    </p>
+                  
+                  {/* Video indicator */}
+                  <div className="absolute top-2 right-2">
+                    <Play className="h-4 w-4 text-white drop-shadow-lg" />
                   </div>
                 </div>
-                <TrendingUp className="h-5 w-5 text-primary" />
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-// Export Trending component
 export default Trending;
