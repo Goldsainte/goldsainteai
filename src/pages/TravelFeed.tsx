@@ -42,6 +42,7 @@ const TravelFeed = () => {
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [isPersonalized, setIsPersonalized] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { isAdmin } = useUserRole();
   const [searchParams] = useSearchParams();
@@ -211,6 +212,8 @@ const TravelFeed = () => {
                       isActive={true}
                       onUpdate={fetchPosts}
                       layout="desktop"
+                      isMuted={isMuted}
+                      onToggleMute={() => setIsMuted(!isMuted)}
                     />
                   ))}
                 </div>
@@ -309,6 +312,8 @@ const TravelFeed = () => {
                     post={post}
                     isActive={index === currentIndex}
                     onUpdate={fetchPosts}
+                    isMuted={isMuted}
+                    onToggleMute={() => setIsMuted(!isMuted)}
                   />
                 </div>
               ))

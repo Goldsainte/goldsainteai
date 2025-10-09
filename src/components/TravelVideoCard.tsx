@@ -42,9 +42,11 @@ interface TravelVideoCardProps {
   isActive: boolean;
   onUpdate: () => void;
   layout?: 'mobile' | 'desktop';
+  isMuted: boolean;
+  onToggleMute: () => void;
 }
 
-const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: TravelVideoCardProps) => {
+const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute }: TravelVideoCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
@@ -56,7 +58,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -292,7 +293,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
               />
               {/* Mute Button */}
               <button
-                onClick={() => setIsMuted(!isMuted)}
+                onClick={onToggleMute}
                 className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110"
                 aria-label={isMuted ? "Unmute" : "Mute"}
               >
@@ -432,7 +433,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
           />
           {/* Mute Button */}
           <button
-            onClick={() => setIsMuted(!isMuted)}
+            onClick={onToggleMute}
             className="absolute top-20 right-4 rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
             aria-label={isMuted ? "Unmute" : "Mute"}
           >
