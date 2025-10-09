@@ -76,8 +76,7 @@ export default function AIAgentOnboarding() {
         return (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-primary" />
+              <CardTitle className="font-chiffon">
                 Welcome! Let's Create Your Personal AI Travel Agent
               </CardTitle>
               <CardDescription>
