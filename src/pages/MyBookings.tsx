@@ -69,15 +69,19 @@ export default function MyBookings() {
     }
   };
 
-  const upcomingBookings = bookings.filter(b => 
-    b.status !== 'cancelled' && 
-    new Date(b.booking_data?.departureDate || b.booking_data?.checkIn) > new Date()
-  );
+  const upcomingBookings = bookings.filter(b => {
+    const dateStr = b.booking_data?.departureDate || b.booking_data?.checkIn;
+    if (!dateStr) return false;
+    const date = new Date(dateStr);
+    return b.status !== 'cancelled' && !isNaN(date.getTime()) && date > new Date();
+  });
 
-  const pastBookings = bookings.filter(b => 
-    b.status === 'cancelled' ||
-    new Date(b.booking_data?.departureDate || b.booking_data?.checkIn) <= new Date()
-  );
+  const pastBookings = bookings.filter(b => {
+    const dateStr = b.booking_data?.departureDate || b.booking_data?.checkIn;
+    if (!dateStr) return true;
+    const date = new Date(dateStr);
+    return b.status === 'cancelled' || isNaN(date.getTime()) || date <= new Date();
+  });
 
   const renderBookingCard = (booking: any) => (
     <Card key={booking.id} className="hover:shadow-lg transition-shadow">
@@ -109,7 +113,12 @@ export default function MyBookings() {
           <div className="flex items-center gap-2 text-sm">
             <Calendar className="h-4 w-4 text-muted-foreground" />
             <span>
-              {format(new Date(booking.booking_data?.departureDate || booking.booking_data?.checkIn), 'MMM dd, yyyy')}
+              {(() => {
+                const dateStr = booking.booking_data?.departureDate || booking.booking_data?.checkIn;
+                if (!dateStr) return 'N/A';
+                const date = new Date(dateStr);
+                return !isNaN(date.getTime()) ? format(date, 'MMM dd, yyyy') : 'N/A';
+              })()}
             </span>
           </div>
           <div className="flex items-center gap-2 text-sm">
