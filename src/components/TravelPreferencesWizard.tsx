@@ -50,7 +50,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={type} className="flex items-center space-x-2">
                   <Checkbox
                     id={`trip-${type}`}
-                    checked={preferences.general?.tripTypes?.includes(type)}
+                    checked={preferences.general?.tripTypes?.includes(type) || false}
                     onCheckedChange={() => toggleArrayValue('general', 'tripTypes', type)}
                   />
                   <Label htmlFor={`trip-${type}`} className="cursor-pointer">{type}</Label>
@@ -66,7 +66,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={companion} className="flex items-center space-x-2">
                   <Checkbox
                     id={`companion-${companion}`}
-                    checked={preferences.general?.travelCompanions?.includes(companion)}
+                    checked={preferences.general?.travelCompanions?.includes(companion) || false}
                     onCheckedChange={() => toggleArrayValue('general', 'travelCompanions', companion)}
                   />
                   <Label htmlFor={`companion-${companion}`} className="cursor-pointer">{companion}</Label>
@@ -105,7 +105,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={pref} className="flex items-center space-x-2">
                   <Checkbox
                     id={`travel-${pref}`}
-                    checked={preferences.destination?.travelScope?.includes(pref)}
+                    checked={preferences.destination?.travelScope?.includes(pref) || false}
                     onCheckedChange={() => toggleArrayValue('destination', 'travelScope', pref)}
                   />
                   <Label htmlFor={`travel-${pref}`} className="cursor-pointer">{pref}</Label>
@@ -164,7 +164,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={method} className="flex items-center space-x-2">
                   <Checkbox
                     id={`method-${method}`}
-                    checked={preferences.transportation?.methods?.includes(method)}
+                    checked={preferences.transportation?.methods?.includes(method) || false}
                     onCheckedChange={() => toggleArrayValue('transportation', 'methods', method)}
                   />
                   <Label htmlFor={`method-${method}`} className="cursor-pointer">{method}</Label>
@@ -229,7 +229,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={type} className="flex items-center space-x-2">
                   <Checkbox
                     id={`accom-${type}`}
-                    checked={preferences.accommodation?.types?.includes(type)}
+                    checked={preferences.accommodation?.types?.includes(type) || false}
                     onCheckedChange={() => toggleArrayValue('accommodation', 'types', type)}
                   />
                   <Label htmlFor={`accom-${type}`} className="cursor-pointer">{type}</Label>
@@ -260,7 +260,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={amenity} className="flex items-center space-x-2">
                   <Checkbox
                     id={`amenity-${amenity}`}
-                    checked={preferences.accommodation?.amenities?.includes(amenity)}
+                    checked={preferences.accommodation?.amenities?.includes(amenity) || false}
                     onCheckedChange={() => toggleArrayValue('accommodation', 'amenities', amenity)}
                   />
                   <Label htmlFor={`amenity-${amenity}`} className="cursor-pointer">{amenity}</Label>
@@ -293,7 +293,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={pref} className="flex items-center space-x-2">
                   <Checkbox
                     id={`food-${pref}`}
-                    checked={preferences.food?.preferences?.includes(pref)}
+                    checked={preferences.food?.preferences?.includes(pref) || false}
                     onCheckedChange={() => toggleArrayValue('food', 'preferences', pref)}
                   />
                   <Label htmlFor={`food-${pref}`} className="cursor-pointer">{pref}</Label>
@@ -387,7 +387,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={priority} className="flex items-center space-x-2">
                   <Checkbox
                     id={`priority-${priority}`}
-                    checked={preferences.budget?.priorities?.includes(priority)}
+                    checked={preferences.budget?.priorities?.includes(priority) || false}
                     onCheckedChange={() => toggleArrayValue('budget', 'priorities', priority)}
                   />
                   <Label htmlFor={`priority-${priority}`} className="cursor-pointer">{priority}</Label>
@@ -412,7 +412,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={activity} className="flex items-center space-x-2">
                   <Checkbox
                     id={`activity-${activity}`}
-                    checked={preferences.activities?.interests?.includes(activity)}
+                    checked={preferences.activities?.interests?.includes(activity) || false}
                     onCheckedChange={() => toggleArrayValue('activities', 'interests', activity)}
                   />
                   <Label htmlFor={`activity-${activity}`} className="cursor-pointer">{activity}</Label>
@@ -461,7 +461,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={requirement} className="flex items-center space-x-2">
                   <Checkbox
                     id={`req-${requirement}`}
-                    checked={preferences.documentation?.openTo?.includes(requirement)}
+                    checked={preferences.documentation?.openTo?.includes(requirement) || false}
                     onCheckedChange={() => toggleArrayValue('documentation', 'openTo', requirement)}
                   />
                   <Label htmlFor={`req-${requirement}`} className="cursor-pointer">{requirement}</Label>
@@ -477,7 +477,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={service} className="flex items-center space-x-2">
                   <Checkbox
                     id={`manage-${service}`}
-                    checked={preferences.documentation?.aiManage?.includes(service)}
+                    checked={preferences.documentation?.aiManage?.includes(service) || false}
                     onCheckedChange={() => toggleArrayValue('documentation', 'aiManage', service)}
                   />
                   <Label htmlFor={`manage-${service}`} className="cursor-pointer">{service}</Label>
@@ -517,7 +517,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
                 <div key={suggestion} className="flex items-center space-x-2">
                   <Checkbox
                     id={`suggest-${suggestion}`}
-                    checked={preferences.personalization?.suggestionTypes?.includes(suggestion)}
+                    checked={preferences.personalization?.suggestionTypes?.includes(suggestion) || false}
                     onCheckedChange={() => toggleArrayValue('personalization', 'suggestionTypes', suggestion)}
                   />
                   <Label htmlFor={`suggest-${suggestion}`} className="cursor-pointer">{suggestion}</Label>
