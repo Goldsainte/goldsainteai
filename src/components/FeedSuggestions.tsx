@@ -131,30 +131,6 @@ export function FeedSuggestions() {
           ))}
         </div>
 
-        {/* Footer Links */}
-        <div className="text-xs text-muted-foreground space-y-1 pt-4">
-          <div className="flex flex-wrap gap-1">
-            <span className="hover:underline cursor-pointer">About</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">Help</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">Press</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">API</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">Jobs</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">Privacy</span>
-          </div>
-          <div className="flex flex-wrap gap-1">
-            <span className="hover:underline cursor-pointer">Terms</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">Locations</span>
-            <span>·</span>
-            <span className="hover:underline cursor-pointer">Language</span>
-          </div>
-          <p className="pt-4">© 2025 GOLDSAINTE</p>
-        </div>
       </div>
     </aside>
   );

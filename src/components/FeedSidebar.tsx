@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { Home, Search, Compass, Video, MessageCircle, Heart, PlusSquare, BarChart3, User, Menu } from "lucide-react";
-import logoWordmark from "@/assets/wordmark-gold.png";
+import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { useAuth } from "@/contexts/AuthContext";
 
 export function FeedSidebar() {
