@@ -337,13 +337,11 @@ const TravelProfile = () => {
       {/* Profile Info */}
       <div className="px-4 pt-4 pb-2 space-y-4">
         <div className="flex items-start justify-between">
-          <div className="relative">
-            <Avatar className="h-20 w-20">
-              <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                {profile?.username?.[0]?.toUpperCase() || 'U'}
-              </AvatarFallback>
-            </Avatar>
+          <Avatar className="h-20 w-20">
+            <AvatarImage src={profile?.avatar_url || undefined} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+              {profile?.username?.[0]?.toUpperCase() || 'U'}
+            </AvatarFallback>
             {isOwnProfile && (
               <>
                 <input
@@ -367,18 +365,18 @@ const TravelProfile = () => {
                 </button>
               </>
             )}
-          </div>
+          </Avatar>
           
           <div className="flex items-center gap-8 pt-2">
-            <button className="text-center">
+            <button className="flex flex-col items-center justify-center">
               <div className="text-xl font-bold">{formatNumber(stats.postsCount)}</div>
               <div className="text-xs text-muted-foreground">posts</div>
             </button>
-            <button className="text-center">
+            <button className="flex flex-col items-center justify-center">
               <div className="text-xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
               <div className="text-xs text-muted-foreground">followers</div>
             </button>
-            <button className="text-center">
+            <button className="flex flex-col items-center justify-center">
               <div className="text-xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
               <div className="text-xs text-muted-foreground">following</div>
             </button>
@@ -478,23 +476,23 @@ const TravelProfile = () => {
 
       {/* Content Tabs */}
       <Tabs defaultValue="posts" className="w-full mt-2">
-        <TabsList className="w-full grid grid-cols-3 rounded-none border-t h-11 bg-transparent">
+        <TabsList className="w-full grid grid-cols-3 rounded-none h-11 bg-transparent">
           <TabsTrigger 
             value="posts" 
-            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
           >
             <Grid3X3 className="h-5 w-5" />
           </TabsTrigger>
           <TabsTrigger 
             value="journeys"
-            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
           >
             <Video className="h-5 w-5" />
           </TabsTrigger>
           {isOwnProfile && (
             <TabsTrigger 
               value="liked"
-              className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
             >
               <Heart className="h-5 w-5" />
             </TabsTrigger>
