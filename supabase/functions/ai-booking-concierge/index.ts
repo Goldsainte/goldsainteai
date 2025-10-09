@@ -130,7 +130,8 @@ serve(async (req) => {
     ];
 
     // Build personalized system prompt
-    let systemPrompt = `You are ${agentProfile?.agent_name || "Goldsainte's AI Booking Concierge"} - a sophisticated luxury travel assistant specializing in high-end travel experiences.`;
+    const agentName = agentProfile?.agent_name || "your Goldsainte AI Travel Concierge";
+    let systemPrompt = `You are ${agentName} - a sophisticated luxury travel assistant specializing in high-end travel experiences.`;
     
     // Add custom personality if provided
     if (agentProfile?.personality_instructions) {
@@ -212,8 +213,12 @@ CRITICAL RULES:
 10. NEVER offer to create booking links or complete bookings directly
 11. If a search takes longer than expected or fails, apologize and offer to try again or connect them with an agent
 
+FIRST GREETING (EXACT WORDS):
+When greeting the user for the very first time in a conversation, you MUST say EXACTLY:
+"Hi! I'm ${agentName}. How can I help you plan your next trip?"
+
 CONVERSATION FLOW:
-1. Greet warmly and ask what they're planning
+1. Greet warmly using the exact greeting above for first message
 2. Gather essential details (destination, dates, guests, budget, preferences) - ONE QUESTION AT A TIME
 3. ANNOUNCE THE SEARCH: "Perfect! Let me search for [flights/hotels] for you. This will take about 30 seconds..."
 4. Use search tools to find options
