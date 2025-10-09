@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Briefcase, Plus, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle } from "lucide-react";
+import { Briefcase, Plus, MapPin, Clock, ArrowLeft, MessageSquare, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ComprehensiveJobForm } from "@/components/ComprehensiveJobForm";
 import { JobBidsReview } from "@/components/JobBidsReview";
@@ -23,6 +23,7 @@ import { RefundGuaranteeCard } from "@/components/RefundGuaranteeCard";
 import { AIAgentMatching } from "@/components/AIAgentMatching";
 import { AgentBidForm } from "@/components/AgentBidForm";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
+import { getCurrencySymbol } from "@/lib/currencyHelpers";
 
 export default function Marketplace() {
   const { user, isLoading } = useAuth();
@@ -459,11 +460,12 @@ export default function Marketplace() {
                     <div className="grid grid-cols-3 gap-4 mb-4">
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{job.destination}</span>
+                        <span className="text-sm">{job.destination || 'Not specified'}</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{job.currency} {job.budget_min} - {job.budget_max}</span>
+                        <span className="text-sm font-medium">
+                          {getCurrencySymbol(job.currency || 'USD')}{job.budget_min?.toLocaleString()} - {getCurrencySymbol(job.currency || 'USD')}{job.budget_max?.toLocaleString()}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
@@ -509,17 +511,17 @@ export default function Marketplace() {
 
           <div className="space-y-6">
             <div>
-              <h3 className="font-semibold mb-2">Job Details</h3>
-              <p className="text-sm text-muted-foreground">{selectedJob?.description}</p>
-              <div className="grid grid-cols-2 gap-4 mt-4">
+              <h3 className="text-base font-semibold mb-2">Job Details</h3>
+              <p className="text-sm text-muted-foreground mb-4">{selectedJob?.description}</p>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Destination</p>
-                  <p className="font-medium">{selectedJob?.destination}</p>
+                  <p className="text-xs text-muted-foreground mb-1">Destination</p>
+                  <p className="text-sm font-medium">{selectedJob?.destination || 'Not specified'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Budget Range</p>
-                  <p className="font-medium">
-                    {selectedJob?.currency} {selectedJob?.budget_min} - {selectedJob?.budget_max}
+                  <p className="text-xs text-muted-foreground mb-1">Budget Range</p>
+                  <p className="text-sm font-medium">
+                    {getCurrencySymbol(selectedJob?.currency || 'USD')}{selectedJob?.budget_min?.toLocaleString()} - {getCurrencySymbol(selectedJob?.currency || 'USD')}{selectedJob?.budget_max?.toLocaleString()}
                   </p>
                 </div>
               </div>

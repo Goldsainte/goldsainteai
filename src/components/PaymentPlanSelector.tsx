@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CreditCard, Calendar, DollarSign } from "lucide-react";
+import { CreditCard, Calendar } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getCurrencySymbol } from "@/lib/currencyHelpers";
 
 interface PaymentPlanSelectorProps {
   jobId: string;
@@ -109,7 +110,7 @@ export const PaymentPlanSelector = ({
 
       toast({
         title: "Payment plan created",
-        description: `${count} installments of ${currency} ${installmentAmount} each`,
+        description: `${count} installments of ${getCurrencySymbol(currency)}${installmentAmount} each`,
       });
 
       onPlanCreated?.();
@@ -128,11 +129,11 @@ export const PaymentPlanSelector = ({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="text-lg flex items-center gap-2">
           <CreditCard className="h-5 w-5" />
           Payment Plan Options
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-sm">
           Break down your payment into flexible installments
         </CardDescription>
       </CardHeader>
@@ -150,10 +151,10 @@ export const PaymentPlanSelector = ({
               <div key={option.value} className="flex items-center space-x-2">
                 <RadioGroupItem value={option.value} id={option.value} />
                 <Label htmlFor={option.value} className="cursor-pointer flex-1">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between text-sm">
                     <span>{option.label}</span>
                     <span className="font-semibold">
-                      {currency} {(totalAmount / parseInt(option.value)).toFixed(2)} each
+                      {getCurrencySymbol(currency)}{(totalAmount / parseInt(option.value)).toFixed(2)} each
                     </span>
                   </div>
                 </Label>
@@ -179,8 +180,8 @@ export const PaymentPlanSelector = ({
         <div className="bg-muted p-4 rounded-lg space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Installment Amount:</span>
-            <span className="font-bold text-lg">
-              {currency} {calculateInstallment()}
+            <span className="font-bold text-base">
+              {getCurrencySymbol(currency)}{calculateInstallment()}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
@@ -194,7 +195,7 @@ export const PaymentPlanSelector = ({
           <div className="flex items-center justify-between text-sm pt-2 border-t">
             <span className="text-muted-foreground">Total Amount:</span>
             <span className="font-semibold">
-              {currency} {totalAmount.toFixed(2)}
+              {getCurrencySymbol(currency)}{totalAmount.toFixed(2)}
             </span>
           </div>
         </div>
