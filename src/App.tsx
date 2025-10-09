@@ -36,6 +36,7 @@ import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
+import TravelFeed from "./pages/TravelFeed";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,7 @@ function AppContent() {
           <Route path="/my-jobs" element={<MyJobs />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
+          <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -144,6 +144,11 @@ export const Header = () => {
                 <DropdownMenuItem onClick={() => navigate('/marketplace')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
                   <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
                   <span>Marketplace</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
+                  <Video className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>Travel Feed</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
