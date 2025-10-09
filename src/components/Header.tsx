@@ -274,11 +274,11 @@ export const Header = () => {
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="ghost" 
-                      className="gap-1 sm:gap-1.5 hover:bg-secondary/10 rounded-full border border-border shadow-sm px-2 sm:px-3 h-10 sm:h-11 min-w-[44px] transition-all duration-300"
+                      size="icon"
+                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-secondary/10 rounded-full border border-border shadow-sm transition-all duration-300"
                       aria-label="User menu"
                     >
-                      <Menu className="h-4 w-4 md:h-4 md:w-4" />
-                      <User className="h-5 w-5 md:h-5 md:w-5" />
+                      <User className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
