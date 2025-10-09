@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle, User, MapPin } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 interface BookingNotification {
   id: string;
@@ -49,16 +49,15 @@ export const RealTimeBookingNotifications = () => {
   }, []);
 
   return (
-    <AnimatePresence>
+    <>
       {isVisible && currentNotification && (
-        <motion.div
-          initial={{ opacity: 0, y: 50, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="fixed bottom-6 left-6 z-50 max-w-sm"
+        <div
+          className={cn(
+            "fixed bottom-6 left-6 z-50 max-w-sm transition-all duration-300",
+            isVisible ? "animate-in slide-in-from-bottom-4 fade-in" : "animate-out slide-out-to-bottom-4 fade-out"
+          )}
         >
-          <div className="bg-card border shadow-lg rounded-lg p-4 backdrop-blur-sm bg-opacity-95">
+          <div className="bg-card border shadow-lg rounded-lg p-4 backdrop-blur-sm">
             <div className="flex items-start gap-3">
               <div className="relative">
                 <Avatar className="h-10 w-10">
@@ -85,8 +84,8 @@ export const RealTimeBookingNotifications = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };
