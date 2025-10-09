@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { TrendingUp, Eye, Heart, Share2, DollarSign } from "lucide-react";
-import { Header } from "@/components/Header";
 
 interface CreatorStats {
   total_views: number;
@@ -78,7 +77,6 @@ export default function CreatorDashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center justify-between mb-8">
           <div>
