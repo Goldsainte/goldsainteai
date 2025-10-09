@@ -367,6 +367,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
           postId={post.id}
           currentCaption={post.caption}
           currentLocation={post.location}
+          currentThumbnailUrl={post.thumbnail_url}
+          videoUrl={post.video_url || null}
           onSuccess={onUpdate}
         />
       </div>
@@ -542,6 +544,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
         postId={post.id}
         currentCaption={post.caption}
         currentLocation={post.location}
+        currentThumbnailUrl={post.thumbnail_url}
+        videoUrl={post.video_url || null}
         onSuccess={onUpdate}
       />
     </div>

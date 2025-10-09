@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save } from "lucide-react";
+import { Loader2, Save, Camera, Upload as UploadIcon } from "lucide-react";
 import { toast } from "sonner";
 
 interface VideoEditModalProps {
@@ -19,6 +20,8 @@ interface VideoEditModalProps {
   postId: string;
   currentCaption: string | null;
   currentLocation: string | null;
+  currentThumbnailUrl: string | null;
+  videoUrl: string | null;
   onSuccess: () => void;
 }
 
@@ -28,20 +31,87 @@ const VideoEditModal = ({
   postId,
   currentCaption,
   currentLocation,
+  currentThumbnailUrl,
+  videoUrl,
   onSuccess,
 }: VideoEditModalProps) => {
+  const { user } = useAuth();
   const [caption, setCaption] = useState(currentCaption || "");
   const [location, setLocation] = useState(currentLocation || "");
   const [saving, setSaving] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(currentThumbnailUrl);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      setThumbnailFile(file);
+      setPreviewThumbnail(URL.createObjectURL(file));
+    }
+  };
+
+  const captureVideoFrame = () => {
+    if (!videoRef.current) {
+      toast.error('Video not loaded');
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
+          setThumbnailFile(file);
+          setPreviewThumbnail(URL.createObjectURL(file));
+          toast.success('Frame captured as cover photo');
+        }
+      }, 'image/jpeg', 0.9);
+    }
+  };
 
   const handleSave = async () => {
+    if (!user) return;
+    
     setSaving(true);
     try {
+      let thumbnailUrl = currentThumbnailUrl;
+
+      // Upload new thumbnail if one was selected/captured
+      if (thumbnailFile) {
+        const thumbExt = thumbnailFile.name.split('.').pop();
+        const thumbFileName = `${user.id}/thumbnails/${Date.now()}.${thumbExt}`;
+        
+        const { error: thumbUploadError } = await supabase.storage
+          .from('travel-videos')
+          .upload(thumbFileName, thumbnailFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (thumbUploadError) throw thumbUploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('travel-videos')
+          .getPublicUrl(thumbFileName);
+        thumbnailUrl = publicUrl;
+      }
+
       const { error } = await supabase
         .from("travel_posts")
         .update({
           caption: caption || null,
           location: location || null,
+          thumbnail_url: thumbnailUrl,
         })
         .eq("id", postId);
 
@@ -66,6 +136,64 @@ const VideoEditModal = ({
         </DialogHeader>
 
         <div className="space-y-4">
+          {videoUrl && (
+            <div className="space-y-2">
+              <Label>Cover Photo</Label>
+              <div className="space-y-2">
+                {previewThumbnail && (
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                    <img 
+                      src={previewThumbnail} 
+                      alt="Cover preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+                <video
+                  ref={videoRef}
+                  src={videoUrl}
+                  className="w-full rounded-lg bg-black"
+                  controls
+                  preload="metadata"
+                />
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={captureVideoFrame}
+                    disabled={saving}
+                    className="flex-1"
+                  >
+                    <Camera className="h-4 w-4 mr-2" />
+                    Capture Frame
+                  </Button>
+                  <div className="relative flex-1">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                      disabled={saving}
+                      className="hidden"
+                      id="edit-thumbnail-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => document.getElementById('edit-thumbnail-upload')?.click()}
+                      disabled={saving}
+                      className="w-full"
+                    >
+                      <UploadIcon className="h-4 w-4 mr-2" />
+                      Upload Image
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-2">
             <Label htmlFor="caption">Caption</Label>
             <Textarea
