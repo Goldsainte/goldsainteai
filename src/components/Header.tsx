@@ -259,6 +259,10 @@ export const Header = () => {
                           <Video className="h-4 w-4 flex-shrink-0" />
                           Travel Feed
                         </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => navigate('/creator-dashboard')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
+                          <TrendingUp className="h-4 w-4 flex-shrink-0" />
+                          Creator Dashboard
+                        </DropdownMenuItem>
                         
                         {isAdmin && (
                           <>
