@@ -54,6 +54,10 @@ function AppContent() {
   const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];
   const showHeader = !hideHeaderPages.some(page => location.pathname.startsWith(page));
 
+  // Don't show AI Booking Concierge on Horizon pages
+  const hideAIBookingPages = ['/travel-feed', '/travel-profile', '/travel-settings', '/search', '/trending'];
+  const showAIBooking = !hideAIBookingPages.some(page => location.pathname.startsWith(page));
+
   return (
     <div className="min-h-screen w-full flex flex-col">
       <SkipNavigation />
@@ -100,7 +104,7 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <AIBookingConcierge />
+      {showAIBooking && <AIBookingConcierge />}
     </div>
   );
 }
