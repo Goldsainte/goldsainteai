@@ -140,7 +140,7 @@ export const Header = () => {
               </a>
 
               {/* Compact Search Bar - Center */}
-              <div className="flex justify-center" data-tour="search">
+              <div className="flex justify-center" data-tour="traditional-search">
                 <CompactHeaderSearch />
               </div>
 
@@ -330,6 +330,7 @@ export const Header = () => {
               onClick={() => navigate('/travel-feed')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Places"
+              data-tour="places"
             >
               <Video className="h-5 w-5" />
               <span className="text-xs">Places</span>
@@ -339,6 +340,7 @@ export const Header = () => {
               onClick={() => navigate('/marketplace')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Marketplace"
+              data-tour="marketplace"
             >
               <Briefcase className="h-5 w-5" />
               <span className="text-xs">Marketplace</span>

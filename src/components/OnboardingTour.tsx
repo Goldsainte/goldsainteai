@@ -16,34 +16,34 @@ export const OnboardingTour = () => {
   const steps: Step[] = [
     {
       target: "body",
-      content: "Welcome to Goldsainte.Ai! Let's take a quick tour of all the amazing features available to you.",
+      content: "Welcome to Goldsainte.Ai! Let's take a quick tour of the key features that make travel planning effortless.",
       placement: "center",
       disableBeacon: true,
     },
     {
-      target: '[data-tour="search"]',
-      content: "Use the search bar to find flights, hotels, destinations, and more. Our AI-powered search makes planning easy.",
+      target: '[data-tour="ai-search"]',
+      content: "Meet your AI Travel Agent! Just type naturally - 'Find me a beach resort in Bali' or 'Romantic dinner in Paris'. Our AI understands and delivers instant results.",
       placement: "bottom",
     },
     {
       target: '[data-tour="ai-widget"]',
-      content: "Your personal AI booking concierge is here! Chat with our AI assistant to plan trips, get recommendations, and make bookings instantly.",
+      content: "Your personal AI Booking Concierge! Chat anytime for travel advice, bookings, itinerary changes, or recommendations. It's like having a travel expert in your pocket.",
       placement: "left",
     },
     {
-      target: '[data-tour="navigation"]',
-      content: "Navigate through different sections: browse travel content, find expert agents, view your bookings, and more.",
+      target: '[data-tour="traditional-search"]',
+      content: "Prefer the classic way? Use our traditional search to filter by dates, prices, and preferences. Perfect for when you know exactly what you want.",
       placement: "bottom",
     },
     {
-      target: '[data-tour="explore"]',
-      content: "Discover curated destinations, luxury experiences, and travel inspiration from our community of creators.",
-      placement: "top",
+      target: '[data-tour="places"]',
+      content: "Explore Goldsainte Places! Discover travel content, videos, and inspiration from creators worldwide. Get ideas for your next adventure.",
+      placement: "bottom",
     },
     {
-      target: '[data-tour="profile"]',
-      content: "Access your profile, bookings, favorites, and settings here. You can also become a travel creator or expert agent!",
-      placement: "left",
+      target: '[data-tour="marketplace"]',
+      content: "Need expert help? Post your trip request and let verified travel agents compete for your business with custom proposals and pricing.",
+      placement: "bottom",
     },
   ];
 
