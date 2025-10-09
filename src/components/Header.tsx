@@ -189,6 +189,10 @@ export const Header = () => {
                     <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer min-h-[44px] text-sm">
                       Booking Preferences
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
+                      <Video className="h-4 w-4 flex-shrink-0" />
+                      Travel Feed
+                    </DropdownMenuItem>
                     
                     {isAdmin && (
                       <>
