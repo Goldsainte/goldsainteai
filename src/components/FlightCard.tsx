@@ -9,18 +9,24 @@ import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 
 const AirlineLogo = ({ carrierCode, className }: { carrierCode: string; className?: string }) => {
   const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
   
-  if (imageError) {
+  if (!carrierCode || imageError) {
     return <Plane className={className} />;
   }
   
   return (
-    <img 
-      src={`https://images.kiwi.com/airlines/64/${carrierCode}.png`}
-      alt={carrierCode}
-      className={className}
-      onError={() => setImageError(true)}
-    />
+    <>
+      {!imageLoaded && <Plane className={className} />}
+      <img 
+        src={`https://images.kiwi.com/airlines/64/${carrierCode}.png`}
+        alt={carrierCode}
+        className={`${className} ${!imageLoaded ? 'hidden' : ''}`}
+        onLoad={() => setImageLoaded(true)}
+        onError={() => setImageError(true)}
+        loading="eager"
+      />
+    </>
   );
 };
 
