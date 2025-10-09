@@ -39,16 +39,16 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 2 - AI Search */}
+            {/* Feature 2 - AI Search & Agent */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">AI-powered search & planning.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">Personal AI agent that learns your preferences.</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Search flights, hotels, restaurants, events, and packages in one conversation. 
-                  Get personalized recommendations tailored to your style.
+                  Build your own AI travel agent by teaching it your travel style, budget, and preferences. 
+                  It learns from every interaction to deliver increasingly personalized recommendations for flights, hotels, restaurants, and experiences.
                 </p>
               </div>
             </div>
