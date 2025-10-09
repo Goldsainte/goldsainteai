@@ -29,6 +29,9 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
   const [location, setLocation] = useState("");
   const [embedUrl, setEmbedUrl] = useState("");
   const [originalCreator, setOriginalCreator] = useState("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string>("");
+  const videoRef = useState<HTMLVideoElement | null>(null)[0];
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
@@ -51,6 +54,43 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
       }
       
       setVideoFile(file);
+      // Create preview URL for video scrubbing
+      const url = URL.createObjectURL(file);
+      setVideoPreviewUrl(url);
+    }
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      setThumbnailFile(file);
+    }
+  };
+
+  const captureVideoFrame = () => {
+    if (!videoRef) {
+      toast.error('Video not loaded');
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.videoWidth;
+    canvas.height = videoRef.videoHeight;
+    const ctx = canvas.getContext('2d');
+    
+    if (ctx) {
+      ctx.drawImage(videoRef, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
+          setThumbnailFile(file);
+          toast.success('Frame captured as thumbnail');
+        }
+      }, 'image/jpeg', 0.9);
     }
   };
 
@@ -105,6 +145,7 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
     setUploading(true);
 
     try {
+      // Upload video
       const fileExt = videoFile.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       
@@ -121,11 +162,33 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
         .from('travel-videos')
         .getPublicUrl(fileName);
 
+      // Upload thumbnail if provided
+      let thumbnailUrl = null;
+      if (thumbnailFile) {
+        const thumbExt = thumbnailFile.name.split('.').pop();
+        const thumbFileName = `${user.id}/thumbnails/${Date.now()}.${thumbExt}`;
+        
+        const { error: thumbUploadError } = await supabase.storage
+          .from('travel-videos')
+          .upload(thumbFileName, thumbnailFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (!thumbUploadError) {
+          const { data: { publicUrl: thumbPublicUrl } } = supabase.storage
+            .from('travel-videos')
+            .getPublicUrl(thumbFileName);
+          thumbnailUrl = thumbPublicUrl;
+        }
+      }
+
       const { error: insertError } = await supabase
         .from('travel_posts')
         .insert([{
           user_id: user.id,
           video_url: publicUrl,
+          thumbnail_url: thumbnailUrl,
           caption: caption || null,
           location: location || null,
           status: 'active',
@@ -138,6 +201,8 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
       setVideoFile(null);
       setCaption("");
       setLocation("");
+      setThumbnailFile(null);
+      setVideoPreviewUrl("");
       
       onSuccess();
     } catch (error: any) {
@@ -185,6 +250,63 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
                 )}
               </div>
             </div>
+
+            {videoPreviewUrl && (
+              <div className="space-y-2">
+                <Label>Cover Image</Label>
+                <div className="space-y-2">
+                  <video
+                    ref={(el) => {
+                      if (el) {
+                        // @ts-ignore
+                        videoRef = el;
+                      }
+                    }}
+                    src={videoPreviewUrl}
+                    className="w-full rounded-lg bg-black"
+                    controls
+                    preload="metadata"
+                  />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={captureVideoFrame}
+                      disabled={uploading}
+                      className="flex-1"
+                    >
+                      Capture Current Frame
+                    </Button>
+                    <div className="relative flex-1">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleThumbnailChange}
+                        disabled={uploading}
+                        className="hidden"
+                        id="thumbnail-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById('thumbnail-upload')?.click()}
+                        disabled={uploading}
+                        className="w-full"
+                      >
+                        Upload Cover Image
+                      </Button>
+                    </div>
+                  </div>
+                  {thumbnailFile && (
+                    <p className="text-xs text-muted-foreground">
+                      Cover image selected: {thumbnailFile.name}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-2">
               <Label>Caption</Label>

@@ -390,7 +390,7 @@ const TravelProfile = () => {
               {userPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-[9/16] bg-muted cursor-pointer group"
+                  className="relative aspect-square bg-muted cursor-pointer group"
                   onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
                 >
                   {post.thumbnail_url ? (
@@ -433,7 +433,7 @@ const TravelProfile = () => {
                 {likedPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="relative aspect-[9/16] bg-muted cursor-pointer group"
+                    className="relative aspect-square bg-muted cursor-pointer group"
                     onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
                   >
                     {post.thumbnail_url ? (
