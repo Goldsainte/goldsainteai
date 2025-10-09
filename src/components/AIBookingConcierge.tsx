@@ -46,7 +46,14 @@ export const AIBookingConcierge = () => {
   // Load user's AI agent profile and restore conversation
   useEffect(() => {
     const loadAgentProfile = async () => {
-      if (!user) return;
+      if (!user) {
+        // Set default greeting even without user
+        setMessages([{
+          role: 'assistant',
+          content: `Hello! I'm your Goldsainte AI Concierge.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+        }]);
+        return;
+      }
       
       const { data, error } = await supabase
         .from('ai_agent_profiles')
@@ -67,15 +74,15 @@ export const AIBookingConcierge = () => {
           const now = Date.now();
           const hoursSinceLastMessage = (now - savedTime) / (1000 * 60 * 60);
 
-          // Restore conversation if less than 24 hours old and has messages
-          if (hoursSinceLastMessage < 24 && parsed.messages?.length > 0) {
+          // Restore conversation if less than 24 hours old and has valid messages
+          if (hoursSinceLastMessage < 24 && Array.isArray(parsed.messages) && parsed.messages.length > 0) {
+            console.log('Restoring conversation from localStorage:', parsed.messages.length, 'messages');
             setMessages(parsed.messages);
             shouldUseInitialGreeting = false;
-            console.log('Restored conversation from localStorage');
           } else {
             // Clear old conversation
+            console.log('Clearing old conversation');
             localStorage.removeItem('aiConciergeConversation');
-            console.log('Cleared old conversation');
           }
         } catch (e) {
           console.error('Failed to parse saved conversation:', e);
@@ -86,6 +93,7 @@ export const AIBookingConcierge = () => {
       // Set initial greeting only if not restoring a conversation
       if (shouldUseInitialGreeting) {
         const agentName = data?.agent_name || "your Goldsainte AI Concierge";
+        console.log('Setting initial greeting with agent:', agentName);
         setMessages([{
           role: 'assistant',
           content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
