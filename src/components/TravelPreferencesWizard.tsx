@@ -545,7 +545,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
       <Card className="p-8">
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">{steps[currentStep].icon}</div>
-          <h2 className="text-2xl font-semibold mb-2">{steps[currentStep].title}</h2>
+          <h2 className="text-2xl font-chiffon mb-2">{steps[currentStep].title}</h2>
           <p className="text-muted-foreground">{steps[currentStep].subtitle}</p>
         </div>
 
