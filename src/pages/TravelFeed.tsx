@@ -233,7 +233,7 @@ const TravelFeed = () => {
               variant="ghost"
               size="icon"
               onClick={() => navigate('/travel-profile')}
-              className="text-white hover:bg-white/20 h-9 w-9"
+              className="text-white hover:bg-white/20 h-9 w-9 border-2 border-secondary backdrop-blur-sm rounded-full"
               aria-label="Home"
             >
               <Home className="h-5 w-5" />
@@ -250,23 +250,15 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-settings')}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9"
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9 border-2 border-secondary"
               >
                 <Settings className="h-5 w-5" />
               </Button>
               <Button
                 variant="ghost"
-                size="sm"
-                onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-3 h-9 font-semibold text-xs"
-              >
-                Profile
-              </Button>
-              <Button
-                variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9"
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9 border-2 border-secondary"
               >
                 <Plus className="h-5 w-5" />
               </Button>
