@@ -4,10 +4,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
+import VideoEditModal from "./VideoEditModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { renderTextWithHashtags } from "@/lib/hashtagHelpers";
 
 interface TravelVideoCardProps {
@@ -48,6 +55,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
   const [videoLoading, setVideoLoading] = useState(true);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const isOwnPost = user?.id === post.user_id;
 
   useEffect(() => {
     checkIfLiked();
@@ -226,9 +236,21 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
               )}
             </div>
           </div>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="h-5 w-5" />
-          </Button>
+          {isOwnPost && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Video/Image */}
@@ -336,6 +358,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
             setLocalCommentCount(prev => prev + 1);
             onUpdate();
           }}
+        />
+
+        {/* Edit Modal */}
+        <VideoEditModal
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          postId={post.id}
+          currentCaption={post.caption}
+          currentLocation={post.location}
+          onSuccess={onUpdate}
         />
       </div>
     );
@@ -473,9 +505,21 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
               <span className="text-xs font-bold drop-shadow-lg">Share</span>
             </button>
 
-            <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-transform active:scale-90">
-              <MoreVertical className="h-7 w-7" />
-            </button>
+            {isOwnPost && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-transform active:scale-90">
+                    <MoreVertical className="h-7 w-7" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Post
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
@@ -489,6 +533,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile' }: Travel
           setLocalCommentCount(prev => prev + 1);
           onUpdate();
         }}
+      />
+
+      {/* Edit Modal */}
+      <VideoEditModal
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        postId={post.id}
+        currentCaption={post.caption}
+        currentLocation={post.location}
+        onSuccess={onUpdate}
       />
     </div>
   );
