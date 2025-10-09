@@ -35,35 +35,30 @@ export const OnboardingTour = () => {
       target: '[data-tour="ai-search"]',
       content: "Meet your AI Travel Agent! Just type naturally - 'Find me a beach resort in Bali' or 'Romantic dinner in Paris'. Our AI understands and delivers instant results.",
       placement: "bottom",
-      offset: 10,
       disableBeacon: true,
     },
     {
       target: '[data-tour="ai-widget"]',
       content: "Your personal AI Booking Concierge! Chat anytime for travel advice, bookings, itinerary changes, or recommendations. It's like having a travel expert in your pocket.",
       placement: window.innerWidth < 768 ? "top" : "left",
-      offset: window.innerWidth < 768 ? 10 : 20,
       disableBeacon: true,
     },
     {
       target: '[data-tour="traditional-search"]',
       content: "Prefer the classic way? Use our traditional search to filter by dates, prices, and preferences. Perfect for when you know exactly what you want.",
       placement: "bottom",
-      offset: 10,
       disableBeacon: true,
     },
     {
       target: '[data-tour="places"]',
       content: "Explore Goldsainte Places! Discover travel content, videos, and inspiration from creators worldwide. Get ideas for your next adventure.",
       placement: "bottom",
-      offset: 10,
       disableBeacon: true,
     },
     {
       target: '[data-tour="marketplace"]',
       content: "Need expert help? Post your trip request and let verified travel agents compete for your business with custom proposals and pricing.",
       placement: "bottom",
-      offset: 10,
       disableBeacon: true,
     },
   ];
@@ -122,6 +117,13 @@ export const OnboardingTour = () => {
           transform: none !important; 
           position: fixed !important;
         }
+        @media (max-width: 768px) {
+          .__floater__body {
+            left: 16px !important;
+            right: 16px !important;
+            max-width: calc(100vw - 32px) !important;
+          }
+        }
         body.react-joyride-active {
           overflow: hidden !important;
         }
@@ -149,13 +151,15 @@ export const OnboardingTour = () => {
           },
           tooltip: {
             borderRadius: window.innerWidth < 768 ? "12px" : "16px",
-            padding: window.innerWidth < 768 ? "14px 16px" : "18px 22px",
+            padding: window.innerWidth < 768 ? "14px" : "18px 22px",
             fontSize: window.innerWidth < 768 ? "12px" : "13px",
-            maxWidth: window.innerWidth < 768 ? "280px" : "320px",
+            maxWidth: window.innerWidth < 768 ? "calc(100vw - 32px)" : "320px",
+            width: window.innerWidth < 768 ? "calc(100vw - 32px)" : "auto",
             backgroundColor: "rgba(255, 255, 255, 0.98)",
             backdropFilter: "blur(24px) saturate(180%)",
             border: "1px solid rgba(255, 255, 255, 0.8)",
             boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)",
+            margin: window.innerWidth < 768 ? "0 16px" : "0",
           },
           tooltipContainer: {
             textAlign: "left" as const,
