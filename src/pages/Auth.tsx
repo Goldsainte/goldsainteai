@@ -139,8 +139,8 @@ const Auth = () => {
       <Card className="w-full max-w-md p-8">
         <div className="flex flex-col items-center mb-8">
           <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
-          <h1 className="text-2xl font-bold text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-            Welcome to Goldsainte AI
+          <h1 className="text-2xl font-chiffon text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+            Welcome to Goldsainte Ai
           </h1>
           <p className="text-sm text-muted-foreground text-center mt-2">
             Sign in to save your favorite travel destinations
