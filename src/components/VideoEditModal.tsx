@@ -190,65 +190,69 @@ const VideoEditModal = ({
           <DialogTitle>Edit Post</DialogTitle>
         </DialogHeader>
 
+        {/* Sticky Video Preview with Capture Controls */}
+        {videoUrl && (
+          <div className="space-y-2 border-b pb-4">
+            <Label>Video Preview & Capture</Label>
+            <div className="relative w-full aspect-[9/16] max-h-[400px] rounded-lg overflow-hidden bg-black">
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                className="absolute inset-0 w-full h-full object-cover"
+                controls
+                preload="metadata"
+                crossOrigin="anonymous"
+                playsInline
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={captureVideoFrame}
+                disabled={saving}
+                className="flex-1"
+              >
+                <Camera className="h-4 w-4 mr-2" />
+                Capture Frame
+              </Button>
+              <div className="relative flex-1">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailChange}
+                  disabled={saving}
+                  className="hidden"
+                  id="edit-thumbnail-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById('edit-thumbnail-upload')?.click()}
+                  disabled={saving}
+                  className="w-full"
+                >
+                  <UploadIcon className="h-4 w-4 mr-2" />
+                  Upload Image
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Scrollable Content */}
         <div className="space-y-4 overflow-y-auto flex-1 pr-2">
-          {videoUrl && (
+          {previewThumbnail && (
             <div className="space-y-2">
-              <Label>Cover Photo</Label>
-              <div className="space-y-2">
-                {previewThumbnail && (
-                  <div className="relative w-full aspect-video rounded-lg overflow-hidden">
-                    <img 
-                      src={previewThumbnail} 
-                      alt="Cover preview" 
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="relative w-full aspect-[9/16] max-h-[500px] rounded-lg overflow-hidden bg-black">
-                  <video
-                    ref={videoRef}
-                    src={videoUrl}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    controls
-                    preload="metadata"
-                    crossOrigin="anonymous"
-                    playsInline
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={captureVideoFrame}
-                    disabled={saving}
-                    className="flex-1"
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    Capture Frame
-                  </Button>
-                  <div className="relative flex-1">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleThumbnailChange}
-                      disabled={saving}
-                      className="hidden"
-                      id="edit-thumbnail-upload"
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => document.getElementById('edit-thumbnail-upload')?.click()}
-                      disabled={saving}
-                      className="w-full"
-                    >
-                      <UploadIcon className="h-4 w-4 mr-2" />
-                      Upload Image
-                    </Button>
-                  </div>
-                </div>
+              <Label>Current Cover Photo</Label>
+              <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+                <img 
+                  src={previewThumbnail} 
+                  alt="Cover preview" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           )}
