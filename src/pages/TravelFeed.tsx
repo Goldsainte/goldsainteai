@@ -235,8 +235,9 @@ const TravelFeed = () => {
                 size="icon"
                 onClick={() => navigate('/')}
                 className="text-white hover:bg-white/20"
+                aria-label="Home"
               >
-                <ChevronLeft className="h-6 w-6" />
+                <Home className="h-6 w-6" />
               </Button>
               <ClearSampleDataButton />
             </div>
