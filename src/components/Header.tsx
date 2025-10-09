@@ -104,52 +104,24 @@ export const Header = () => {
 
           {/* Right side actions */}
           <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-            {user && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => navigate("/search")}
-                  className="h-10 w-10 sm:h-11 sm:w-11"
-                >
-                  <Search className="h-5 w-5" />
-                </Button>
-          <NotificationCenter />
-          
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/search")}
-            className="text-foreground hover:text-primary"
-            aria-label="Search"
-          >
-            <Search className="h-5 w-5" />
-          </Button>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/trending")}
-            className="text-foreground hover:text-primary"
-            aria-label="Trending"
-          >
-            <TrendingUp className="h-5 w-5" />
-          </Button>
-              </>
-            )}
+            {user && <NotificationCenter />}
+            {/* Main Navigation - Desktop & Mobile */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
                   variant="ghost" 
-                  size="sm"
-                  className="gap-1 text-xs sm:text-sm font-medium hover:bg-muted hidden sm:flex h-10 sm:h-11 px-2 sm:px-3"
-                  aria-label="Services menu"
+                  size="icon"
+                  className="h-10 w-10 sm:h-11 sm:w-11"
+                  aria-label="Main menu"
                 >
-                  <Briefcase className="h-4 w-4 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Services</span>
+                  <Menu className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="center" className="w-56 bg-background border-border z-[100] touch-manipulation">
+              <DropdownMenuContent align="end" className="w-72 bg-background border-border z-[100] touch-manipulation">
+                {/* Travel Section */}
+                <div className="px-2 py-1.5">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider">Travel</p>
+                </div>
                 <DropdownMenuItem onClick={() => handleServiceClick('hotels')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
                   <Hotel className="h-4 w-4 text-primary flex-shrink-0" />
                   <span>Hotels & Stays</span>
@@ -170,32 +142,47 @@ export const Header = () => {
                   <Car className="h-4 w-4 text-primary flex-shrink-0" />
                   <span>Car Rentals</span>
                 </DropdownMenuItem>
+                
                 <DropdownMenuSeparator />
+                
+                {/* Horizon Section */}
+                <div className="px-2 py-1.5">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider">Horizon</p>
+                </div>
+                <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
+                  <Video className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>Travel Feed</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/trending')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
+                  <TrendingUp className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>Trending</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/search')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
+                  <Search className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>Explore</span>
+                </DropdownMenuItem>
+                
+                <DropdownMenuSeparator />
+                
+                {/* Travel Agent Marketplace Section */}
+                <div className="px-2 py-1.5">
+                  <p className="text-xs font-semibold text-primary uppercase tracking-wider">Agent Marketplace</p>
+                </div>
                 <DropdownMenuItem onClick={() => navigate('/browse-agents')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
                   <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span>Travel Agents</span>
+                  <span>Browse Agents</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate('/marketplace')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
                   <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
                   <span>Marketplace</span>
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/travel-feed')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
-                  <Video className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span>Travel Feed</span>
+                <DropdownMenuItem onClick={() => navigate('/agent-onboarding')} className="gap-3 cursor-pointer min-h-[44px] text-sm">
+                  <Briefcase className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span>Become an Agent</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="hidden lg:flex gap-2 text-xs sm:text-sm font-medium hover:bg-muted rounded-full px-2 sm:px-3 h-10 sm:h-11"
-              onClick={() => navigate('/agent-onboarding')}
-            >
-              <span className="hidden xl:inline">Become an Agent</span>
-              <span className="xl:hidden">Agent</span>
-            </Button>
-            
+            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button 
