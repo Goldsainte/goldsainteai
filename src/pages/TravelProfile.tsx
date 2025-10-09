@@ -27,7 +27,9 @@ interface Profile {
 
 interface Post {
   id: string;
-  video_url: string;
+  video_url?: string;
+  image_urls?: string[];
+  media_type?: string;
   thumbnail_url: string | null;
   caption: string | null;
   location: string | null;
@@ -41,8 +43,10 @@ const TravelProfile = () => {
   const { userId } = useParams();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
+  const [videoPosts, setVideoPosts] = useState<Post[]>([]);
   const [likedPosts, setLikedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [stats, setStats] = useState({
     postsCount: 0,
     likesCount: 0,
@@ -58,6 +62,7 @@ const TravelProfile = () => {
     if (profileUserId) {
       fetchProfile();
       fetchUserPosts();
+      fetchVideoPosts();
       fetchLikedPosts();
       fetchStats();
     }
@@ -88,12 +93,13 @@ const TravelProfile = () => {
 
   const fetchUserPosts = async () => {
     try {
-      console.log('Fetching posts for user:', profileUserId);
-      // Base query: user's posts ordered by newest first
+      console.log('Fetching photo posts for user:', profileUserId);
+      // Fetch only photo posts for the Posts tab
       let query: any = supabase
         .from('travel_posts')
-        .select('id, video_url, thumbnail_url, caption, location, view_count, like_count')
+        .select('id, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count')
         .eq('user_id', profileUserId)
+        .eq('media_type', 'photo')
         .order('created_at', { ascending: false });
 
       // Only show active posts for other users; show all on own profile
@@ -108,11 +114,42 @@ const TravelProfile = () => {
         throw error;
       }
       
-      console.log('Fetched posts:', data?.length || 0, 'posts');
+      console.log('Fetched photo posts:', data?.length || 0, 'posts');
       setUserPosts(data || []);
     } catch (error) {
-      console.error('Error fetching user posts:', error);
-      toast.error('Failed to load posts');
+      console.error('Error fetching photo posts:', error);
+      toast.error('Failed to load photos');
+    }
+  };
+
+  const fetchVideoPosts = async () => {
+    try {
+      console.log('Fetching video posts for user:', profileUserId);
+      // Fetch only video posts for the Journeys tab
+      let query: any = supabase
+        .from('travel_posts')
+        .select('id, video_url, media_type, thumbnail_url, caption, location, view_count, like_count')
+        .eq('user_id', profileUserId)
+        .eq('media_type', 'video')
+        .order('created_at', { ascending: false });
+
+      // Only show active posts for other users; show all on own profile
+      if (!isOwnProfile) {
+        query = query.eq('status', 'active');
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        console.error('Error in fetchVideoPosts:', error);
+        throw error;
+      }
+      
+      console.log('Fetched video posts:', data?.length || 0, 'posts');
+      setVideoPosts(data || []);
+    } catch (error) {
+      console.error('Error fetching video posts:', error);
+      toast.error('Failed to load videos');
     } finally {
       setLoading(false);
     }
@@ -137,7 +174,7 @@ const TravelProfile = () => {
 
       const { data: posts, error: postsError } = await supabase
         .from('travel_posts')
-        .select('id, video_url, thumbnail_url, caption, location, view_count, like_count')
+        .select('id, video_url, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count')
         .in('id', postIds)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
@@ -182,6 +219,55 @@ const TravelProfile = () => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB');
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      toast.success('Profile photo updated!');
+      fetchProfile();
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      toast.error(error.message || 'Failed to upload photo');
+    } finally {
+      setUploadingAvatar(false);
+    }
   };
 
   if (!user && !userId) {
@@ -239,9 +325,27 @@ const TravelProfile = () => {
               </AvatarFallback>
             </Avatar>
             {isOwnProfile && (
-              <button className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 ring-2 ring-background">
-                <PlusCircle className="h-4 w-4" />
-              </button>
+              <>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  id="avatar-upload"
+                  disabled={uploadingAvatar}
+                />
+                <button
+                  onClick={() => document.getElementById('avatar-upload')?.click()}
+                  disabled={uploadingAvatar}
+                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 ring-2 ring-background hover:bg-primary/90 transition-colors disabled:opacity-50"
+                >
+                  {uploadingAvatar ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                  ) : (
+                    <PlusCircle className="h-4 w-4" />
+                  )}
+                </button>
+              </>
             )}
           </div>
           
@@ -364,35 +468,26 @@ const TravelProfile = () => {
         </TabsList>
 
         <TabsContent value="journeys" className="mt-0">
-          <div className="flex items-center justify-center p-12 text-center">
-            <div>
-              <Video className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">Journeys view coming soon</p>
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="posts" className="mt-0">
           {loading ? (
             <div className="flex items-center justify-center p-12">
-              <div className="text-muted-foreground">Loading posts...</div>
+              <div className="text-muted-foreground">Loading videos...</div>
             </div>
-          ) : userPosts.length === 0 ? (
+          ) : videoPosts.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 text-center">
               <Video className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No posts yet</p>
+              <p className="text-muted-foreground">No videos yet</p>
               {isOwnProfile && (
                 <Button
                   className="mt-4"
                   onClick={() => navigate('/travel-feed')}
                 >
-                  Create your first post
+                  Create your first video
                 </Button>
               )}
             </div>
           ) : (
             <div className="grid grid-cols-3 gap-1">
-              {userPosts.map((post) => (
+              {videoPosts.map((post) => (
                 <div
                   key={post.id}
                   className="relative aspect-square bg-muted cursor-pointer group"
@@ -407,6 +502,77 @@ const TravelProfile = () => {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
                       <Video className="h-8 w-8 text-white" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                    <div className="text-white text-sm space-y-1 flex items-center gap-3">
+                      <div className="flex items-center gap-1">
+                        <Heart className="h-4 w-4 fill-white" />
+                        <span>{formatNumber(post.like_count)}</span>
+                      </div>
+                      {isOwnProfile && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingPost(post);
+                            setEditOpen(true);
+                          }}
+                          className="ml-2"
+                        >
+                          <Edit className="h-4 w-4 mr-1" /> Edit
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="posts" className="mt-0">
+          {loading ? (
+            <div className="flex items-center justify-center p-12">
+              <div className="text-muted-foreground">Loading photos...</div>
+            </div>
+          ) : userPosts.length === 0 ? (
+            <div className="flex flex-col items-center justify-center p-12 text-center">
+              <Grid3X3 className="h-12 w-12 text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No photos yet</p>
+              {isOwnProfile && (
+                <Button
+                  className="mt-4"
+                  onClick={() => navigate('/travel-feed')}
+                >
+                  Share your first photo
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-3 gap-1">
+              {userPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className="relative aspect-square bg-muted cursor-pointer group"
+                  onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
+                >
+                  {post.image_urls && post.image_urls.length > 0 ? (
+                    <img
+                      src={post.image_urls[0]}
+                      alt={post.caption || 'Photo'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : post.thumbnail_url ? (
+                    <img
+                      src={post.thumbnail_url}
+                      alt={post.caption || 'Photo'}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+                      <Grid3X3 className="h-8 w-8 text-white" />
                     </div>
                   )}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
@@ -455,15 +621,25 @@ const TravelProfile = () => {
                     className="relative aspect-square bg-muted cursor-pointer group"
                     onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
                   >
-                    {post.thumbnail_url ? (
+                    {post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0 ? (
+                      <img
+                        src={post.image_urls[0]}
+                        alt={post.caption || 'Photo'}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : post.thumbnail_url ? (
                       <img
                         src={post.thumbnail_url}
-                        alt={post.caption || 'Video'}
+                        alt={post.caption || 'Content'}
                         className="w-full h-full object-cover"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
-                        <Video className="h-8 w-8 text-white" />
+                        {post.media_type === 'video' ? (
+                          <Video className="h-8 w-8 text-white" />
+                        ) : (
+                          <Grid3X3 className="h-8 w-8 text-white" />
+                        )}
                       </div>
                     )}
                   </div>
@@ -482,9 +658,10 @@ const TravelProfile = () => {
           currentCaption={editingPost.caption}
           currentLocation={editingPost.location}
           currentThumbnailUrl={editingPost.thumbnail_url}
-          videoUrl={editingPost.video_url}
+          videoUrl={editingPost.video_url || null}
           onSuccess={() => {
             fetchUserPosts();
+            fetchVideoPosts();
           }}
         />
       )}
