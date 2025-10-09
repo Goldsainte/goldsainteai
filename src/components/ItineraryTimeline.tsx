@@ -83,7 +83,7 @@ export const ItineraryTimeline = ({ itineraryId }: ItineraryTimelineProps) => {
 
   const fetchItems = async () => {
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("itinerary_items")
         .select("*")
         .eq("itinerary_id", itineraryId)
@@ -105,7 +105,7 @@ export const ItineraryTimeline = ({ itineraryId }: ItineraryTimelineProps) => {
 
     try {
       // Get itinerary to calculate item_date
-      const { data: itinerary } = await (supabase as any)
+      const { data: itinerary } = await supabase
         .from("trip_itineraries")
         .select("start_date")
         .eq("id", itineraryId)
@@ -117,7 +117,7 @@ export const ItineraryTimeline = ({ itineraryId }: ItineraryTimelineProps) => {
       const itemDate = new Date(startDate);
       itemDate.setDate(startDate.getDate() + newItem.day_number - 1);
 
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from("itinerary_items")
         .insert({
           itinerary_id: itineraryId,

@@ -14,7 +14,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 interface ItineraryBuilderProps {
-  jobId: string;
+  jobId?: string;
   userId: string;
   onComplete?: () => void;
 }
@@ -46,10 +46,10 @@ export const ItineraryBuilder = ({ jobId, userId, onComplete }: ItineraryBuilder
 
     setSaving(true);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("trip_itineraries")
         .insert({
-          job_id: jobId,
+          job_id: jobId || null,
           user_id: userId,
           title: formData.title,
           description: formData.description,
@@ -57,7 +57,7 @@ export const ItineraryBuilder = ({ jobId, userId, onComplete }: ItineraryBuilder
           start_date: format(startDate, "yyyy-MM-dd"),
           end_date: format(endDate, "yyyy-MM-dd"),
           status: "draft",
-          created_by: (await supabase.auth.getUser()).data.user?.id,
+          created_by: userId,
         })
         .select()
         .single();

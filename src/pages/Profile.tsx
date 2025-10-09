@@ -5,7 +5,7 @@ import { useUserRole } from "@/hooks/useUserRole";
 import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Settings, Heart, Briefcase, ArrowLeft } from "lucide-react";
+import { CreditCard, Settings, Heart, Briefcase, ArrowLeft, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
 
@@ -92,6 +92,10 @@ export default function Profile() {
                   <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full justify-start gap-2">
                     <Heart className="h-4 w-4" />
                     View Favorites
+                  </Button>
+                  <Button onClick={() => navigate('/my-trips')} variant="outline" className="w-full justify-start gap-2">
+                    <MapPin className="h-4 w-4" />
+                    Manage My Trips & Itineraries
                   </Button>
                   <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full justify-start gap-2">
                     <Briefcase className="h-4 w-4" />

@@ -23,6 +23,7 @@ import AdminInquiries from "./pages/AdminInquiries";
 import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
 import MyJobs from "./pages/MyJobs";
+import MyTrips from "./pages/MyTrips";
 import BookingPreferences from "./pages/BookingPreferences";
 import CommissionDashboard from "./pages/CommissionDashboard";
 import EmailPreview from "./pages/EmailPreview";
@@ -73,6 +74,7 @@ function AppContent() {
           <Route path="/hotel-booking" element={<HotelBooking />} />
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
           <Route path="/my-jobs" element={<MyJobs />} />
+          <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

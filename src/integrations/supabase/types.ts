@@ -740,6 +740,82 @@ export type Database = {
           },
         ]
       }
+      calendar_events: {
+        Row: {
+          agent_id: string
+          color: string | null
+          created_at: string
+          description: string | null
+          end_datetime: string
+          event_type: string
+          id: string
+          is_all_day: boolean | null
+          location: string | null
+          related_itinerary_id: string | null
+          related_job_id: string | null
+          reminder_minutes: number | null
+          start_datetime: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          agent_id: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          end_datetime: string
+          event_type: string
+          id?: string
+          is_all_day?: boolean | null
+          location?: string | null
+          related_itinerary_id?: string | null
+          related_job_id?: string | null
+          reminder_minutes?: number | null
+          start_datetime: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          end_datetime?: string
+          event_type?: string
+          id?: string
+          is_all_day?: boolean | null
+          location?: string | null
+          related_itinerary_id?: string | null
+          related_job_id?: string | null
+          reminder_minutes?: number | null
+          start_datetime?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "calendar_events_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_events_related_itinerary_id_fkey"
+            columns: ["related_itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "trip_itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "calendar_events_related_job_id_fkey"
+            columns: ["related_job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       conversations: {
         Row: {
           created_at: string
@@ -1055,6 +1131,118 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      itinerary_items: {
+        Row: {
+          attachments: Json | null
+          booking_reference: string | null
+          confirmation_number: string | null
+          cost: number | null
+          created_at: string
+          currency: string | null
+          day_number: number
+          description: string | null
+          end_time: string | null
+          id: string
+          item_date: string
+          item_type: string
+          itinerary_id: string
+          location: string | null
+          location_coordinates: Json | null
+          notes: string | null
+          start_time: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          attachments?: Json | null
+          booking_reference?: string | null
+          confirmation_number?: string | null
+          cost?: number | null
+          created_at?: string
+          currency?: string | null
+          day_number: number
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          item_date: string
+          item_type: string
+          itinerary_id: string
+          location?: string | null
+          location_coordinates?: Json | null
+          notes?: string | null
+          start_time?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          attachments?: Json | null
+          booking_reference?: string | null
+          confirmation_number?: string | null
+          cost?: number | null
+          created_at?: string
+          currency?: string | null
+          day_number?: number
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          item_date?: string
+          item_type?: string
+          itinerary_id?: string
+          location?: string | null
+          location_coordinates?: Json | null
+          notes?: string | null
+          start_time?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_items_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "trip_itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itinerary_shares: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          id: string
+          itinerary_id: string
+          permission_level: string
+          shared_by_user_id: string
+          shared_with_email: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          itinerary_id: string
+          permission_level?: string
+          shared_by_user_id: string
+          shared_with_email: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          itinerary_id?: string
+          permission_level?: string
+          shared_by_user_id?: string
+          shared_with_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_shares_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "trip_itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       job_completion_submissions: {
         Row: {
@@ -2358,6 +2546,130 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Relationships: []
+      }
+      travel_documents: {
+        Row: {
+          created_at: string
+          document_number: string | null
+          document_title: string
+          document_type: string
+          expiry_date: string | null
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          issue_date: string | null
+          itinerary_id: string
+          mime_type: string | null
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_number?: string | null
+          document_title: string
+          document_type: string
+          expiry_date?: string | null
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          issue_date?: string | null
+          itinerary_id: string
+          mime_type?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_number?: string | null
+          document_title?: string
+          document_type?: string
+          expiry_date?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          issue_date?: string | null
+          itinerary_id?: string
+          mime_type?: string | null
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "travel_documents_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            isOneToOne: false
+            referencedRelation: "trip_itineraries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_itineraries: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          destination: string
+          end_date: string
+          id: string
+          is_shared: boolean | null
+          job_id: string | null
+          share_token: string | null
+          start_date: string
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          destination: string
+          end_date: string
+          id?: string
+          is_shared?: boolean | null
+          job_id?: string | null
+          share_token?: string | null
+          start_date: string
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          destination?: string
+          end_date?: string
+          id?: string
+          is_shared?: boolean | null
+          job_id?: string | null
+          share_token?: string | null
+          start_date?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_itineraries_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_booking_preferences: {
         Row: {

@@ -59,25 +59,28 @@ export const TravelDocumentUpload = ({
       const fileName = `${userId}/${itineraryId}/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("verification-documents")
+        .from("travel-documents")
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
-        .from("verification-documents")
+        .from("travel-documents")
         .getPublicUrl(fileName);
 
       // Save document record
-      const { error: dbError } = await (supabase as any)
+      const { error: dbError } = await supabase
         .from("travel_documents")
         .insert({
           itinerary_id: itineraryId,
           user_id: userId,
           document_type: formData.document_type,
-          title: formData.title,
-          document_url: publicUrl,
+          document_title: formData.title,
+          file_url: publicUrl,
+          file_name: file.name,
+          file_size: file.size,
+          mime_type: file.type,
           document_number: formData.document_number || null,
           issue_date: formData.issue_date || null,
           expiry_date: formData.expiry_date || null,
