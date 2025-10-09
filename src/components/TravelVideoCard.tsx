@@ -232,41 +232,41 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
         getEmbedComponent()
       ) : null}
 
-      {/* Gradient Overlay */}
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
+      {/* Gradient Overlay - Stronger for better readability */}
+      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
 
       {/* Bottom Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 text-white">
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-3 max-w-[70%]">
             {/* Featured Badge */}
             {post.is_featured && (
-              <Badge className="mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-0">
+              <Badge className="mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-0 text-sm font-bold">
                 ⭐ Featured
               </Badge>
             )}
 
             <div 
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-3 cursor-pointer"
               onClick={() => navigate(`/travel-profile/${post.user_id}`)}
             >
-              <Avatar className="h-10 w-10 border-2 border-white">
+              <Avatar className="h-11 w-11 border-2 border-white ring-2 ring-black/20">
                 <AvatarImage src={post.profiles?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary text-primary-foreground">
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                   {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <div className="flex items-center gap-1">
-                  <p className="font-semibold">{post.profiles?.username || 'Anonymous'}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="font-bold text-base drop-shadow-lg">{post.profiles?.username || 'Anonymous'}</p>
                   {post.profiles?.is_verified && (
-                    <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                    <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500 drop-shadow-lg" />
                   )}
                 </div>
                 {post.location && (
-                  <div className="flex items-center gap-1 text-xs text-white/80">
-                    <MapPin className="h-3 w-3" />
+                  <div className="flex items-center gap-1 text-sm text-white drop-shadow-md">
+                    <MapPin className="h-3.5 w-3.5" />
                     {post.location}
                   </div>
                 )}
@@ -275,13 +275,15 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
 
             {/* Original Creator Attribution */}
             {post.original_creator && (
-              <p className="text-xs text-white/70">
-                Original: {post.original_creator}
-              </p>
+              <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1 inline-block">
+                <p className="text-xs font-medium">
+                  Original: {post.original_creator}
+                </p>
+              </div>
             )}
 
             {post.caption && (
-              <p className="text-sm line-clamp-2">
+              <p className="text-base leading-relaxed drop-shadow-lg font-medium">
                 {renderTextWithHashtags(post.caption, (hashtag) => 
                   navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
                 ).map((part, idx) => 
@@ -292,39 +294,39 @@ const TravelVideoCard = ({ post, isActive, onUpdate }: TravelVideoCardProps) => 
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col items-center gap-4 pb-2">
+          <div className="flex flex-col items-center gap-5 pb-2">
             <button
               onClick={handleLike}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <div className={`rounded-full p-2 ${isLiked ? 'bg-red-500' : 'bg-white/20 backdrop-blur-sm'}`}>
-                <Heart className={`h-6 w-6 ${isLiked ? 'fill-white' : ''}`} />
+              <div className={`rounded-full p-3 shadow-xl ${isLiked ? 'bg-red-500' : 'bg-black/40 backdrop-blur-md'}`}>
+                <Heart className={`h-7 w-7 ${isLiked ? 'fill-white' : ''}`} />
               </div>
-              <span className="text-xs font-semibold">{formatCount(localLikeCount)}</span>
+              <span className="text-sm font-bold drop-shadow-lg">{formatCount(localLikeCount)}</span>
             </button>
 
             <button
               onClick={() => setCommentsOpen(true)}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <div className="rounded-full bg-white/20 backdrop-blur-sm p-2">
-                <MessageCircle className="h-6 w-6" />
+              <div className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl">
+                <MessageCircle className="h-7 w-7" />
               </div>
-              <span className="text-xs font-semibold">{formatCount(localCommentCount)}</span>
+              <span className="text-sm font-bold drop-shadow-lg">{formatCount(localCommentCount)}</span>
             </button>
 
             <button
               onClick={handleShare}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <div className="rounded-full bg-white/20 backdrop-blur-sm p-2">
-                <Share2 className="h-6 w-6" />
+              <div className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl">
+                <Share2 className="h-7 w-7" />
               </div>
-              <span className="text-xs font-semibold">Share</span>
+              <span className="text-xs font-bold drop-shadow-lg">Share</span>
             </button>
 
-            <button className="rounded-full bg-white/20 backdrop-blur-sm p-2 transition-transform active:scale-90">
-              <MoreVertical className="h-6 w-6" />
+            <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-transform active:scale-90">
+              <MoreVertical className="h-7 w-7" />
             </button>
           </div>
         </div>

@@ -162,24 +162,21 @@ const TravelFeed = () => {
           </div>
         )}
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-settings')}
-            className="text-white hover:bg-white/20"
+            className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-10 w-10"
           >
-            <Settings className="h-5 h-5" />
+            <Settings className="h-5 w-5" />
           </Button>
           <Button
             variant="ghost"
-            size="icon"
             onClick={() => navigate('/travel-profile')}
-            className="text-white hover:bg-white/20"
+            className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-4 h-10 font-semibold text-sm"
           >
-            <div className="h-8 w-8 rounded-full bg-white flex items-center justify-center text-black font-bold border-2 border-white">
-              {user?.email?.[0]?.toUpperCase() || 'U'}
-            </div>
+            Profile
           </Button>
         </div>
       </div>
