@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { SearchBar } from "@/components/SearchBar";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -24,6 +26,7 @@ export const Header = () => {
   const { isAdmin } = useUserRole();
   const isMobile = useIsMobile();
   const [usePreferences, setUsePreferences] = useState(true);
+  const [searchSheetOpen, setSearchSheetOpen] = useState(false);
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -313,7 +316,7 @@ export const Header = () => {
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t border-border">
           <div className="grid grid-cols-4 h-16">
             <button
-              onClick={() => navigate('/search')}
+              onClick={() => setSearchSheetOpen(true)}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Search"
             >
@@ -415,6 +418,20 @@ export const Header = () => {
             </DropdownMenu>
           </div>
         </nav>
+      )}
+
+      {/* Mobile Search Sheet */}
+      {isMobile && (
+        <Sheet open={searchSheetOpen} onOpenChange={setSearchSheetOpen}>
+          <SheetContent side="bottom" className="h-[90vh] p-0">
+            <SheetHeader className="p-6 pb-4">
+              <SheetTitle>Search Travel</SheetTitle>
+            </SheetHeader>
+            <div className="overflow-y-auto h-[calc(90vh-5rem)] px-4 pb-6">
+              <SearchBar />
+            </div>
+          </SheetContent>
+        </Sheet>
       )}
     </>
   );
