@@ -85,12 +85,19 @@ const TravelProfile = () => {
   const fetchUserPosts = async () => {
     try {
       console.log('Fetching posts for user:', profileUserId);
-      const { data, error } = await supabase
+      // Base query: user's posts ordered by newest first
+      let query: any = supabase
         .from('travel_posts')
         .select('id, video_url, thumbnail_url, caption, view_count, like_count')
         .eq('user_id', profileUserId)
-        .eq('status', 'active')
         .order('created_at', { ascending: false });
+
+      // Only show active posts for other users; show all on own profile
+      if (!isOwnProfile) {
+        query = query.eq('status', 'active');
+      }
+
+      const { data, error } = await query;
 
       if (error) {
         console.error('Error in fetchUserPosts:', error);
@@ -140,11 +147,17 @@ const TravelProfile = () => {
 
   const fetchStats = async () => {
     try {
-      const { data: posts } = await supabase
+      let query: any = supabase
         .from('travel_posts')
         .select('view_count, like_count')
-        .eq('user_id', profileUserId)
-        .eq('status', 'active');
+        .eq('user_id', profileUserId);
+
+      // Only count active posts for other users
+      if (!isOwnProfile) {
+        query = query.eq('status', 'active');
+      }
+
+      const { data: posts } = await query;
 
       if (posts) {
         const totalViews = posts.reduce((sum, post) => sum + post.view_count, 0);

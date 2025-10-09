@@ -75,6 +75,7 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
         embed_url: embedUrl,
         embed_platform: platform,
         original_creator: originalCreator || null,
+        status: 'active',
       }]);
 
       if (error) throw error;
@@ -127,6 +128,7 @@ const VideoUploadModal = ({ open, onOpenChange, onSuccess }: VideoUploadModalPro
           video_url: publicUrl,
           caption: caption || null,
           location: location || null,
+          status: 'active',
         }]);
 
       if (insertError) throw insertError;
