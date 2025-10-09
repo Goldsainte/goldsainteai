@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload, ChevronLeft, Settings, User, PlusSquare, Home, Search as SearchIcon } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import TravelVideoCard from "@/components/TravelVideoCard";
 import VideoUploadModal from "@/components/VideoUploadModal";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -40,15 +40,18 @@ const TravelFeed = () => {
   const [isPersonalized, setIsPersonalized] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { isAdmin } = useUserRole();
+  const [searchParams] = useSearchParams();
+  const targetPostId = searchParams.get('postId');
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    fetchPosts(targetPostId || undefined);
+  }, [targetPostId]);
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (focusPostId?: string) => {
     try {
-      // Use personalized feed if user is logged in
-      if (user) {
+      let loadedPosts: TravelPost[] = [];
+      // Use personalized feed if user is logged in and we're not targeting a specific post
+      if (user && !focusPostId) {
         const { data, error } = await supabase.functions.invoke('get-personalized-feed');
         
         if (error) {
@@ -56,16 +59,31 @@ const TravelFeed = () => {
           toast.error('Failed to load personalized feed, showing recent posts');
           setIsPersonalized(false);
           // Fallback to chronological feed
-          await fetchChronologicalPosts();
-          return;
+          loadedPosts = await fetchChronologicalPosts();
+        } else {
+          const postsArr = (data as any)?.posts || [];
+          setPosts(postsArr);
+          loadedPosts = postsArr;
+          setIsPersonalized(true);
         }
-        
-        setPosts(data.posts || []);
-        setIsPersonalized(true);
       } else {
-        // Show chronological feed for non-logged in users
+        // Show chronological feed for non-logged in users or when focusing specific post
         setIsPersonalized(false);
-        await fetchChronologicalPosts();
+        loadedPosts = await fetchChronologicalPosts();
+      }
+
+      // If a specific post is requested (from profile grid), jump to it
+      if (focusPostId && loadedPosts.length) {
+        const idx = loadedPosts.findIndex((p) => p.id === focusPostId);
+        if (idx >= 0) {
+          setCurrentIndex(idx);
+          const container = containerRef.current;
+          if (container) {
+            requestAnimationFrame(() => {
+              container.scrollTo({ top: idx * container.clientHeight, behavior: 'instant' as ScrollBehavior });
+            });
+          }
+        }
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
@@ -76,7 +94,7 @@ const TravelFeed = () => {
     }
   };
 
-  const fetchChronologicalPosts = async () => {
+  const fetchChronologicalPosts = async (): Promise<TravelPost[]> => {
     console.log('Fetching chronological posts...');
     const { data, error } = await supabase
       .from('travel_posts')
@@ -110,6 +128,7 @@ const TravelFeed = () => {
     
     console.log('Posts with profiles:', postsWithProfiles.length);
     setPosts(postsWithProfiles);
+    return postsWithProfiles;
   };
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
