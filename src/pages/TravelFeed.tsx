@@ -114,15 +114,17 @@ const TravelFeed = () => {
           <ChevronLeft className="h-6 w-6" />
         </Button>
         <h1 className="text-xl font-bold">Travel Feed</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setUploadModalOpen(true)}
-          className="text-foreground"
-        >
-          <Upload className="h-6 w-6" />
-        </Button>
+        <div className="w-10" /> {/* Spacer for centering */}
       </div>
+
+      {/* Floating Upload Button (FAB) */}
+      <Button
+        onClick={() => setUploadModalOpen(true)}
+        className="absolute bottom-24 right-6 z-20 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90"
+        size="icon"
+      >
+        <Upload className="h-6 w-6" />
+      </Button>
 
       {/* Video Feed - Vertical Scroll */}
       <div
