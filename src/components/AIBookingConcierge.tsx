@@ -85,17 +85,11 @@ export const AIBookingConcierge = () => {
 
       // Set initial greeting only if not restoring a conversation
       if (shouldUseInitialGreeting) {
-        if (data) {
-          setMessages([{
-            role: 'assistant',
-            content: `Hello! I'm ${data.agent_name}.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
-          }]);
-        } else {
-          setMessages([{
-            role: 'assistant',
-            content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
-          }]);
-        }
+        const agentName = data?.agent_name || "your Goldsainte AI Concierge";
+        setMessages([{
+          role: 'assistant',
+          content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+        }]);
       }
     };
 
@@ -157,18 +151,12 @@ export const AIBookingConcierge = () => {
   const clearConversation = () => {
     localStorage.removeItem('aiConciergeConversation');
     
-    // Reset to initial greeting
-    if (agentProfile) {
-      setMessages([{
-        role: 'assistant',
-        content: `Hello! I'm ${agentProfile.agent_name}.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
-      }]);
-    } else {
-      setMessages([{
-        role: 'assistant',
-        content: "Hello! I'm your Goldsainte AI Concierge.\n\nTo get started:\n1. Make sure your microphone is unmuted\n2. Say 'Hey Goldsainte' to activate voice mode\n3. Or type your travel request below\n\nI can help you search AND book flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?"
-      }]);
-    }
+    // Reset to initial greeting with detailed instructions
+    const agentName = agentProfile?.agent_name || "your Goldsainte AI Concierge";
+    setMessages([{
+      role: 'assistant',
+      content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+    }]);
 
     toast({
       title: "Conversation Cleared",
@@ -543,14 +531,14 @@ export const AIBookingConcierge = () => {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={clearConversation}
-                className="text-primary-foreground hover:bg-white/10"
+                className="text-primary-foreground hover:bg-white/10 h-8 w-8"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -562,16 +550,8 @@ export const AIBookingConcierge = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsMinimized(!isMinimized)}
-            className="text-primary-foreground hover:bg-white/10"
-          >
-            {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
             onClick={() => setIsOpen(false)}
-            className="text-primary-foreground hover:bg-white/10"
+            className="text-primary-foreground hover:bg-white/10 h-8 w-8"
           >
             <X className="h-4 w-4" />
           </Button>
