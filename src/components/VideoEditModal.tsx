@@ -179,15 +179,17 @@ const VideoEditModal = ({
                     />
                   </div>
                 )}
-                <video
-                  ref={videoRef}
-                  src={videoUrl}
-                  className="w-full rounded-lg bg-black"
-                  controls
-                  preload="metadata"
-                  crossOrigin="anonymous"
-                  playsInline
-                />
+                <div className="relative w-full aspect-[9/16] max-h-[500px] rounded-lg overflow-hidden bg-black">
+                  <video
+                    ref={videoRef}
+                    src={videoUrl}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    controls
+                    preload="metadata"
+                    crossOrigin="anonymous"
+                    playsInline
+                  />
+                </div>
                 <div className="flex gap-2">
                   <Button
                     type="button"
