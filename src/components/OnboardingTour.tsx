@@ -65,8 +65,11 @@ export const OnboardingTour = () => {
         }
         .react-joyride__tooltip__footer {
           display: flex;
-          flex-direction: column-reverse;
-          gap: 12px;
+          justify-content: center;
+          gap: 8px;
+        }
+        .react-joyride__tooltip__footer button:first-child:last-child {
+          width: 100%;
         }
         .__floater__body > div > div:last-child > div:first-child {
           font-size: 12px;
@@ -76,6 +79,12 @@ export const OnboardingTour = () => {
           padding: 0;
           text-align: center;
         }
+        .__floater {
+          filter: none !important;
+        }
+        .__floater__body {
+          transform: none !important;
+        }
       `}</style>
       <Joyride
         steps={steps}
@@ -83,6 +92,9 @@ export const OnboardingTour = () => {
         continuous
         showProgress
         showSkipButton={false}
+        disableScrolling={true}
+        disableScrollParentFix={true}
+        spotlightClicks={false}
         callback={handleJoyrideCallback}
         styles={{
           options: {
@@ -116,38 +128,35 @@ export const OnboardingTour = () => {
           tooltipFooter: {
             marginTop: window.innerWidth < 768 ? "10px" : "12px",
             display: "flex",
-            flexDirection: "column-reverse" as const,
+            justifyContent: "center",
             gap: "8px",
+          },
+          buttonClose: {
+            color: "hsl(var(--muted-foreground))",
+            width: window.innerWidth < 768 ? "24px" : "28px",
+            height: window.innerWidth < 768 ? "24px" : "28px",
           },
           buttonNext: {
             backgroundColor: "hsl(var(--primary))",
             color: "hsl(var(--primary-foreground))",
             borderRadius: window.innerWidth < 768 ? "6px" : "8px",
-            padding: window.innerWidth < 768 ? "5px 12px" : "6px 14px",
+            padding: window.innerWidth < 768 ? "6px 16px" : "8px 20px",
             fontSize: window.innerWidth < 768 ? "11px" : "12px",
             fontWeight: "600",
             border: "none",
             boxShadow: "0 2px 8px hsl(var(--primary) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
             transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             letterSpacing: "0.01em",
-          },
-          buttonBack: {
-            color: "hsl(var(--foreground))",
-            padding: window.innerWidth < 768 ? "5px 10px" : "6px 12px",
-            fontSize: window.innerWidth < 768 ? "11px" : "12px",
-            fontWeight: "500",
-            borderRadius: window.innerWidth < 768 ? "6px" : "8px",
-            border: "1px solid hsl(var(--border))",
-            backgroundColor: "hsl(var(--background))",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            letterSpacing: "0.01em",
+            width: "100%",
           },
         }}
         locale={{
-          back: "Back",
           close: "Close",
           last: "Finish",
           next: "Next",
+        }}
+        floaterProps={{
+          disableAnimation: true,
         }}
       />
     </>
