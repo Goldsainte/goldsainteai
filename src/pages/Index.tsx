@@ -149,7 +149,10 @@ const Index = () => {
 
   const handleCloseWelcome = () => {
     setShowWelcomeModal(false);
-    try { localStorage.setItem('welcomeDismissed', 'true'); } catch {}
+    try { 
+      localStorage.setItem('welcomeDismissed', 'true');
+      window.dispatchEvent(new Event('welcomeDismissed'));
+    } catch {}
   };
 
   useEffect(() => {

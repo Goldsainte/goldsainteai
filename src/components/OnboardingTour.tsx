@@ -5,12 +5,23 @@ export const OnboardingTour = () => {
   const [run, setRun] = useState(false);
 
   useEffect(() => {
-    // Check if user has seen the tour
-    const hasSeenTour = localStorage.getItem("hasSeenOnboardingTour");
-    if (!hasSeenTour) {
-      // Delay tour start to let page load
-      setTimeout(() => setRun(true), 1000);
+    const hasSeenTour = localStorage.getItem("hasSeenOnboardingTour") === "true";
+    const welcomeDismissed = localStorage.getItem("welcomeDismissed") === "true";
+
+    const startTour = () => {
+      if (!hasSeenTour) {
+        setTimeout(() => setRun(true), 800);
+      }
+    };
+
+    if (!hasSeenTour && welcomeDismissed) {
+      startTour();
     }
+
+    const handleWelcomeDismissed = () => startTour();
+    window.addEventListener("welcomeDismissed", handleWelcomeDismissed);
+
+    return () => window.removeEventListener("welcomeDismissed", handleWelcomeDismissed);
   }, []);
 
   const steps: Step[] = [
@@ -65,11 +76,8 @@ export const OnboardingTour = () => {
         }
         .react-joyride__tooltip__footer {
           display: flex;
-          justify-content: center;
+          justify-content: flex-end;
           gap: 8px;
-        }
-        .react-joyride__tooltip__footer button:first-child:last-child {
-          width: 100%;
         }
         .__floater__body > div > div:last-child > div:first-child {
           font-size: 12px;
@@ -79,12 +87,8 @@ export const OnboardingTour = () => {
           padding: 0;
           text-align: center;
         }
-        .__floater {
-          filter: none !important;
-        }
-        .__floater__body {
-          transform: none !important;
-        }
+        .__floater { filter: none !important; }
+        .__floater__body { transform: none !important; }
       `}</style>
       <Joyride
         steps={steps}
@@ -128,26 +132,33 @@ export const OnboardingTour = () => {
           tooltipFooter: {
             marginTop: window.innerWidth < 768 ? "10px" : "12px",
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "flex-end",
             gap: "8px",
           },
           buttonClose: {
             color: "hsl(var(--muted-foreground))",
-            width: window.innerWidth < 768 ? "24px" : "28px",
-            height: window.innerWidth < 768 ? "24px" : "28px",
+            width: window.innerWidth < 768 ? "18px" : "20px",
+            height: window.innerWidth < 768 ? "18px" : "20px",
+            padding: 0,
+            lineHeight: 1,
+            transform: "scale(0.9)",
+            opacity: 0.9,
           },
           buttonNext: {
             backgroundColor: "hsl(var(--primary))",
             color: "hsl(var(--primary-foreground))",
             borderRadius: window.innerWidth < 768 ? "6px" : "8px",
-            padding: window.innerWidth < 768 ? "6px 16px" : "8px 20px",
+            padding: window.innerWidth < 768 ? "5px 12px" : "6px 14px",
             fontSize: window.innerWidth < 768 ? "11px" : "12px",
             fontWeight: "600",
+            fontFamily: "inherit",
             border: "none",
             boxShadow: "0 2px 8px hsl(var(--primary) / 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15)",
             transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             letterSpacing: "0.01em",
-            width: "100%",
+          },
+          buttonBack: {
+            display: "none",
           },
         }}
         locale={{
