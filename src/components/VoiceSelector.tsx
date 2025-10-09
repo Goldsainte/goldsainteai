@@ -91,14 +91,15 @@ export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorPro
               </div>
               <Button
                 variant="ghost"
-                size="sm"
+                size="default"
+                className="md:size-auto min-h-10 min-w-10"
                 onClick={(e) => {
                   e.stopPropagation();
                   previewVoice(voice.id);
                 }}
                 disabled={playingVoice === voice.id}
               >
-                <Play className="h-4 w-4" />
+                <Play className="h-5 w-5 md:h-4 md:w-4" />
               </Button>
             </div>
           </Card>
