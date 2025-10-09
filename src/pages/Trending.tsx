@@ -30,19 +30,44 @@ const Trending = () => {
 
   const fetchExplorePosts = async () => {
     try {
-      // Fetch posts ordered by engagement (likes + views)
-      const { data, error } = await supabase
+      // Fetch top posts by engagement
+      const { data: topPosts, error: topError } = await supabase
         .from("travel_posts")
-        .select("id, user_id, video_url, thumbnail_url, caption, view_count, like_count, comment_count")
+        .select("id, user_id, video_url, thumbnail_url, caption, view_count, like_count, comment_count, created_at")
         .eq('status', 'active')
         .order("like_count", { ascending: false })
-        .limit(30);
+        .limit(15);
 
-      if (error) throw error;
+      if (topError) throw topError;
+
+      // Fetch recent posts (last 30 days) for discovery
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      
+      const { data: recentPosts, error: recentError } = await supabase
+        .from("travel_posts")
+        .select("id, user_id, video_url, thumbnail_url, caption, view_count, like_count, comment_count, created_at")
+        .eq('status', 'active')
+        .gte('created_at', thirtyDaysAgo.toISOString())
+        .order("created_at", { ascending: false })
+        .limit(15);
+
+      if (recentError) throw recentError;
+
+      // Combine and shuffle for a mixed feed
+      const allPosts = [...(topPosts || []), ...(recentPosts || [])];
+      
+      // Remove duplicates
+      const uniquePosts = allPosts.filter((post, index, self) => 
+        index === self.findIndex(p => p.id === post.id)
+      );
+
+      // Shuffle to create variety
+      const shuffled = uniquePosts.sort(() => Math.random() - 0.5);
 
       // Fetch profiles separately
       const postsWithProfiles = await Promise.all(
-        (data || []).map(async (post) => {
+        shuffled.slice(0, 30).map(async (post) => {
           const { data: profile } = await supabase
             .from('profiles')
             .select('username')
