@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Search as SearchIcon, ChevronLeft, MapPin, CheckCircle2, Loader2 } from "lucide-react";
+import { Search as SearchIcon, ChevronLeft, MapPin, CheckCircle2, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 
 interface SearchUser {
@@ -39,12 +39,19 @@ export default function Search() {
   const [posts, setPosts] = useState<SearchPost[]>([]);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("users");
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
 
   useEffect(() => {
     const q = searchParams.get("q");
     if (q) {
       setQuery(q);
       performSearch(q);
+    }
+    
+    // Load recent searches from localStorage
+    const saved = localStorage.getItem('recentSearches');
+    if (saved) {
+      setRecentSearches(JSON.parse(saved));
     }
   }, [searchParams]);
 
@@ -105,135 +112,211 @@ export default function Search() {
     e.preventDefault();
     if (query.trim()) {
       setSearchParams({ q: query });
+      
+      // Save to recent searches
+      const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 10);
+      setRecentSearches(updated);
+      localStorage.setItem('recentSearches', JSON.stringify(updated));
     }
   };
 
+  const clearRecentSearches = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentSearches');
+  };
+
+  const removeRecentSearch = (search: string) => {
+    const updated = recentSearches.filter(s => s !== search);
+    setRecentSearches(updated);
+    localStorage.setItem('recentSearches', JSON.stringify(updated));
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-6 max-w-2xl">
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="mb-6">
-          <div className="relative">
-            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search users, videos, locations..."
-              className="pl-10"
-              autoFocus
-            />
+    <div className="min-h-screen bg-background flex">
+      {/* Left Sidebar - Instagram Style */}
+      <div className="w-full md:w-96 border-r border-border bg-background flex flex-col h-screen">
+        {/* Header */}
+        <div className="p-4 border-b border-border">
+          <div className="flex items-center gap-4 mb-4">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/')}
+              className="hover:bg-accent"
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </Button>
+            <h1 className="text-2xl font-bold">Search</h1>
           </div>
-        </form>
 
-        {/* Results Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="users">
-              Users {users.length > 0 && `(${users.length})`}
-            </TabsTrigger>
-            <TabsTrigger value="posts">
-              Videos {posts.length > 0 && `(${posts.length})`}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="users" className="space-y-2 mt-4">
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : users.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">
-                {query ? "No users found" : "Search for users"}
-              </p>
-            ) : (
-              users.map((user) => (
-                <Card
-                  key={user.id}
-                  onClick={() => navigate(`/travel-profile/${user.id}`)}
-                  className="p-4 cursor-pointer hover:bg-accent transition-colors"
+          {/* Search Input */}
+          <form onSubmit={handleSearch}>
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search"
+                className="pl-10 bg-muted"
+                autoFocus
+              />
+              {query && (
+                <button
+                  type="button"
+                  onClick={() => setQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={user.avatar_url || undefined} />
-                      <AvatarFallback>
-                        {user.username?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold truncate">
-                          {user.full_name || user.username || "Anonymous"}
-                        </p>
-                        {user.is_verified && (
-                          <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500 flex-shrink-0" />
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        @{user.username || "user"}
-                      </p>
-                      {user.bio && (
-                        <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                          {user.bio}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
-          </TabsContent>
+                  <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                </button>
+              )}
+            </div>
+          </form>
+        </div>
 
-          <TabsContent value="posts" className="space-y-2 mt-4">
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        {/* Recent Searches / Results */}
+        <div className="flex-1 overflow-y-auto">
+          {!query && recentSearches.length > 0 && (
+            <div className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-semibold">Recent</h2>
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={clearRecentSearches}
+                  className="text-blue-500 p-0 h-auto"
+                >
+                  Clear all
+                </Button>
               </div>
-            ) : posts.length === 0 ? (
-              <p className="text-center text-muted-foreground py-12">
-                {query ? "No videos found" : "Search for videos"}
-              </p>
-            ) : (
-              <div className="grid grid-cols-2 gap-2">
-                {posts.map((post) => (
-                  <Card
-                    key={post.id}
-                    onClick={() => navigate("/travel-feed")}
-                    className="overflow-hidden cursor-pointer hover:opacity-80 transition-opacity"
+              <div className="space-y-2">
+                {recentSearches.map((search, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between py-2 hover:bg-accent rounded-lg px-2 cursor-pointer"
+                    onClick={() => {
+                      setQuery(search);
+                      setSearchParams({ q: search });
+                    }}
                   >
-                    <div className="aspect-[9/16] bg-muted relative">
-                      {post.thumbnail_url && (
-                        <img
-                          src={post.thumbnail_url}
-                          alt={post.caption || "Video"}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                      <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
-                        <p className="text-white text-xs line-clamp-2">
-                          {post.caption}
-                        </p>
-                        {post.location && (
-                          <div className="flex items-center gap-1 mt-1">
-                            <MapPin className="h-3 w-3 text-white" />
-                            <p className="text-white text-xs truncate">{post.location}</p>
-                          </div>
-                        )}
-                        <div className="flex gap-3 mt-1">
-                          <span className="text-white text-xs">
-                            ❤️ {post.like_count}
-                          </span>
-                          <span className="text-white text-xs">
-                            👁️ {post.view_count}
-                          </span>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <SearchIcon className="h-5 w-5 text-muted-foreground" />
+                      <span>{search}</span>
                     </div>
-                  </Card>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeRecentSearch(search);
+                      }}
+                      className="hover:opacity-70"
+                    >
+                      <X className="h-4 w-4 text-muted-foreground" />
+                    </button>
+                  </div>
                 ))}
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
+            </div>
+          )}
+
+          {!query && recentSearches.length === 0 && (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-muted-foreground text-center px-4">
+                No recent searches.
+              </p>
+            </div>
+          )}
+
+          {query && (
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full grid grid-cols-2 sticky top-0 bg-background z-10 border-b rounded-none h-12">
+                <TabsTrigger value="users" className="rounded-none">
+                  Users
+                </TabsTrigger>
+                <TabsTrigger value="posts" className="rounded-none">
+                  Videos
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="users" className="p-4 space-y-2 m-0">
+                {loading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : users.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-12">
+                    No users found
+                  </p>
+                ) : (
+                  users.map((user) => (
+                    <div
+                      key={user.id}
+                      onClick={() => navigate(`/travel-profile/${user.id}`)}
+                      className="flex items-center gap-3 p-2 cursor-pointer hover:bg-accent rounded-lg transition-colors"
+                    >
+                      <Avatar className="h-11 w-11">
+                        <AvatarImage src={user.avatar_url || undefined} />
+                        <AvatarFallback>
+                          {user.username?.[0]?.toUpperCase() || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-sm truncate">
+                            {user.username || "Anonymous"}
+                          </p>
+                          {user.is_verified && (
+                            <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500 flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {user.full_name}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </TabsContent>
+
+              <TabsContent value="posts" className="p-4 m-0">
+                {loading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : posts.length === 0 ? (
+                  <p className="text-center text-muted-foreground py-12">
+                    No videos found
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-3 gap-1">
+                    {posts.map((post) => (
+                      <div
+                        key={post.id}
+                        onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
+                        className="aspect-square cursor-pointer hover:opacity-80 transition-opacity relative overflow-hidden rounded"
+                      >
+                        {post.thumbnail_url && (
+                          <img
+                            src={post.thumbnail_url}
+                            alt={post.caption || "Video"}
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          )}
+        </div>
+      </div>
+
+      {/* Right Content Area - Empty for Instagram style */}
+      <div className="hidden md:flex flex-1 items-center justify-center bg-muted/20">
+        <div className="text-center p-8">
+          <SearchIcon className="h-24 w-24 mx-auto text-muted-foreground/20 mb-4" />
+          <p className="text-muted-foreground">Search for people and videos</p>
+        </div>
       </div>
     </div>
   );
