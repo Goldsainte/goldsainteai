@@ -3,11 +3,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
 import { ConversationsList } from "@/components/ConversationsList";
 import { MessageThread } from "@/components/MessageThread";
-import { NotificationCenter } from "@/components/NotificationCenter";
-import { QuickReplyManager } from "@/components/QuickReplyManager";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Loader2, MessageCircle, Edit } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 
 const Messages = () => {
   const { user } = useAuth();
@@ -49,53 +49,98 @@ const Messages = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Messages</h1>
-        <p className="text-muted-foreground">
-          Chat with {isAgent ? "customers" : "agents"}, manage notifications, and stay connected
-        </p>
+    <div className="flex h-screen overflow-hidden">
+      {/* Left Sidebar - Conversations */}
+      <div className="w-full md:w-[400px] border-r flex flex-col bg-background">
+        {/* Header */}
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-xl font-semibold">{user.email?.split('@')[0] || 'Messages'}</h1>
+            <Button variant="ghost" size="icon">
+              <Edit className="h-5 w-5" />
+            </Button>
+          </div>
+
+          {/* Tabs */}
+          <Tabs defaultValue="primary" className="w-full">
+            <TabsList className="w-full justify-start h-auto p-0 bg-transparent border-b rounded-none">
+              <TabsTrigger 
+                value="primary" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-4"
+              >
+                Primary
+              </TabsTrigger>
+              <TabsTrigger 
+                value="general" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-4"
+              >
+                General
+              </TabsTrigger>
+              <TabsTrigger 
+                value="channels" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-4"
+              >
+                Channels
+              </TabsTrigger>
+              <TabsTrigger 
+                value="requests" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-foreground data-[state=active]:bg-transparent px-4"
+              >
+                Requests
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="primary" className="mt-0 flex-1">
+              <ConversationsList
+                userId={user.id}
+                userType={isAgent ? "agent" : "customer"}
+                selectedConversationId={selectedConversationId}
+                onSelectConversation={setSelectedConversationId}
+              />
+            </TabsContent>
+            
+            <TabsContent value="general" className="mt-0">
+              <ConversationsList
+                userId={user.id}
+                userType={isAgent ? "agent" : "customer"}
+                selectedConversationId={selectedConversationId}
+                onSelectConversation={setSelectedConversationId}
+              />
+            </TabsContent>
+            
+            <TabsContent value="channels" className="mt-0">
+              <div className="p-8 text-center text-muted-foreground">
+                <p className="text-sm">No channels yet</p>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="requests" className="mt-0">
+              <div className="p-8 text-center text-muted-foreground">
+                <p className="text-sm">No message requests</p>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Sidebar - Conversations & Notifications */}
-        <div className="lg:col-span-3 space-y-6">
-          <ConversationsList
+      {/* Main Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {selectedConversationId ? (
+          <MessageThread
+            conversationId={selectedConversationId}
             userId={user.id}
             userType={isAgent ? "agent" : "customer"}
-            selectedConversationId={selectedConversationId}
-            onSelectConversation={setSelectedConversationId}
           />
-        </div>
-
-        {/* Main Chat Area */}
-        <div className="lg:col-span-6">
-          {selectedConversationId ? (
-            <MessageThread
-              conversationId={selectedConversationId}
-              userId={user.id}
-              userType={isAgent ? "agent" : "customer"}
-            />
-          ) : (
-            <div className="h-[600px] border rounded-lg flex items-center justify-center text-muted-foreground">
-              <div className="text-center">
-                <p className="text-lg font-medium">No conversation selected</p>
-                <p className="text-sm">Select a conversation from the list to start messaging</p>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full border-2 border-foreground mb-4">
+                <MessageCircle className="h-12 w-12" />
               </div>
+              <h2 className="text-xl font-semibold mb-2">Your messages</h2>
+              <p className="text-muted-foreground mb-6">Send a message to start a chat.</p>
+              <Button>Send message</Button>
             </div>
-          )}
-        </div>
-
-        {/* Right Sidebar - Quick Replies (Agents Only) */}
-        {isAgent && agentId && (
-          <div className="lg:col-span-3">
-            <QuickReplyManager
-              agentId={agentId}
-              onSelectTemplate={(content) => {
-                // This would be used to insert template into message input
-                console.log("Selected template:", content);
-              }}
-            />
           </div>
         )}
       </div>

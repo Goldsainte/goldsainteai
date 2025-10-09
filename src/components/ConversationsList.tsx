@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MessageCircle, Clock } from "lucide-react";
+import { Search, MessageCircle, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -107,85 +106,84 @@ export const ConversationsList = ({
   );
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5" />
-          Messages
-        </CardTitle>
-        <CardDescription>
-          {conversations.length} active {conversations.length === 1 ? "conversation" : "conversations"}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+    <div className="flex flex-col h-full">
+      {/* Search */}
+      <div className="p-4 border-b">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search conversations..."
+            placeholder="Search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-muted border-0 rounded-lg"
           />
         </div>
+      </div>
 
-        <div className="space-y-2 max-h-[600px] overflow-y-auto">
-          {filteredConversations.map((conversation) => {
-            const unreadCount = getUnreadCount(conversation);
-            const isSelected = conversation.id === selectedConversationId;
+      {/* Conversations List */}
+      <ScrollArea className="flex-1">
+        <div>
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : filteredConversations.length === 0 ? (
+            <div className="text-center py-8 px-4">
+              <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <p className="text-sm text-muted-foreground">
+                {searchQuery ? "No conversations found" : "No messages yet"}
+              </p>
+            </div>
+          ) : (
+            filteredConversations.map((conversation) => {
+              const unreadCount = getUnreadCount(conversation);
+              const isSelected = selectedConversationId === conversation.id;
 
-            return (
-              <button
-                key={conversation.id}
-                onClick={() => onSelectConversation(conversation.id)}
-                className={cn(
-                  "w-full p-4 rounded-lg border text-left transition-colors hover:bg-accent",
-                  isSelected && "bg-accent border-primary"
-                )}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3 flex-1 min-w-0">
-                    <Avatar>
-                      <AvatarFallback>
-                        {userType === 'customer' ? 'A' : 'C'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="font-semibold truncate">
-                          {userType === 'customer' ? 'Your Agent' : 'Customer'}
-                        </p>
-                        {unreadCount > 0 && (
-                          <Badge variant="default" className="shrink-0">
-                            {unreadCount}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Job #{conversation.job_id.slice(0, 8)}
+              return (
+                <button
+                  key={conversation.id}
+                  onClick={() => onSelectConversation(conversation.id)}
+                  className={cn(
+                    "w-full p-3 text-left transition-colors flex items-center gap-3 hover:bg-muted",
+                    isSelected && "bg-muted"
+                  )}
+                >
+                  <Avatar className="h-14 w-14 flex-shrink-0">
+                    <AvatarFallback className="text-lg">
+                      {userType === 'customer' ? 'A' : 'C'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-baseline justify-between gap-2 mb-1">
+                      <p className="font-semibold truncate">
+                        {userType === 'customer' ? 'Your Agent' : 'Customer'}
                       </p>
                       {conversation.last_message_at && (
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                          <Clock className="h-3 w-3" />
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">
                           {formatDistanceToNow(new Date(conversation.last_message_at), {
-                            addSuffix: true,
-                          })}
-                        </div>
+                            addSuffix: false,
+                          }).replace('about ', '')}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className={cn(
+                        "text-sm truncate",
+                        unreadCount > 0 ? "font-medium text-foreground" : "text-muted-foreground"
+                      )}>
+                        Job #{conversation.job_id.slice(0, 8)}
+                      </p>
+                      {unreadCount > 0 && (
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                       )}
                     </div>
                   </div>
-                </div>
-              </button>
-            );
-          })}
-
-          {filteredConversations.length === 0 && !loading && (
-            <div className="text-center py-8 text-muted-foreground">
-              <MessageCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No conversations found</p>
-            </div>
+                </button>
+              );
+            })
           )}
         </div>
-      </CardContent>
-    </Card>
+      </ScrollArea>
+    </div>
   );
 };
