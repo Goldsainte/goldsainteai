@@ -86,7 +86,12 @@ serve(async (req) => {
     const scoredPosts = postsWithProfiles.map(post => {
       let score = 0;
       
-      // Boost posts from followed accounts (highest priority)
+      // Always include your own posts prominently
+      if (post.user_id === user.id) {
+        score += 1000;
+      }
+      
+      // Boost posts from followed accounts (high priority)
       if (followingIds.includes(post.user_id)) {
         score += 100;
       }
