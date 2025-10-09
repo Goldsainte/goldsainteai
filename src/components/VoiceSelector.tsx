@@ -12,16 +12,11 @@ interface VoiceSelectorProps {
 
 const AVAILABLE_VOICES = [
   { id: 'alloy', name: 'Alloy', description: 'Neutral and balanced' },
-  { id: 'ash', name: 'Ash', description: 'Smooth and conversational' },
-  { id: 'ballad', name: 'Ballad', description: 'Melodic and soothing' },
-  { id: 'coral', name: 'Coral', description: 'Vibrant and upbeat' },
   { id: 'echo', name: 'Echo', description: 'Clear and professional' },
   { id: 'fable', name: 'Fable', description: 'Warm and expressive' },
   { id: 'onyx', name: 'Onyx', description: 'Deep and authoritative' },
   { id: 'nova', name: 'Nova', description: 'Energetic and friendly' },
-  { id: 'sage', name: 'Sage', description: 'Wise and thoughtful' },
   { id: 'shimmer', name: 'Shimmer', description: 'Bright and engaging' },
-  { id: 'verse', name: 'Verse', description: 'Articulate and refined' },
 ];
 
 export const VoiceSelector = ({ selectedVoice, onVoiceSelect }: VoiceSelectorProps) => {
