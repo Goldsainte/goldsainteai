@@ -2,15 +2,16 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Footer } from "@/components/Footer";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, MapPin, Briefcase, Search, ArrowLeft } from "lucide-react";
+import { Search, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { EnhancedAgentCard } from "@/components/EnhancedAgentCard";
+import { RealTimeBookingNotifications } from "@/components/RealTimeBookingNotifications";
 
 
 export default function BrowseAgents() {
@@ -26,6 +27,8 @@ export default function BrowseAgents() {
   const [experienceRange, setExperienceRange] = useState<"all" | "0-2" | "3-5" | "5+">("all");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("all");
   const [myAgentProfile, setMyAgentProfile] = useState<any | null>(null);
+  const [agentMetrics, setAgentMetrics] = useState<Record<string, any>>({});
+  const [agentBadges, setAgentBadges] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     fetchAgents();
@@ -64,6 +67,37 @@ export default function BrowseAgents() {
 
       if (error) throw error;
       setAgents(data || []);
+
+      // Fetch metrics and badges for all agents
+      if (data && data.length > 0) {
+        const agentIds = data.map(a => a.id);
+        
+        // Fetch performance metrics
+        const { data: metricsData } = await supabase
+          .from('agent_performance_metrics')
+          .select('*')
+          .in('agent_id', agentIds);
+        
+        const metricsMap: Record<string, any> = {};
+        metricsData?.forEach(m => {
+          metricsMap[m.agent_id] = m;
+        });
+        setAgentMetrics(metricsMap);
+
+        // Fetch badges
+        const { data: badgesData } = await supabase
+          .from('agent_badges')
+          .select('*')
+          .in('agent_id', agentIds)
+          .gte('valid_until', new Date().toISOString());
+        
+        const badgesMap: Record<string, any[]> = {};
+        badgesData?.forEach(b => {
+          if (!badgesMap[b.agent_id]) badgesMap[b.agent_id] = [];
+          badgesMap[b.agent_id].push(b);
+        });
+        setAgentBadges(badgesMap);
+      }
     } catch (error: any) {
       console.error('Error fetching agents:', error);
       toast.error('Failed to load agents');
@@ -305,77 +339,19 @@ export default function BrowseAgents() {
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAgents.map((agent) => (
-              <Card key={agent.id} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate(`/agent/${agent.id}`)}>
-                <CardHeader>
-                  <div className="flex items-start gap-4">
-                    <Avatar className="h-16 w-16">
-                      <AvatarImage src={agent.profile_image_url} />
-                      <AvatarFallback className="text-xl">
-                        {agent.agency_name?.charAt(0) || 'A'}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <CardTitle className="text-lg font-chiffon truncate">
-                        {agent.agency_name}
-                      </CardTitle>
-                      <div className="flex items-center gap-2 mt-1">
-                        <div className="flex items-center gap-1">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-semibold">{agent.rating || 0}</span>
-                        </div>
-                        <span className="text-xs text-muted-foreground">
-                          ({agent.total_reviews || 0})
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="line-clamp-2 mb-3">
-                    {agent.bio || 'No description available'}
-                  </CardDescription>
-
-                  {agent.specializations && agent.specializations.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {agent.specializations.slice(0, 3).map((spec: string) => (
-                        <Badge key={spec} variant="secondary" className="text-xs">
-                          {spec}
-                        </Badge>
-                      ))}
-                      {agent.specializations.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{agent.specializations.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="space-y-2 text-sm">
-                    {agent.destinations && agent.destinations.length > 0 && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <MapPin className="h-4 w-4 flex-shrink-0" />
-                        <span className="truncate">
-                          {agent.destinations.slice(0, 2).join(', ')}
-                          {agent.destinations.length > 2 && ` +${agent.destinations.length - 2}`}
-                        </span>
-                      </div>
-                    )}
-                    {agent.experience_years && (
-                      <div className="flex items-center gap-2 text-muted-foreground">
-                        <Briefcase className="h-4 w-4 flex-shrink-0" />
-                        <span>{agent.experience_years} years experience</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <Button className="w-full mt-4" size="sm">
-                    View Profile
-                  </Button>
-                </CardContent>
-              </Card>
+              <EnhancedAgentCard
+                key={agent.id}
+                agent={agent}
+                metrics={agentMetrics[agent.id]}
+                badges={agentBadges[agent.id]}
+                onClick={() => navigate(`/agent/${agent.id}`)}
+              />
             ))}
           </div>
         )}
+
+        {/* Real-time booking notifications */}
+        <RealTimeBookingNotifications />
       </main>
 
       <Footer />
