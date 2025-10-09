@@ -41,6 +41,8 @@ export const AIBookingConcierge = () => {
   const { toast } = useToast();
   const { user } = useAuth();
 
+  console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
+
   // Load user's AI agent profile
   useEffect(() => {
     const loadAgentProfile = async () => {
@@ -123,9 +125,16 @@ export const AIBookingConcierge = () => {
   };
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    console.log('[AIBookingConcierge] handleSend called, input:', input, 'isLoading:', isLoading);
+    
+    if (!input.trim() || isLoading) {
+      console.log('[AIBookingConcierge] handleSend blocked - empty input or loading');
+      return;
+    }
 
     const userMessage = input.trim();
+    console.log('[AIBookingConcierge] Sending message:', userMessage);
+    
     setInput("");
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setIsLoading(true);
@@ -136,6 +145,7 @@ export const AIBookingConcierge = () => {
       setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
+      console.log('[AIBookingConcierge] Calling edge function:', CHAT_URL);
       
       const resp = await fetch(CHAT_URL, {
         method: "POST",
@@ -150,11 +160,16 @@ export const AIBookingConcierge = () => {
         }),
       });
 
+      console.log('[AIBookingConcierge] Response status:', resp.status);
+
       if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('[AIBookingConcierge] Error response:', errorText);
         throw new Error("Failed to get response");
       }
 
       const data = await resp.json();
+      console.log('[AIBookingConcierge] Response data:', data);
       
       // Update assistant message with response
       setMessages(prev => {
@@ -404,7 +419,10 @@ export const AIBookingConcierge = () => {
       <Tooltip>
         <TooltipTrigger asChild>
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              console.log('[AIBookingConcierge] Button clicked, opening widget');
+              setIsOpen(true);
+            }}
             className="fixed bottom-6 right-6 z-50 group"
             aria-label="Open AI Booking Concierge"
           >
