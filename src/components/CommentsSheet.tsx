@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -8,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Send, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { renderTextWithMentionsAndHashtags } from "@/lib/mentionHelpers";
 
 interface Comment {
   id: string;
@@ -29,6 +31,7 @@ interface CommentsSheetProps {
 
 export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: CommentsSheetProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
@@ -163,7 +166,38 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
                       {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
                     </span>
                   </div>
-                  <p className="text-sm mt-1">{comment.comment_text}</p>
+                  <p className="text-sm mt-1">
+                    {renderTextWithMentionsAndHashtags(
+                      comment.comment_text,
+                      (username) => {
+                        navigate(`/travel-profile?user=${username}`);
+                        onOpenChange(false);
+                      },
+                      (hashtag) => {
+                        navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`);
+                        onOpenChange(false);
+                      }
+                    ).map((part, idx) => {
+                      if (typeof part === 'string') return part;
+                      return (
+                        <button
+                          key={part.key}
+                          onClick={() => {
+                            if (part.type === 'mention') {
+                              navigate(`/travel-profile?user=${part.value}`);
+                              onOpenChange(false);
+                            } else {
+                              navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
+                              onOpenChange(false);
+                            }
+                          }}
+                          className={part.type === 'mention' ? 'font-semibold text-primary hover:underline' : 'text-primary hover:underline'}
+                        >
+                          {part.type === 'mention' ? `@${part.value}` : `#${part.value}`}
+                        </button>
+                      );
+                    })}
+                  </p>
                 </div>
               </div>
             ))
@@ -175,7 +209,7 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
           <Input
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment..."
+            placeholder="Add a comment... Use @username to mention"
             disabled={submitting || !user}
             className="flex-1"
           />
