@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Progress } from "@/components/ui/progress";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, Plane, Globe, Train, Hotel, UtensilsCrossed, Wallet, Target, ClipboardList } from "lucide-react";
 
 interface TravelPreferencesWizardProps {
   preferences: any;
@@ -39,7 +39,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Let's start simple",
       subtitle: "How do you like to travel?",
-      icon: "✈️",
+      icon: Plane,
       content: (
         <div className="space-y-6">
           <div>
@@ -95,7 +95,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Where in the world?",
       subtitle: "Tell us about your dream destinations",
-      icon: "🌍",
+      icon: Globe,
       content: (
         <div className="space-y-6">
           <div>
@@ -154,7 +154,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Getting there",
       subtitle: "Your transportation preferences",
-      icon: "🚄",
+      icon: Train,
       content: (
         <div className="space-y-6">
           <div>
@@ -219,7 +219,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Where you'll stay",
       subtitle: "Accommodation preferences",
-      icon: "🏨",
+      icon: Hotel,
       content: (
         <div className="space-y-6">
           <div>
@@ -274,7 +274,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Food & experiences",
       subtitle: "Tell us about your taste",
-      icon: "🍽️",
+      icon: UtensilsCrossed,
       content: (
         <div className="space-y-6">
           <div>
@@ -322,7 +322,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Timing & budget",
       subtitle: "When and how much",
-      icon: "💰",
+      icon: Wallet,
       content: (
         <div className="space-y-6">
           <div>
@@ -401,7 +401,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "What you love to do",
       subtitle: "Activities and pace",
-      icon: "🎯",
+      icon: Target,
       content: (
         <div className="space-y-6">
           <div>
@@ -441,7 +441,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Almost there!",
       subtitle: "Documentation & logistics",
-      icon: "📋",
+      icon: ClipboardList,
       content: (
         <div className="space-y-6">
           <div>
@@ -491,7 +491,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
     {
       title: "Personalize your experience",
       subtitle: "How should I help you best?",
-      icon: "✨",
+      icon: Sparkles,
       content: (
         <div className="space-y-6">
           <div>
@@ -544,7 +544,12 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
 
       <Card className="p-8">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">{steps[currentStep].icon}</div>
+          <div className="mb-4 flex justify-center">
+            {(() => {
+              const IconComponent = steps[currentStep].icon;
+              return <IconComponent className="h-12 w-12 text-primary" strokeWidth={1.5} />;
+            })()}
+          </div>
           <h2 className="text-2xl font-chiffon mb-2">{steps[currentStep].title}</h2>
           <p className="text-muted-foreground">{steps[currentStep].subtitle}</p>
         </div>
