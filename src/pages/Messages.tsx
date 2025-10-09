@@ -8,6 +8,16 @@ import { useNavigate } from "react-router-dom";
 import { Loader2, MessageCircle, Edit } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 const Messages = () => {
   const { user } = useAuth();
@@ -15,6 +25,9 @@ const Messages = () => {
   const navigate = useNavigate();
   const [selectedConversationId, setSelectedConversationId] = useState<string | undefined>();
   const [agentId, setAgentId] = useState<string | undefined>();
+  const [newMessageDialogOpen, setNewMessageDialogOpen] = useState(false);
+  const [searchUsername, setSearchUsername] = useState("");
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!user && !roleLoading) {
@@ -40,6 +53,50 @@ const Messages = () => {
     fetchAgentId();
   }, [user, isAgent]);
 
+  const handleStartConversation = async () => {
+    if (!searchUsername.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a username",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Find user by username
+      const { data: profile, error: profileError } = await supabase
+        .from("profiles")
+        .select("id, username")
+        .eq("username", searchUsername.trim())
+        .single();
+
+      if (profileError || !profile) {
+        toast({
+          title: "User not found",
+          description: "No user found with that username",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create or find existing conversation
+      toast({
+        title: "Feature coming soon",
+        description: "Direct messaging will be available soon!",
+      });
+      setNewMessageDialogOpen(false);
+      setSearchUsername("");
+    } catch (error) {
+      console.error("Error starting conversation:", error);
+      toast({
+        title: "Error",
+        description: "Failed to start conversation",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (!user || roleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -56,9 +113,39 @@ const Messages = () => {
         <div className="p-4 border-b">
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-xl font-semibold">{user.email?.split('@')[0] || 'Messages'}</h1>
-            <Button variant="ghost" size="icon">
-              <Edit className="h-5 w-5" />
-            </Button>
+            <Dialog open={newMessageDialogOpen} onOpenChange={setNewMessageDialogOpen}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Edit className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>New message</DialogTitle>
+                  <DialogDescription>
+                    Start a conversation with another user
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium">To:</label>
+                    <Input
+                      placeholder="Enter username"
+                      value={searchUsername}
+                      onChange={(e) => setSearchUsername(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleStartConversation();
+                        }
+                      }}
+                    />
+                  </div>
+                  <Button onClick={handleStartConversation} className="w-full">
+                    Start conversation
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
 
           {/* Tabs */}
@@ -139,7 +226,7 @@ const Messages = () => {
               </div>
               <h2 className="text-xl font-semibold mb-2">Your messages</h2>
               <p className="text-muted-foreground mb-6">Send a message to start a chat.</p>
-              <Button>Send message</Button>
+              <Button onClick={() => setNewMessageDialogOpen(true)}>Send message</Button>
             </div>
           </div>
         )}
