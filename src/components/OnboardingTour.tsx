@@ -76,19 +76,30 @@ export const OnboardingTour = () => {
         },
         tooltip: {
           borderRadius: "8px",
-          padding: "16px",
+          padding: window.innerWidth < 768 ? "12px" : "16px",
+          fontSize: window.innerWidth < 768 ? "13px" : "15px",
+          maxWidth: window.innerWidth < 768 ? "280px" : "400px",
+        },
+        tooltipContent: {
+          fontSize: window.innerWidth < 768 ? "13px" : "15px",
+          lineHeight: "1.4",
         },
         buttonNext: {
           backgroundColor: "hsl(var(--primary))",
           color: "hsl(var(--primary-foreground))",
           borderRadius: "6px",
-          padding: "8px 16px",
+          padding: window.innerWidth < 768 ? "6px 12px" : "8px 16px",
+          fontSize: window.innerWidth < 768 ? "13px" : "14px",
         },
         buttonBack: {
           color: "hsl(var(--muted-foreground))",
+          padding: window.innerWidth < 768 ? "6px 12px" : "8px 16px",
+          fontSize: window.innerWidth < 768 ? "13px" : "14px",
         },
         buttonSkip: {
           color: "hsl(var(--muted-foreground))",
+          padding: window.innerWidth < 768 ? "6px 12px" : "8px 16px",
+          fontSize: window.innerWidth < 768 ? "13px" : "14px",
         },
       }}
       locale={{
