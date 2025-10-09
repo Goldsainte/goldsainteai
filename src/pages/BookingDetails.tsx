@@ -47,7 +47,7 @@ export default function BookingDetails() {
       setLoading(true);
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
+        .select('*, travel_agents(agency_name)')
         .eq('id', bookingId)
         .eq('user_id', user?.id)
         .maybeSingle();
@@ -222,9 +222,47 @@ export default function BookingDetails() {
               </div>
               <Separator />
               <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Payment Status</span>
+                <Badge variant={
+                  booking.payment_status === 'completed' ? 'default' : 
+                  booking.payment_status === 'failed' ? 'destructive' : 
+                  'secondary'
+                }>
+                  {booking.payment_status || 'pending'}
+                </Badge>
+              </div>
+              {booking.payment_method && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-muted-foreground">Payment Method</span>
+                  <span className="capitalize">{booking.payment_method}</span>
+                </div>
+              )}
+              <Separator />
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Booking Source</span>
+                <Badge variant="outline" className="capitalize">
+                  {booking.booking_source === 'ai_agent' ? 'AI Booking Assistant' :
+                   booking.booking_source === 'ai_concierge' ? 'AI Concierge' :
+                   booking.booking_source === 'marketplace_agent' ? 'Travel Agent' :
+                   'Manual Booking'}
+                </Badge>
+              </div>
+              <Separator />
+              <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Booked on</span>
                 <span>{format(new Date(booking.created_at), 'MMM dd, yyyy')}</span>
               </div>
+              {booking.booking_data?.amadeus_error && (
+                <>
+                  <Separator />
+                  <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                    <p className="text-sm font-medium text-destructive mb-1">Booking Error</p>
+                    <p className="text-xs text-muted-foreground">
+                      This booking encountered an error during processing. No payment was charged.
+                    </p>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 

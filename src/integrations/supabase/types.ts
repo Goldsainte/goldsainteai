@@ -716,9 +716,11 @@ export type Database = {
       }
       bookings: {
         Row: {
+          agent_id: string | null
           base_cost: number | null
           booking_data: Json
           booking_reference: string | null
+          booking_source: string | null
           booking_type: string
           commission_earned: number | null
           created_at: string
@@ -728,16 +730,21 @@ export type Database = {
           markup_amount: number | null
           markup_percentage: number | null
           net_profit: number | null
+          payment_method: string | null
+          payment_status: string | null
           status: string
           stripe_fee: number | null
+          stripe_payment_intent_id: string | null
           total_price: number
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          agent_id?: string | null
           base_cost?: number | null
           booking_data: Json
           booking_reference?: string | null
+          booking_source?: string | null
           booking_type: string
           commission_earned?: number | null
           created_at?: string
@@ -747,16 +754,21 @@ export type Database = {
           markup_amount?: number | null
           markup_percentage?: number | null
           net_profit?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
           status?: string
           stripe_fee?: number | null
+          stripe_payment_intent_id?: string | null
           total_price: number
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          agent_id?: string | null
           base_cost?: number | null
           booking_data?: Json
           booking_reference?: string | null
+          booking_source?: string | null
           booking_type?: string
           commission_earned?: number | null
           created_at?: string
@@ -766,13 +778,23 @@ export type Database = {
           markup_amount?: number | null
           markup_percentage?: number | null
           net_profit?: number | null
+          payment_method?: string | null
+          payment_status?: string | null
           status?: string
           stripe_fee?: number | null
+          stripe_payment_intent_id?: string | null
           total_price?: number
           updated_at?: string
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_guest_id_fkey"
             columns: ["guest_id"]
