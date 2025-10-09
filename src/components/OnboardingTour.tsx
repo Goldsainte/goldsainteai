@@ -82,7 +82,7 @@ export const OnboardingTour = () => {
         run={run}
         continuous
         showProgress
-        showSkipButton
+        showSkipButton={false}
         callback={handleJoyrideCallback}
         styles={{
           options: {
@@ -142,21 +142,12 @@ export const OnboardingTour = () => {
             transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
             letterSpacing: "0.01em",
           },
-          buttonSkip: {
-            color: "hsl(var(--muted-foreground))",
-            padding: window.innerWidth < 768 ? "5px 10px" : "6px 12px",
-            fontSize: window.innerWidth < 768 ? "10px" : "11px",
-            fontWeight: "500",
-            transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
-            letterSpacing: "0.01em",
-          },
         }}
         locale={{
           back: "Back",
           close: "Close",
           last: "Finish",
           next: "Next",
-          skip: "Skip tour",
         }}
       />
     </>
