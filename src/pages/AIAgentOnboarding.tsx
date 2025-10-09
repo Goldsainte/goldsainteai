@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { VoiceSelector } from "@/components/VoiceSelector";
-import { AgentTeachingInterface } from "@/components/AgentTeachingInterface";
+import TravelPreferencesWizard from "@/components/TravelPreferencesWizard";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Check, Sparkles } from "lucide-react";
 import logomark from "@/assets/logomark-gold.png";
@@ -20,9 +20,7 @@ export default function AIAgentOnboarding() {
   // Agent configuration state
   const [selectedVoice, setSelectedVoice] = useState("alloy");
   const [agentName, setAgentName] = useState("My Travel Assistant");
-  const [personality, setPersonality] = useState("");
-  const [communicationStyle, setCommunicationStyle] = useState("professional");
-  const [customKnowledge, setCustomKnowledge] = useState<string[]>([]);
+  const [travelPreferences, setTravelPreferences] = useState<any>({});
 
   const totalSteps = 3;
   const progress = (currentStep / totalSteps) * 100;
@@ -57,9 +55,7 @@ export default function AIAgentOnboarding() {
           user_id: user?.id,
           agent_name: agentName,
           voice: selectedVoice,
-          personality_instructions: personality,
-          communication_style: communicationStyle,
-          custom_knowledge: customKnowledge,
+          travel_preferences: travelPreferences,
         });
 
       if (agentError) throw agentError;
@@ -99,26 +95,12 @@ export default function AIAgentOnboarding() {
 
       case 2:
         return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Teach Your Agent About You</CardTitle>
-              <CardDescription>
-                The more you teach it, the better it gets at planning trips you'll love.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AgentTeachingInterface
-                agentName={agentName}
-                onAgentNameChange={setAgentName}
-                personality={personality}
-                onPersonalityChange={setPersonality}
-                communicationStyle={communicationStyle}
-                onCommunicationStyleChange={setCommunicationStyle}
-                customKnowledge={customKnowledge}
-                onCustomKnowledgeChange={setCustomKnowledge}
-              />
-            </CardContent>
-          </Card>
+          <div>
+            <TravelPreferencesWizard
+              preferences={travelPreferences}
+              onPreferencesChange={setTravelPreferences}
+            />
+          </div>
         );
 
       case 3:
@@ -127,10 +109,10 @@ export default function AIAgentOnboarding() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Check className="h-5 w-5 text-primary" />
-                Review Your AI Agent
+                Your AI Agent is Ready!
               </CardTitle>
               <CardDescription>
-                Everything looks good? Your agent is ready to start helping you!
+                Here's what we've set up for you
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -146,38 +128,24 @@ export default function AIAgentOnboarding() {
                 </div>
 
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Communication Style</p>
-                  <p className="text-lg font-semibold capitalize">{communicationStyle}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Travel Preferences</p>
+                  <p className="text-sm mt-1">
+                    {Object.keys(travelPreferences).length > 0 
+                      ? `You've configured ${Object.keys(travelPreferences).length} preference categories`
+                      : "You can add preferences anytime in your profile"}
+                  </p>
                 </div>
-
-                {personality && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground">Personality</p>
-                    <p className="text-sm mt-1">{personality}</p>
-                  </div>
-                )}
-
-                {customKnowledge.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">Custom Knowledge</p>
-                    <ul className="list-disc list-inside space-y-1">
-                      {customKnowledge.map((item, index) => (
-                        <li key={index} className="text-sm">{item}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
               </div>
 
               <div className="bg-primary/10 p-4 rounded-lg">
                 <p className="text-sm">
-                  <strong>What happens next?</strong> Your AI agent will use this information to:
+                  <strong>What happens next?</strong> Your AI agent will:
                 </p>
                 <ul className="list-disc list-inside text-sm mt-2 space-y-1 text-muted-foreground">
-                  <li>Understand your travel preferences and style</li>
-                  <li>Suggest destinations and experiences you'll love</li>
-                  <li>Remember important details from every conversation</li>
-                  <li>Plan trips that match your budget and interests</li>
+                  <li>Understand your unique travel style</li>
+                  <li>Suggest perfect destinations and experiences</li>
+                  <li>Remember your preferences in every conversation</li>
+                  <li>Plan trips tailored exactly to you</li>
                 </ul>
               </div>
             </CardContent>

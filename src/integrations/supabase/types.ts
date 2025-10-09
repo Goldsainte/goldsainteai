@@ -509,6 +509,7 @@ export type Database = {
           id: string
           personality_instructions: string | null
           preferred_language: string | null
+          travel_preferences: Json | null
           updated_at: string
           user_id: string
           voice: string
@@ -521,6 +522,7 @@ export type Database = {
           id?: string
           personality_instructions?: string | null
           preferred_language?: string | null
+          travel_preferences?: Json | null
           updated_at?: string
           user_id: string
           voice?: string
@@ -533,6 +535,7 @@ export type Database = {
           id?: string
           personality_instructions?: string | null
           preferred_language?: string | null
+          travel_preferences?: Json | null
           updated_at?: string
           user_id?: string
           voice?: string
