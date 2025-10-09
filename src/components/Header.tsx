@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -342,80 +343,23 @@ export const Header = () => {
               <span className="text-xs">Marketplace</span>
             </button>
             
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button
-                  className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
-                  aria-label="Profile"
-                >
-                  <User className="h-5 w-5" />
-                  <span className="text-xs">Profile</span>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" side="top" className="w-64 bg-background border-border mb-2">
-                {user ? (
-                  <>
-                    <DropdownMenuItem onClick={() => navigate('/dashboard')} className="cursor-pointer min-h-[44px] text-sm">
-                      Dashboard
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/my-bookings')} className="cursor-pointer min-h-[44px] text-sm">
-                      My Bookings
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/favorites')} className="cursor-pointer gap-2 min-h-[44px] text-sm">
-                      <Heart className="h-4 w-4 flex-shrink-0" />
-                      Favorites
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/booking-preferences')} className="cursor-pointer min-h-[44px] text-sm">
-                      Booking Preferences
-                    </DropdownMenuItem>
-                    
-                    {isAdmin && (
-                      <>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => navigate('/admin/agent-approvals')} className="cursor-pointer min-h-[44px] text-sm font-medium text-primary">
-                          Admin Panel
-                        </DropdownMenuItem>
-                      </>
-                    )}
-                    
-                    <DropdownMenuSeparator />
-                    
-                    <div className="px-2 py-3 min-h-[60px]">
-                      <div className="flex items-center justify-between gap-3">
-                        <Label htmlFor="preferences-toggle-mobile" className="text-sm font-medium cursor-pointer flex-1 leading-tight">
-                          Use My Preferences
-                        </Label>
-                        <Switch
-                          id="preferences-toggle-mobile"
-                          checked={usePreferences}
-                          onCheckedChange={togglePreferences}
-                          className="flex-shrink-0"
-                          aria-label="Toggle search preferences"
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
-                        Apply saved preferences to searches
-                      </p>
-                    </div>
-                    
-                    <DropdownMenuSeparator />
-                    
-                    <DropdownMenuItem onClick={signOut} className="cursor-pointer min-h-[44px] text-sm">
-                      Sign Out
-                    </DropdownMenuItem>
-                  </>
-                ) : (
-                  <>
-                    <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer font-medium min-h-[44px] text-sm">
-                      Sign In
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/auth')} className="cursor-pointer min-h-[44px] text-sm">
-                      Sign Up
-                    </DropdownMenuItem>
-                  </>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <button
+              onClick={() => user ? navigate('/travel-profile') : navigate('/auth')}
+              className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
+              aria-label="Profile"
+            >
+              {user ? (
+                <Avatar className="h-6 w-6 ring-2 ring-primary/20">
+                  <AvatarImage src={user.user_metadata?.avatar_url} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                    {user.user_metadata?.username?.[0]?.toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <User className="h-5 w-5" />
+              )}
+              <span className="text-xs">Profile</span>
+            </button>
           </div>
         </nav>
       )}
