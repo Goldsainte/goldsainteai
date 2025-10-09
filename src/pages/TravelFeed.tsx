@@ -10,6 +10,10 @@ import CreateContentSheet from "@/components/CreateContentSheet";
 import { ClearSampleDataButton } from "@/components/ClearSampleDataButton";
 import { useUserRole } from "@/hooks/useUserRole";
 import { toast } from "sonner";
+import { FeedSidebar } from "@/components/FeedSidebar";
+import { FeedSuggestions } from "@/components/FeedSuggestions";
+import StoryHighlights from "@/components/StoryHighlights";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TravelPost {
   id: string;
@@ -42,6 +46,7 @@ const TravelFeed = () => {
   const { isAdmin } = useUserRole();
   const [searchParams] = useSearchParams();
   const targetPostId = searchParams.get('postId');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     fetchPosts(targetPostId || undefined);
@@ -167,97 +172,150 @@ const TravelFeed = () => {
   }
 
   return (
-    <div className="relative h-screen w-full bg-black overflow-hidden">
-      {/* Top Navigation - Minimal */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/')}
-            className="text-white hover:bg-white/20"
-          >
-            <ChevronLeft className="h-6 w-6" />
-          </Button>
-          <ClearSampleDataButton />
-        </div>
-        
-        {isPersonalized && (
-          <div className="absolute left-1/2 -translate-x-1/2 top-4 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
-            <p className="text-white text-xs font-medium">For You</p>
-          </div>
-        )}
-        
-        <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate('/travel-settings')}
-            className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-10 w-10"
-          >
-            <Settings className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/travel-profile')}
-            className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-4 h-10 font-semibold text-sm"
-          >
-            Profile
-          </Button>
-        </div>
-      </div>
+    <>
+      {/* Desktop Layout - 3 columns */}
+      {!isMobile ? (
+        <div className="flex w-full min-h-screen bg-background">
+          {/* Left Sidebar */}
+          <FeedSidebar />
 
-      {/* Floating Upload Button (FAB) */}
-      <Button
-        onClick={() => setCreateSheetOpen(true)}
-        className="absolute bottom-28 right-4 z-20 h-14 w-14 rounded-full shadow-2xl bg-primary text-primary-foreground hover:bg-primary/90"
-        size="icon"
-      >
-        <PlusSquare className="h-6 w-6" />
-      </Button>
+          {/* Center Feed */}
+          <div className="flex-1 max-w-[630px] mx-auto">
+            {/* Stories Section */}
+            <div className="border-b border-border py-4 px-2">
+              <StoryHighlights />
+            </div>
 
-      {/* Video Feed - Full Screen Vertical Scroll */}
-      <div
-        ref={containerRef}
-        onScroll={handleScroll}
-        className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        <style>{`
-          div::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-        
-        {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-muted-foreground">Loading feed...</div>
+            {/* Feed Posts */}
+            <div className="py-6">
+              {loading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-muted-foreground">Loading feed...</div>
+                </div>
+              ) : posts.length === 0 ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center space-y-4">
+                    <p className="text-muted-foreground">No videos yet</p>
+                    <Button onClick={() => setCreateSheetOpen(true)}>
+                      <Upload className="mr-2 h-4 w-4" />
+                      Upload First Video
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {posts.map((post) => (
+                    <div key={post.id} className="border-b border-border pb-8">
+                      <TravelVideoCard
+                        post={post}
+                        isActive={true}
+                        onUpdate={fetchPosts}
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
-        ) : posts.length === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center space-y-4">
-              <p className="text-muted-foreground">No videos yet</p>
-              <Button onClick={() => setUploadModalOpen(true)}>
-                <Upload className="mr-2 h-4 w-4" />
-                Upload First Video
+
+          {/* Right Suggestions Panel */}
+          <FeedSuggestions />
+        </div>
+      ) : (
+        /* Mobile Layout - Full Screen Vertical Scroll */
+        <div className="relative h-screen w-full bg-black overflow-hidden">
+          {/* Top Navigation - Minimal */}
+          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between p-4">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/')}
+                className="text-white hover:bg-white/20"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </Button>
+              <ClearSampleDataButton />
+            </div>
+            
+            {isPersonalized && (
+              <div className="absolute left-1/2 -translate-x-1/2 top-4 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
+                <p className="text-white text-xs font-medium">For You</p>
+              </div>
+            )}
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/travel-settings')}
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-10 w-10"
+              >
+                <Settings className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => navigate('/travel-profile')}
+                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full px-4 h-10 font-semibold text-sm"
+              >
+                Profile
               </Button>
             </div>
           </div>
-        ) : (
-          posts.map((post, index) => (
-            <div
-              key={post.id}
-              className="h-screen w-full snap-start snap-always"
-            >
-              <TravelVideoCard
-                post={post}
-                isActive={index === currentIndex}
-                onUpdate={fetchPosts}
-              />
-            </div>
-          ))
-        )}
-      </div>
+
+          {/* Floating Upload Button (FAB) */}
+          <Button
+            onClick={() => setCreateSheetOpen(true)}
+            className="absolute bottom-28 right-4 z-20 h-14 w-14 rounded-full shadow-2xl bg-primary text-primary-foreground hover:bg-primary/90"
+            size="icon"
+          >
+            <PlusSquare className="h-6 w-6" />
+          </Button>
+
+          {/* Video Feed - Full Screen Vertical Scroll */}
+          <div
+            ref={containerRef}
+            onScroll={handleScroll}
+            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            <style>{`
+              div::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            
+            {loading ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-muted-foreground">Loading feed...</div>
+              </div>
+            ) : posts.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center space-y-4">
+                  <p className="text-muted-foreground">No videos yet</p>
+                  <Button onClick={() => setUploadModalOpen(true)}>
+                    <Upload className="mr-2 h-4 w-4" />
+                    Upload First Video
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              posts.map((post, index) => (
+                <div
+                  key={post.id}
+                  className="h-screen w-full snap-start snap-always"
+                >
+                  <TravelVideoCard
+                    post={post}
+                    isActive={index === currentIndex}
+                    onUpdate={fetchPosts}
+                  />
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Create Content Sheet */}
       <CreateContentSheet
@@ -272,7 +330,7 @@ const TravelFeed = () => {
         onOpenChange={setUploadModalOpen}
         onSuccess={handleVideoUpload}
       />
-    </div>
+    </>
   );
 };
 
