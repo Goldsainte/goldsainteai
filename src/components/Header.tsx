@@ -271,9 +271,6 @@ export const Header = () => {
                   </DropdownMenuContent>
                  </DropdownMenu>
 
-                {/* Notifications */}
-                {user && <NotificationCenter />}
-
                 {/* User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
