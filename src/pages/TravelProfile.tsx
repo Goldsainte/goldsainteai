@@ -5,12 +5,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
+import VideoEditModal from "@/components/VideoEditModal";
 
 interface Profile {
   id: string;
@@ -29,6 +30,7 @@ interface Post {
   video_url: string;
   thumbnail_url: string | null;
   caption: string | null;
+  location: string | null;
   view_count: number;
   like_count: number;
 }
@@ -46,6 +48,8 @@ const TravelProfile = () => {
     likesCount: 0,
     viewsCount: 0,
   });
+  const [editOpen, setEditOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<Post | null>(null);
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -88,7 +92,7 @@ const TravelProfile = () => {
       // Base query: user's posts ordered by newest first
       let query: any = supabase
         .from('travel_posts')
-        .select('id, video_url, thumbnail_url, caption, view_count, like_count')
+        .select('id, video_url, thumbnail_url, caption, location, view_count, like_count')
         .eq('user_id', profileUserId)
         .order('created_at', { ascending: false });
 
@@ -133,7 +137,7 @@ const TravelProfile = () => {
 
       const { data: posts, error: postsError } = await supabase
         .from('travel_posts')
-        .select('id, video_url, thumbnail_url, caption, view_count, like_count')
+        .select('id, video_url, thumbnail_url, caption, location, view_count, like_count')
         .in('id', postIds)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
@@ -411,6 +415,20 @@ const TravelProfile = () => {
                         <Heart className="h-4 w-4 fill-white" />
                         <span>{formatNumber(post.like_count)}</span>
                       </div>
+                      {isOwnProfile && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingPost(post);
+                            setEditOpen(true);
+                          }}
+                          className="ml-2"
+                        >
+                          <Edit className="h-4 w-4 mr-1" /> Edit
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -455,6 +473,21 @@ const TravelProfile = () => {
           </TabsContent>
         )}
       </Tabs>
+
+      {isOwnProfile && editingPost && (
+        <VideoEditModal
+          open={editOpen}
+          onOpenChange={setEditOpen}
+          postId={editingPost.id}
+          currentCaption={editingPost.caption}
+          currentLocation={editingPost.location}
+          currentThumbnailUrl={editingPost.thumbnail_url}
+          videoUrl={editingPost.video_url}
+          onSuccess={() => {
+            fetchUserPosts();
+          }}
+        />
+      )}
     </div>
   );
 };
