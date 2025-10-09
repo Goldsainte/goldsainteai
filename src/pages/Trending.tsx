@@ -110,4 +110,5 @@ const Trending = () => {
   );
 };
 
+// Export Trending component
 export default Trending;
