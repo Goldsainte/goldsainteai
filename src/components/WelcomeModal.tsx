@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star, Mic } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star, Mic, Share2 } from "lucide-react";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -22,7 +23,8 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             </h2>
           </div>
 
-          <div className="space-y-3 sm:space-y-4">
+          <ScrollArea className="h-[60vh] sm:h-[65vh] pr-4">
+            <div className="space-y-3 sm:space-y-4">
             {/* Feature 1 - Voice AI */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
@@ -53,7 +55,21 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 3 - Expert Agents */}
+            {/* Feature 3 - Goldsainte Places */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-accent to-secondary flex items-center justify-center">
+                <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">Create. Share. Make Money.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  A social networking platform for content creators to share their luxury travel experiences and create interactive trip plans, 
+                  allowing them to earn income from their content.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 4 - Expert Agents */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -67,7 +83,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 4 - Group Bookings */}
+            {/* Feature 5 - Group Bookings */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -81,7 +97,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 5 - Itinerary Management */}
+            {/* Feature 6 - Itinerary Management */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -95,7 +111,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 6 - Communication Hub */}
+            {/* Feature 7 - Communication Hub */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
@@ -108,9 +124,10 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
                 </p>
               </div>
             </div>
-          </div>
+            </div>
+          </ScrollArea>
 
-          <Button 
+          <Button
             onClick={onClose} 
             className="w-full h-10 sm:h-11 text-xs sm:text-sm group"
             size="lg"
