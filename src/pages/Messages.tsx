@@ -5,7 +5,7 @@ import { ConversationsList } from "@/components/ConversationsList";
 import { MessageThread } from "@/components/MessageThread";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { Loader2, MessageCircle, Edit } from "lucide-react";
+import { Loader2, Mail, Edit } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
@@ -251,8 +251,8 @@ const Messages = () => {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full border-2 border-foreground mb-4">
-                <MessageCircle className="h-12 w-12" />
+              <div className="inline-flex items-center justify-center w-24 h-24 rounded-full border-2 border-primary/20 bg-primary/5 mb-4">
+                <Mail className="h-12 w-12 text-primary" />
               </div>
               <h2 className="text-xl font-semibold mb-2">Your messages</h2>
               <p className="text-muted-foreground mb-6">Send a message to start a chat.</p>

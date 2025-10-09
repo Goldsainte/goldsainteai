@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
-import { Search, MessageCircle, Loader2 } from "lucide-react";
+import { Search, Mail, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -141,7 +141,7 @@ export const ConversationsList = ({
             </div>
           ) : filteredConversations.length === 0 ? (
             <div className="text-center py-8 px-4">
-              <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+              <Mail className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
               <p className="text-sm text-muted-foreground">
                 {searchQuery ? "No conversations found" : "No messages yet"}
               </p>
