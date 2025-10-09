@@ -303,8 +303,6 @@ export default function Dashboard() {
           </TabsContent>
         </Tabs>
       </main>
-
-      <Footer />
     </div>
   );
 }

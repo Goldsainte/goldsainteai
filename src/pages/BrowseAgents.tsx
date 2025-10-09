@@ -353,8 +353,6 @@ export default function BrowseAgents() {
         {/* Real-time booking notifications */}
         <RealTimeBookingNotifications />
       </main>
-
-      <Footer />
     </div>
   );
 }

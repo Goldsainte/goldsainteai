@@ -549,8 +549,6 @@ export default function AgentOnboarding() {
           </CardContent>
         </Card>
       </main>
-
-      <Footer />
     </div>
   );
 }

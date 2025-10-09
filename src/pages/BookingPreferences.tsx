@@ -221,8 +221,6 @@ export default function BookingPreferences() {
           </Card>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 }

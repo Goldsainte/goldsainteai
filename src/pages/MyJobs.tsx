@@ -337,8 +337,6 @@ export default function MyJobs() {
           </div>
         )}
       </main>
-
-      <Footer />
       
       {/* Job Details Modal */}
       <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>

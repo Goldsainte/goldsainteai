@@ -367,8 +367,6 @@ export default function AgentProfile() {
           </div>
         </div>
       </main>
-
-      <Footer />
       
       {agent && (
         <ReportUserModal

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -104,7 +103,6 @@ export default function MyTrips() {
             <p className="text-muted-foreground">Loading your trips...</p>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -260,7 +258,6 @@ export default function MyTrips() {
           </Card>
         )}
       </div>
-      <Footer />
     </div>
   );
 }

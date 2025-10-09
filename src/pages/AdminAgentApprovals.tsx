@@ -461,7 +461,6 @@ export default function AdminAgentApprovals() {
           </TabsContent>
         </Tabs>
       </main>
-      <Footer />
 
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
         <DialogContent className="max-w-2xl">

@@ -193,7 +193,6 @@ export default function AgentDashboard() {
             </CardContent>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -580,8 +579,6 @@ export default function AgentDashboard() {
           </DialogContent>
         </Dialog>
       </main>
-
-      <Footer />
     </div>
   );
 }
