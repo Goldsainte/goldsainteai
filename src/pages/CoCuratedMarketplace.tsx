@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Sparkles, MapPin, Calendar, Users, DollarSign, TrendingUp, Search } from "lucide-react";
+import { Sparkles, MapPin, Calendar, Users, DollarSign, TrendingUp, Search, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
@@ -160,6 +160,15 @@ export default function CoCuratedMarketplace() {
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 container mx-auto py-8 px-4">
         <div className="mb-8">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate(-1)}
+            className="mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="h-6 w-6 text-primary" />
             <h1 className="text-3xl font-bold">CoCurated<span className="text-base align-super">™</span> Marketplace</h1>
