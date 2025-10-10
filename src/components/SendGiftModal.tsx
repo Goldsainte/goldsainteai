@@ -49,6 +49,14 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
 
   const handleSendGift = async (giftId: string, cost: number) => {
     if (!user) return;
+    if (recipientId === user.id) {
+      toast({
+        title: 'Not allowed',
+        description: 'You cannot send a gift to yourself.',
+        variant: 'destructive',
+      });
+      return;
+    }
     
     if (balance < cost) {
       toast({
@@ -90,10 +98,11 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
       }
     } catch (error: any) {
       console.error('Error sending gift:', error);
+      const serverMessage = error?.context?.error || error?.context?.message;
       toast({
-        title: "Error",
-        description: error.message || "Failed to send gift. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: serverMessage || error.message || 'Failed to send gift. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);

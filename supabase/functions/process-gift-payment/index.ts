@@ -27,7 +27,22 @@ serve(async (req) => {
       throw new Error('User not authenticated');
     }
 
-    const { giftId, recipientId, postId, coinAmount } = await req.json();
+  const { giftId, recipientId, postId, coinAmount } = await req.json();
+
+    // Validate input and disallow self-gifts with a clear message
+    if (!giftId || !recipientId || !postId) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    if (recipientId === user.id) {
+      return new Response(
+        JSON.stringify({ error: 'You cannot send a gift to yourself.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
 
     // Get gift details
     const { data: gift } = await supabaseClient

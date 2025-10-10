@@ -514,7 +514,7 @@ const TravelProfile = () => {
 
         {/* Dashboard and Coins Cards for own profile - Hidden on mobile */}
         {isOwnProfile && (
-          <div className="hidden md:flex flex-col md:flex-row gap-2">
+          <div className="flex flex-col md:flex-row gap-2">
             {/* Dashboard Card */}
             {stats.viewsCount > 0 && (
               <Card className="p-3 bg-dashboard-bg border-dashboard-bg flex-1">
@@ -552,13 +552,13 @@ const TravelProfile = () => {
           </div>
         )}
 
-        {/* Action Buttons - Hidden on mobile */}
-        <div className="hidden md:flex gap-2 flex-wrap">
+        {/* Action Buttons - Mobile shows Edit & Share; others hidden */}
+        <div className="flex gap-2 flex-wrap">
           {isOwnProfile ? (
             <>
               <Button
                 variant="default"
-                className="flex-1 min-w-[80px] h-9 md:h-8 text-sm font-semibold"
+                className="hidden md:inline-flex flex-1 min-w-[80px] h-9 md:h-8 text-sm font-semibold"
                 onClick={() => setUploadModalOpen(true)}
               >
                 <PlusCircle className="h-4 w-4 mr-1" />
@@ -586,7 +586,7 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 size="icon"
-                className="h-9 w-9 md:h-8 md:w-8"
+                className="hidden md:inline-flex h-9 w-9 md:h-8 md:w-8"
                 onClick={() => setCloseFriendsOpen(true)}
                 title="Manage Close Friends"
               >
@@ -595,7 +595,7 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 size="icon"
-                className="relative h-9 w-9 md:h-8 md:w-8"
+                className="hidden md:inline-flex relative h-9 w-9 md:h-8 md:w-8"
                 onClick={() => setCollaborationSheetOpen(true)}
                 aria-label="Collaboration invites"
               >
@@ -956,7 +956,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/')}
-            className="hover:bg-accent h-14 w-14"
+            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
             aria-label="Home"
           >
             <Home className="h-8 w-8" />
@@ -966,7 +966,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/search')}
-            className="hover:bg-accent h-14 w-14"
+            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
             aria-label="Search"
           >
             <SearchIcon className="h-8 w-8" />
@@ -976,7 +976,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => setCreateSheetOpen(true)}
-            className="hover:bg-accent h-14 w-14"
+            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
             aria-label="Create"
           >
             <PlusSquare className="h-8 w-8" />
@@ -986,7 +986,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-profile')}
-            className="hover:bg-accent h-14 w-14"
+            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
             aria-label="Profile"
           >
             <User className="h-8 w-8" />
