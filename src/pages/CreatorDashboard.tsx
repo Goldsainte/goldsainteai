@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users } from "lucide-react";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
@@ -23,6 +23,7 @@ interface CreatorStats {
 
 export default function CreatorDashboard() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { balance: coinBalance, refetch: refetchCoins } = useCoinBalance();
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -118,7 +119,7 @@ export default function CreatorDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold mb-2 font-secondary">Creator Dashboard</h1>
             <p className="text-muted-foreground">
@@ -135,6 +136,26 @@ export default function CreatorDashboard() {
               {coinBalance} coins
             </Badge>
           </div>
+        </div>
+
+        {/* Quick Access Navigation */}
+        <div className="flex gap-3 mb-8">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => navigate('/shop')}
+          >
+            <ShoppingBag className="w-4 h-4" />
+            Visit Shop
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => navigate('/marketplace')}
+          >
+            <Users className="w-4 h-4" />
+            Agent Marketplace
+          </Button>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
