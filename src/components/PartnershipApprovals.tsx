@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, XCircle, AlertCircle, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface Partnership {
   id: string;
@@ -41,6 +46,7 @@ export const PartnershipApprovals = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPartnership, setSelectedPartnership] = useState<Partnership | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -121,21 +127,47 @@ export const PartnershipApprovals = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading...</div>;
+    return (
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+          <span className="text-sm font-medium">Partnership Requests</span>
+          <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-2">
+          <div className="text-center py-4 text-muted-foreground text-sm">Loading...</div>
+        </CollapsibleContent>
+      </Collapsible>
+    );
   }
 
   if (partnerships.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
-        <p>No pending partnership requests</p>
-      </div>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+          <span className="text-sm font-medium">Partnership Requests</span>
+          <Badge variant="secondary" className="ml-2">0</Badge>
+          <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-2">
+          <div className="text-center py-4 text-muted-foreground">
+            <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No pending requests</p>
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
     );
   }
 
   return (
     <>
-      <div className="space-y-4">
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+          <span className="text-sm font-medium">Partnership Requests</span>
+          <Badge variant="destructive" className="ml-2">{partnerships.length}</Badge>
+          <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-2">
+          <div className="space-y-4">
         {partnerships.map((partnership) => (
           <Card key={partnership.id} className="p-4">
             <div className="flex items-start gap-4">
@@ -205,8 +237,10 @@ export const PartnershipApprovals = () => {
               </div>
             </div>
           </Card>
-        ))}
-      </div>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
 
       <Dialog
         open={!!selectedPartnership}

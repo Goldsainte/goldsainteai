@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Users, Check, X } from "lucide-react";
+import { Check, X, ChevronDown, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 
 interface CollaborationInvite {
   id: string;
@@ -21,7 +24,7 @@ interface CollaborationInvite {
 
 export const CollaborationInvites = () => {
   const [invites, setInvites] = useState<CollaborationInvite[]>([]);
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -117,63 +120,59 @@ export const CollaborationInvites = () => {
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Users className="w-5 h-5" />
-          {invites.length > 0 && (
-            <Badge
-              variant="destructive"
-              className="absolute -top-1 -right-1 w-5 h-5 flex items-center justify-center p-0 text-xs"
-            >
-              {invites.length}
-            </Badge>
-          )}
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Collaboration Invites</DialogTitle>
-        </DialogHeader>
-        <ScrollArea className="h-[400px]">
-          {invites.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">No pending invites</p>
-          ) : (
-            <div className="space-y-4">
-              {invites.map((invite) => (
-                <div key={invite.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={invite.inviter.avatar_url || undefined} />
-                      <AvatarFallback>{invite.inviter.username[0]?.toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">@{invite.inviter.username}</p>
-                      <p className="text-sm text-muted-foreground">wants to collaborate</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="icon"
-                      variant="default"
-                      onClick={() => respondToInvite(invite.id, 'accepted')}
-                    >
-                      <Check className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => respondToInvite(invite.id, 'declined')}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+        <span className="text-sm font-medium">Collaboration Invites</span>
+        {invites.length > 0 && (
+          <Badge variant="destructive" className="ml-2">{invites.length}</Badge>
+        )}
+        {invites.length === 0 && (
+          <Badge variant="secondary" className="ml-2">0</Badge>
+        )}
+        <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pt-2">
+        {invites.length === 0 ? (
+          <div className="text-center py-4 text-muted-foreground">
+            <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">No pending invites</p>
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-[300px] overflow-y-auto">
+            {invites.map((invite) => (
+              <div key={invite.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={invite.inviter.avatar_url || undefined} />
+                    <AvatarFallback>{invite.inviter.username[0]?.toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">@{invite.inviter.username}</p>
+                    <p className="text-xs text-muted-foreground">wants to collaborate</p>
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-      </DialogContent>
-    </Dialog>
+                <div className="flex gap-2">
+                  <Button
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => respondToInvite(invite.id, 'accepted')}
+                  >
+                    <Check className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    className="h-8 w-8"
+                    onClick={() => respondToInvite(invite.id, 'declined')}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
   );
 };

@@ -356,13 +356,9 @@ export const Header = () => {
                         
                         <DropdownMenuSeparator className="bg-border/50" />
                         
-                        <div className="py-2">
-                          <div className="mx-2 px-4 py-2">
-                            <CollaborationInvites />
-                          </div>
-                          <div className="mx-2 px-4 py-2">
-                            <PartnershipApprovals />
-                          </div>
+                        <div className="px-2 py-2">
+                          <CollaborationInvites />
+                          <PartnershipApprovals />
                         </div>
                         
                         {isAdmin && (
