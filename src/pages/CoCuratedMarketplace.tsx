@@ -162,11 +162,11 @@ export default function CoCuratedMarketplace() {
         <div className="mb-8">
           <Button 
             variant="ghost" 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/cocurated-dashboard')}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+            Back to Dashboard
           </Button>
           
           <div className="flex items-center gap-3 mb-2">
