@@ -308,12 +308,15 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <video
                 ref={videoRef}
                 src={post.video_url}
+                poster={post.thumbnail_url || undefined}
                 className="w-full h-full object-cover"
                 loop
                 playsInline
                 muted={isMuted}
+                preload="metadata"
                 crossOrigin="anonymous"
                 onLoadedData={() => setVideoLoading(false)}
+                onCanPlay={() => setVideoLoading(false)}
                 onError={() => {
                   setVideoError(true);
                   setVideoLoading(false);
@@ -495,12 +498,15 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           <video
             ref={videoRef}
             src={post.video_url}
+            poster={post.thumbnail_url || undefined}
             className="absolute inset-0 w-full h-full object-cover"
             loop
             playsInline
             muted={isMuted}
+            preload="metadata"
             crossOrigin="anonymous"
             onLoadedData={() => setVideoLoading(false)}
+            onCanPlay={() => setVideoLoading(false)}
             onError={() => {
               setVideoError(true);
               setVideoLoading(false);
