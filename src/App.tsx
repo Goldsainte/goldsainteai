@@ -15,6 +15,7 @@ import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import AIAgentOnboarding from "./pages/AIAgentOnboarding";
 import Favorites from "./pages/Favorites";
+import Collections from "./pages/Collections";
 import Dashboard from "./pages/Dashboard";
 import Marketplace from "./pages/Marketplace";
 import AgentOnboarding from "./pages/AgentOnboarding";
@@ -80,6 +81,7 @@ function AppContent() {
           <Route path="/commission-dashboard" element={<CommissionDashboard />} />
           <Route path="/email-preview" element={<EmailPreview />} />
           <Route path="/favorites" element={<Favorites />} />
+          <Route path="/collections" element={<Collections />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/travel-profile" element={<TravelProfile />} />

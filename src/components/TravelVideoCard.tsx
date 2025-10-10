@@ -4,11 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
 import VideoEditModal from "./VideoEditModal";
+import { CollectionSelector } from "./CollectionSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -62,6 +63,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
+  const [collectionSelectorOpen, setCollectionSelectorOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
 
   const isOwnPost = user?.id === post.user_id;
@@ -342,24 +344,32 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
         {/* Actions */}
         <div className="p-4 space-y-3">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleLike}
+                className="transition-transform active:scale-90"
+              >
+                <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              </button>
+              <button
+                onClick={() => setCommentsOpen(true)}
+                className="transition-transform active:scale-90"
+              >
+                <MessageCircle className="h-6 w-6" />
+              </button>
+              <button
+                onClick={handleShare}
+                className="transition-transform active:scale-90"
+              >
+                <Share2 className="h-6 w-6" />
+              </button>
+            </div>
             <button
-              onClick={handleLike}
+              onClick={() => setCollectionSelectorOpen(true)}
               className="transition-transform active:scale-90"
             >
-              <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-            </button>
-            <button
-              onClick={() => setCommentsOpen(true)}
-              className="transition-transform active:scale-90"
-            >
-              <MessageCircle className="h-6 w-6" />
-            </button>
-            <button
-              onClick={handleShare}
-              className="transition-transform active:scale-90"
-            >
-              <Share2 className="h-6 w-6" />
+              <Bookmark className="h-6 w-6" />
             </button>
           </div>
 
@@ -646,6 +656,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <Send className="h-7 w-7 text-white drop-shadow-lg" />
             </button>
 
+            <button
+              onClick={() => setCollectionSelectorOpen(true)}
+              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            >
+              <Bookmark className="h-7 w-7 text-white drop-shadow-lg" />
+            </button>
+
             {isOwnPost && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -686,6 +703,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         currentThumbnailUrl={post.thumbnail_url}
         videoUrl={post.video_url || null}
         onSuccess={onUpdate}
+      />
+
+      {/* Collection Selector */}
+      <CollectionSelector
+        postId={post.id}
+        open={collectionSelectorOpen}
+        onOpenChange={setCollectionSelectorOpen}
       />
     </div>
   );
