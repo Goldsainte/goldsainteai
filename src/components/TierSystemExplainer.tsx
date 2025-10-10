@@ -50,6 +50,19 @@ export function TierSystemExplainer() {
             </ul>
           </div>
 
+          <div className="border-t pt-3">
+            <h4 className="font-semibold mb-2">How Commission Bonus Works:</h4>
+            <p className="text-sm text-muted-foreground mb-2">
+              Your tier commission bonus directly increases your earnings across all revenue streams:
+            </p>
+            <ul className="space-y-1 text-sm text-muted-foreground ml-5 list-disc">
+              <li><strong>Template Sales:</strong> Base 70% + your tier bonus (e.g., 5% bonus = 73.5% total payout)</li>
+              <li><strong>Package Resales:</strong> Your commission rate + tier bonus applied to the resale amount</li>
+              <li><strong>Virtual Gifts:</strong> Base payout percentage + tier bonus on all gifts received</li>
+              <li><strong>Example:</strong> Bronze (0% bonus) earns $70 on a $100 template. Silver (5% bonus) earns $73.50 on the same sale.</li>
+            </ul>
+          </div>
+
           <div className="bg-primary/5 p-3 rounded-lg">
             <p className="text-sm">
               <strong>Tip:</strong> To move up tiers, focus on creating engaging content, growing your follower base, and earning through packages, templates, and virtual gifts. Click the refresh button on your tier card to recalculate your progress anytime.
