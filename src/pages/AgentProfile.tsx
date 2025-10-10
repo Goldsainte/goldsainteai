@@ -374,7 +374,6 @@ export default function AgentProfile() {
           onClose={() => setShowReportModal(false)}
           reportedUserId={agent.user_id}
           reportedUserName={agent.agency_name}
-          reportedAgentId={agent.id}
         />
       )}
     </div>

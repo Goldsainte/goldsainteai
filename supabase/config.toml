@@ -132,3 +132,9 @@ verify_jwt = true
 [functions.verify-group-payment]
 verify_jwt = false
 
+[functions.moderate-content]
+verify_jwt = false
+
+[functions.get-personalized-feed]
+verify_jwt = true
+

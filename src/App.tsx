@@ -46,6 +46,8 @@ import TravelSettings2 from "./pages/TravelSettings2";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Search from "./pages/Search";
 import Trending from "./pages/Trending";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
+import TrustSafety from "./pages/TrustSafety";
 
 const queryClient = new QueryClient();
 
@@ -105,6 +107,8 @@ function AppContent() {
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/travel-feed" element={<TravelFeed />} />
+          <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
