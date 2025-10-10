@@ -7,13 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus, MapPin } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus, MapPin, Calendar } from "lucide-react";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
 import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 import { CreateProductModal } from "@/components/CreateProductModal";
 import { CreatorEscrowDashboard } from "@/components/CreatorEscrowDashboard";
+import { PackageMarketingEditor } from "@/components/PackageMarketingEditor";
+import { ItineraryTemplateBuilder } from "@/components/ItineraryTemplateBuilder";
 
 interface CreatorStats {
   total_views: number;
@@ -304,18 +306,26 @@ export default function CreatorDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Overview
             </TabsTrigger>
             <TabsTrigger value="escrow" className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
-              Escrow & Payments
+              Escrow
+            </TabsTrigger>
+            <TabsTrigger value="packages" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Packages
+            </TabsTrigger>
+            <TabsTrigger value="templates" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Templates
             </TabsTrigger>
             <TabsTrigger value="partnerships" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
-              Brand Partnerships
+              Partnerships
             </TabsTrigger>
           </TabsList>
 
@@ -554,6 +564,14 @@ export default function CreatorDashboard() {
 
           <TabsContent value="escrow">
             <CreatorEscrowDashboard />
+          </TabsContent>
+
+          <TabsContent value="packages">
+            <PackageMarketingEditor />
+          </TabsContent>
+
+          <TabsContent value="templates">
+            <ItineraryTemplateBuilder />
           </TabsContent>
 
           <TabsContent value="partnerships">

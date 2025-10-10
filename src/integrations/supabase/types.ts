@@ -1972,6 +1972,53 @@ export type Database = {
           },
         ]
       }
+      itinerary_templates: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          id: string
+          is_public: boolean | null
+          package_id: string | null
+          template_name: string
+          total_days: number
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          package_id?: string | null
+          template_name: string
+          total_days: number
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean | null
+          package_id?: string | null
+          template_name?: string
+          total_days?: number
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_templates_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "package_marketing_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_completion_submissions: {
         Row: {
           agent_id: string
@@ -2794,6 +2841,167 @@ export type Database = {
           title?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      package_bookings: {
+        Row: {
+          booking_reference: string
+          booking_status: string
+          confirmed_at: string | null
+          created_at: string
+          currency: string
+          customer_id: string
+          escrow_transaction_id: string | null
+          id: string
+          number_of_travelers: number
+          package_id: string
+          payment_status: string
+          special_requests: string | null
+          stripe_payment_intent_id: string | null
+          total_price: number
+          travel_dates_end: string
+          travel_dates_start: string
+          traveler_details: Json | null
+          updated_at: string
+        }
+        Insert: {
+          booking_reference: string
+          booking_status?: string
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          customer_id: string
+          escrow_transaction_id?: string | null
+          id?: string
+          number_of_travelers?: number
+          package_id: string
+          payment_status?: string
+          special_requests?: string | null
+          stripe_payment_intent_id?: string | null
+          total_price: number
+          travel_dates_end: string
+          travel_dates_start: string
+          traveler_details?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          booking_reference?: string
+          booking_status?: string
+          confirmed_at?: string | null
+          created_at?: string
+          currency?: string
+          customer_id?: string
+          escrow_transaction_id?: string | null
+          id?: string
+          number_of_travelers?: number
+          package_id?: string
+          payment_status?: string
+          special_requests?: string | null
+          stripe_payment_intent_id?: string | null
+          total_price?: number
+          travel_dates_end?: string
+          travel_dates_start?: string
+          traveler_details?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_bookings_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "package_marketing_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      package_marketing_materials: {
+        Row: {
+          best_season: string | null
+          booking_count: number | null
+          created_at: string
+          creator_id: string
+          currency: string
+          description: string
+          destination: string
+          difficulty_level: string | null
+          duration_days: number
+          excluded_items: string[] | null
+          gallery_images: string[] | null
+          group_size_max: number | null
+          group_size_min: number | null
+          hero_image_url: string | null
+          highlights: string[] | null
+          id: string
+          included_items: string[] | null
+          is_published: boolean | null
+          package_name: string
+          promotional_video_url: string | null
+          requirements: string[] | null
+          starting_price: number
+          tagline: string | null
+          tags: string[] | null
+          updated_at: string
+          video_url: string | null
+          view_count: number | null
+        }
+        Insert: {
+          best_season?: string | null
+          booking_count?: number | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          description: string
+          destination: string
+          difficulty_level?: string | null
+          duration_days: number
+          excluded_items?: string[] | null
+          gallery_images?: string[] | null
+          group_size_max?: number | null
+          group_size_min?: number | null
+          hero_image_url?: string | null
+          highlights?: string[] | null
+          id?: string
+          included_items?: string[] | null
+          is_published?: boolean | null
+          package_name: string
+          promotional_video_url?: string | null
+          requirements?: string[] | null
+          starting_price: number
+          tagline?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          best_season?: string | null
+          booking_count?: number | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          description?: string
+          destination?: string
+          difficulty_level?: string | null
+          duration_days?: number
+          excluded_items?: string[] | null
+          gallery_images?: string[] | null
+          group_size_max?: number | null
+          group_size_min?: number | null
+          hero_image_url?: string | null
+          highlights?: string[] | null
+          id?: string
+          included_items?: string[] | null
+          is_published?: boolean | null
+          package_name?: string
+          promotional_video_url?: string | null
+          requirements?: string[] | null
+          starting_price?: number
+          tagline?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          video_url?: string | null
+          view_count?: number | null
         }
         Relationships: []
       }
@@ -4372,6 +4580,78 @@ export type Database = {
           website?: string | null
         }
         Relationships: []
+      }
+      template_day_items: {
+        Row: {
+          activity_description: string | null
+          activity_title: string
+          activity_type: string | null
+          booking_required: boolean | null
+          created_at: string
+          currency: string | null
+          day_number: number
+          duration_minutes: number | null
+          estimated_cost: number | null
+          id: string
+          location: string | null
+          notes: string | null
+          order_index: number
+          supplier_id: string | null
+          template_id: string
+          time_of_day: string | null
+        }
+        Insert: {
+          activity_description?: string | null
+          activity_title: string
+          activity_type?: string | null
+          booking_required?: boolean | null
+          created_at?: string
+          currency?: string | null
+          day_number: number
+          duration_minutes?: number | null
+          estimated_cost?: number | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          order_index?: number
+          supplier_id?: string | null
+          template_id: string
+          time_of_day?: string | null
+        }
+        Update: {
+          activity_description?: string | null
+          activity_title?: string
+          activity_type?: string | null
+          booking_required?: boolean | null
+          created_at?: string
+          currency?: string | null
+          day_number?: number
+          duration_minutes?: number | null
+          estimated_cost?: number | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          order_index?: number
+          supplier_id?: string | null
+          template_id?: string
+          time_of_day?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_day_items_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_day_items_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_templates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       travel_agents: {
         Row: {
