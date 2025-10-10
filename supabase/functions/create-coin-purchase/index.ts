@@ -24,7 +24,7 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { coin_amount, price_usd } = await req.json();
+    const { coin_amount, price_usd, return_url } = await req.json();
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -36,6 +36,7 @@ serve(async (req) => {
       customerId = customers.data[0].id;
     }
 
+    const baseSuccessUrl = return_url || `${req.headers.get("origin")}/creator-dashboard`;
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -53,8 +54,8 @@ serve(async (req) => {
         },
       ],
       mode: "payment",
-      success_url: `${req.headers.get("origin")}/creator-dashboard?coins_purchased=true`,
-      cancel_url: `${req.headers.get("origin")}/creator-dashboard`,
+      success_url: `${baseSuccessUrl}?coins_purchased=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: baseSuccessUrl,
       metadata: {
         user_id: user.id,
         coin_amount: coin_amount.toString(),

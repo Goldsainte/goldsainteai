@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,8 +22,9 @@ interface CreatorStats {
 
 export default function CreatorDashboard() {
   const { toast } = useToast();
-  const { balance: coinBalance } = useCoinBalance();
+  const { balance: coinBalance, refetch: refetchCoins } = useCoinBalance();
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [stats, setStats] = useState<CreatorStats>({
     total_views: 0,
     total_likes: 0,
@@ -35,7 +37,38 @@ export default function CreatorDashboard() {
 
   useEffect(() => {
     loadCreatorStats();
+    handlePaymentSuccess();
   }, []);
+
+  const handlePaymentSuccess = async () => {
+    const coinsPurchased = searchParams.get('coins_purchased');
+    const sessionId = searchParams.get('session_id');
+    
+    if (coinsPurchased === 'true' && sessionId) {
+      try {
+        const { data, error } = await supabase.functions.invoke('verify-coin-payment', {
+          body: { session_id: sessionId }
+        });
+
+        if (error) throw error;
+
+        if (data?.success) {
+          toast({
+            title: "Coins Added! 🎉",
+            description: `${data.coins_added} coins added to your balance`,
+          });
+          refetchCoins();
+        }
+      } catch (error) {
+        console.error('Error verifying coin payment:', error);
+      } finally {
+        // Clean up URL
+        searchParams.delete('coins_purchased');
+        searchParams.delete('session_id');
+        setSearchParams(searchParams);
+      }
+    }
+  };
 
   const loadCreatorStats = async () => {
     try {

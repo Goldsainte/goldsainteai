@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, useParams } from "react-router-dom";
@@ -56,6 +57,7 @@ const TravelProfile = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { userId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [userPosts, setUserPosts] = useState<Post[]>([]);
   const [videoPosts, setVideoPosts] = useState<Post[]>([]);
@@ -79,7 +81,7 @@ const TravelProfile = () => {
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
-  const { balance } = useCoinBalance();
+  const { balance, refetch: refetchCoins } = useCoinBalance();
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -98,6 +100,39 @@ const TravelProfile = () => {
       }
     }
   }, [profileUserId, isOwnProfile, user]);
+
+  useEffect(() => {
+    if (isOwnProfile) {
+      handlePaymentSuccess();
+    }
+  }, [searchParams, isOwnProfile]);
+
+  const handlePaymentSuccess = async () => {
+    const coinsPurchased = searchParams.get('coins_purchased');
+    const sessionId = searchParams.get('session_id');
+    
+    if (coinsPurchased === 'true' && sessionId) {
+      try {
+        const { data, error } = await supabase.functions.invoke('verify-coin-payment', {
+          body: { session_id: sessionId }
+        });
+
+        if (error) throw error;
+
+        if (data?.success) {
+          toast.success(`${data.coins_added} coins added to your balance! 🎉`);
+          refetchCoins();
+        }
+      } catch (error) {
+        console.error('Error verifying coin payment:', error);
+      } finally {
+        // Clean up URL
+        searchParams.delete('coins_purchased');
+        searchParams.delete('session_id');
+        setSearchParams(searchParams);
+      }
+    }
+  };
 
   const fetchCollabCount = async () => {
     if (!user) return;

@@ -33,10 +33,15 @@ export const BuyCoinsModal = ({ open, onOpenChange }: BuyCoinsModalProps) => {
     setLoading(true);
     try {
       const totalCoins = pkg.coins + (pkg.bonus || 0);
+      const currentPath = window.location.pathname;
       
       // Create payment intent via edge function
       const { data, error } = await supabase.functions.invoke('create-coin-purchase', {
-        body: { coin_amount: totalCoins, price_usd: pkg.price }
+        body: { 
+          coin_amount: totalCoins, 
+          price_usd: pkg.price,
+          return_url: `${window.location.origin}${currentPath}`
+        }
       });
 
       if (error) throw error;

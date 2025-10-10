@@ -138,3 +138,9 @@ verify_jwt = false
 [functions.get-personalized-feed]
 verify_jwt = true
 
+[functions.create-coin-purchase]
+verify_jwt = true
+
+[functions.verify-coin-payment]
+verify_jwt = false
+
