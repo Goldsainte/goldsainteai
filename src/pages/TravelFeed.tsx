@@ -47,11 +47,40 @@ const TravelFeed = () => {
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [isPersonalized, setIsPersonalized] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [visibleVideoId, setVisibleVideoId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { isAdmin } = useUserRole();
   const [searchParams] = useSearchParams();
   const targetPostId = searchParams.get('postId');
   const isMobile = useIsMobile();
+
+  // Track which video is currently visible in viewport
+  useEffect(() => {
+    if (isMobile) return; // Mobile already handles this with currentIndex
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            const videoId = entry.target.getAttribute('data-video-id');
+            if (videoId) {
+              setVisibleVideoId(videoId);
+            }
+          }
+        });
+      },
+      {
+        threshold: [0.5],
+        root: null,
+      }
+    );
+
+    // Observe all video containers
+    const videoContainers = document.querySelectorAll('[data-video-id]');
+    videoContainers.forEach((container) => observer.observe(container));
+
+    return () => observer.disconnect();
+  }, [posts, isMobile]);
 
   useEffect(() => {
     fetchPosts(targetPostId || undefined);
@@ -213,15 +242,16 @@ const TravelFeed = () => {
               ) : (
                 <div className="space-y-6">
                   {posts.map((post) => (
-                    <TravelVideoCard
-                      key={post.id}
-                      post={post}
-                      isActive={true}
-                      onUpdate={fetchPosts}
-                      layout="desktop"
-                      isMuted={isMuted}
-                      onToggleMute={() => setIsMuted(!isMuted)}
-                    />
+                    <div key={post.id} data-video-id={post.id}>
+                      <TravelVideoCard
+                        post={post}
+                        isActive={visibleVideoId === post.id}
+                        onUpdate={fetchPosts}
+                        layout="desktop"
+                        isMuted={visibleVideoId !== post.id}
+                        onToggleMute={() => setIsMuted(!isMuted)}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
