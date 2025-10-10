@@ -426,77 +426,149 @@ export type Database = {
         Row: {
           agent_commission_percentage: number
           agent_id: string
+          agent_notes: string | null
           available_from: string | null
           available_until: string | null
+          base_price_per_person: number | null
+          booking_approval_type: string | null
+          booking_deadline_days: number | null
+          cancellation_policy: string | null
+          cover_image_url: string | null
           created_at: string
+          creator_video_url: string | null
           currency: string
+          deposit_amount: number | null
+          deposit_percentage: number | null
           description: string | null
           destination: string
           duration_days: number
+          emergency_contact_required: boolean | null
           exclusions: Json | null
+          faq: Json | null
+          hashtags: string[] | null
+          highlights: Json | null
           id: string
+          ideal_for: string | null
           images: Json | null
           inclusions: Json | null
           influencer_commission_percentage: number
           is_active: boolean | null
           max_participants: number | null
+          min_group_size: number | null
+          min_signups_to_confirm: number | null
           package_name: string
+          payment_plan_type: string | null
           platform_fee_percentage: number
           promotional_materials: Json | null
+          refund_policy: string | null
           retail_price: number
+          status: string
           terms_conditions: string | null
+          travel_requirements: string | null
+          trip_type: string | null
           updated_at: string
+          upgrade_options: Json | null
+          waiver_text: string | null
           wholesale_cost: number
+          why_this_trip: string | null
         }
         Insert: {
           agent_commission_percentage?: number
           agent_id: string
+          agent_notes?: string | null
           available_from?: string | null
           available_until?: string | null
+          base_price_per_person?: number | null
+          booking_approval_type?: string | null
+          booking_deadline_days?: number | null
+          cancellation_policy?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          creator_video_url?: string | null
           currency?: string
+          deposit_amount?: number | null
+          deposit_percentage?: number | null
           description?: string | null
           destination: string
           duration_days: number
+          emergency_contact_required?: boolean | null
           exclusions?: Json | null
+          faq?: Json | null
+          hashtags?: string[] | null
+          highlights?: Json | null
           id?: string
+          ideal_for?: string | null
           images?: Json | null
           inclusions?: Json | null
           influencer_commission_percentage?: number
           is_active?: boolean | null
           max_participants?: number | null
+          min_group_size?: number | null
+          min_signups_to_confirm?: number | null
           package_name: string
+          payment_plan_type?: string | null
           platform_fee_percentage?: number
           promotional_materials?: Json | null
+          refund_policy?: string | null
           retail_price: number
+          status?: string
           terms_conditions?: string | null
+          travel_requirements?: string | null
+          trip_type?: string | null
           updated_at?: string
+          upgrade_options?: Json | null
+          waiver_text?: string | null
           wholesale_cost: number
+          why_this_trip?: string | null
         }
         Update: {
           agent_commission_percentage?: number
           agent_id?: string
+          agent_notes?: string | null
           available_from?: string | null
           available_until?: string | null
+          base_price_per_person?: number | null
+          booking_approval_type?: string | null
+          booking_deadline_days?: number | null
+          cancellation_policy?: string | null
+          cover_image_url?: string | null
           created_at?: string
+          creator_video_url?: string | null
           currency?: string
+          deposit_amount?: number | null
+          deposit_percentage?: number | null
           description?: string | null
           destination?: string
           duration_days?: number
+          emergency_contact_required?: boolean | null
           exclusions?: Json | null
+          faq?: Json | null
+          hashtags?: string[] | null
+          highlights?: Json | null
           id?: string
+          ideal_for?: string | null
           images?: Json | null
           inclusions?: Json | null
           influencer_commission_percentage?: number
           is_active?: boolean | null
           max_participants?: number | null
+          min_group_size?: number | null
+          min_signups_to_confirm?: number | null
           package_name?: string
+          payment_plan_type?: string | null
           platform_fee_percentage?: number
           promotional_materials?: Json | null
+          refund_policy?: string | null
           retail_price?: number
+          status?: string
           terms_conditions?: string | null
+          travel_requirements?: string | null
+          trip_type?: string | null
           updated_at?: string
+          upgrade_options?: Json | null
+          waiver_text?: string | null
           wholesale_cost?: number
+          why_this_trip?: string | null
         }
         Relationships: [
           {
@@ -3256,6 +3328,103 @@ export type Database = {
           },
         ]
       }
+      package_collaborators: {
+        Row: {
+          commission_percentage: number
+          created_at: string
+          id: string
+          invited_at: string
+          package_id: string
+          responded_at: string | null
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          commission_percentage: number
+          created_at?: string
+          id?: string
+          invited_at?: string
+          package_id: string
+          responded_at?: string | null
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          commission_percentage?: number
+          created_at?: string
+          id?: string
+          invited_at?: string
+          package_id?: string
+          responded_at?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_collaborators_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "agent_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      package_itinerary: {
+        Row: {
+          accommodation: string | null
+          activities: Json | null
+          created_at: string
+          day_number: number
+          description: string | null
+          id: string
+          is_featured_day: boolean | null
+          meals_included: string[] | null
+          package_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          accommodation?: string | null
+          activities?: Json | null
+          created_at?: string
+          day_number: number
+          description?: string | null
+          id?: string
+          is_featured_day?: boolean | null
+          meals_included?: string[] | null
+          package_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          accommodation?: string | null
+          activities?: Json | null
+          created_at?: string
+          day_number?: number
+          description?: string | null
+          id?: string
+          is_featured_day?: boolean | null
+          meals_included?: string[] | null
+          package_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_itinerary_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "agent_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       package_marketing_materials: {
         Row: {
           allow_resale: boolean | null
@@ -3351,6 +3520,94 @@ export type Database = {
           view_count?: number | null
         }
         Relationships: []
+      }
+      package_media_gallery: {
+        Row: {
+          caption: string | null
+          created_at: string
+          display_order: number | null
+          id: string
+          is_cover: boolean | null
+          media_type: string
+          media_url: string
+          package_id: string
+          updated_at: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_cover?: boolean | null
+          media_type: string
+          media_url: string
+          package_id: string
+          updated_at?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          display_order?: number | null
+          id?: string
+          is_cover?: boolean | null
+          media_type?: string
+          media_url?: string
+          package_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_media_gallery_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "agent_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      package_payment_milestones: {
+        Row: {
+          amount_percentage: number
+          created_at: string
+          description: string | null
+          due_days_before_trip: number
+          id: string
+          milestone_name: string
+          milestone_number: number
+          package_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_percentage: number
+          created_at?: string
+          description?: string | null
+          due_days_before_trip: number
+          id?: string
+          milestone_name: string
+          milestone_number: number
+          package_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_percentage?: number
+          created_at?: string
+          description?: string | null
+          due_days_before_trip?: number
+          id?: string
+          milestone_name?: string
+          milestone_number?: number
+          package_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_payment_milestones_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "agent_packages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       package_resale_transactions: {
         Row: {
