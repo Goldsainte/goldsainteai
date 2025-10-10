@@ -19,6 +19,7 @@ import { ItineraryTemplateBuilder } from "@/components/ItineraryTemplateBuilder"
 import { CreatorTierCard } from "@/components/CreatorTierCard";
 import { TierUpgradeHistory } from "@/components/TierUpgradeHistory";
 import { AllTiersOverview } from "@/components/AllTiersOverview";
+import { TierSystemExplainer } from "@/components/TierSystemExplainer";
 
 interface CreatorStats {
   total_views: number;
@@ -570,6 +571,7 @@ export default function CreatorDashboard() {
           </TabsContent>
 
           <TabsContent value="tier" className="space-y-6">
+            <TierSystemExplainer />
             <CreatorTierCard />
             <AllTiersOverview />
             <TierUpgradeHistory />

@@ -1,9 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Award, Crown, Gem, Star, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Award, Crown, Gem, Star, TrendingUp, RefreshCw } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 
 const tierIcons: Record<string, any> = {
   bronze: Award,
@@ -22,6 +24,42 @@ const tierColors: Record<string, string> = {
 };
 
 export function CreatorTierCard() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const evaluateTierMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke('evaluate-creator-tier');
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["creator-tier-membership"] });
+      queryClient.invalidateQueries({ queryKey: ["tier-progress-metrics"] });
+      queryClient.invalidateQueries({ queryKey: ["tier-upgrade-history"] });
+      
+      if (data.tier_result?.tier_changed) {
+        toast({
+          title: "Tier Updated! 🎉",
+          description: `You've been upgraded to ${data.tier_result.new_tier}!`,
+        });
+      } else {
+        toast({
+          title: "Tier Evaluated",
+          description: "Your progress has been recalculated.",
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to evaluate tier. Please try again.",
+        variant: "destructive",
+      });
+      console.error('Error evaluating tier:', error);
+    },
+  });
+
   const { data: tierMembership, isLoading: membershipLoading } = useQuery({
     queryKey: ["creator-tier-membership"],
     queryFn: async () => {
@@ -132,9 +170,19 @@ export function CreatorTierCard() {
               <CardDescription>{currentTier.description}</CardDescription>
             </div>
           </div>
-          <Badge variant="secondary" className="text-sm">
-            Level {currentTier.tier_level}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary" className="text-sm">
+              Level {currentTier.tier_level}
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => evaluateTierMutation.mutate()}
+              disabled={evaluateTierMutation.isPending}
+            >
+              <RefreshCw className={`h-4 w-4 ${evaluateTierMutation.isPending ? 'animate-spin' : ''}`} />
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
