@@ -13,6 +13,7 @@ import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
 import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 import { CreateProductModal } from "@/components/CreateProductModal";
+import { CreatorEscrowDashboard } from "@/components/CreatorEscrowDashboard";
 
 interface CreatorStats {
   total_views: number;
@@ -303,10 +304,14 @@ export default function CreatorDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="escrow" className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4" />
+              Escrow & Payments
             </TabsTrigger>
             <TabsTrigger value="partnerships" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
@@ -545,6 +550,10 @@ export default function CreatorDashboard() {
                 </p>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="escrow">
+            <CreatorEscrowDashboard />
           </TabsContent>
 
           <TabsContent value="partnerships">

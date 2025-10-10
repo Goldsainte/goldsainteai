@@ -51,6 +51,7 @@ import CommunityGuidelines from "./pages/CommunityGuidelines";
 import TrustSafety from "./pages/TrustSafety";
 import Shop from "./pages/Shop";
 import AffiliateManager from "./pages/AffiliateManager";
+import SupplierManagement from "./pages/SupplierManagement";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +117,7 @@ function AppContent() {
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/affiliate-manager" element={<AffiliateManager />} />
+          <Route path="/supplier-management" element={<SupplierManagement />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
