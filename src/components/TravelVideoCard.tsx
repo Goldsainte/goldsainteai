@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -23,6 +23,7 @@ import { useCollections } from "@/hooks/useCollections";
 import { SendGiftModal } from "@/components/SendGiftModal";
 import { Coins } from "lucide-react";
 import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
+import { PromotePostModal } from "./PromotePostModal";
 
 interface TravelVideoCardProps {
   post: {
@@ -77,6 +78,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const { collections, createCollection, addPostToCollection } = useCollections();
   const [giftModalOpen, setGiftModalOpen] = useState(false);
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
+  const [promoteModalOpen, setPromoteModalOpen] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -914,6 +916,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <Coins className="h-7 w-7 text-yellow-500 drop-shadow-lg" />
             </button>
 
+            {isOwnPost && (
+              <button
+                onClick={() => setPromoteModalOpen(true)}
+                className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+                title="Promote this post"
+              >
+                <TrendingUp className="h-7 w-7 text-secondary drop-shadow-lg" />
+              </button>
+            )}
+
             <button
               onClick={() => setCollaboratorSelectorOpen(true)}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
@@ -1002,6 +1014,15 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           open={partnershipProposalOpen}
           onOpenChange={setPartnershipProposalOpen}
           creatorId={post.user_id}
+          postId={post.id}
+        />
+      )}
+
+      {/* Promote Post Modal */}
+      {promoteModalOpen && (
+        <PromotePostModal
+          open={promoteModalOpen}
+          onOpenChange={setPromoteModalOpen}
           postId={post.id}
         />
       )}

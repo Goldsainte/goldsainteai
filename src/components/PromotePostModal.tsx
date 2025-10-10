@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card } from "@/components/ui/card";
-import { TrendingUp, Users, Target, Calendar } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { TrendingUp, Users, Target, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,66 +15,49 @@ interface PromotePostModalProps {
   postId: string;
 }
 
-interface PromotionPlan {
-  id: string;
-  name: string;
-  duration_days: number;
-  reach_estimate: string;
-  price: number;
-  features: string[];
-  icon: typeof TrendingUp;
-}
-
-const promotionPlans: PromotionPlan[] = [
-  {
-    id: "basic",
-    name: "Basic Boost",
-    duration_days: 3,
-    reach_estimate: "5K-10K",
-    price: 29.99,
-    features: [
-      "3 days of promotion",
-      "Highlighted in feed",
-      "Estimated 5K-10K reach"
-    ],
-    icon: TrendingUp
-  },
-  {
-    id: "standard",
-    name: "Standard Boost",
-    duration_days: 7,
-    reach_estimate: "15K-25K",
-    price: 79.99,
-    features: [
-      "7 days of promotion",
-      "Priority placement in feed",
-      "Estimated 15K-25K reach",
-      "Featured on Trending page"
-    ],
-    icon: Users
-  },
-  {
-    id: "premium",
-    name: "Premium Boost",
-    duration_days: 14,
-    reach_estimate: "50K-100K",
-    price: 149.99,
-    features: [
-      "14 days of promotion",
-      "Top placement in feed",
-      "Estimated 50K-100K reach",
-      "Featured on Trending page",
-      "Cross-platform promotion"
-    ],
-    icon: Target
+// Calculate promotion benefits based on budget
+const calculateBenefits = (budget: number) => {
+  const daysPerDollar = 0.2; // 5 dollars = 1 day
+  const reachPerDollar = 200; // $1 = 200 estimated reach
+  
+  const days = Math.max(1, Math.round(budget * daysPerDollar));
+  const reach = Math.round(budget * reachPerDollar);
+  
+  const features = [];
+  
+  // Base features
+  features.push(`${days} day${days > 1 ? 's' : ''} of promotion`);
+  features.push("Highlighted in feed");
+  features.push(`Estimated ${reach.toLocaleString()}+ reach`);
+  
+  // Premium features based on budget
+  if (budget >= 50) {
+    features.push("Priority placement in feed");
   }
-];
+  if (budget >= 100) {
+    features.push("Featured on Trending page");
+  }
+  if (budget >= 150) {
+    features.push("Cross-platform promotion");
+  }
+  if (budget >= 200) {
+    features.push("Dedicated account manager support");
+  }
+  
+  return {
+    days,
+    reach: `${(reach / 1000).toFixed(1)}K${reach >= 10000 ? '+' : ''}`,
+    features
+  };
+};
 
 export function PromotePostModal({ open, onOpenChange, postId }: PromotePostModalProps) {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [selectedPlan, setSelectedPlan] = useState<string>("standard");
+  const [budget, setBudget] = useState<number>(100);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const benefits = calculateBenefits(budget);
 
   const handlePromote = async () => {
     if (!user) {
@@ -86,8 +69,14 @@ export function PromotePostModal({ open, onOpenChange, postId }: PromotePostModa
       return;
     }
 
-    const plan = promotionPlans.find(p => p.id === selectedPlan);
-    if (!plan) return;
+    if (budget < 10) {
+      toast({
+        title: "Minimum Budget Required",
+        description: "The minimum promotion budget is $10",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsProcessing(true);
 
@@ -96,16 +85,16 @@ export function PromotePostModal({ open, onOpenChange, postId }: PromotePostModa
       const { data, error } = await supabase.functions.invoke('create-promotion-checkout', {
         body: {
           postId,
-          planId: plan.id,
-          amount: plan.price,
-          durationDays: plan.duration_days
+          planId: 'custom',
+          amount: budget,
+          durationDays: benefits.days
         }
       });
 
       if (error) throw error;
 
       if (data?.url) {
-        window.location.href = data.url;
+        window.open(data.url, '_blank');
       }
     } catch (error) {
       console.error("Error promoting post:", error);
@@ -119,91 +108,107 @@ export function PromotePostModal({ open, onOpenChange, postId }: PromotePostModa
     }
   };
 
-  const selectedPlanDetails = promotionPlans.find(p => p.id === selectedPlan);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-secondary" />
             Promote Your Post
           </DialogTitle>
           <DialogDescription>
-            Boost your post's visibility and reach more travelers
+            Choose your budget to boost visibility and reach more travelers
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <RadioGroup value={selectedPlan} onValueChange={setSelectedPlan}>
-            {promotionPlans.map((plan) => {
-              const Icon = plan.icon;
-              return (
-                <Card
-                  key={plan.id}
-                  className={`p-4 cursor-pointer transition-all ${
-                    selectedPlan === plan.id
-                      ? "border-secondary bg-secondary/5"
-                      : "hover:border-secondary/50"
-                  }`}
-                  onClick={() => setSelectedPlan(plan.id)}
-                >
-                  <div className="flex items-start gap-4">
-                    <RadioGroupItem value={plan.id} id={plan.id} className="mt-1" />
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Icon className="h-5 w-5 text-secondary" />
-                          <Label htmlFor={plan.id} className="text-lg font-semibold cursor-pointer">
-                            {plan.name}
-                          </Label>
-                        </div>
-                        <span className="text-2xl font-bold text-secondary">
-                          ${plan.price}
-                        </span>
-                      </div>
-                      
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-4 w-4" />
-                          {plan.duration_days} days
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          {plan.reach_estimate} reach
-                        </div>
-                      </div>
+        <div className="space-y-6">
+          {/* Budget Slider */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-semibold">Your Budget</Label>
+              <div className="flex items-center gap-2">
+                <DollarSign className="h-5 w-5 text-secondary" />
+                <span className="text-3xl font-bold text-secondary">
+                  ${budget}
+                </span>
+              </div>
+            </div>
+            
+            <Slider
+              value={[budget]}
+              onValueChange={(value) => setBudget(value[0])}
+              min={10}
+              max={500}
+              step={5}
+              className="w-full"
+            />
+            
+            <div className="flex justify-between text-xs text-muted-foreground">
+              <span>$10 min</span>
+              <span>$500 max</span>
+            </div>
+          </div>
 
-                      <ul className="space-y-1">
-                        {plan.features.map((feature, idx) => (
-                          <li key={idx} className="text-sm flex items-center gap-2">
-                            <div className="h-1.5 w-1.5 rounded-full bg-secondary" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
-          </RadioGroup>
+          {/* Promotion Benefits */}
+          <Card className="p-6 border-2 border-secondary/20 bg-secondary/5">
+            <h3 className="font-semibold mb-4 flex items-center gap-2">
+              <Target className="h-5 w-5 text-secondary" />
+              What You'll Get
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Duration</p>
+                <p className="text-2xl font-bold text-secondary">{benefits.days} day{benefits.days > 1 ? 's' : ''}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-muted-foreground">Est. Reach</p>
+                <p className="text-2xl font-bold text-secondary">{benefits.reach}</p>
+              </div>
+            </div>
 
-          {selectedPlanDetails && (
-            <Card className="p-4 bg-muted/50">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="font-medium">Total</p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedPlanDetails.duration_days} days promotion
-                  </p>
-                </div>
-                <p className="text-2xl font-bold text-secondary">
-                  ${selectedPlanDetails.price}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Features included:</p>
+              <ul className="space-y-2">
+                {benefits.features.map((feature, idx) => (
+                  <li key={idx} className="text-sm flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 rounded-full bg-secondary flex-shrink-0" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </Card>
+
+          {/* Budget Suggestions */}
+          <div className="flex gap-2">
+            {[50, 100, 200, 300].map((amount) => (
+              <Button
+                key={amount}
+                variant="outline"
+                size="sm"
+                onClick={() => setBudget(amount)}
+                className={budget === amount ? "border-secondary bg-secondary/10" : ""}
+              >
+                ${amount}
+              </Button>
+            ))}
+          </div>
+
+          {/* Total Summary */}
+          <Card className="p-4 bg-muted/50">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">Total Investment</p>
+                <p className="text-sm text-muted-foreground">
+                  {benefits.days} days · {benefits.reach} estimated reach
                 </p>
               </div>
-            </Card>
-          )}
+              <p className="text-3xl font-bold text-secondary">
+                ${budget}
+              </p>
+            </div>
+          </Card>
         </div>
 
         <DialogFooter>
@@ -212,10 +217,10 @@ export function PromotePostModal({ open, onOpenChange, postId }: PromotePostModa
           </Button>
           <Button 
             onClick={handlePromote} 
-            disabled={isProcessing}
+            disabled={isProcessing || budget < 10}
             className="bg-secondary hover:bg-secondary/90"
           >
-            {isProcessing ? "Processing..." : "Promote Post"}
+            {isProcessing ? "Processing..." : `Promote for $${budget}`}
           </Button>
         </DialogFooter>
       </DialogContent>
