@@ -512,25 +512,26 @@ const TravelProfile = () => {
           )}
         </div>
 
-        {/* Dashboard Card for own profile */}
-        {isOwnProfile && stats.viewsCount > 0 && (
-          <Card className="p-3 bg-dashboard-bg border-dashboard-bg">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="font-semibold text-sm text-dashboard-text">Your dashboard</p>
-                <p className="text-xs text-dashboard-text flex items-center gap-1 mt-0.5">
-                  <TrendingUp className="h-3 w-3" />
-                  {formatNumber(stats.viewsCount)} views in the last 30 days.
-                </p>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Coin Balance Card for own profile */}
+        {/* Dashboard and Coins Cards for own profile */}
         {isOwnProfile && (
-          <div className="flex justify-start">
-            <Card className="p-3 bg-coins-bg border-coins-bg" style={{ width: 'fit-content', maxWidth: '66%' }}>
+          <div className="flex gap-2">
+            {/* Dashboard Card */}
+            {stats.viewsCount > 0 && (
+              <Card className="p-3 bg-dashboard-bg border-dashboard-bg flex-1">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="font-semibold text-sm text-dashboard-text">Your dashboard</p>
+                    <p className="text-xs text-dashboard-text flex items-center gap-1 mt-0.5">
+                      <TrendingUp className="h-3 w-3" />
+                      {formatNumber(stats.viewsCount)} views in the last 30 days.
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            )}
+
+            {/* Coin Balance Card */}
+            <Card className="p-3 bg-coins-bg border-coins-bg flex-1">
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2">
                   <Coins className="h-5 w-5 text-white" />
@@ -542,7 +543,7 @@ const TravelProfile = () => {
                 <Button
                   size="sm"
                   onClick={() => setBuyCoinsOpen(true)}
-                  className="h-8 bg-coins-button hover:bg-coins-button/90 text-coins-bg"
+                  className="h-8 bg-coins-button hover:bg-coins-button/90 text-coins-bg ml-auto"
                 >
                   Buy Coins
                 </Button>
