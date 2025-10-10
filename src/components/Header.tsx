@@ -16,6 +16,7 @@ import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 

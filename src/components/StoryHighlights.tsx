@@ -32,18 +32,18 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
 
   const fetchHighlights = async () => {
     try {
-      const response = await supabase
+      const { data, error } = await supabase
         .from("story_highlights" as any)
         .select("*")
         .eq("user_id", userId)
         .order("created_at", { ascending: false });
 
-      if (response.error) {
-        console.error("Error fetching highlights:", response.error);
+      if (error) {
+        console.error("Error fetching highlights:", error);
         return;
       }
 
-      setHighlights(response.data || []);
+      setHighlights((data as unknown as Highlight[]) || []);
     } catch (e) {
       console.error("Highlights error:", e);
     }
