@@ -267,27 +267,30 @@ export default function CoCuratedMarketplace() {
                     </div>
                   )}
 
-                  {!promotion ? (
-                    <Button 
-                      onClick={() => requestPromotion(pkg.id, pkg.package_name)}
-                      className="w-full"
-                    >
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Request to Promote
-                    </Button>
-                  ) : promotion.status === 'pending' ? (
-                    <Button disabled className="w-full" variant="secondary">
-                      Awaiting Agent Approval
-                    </Button>
-                  ) : promotion.status === 'active' ? (
+                  <div className="flex gap-2">
                     <Button 
                       variant="outline"
-                      className="w-full"
-                      onClick={() => navigate(`/cocurated-promotion/${promotion.id}`)}
+                      onClick={() => navigate(`/cocurated-package/${pkg.id}`)}
+                      className="flex-1"
                     >
-                      View Promotion Details
+                      View Details
                     </Button>
-                  ) : null}
+                    {!promotion ? (
+                      <Button 
+                        onClick={() => requestPromotion(pkg.id, pkg.package_name)}
+                        className="flex-1"
+                      >
+                        <TrendingUp className="h-4 w-4 mr-2" />
+                        Promote
+                      </Button>
+                    ) : promotion.status === 'pending' ? (
+                      <Button disabled className="flex-1" variant="secondary">
+                        Pending
+                      </Button>
+                    ) : promotion.status === 'active' ? (
+                      <Badge className="flex-1 justify-center py-2">Active</Badge>
+                    ) : null}
+                  </div>
                 </CardContent>
               </Card>
             );

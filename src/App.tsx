@@ -56,6 +56,8 @@ import SupplierManagement from "./pages/SupplierManagement";
 import CoCuratedDashboard from "./pages/CoCuratedDashboard";
 import CoCuratedCreate from "./pages/CoCuratedCreate";
 import CoCuratedMarketplace from "./pages/CoCuratedMarketplace";
+import CoCuratedPackage from "./pages/CoCuratedPackage";
+import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 
 const queryClient = new QueryClient();
 
@@ -126,6 +128,8 @@ function AppContent() {
           <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
           <Route path="/cocurated-create" element={<CoCuratedCreate />} />
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
+          <Route path="/cocurated-package/:packageId" element={<CoCuratedPackage />} />
+          <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

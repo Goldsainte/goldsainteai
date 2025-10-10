@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Sparkles, Plus, DollarSign, TrendingUp, Package, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 
 export default function CoCuratedDashboard() {
   const { user } = useAuth();
@@ -270,15 +271,7 @@ export default function CoCuratedDashboard() {
               </TabsContent>
 
               <TabsContent value="approvals" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Pending Promotion Requests</CardTitle>
-                    <CardDescription>Approve influencers to promote your packages</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground text-center py-8">No pending requests</p>
-                  </CardContent>
-                </Card>
+                <PartnershipApprovals />
               </TabsContent>
             </>
           ) : (

@@ -3609,6 +3609,27 @@ export type Database = {
           },
         ]
       }
+      package_post_tags: {
+        Row: {
+          created_at: string | null
+          id: string
+          package_id: string
+          post_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          package_id: string
+          post_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          package_id?: string
+          post_id?: string
+        }
+        Relationships: []
+      }
       package_resale_transactions: {
         Row: {
           booking_amount: number
@@ -4513,48 +4534,36 @@ export type Database = {
       }
       promo_code_usage: {
         Row: {
-          currency: string
-          discount_applied: number
+          clicked_at: string | null
+          converted: boolean | null
+          created_at: string | null
           id: string
-          job_id: string | null
-          promo_code_id: string
-          used_at: string
-          user_id: string
+          package_id: string
+          promo_code: string
+          session_id: string | null
+          user_id: string | null
         }
         Insert: {
-          currency?: string
-          discount_applied: number
+          clicked_at?: string | null
+          converted?: boolean | null
+          created_at?: string | null
           id?: string
-          job_id?: string | null
-          promo_code_id: string
-          used_at?: string
-          user_id: string
+          package_id: string
+          promo_code: string
+          session_id?: string | null
+          user_id?: string | null
         }
         Update: {
-          currency?: string
-          discount_applied?: number
+          clicked_at?: string | null
+          converted?: boolean | null
+          created_at?: string | null
           id?: string
-          job_id?: string | null
-          promo_code_id?: string
-          used_at?: string
-          user_id?: string
+          package_id?: string
+          promo_code?: string
+          session_id?: string | null
+          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "promo_code_usage_job_id_fkey"
-            columns: ["job_id"]
-            isOneToOne: false
-            referencedRelation: "marketplace_jobs"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "promo_code_usage_promo_code_id_fkey"
-            columns: ["promo_code_id"]
-            isOneToOne: false
-            referencedRelation: "promotional_codes"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       promotional_codes: {
         Row: {
