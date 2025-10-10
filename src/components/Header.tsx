@@ -267,6 +267,13 @@ export const Header = () => {
                         <span className="text-sm font-medium">Browse Agents</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
+                        onClick={() => navigate('/browse-creators')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Browse Creators</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
                         onClick={() => navigate('/marketplace')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >

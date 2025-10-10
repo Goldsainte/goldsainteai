@@ -59,6 +59,7 @@ import CoCuratedMarketplace from "./pages/CoCuratedMarketplace";
 import CoCuratedPackage from "./pages/CoCuratedPackage";
 import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
+import BrowseCreators from "./pages/BrowseCreators";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +89,7 @@ function AppContent() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/marketplace" element={<Marketplace />} />
           <Route path="/browse-agents" element={<BrowseAgents />} />
+          <Route path="/browse-creators" element={<BrowseCreators />} />
           <Route path="/agent/:agentId" element={<AgentProfile />} />
           <Route path="/agent-onboarding" element={<AgentOnboarding />} />
           <Route path="/agent-dashboard" element={<AgentDashboard />} />
