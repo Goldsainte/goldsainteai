@@ -144,8 +144,8 @@ export const NotificationCenter = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5 text-[#BFAD72]" />
+        <Button variant="ghost" size="icon" className="relative group">
+          <Bell className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
