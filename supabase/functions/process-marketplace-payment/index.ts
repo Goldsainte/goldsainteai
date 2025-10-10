@@ -56,17 +56,27 @@ serve(async (req) => {
       throw new Error('Agent payment account not set up');
     }
 
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '');
+    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+      apiVersion: '2025-08-27.basil',
+    });
 
     // Customer pays the customer_facing_price
     const customerAmount = Math.round(bid.customer_facing_price * 100); // Convert to cents
+    const agentPayoutAmount = Math.round(bid.agent_payout_amount * 100);
+    const platformFees = customerAmount - agentPayoutAmount; // Service fee + success fee
 
-    // Create payment intent with ESCROW - funds held until job completion
-    // NOTE: We do NOT use transfer_data here - funds stay in platform account until customer approves completion
+    // Create payment intent with automatic transfer to agent using destination charges
+    // This provides escrow - we capture payment but transfer happens on job completion
     const paymentIntent = await stripe.paymentIntents.create({
       amount: customerAmount,
       currency: bid.currency.toLowerCase(),
       customer: user.email,
+      capture_method: 'manual', // Requires manual capture after job completion
+      application_fee_amount: platformFees,
+      on_behalf_of: bid.travel_agents.stripe_account_id, // Agent's account
+      transfer_data: {
+        destination: bid.travel_agents.stripe_account_id,
+      },
       metadata: {
         job_id: jobId,
         bid_id: bidId,
@@ -75,11 +85,9 @@ serve(async (req) => {
         service_fee: bid.platform_service_fee.toString(),
         success_fee: bid.platform_success_fee.toString(),
         agent_payout_amount: bid.agent_payout_amount.toString(),
-        stripe_account_id: bid.travel_agents.stripe_account_id,
       },
       description: `Escrow payment for ${job.title}`,
-      // Platform keeps full amount until job completion approval
-      // Funds will be transferred manually after customer approval
+      // When captured, agent automatically receives their payout, platform keeps fees
     });
 
     // Update job with payment intent and set to in_progress

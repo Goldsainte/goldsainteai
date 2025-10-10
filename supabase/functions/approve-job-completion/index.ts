@@ -59,6 +59,14 @@ serve(async (req) => {
       throw new Error('Agent has not set up payouts yet');
     }
 
+    // Get the job and verify payment was already captured
+    const job = submission.marketplace_jobs;
+    const paymentIntentId = job.payment_intent_id;
+    
+    if (!paymentIntentId) {
+      throw new Error('No payment intent found for this job');
+    }
+
     // Get accepted bid amount
     const { data: bid } = await supabaseClient
       .from('agent_bids')
@@ -75,32 +83,10 @@ serve(async (req) => {
       apiVersion: '2025-08-27.basil',
     });
 
-    // Calculate amounts (85% to agent, 15% platform fee)
-    const totalAmountCents = Math.round(bid.customer_facing_price * 100);
-    const agentPayoutCents = Math.round(totalAmountCents * 0.85);
-    const platformFeeCents = totalAmountCents - agentPayoutCents;
+    // Capture the payment - this automatically transfers to agent per the payment intent setup
+    const paymentIntent = await stripe.paymentIntents.capture(paymentIntentId);
 
-    // Create payment intent with automatic transfer
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmountCents,
-      currency: bid.currency.toLowerCase(),
-      application_fee_amount: platformFeeCents,
-      transfer_data: {
-        destination: agent.stripe_account_id,
-      },
-      metadata: {
-        job_id: submission.job_id,
-        submission_id: submissionId,
-        agent_id: submission.marketplace_jobs.assigned_agent_id,
-      },
-      confirm: true,
-      automatic_payment_methods: {
-        enabled: true,
-        allow_redirects: 'never',
-      },
-    });
-
-    console.log('Payment intent created and confirmed:', paymentIntent.id);
+    console.log('Payment captured and transferred to agent:', paymentIntentId);
 
     // Update submission status
     await supabaseClient
@@ -118,7 +104,6 @@ serve(async (req) => {
       .update({
         status: 'completed',
         customer_approved_at: new Date().toISOString(),
-        stripe_payment_intent_id: paymentIntent.id,
         payment_captured_at: new Date().toISOString(),
         payout_processed_at: new Date().toISOString(),
         payment_status: 'completed'
@@ -133,8 +118,8 @@ serve(async (req) => {
         customer_id: submission.marketplace_jobs.user_id,
         agent_id: submission.marketplace_jobs.assigned_agent_id,
         total_amount: bid.customer_facing_price,
-        agent_payout: agentPayoutCents / 100,
-        platform_fee: platformFeeCents / 100,
+        agent_payout: bid.agent_payout_amount,
+        platform_fee: bid.customer_facing_price - bid.agent_payout_amount,
         currency: bid.currency,
         status: 'paid',
         paid_at: new Date().toISOString(),
@@ -147,8 +132,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true,
         paymentIntentId: paymentIntent.id,
-        agentPayout: agentPayoutCents / 100,
-        platformFee: platformFeeCents / 100
+        captured: true
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );

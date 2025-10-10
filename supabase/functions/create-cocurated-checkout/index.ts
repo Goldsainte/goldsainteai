@@ -101,16 +101,38 @@ serve(async (req) => {
       }
     }
 
+    // Get agent's Stripe Connect account
+    const { data: agentProfile, error: agentError } = await supabaseClient
+      .from('profiles')
+      .select('stripe_account_id, stripe_payouts_enabled')
+      .eq('id', packageData.travel_agents.user_id)
+      .single();
+
+    if (agentError || !agentProfile?.stripe_account_id || !agentProfile.stripe_payouts_enabled) {
+      throw new Error('Agent has not set up payouts yet');
+    }
+
     // Calculate commission split
     const margin = packageData.retail_price - packageData.wholesale_cost;
     const agentCommission = margin * (packageData.agent_commission_percentage / 100);
     const influencerCommission = promotionId ? margin * (packageData.influencer_commission_percentage / 100) : 0;
     const platformFee = margin * (packageData.platform_fee_percentage / 100);
+    
+    // Agent gets their commission + the wholesale cost
+    const agentPayout = packageData.wholesale_cost + agentCommission;
+    const totalMargin = agentCommission + influencerCommission + platformFee;
 
-    // Create checkout session
+    // Create checkout session with automatic split to agent
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : undefined,
+      payment_intent_data: {
+        application_fee_amount: Math.round((platformFee + influencerCommission) * 100 * travelers),
+        transfer_data: {
+          destination: agentProfile.stripe_account_id,
+          amount: Math.round(agentPayout * 100 * travelers)
+        }
+      },
       line_items: [{
         price_data: {
           currency: packageData.currency.toLowerCase(),
@@ -128,6 +150,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/cocurated-package/${packageId}`,
       metadata: {
         package_id: packageId,
+        agent_id: packageData.agent_id,
         promo_code: promoCode || '',
         promotion_id: promotionId || '',
         travelers: travelers.toString(),

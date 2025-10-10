@@ -84,20 +84,23 @@ serve(async (req) => {
           .eq('id', promotionId);
       }
 
-      // Create commission record
-      await supabaseClient
-        .from('shared_commission_bookings')
-        .insert({
-          package_id: packageId,
-          promotion_id: promotionId,
-          booking_id: booking.id,
-          customer_id: booking.user_id,
-          total_booking_amount: session.amount_total! / 100,
-          currency: session.currency?.toUpperCase() || 'USD',
-          agent_commission: parseFloat(metadata.agent_commission || '0'),
-          influencer_commission: parseFloat(metadata.influencer_commission || '0'),
-          platform_fee: parseFloat(metadata.platform_fee || '0')
-        });
+      // Create commission record for influencer (agent already paid via Stripe Connect)
+      if (parseFloat(metadata.influencer_commission || '0') > 0) {
+        await supabaseClient
+          .from('shared_commission_bookings')
+          .insert({
+            package_id: packageId,
+            promotion_id: promotionId,
+            booking_id: booking.id,
+            customer_id: booking.user_id,
+            total_booking_amount: session.amount_total! / 100,
+            currency: session.currency?.toUpperCase() || 'USD',
+            agent_commission: parseFloat(metadata.agent_commission || '0'),
+            influencer_commission: parseFloat(metadata.influencer_commission || '0'),
+            platform_fee: parseFloat(metadata.platform_fee || '0'),
+            agent_paid_via_connect: true
+          });
+      }
     }
 
     return new Response(
