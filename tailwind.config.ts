@@ -51,6 +51,10 @@ export default {
           bg: "hsl(var(--dashboard-bg))",
           text: "hsl(var(--dashboard-text))",
         },
+        coins: {
+          bg: "hsl(var(--coins-bg))",
+          button: "hsl(var(--coins-button))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

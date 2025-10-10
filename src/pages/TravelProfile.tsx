@@ -529,24 +529,26 @@ const TravelProfile = () => {
 
         {/* Coin Balance Card for own profile */}
         {isOwnProfile && (
-          <Card className="p-3 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/20">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Coins className="h-5 w-5 text-yellow-500" />
-                <div>
-                  <p className="font-semibold text-sm">Your Coins</p>
-                  <p className="text-xs text-muted-foreground">{balance} coins available</p>
+          <div className="flex justify-start">
+            <Card className="p-3 bg-coins-bg border-coins-bg" style={{ width: 'fit-content', maxWidth: '66%' }}>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Coins className="h-5 w-5 text-white" />
+                  <div>
+                    <p className="font-semibold text-sm text-white">Your Coins</p>
+                    <p className="text-xs text-white/80">{balance} coins available</p>
+                  </div>
                 </div>
+                <Button
+                  size="sm"
+                  onClick={() => setBuyCoinsOpen(true)}
+                  className="h-8 bg-coins-button hover:bg-coins-button/90 text-coins-bg"
+                >
+                  Buy Coins
+                </Button>
               </div>
-              <Button
-                size="sm"
-                onClick={() => setBuyCoinsOpen(true)}
-                className="h-8"
-              >
-                Buy Coins
-              </Button>
-            </div>
-          </Card>
+            </Card>
+          </div>
         )}
 
         {/* Action Buttons */}
