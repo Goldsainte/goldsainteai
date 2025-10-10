@@ -217,18 +217,18 @@ export default function CreatorDashboard() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="mb-6 space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold mb-2 font-secondary">Creator Dashboard</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 font-secondary">Creator Dashboard</h1>
+              <p className="text-sm md:text-base text-muted-foreground">
                 Track your content performance, earnings, and partnerships
               </p>
             </div>
-            <div className="flex gap-2">
-              <Badge variant="outline" className="text-lg px-4 py-2">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="text-sm md:text-lg px-3 md:px-4 py-1.5 md:py-2 whitespace-nowrap">
                 {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(stats.estimated_earnings)} earned
               </Badge>
-              <Badge variant="outline" className="text-lg px-4 py-2 cursor-pointer" onClick={() => setBuyCoinsOpen(true)}>
+              <Badge variant="outline" className="text-sm md:text-lg px-3 md:px-4 py-1.5 md:py-2 cursor-pointer whitespace-nowrap" onClick={() => setBuyCoinsOpen(true)}>
                 <Coins className="w-4 h-4 mr-1 text-yellow-500" />
                 {coinBalance} coins
               </Badge>
@@ -282,66 +282,70 @@ export default function CreatorDashboard() {
         </div>
 
         {/* Quick Access Navigation */}
-        <div className="flex gap-3 mb-8">
+        <div className="grid grid-cols-2 md:flex md:flex-wrap gap-2 md:gap-3 mb-8">
           <Button 
             variant="outline" 
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 text-sm md:text-base h-auto py-2 md:py-2.5"
             onClick={() => navigate('/cocurated-dashboard')}
           >
             <Sparkles className="w-4 h-4" />
-            CoCurated™
+            <span className="hidden sm:inline">CoCurated™</span>
+            <span className="sm:hidden">CoCurated</span>
           </Button>
           <Button 
             variant="outline" 
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 text-sm md:text-base h-auto py-2 md:py-2.5"
             onClick={() => setCreateProductOpen(true)}
           >
             <Plus className="w-4 h-4" />
-            Create Product/Package
+            <span className="hidden sm:inline">Create Product/Package</span>
+            <span className="sm:hidden">Create</span>
           </Button>
           <Button 
             variant="outline" 
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 text-sm md:text-base h-auto py-2 md:py-2.5"
             onClick={() => navigate('/shop')}
           >
             <ShoppingBag className="w-4 h-4" />
-            Visit Shop
+            <span className="hidden sm:inline">Visit Shop</span>
+            <span className="sm:hidden">Shop</span>
           </Button>
           <Button 
             variant="outline" 
-            className="flex items-center gap-2"
+            className="flex items-center justify-center gap-2 text-sm md:text-base h-auto py-2 md:py-2.5"
             onClick={() => navigate('/marketplace')}
           >
             <Users className="w-4 h-4" />
-            Agent Marketplace
+            <span className="hidden sm:inline">Agent Marketplace</span>
+            <span className="sm:hidden">Marketplace</span>
           </Button>
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Overview
+          <TabsList className="grid w-full grid-cols-3 md:grid-cols-6 gap-1">
+            <TabsTrigger value="overview" className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+              <TrendingUp className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="tier" className="flex items-center gap-2">
-              <Star className="h-4 w-4" />
-              Tier
+            <TabsTrigger value="tier" className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+              <Star className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Tier</span>
             </TabsTrigger>
-            <TabsTrigger value="escrow" className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4" />
-              Escrow
+            <TabsTrigger value="escrow" className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+              <DollarSign className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Escrow</span>
             </TabsTrigger>
-            <TabsTrigger value="packages" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              Packages
+            <TabsTrigger value="packages" className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+              <Briefcase className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Packages</span>
             </TabsTrigger>
-            <TabsTrigger value="templates" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Templates
+            <TabsTrigger value="templates" className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+              <Calendar className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Templates</span>
             </TabsTrigger>
-            <TabsTrigger value="partnerships" className="flex items-center gap-2">
-              <Briefcase className="h-4 w-4" />
-              Partnerships
+            <TabsTrigger value="partnerships" className="flex items-center justify-center gap-1 md:gap-2 text-xs md:text-sm px-2 md:px-3">
+              <Briefcase className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Partners</span>
             </TabsTrigger>
           </TabsList>
 

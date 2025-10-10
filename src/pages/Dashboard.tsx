@@ -127,70 +127,73 @@ export default function Dashboard() {
 
   const renderBookingCard = (booking: Booking) => (
     <Card key={booking.id} className="hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
+      <CardHeader className="pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+          <div className="flex items-start gap-3 min-w-0 flex-1">
+            <div className="p-2 bg-primary/10 rounded-lg shrink-0">
               {getBookingIcon(booking.booking_type)}
             </div>
-            <div>
-              <CardTitle className="text-lg">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-base md:text-lg line-clamp-2">
                 {booking.booking_type === 'flight' 
                   ? `${booking.booking_data?.origin} → ${booking.booking_data?.destination}`
                   : booking.booking_data?.hotelName || 'Hotel Booking'
                 }
               </CardTitle>
-              <CardDescription>
+              <CardDescription className="text-xs md:text-sm truncate">
                 Ref: {booking.booking_reference}
               </CardDescription>
             </div>
           </div>
-          <Badge className={getStatusColor(booking.status)}>
+          <Badge className={`${getStatusColor(booking.status)} shrink-0`}>
             {booking.status}
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-            <span>
+      <CardContent className="space-y-4 pt-0">
+        <div className="grid grid-cols-2 gap-3 md:gap-4">
+          <div className="flex items-center gap-2 text-xs md:text-sm">
+            <Calendar className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+            <span className="truncate">
               {formatDate(booking.booking_data?.departureDate || booking.booking_data?.checkIn)}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <Clock className="h-4 w-4 text-muted-foreground" />
-            <span>
+          <div className="flex items-center gap-2 text-xs md:text-sm">
+            <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+            <span className="truncate">
               {booking.booking_data?.departureTime || booking.booking_data?.checkInTime || 'N/A'}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-            <span className="font-semibold">
+          <div className="flex items-center gap-2 text-xs md:text-sm">
+            <DollarSign className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+            <span className="font-semibold truncate">
               {booking.currency} {Number(booking.total_price).toFixed(2)}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm">
-            <MapPin className="h-4 w-4 text-muted-foreground" />
-            <span>{booking.booking_data?.destination}</span>
+          <div className="flex items-center gap-2 text-xs md:text-sm">
+            <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4 text-muted-foreground shrink-0" />
+            <span className="truncate">{booking.booking_data?.destination}</span>
           </div>
         </div>
         
-        <div className="flex gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row gap-2 pt-2">
           <Button 
             variant="outline" 
-            className="flex-1"
+            className="flex-1 text-sm h-9 md:h-10"
             onClick={() => navigate(`/booking-details/${booking.id}`)}
           >
-            View Details
+            <span className="hidden sm:inline">View Details</span>
+            <span className="sm:hidden">Details</span>
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
           {booking.status !== 'cancelled' && booking.booking_type === 'flight' && (
             <Button 
               variant="default" 
+              className="flex-1 sm:flex-initial text-sm h-9 md:h-10"
               onClick={() => navigate(`/modify-flight/${booking.id}`)}
             >
-              Modify Flight
+              <span className="hidden sm:inline">Modify Flight</span>
+              <span className="sm:hidden">Modify</span>
             </Button>
           )}
         </div>
@@ -229,14 +232,18 @@ export default function Dashboard() {
         </div>
 
         <Tabs defaultValue="upcoming" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-xl">
-            <TabsTrigger value="upcoming">
-              Upcoming ({upcomingBookings.length})
+          <TabsList className="grid w-full grid-cols-3 max-w-xl text-xs md:text-sm">
+            <TabsTrigger value="upcoming" className="px-2 md:px-3">
+              <span className="hidden sm:inline">Upcoming</span>
+              <span className="sm:hidden">Up</span> ({upcomingBookings.length})
             </TabsTrigger>
-            <TabsTrigger value="past">
+            <TabsTrigger value="past" className="px-2 md:px-3">
               Past ({pastBookings.length})
             </TabsTrigger>
-            <TabsTrigger value="history">Search History</TabsTrigger>
+            <TabsTrigger value="history" className="px-2 md:px-3">
+              <span className="hidden sm:inline">Search History</span>
+              <span className="sm:hidden">History</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="upcoming" className="space-y-4">

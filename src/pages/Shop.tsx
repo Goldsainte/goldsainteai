@@ -115,13 +115,14 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
+      <div className="container mx-auto px-4 py-6 md:py-8 max-w-6xl">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <Button 
               variant="ghost" 
               onClick={handleBack}
-              className="gap-2"
+              className="gap-2 self-start"
+              size="sm"
             >
               <ArrowLeft className="h-4 w-4" />
               Back
@@ -129,16 +130,18 @@ export default function Shop() {
             {user && (
               <Button 
                 onClick={() => setCreateModalOpen(true)}
-                className="gap-2"
+                className="gap-2 w-full sm:w-auto"
+                size="sm"
               >
                 <Plus className="h-4 w-4" />
-                Sell Your Products
+                <span className="hidden sm:inline">Sell Your Products</span>
+                <span className="sm:hidden">Sell</span>
               </Button>
             )}
           </div>
 
-          <h1 className="text-4xl font-secondary font-bold mb-4">The Sainte Creator Travel Collection</h1>
-          <p className="text-muted-foreground mb-6">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-secondary font-bold mb-3 md:mb-4">The Sainte Creator Travel Collection</h1>
+          <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6">
             Discover travel gear, packages, and experiences from creators
           </p>
 
@@ -153,15 +156,16 @@ export default function Shop() {
           </div>
         </div>
 
-        <Tabs defaultValue="products" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="products">
-              <Package className="h-4 w-4 mr-2" />
+        <Tabs defaultValue="products" className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md">
+            <TabsTrigger value="products" className="text-xs md:text-sm">
+              <Package className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
               Products
             </TabsTrigger>
-            <TabsTrigger value="packages">
-              <MapPin className="h-4 w-4 mr-2" />
-              Travel Packages
+            <TabsTrigger value="packages" className="text-xs md:text-sm">
+              <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
+              <span className="hidden sm:inline">Travel Packages</span>
+              <span className="sm:hidden">Packages</span>
             </TabsTrigger>
           </TabsList>
 

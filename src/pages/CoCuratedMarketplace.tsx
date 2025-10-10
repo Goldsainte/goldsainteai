@@ -158,22 +158,23 @@ export default function CoCuratedMarketplace() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <main className="flex-1 container mx-auto py-8 px-4">
-        <div className="mb-8">
+      <main className="flex-1 container mx-auto py-6 md:py-8 px-4">
+        <div className="mb-6 md:mb-8">
           <Button 
             variant="ghost" 
             onClick={() => navigate('/cocurated-dashboard')}
             className="mb-4"
+            size="sm"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
           
-          <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <h1 className="text-3xl font-bold">CoCurated<span className="text-base align-super">™</span> Marketplace</h1>
+          <div className="flex items-center gap-2 md:gap-3 mb-2">
+            <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-primary shrink-0" />
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">CoCurated<span className="text-xs md:text-base align-super">™</span> Marketplace</h1>
           </div>
-          <p className="text-sm text-muted-foreground">Discover and promote travel packages with shared commissions</p>
+          <p className="text-xs md:text-sm text-muted-foreground">Discover and promote travel packages with shared commissions</p>
         </div>
 
       {/* Search */}

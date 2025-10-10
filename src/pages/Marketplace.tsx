@@ -320,32 +320,33 @@ export default function Marketplace() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-4 md:mb-6"
+          size="sm"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Button>
         
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
+        <div className="flex flex-col gap-3 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-secondary text-primary mb-1 leading-tight">The Travel Agent Marketplace</h1>
-            <p className="text-sm text-muted-foreground">Connect with expert travel agents for complex bookings</p>
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-secondary text-primary mb-1 leading-tight">The Travel Agent Marketplace</h1>
+            <p className="text-xs md:text-sm text-muted-foreground">Connect with expert travel agents for complex bookings</p>
           </div>
           
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="gap-2 w-full md:w-auto" size="default">
-                <Plus className="h-4 w-4" />
-                Post a Job
+              <Button className="gap-2 w-full md:w-auto" size="sm">
+                <Plus className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                <span className="text-xs md:text-sm">Post a Job</span>
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-5xl h-[95vh] flex flex-col p-0">
-              <DialogHeader className="flex-shrink-0 px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
-                <DialogTitle className="font-secondary text-lg md:text-2xl">Post a Comprehensive Travel Job</DialogTitle>
+              <DialogHeader className="flex-shrink-0 px-3 md:px-6 pt-3 md:pt-6 pb-2 md:pb-4">
+                <DialogTitle className="font-secondary text-base md:text-xl lg:text-2xl">Post a Comprehensive Travel Job</DialogTitle>
                 <DialogDescription className="text-xs md:text-sm">
                   Provide detailed information about your travel needs and get bids from qualified agents
                 </DialogDescription>
@@ -361,10 +362,16 @@ export default function Marketplace() {
           </Dialog>
         </div>
 
-        <Tabs defaultValue="browse" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="browse" className="!font-secondary">Browse Jobs</TabsTrigger>
-            <TabsTrigger value="my-jobs" className="!font-secondary">My Jobs ({myJobs.length})</TabsTrigger>
+        <Tabs defaultValue="browse" className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-md text-xs md:text-sm">
+            <TabsTrigger value="browse" className="!font-secondary px-2 md:px-3">
+              <span className="hidden sm:inline">Browse Jobs</span>
+              <span className="sm:hidden">Browse</span>
+            </TabsTrigger>
+            <TabsTrigger value="my-jobs" className="!font-secondary px-2 md:px-3">
+              <span className="hidden sm:inline">My Jobs</span>
+              <span className="sm:hidden">Mine</span> ({myJobs.length})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-4">

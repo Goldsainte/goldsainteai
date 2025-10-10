@@ -40,14 +40,14 @@ export const Hero = () => {
             onSubmit={handleSearch}
             aria-label="Hotel search form"
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
-              <div className="sm:col-span-2 lg:col-span-1 relative">
+            <div className="flex flex-col gap-3 sm:gap-4">
+              <div className="relative">
                 <label htmlFor="location" className="sr-only">Destination</label>
                 <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
                 <Input
                   id="location"
                   placeholder="Where are you going?"
-                  className="pl-10 h-12 bg-background text-foreground"
+                  className="pl-10 h-12 bg-background text-foreground w-full"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   required
@@ -55,30 +55,32 @@ export const Hero = () => {
                 />
               </div>
 
-              <div className="relative">
-                <label htmlFor="check-in" className="sr-only">Check-in date</label>
-                <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                <Input
-                  id="check-in"
-                  type="date"
-                  className="pl-10 h-12 bg-background text-foreground"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  aria-label="Check-in date"
-                />
-              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="relative">
+                  <label htmlFor="check-in" className="sr-only">Check-in date</label>
+                  <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                  <Input
+                    id="check-in"
+                    type="date"
+                    className="pl-10 h-12 bg-background text-foreground w-full"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    aria-label="Check-in date"
+                  />
+                </div>
 
-              <div className="relative">
-                <label htmlFor="check-out" className="sr-only">Check-out date</label>
-                <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
-                <Input
-                  id="check-out"
-                  type="date"
-                  className="pl-10 h-12 bg-background text-foreground"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  aria-label="Check-out date"
-                />
+                <div className="relative">
+                  <label htmlFor="check-out" className="sr-only">Check-out date</label>
+                  <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                  <Input
+                    id="check-out"
+                    type="date"
+                    className="pl-10 h-12 bg-background text-foreground w-full"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    aria-label="Check-out date"
+                  />
+                </div>
               </div>
 
               <div className="relative">
@@ -90,7 +92,7 @@ export const Hero = () => {
                   min="1"
                   max="20"
                   placeholder="2 guests"
-                  className="pl-10 h-12 bg-background text-foreground"
+                  className="pl-10 h-12 bg-background text-foreground w-full"
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
                   aria-label="Number of guests"
