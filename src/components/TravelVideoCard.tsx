@@ -40,6 +40,7 @@ interface TravelVideoCardProps {
       username: string | null;
       avatar_url: string | null;
       is_verified?: boolean;
+      instagram_username?: string | null;
     };
   };
   isActive: boolean;
@@ -372,7 +373,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 {renderTextWithMentionsAndHashtags(
                   post.caption,
                   (username) => navigate(`/travel-profile?user=${username}`),
-                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
+                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`),
+                  post.profiles?.instagram_username || undefined
                 ).map((part, idx) => {
                   if (typeof part === 'string') return part;
                   return (
@@ -382,7 +384,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                       onClick={(e) => {
                         e.stopPropagation();
                         if (part.type === 'mention') {
-                          navigate(`/travel-profile?user=${part.value}`);
+                          if ('isInstagram' in part && part.isInstagram) {
+                            window.open(`https://instagram.com/${part.value}`, '_blank');
+                          } else {
+                            navigate(`/travel-profile?user=${part.value}`);
+                          }
                         } else {
                           navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
                         }
@@ -572,7 +578,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 {renderTextWithMentionsAndHashtags(
                   post.caption,
                   (username) => navigate(`/travel-profile?user=${username}`),
-                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`)
+                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`),
+                  post.profiles?.instagram_username || undefined
                 ).map((part, idx) => {
                   if (typeof part === 'string') return part;
                   return (
@@ -582,7 +589,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                       onClick={(e) => {
                         e.stopPropagation();
                         if (part.type === 'mention') {
-                          navigate(`/travel-profile?user=${part.value}`);
+                          if ('isInstagram' in part && part.isInstagram) {
+                            window.open(`https://instagram.com/${part.value}`, '_blank');
+                          } else {
+                            navigate(`/travel-profile?user=${part.value}`);
+                          }
                         } else {
                           navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
                         }

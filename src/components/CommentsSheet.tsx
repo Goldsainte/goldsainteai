@@ -19,6 +19,7 @@ interface Comment {
   profiles?: {
     username: string | null;
     avatar_url: string | null;
+    instagram_username?: string | null;
   };
 }
 
@@ -61,7 +62,7 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
         (data || []).map(async (comment) => {
           const { data: profile } = await supabase
             .from("profiles")
-            .select("username, avatar_url")
+            .select("username, avatar_url, instagram_username")
             .eq("id", comment.user_id)
             .maybeSingle();
 
@@ -176,7 +177,8 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
                       (hashtag) => {
                         navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`);
                         onOpenChange(false);
-                      }
+                      },
+                      comment.profiles?.instagram_username || undefined
                     ).map((part, idx) => {
                       if (typeof part === 'string') return part;
                       return (
@@ -184,8 +186,12 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
                           key={part.key}
                           onClick={() => {
                             if (part.type === 'mention') {
-                              navigate(`/travel-profile?user=${part.value}`);
-                              onOpenChange(false);
+                              if ('isInstagram' in part && part.isInstagram) {
+                                window.open(`https://instagram.com/${part.value}`, '_blank');
+                              } else {
+                                navigate(`/travel-profile?user=${part.value}`);
+                                onOpenChange(false);
+                              }
                             } else {
                               navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
                               onOpenChange(false);

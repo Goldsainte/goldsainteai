@@ -71,13 +71,13 @@ serve(async (req) => {
       (allPosts || []).map(async (post) => {
         const { data: profile } = await supabaseClient
           .from('profiles')
-          .select('username, avatar_url, is_verified')
+          .select('username, avatar_url, is_verified, instagram_username')
           .eq('id', post.user_id)
           .maybeSingle();
         
         return {
           ...post,
-          profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false }
+          profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
         };
       })
     );

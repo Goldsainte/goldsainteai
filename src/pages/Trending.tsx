@@ -16,6 +16,7 @@ interface ExplorePost {
   comment_count: number;
   profiles?: {
     username: string | null;
+    instagram_username?: string | null;
   };
 }
 
@@ -70,7 +71,7 @@ const Trending = () => {
         shuffled.slice(0, 30).map(async (post) => {
           const { data: profile } = await supabase
             .from('profiles')
-            .select('username')
+            .select('username, instagram_username')
             .eq('id', post.user_id)
             .maybeSingle();
 
