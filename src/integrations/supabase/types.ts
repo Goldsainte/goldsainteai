@@ -4068,6 +4068,311 @@ export type Database = {
           },
         ]
       }
+      supplier_partnerships: {
+        Row: {
+          agent_id: string | null
+          commission_override: number | null
+          created_at: string
+          creator_id: string
+          discount_percentage: number | null
+          id: string
+          is_active: boolean | null
+          last_booking_date: string | null
+          partnership_end_date: string | null
+          partnership_start_date: string
+          partnership_type: string | null
+          supplier_id: string
+          total_bookings: number | null
+          total_revenue: number | null
+          updated_at: string
+        }
+        Insert: {
+          agent_id?: string | null
+          commission_override?: number | null
+          created_at?: string
+          creator_id: string
+          discount_percentage?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_booking_date?: string | null
+          partnership_end_date?: string | null
+          partnership_start_date?: string
+          partnership_type?: string | null
+          supplier_id: string
+          total_bookings?: number | null
+          total_revenue?: number | null
+          updated_at?: string
+        }
+        Update: {
+          agent_id?: string | null
+          commission_override?: number | null
+          created_at?: string
+          creator_id?: string
+          discount_percentage?: number | null
+          id?: string
+          is_active?: boolean | null
+          last_booking_date?: string | null
+          partnership_end_date?: string | null
+          partnership_start_date?: string
+          partnership_type?: string | null
+          supplier_id?: string
+          total_bookings?: number | null
+          total_revenue?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_partnerships_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_partnerships_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_reviews: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          id: string
+          is_featured: boolean | null
+          is_verified: boolean | null
+          photos: Json | null
+          rating: number
+          reliability_rating: number | null
+          responded_at: string | null
+          response_from_supplier: string | null
+          review_text: string | null
+          reviewer_id: string
+          service_quality_rating: number | null
+          supplier_id: string
+          title: string | null
+          updated_at: string
+          value_for_money_rating: number | null
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          id?: string
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          photos?: Json | null
+          rating: number
+          reliability_rating?: number | null
+          responded_at?: string | null
+          response_from_supplier?: string | null
+          review_text?: string | null
+          reviewer_id: string
+          service_quality_rating?: number | null
+          supplier_id: string
+          title?: string | null
+          updated_at?: string
+          value_for_money_rating?: number | null
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          id?: string
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          photos?: Json | null
+          rating?: number
+          reliability_rating?: number | null
+          responded_at?: string | null
+          response_from_supplier?: string | null
+          review_text?: string | null
+          reviewer_id?: string
+          service_quality_rating?: number | null
+          supplier_id?: string
+          title?: string | null
+          updated_at?: string
+          value_for_money_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_reviews_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_vetting: {
+        Row: {
+          approval_decision: string | null
+          background_check_status: string | null
+          created_at: string
+          id: string
+          insurance_check_status: string | null
+          license_check_status: string | null
+          red_flags: Json | null
+          reference_check_status: string | null
+          rejection_reason: string | null
+          renewal_required: boolean | null
+          strengths: Json | null
+          supplier_id: string
+          updated_at: string
+          vetted_at: string | null
+          vetted_by: string | null
+          vetting_expires_at: string | null
+          vetting_notes: string | null
+        }
+        Insert: {
+          approval_decision?: string | null
+          background_check_status?: string | null
+          created_at?: string
+          id?: string
+          insurance_check_status?: string | null
+          license_check_status?: string | null
+          red_flags?: Json | null
+          reference_check_status?: string | null
+          rejection_reason?: string | null
+          renewal_required?: boolean | null
+          strengths?: Json | null
+          supplier_id: string
+          updated_at?: string
+          vetted_at?: string | null
+          vetted_by?: string | null
+          vetting_expires_at?: string | null
+          vetting_notes?: string | null
+        }
+        Update: {
+          approval_decision?: string | null
+          background_check_status?: string | null
+          created_at?: string
+          id?: string
+          insurance_check_status?: string | null
+          license_check_status?: string | null
+          red_flags?: Json | null
+          reference_check_status?: string | null
+          rejection_reason?: string | null
+          renewal_required?: boolean | null
+          strengths?: Json | null
+          supplier_id?: string
+          updated_at?: string
+          vetted_at?: string | null
+          vetted_by?: string | null
+          vetting_expires_at?: string | null
+          vetting_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_vetting_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          address: Json | null
+          business_name: string | null
+          business_registration_number: string | null
+          certifications: string[] | null
+          commission_rate: number | null
+          contact_email: string
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          insurance_verified: boolean | null
+          is_active: boolean | null
+          is_featured: boolean | null
+          license_verified: boolean | null
+          metadata: Json | null
+          name: string
+          payment_terms: string | null
+          rating: number | null
+          services_offered: string[] | null
+          supplier_type: Database["public"]["Enums"]["supplier_type"]
+          total_reviews: number | null
+          trust_score: number | null
+          updated_at: string
+          verification_documents: Json | null
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          verified_at: string | null
+          verified_by: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: Json | null
+          business_name?: string | null
+          business_registration_number?: string | null
+          certifications?: string[] | null
+          commission_rate?: number | null
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          insurance_verified?: boolean | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          license_verified?: boolean | null
+          metadata?: Json | null
+          name: string
+          payment_terms?: string | null
+          rating?: number | null
+          services_offered?: string[] | null
+          supplier_type: Database["public"]["Enums"]["supplier_type"]
+          total_reviews?: number | null
+          trust_score?: number | null
+          updated_at?: string
+          verification_documents?: Json | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_at?: string | null
+          verified_by?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: Json | null
+          business_name?: string | null
+          business_registration_number?: string | null
+          certifications?: string[] | null
+          commission_rate?: number | null
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          insurance_verified?: boolean | null
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          license_verified?: boolean | null
+          metadata?: Json | null
+          name?: string
+          payment_terms?: string | null
+          rating?: number | null
+          services_offered?: string[] | null
+          supplier_type?: Database["public"]["Enums"]["supplier_type"]
+          total_reviews?: number | null
+          trust_score?: number | null
+          updated_at?: string
+          verification_documents?: Json | null
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_at?: string | null
+          verified_by?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       travel_agents: {
         Row: {
           accepted_gdpr: boolean | null
@@ -5579,6 +5884,10 @@ export type Database = {
         Args: { lifetime_points_value: number }
         Returns: string
       }
+      calculate_supplier_trust_score: {
+        Args: { supplier_uuid: string }
+        Returns: number
+      }
       check_creator_eligibility: {
         Args: { p_user_id: string }
         Returns: boolean
@@ -5699,6 +6008,14 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "agent"
+      supplier_type:
+        | "hotel"
+        | "activity_provider"
+        | "tour_guide"
+        | "restaurant"
+        | "transportation"
+        | "other"
+      verification_status: "pending" | "verified" | "rejected" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -5827,6 +6144,15 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "agent"],
+      supplier_type: [
+        "hotel",
+        "activity_provider",
+        "tour_guide",
+        "restaurant",
+        "transportation",
+        "other",
+      ],
+      verification_status: ["pending", "verified", "rejected", "suspended"],
     },
   },
 } as const
