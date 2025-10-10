@@ -422,6 +422,92 @@ export type Database = {
           },
         ]
       }
+      agent_packages: {
+        Row: {
+          agent_commission_percentage: number
+          agent_id: string
+          available_from: string | null
+          available_until: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          destination: string
+          duration_days: number
+          exclusions: Json | null
+          id: string
+          images: Json | null
+          inclusions: Json | null
+          influencer_commission_percentage: number
+          is_active: boolean | null
+          max_participants: number | null
+          package_name: string
+          platform_fee_percentage: number
+          promotional_materials: Json | null
+          retail_price: number
+          terms_conditions: string | null
+          updated_at: string
+          wholesale_cost: number
+        }
+        Insert: {
+          agent_commission_percentage?: number
+          agent_id: string
+          available_from?: string | null
+          available_until?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination: string
+          duration_days: number
+          exclusions?: Json | null
+          id?: string
+          images?: Json | null
+          inclusions?: Json | null
+          influencer_commission_percentage?: number
+          is_active?: boolean | null
+          max_participants?: number | null
+          package_name: string
+          platform_fee_percentage?: number
+          promotional_materials?: Json | null
+          retail_price: number
+          terms_conditions?: string | null
+          updated_at?: string
+          wholesale_cost: number
+        }
+        Update: {
+          agent_commission_percentage?: number
+          agent_id?: string
+          available_from?: string | null
+          available_until?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          destination?: string
+          duration_days?: number
+          exclusions?: Json | null
+          id?: string
+          images?: Json | null
+          inclusions?: Json | null
+          influencer_commission_percentage?: number
+          is_active?: boolean | null
+          max_participants?: number | null
+          package_name?: string
+          platform_fee_percentage?: number
+          promotional_materials?: Json | null
+          retail_price?: number
+          terms_conditions?: string | null
+          updated_at?: string
+          wholesale_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_packages_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       agent_performance_metrics: {
         Row: {
           acceptance_rate_percentage: number | null
@@ -1195,6 +1281,75 @@ export type Database = {
             columns: ["post_id"]
             isOneToOne: false
             referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commission_payout_requests: {
+        Row: {
+          amount: number
+          booking_ids: Json | null
+          created_at: string
+          currency: string
+          id: string
+          payout_details: Json | null
+          payout_method: string
+          processed_at: string | null
+          processed_by: string | null
+          rejection_reason: string | null
+          status: string
+          stripe_transfer_id: string | null
+          updated_at: string
+          user_id: string
+          user_type: string
+        }
+        Insert: {
+          amount: number
+          booking_ids?: Json | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payout_details?: Json | null
+          payout_method?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+          user_id: string
+          user_type: string
+        }
+        Update: {
+          amount?: number
+          booking_ids?: Json | null
+          created_at?: string
+          currency?: string
+          id?: string
+          payout_details?: Json | null
+          payout_method?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          rejection_reason?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+          user_id?: string
+          user_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_payout_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1973,6 +2128,69 @@ export type Database = {
           use_count?: number | null
         }
         Relationships: []
+      }
+      influencer_promotions: {
+        Row: {
+          approved_by_agent: boolean | null
+          clicks: number | null
+          conversions: number | null
+          created_at: string
+          custom_influencer_commission_percentage: number | null
+          id: string
+          influencer_id: string
+          package_id: string
+          promo_code: string
+          status: string
+          total_commission_earned: number | null
+          total_revenue: number | null
+          updated_at: string
+        }
+        Insert: {
+          approved_by_agent?: boolean | null
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string
+          custom_influencer_commission_percentage?: number | null
+          id?: string
+          influencer_id: string
+          package_id: string
+          promo_code: string
+          status?: string
+          total_commission_earned?: number | null
+          total_revenue?: number | null
+          updated_at?: string
+        }
+        Update: {
+          approved_by_agent?: boolean | null
+          clicks?: number | null
+          conversions?: number | null
+          created_at?: string
+          custom_influencer_commission_percentage?: number | null
+          id?: string
+          influencer_id?: string
+          package_id?: string
+          promo_code?: string
+          status?: string
+          total_commission_earned?: number | null
+          total_revenue?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "influencer_promotions_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_promotions_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "agent_packages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       itinerary_items: {
         Row: {
@@ -4346,6 +4564,106 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_commission_bookings: {
+        Row: {
+          agent_commission: number
+          agent_payout_status: string
+          booking_date: string
+          booking_status: string
+          created_at: string
+          currency: string
+          customer_id: string | null
+          customer_payment_status: string
+          guest_email: string | null
+          guest_name: string | null
+          id: string
+          influencer_commission: number
+          influencer_payout_status: string
+          package_id: string
+          participants: number
+          platform_fee: number
+          promotion_id: string | null
+          retail_price: number
+          stripe_payment_intent_id: string | null
+          total_margin: number
+          travel_date: string
+          updated_at: string
+          wholesale_cost: number
+        }
+        Insert: {
+          agent_commission: number
+          agent_payout_status?: string
+          booking_date: string
+          booking_status?: string
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_payment_status?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          influencer_commission: number
+          influencer_payout_status?: string
+          package_id: string
+          participants?: number
+          platform_fee: number
+          promotion_id?: string | null
+          retail_price: number
+          stripe_payment_intent_id?: string | null
+          total_margin: number
+          travel_date: string
+          updated_at?: string
+          wholesale_cost: number
+        }
+        Update: {
+          agent_commission?: number
+          agent_payout_status?: string
+          booking_date?: string
+          booking_status?: string
+          created_at?: string
+          currency?: string
+          customer_id?: string | null
+          customer_payment_status?: string
+          guest_email?: string | null
+          guest_name?: string | null
+          id?: string
+          influencer_commission?: number
+          influencer_payout_status?: string
+          package_id?: string
+          participants?: number
+          platform_fee?: number
+          promotion_id?: string | null
+          retail_price?: number
+          stripe_payment_intent_id?: string | null
+          total_margin?: number
+          travel_date?: string
+          updated_at?: string
+          wholesale_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_commission_bookings_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "agent_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_commission_bookings_promotion_id_fkey"
+            columns: ["promotion_id"]
+            isOneToOne: false
+            referencedRelation: "influencer_promotions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stories: {
         Row: {
           caption: string | null
@@ -6496,6 +6814,16 @@ export type Database = {
           agent_price: number
           service_fee_pct?: number
           success_fee_pct?: number
+        }
+        Returns: Json
+      }
+      calculate_commission_split: {
+        Args: {
+          p_agent_percentage: number
+          p_influencer_percentage: number
+          p_platform_percentage: number
+          p_retail_price: number
+          p_wholesale_cost: number
         }
         Returns: Json
       }
