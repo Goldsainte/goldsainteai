@@ -491,13 +491,13 @@ export const Header = () => {
             </button>
             
             <button
-              onClick={() => setCreateSheetOpen(true)}
+              onClick={() => navigate('/travel-feed')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
-              aria-label="Create"
+              aria-label="Journeys"
               data-tour="places"
             >
-              <Plus className="h-5 w-5" />
-              <span className="text-xs">Create</span>
+              <Video className="h-5 w-5" />
+              <span className="text-xs">Journeys</span>
             </button>
             
             <button
