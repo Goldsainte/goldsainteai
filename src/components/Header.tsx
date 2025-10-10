@@ -156,7 +156,7 @@ export const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-secondary/10 transition-all duration-300 group"
+                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-[#BFAD72] transition-all duration-300 group"
                       aria-label="Main menu"
                       data-tour="navigation"
                     >
@@ -277,7 +277,7 @@ export const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-secondary/10 rounded-full border border-border shadow-sm transition-all duration-300 group"
+                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group"
                       aria-label="User menu"
                     >
                       <User className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
