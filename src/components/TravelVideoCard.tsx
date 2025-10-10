@@ -73,6 +73,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const isOwnPost = user?.id === post.user_id;
 
   useEffect(() => {
+    console.log('Collection selector open state:', collectionSelectorOpen);
+  }, [collectionSelectorOpen]);
+
+  useEffect(() => {
     checkIfLiked();
     fetchCollaborators();
     fetchPartnership();
