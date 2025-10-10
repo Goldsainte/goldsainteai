@@ -164,24 +164,6 @@ export const Header = () => {
 
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                {user && <CollaborationInvites />}
-                {user && (
-                  <Sheet>
-                    <SheetTrigger asChild>
-                      <Button variant="ghost" size="icon" className="relative">
-                        <Briefcase className="h-5 w-5" />
-                      </Button>
-                    </SheetTrigger>
-                    <SheetContent>
-                      <SheetHeader>
-                        <SheetTitle>Partnership Requests</SheetTitle>
-                      </SheetHeader>
-                      <div className="mt-6">
-                        <PartnershipApprovals />
-                      </div>
-                    </SheetContent>
-                  </Sheet>
-                )}
                 {user && <NotificationCenter />}
                 
                 {/* Main Navigation - Desktop */}
@@ -370,6 +352,17 @@ export const Header = () => {
                             <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Creator Dashboard</span>
                           </DropdownMenuItem>
+                        </div>
+                        
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        
+                        <div className="py-2">
+                          <div className="mx-2 px-4 py-2">
+                            <CollaborationInvites />
+                          </div>
+                          <div className="mx-2 px-4 py-2">
+                            <PartnershipApprovals />
+                          </div>
                         </div>
                         
                         {isAdmin && (
