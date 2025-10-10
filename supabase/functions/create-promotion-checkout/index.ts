@@ -30,10 +30,10 @@ serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `Post Promotion - ${planId}`,
+              name: 'Post Promotion',
               description: `Promote your post for ${durationDays} days`,
             },
-            unit_amount: Math.round(amount * 100),
+            unit_amount: Math.round(amount * 100), // Convert to cents
           },
           quantity: 1,
         },
