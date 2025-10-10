@@ -51,11 +51,11 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
       available: true
     },
     { 
-      id: "story-highlight", 
-      label: "Story highlight", 
+      id: "moments-vault", 
+      label: "Moments Vault", 
       icon: Sparkles, 
-      description: "Create a collection of stories",
-      available: false
+      description: "Create a collection of moments",
+      available: true
     },
     { 
       id: "live", 

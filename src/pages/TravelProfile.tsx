@@ -325,6 +325,9 @@ const TravelProfile = () => {
   const handleCreateContent = (type: string) => {
     if (type === 'reel' || type === 'post') {
       setUploadModalOpen(true);
+    } else if (type === 'moments-vault') {
+      toast.info('Tap the + button in the Moments Vaults section below to create a new vault');
+      setCreateSheetOpen(false);
     }
   };
 
