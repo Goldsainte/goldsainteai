@@ -49,6 +49,7 @@ import Search from "./pages/Search";
 import Trending from "./pages/Trending";
 import CommunityGuidelines from "./pages/CommunityGuidelines";
 import TrustSafety from "./pages/TrustSafety";
+import CancellationRefundPolicy from "./pages/CancellationRefundPolicy";
 import Shop from "./pages/Shop";
 import AffiliateManager from "./pages/AffiliateManager";
 import SupplierManagement from "./pages/SupplierManagement";
@@ -115,6 +116,7 @@ function AppContent() {
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
+          <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/affiliate-manager" element={<AffiliateManager />} />
           <Route path="/supplier-management" element={<SupplierManagement />} />

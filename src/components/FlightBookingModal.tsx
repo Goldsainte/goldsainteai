@@ -10,6 +10,7 @@ import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { SeatMapSelector } from "./SeatMapSelector";
 import { BaggageSelector } from "./BaggageSelector";
+import { BookingPolicyBanner } from "./BookingPolicyBanner";
 
 interface FlightBookingModalProps {
   open: boolean;
@@ -340,6 +341,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
         <DialogHeader className="pb-4">
           <DialogTitle className="text-xl sm:text-2xl font-secondary">Complete Your Flight Booking</DialogTitle>
         </DialogHeader>
+
+        <BookingPolicyBanner bookingType="flight" />
 
         {/* Autofill Prompt */}
         {showAutofillPrompt && (

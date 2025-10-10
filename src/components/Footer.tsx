@@ -21,7 +21,7 @@ export const Footer = () => {
               <li><a href="#" className="hover:text-accent transition-colors">Help Center</a></li>
               <li><a href="#" className="hover:text-accent transition-colors">Contact Us</a></li>
               <li><a href="#" className="hover:text-accent transition-colors">Safety Information</a></li>
-              <li><a href="#" className="hover:text-accent transition-colors">Cancellation Options</a></li>
+              <li><a href="/cancellation-refund-policy" className="hover:text-accent transition-colors">Cancellation & Refund Policy</a></li>
             </ul>
           </div>
 

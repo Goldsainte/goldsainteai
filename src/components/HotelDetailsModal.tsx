@@ -10,6 +10,7 @@ import { useState, useMemo } from "react";
 import { HotelMap } from "./HotelMap";
 import { getHotelImages, getRoomImages } from "@/lib/imageHelpers";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
+import { BookingPolicyBanner } from "./BookingPolicyBanner";
 
 interface RoomOption {
   id: string;
@@ -207,6 +208,8 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
             </div>
           </div>
         </DialogHeader>
+
+        <BookingPolicyBanner bookingType="hotel" />
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-6">

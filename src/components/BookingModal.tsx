@@ -17,6 +17,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCurrencySymbol } from "@/lib/currencyHelpers";
 import { useNavigate } from "react-router-dom";
+import { BookingPolicyBanner } from "./BookingPolicyBanner";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -197,6 +198,8 @@ export const BookingModal = ({
           <DialogTitle>Complete Your Booking</DialogTitle>
           <DialogDescription>Please provide your information to complete the reservation</DialogDescription>
         </DialogHeader>
+
+        <BookingPolicyBanner bookingType={bookingType} />
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
