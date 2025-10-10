@@ -92,6 +92,21 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error('Error in creator-stripe-onboarding:', error);
+    
+    // Provide helpful error message for Stripe Connect setup
+    if (error.message?.includes('signed up for Connect')) {
+      return new Response(
+        JSON.stringify({ 
+          error: 'Stripe Connect is not enabled on this account. Please enable Stripe Connect in your Stripe Dashboard: https://dashboard.stripe.com/settings/connect',
+          details: 'To enable creator payouts, you need to activate Stripe Connect. This allows the platform to create connected accounts for sellers.'
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+    
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
