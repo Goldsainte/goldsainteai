@@ -17,7 +17,7 @@ export default {
         chiffon: ['Chiffon', 'serif'],
         covik: ['Covik Sans', 'sans-serif'],
         primary: ['Cormorant Garamond', 'serif'],
-        secondary: ['Work Sans', 'sans-serif'],
+        secondary: ['Playfair Display', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
