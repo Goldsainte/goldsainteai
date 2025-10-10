@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { FeedSidebar } from "@/components/FeedSidebar";
 import { FeedSuggestions } from "@/components/FeedSuggestions";
 import StoryHighlights from "@/components/StoryHighlights";
+import { MomentsRing } from "@/components/MomentsRing";
+import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface TravelPost {
@@ -42,6 +44,7 @@ const TravelFeed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
+  const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [isPersonalized, setIsPersonalized] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -155,6 +158,11 @@ const TravelFeed = () => {
   };
 
   const handleCreateContent = (type: string) => {
+    if (type === "moment") {
+      setCreateSheetOpen(false);
+      setCreateMomentOpen(true);
+      return;
+    }
     if (type === "reel" || type === "post") {
       setUploadModalOpen(true);
     } else {
@@ -183,6 +191,9 @@ const TravelFeed = () => {
 
           {/* Center Feed */}
           <div className="flex-1 max-w-[630px] mx-auto">
+            {/* Moments Ring */}
+            <MomentsRing />
+            
             {/* Feed Posts */}
             <div className="py-6">
               {loading ? (
@@ -223,6 +234,11 @@ const TravelFeed = () => {
       ) : (
         /* Mobile Layout - Full Screen Vertical Scroll */
         <div className="relative h-screen w-full bg-black overflow-hidden">
+          {/* Moments Ring - Positioned at top */}
+          <div className="absolute top-14 left-0 right-0 z-20">
+            <MomentsRing />
+          </div>
+          
           {/* Top Navigation - Minimal */}
           <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-3 py-2 safe-top">
             <Button
@@ -320,6 +336,12 @@ const TravelFeed = () => {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleVideoUpload}
+      />
+
+      {/* Create Moment Modal */}
+      <CreateMomentModal
+        open={createMomentOpen}
+        onOpenChange={setCreateMomentOpen}
       />
     </>
   );

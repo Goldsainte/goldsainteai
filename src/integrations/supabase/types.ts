@@ -2180,6 +2180,131 @@ export type Database = {
           },
         ]
       }
+      moment_highlight_items: {
+        Row: {
+          added_at: string | null
+          highlight_id: string
+          id: string
+          moment_id: string
+        }
+        Insert: {
+          added_at?: string | null
+          highlight_id: string
+          id?: string
+          moment_id: string
+        }
+        Update: {
+          added_at?: string | null
+          highlight_id?: string
+          id?: string
+          moment_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moment_highlight_items_highlight_id_fkey"
+            columns: ["highlight_id"]
+            isOneToOne: false
+            referencedRelation: "moment_highlights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "moment_highlight_items_moment_id_fkey"
+            columns: ["moment_id"]
+            isOneToOne: false
+            referencedRelation: "moments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moment_highlights: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string | null
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      moment_views: {
+        Row: {
+          id: string
+          moment_id: string
+          viewed_at: string | null
+          viewer_id: string
+        }
+        Insert: {
+          id?: string
+          moment_id: string
+          viewed_at?: string | null
+          viewer_id: string
+        }
+        Update: {
+          id?: string
+          moment_id?: string
+          viewed_at?: string | null
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moment_views_moment_id_fkey"
+            columns: ["moment_id"]
+            isOneToOne: false
+            referencedRelation: "moments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moments: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          duration_seconds: number | null
+          expires_at: string | null
+          id: string
+          media_type: string
+          media_url: string
+          user_id: string
+          view_count: number | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          expires_at?: string | null
+          id?: string
+          media_type: string
+          media_url: string
+          user_id: string
+          view_count?: number | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          expires_at?: string | null
+          id?: string
+          media_type?: string
+          media_url?: string
+          user_id?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null

@@ -30,6 +30,13 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
 
   const options = [
     { 
+      id: "moment", 
+      label: "Moment", 
+      icon: Circle, 
+      description: "Share a moment that disappears in 24h",
+      available: true
+    },
+    { 
       id: "reel", 
       label: "Reel", 
       icon: Video, 
@@ -42,13 +49,6 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
       icon: Grid3X3, 
       description: "Share photos and videos",
       available: true
-    },
-    { 
-      id: "story", 
-      label: "Story", 
-      icon: Circle, 
-      description: "Share a moment that disappears in 24h",
-      available: false
     },
     { 
       id: "story-highlight", 
