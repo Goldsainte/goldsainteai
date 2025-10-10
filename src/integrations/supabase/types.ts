@@ -4568,6 +4568,65 @@ export type Database = {
         }
         Relationships: []
       }
+      promoted_posts: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          duration_days: number
+          expires_at: string
+          id: string
+          plan_id: string
+          post_id: string
+          reach_estimate: string | null
+          started_at: string
+          status: string
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          duration_days: number
+          expires_at: string
+          id?: string
+          plan_id: string
+          post_id: string
+          reach_estimate?: string | null
+          started_at?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          duration_days?: number
+          expires_at?: string
+          id?: string
+          plan_id?: string
+          post_id?: string
+          reach_estimate?: string | null
+          started_at?: string
+          status?: string
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "promoted_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotional_codes: {
         Row: {
           code: string
