@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -571,6 +571,10 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 className="flex-1 h-8 text-sm font-semibold"
+                onClick={() => {
+                  navigator.clipboard.writeText(window.location.href);
+                  toast.success("Profile link copied to clipboard!");
+                }}
               >
                 Share profile
               </Button>
@@ -581,7 +585,7 @@ const TravelProfile = () => {
                 onClick={() => setCloseFriendsOpen(true)}
                 title="Manage Close Friends"
               >
-                <Star className="h-4 w-4 text-green-500" />
+                <Star className="h-4 w-4 text-accent fill-accent" />
               </Button>
               <Button
                 variant="secondary"
@@ -889,8 +893,18 @@ const TravelProfile = () => {
       {/* Collaboration Invites Sheet */}
       {collaborationSheetOpen && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
-          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <CollaborationInvites />
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md p-4">
+            <div className="bg-card rounded-lg p-4 relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-2 right-2 h-8 w-8"
+                onClick={() => setCollaborationSheetOpen(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <CollaborationInvites />
+            </div>
           </div>
         </div>
       )}

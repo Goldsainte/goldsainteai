@@ -83,7 +83,7 @@ export const CloseFriendsManager = ({ open, onOpenChange }: CloseFriendsManagerP
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-green-500 fill-green-500" />
+            <Star className="h-5 w-5 text-accent fill-accent" />
             Close Friends
           </DialogTitle>
         </DialogHeader>
