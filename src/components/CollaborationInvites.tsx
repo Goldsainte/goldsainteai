@@ -121,7 +121,7 @@ export const CollaborationInvites = () => {
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+      <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
         <span className="text-sm font-medium">Collaboration Invites</span>
         {invites.length > 0 && (
           <Badge variant="destructive" className="ml-2">{invites.length}</Badge>

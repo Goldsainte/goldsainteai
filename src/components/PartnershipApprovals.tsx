@@ -129,7 +129,7 @@ export const PartnershipApprovals = () => {
   if (loading) {
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
           <span className="text-sm font-medium">Partnership Requests</span>
           <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
@@ -143,7 +143,7 @@ export const PartnershipApprovals = () => {
   if (partnerships.length === 0) {
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
           <span className="text-sm font-medium">Partnership Requests</span>
           <Badge variant="secondary" className="ml-2">0</Badge>
           <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -161,7 +161,7 @@ export const PartnershipApprovals = () => {
   return (
     <>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors">
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
           <span className="text-sm font-medium">Partnership Requests</span>
           <Badge variant="destructive" className="ml-2">{partnerships.length}</Badge>
           <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
