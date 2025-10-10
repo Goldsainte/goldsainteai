@@ -61,18 +61,24 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
 
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('send_virtual_gift', {
-        p_sender_id: user.id,
-        p_recipient_id: recipientId,
-        p_post_id: postId,
-        p_gift_id: giftId,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('process-gift-payment', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: {
+          giftId,
+          recipientId,
+          postId,
+          coinAmount: cost
+        }
       });
 
       if (error) throw error;
 
-      const result = data as { success: boolean; error?: string; coins_spent?: number };
-
-      if (result?.success) {
+      if (data?.success) {
         toast({
           title: "Gift Sent! 🎁",
           description: `You spent ${cost} coins`,
@@ -80,13 +86,13 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
         refetch();
         onOpenChange(false);
       } else {
-        throw new Error(result?.error || 'Failed to send gift');
+        throw new Error('Failed to send gift');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending gift:', error);
       toast({
         title: "Error",
-        description: "Failed to send gift",
+        description: error.message || "Failed to send gift. Make sure the creator has set up payouts.",
         variant: "destructive",
       });
     } finally {

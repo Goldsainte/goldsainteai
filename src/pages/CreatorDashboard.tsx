@@ -10,6 +10,7 @@ import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase } from "lu
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
+import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
 
 interface CreatorStats {
   total_views: number;
@@ -149,6 +150,8 @@ export default function CreatorDashboard() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-8">
+            {/* Stripe Payout Setup */}
+            <CreatorStripeOnboarding />
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

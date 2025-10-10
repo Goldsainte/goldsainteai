@@ -144,3 +144,12 @@ verify_jwt = true
 [functions.verify-coin-payment]
 verify_jwt = false
 
+[functions.creator-stripe-onboarding]
+verify_jwt = true
+
+[functions.check-creator-stripe-status]
+verify_jwt = true
+
+[functions.process-gift-payment]
+verify_jwt = true
+

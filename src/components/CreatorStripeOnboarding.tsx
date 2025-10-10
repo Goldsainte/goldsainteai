@@ -1,0 +1,183 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, AlertCircle, DollarSign, Calendar } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+
+interface StripeStatus {
+  connected: boolean;
+  onboarding_complete: boolean;
+  charges_enabled: boolean;
+  payouts_enabled: boolean;
+  payout_schedule: string;
+  requirements?: any;
+}
+
+export const CreatorStripeOnboarding = () => {
+  const [status, setStatus] = useState<StripeStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [onboarding, setOnboarding] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    checkStatus();
+    
+    // Check URL params for onboarding completion
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('onboarding') === 'complete') {
+      toast({
+        title: "Setup Complete!",
+        description: "Your payout account has been configured successfully.",
+      });
+      checkStatus();
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (params.get('refresh') === 'true') {
+      checkStatus();
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
+  const checkStatus = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const { data, error } = await supabase.functions.invoke('check-creator-stripe-status', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+      setStatus(data);
+    } catch (error: any) {
+      console.error('Error checking status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to check payout status",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startOnboarding = async () => {
+    setOnboarding(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      const { data, error } = await supabase.functions.invoke('creator-stripe-onboarding', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (error) throw error;
+      
+      // Open Stripe onboarding in new tab
+      window.open(data.url, '_blank');
+      
+      toast({
+        title: "Redirecting to Stripe",
+        description: "Please complete the setup to receive payouts.",
+      });
+    } catch (error: any) {
+      console.error('Error starting onboarding:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to start onboarding",
+        variant: "destructive",
+      });
+    } finally {
+      setOnboarding(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <DollarSign className="h-5 w-5" />
+          Payout Setup
+        </CardTitle>
+        <CardDescription>
+          Configure your bank account to receive earnings from virtual gifts
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {!status?.connected && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Connect your bank account to start receiving payments from your fans
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {status?.connected && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium">Account Status</span>
+              <Badge variant={status.onboarding_complete ? "default" : "secondary"}>
+                {status.onboarding_complete ? "Active" : "Pending"}
+              </Badge>
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Payouts Enabled</span>
+              {status.payouts_enabled ? (
+                <CheckCircle className="h-4 w-4 text-green-500" />
+              ) : (
+                <AlertCircle className="h-4 w-4 text-yellow-500" />
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-sm flex items-center gap-2">
+                <Calendar className="h-4 w-4" />
+                Payout Schedule
+              </span>
+              <Badge variant="outline">Daily</Badge>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Button 
+            onClick={status?.connected && status.onboarding_complete ? checkStatus : startOnboarding}
+            disabled={onboarding}
+            className="w-full"
+          >
+            {onboarding ? "Loading..." : 
+             status?.connected && status.onboarding_complete ? "Refresh Status" : 
+             status?.connected ? "Continue Setup" : 
+             "Set Up Payouts"}
+          </Button>
+        </div>
+
+        <Alert>
+          <AlertDescription className="text-xs">
+            <strong>How it works:</strong> When fans send you virtual gifts, Goldsainte keeps 30% and you receive 70% directly to your bank account daily.
+          </AlertDescription>
+        </Alert>
+      </CardContent>
+    </Card>
+  );
+};

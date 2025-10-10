@@ -1218,8 +1218,11 @@ export type Database = {
           currency: string | null
           earning_type: string | null
           id: string
+          platform_fee: number | null
           post_id: string | null
           status: string | null
+          stripe_transfer_id: string | null
+          transfer_date: string | null
           user_id: string
         }
         Insert: {
@@ -1228,8 +1231,11 @@ export type Database = {
           currency?: string | null
           earning_type?: string | null
           id?: string
+          platform_fee?: number | null
           post_id?: string | null
           status?: string | null
+          stripe_transfer_id?: string | null
+          transfer_date?: string | null
           user_id: string
         }
         Update: {
@@ -1238,8 +1244,11 @@ export type Database = {
           currency?: string | null
           earning_type?: string | null
           id?: string
+          platform_fee?: number | null
           post_id?: string | null
           status?: string | null
+          stripe_transfer_id?: string | null
+          transfer_date?: string | null
           user_id?: string
         }
         Relationships: [
@@ -1493,8 +1502,11 @@ export type Database = {
           id: string
           platform_fee: number
           post_id: string | null
+          processed_at: string | null
           recipient_id: string
           sender_id: string
+          stripe_payment_intent_id: string | null
+          stripe_transfer_id: string | null
         }
         Insert: {
           coin_amount: number
@@ -1504,8 +1516,11 @@ export type Database = {
           id?: string
           platform_fee: number
           post_id?: string | null
+          processed_at?: string | null
           recipient_id: string
           sender_id: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
         }
         Update: {
           coin_amount?: number
@@ -1515,8 +1530,11 @@ export type Database = {
           id?: string
           platform_fee?: number
           post_id?: string | null
+          processed_at?: string | null
           recipient_id?: string
           sender_id?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
         }
         Relationships: [
           {
@@ -3072,11 +3090,17 @@ export type Database = {
           last_name: string | null
           last_warning_at: string | null
           location: string | null
+          payout_schedule: string | null
           phone: string | null
           preferences: Json | null
           preferred_currency: string | null
           restriction_expires_at: string | null
           sms_notifications: boolean | null
+          stripe_account_id: string | null
+          stripe_account_status: string | null
+          stripe_charges_enabled: boolean | null
+          stripe_onboarding_completed: boolean | null
+          stripe_payouts_enabled: boolean | null
           tax_id: string | null
           tiktok_username: string | null
           updated_at: string
@@ -3106,11 +3130,17 @@ export type Database = {
           last_name?: string | null
           last_warning_at?: string | null
           location?: string | null
+          payout_schedule?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
           restriction_expires_at?: string | null
           sms_notifications?: boolean | null
+          stripe_account_id?: string | null
+          stripe_account_status?: string | null
+          stripe_charges_enabled?: boolean | null
+          stripe_onboarding_completed?: boolean | null
+          stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
           tiktok_username?: string | null
           updated_at?: string
@@ -3140,11 +3170,17 @@ export type Database = {
           last_name?: string | null
           last_warning_at?: string | null
           location?: string | null
+          payout_schedule?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
           restriction_expires_at?: string | null
           sms_notifications?: boolean | null
+          stripe_account_id?: string | null
+          stripe_account_status?: string | null
+          stripe_charges_enabled?: boolean | null
+          stripe_onboarding_completed?: boolean | null
+          stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
           tiktok_username?: string | null
           updated_at?: string
