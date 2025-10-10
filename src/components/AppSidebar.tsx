@@ -26,6 +26,7 @@ const items = [
   { title: "Marketplace", url: "/marketplace", icon: Clipboard, authRequired: true },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
+  { title: "Creator Earnings", url: "/creator-dashboard", icon: DollarSign, authRequired: true },
   { title: "Favorites", url: "/favorites", icon: Heart },
 ];
 
