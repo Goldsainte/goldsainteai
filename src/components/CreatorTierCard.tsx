@@ -129,12 +129,16 @@ export function CreatorTierCard() {
   if (!tierMembership || !tierMembership.tier) {
     return (
       <Card>
-        <CardContent className="py-8 text-center">
-          <Award className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-2">No tier assigned yet</p>
-          <p className="text-sm text-muted-foreground">
-            Start creating content to get your first tier!
-          </p>
+        <CardContent className="py-8 text-center space-y-4">
+          <Award className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+          <p className="text-muted-foreground">No tier assigned yet</p>
+          <p className="text-sm text-muted-foreground">Click below to calculate your current metrics and assign your starting tier.</p>
+          <div>
+            <Button onClick={() => evaluateTierMutation.mutate()} disabled={evaluateTierMutation.isPending}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${evaluateTierMutation.isPending ? 'animate-spin' : ''}`} />
+              Calculate My Tier
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
