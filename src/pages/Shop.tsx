@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Header } from "@/components/Header";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Search, Package, MapPin } from "lucide-react";
+import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 export default function Shop() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
@@ -92,10 +93,28 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
-      <div className="container mx-auto px-4 py-8 mt-16">
+      <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <Button 
+              variant="ghost" 
+              onClick={() => navigate(-1)}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            {user && (
+              <Button 
+                onClick={() => navigate('/creator-dashboard')}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Sell Your Products
+              </Button>
+            )}
+          </div>
+
           <h1 className="text-4xl font-secondary font-bold mb-4">Travel Shop</h1>
           <p className="text-muted-foreground mb-6">
             Discover travel gear, packages, and experiences from creators
