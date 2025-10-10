@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus } from "lucide-react";
+import CreateContentSheet from "@/components/CreateContentSheet";
+import ContentUploadModal from "@/components/ContentUploadModal";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -30,6 +32,8 @@ export const Header = () => {
   const isMobile = useIsMobile();
   const [usePreferences, setUsePreferences] = useState(true);
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -49,6 +53,16 @@ export const Header = () => {
 
     fetchPreferences();
   }, [user]);
+
+  const handleCreateContent = (type: string) => {
+    if (type === "reel" || type === "post") {
+      setUploadModalOpen(true);
+    }
+  };
+
+  const handleUploadSuccess = () => {
+    setUploadModalOpen(false);
+  };
 
   const togglePreferences = async (checked: boolean) => {
     setUsePreferences(checked);
@@ -434,12 +448,12 @@ export const Header = () => {
             </button>
             
             <button
-              onClick={() => navigate('/travel-feed')}
+              onClick={() => setCreateSheetOpen(true)}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Create"
               data-tour="places"
             >
-              <Video className="h-5 w-5" />
+              <Plus className="h-5 w-5" />
               <span className="text-xs">Create</span>
             </button>
             
@@ -501,6 +515,20 @@ export const Header = () => {
           </SheetContent>
         </Sheet>
       )}
+
+      {/* Create Content Sheet */}
+      <CreateContentSheet
+        open={createSheetOpen}
+        onOpenChange={setCreateSheetOpen}
+        onSelectType={handleCreateContent}
+      />
+
+      {/* Upload Modal */}
+      <ContentUploadModal
+        open={uploadModalOpen}
+        onOpenChange={setUploadModalOpen}
+        onSuccess={handleUploadSuccess}
+      />
 
     </>
   );
