@@ -110,37 +110,31 @@ export default function CoCuratedDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <Card className="max-w-md">
-            <CardHeader>
-              <CardTitle>Sign In Required</CardTitle>
-              <CardDescription>Please sign in to access CoCurated™</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button onClick={() => navigate('/auth')} className="w-full">
-                Sign In
-              </Button>
-            </CardContent>
-          </Card>
-        </main>
-        <Footer />
+      <div className="min-h-screen flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardHeader>
+            <CardTitle>Sign In Required</CardTitle>
+            <CardDescription>Please sign in to access CoCurated<span className="text-xs align-super">™</span></CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button onClick={() => navigate('/auth')} className="w-full">
+              Sign In
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      
       <main className="flex-1 container mx-auto py-8 px-4">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <h1 className="text-3xl font-bold">CoCurated™ Dashboard</h1>
+                <h1 className="text-3xl font-bold">CoCurated<span className="text-base align-super">™</span> Dashboard</h1>
               </div>
               <p className="text-sm text-muted-foreground">
                 {isAgent ? 'Manage your packages and track influencer promotions' : 'Track your promotions and earnings'}
@@ -197,7 +191,7 @@ export default function CoCuratedDashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.totalEarnings.toFixed(2)}</div>
+              <div className="text-2xl font-bold">{stats.totalEarnings.toFixed(2)}</div>
             </CardContent>
           </Card>
           
@@ -207,7 +201,7 @@ export default function CoCuratedDashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.pendingPayouts.toFixed(2)}</div>
+              <div className="text-2xl font-bold">{stats.pendingPayouts.toFixed(2)}</div>
             </CardContent>
           </Card>
         </div>
@@ -349,8 +343,6 @@ export default function CoCuratedDashboard() {
           )}
         </Tabs>
       </main>
-
-      <Footer />
     </div>
   );
 }
