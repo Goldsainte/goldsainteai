@@ -477,7 +477,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </DropdownMenu>
             </div>
             <button
-              onClick={() => setCollectionSelectorOpen(true)}
+              onClick={() => {
+                console.log('Save button clicked - desktop');
+                setCollectionSelectorOpen(true);
+              }}
               className="transition-transform active:scale-90"
             >
               <Bookmark className="h-6 w-6" />
@@ -789,7 +792,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </DropdownMenu>
 
             <button
-              onClick={() => setCollectionSelectorOpen(true)}
+              onClick={() => {
+                console.log('Save button clicked - mobile');
+                setCollectionSelectorOpen(true);
+              }}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
               <Bookmark className="h-7 w-7 text-white drop-shadow-lg" />

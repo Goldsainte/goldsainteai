@@ -62,7 +62,9 @@ export const CollectionSelector = ({ postId, open, onOpenChange }: CollectionSel
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md" onOpenAutoFocus={(e) => {
+        console.log('CollectionSelector dialog opened');
+      }}>
         <DialogHeader>
           <DialogTitle>Save to Collection</DialogTitle>
         </DialogHeader>
