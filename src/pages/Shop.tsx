@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus } from "lucide-react";
+import { CreateProductModal } from "@/components/CreateProductModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -17,13 +18,14 @@ export default function Shop() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const handleBack = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate('/');
   };
   // Fetch products
-  const { data: products = [], isLoading: productsLoading } = useQuery({
+  const { data: products = [], isLoading: productsLoading, refetch: refetchProducts } = useQuery({
     queryKey: ['products', searchQuery],
     queryFn: async () => {
       let query = supabase
@@ -43,7 +45,7 @@ export default function Shop() {
   });
 
   // Fetch travel packages
-  const { data: packages = [], isLoading: packagesLoading } = useQuery({
+  const { data: packages = [], isLoading: packagesLoading, refetch: refetchPackages } = useQuery({
     queryKey: ['travel-packages', searchQuery],
     queryFn: async () => {
       let query = supabase
@@ -104,7 +106,7 @@ export default function Shop() {
             </Button>
             {user && (
               <Button 
-                onClick={() => navigate('/creator-dashboard')}
+                onClick={() => setCreateModalOpen(true)}
                 className="gap-2"
               >
                 <Plus className="h-4 w-4" />
@@ -273,6 +275,17 @@ export default function Shop() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <CreateProductModal 
+        open={createModalOpen} 
+        onOpenChange={(open) => {
+          setCreateModalOpen(open);
+          if (!open) {
+            refetchProducts();
+            refetchPackages();
+          }
+        }} 
+      />
     </div>
   );
 }

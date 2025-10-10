@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus } from "lucide-react";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
 import { CreatorStripeOnboarding } from "@/components/CreatorStripeOnboarding";
+import { CreateProductModal } from "@/components/CreateProductModal";
 
 interface CreatorStats {
   total_views: number;
@@ -26,6 +27,7 @@ export default function CreatorDashboard() {
   const navigate = useNavigate();
   const { balance: coinBalance, refetch: refetchCoins } = useCoinBalance();
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
+  const [createProductOpen, setCreateProductOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const [stats, setStats] = useState<CreatorStats>({
     total_views: 0,
@@ -140,6 +142,14 @@ export default function CreatorDashboard() {
 
         {/* Quick Access Navigation */}
         <div className="flex gap-3 mb-8">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => setCreateProductOpen(true)}
+          >
+            <Plus className="w-4 h-4" />
+            Create Product/Package
+          </Button>
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
@@ -320,6 +330,7 @@ export default function CreatorDashboard() {
       </div>
 
       <BuyCoinsModal open={buyCoinsOpen} onOpenChange={setBuyCoinsOpen} />
+      <CreateProductModal open={createProductOpen} onOpenChange={setCreateProductOpen} />
     </div>
   );
 }
