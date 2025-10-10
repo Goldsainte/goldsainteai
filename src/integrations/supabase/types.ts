@@ -2797,6 +2797,8 @@ export type Database = {
         Row: {
           account_status: string | null
           account_type: string | null
+          auto_share_instagram: boolean | null
+          auto_share_tiktok: boolean | null
           avatar_url: string | null
           billing_address: Json | null
           bio: string | null
@@ -2820,6 +2822,7 @@ export type Database = {
           restriction_expires_at: string | null
           sms_notifications: boolean | null
           tax_id: string | null
+          tiktok_username: string | null
           updated_at: string
           username: string | null
           warning_count: number | null
@@ -2828,6 +2831,8 @@ export type Database = {
         Insert: {
           account_status?: string | null
           account_type?: string | null
+          auto_share_instagram?: boolean | null
+          auto_share_tiktok?: boolean | null
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
@@ -2851,6 +2856,7 @@ export type Database = {
           restriction_expires_at?: string | null
           sms_notifications?: boolean | null
           tax_id?: string | null
+          tiktok_username?: string | null
           updated_at?: string
           username?: string | null
           warning_count?: number | null
@@ -2859,6 +2865,8 @@ export type Database = {
         Update: {
           account_status?: string | null
           account_type?: string | null
+          auto_share_instagram?: boolean | null
+          auto_share_tiktok?: boolean | null
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
@@ -2882,6 +2890,7 @@ export type Database = {
           restriction_expires_at?: string | null
           sms_notifications?: boolean | null
           tax_id?: string | null
+          tiktok_username?: string | null
           updated_at?: string
           username?: string | null
           warning_count?: number | null

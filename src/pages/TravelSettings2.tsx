@@ -173,7 +173,7 @@ const TravelSettings2 = () => {
           <SettingsItem
             icon={Grid2X2}
             title="Crossposting"
-            onClick={() => {}}
+            onClick={() => navigate('/crossposting-settings')}
           />
           <SettingsItem
             icon={Ban}

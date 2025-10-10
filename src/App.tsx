@@ -43,6 +43,7 @@ import TravelFeed from "./pages/TravelFeed";
 import TravelProfile from "./pages/TravelProfile";
 import TravelSettings from "./pages/TravelSettings";
 import TravelSettings2 from "./pages/TravelSettings2";
+import CrosspostingSettings from "./pages/CrosspostingSettings";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Search from "./pages/Search";
 import Trending from "./pages/Trending";
@@ -93,7 +94,9 @@ function AppContent() {
           <Route path="/travel-profile" element={<TravelProfile />} />
           <Route path="/travel-profile/:userId" element={<TravelProfile />} />
           <Route path="/travel-settings" element={<TravelSettings2 />} />
+          <Route path="/travel-settings-2" element={<TravelSettings2 />} />
           <Route path="/travel-settings/edit" element={<TravelSettings />} />
+          <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
           <Route path="/creator-dashboard" element={<CreatorDashboard />} />
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
