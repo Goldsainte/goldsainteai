@@ -160,7 +160,7 @@ export const Header = () => {
                       aria-label="Main menu"
                       data-tour="navigation"
                     >
-                      <Menu className="h-5 w-5" />
+                      <Menu className="h-5 w-5 text-[#BFAD72]" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
@@ -280,7 +280,7 @@ export const Header = () => {
                       className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-secondary/10 rounded-full border border-border shadow-sm transition-all duration-300"
                       aria-label="User menu"
                     >
-                      <User className="h-5 w-5" />
+                      <User className="h-5 w-5 text-[#BFAD72]" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
