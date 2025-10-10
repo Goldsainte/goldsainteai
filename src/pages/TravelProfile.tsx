@@ -514,11 +514,11 @@ const TravelProfile = () => {
 
         {/* Dashboard Card for own profile */}
         {isOwnProfile && stats.viewsCount > 0 && (
-          <Card className="p-3 bg-muted/50 border-muted">
+          <Card className="p-3 bg-dashboard-bg border-dashboard-bg">
             <div className="flex items-start justify-between">
               <div>
-                <p className="font-semibold text-sm">Your dashboard</p>
-                <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                <p className="font-semibold text-sm text-dashboard-text">Your dashboard</p>
+                <p className="text-xs text-dashboard-text flex items-center gap-1 mt-0.5">
                   <TrendingUp className="h-3 w-3" />
                   {formatNumber(stats.viewsCount)} views in the last 30 days.
                 </p>
@@ -585,7 +585,7 @@ const TravelProfile = () => {
                 onClick={() => setCloseFriendsOpen(true)}
                 title="Manage Close Friends"
               >
-                <Star className="h-4 w-4 text-accent fill-accent" />
+                <Star className="h-4 w-4 text-dashboard-bg fill-dashboard-bg" />
               </Button>
               <Button
                 variant="secondary"

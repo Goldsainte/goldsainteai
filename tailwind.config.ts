@@ -47,6 +47,10 @@ export default {
           dark: "hsl(var(--accent-dark))",
           gray: "hsl(var(--accent-gray))",
         },
+        dashboard: {
+          bg: "hsl(var(--dashboard-bg))",
+          text: "hsl(var(--dashboard-text))",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",
