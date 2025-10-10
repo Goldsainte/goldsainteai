@@ -1030,13 +1030,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       )}
 
       {/* Promote Post Modal */}
-      {promoteModalOpen && (
-        <PromotePostModal
-          open={promoteModalOpen}
-          onOpenChange={setPromoteModalOpen}
-          postId={post.id}
-        />
-      )}
+      <PromotePostModal
+        open={promoteModalOpen}
+        onOpenChange={setPromoteModalOpen}
+        postId={post.id}
+      />
     </div>
   );
 };
