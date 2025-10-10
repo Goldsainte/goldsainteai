@@ -554,6 +554,14 @@ const TravelProfile = () => {
           {isOwnProfile ? (
             <>
               <Button
+                variant="default"
+                className="flex-1 h-8 text-sm font-semibold"
+                onClick={() => setUploadModalOpen(true)}
+              >
+                <PlusCircle className="h-4 w-4 mr-1" />
+                Create
+              </Button>
+              <Button
                 variant="secondary"
                 className="flex-1 h-8 text-sm font-semibold"
                 onClick={() => setEditProfileOpen(true)}
