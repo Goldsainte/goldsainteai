@@ -67,46 +67,46 @@ export const BuyCoinsModal = ({ open, onOpenChange }: BuyCoinsModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl" data-tour="buy-coins-modal">
+      <DialogContent className="max-w-3xl max-h-[90vh]" data-tour="buy-coins-modal">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-2xl">
-            <Coins className="h-6 w-6 text-yellow-500" />
+          <DialogTitle className="flex items-center gap-2 text-xl">
+            <Coins className="h-5 w-5 text-yellow-500" />
             Buy Coins
           </DialogTitle>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-2">
           {COIN_PACKAGES.map((pkg) => (
             <div
               key={pkg.coins}
-              className={`relative border rounded-lg p-4 ${
+              className={`relative border rounded-lg p-3 ${
                 pkg.popular ? 'border-primary shadow-lg' : 'border-border'
               }`}
             >
               {pkg.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-medium">
+                <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-2 py-0.5 rounded-full text-xs font-medium">
                   Most Popular
                 </div>
               )}
               
-              <div className="text-center space-y-2">
-                <div className="text-3xl font-bold">{pkg.coins.toLocaleString()}</div>
-                <div className="text-sm text-muted-foreground">Coins</div>
+              <div className="text-center space-y-1.5">
+                <div className="text-2xl font-bold">{pkg.coins.toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">Coins</div>
                 
                 {pkg.bonus && (
-                  <div className="text-sm text-green-600 font-medium">
-                    +{pkg.bonus} Bonus Coins!
+                  <div className="text-xs text-green-600 font-medium">
+                    +{pkg.bonus} Bonus!
                   </div>
                 )}
                 
-                <div className="text-2xl font-bold text-primary">
+                <div className="text-xl font-bold text-primary">
                   ${pkg.price.toFixed(2)}
                 </div>
                 
                 <Button
                   onClick={() => handlePurchase(pkg)}
                   disabled={loading}
-                  className="w-full"
+                  className="w-full h-8 text-sm"
                   variant={pkg.popular ? "default" : "outline"}
                 >
                   {loading ? "Processing..." : "Buy Now"}
@@ -116,7 +116,7 @@ export const BuyCoinsModal = ({ open, onOpenChange }: BuyCoinsModalProps) => {
           ))}
         </div>
         
-        <div className="text-xs text-muted-foreground text-center mt-4">
+        <div className="text-xs text-muted-foreground text-center mt-2">
           Coins can be used to send virtual gifts to creators
         </div>
       </DialogContent>
