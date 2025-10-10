@@ -26,6 +26,7 @@ interface TravelPost {
   like_count: number;
   comment_count: number;
   created_at: string;
+  is_suggested?: boolean;
   profiles?: {
     username: string | null;
     avatar_url: string | null;

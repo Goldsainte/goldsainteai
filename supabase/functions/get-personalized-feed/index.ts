@@ -85,14 +85,17 @@ serve(async (req) => {
     // Score and rank posts
     const scoredPosts = postsWithProfiles.map(post => {
       let score = 0;
+      const isFollowing = followingIds.includes(post.user_id);
+      const isOwnPost = post.user_id === user.id;
+      const isSuggested = !isFollowing && !isOwnPost;
       
       // Always include your own posts prominently
-      if (post.user_id === user.id) {
+      if (isOwnPost) {
         score += 1000;
       }
       
       // Boost posts from followed accounts (high priority)
-      if (followingIds.includes(post.user_id)) {
+      if (isFollowing) {
         score += 100;
       }
       
@@ -149,15 +152,20 @@ serve(async (req) => {
       else if (daysOld < 3) score += 10;
       else if (daysOld < 7) score += 5;
       
-      return { ...post, score };
+      return { ...post, score, is_suggested: isSuggested };
     });
 
     // Sort by score and return top posts
     const personalizedFeed = scoredPosts
       .sort((a, b) => b.score - a.score)
-      .slice(0, 20);
+      .slice(0, 30); // Get more posts to mix in suggestions
+
+    // Calculate suggestion stats
+    const suggestedCount = personalizedFeed.filter(p => p.is_suggested).length;
+    const followingCount = personalizedFeed.filter(p => !p.is_suggested && p.user_id !== user.id).length;
 
     console.log(`[PERSONALIZED-FEED] Returning ${personalizedFeed.length} personalized posts`);
+    console.log(`[PERSONALIZED-FEED] Following: ${followingCount}, Suggested: ${suggestedCount}, Own: ${personalizedFeed.length - suggestedCount - followingCount}`);
     console.log(`[PERSONALIZED-FEED] Top 3 scores: ${personalizedFeed.slice(0, 3).map(p => p.score).join(', ')}`);
 
     return new Response(JSON.stringify({ posts: personalizedFeed }), {

@@ -37,6 +37,7 @@ interface TravelVideoCardProps {
     comment_count: number;
     share_count?: number;
     is_featured?: boolean;
+    is_suggested?: boolean;
     profiles?: {
       username: string | null;
       avatar_url: string | null;
@@ -248,7 +249,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         {/* Header */}
         <div className="flex items-center justify-between p-4">
           <div 
-            className="flex items-center gap-3 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer flex-1"
             onClick={() => navigate(`/travel-profile/${post.user_id}`)}
           >
             <Avatar className="h-10 w-10">
@@ -257,7 +258,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="flex-1">
               <div className="flex items-center gap-1.5">
                 <p className="font-semibold text-sm">{post.profiles?.username || 'Anonymous'}</p>
                 {post.profiles?.is_verified && (
@@ -269,6 +270,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   <MapPin className="h-3 w-3" />
                   {post.location}
                 </div>
+              )}
+              {post.is_suggested && (
+                <p className="text-xs text-muted-foreground font-medium">Suggested for you</p>
               )}
             </div>
           </div>
@@ -576,6 +580,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     <MapPin className="h-3.5 w-3.5" />
                     {post.location}
                   </div>
+                )}
+                {post.is_suggested && (
+                  <p className="text-xs text-white/80 drop-shadow-md font-medium">
+                    Suggested for you
+                  </p>
                 )}
               </div>
             </div>
