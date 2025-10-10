@@ -32,7 +32,13 @@ serve(async (req) => {
     // Get submission details
     const { data: submission, error: submissionError } = await supabaseClient
       .from('job_completion_submissions')
-      .select('*, marketplace_jobs(*)')
+      .select(`
+        *,
+        marketplace_jobs(
+          *,
+          travel_agents(stripe_account_id, stripe_payouts_enabled)
+        )
+      `)
       .eq('id', submissionId)
       .single();
 
@@ -47,37 +53,54 @@ serve(async (req) => {
       throw new Error('Submission already processed');
     }
 
-    // Get payment intent details from job
-    const paymentIntentId = submission.marketplace_jobs.payment_intent_id;
-    
-    if (!paymentIntentId) {
-      throw new Error('No payment found for this job');
+    // Check if agent has Stripe Connect set up
+    const agent = submission.marketplace_jobs.travel_agents;
+    if (!agent?.stripe_account_id || !agent.stripe_payouts_enabled) {
+      throw new Error('Agent has not set up payouts yet');
+    }
+
+    // Get accepted bid amount
+    const { data: bid } = await supabaseClient
+      .from('agent_bids')
+      .select('customer_facing_price, currency, agent_payout_amount, platform_success_fee')
+      .eq('job_id', submission.job_id)
+      .eq('status', 'accepted')
+      .single();
+
+    if (!bid) {
+      throw new Error('No accepted bid found');
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2025-08-27.basil',
     });
 
-    // Get payment intent metadata
-    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-    const metadata = paymentIntent.metadata;
+    // Calculate amounts (85% to agent, 15% platform fee)
+    const totalAmountCents = Math.round(bid.customer_facing_price * 100);
+    const agentPayoutCents = Math.round(totalAmountCents * 0.85);
+    const platformFeeCents = totalAmountCents - agentPayoutCents;
 
-    // Create transfer to agent's connected account
-    const agentPayoutAmount = Math.round(parseFloat(metadata.agent_payout_amount) * 100);
-    const stripeAccountId = metadata.stripe_account_id;
-
-    const transfer = await stripe.transfers.create({
-      amount: agentPayoutAmount,
-      currency: paymentIntent.currency,
-      destination: stripeAccountId,
-      description: `Payout for ${submission.marketplace_jobs.title}`,
+    // Create payment intent with automatic transfer
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: totalAmountCents,
+      currency: bid.currency.toLowerCase(),
+      application_fee_amount: platformFeeCents,
+      transfer_data: {
+        destination: agent.stripe_account_id,
+      },
       metadata: {
         job_id: submission.job_id,
         submission_id: submissionId,
+        agent_id: submission.marketplace_jobs.assigned_agent_id,
+      },
+      confirm: true,
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: 'never',
       },
     });
 
-    console.log('Transfer created:', transfer.id);
+    console.log('Payment intent created and confirmed:', paymentIntent.id);
 
     // Update submission status
     await supabaseClient
@@ -89,38 +112,43 @@ serve(async (req) => {
       })
       .eq('id', submissionId);
 
-    // Update job status
+    // Update job status with payment details
     await supabaseClient
       .from('marketplace_jobs')
       .update({
         status: 'completed',
         customer_approved_at: new Date().toISOString(),
-        funds_released: true,
-        funds_released_at: new Date().toISOString(),
+        stripe_payment_intent_id: paymentIntent.id,
+        payment_captured_at: new Date().toISOString(),
+        payout_processed_at: new Date().toISOString(),
         payment_status: 'completed'
       })
       .eq('id', submission.job_id);
 
-    // Update payment record
+    // Create invoice record
     await supabaseClient
-      .from('payments')
-      .update({
-        transferred_to_agent: true,
-        transfer_id: transfer.id,
-        transferred_at: new Date().toISOString(),
-        escrow_held: false
-      })
-      .eq('stripe_payment_intent_id', paymentIntentId);
+      .from('marketplace_invoices')
+      .insert({
+        job_id: submission.job_id,
+        customer_id: submission.marketplace_jobs.user_id,
+        agent_id: submission.marketplace_jobs.assigned_agent_id,
+        total_amount: bid.customer_facing_price,
+        agent_payout: agentPayoutCents / 100,
+        platform_fee: platformFeeCents / 100,
+        currency: bid.currency,
+        status: 'paid',
+        paid_at: new Date().toISOString(),
+        transfer_date: new Date().toISOString()
+      });
 
-    console.log('Job completion approved and funds released');
-
-    // TODO: Send notification to agent
-    // TODO: Prompt customer to leave review
+    console.log('Job completion approved and funds transferred');
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        transferId: transfer.id 
+        paymentIntentId: paymentIntent.id,
+        agentPayout: agentPayoutCents / 100,
+        platformFee: platformFeeCents / 100
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );

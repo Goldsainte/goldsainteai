@@ -53,6 +53,14 @@ serve(async (req) => {
           transfers: { requested: true },
         },
         business_type: 'individual',
+        settings: {
+          payouts: {
+            schedule: {
+              interval: 'daily',
+              delay_days: 'minimum',
+            },
+          },
+        },
       });
       
       accountId = account.id;
@@ -62,7 +70,8 @@ serve(async (req) => {
         .from('travel_agents')
         .update({ 
           stripe_account_id: accountId,
-          stripe_account_status: 'pending'
+          stripe_account_status: 'pending',
+          payout_schedule: 'daily'
         })
         .eq('user_id', user.id);
     }

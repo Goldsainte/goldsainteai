@@ -29,7 +29,7 @@ serve(async (req) => {
 
     const { data: agentData, error: agentError } = await supabaseClient
       .from('travel_agents')
-      .select('stripe_account_id')
+      .select('stripe_account_id, payout_schedule')
       .eq('user_id', user.id)
       .single();
 
@@ -41,7 +41,8 @@ serve(async (req) => {
           connected: false,
           onboarding_complete: false,
           charges_enabled: false,
-          payouts_enabled: false
+          payouts_enabled: false,
+          payout_schedule: 'daily'
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
@@ -70,6 +71,7 @@ serve(async (req) => {
         onboarding_complete: account.details_submitted,
         charges_enabled: account.charges_enabled,
         payouts_enabled: account.payouts_enabled,
+        payout_schedule: agentData.payout_schedule || 'daily',
         requirements: account.requirements
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }

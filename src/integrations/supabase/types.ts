@@ -1937,14 +1937,17 @@ export type Database = {
           paid_at: string | null
           payment_method: string | null
           payment_terms: string | null
+          platform_fee: number | null
           sent_at: string | null
           status: string
           stripe_invoice_id: string | null
+          stripe_transfer_id: string | null
           subtotal: number
           tax_amount: number | null
           tax_details: Json | null
           tax_rate: number | null
           total_amount: number
+          transfer_date: string | null
           updated_at: string
         }
         Insert: {
@@ -1966,14 +1969,17 @@ export type Database = {
           paid_at?: string | null
           payment_method?: string | null
           payment_terms?: string | null
+          platform_fee?: number | null
           sent_at?: string | null
           status?: string
           stripe_invoice_id?: string | null
+          stripe_transfer_id?: string | null
           subtotal: number
           tax_amount?: number | null
           tax_details?: Json | null
           tax_rate?: number | null
           total_amount: number
+          transfer_date?: string | null
           updated_at?: string
         }
         Update: {
@@ -1995,14 +2001,17 @@ export type Database = {
           paid_at?: string | null
           payment_method?: string | null
           payment_terms?: string | null
+          platform_fee?: number | null
           sent_at?: string | null
           status?: string
           stripe_invoice_id?: string | null
+          stripe_transfer_id?: string | null
           subtotal?: number
           tax_amount?: number | null
           tax_details?: Json | null
           tax_rate?: number | null
           total_amount?: number
+          transfer_date?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -2092,16 +2101,20 @@ export type Database = {
           is_group_booking: boolean | null
           number_of_travelers: number | null
           paid_at: string | null
+          payment_captured_at: string | null
           payment_intent_id: string | null
           payment_plan_enabled: boolean | null
           payment_status: string | null
           payments_collected: number | null
+          payout_processed_at: string | null
           refund_guarantee_enabled: boolean | null
           refund_guarantee_id: string | null
           rejection_reason: string | null
           requirements: Json
           service_fee_collected: number | null
           status: string
+          stripe_payment_intent_id: string | null
+          stripe_transfer_id: string | null
           success_fee_collected: number | null
           title: string
           total_paid_amount: number | null
@@ -2139,16 +2152,20 @@ export type Database = {
           is_group_booking?: boolean | null
           number_of_travelers?: number | null
           paid_at?: string | null
+          payment_captured_at?: string | null
           payment_intent_id?: string | null
           payment_plan_enabled?: boolean | null
           payment_status?: string | null
           payments_collected?: number | null
+          payout_processed_at?: string | null
           refund_guarantee_enabled?: boolean | null
           refund_guarantee_id?: string | null
           rejection_reason?: string | null
           requirements: Json
           service_fee_collected?: number | null
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
           success_fee_collected?: number | null
           title: string
           total_paid_amount?: number | null
@@ -2186,16 +2203,20 @@ export type Database = {
           is_group_booking?: boolean | null
           number_of_travelers?: number | null
           paid_at?: string | null
+          payment_captured_at?: string | null
           payment_intent_id?: string | null
           payment_plan_enabled?: boolean | null
           payment_status?: string | null
           payments_collected?: number | null
+          payout_processed_at?: string | null
           refund_guarantee_enabled?: boolean | null
           refund_guarantee_id?: string | null
           rejection_reason?: string | null
           requirements?: Json
           service_fee_collected?: number | null
           status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
           success_fee_collected?: number | null
           title?: string
           total_paid_amount?: number | null
@@ -3670,6 +3691,7 @@ export type Database = {
           last_active_at: string | null
           license_number: string | null
           payment_processor: string | null
+          payout_schedule: string | null
           phone: string | null
           preferred_currency: string | null
           primary_contact_name: string | null
@@ -3740,6 +3762,7 @@ export type Database = {
           last_active_at?: string | null
           license_number?: string | null
           payment_processor?: string | null
+          payout_schedule?: string | null
           phone?: string | null
           preferred_currency?: string | null
           primary_contact_name?: string | null
@@ -3810,6 +3833,7 @@ export type Database = {
           last_active_at?: string | null
           license_number?: string | null
           payment_processor?: string | null
+          payout_schedule?: string | null
           phone?: string | null
           preferred_currency?: string | null
           primary_contact_name?: string | null

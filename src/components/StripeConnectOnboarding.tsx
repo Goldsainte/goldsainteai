@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, AlertCircle, ExternalLink } from "lucide-react";
+import { CheckCircle, AlertCircle, ExternalLink, Calendar } from "lucide-react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
@@ -12,6 +12,7 @@ interface StripeConnectStatus {
   onboarding_complete: boolean;
   charges_enabled: boolean;
   payouts_enabled: boolean;
+  payout_schedule?: string;
   requirements?: any;
 }
 
@@ -126,6 +127,16 @@ export const StripeConnectOnboarding = () => {
                 )}
                 <span>Payouts {status.payouts_enabled ? 'Enabled' : 'Disabled'}</span>
               </div>
+
+              {status.payouts_enabled && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span>Daily Automatic Payouts</span>
+                  <Badge variant="outline" className="text-xs">
+                    {status.payout_schedule || 'daily'}
+                  </Badge>
+                </div>
+              )}
             </div>
 
             {!status.onboarding_complete && (
@@ -181,9 +192,7 @@ export const StripeConnectOnboarding = () => {
 
         <Alert>
           <AlertDescription className="text-xs">
-            <strong>Payment Structure:</strong> You receive 85% of your quoted price. 
-            Goldsainte retains a 15% success fee for platform services. 
-            Customers pay your price + 3% service fee.
+            <strong>How it works:</strong> When a job is completed and approved, you receive 85% of your quoted price directly to your bank account within 1-2 business days (daily automatic payouts). Goldsainte keeps 15% as a success fee. Customers pay your quoted price + 3% service fee.
           </AlertDescription>
         </Alert>
       </CardContent>
