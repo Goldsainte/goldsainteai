@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star, Mic, Share2 } from "lucide-react";
+import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star, Mic, Share2, Users, BarChart3, DollarSign } from "lucide-react";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -111,7 +111,57 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 7 - Communication Hub */}
+            {/* Feature 7 - CoCurated Packages */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">CoCurated™ - Collaborative Travel Packages.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Browse exclusive travel packages created by top creators and agents. Each CoCurated package includes detailed itineraries, 
+                  accommodation, activities, and dining recommendations. Choose from fixed dates or flexible options, 
+                  with secure booking and transparent pricing. Perfect for unique group experiences or solo adventures 
+                  curated by travel experts who know the destinations best.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 8 - Creator Dashboard */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">Creator Dashboard - All Your Tools in One Place.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Comprehensive analytics showing views, engagement, and earnings across all your content. 
+                  Manage your CoCurated packages, track bookings, and view customer details. 
+                  Handle brand partnerships and promotional deals. Create and edit travel products for the Shop. 
+                  Monitor your creator tier progress with Bronze, Silver, Gold, and Platinum levels unlocking higher commission bonuses. 
+                  Access detailed earnings breakdowns, payout history, and real-time revenue tracking.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 9 - Creator Payouts */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">Creator Payouts - Multiple Revenue Streams.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Earn from multiple sources: content views and engagement, virtual gifts from fans, 
+                  CoCurated package bookings (up to 40% commission), product sales in the Shop, 
+                  brand partnerships and sponsorships, affiliate marketing commissions, and template resales. 
+                  Your creator tier level boosts all earnings - Platinum members earn up to 20% more on every transaction. 
+                  Secure Stripe Connect integration ensures fast, reliable payouts with detailed transaction history and tax reporting.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 10 - Communication Hub */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
                 <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
