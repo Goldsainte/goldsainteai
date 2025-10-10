@@ -364,7 +364,7 @@ export default function Marketplace() {
         <Tabs defaultValue="browse" className="space-y-6">
           <TabsList>
             <TabsTrigger value="browse">Browse Jobs</TabsTrigger>
-            <TabsTrigger value="my-jobs">My Jobs ({myJobs.length})</TabsTrigger>
+            <TabsTrigger value="my-jobs" className="font-secondary">My Jobs ({myJobs.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="browse" className="space-y-4">
