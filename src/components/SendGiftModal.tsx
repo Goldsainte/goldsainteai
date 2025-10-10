@@ -6,6 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
+import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 
 interface Gift {
   id: string;
@@ -27,6 +28,7 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   const { balance, refetch } = useCoinBalance();
   const [gifts, setGifts] = useState<Gift[]>([]);
   const [loading, setLoading] = useState(false);
+  const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -92,37 +94,71 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span>Send a Gift</span>
-            <div className="flex items-center gap-1 text-sm font-normal">
-              <Coins className="h-4 w-4 text-yellow-500" />
-              <span>{balance} coins</span>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <span>Send a Gift</span>
+              <div className="flex items-center gap-1 text-sm font-normal">
+                <Coins className="h-4 w-4 text-yellow-500" />
+                <span>{balance} coins</span>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          
+          {balance === 0 && (
+            <div className="bg-muted/50 border border-border rounded-lg p-4 text-center space-y-2">
+              <p className="text-sm text-muted-foreground">You don't have any coins yet</p>
+              <Button 
+                onClick={() => setBuyCoinsOpen(true)}
+                className="w-full"
+              >
+                <Coins className="h-4 w-4 mr-2" />
+                Buy Coins
+              </Button>
             </div>
-          </DialogTitle>
-        </DialogHeader>
-        
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          {gifts.map((gift) => (
-            <Button
-              key={gift.id}
-              onClick={() => handleSendGift(gift.id, gift.coin_cost)}
-              disabled={loading || balance < gift.coin_cost}
-              variant="outline"
-              className="h-auto flex flex-col items-center gap-2 py-4"
+          )}
+          
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            {gifts.map((gift) => (
+              <Button
+                key={gift.id}
+                onClick={() => handleSendGift(gift.id, gift.coin_cost)}
+                disabled={loading || balance < gift.coin_cost}
+                variant="outline"
+                className="h-auto flex flex-col items-center gap-2 py-4"
+              >
+                <span className="text-3xl">{gift.display_name.split(' ')[0]}</span>
+                <span className="text-xs">{gift.display_name.split(' ').slice(1).join(' ')}</span>
+                <span className="text-xs font-medium flex items-center gap-1">
+                  <Coins className="h-3 w-3 text-yellow-500" />
+                  {gift.coin_cost}
+                </span>
+              </Button>
+            ))}
+          </div>
+          
+          {balance > 0 && balance < Math.min(...gifts.map(g => g.coin_cost)) && (
+            <Button 
+              onClick={() => setBuyCoinsOpen(true)}
+              variant="secondary"
+              className="w-full mt-2"
             >
-              <span className="text-3xl">{gift.display_name.split(' ')[0]}</span>
-              <span className="text-xs">{gift.display_name.split(' ').slice(1).join(' ')}</span>
-              <span className="text-xs font-medium flex items-center gap-1">
-                <Coins className="h-3 w-3 text-yellow-500" />
-                {gift.coin_cost}
-              </span>
+              <Coins className="h-4 w-4 mr-2" />
+              Need More Coins?
             </Button>
-          ))}
-        </div>
-      </DialogContent>
-    </Dialog>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <BuyCoinsModal 
+        open={buyCoinsOpen} 
+        onOpenChange={(open) => {
+          setBuyCoinsOpen(open);
+          if (!open) refetch();
+        }} 
+      />
+    </>
   );
 };

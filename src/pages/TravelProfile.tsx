@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -19,6 +19,8 @@ import { EditProfileDialog } from "@/components/EditProfileDialog";
 import { ActivityStatus } from "@/components/ActivityStatus";
 import { CloseFriendsManager } from "@/components/CloseFriendsManager";
 import { useCloseFriends } from "@/hooks/useCloseFriends";
+import { useCoinBalance } from "@/hooks/useCoinBalance";
+import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 
 interface Profile {
   id: string;
@@ -71,7 +73,9 @@ const TravelProfile = () => {
   const [unreadCollabCount, setUnreadCollabCount] = useState(0);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
+  const { balance } = useCoinBalance();
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -484,6 +488,28 @@ const TravelProfile = () => {
           </Card>
         )}
 
+        {/* Coin Balance Card for own profile */}
+        {isOwnProfile && (
+          <Card className="p-3 bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border-yellow-500/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Coins className="h-5 w-5 text-yellow-500" />
+                <div>
+                  <p className="font-semibold text-sm">Your Coins</p>
+                  <p className="text-xs text-muted-foreground">{balance} coins available</p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setBuyCoinsOpen(true)}
+                className="h-8"
+              >
+                Buy Coins
+              </Button>
+            </div>
+          </Card>
+        )}
+
         {/* Action Buttons */}
         <div className="flex gap-2">
           {isOwnProfile ? (
@@ -824,6 +850,12 @@ const TravelProfile = () => {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
+      />
+
+      {/* Buy Coins Modal */}
+      <BuyCoinsModal
+        open={buyCoinsOpen}
+        onOpenChange={setBuyCoinsOpen}
       />
     </div>
   );

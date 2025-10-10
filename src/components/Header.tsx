@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
+import { useCoinBalance } from "@/hooks/useCoinBalance";
+import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -34,6 +36,8 @@ export const Header = () => {
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
+  const { balance } = useCoinBalance();
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -312,6 +316,24 @@ export const Header = () => {
                   >
                     {user ? (
                       <>
+                        {/* Coin Balance Section */}
+                        <div className="px-4 py-3 border-b border-border/50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <Coins className="h-4 w-4 text-yellow-500" />
+                              <span className="text-sm font-medium">{balance} Coins</span>
+                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setBuyCoinsOpen(true)}
+                              className="h-7 text-xs hover:bg-secondary/10"
+                            >
+                              Buy
+                            </Button>
+                          </div>
+                        </div>
+
                         <div className="py-2">
                           <DropdownMenuItem 
                             onClick={() => navigate('/dashboard')} 
@@ -524,6 +546,12 @@ export const Header = () => {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
+      />
+
+      {/* Buy Coins Modal */}
+      <BuyCoinsModal
+        open={buyCoinsOpen}
+        onOpenChange={setBuyCoinsOpen}
       />
 
     </>
