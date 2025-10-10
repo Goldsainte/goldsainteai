@@ -456,7 +456,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
             <Accordion type="multiple" className="w-full" defaultValue={["basic"]}>
               {/* Basic Info */}
               <AccordionItem value="basic">
-                <AccordionTrigger>📋 Basic Information (Required)</AccordionTrigger>
+                <AccordionTrigger className="text-lg">📋 Basic Information (Required)</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="package-title">Title *</Label>
@@ -494,7 +494,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Location */}
               <AccordionItem value="location">
-                <AccordionTrigger>📍 Location Details (Required)</AccordionTrigger>
+                <AccordionTrigger className="text-lg">📍 Location Details (Required)</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -552,7 +552,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Dates & Duration */}
               <AccordionItem value="dates">
-                <AccordionTrigger>📅 Dates & Duration (Required)</AccordionTrigger>
+                <AccordionTrigger className="text-lg">📅 Dates & Duration (Required)</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -605,7 +605,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* What's Included */}
               <AccordionItem value="included">
-                <AccordionTrigger>✅ What's Included</AccordionTrigger>
+                <AccordionTrigger className="text-lg">✅ What's Included</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="accommodation">🏨 Accommodation</Label>
@@ -664,7 +664,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* What's Not Included */}
               <AccordionItem value="not-included">
-                <AccordionTrigger>🚫 What's Not Included</AccordionTrigger>
+                <AccordionTrigger className="text-lg">🚫 What's Not Included</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="not-included">Items Not Included (comma-separated)</Label>
@@ -681,7 +681,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Pricing */}
               <AccordionItem value="pricing">
-                <AccordionTrigger>💵 Pricing & Payment (Required)</AccordionTrigger>
+                <AccordionTrigger className="text-lg">💵 Pricing & Payment (Required)</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="grid grid-cols-3 gap-4">
                     <div className="space-y-2">
@@ -803,7 +803,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Itinerary */}
               <AccordionItem value="itinerary">
-                <AccordionTrigger>📖 Day-by-Day Itinerary</AccordionTrigger>
+                <AccordionTrigger className="text-lg">📖 Day-by-Day Itinerary</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="itinerary">Daily Itinerary (JSON or one per line)</Label>
@@ -823,7 +823,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Travel Requirements */}
               <AccordionItem value="requirements">
-                <AccordionTrigger>🛂 Travel Requirements</AccordionTrigger>
+                <AccordionTrigger className="text-lg">🛂 Travel Requirements</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-4">
                     <div className="flex items-center space-x-2">
@@ -886,7 +886,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Creator Story & Media */}
               <AccordionItem value="media">
-                <AccordionTrigger>📸 Photos, Video & Your Story</AccordionTrigger>
+                <AccordionTrigger className="text-lg">📸 Photos, Video & Your Story</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="creator-story">Your Story (Why you curated this trip)</Label>
@@ -939,7 +939,7 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
               {/* Booking CTA */}
               <AccordionItem value="cta">
-                <AccordionTrigger>🛒 Booking Call-to-Action</AccordionTrigger>
+                <AccordionTrigger className="text-lg">🛒 Booking Call-to-Action</AccordionTrigger>
                 <AccordionContent className="space-y-4 pt-4">
                   <div className="space-y-2">
                     <Label htmlFor="booking-cta">Button Text</Label>
