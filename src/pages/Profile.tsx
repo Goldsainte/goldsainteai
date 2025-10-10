@@ -6,7 +6,7 @@ import { Footer } from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CreditCard, Settings, Heart, Briefcase, ArrowLeft, MapPin, Globe, Phone, User, Mail } from "lucide-react";
+import { CreditCard, Settings, Heart, Briefcase, ArrowLeft, MapPin, Globe, Phone, User, Mail, Share2, LayoutDashboard, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
@@ -76,175 +76,178 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1 container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background flex flex-col pb-24 md:pb-0">
+      <main className="flex-1 container mx-auto px-4 py-4 md:py-8 max-w-3xl">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Button>
-        
-        <div className="mb-8">
-          <h1 className="text-4xl font-secondary text-primary mb-2">Profile Settings</h1>
-          <p className="text-muted-foreground">Manage your account and preferences</p>
+
+        {/* Profile Header */}
+        <div className="space-y-4 mb-6">
+          {/* Avatar and Name */}
+          <div className="flex items-start gap-4">
+            <Avatar className="h-20 w-20 md:h-24 md:w-24">
+              <AvatarImage src={profile?.avatar_url || undefined} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                {profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <h2 className="font-semibold text-xl md:text-2xl uppercase tracking-wide">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : profile?.username || 'User'}
+              </h2>
+              {profile?.username && (
+                <p className="text-sm text-muted-foreground">@{profile.username}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Bio */}
+          {profile?.bio && (
+            <p className="text-sm">{profile.bio}</p>
+          )}
+
+          {/* Profile Details */}
+          <div className="space-y-2 text-sm">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span>{user.email}</span>
+            </div>
+            {profile?.phone && (
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                <span>{profile.phone}</span>
+              </div>
+            )}
+            {profile?.website && (
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <a 
+                  href={profile.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {profile.website.replace(/^https?:\/\//, '')}
+                </a>
+              </div>
+            )}
+            {profile?.location && (
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <span>{profile.location}</span>
+              </div>
+            )}
+          </div>
+
+          {/* Dashboard Stats Section */}
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h3 className="font-semibold mb-1">Your dashboard</h3>
+            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+              <ArrowUpRight className="h-4 w-4 text-green-600" />
+              <span>View your activity and bookings</span>
+            </div>
+          </div>
+
+          {/* Action Buttons Row */}
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              variant="secondary"
+              onClick={() => navigate('/dashboard')}
+              className="w-full"
+            >
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => setEditProfileOpen(true)}
+              className="w-full"
+            >
+              Edit profile
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                const profileUrl = `${window.location.origin}/travel-profile/${profile?.username || user.id}`;
+                navigator.clipboard.writeText(profileUrl);
+                toast.success('Profile link copied!');
+              }}
+              className="w-full"
+            >
+              <Share2 className="h-4 w-4 mr-2" />
+              Share
+            </Button>
+          </div>
         </div>
 
-        <div className="max-w-3xl space-y-6">
-          {/* Profile Information Card */}
+        {/* Account Management Section */}
+        <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="font-secondary">Personal Information</CardTitle>
-              <CardDescription>
-                Your profile details and public information
-              </CardDescription>
+              <CardTitle>Payment & Preferences</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Avatar and Basic Info */}
-                <div className="flex items-start gap-4">
-                  <Avatar className="h-20 w-20">
-                    <AvatarImage src={profile?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
-                      {profile?.username?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          {profile?.first_name && profile?.last_name
-                            ? `${profile.first_name} ${profile.last_name}`
-                            : profile?.username || 'User'}
-                        </h3>
-                        {profile?.username && (
-                          <p className="text-sm text-muted-foreground">@{profile.username}</p>
-                        )}
-                      </div>
-                      <Button 
-                        onClick={() => setEditProfileOpen(true)}
-                        size="sm"
-                      >
-                        Edit Profile
-                      </Button>
-                    </div>
-                    {profile?.bio && (
-                      <p className="text-sm text-muted-foreground">{profile.bio}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="border-t pt-4 space-y-3">
-                  <div className="flex items-center gap-3 text-sm">
-                    <Mail className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Email:</span>
-                    <span>{user.email}</span>
-                  </div>
-                  
-                  {profile?.phone && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Phone:</span>
-                      <span>{profile.phone}</span>
-                    </div>
-                  )}
-
-                  {profile?.website && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Website:</span>
-                      <a 
-                        href={profile.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        {profile.website.replace(/^https?:\/\//, '')}
-                      </a>
-                    </div>
-                  )}
-
-                  {profile?.location && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">Location:</span>
-                      <span>{profile.location}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+            <CardContent className="space-y-2">
+              <Button 
+                onClick={async () => {
+                  try {
+                    const { data, error } = await supabase.functions.invoke('customer-portal');
+                    if (error) throw error;
+                    if (data?.url) {
+                      window.open(data.url, '_blank');
+                    }
+                  } catch (error: any) {
+                    toast.error('Failed to open payment portal');
+                  }
+                }}
+                variant="outline" 
+                className="w-full justify-start gap-2"
+              >
+                <CreditCard className="h-4 w-4" />
+                Manage Payment Methods
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="w-full justify-start gap-2"
+                onClick={() => navigate('/booking-preferences')}
+              >
+                <Settings className="h-4 w-4" />
+                Booking Preferences & AI Assistant
+              </Button>
             </CardContent>
           </Card>
 
-          {/* Account Management Card */}
           <Card>
             <CardHeader>
-              <CardTitle className="font-secondary">Account Management</CardTitle>
-              <CardDescription>
-                Manage your account settings and preferences
-              </CardDescription>
+              <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold mb-3">Payment & Preferences</h3>
-                  <div className="space-y-2">
-                  <Button 
-                    onClick={async () => {
-                      try {
-                        const { data, error } = await supabase.functions.invoke('customer-portal');
-                        if (error) throw error;
-                        if (data?.url) {
-                          window.open(data.url, '_blank');
-                        }
-                      } catch (error: any) {
-                        toast.error('Failed to open payment portal');
-                      }
-                    }}
-                    variant="outline" 
-                    className="w-full justify-start gap-2"
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    Manage Payment Methods
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start gap-2"
-                    onClick={() => navigate('/booking-preferences')}
-                  >
-                    <Settings className="h-4 w-4" />
-                    Booking Preferences & AI Assistant
-                  </Button>
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t space-y-3">
-                  <h3 className="font-semibold">Quick Actions</h3>
-                  <div className="space-y-2">
-                  <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full justify-start gap-2">
-                    <Heart className="h-4 w-4" />
-                    View Favorites
-                  </Button>
-                  <Button onClick={() => navigate('/my-trips')} variant="outline" className="w-full justify-start gap-2">
-                    <MapPin className="h-4 w-4" />
-                    Manage My Trips & Itineraries
-                  </Button>
-                  <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full justify-start gap-2">
-                    <Briefcase className="h-4 w-4" />
-                    Post Complex Booking Job
-                  </Button>
-                  {!isAgent && !roleLoading && (
-                    <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
-                      <Briefcase className="h-4 w-4" />
-                      Become a Travel Agent
-                    </Button>
-                  )}
-                  </div>
-                </div>
-              </div>
+            <CardContent className="space-y-2">
+              <Button onClick={() => navigate('/favorites')} variant="outline" className="w-full justify-start gap-2">
+                <Heart className="h-4 w-4" />
+                View Favorites
+              </Button>
+              <Button onClick={() => navigate('/my-trips')} variant="outline" className="w-full justify-start gap-2">
+                <MapPin className="h-4 w-4" />
+                Manage My Trips & Itineraries
+              </Button>
+              <Button onClick={() => navigate('/marketplace')} variant="outline" className="w-full justify-start gap-2">
+                <Briefcase className="h-4 w-4" />
+                Post Complex Booking Job
+              </Button>
+              {!isAgent && !roleLoading && (
+                <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
+                  <Briefcase className="h-4 w-4" />
+                  Become a Travel Agent
+                </Button>
+              )}
             </CardContent>
           </Card>
         </div>
