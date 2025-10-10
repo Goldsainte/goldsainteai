@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { renderTextWithHashtags } from "@/lib/hashtagHelpers";
 import { renderTextWithMentionsAndHashtags } from "@/lib/mentionHelpers";
+import { useCollections } from "@/hooks/useCollections";
 
 interface TravelVideoCardProps {
   post: {
@@ -69,6 +70,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [collaboratorSelectorOpen, setCollaboratorSelectorOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
   const [partnership, setPartnership] = useState<any>(null);
+  const { collections, createCollection, addPostToCollection } = useCollections();
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -115,7 +117,31 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       // Not liked
     }
   };
+  const handleSaveClick = async () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    try {
+      console.log('Attempting quick save...');
+      setCollectionSelectorOpen(true);
 
+      let target: any = collections?.find((c) => c.name?.toLowerCase?.() === 'saved');
+      if (!target) {
+        const created: any = await createCollection('Saved', 'Your saved items', true);
+        if (created) target = created;
+      }
+      if (target) {
+        await addPostToCollection(target.id, post.id);
+        toast.success('Saved to "Saved"');
+      } else {
+        toast.error('Could not create/find a collection');
+      }
+    } catch (e) {
+      console.error('Quick save failed', e);
+      toast.error('Failed to save');
+    }
+  };
   const fetchCollaborators = async () => {
     try {
       const { data } = await supabase
@@ -481,10 +507,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </DropdownMenu>
             </div>
             <button
-              onClick={() => {
-                console.log('Save button clicked - desktop');
-                setCollectionSelectorOpen(true);
-              }}
+              onClick={handleSaveClick}
               className="transition-transform active:scale-90"
             >
               <Bookmark className="h-6 w-6" />
@@ -796,10 +819,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </DropdownMenu>
 
             <button
-              onClick={() => {
-                console.log('Save button clicked - mobile');
-                setCollectionSelectorOpen(true);
-              }}
+              onClick={handleSaveClick}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
               <Bookmark className="h-7 w-7 text-white drop-shadow-lg" />
