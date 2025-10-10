@@ -5,11 +5,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
+import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
+import { CreatorPartnershipRequest } from "@/components/CreatorPartnershipRequest";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
@@ -74,6 +76,8 @@ const TravelProfile = () => {
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
+  const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
+  const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
   const { balance } = useCoinBalance();
 
@@ -563,6 +567,22 @@ const TravelProfile = () => {
               {user && <FollowButton targetUserId={profileUserId!} />}
               <Button
                 variant="secondary"
+                className="flex-1 h-8 text-sm font-semibold"
+                onClick={() => setPartnershipProposalOpen(true)}
+              >
+                <Briefcase className="h-4 w-4 mr-1" />
+                Partner
+              </Button>
+              <Button
+                variant="secondary"
+                className="flex-1 h-8 text-sm font-semibold"
+                onClick={() => setPartnershipRequestOpen(true)}
+              >
+                <Sparkles className="h-4 w-4 mr-1" />
+                Request
+              </Button>
+              <Button
+                variant="secondary"
                 size="icon"
                 className="h-8 w-8"
               >
@@ -857,6 +877,22 @@ const TravelProfile = () => {
         open={buyCoinsOpen}
         onOpenChange={setBuyCoinsOpen}
       />
+
+      {/* Brand Partnership Proposal Modal */}
+      {!isOwnProfile && profileUserId && (
+        <>
+          <BrandPartnershipProposal
+            open={partnershipProposalOpen}
+            onOpenChange={setPartnershipProposalOpen}
+            creatorId={profileUserId}
+          />
+          <CreatorPartnershipRequest
+            open={partnershipRequestOpen}
+            onOpenChange={setPartnershipRequestOpen}
+            brandId={profileUserId}
+          />
+        </>
+      )}
     </div>
   );
 };

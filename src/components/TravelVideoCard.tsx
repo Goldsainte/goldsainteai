@@ -22,6 +22,7 @@ import { renderTextWithMentionsAndHashtags } from "@/lib/mentionHelpers";
 import { useCollections } from "@/hooks/useCollections";
 import { SendGiftModal } from "@/components/SendGiftModal";
 import { Coins } from "lucide-react";
+import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
 
 interface TravelVideoCardProps {
   post: {
@@ -74,6 +75,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [partnership, setPartnership] = useState<any>(null);
   const { collections, createCollection, addPostToCollection } = useCollections();
   const [giftModalOpen, setGiftModalOpen] = useState(false);
+  const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -399,7 +401,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               )}
             </div>
           </div>
-          {isOwnPost && (
+          {isOwnPost ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -410,6 +412,20 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 <DropdownMenuItem onClick={() => setEditOpen(true)}>
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Sainte
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreVertical className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
+                  <Users className="h-4 w-4 mr-2" />
+                  Propose Partnership
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -862,6 +878,21 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+            {!isOwnPost && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="transition-transform active:scale-90 mt-2">
+                    <MoreVertical className="h-7 w-7 text-white drop-shadow-lg" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Propose Partnership
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
@@ -906,6 +937,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         recipientId={post.user_id}
         postId={post.id}
       />
+
+      {/* Brand Partnership Proposal Modal */}
+      {!isOwnPost && (
+        <BrandPartnershipProposal
+          open={partnershipProposalOpen}
+          onOpenChange={setPartnershipProposalOpen}
+          creatorId={post.user_id}
+          postId={post.id}
+        />
+      )}
     </div>
   );
 };
