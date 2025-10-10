@@ -153,3 +153,12 @@ verify_jwt = true
 [functions.process-gift-payment]
 verify_jwt = true
 
+[functions.purchase-product]
+verify_jwt = true
+
+[functions.track-affiliate-click]
+verify_jwt = false
+
+[functions.verify-product-payment]
+verify_jwt = true
+

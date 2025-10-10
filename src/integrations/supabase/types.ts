@@ -50,6 +50,155 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_clicks: {
+        Row: {
+          affiliate_link_id: string
+          clicked_at: string
+          conversion_amount: number | null
+          converted: boolean | null
+          converted_at: string | null
+          id: string
+          ip_address: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          affiliate_link_id: string
+          clicked_at?: string
+          conversion_amount?: number | null
+          converted?: boolean | null
+          converted_at?: string | null
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          affiliate_link_id?: string
+          clicked_at?: string
+          conversion_amount?: number | null
+          converted?: boolean | null
+          converted_at?: string | null
+          id?: string
+          ip_address?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_clicks_affiliate_link_id_fkey"
+            columns: ["affiliate_link_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_commissions: {
+        Row: {
+          affiliate_click_id: string | null
+          affiliate_link_id: string
+          commission_amount: number
+          created_at: string
+          creator_id: string
+          currency: string
+          id: string
+          paid_at: string | null
+          status: string
+          stripe_transfer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          affiliate_click_id?: string | null
+          affiliate_link_id: string
+          commission_amount: number
+          created_at?: string
+          creator_id: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          affiliate_click_id?: string | null
+          affiliate_link_id?: string
+          commission_amount?: number
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          id?: string
+          paid_at?: string | null
+          status?: string
+          stripe_transfer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_commissions_affiliate_click_id_fkey"
+            columns: ["affiliate_click_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_clicks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "affiliate_commissions_affiliate_link_id_fkey"
+            columns: ["affiliate_link_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_links"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      affiliate_links: {
+        Row: {
+          affiliate_code: string
+          clicks: number | null
+          commission_rate: number
+          conversions: number | null
+          created_at: string
+          creator_id: string
+          id: string
+          is_active: boolean | null
+          platform: string | null
+          product_name: string
+          product_url: string
+          total_earnings: number | null
+          updated_at: string
+        }
+        Insert: {
+          affiliate_code: string
+          clicks?: number | null
+          commission_rate?: number
+          conversions?: number | null
+          created_at?: string
+          creator_id: string
+          id?: string
+          is_active?: boolean | null
+          platform?: string | null
+          product_name: string
+          product_url: string
+          total_earnings?: number | null
+          updated_at?: string
+        }
+        Update: {
+          affiliate_code?: string
+          clicks?: number | null
+          commission_rate?: number
+          conversions?: number | null
+          created_at?: string
+          creator_id?: string
+          id?: string
+          is_active?: boolean | null
+          platform?: string | null
+          product_name?: string
+          product_url?: string
+          total_earnings?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       agent_availability: {
         Row: {
           agent_id: string
@@ -1834,6 +1983,95 @@ export type Database = {
           },
         ]
       }
+      live_shopping_events: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          created_at: string
+          creator_id: string
+          description: string | null
+          featured_products: Json | null
+          id: string
+          scheduled_end: string | null
+          scheduled_start: string
+          status: string
+          stream_url: string | null
+          title: string
+          total_sales: number | null
+          updated_at: string
+          viewer_count: number | null
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          featured_products?: Json | null
+          id?: string
+          scheduled_end?: string | null
+          scheduled_start: string
+          status?: string
+          stream_url?: string | null
+          title: string
+          total_sales?: number | null
+          updated_at?: string
+          viewer_count?: number | null
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          featured_products?: Json | null
+          id?: string
+          scheduled_end?: string | null
+          scheduled_start?: string
+          status?: string
+          stream_url?: string | null
+          title?: string
+          total_sales?: number | null
+          updated_at?: string
+          viewer_count?: number | null
+        }
+        Relationships: []
+      }
+      live_shopping_viewers: {
+        Row: {
+          event_id: string
+          id: string
+          joined_at: string
+          left_at: string | null
+          purchases_made: number | null
+          user_id: string | null
+        }
+        Insert: {
+          event_id: string
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          purchases_made?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          event_id?: string
+          id?: string
+          joined_at?: string
+          left_at?: string | null
+          purchases_made?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "live_shopping_viewers_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "live_shopping_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       loyalty_points: {
         Row: {
           created_at: string
@@ -3088,6 +3326,144 @@ export type Database = {
           },
         ]
       }
+      product_orders: {
+        Row: {
+          buyer_id: string
+          completed_at: string | null
+          created_at: string
+          currency: string
+          id: string
+          package_id: string | null
+          paid_at: string | null
+          platform_fee: number
+          product_id: string | null
+          quantity: number
+          seller_id: string
+          seller_payout: number
+          shipped_at: string | null
+          shipping_address: Json | null
+          status: string
+          stripe_payment_intent_id: string | null
+          stripe_transfer_id: string | null
+          total_amount: number
+          tracking_number: string | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          package_id?: string | null
+          paid_at?: string | null
+          platform_fee: number
+          product_id?: string | null
+          quantity?: number
+          seller_id: string
+          seller_payout: number
+          shipped_at?: string | null
+          shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
+          total_amount: number
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          package_id?: string | null
+          paid_at?: string | null
+          platform_fee?: number
+          product_id?: string | null
+          quantity?: number
+          seller_id?: string
+          seller_payout?: number
+          shipped_at?: string | null
+          shipping_address?: Json | null
+          status?: string
+          stripe_payment_intent_id?: string | null
+          stripe_transfer_id?: string | null
+          total_amount?: number
+          tracking_number?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_orders_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "travel_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_orders_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          category: string | null
+          created_at: string
+          creator_id: string
+          currency: string
+          description: string | null
+          id: string
+          images: Json | null
+          inventory_count: number | null
+          is_active: boolean | null
+          price: number
+          product_type: string
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          creator_id: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: Json | null
+          inventory_count?: number | null
+          is_active?: boolean | null
+          price: number
+          product_type: string
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: Json | null
+          inventory_count?: number | null
+          is_active?: boolean | null
+          price?: number
+          product_type?: string
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           account_status: string | null
@@ -3927,6 +4303,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      travel_packages: {
+        Row: {
+          created_at: string
+          creator_id: string
+          currency: string
+          description: string
+          destination: string
+          duration_days: number
+          id: string
+          images: Json | null
+          included_services: Json | null
+          is_active: boolean | null
+          itinerary: Json
+          max_travelers: number | null
+          price: number
+          stripe_price_id: string | null
+          stripe_product_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          currency?: string
+          description: string
+          destination: string
+          duration_days: number
+          id?: string
+          images?: Json | null
+          included_services?: Json | null
+          is_active?: boolean | null
+          itinerary?: Json
+          max_travelers?: number | null
+          price: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          currency?: string
+          description?: string
+          destination?: string
+          duration_days?: number
+          id?: string
+          images?: Json | null
+          included_services?: Json | null
+          is_active?: boolean | null
+          itinerary?: Json
+          max_travelers?: number | null
+          price?: number
+          stripe_price_id?: string | null
+          stripe_product_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       travel_posts: {
         Row: {

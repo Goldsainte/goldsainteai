@@ -49,6 +49,8 @@ import Search from "./pages/Search";
 import Trending from "./pages/Trending";
 import CommunityGuidelines from "./pages/CommunityGuidelines";
 import TrustSafety from "./pages/TrustSafety";
+import Shop from "./pages/Shop";
+import AffiliateManager from "./pages/AffiliateManager";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +114,8 @@ function AppContent() {
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/affiliate-manager" element={<AffiliateManager />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

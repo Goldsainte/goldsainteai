@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2 } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { Button } from "@/components/ui/button";
@@ -288,11 +288,34 @@ export const Header = () => {
                         <span className="text-sm font-medium">Marketplace</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => navigate('/agent-onboarding')} 
+                        onClick={() => navigate('/become an Agent')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Become an Agent</span>
+                      </DropdownMenuItem>
+                    </div>
+                    
+                    <DropdownMenuSeparator className="bg-border/50" />
+                    
+                    {/* Shop & Commerce Section */}
+                    <div className="px-4 py-3 border-b border-border/50">
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Shop & Earn</p>
+                    </div>
+                    <div className="py-2 pb-3">
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/shop')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Shop</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/affiliate-manager')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Link2 className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Affiliate Links</span>
                       </DropdownMenuItem>
                     </div>
                   </DropdownMenuContent>
