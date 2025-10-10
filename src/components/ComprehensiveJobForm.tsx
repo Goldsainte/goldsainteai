@@ -109,7 +109,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
   };
 
   return (
-    <div className="flex flex-col h-full space-y-4">
+    <div className="flex flex-col h-full space-y-4 max-w-full overflow-hidden">
       {/* Progress Indicator */}
       <div className="flex items-center justify-between flex-shrink-0">
         <div className="flex-1 flex gap-2">
@@ -127,8 +127,8 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         </span>
       </div>
 
-      <ScrollArea className="flex-1 overflow-y-auto">
-        <div className="pr-4 space-y-6">
+      <ScrollArea className="flex-1 overflow-y-auto max-w-full">
+        <div className="pr-4 space-y-6 max-w-full">
         {/* Step 1: Basic Overview */}
         {step === 1 && (
           <div className="space-y-4">
