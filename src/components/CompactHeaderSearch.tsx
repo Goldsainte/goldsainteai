@@ -11,12 +11,12 @@ export const CompactHeaderSearch = () => {
     <>
       <Button
         variant="outline"
-        className="flex items-center gap-2 px-3 h-10 rounded-full border-2 border-secondary shadow-sm hover:shadow-md hover:bg-[#BFAD72] hover:border-[#bfad72] transition-all bg-background w-full max-w-[280px] md:max-w-3xl"
+        className="flex items-center gap-2 px-3 h-10 rounded-full border-2 border-secondary shadow-sm hover:shadow-md hover:bg-[#BFAD72] hover:border-[#bfad72] transition-all bg-background w-full max-w-[280px] md:max-w-3xl group"
         aria-label="Open search"
         onClick={() => setOpen(true)}
       >
-        <Search className="h-4 w-4 text-secondary" />
-        <span className="text-sm font-medium">Search</span>
+        <Search className="h-4 w-4 text-secondary group-hover:text-white transition-colors" />
+        <span className="text-sm font-medium group-hover:text-white transition-colors">Search</span>
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
