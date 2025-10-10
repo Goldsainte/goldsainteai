@@ -20,6 +20,8 @@ import {
 import { renderTextWithHashtags } from "@/lib/hashtagHelpers";
 import { renderTextWithMentionsAndHashtags } from "@/lib/mentionHelpers";
 import { useCollections } from "@/hooks/useCollections";
+import { SendGiftModal } from "@/components/SendGiftModal";
+import { Coins } from "lucide-react";
 
 interface TravelVideoCardProps {
   post: {
@@ -71,6 +73,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
   const [partnership, setPartnership] = useState<any>(null);
   const { collections, createCollection, addPostToCollection } = useCollections();
+  const [giftModalOpen, setGiftModalOpen] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -512,6 +515,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             >
               <Bookmark className="h-6 w-6" />
             </button>
+            <button
+              onClick={() => setGiftModalOpen(true)}
+              className="transition-transform active:scale-90"
+            >
+              <Coins className="h-6 w-6 text-yellow-500" />
+            </button>
           </div>
 
           {/* Like count */}
@@ -824,6 +833,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             >
               <Bookmark className="h-7 w-7 text-white drop-shadow-lg" />
             </button>
+            <button
+              onClick={() => setGiftModalOpen(true)}
+              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            >
+              <Coins className="h-7 w-7 text-yellow-500 drop-shadow-lg" />
+            </button>
 
             <button
               onClick={() => setCollaboratorSelectorOpen(true)}
@@ -884,6 +899,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         postId={post.id}
         open={collaboratorSelectorOpen}
         onOpenChange={setCollaboratorSelectorOpen}
+      />
+      <SendGiftModal
+        open={giftModalOpen}
+        onOpenChange={setGiftModalOpen}
+        recipientId={post.user_id}
+        postId={post.id}
       />
     </div>
   );

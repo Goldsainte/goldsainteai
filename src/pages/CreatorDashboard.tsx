@@ -4,7 +4,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins } from "lucide-react";
+import { useCoinBalance } from "@/hooks/useCoinBalance";
+import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 
 interface CreatorStats {
   total_views: number;
@@ -17,6 +19,8 @@ interface CreatorStats {
 
 export default function CreatorDashboard() {
   const { toast } = useToast();
+  const { balance: coinBalance } = useCoinBalance();
+  const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [stats, setStats] = useState<CreatorStats>({
     total_views: 0,
     total_likes: 0,
@@ -85,10 +89,16 @@ export default function CreatorDashboard() {
               Track your content performance and earnings
             </p>
           </div>
-          <Badge variant="outline" className="text-lg px-4 py-2">
-            <DollarSign className="w-4 h-4 mr-1" />
-            ${stats.estimated_earnings.toFixed(2)} earned
-          </Badge>
+          <div className="flex gap-2">
+            <Badge variant="outline" className="text-lg px-4 py-2">
+              <DollarSign className="w-4 h-4 mr-1" />
+              ${stats.estimated_earnings.toFixed(2)} earned
+            </Badge>
+            <Badge variant="outline" className="text-lg px-4 py-2 cursor-pointer" onClick={() => setBuyCoinsOpen(true)}>
+              <Coins className="w-4 h-4 mr-1 text-yellow-500" />
+              {coinBalance} coins
+            </Badge>
+          </div>
         </div>
 
         {/* Stats Grid */}
@@ -204,7 +214,33 @@ export default function CreatorDashboard() {
             <p className="text-sm">🔗 Share inspiring content from TikTok/Instagram with proper attribution</p>
           </CardContent>
         </Card>
+
+        {/* Coin Balance & Purchase */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Coins className="w-5 h-5 text-yellow-500" />
+              Virtual Coins
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-bold">{coinBalance}</p>
+                <p className="text-sm text-muted-foreground">Available Coins</p>
+              </div>
+              <Button onClick={() => setBuyCoinsOpen(true)}>
+                Buy More Coins
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Use coins to send virtual gifts to other creators and show your support!
+            </p>
+          </CardContent>
+        </Card>
       </div>
+
+      <BuyCoinsModal open={buyCoinsOpen} onOpenChange={setBuyCoinsOpen} />
     </div>
   );
 }

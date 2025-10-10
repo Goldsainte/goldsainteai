@@ -934,6 +934,36 @@ export type Database = {
         }
         Relationships: []
       }
+      coin_purchases: {
+        Row: {
+          coin_amount: number
+          created_at: string
+          id: string
+          price_usd: number
+          status: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          coin_amount: number
+          created_at?: string
+          id?: string
+          price_usd: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          coin_amount?: number
+          created_at?: string
+          id?: string
+          price_usd?: number
+          status?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       collection_posts: {
         Row: {
           added_at: string
@@ -1400,6 +1430,57 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gift_transactions: {
+        Row: {
+          coin_amount: number
+          created_at: string
+          creator_earnings: number
+          gift_id: string
+          id: string
+          platform_fee: number
+          post_id: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          coin_amount: number
+          created_at?: string
+          creator_earnings: number
+          gift_id: string
+          id?: string
+          platform_fee: number
+          post_id?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          coin_amount?: number
+          created_at?: string
+          creator_earnings?: number
+          gift_id?: string
+          id?: string
+          platform_fee?: number
+          post_id?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_transactions_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "virtual_gifts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gift_transactions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -4354,6 +4435,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_coin_balance: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          lifetime_purchased: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          lifetime_purchased?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          lifetime_purchased?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_conversations: {
         Row: {
           agent_id: string | null
@@ -4569,6 +4677,42 @@ export type Database = {
           stripe_subscription_id?: string | null
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      virtual_gifts: {
+        Row: {
+          coin_cost: number
+          created_at: string
+          creator_payout_percentage: number
+          display_name: string
+          icon_url: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          sort_order: number | null
+        }
+        Insert: {
+          coin_cost: number
+          created_at?: string
+          creator_payout_percentage?: number
+          display_name: string
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          sort_order?: number | null
+        }
+        Update: {
+          coin_cost?: number
+          created_at?: string
+          creator_payout_percentage?: number
+          display_name?: string
+          icon_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          sort_order?: number | null
         }
         Relationships: []
       }
@@ -4867,6 +5011,15 @@ export type Database = {
           specializations: string[]
           total_reviews: number
         }[]
+      }
+      send_virtual_gift: {
+        Args: {
+          p_gift_id: string
+          p_post_id: string
+          p_recipient_id: string
+          p_sender_id: string
+        }
+        Returns: Json
       }
       update_agent_performance_metrics: {
         Args: { target_agent_id: string }
