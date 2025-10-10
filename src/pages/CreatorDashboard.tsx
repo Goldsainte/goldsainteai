@@ -245,39 +245,91 @@ export default function CreatorDashboard() {
             <CardTitle>How You Earn</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Eye className="w-5 h-5 text-blue-500 mt-1" />
-              <div>
-                <p className="font-medium">Views</p>
-                <p className="text-sm text-muted-foreground">
-                  Earn 0.001 per view on your travel content
-                </p>
+            <div className="space-y-4">
+              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Content Engagement</h3>
+              <div className="flex items-start gap-3">
+                <Eye className="w-5 h-5 text-blue-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Views</p>
+                  <p className="text-sm text-muted-foreground">
+                    Earn 0.001 per view on your travel content. Higher quality content gets more views and earnings.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Heart className="w-5 h-5 text-red-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Likes</p>
+                  <p className="text-sm text-muted-foreground">
+                    Earn 0.01 per like from engaged viewers. Create compelling content that resonates with your audience.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Share2 className="w-5 h-5 text-green-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Shares</p>
+                  <p className="text-sm text-muted-foreground">
+                    Earn 0.05 per share. Create viral-worthy content and watch your earnings multiply.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <TrendingUp className="w-5 h-5 text-yellow-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Featured Content</p>
+                  <p className="text-sm text-muted-foreground">
+                    Get featured on the platform for massive visibility boost and increased earnings potential.
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <Heart className="w-5 h-5 text-red-500 mt-1" />
-              <div>
-                <p className="font-medium">Likes</p>
-                <p className="text-sm text-muted-foreground">
-                  Earn 0.01 per like from engaged viewers
-                </p>
+
+            <div className="border-t pt-4 space-y-4">
+              <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Direct Monetization</h3>
+              <div className="flex items-start gap-3">
+                <Coins className="w-5 h-5 text-yellow-600 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Virtual Gifts</p>
+                  <p className="text-sm text-muted-foreground">
+                    Receive virtual gifts from fans on your posts. Each gift converts to real money (70-80% payout).
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <ShoppingBag className="w-5 h-5 text-purple-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Product & Package Sales</p>
+                  <p className="text-sm text-muted-foreground">
+                    Sell travel packages, guides, presets, and digital products. Keep up to 85% after platform fees.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Briefcase className="w-5 h-5 text-indigo-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Brand Partnerships</p>
+                  <p className="text-sm text-muted-foreground">
+                    Collaborate with brands on sponsored content. Negotiate your own rates and build lasting partnerships.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <DollarSign className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="font-medium">Affiliate Commissions</p>
+                  <p className="text-sm text-muted-foreground">
+                    Earn commissions by sharing affiliate links to hotels, tours, and travel products you recommend.
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="flex items-start gap-3">
-              <Share2 className="w-5 h-5 text-green-500 mt-1" />
-              <div>
-                <p className="font-medium">Shares</p>
-                <p className="text-sm text-muted-foreground">
-                  Earn 0.05 per share - help your content go viral!
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <TrendingUp className="w-5 h-5 text-yellow-500 mt-1" />
-              <div>
-                <p className="font-medium">Featured Content</p>
-                <p className="text-sm text-muted-foreground">
-                  Get featured to boost visibility and earnings
+
+            <div className="border-t pt-4">
+              <div className="bg-muted/50 rounded-lg p-4">
+                <p className="text-sm font-medium mb-2">💡 Pro Tip</p>
+                <p className="text-xs text-muted-foreground">
+                  Diversify your income streams! Successful creators combine engagement earnings, virtual gifts, product sales, and brand partnerships for maximum revenue.
                 </p>
               </div>
             </div>
