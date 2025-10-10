@@ -752,19 +752,19 @@ export default function CoCuratedCreate() {
                 <div className="p-4 bg-muted/50 rounded-lg space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="font-semibold">Total Margin:</span>
-                    <span className="text-primary font-bold">${margin.toFixed(2)}</span>
+                    <span className="text-primary font-bold">{margin.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Agent Commission ({agentCommission}%):</span>
-                    <span>${agentCom.toFixed(2)}</span>
+                    <span>{agentCom.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Influencer Commission ({influencerCommission}%):</span>
-                    <span>${influencerCom.toFixed(2)}</span>
+                    <span>{influencerCom.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm pt-2 border-t">
                     <span>Platform Fee (20%):</span>
-                    <span className="text-muted-foreground">${platformFee.toFixed(2)}</span>
+                    <span className="text-muted-foreground">{platformFee.toFixed(2)}</span>
                   </div>
                 </div>
               )}
