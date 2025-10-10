@@ -193,7 +193,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="space-y-2">
-            <DialogTitle className="text-2xl">{hotelName}</DialogTitle>
+            <DialogTitle className="text-2xl font-secondary">{hotelName}</DialogTitle>
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-1">
                 <Star className="h-4 w-4 fill-primary text-primary" />

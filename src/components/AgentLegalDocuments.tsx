@@ -6,7 +6,7 @@ export const TermsDialog = ({ children }: { children: React.ReactNode }) => (
     <DialogTrigger asChild>{children}</DialogTrigger>
     <DialogContent className="max-w-3xl max-h-[80vh]">
       <DialogHeader>
-        <DialogTitle className="font-chiffon text-2xl">Goldsainte Terms & Conditions</DialogTitle>
+        <DialogTitle className="font-secondary text-2xl">Goldsainte Terms & Conditions</DialogTitle>
       </DialogHeader>
       <ScrollArea className="h-[60vh] pr-4">
         <div className="space-y-4 text-sm">
@@ -86,7 +86,7 @@ export const PrivacyDialog = ({ children }: { children: React.ReactNode }) => (
     <DialogTrigger asChild>{children}</DialogTrigger>
     <DialogContent className="max-w-3xl max-h-[80vh]">
       <DialogHeader>
-        <DialogTitle className="font-chiffon text-2xl">Goldsainte Privacy Policy</DialogTitle>
+        <DialogTitle className="font-secondary text-2xl">Goldsainte Privacy Policy</DialogTitle>
       </DialogHeader>
       <ScrollArea className="h-[60vh] pr-4">
         <div className="space-y-4 text-sm">
@@ -181,7 +181,7 @@ export const VendorDialog = ({ children }: { children: React.ReactNode }) => (
     <DialogTrigger asChild>{children}</DialogTrigger>
     <DialogContent className="max-w-3xl max-h-[80vh]">
       <DialogHeader>
-        <DialogTitle className="font-chiffon text-2xl">Goldsainte Vendor Agreement</DialogTitle>
+        <DialogTitle className="font-secondary text-2xl">Goldsainte Vendor Agreement</DialogTitle>
       </DialogHeader>
       <ScrollArea className="h-[60vh] pr-4">
         <div className="space-y-4 text-sm">
@@ -310,7 +310,7 @@ export const InsuranceDialog = ({ children }: { children: React.ReactNode }) => 
     <DialogTrigger asChild>{children}</DialogTrigger>
     <DialogContent className="max-w-3xl max-h-[80vh]">
       <DialogHeader>
-        <DialogTitle className="font-chiffon text-2xl">Travel Insurance & Liability Requirements</DialogTitle>
+        <DialogTitle className="font-secondary text-2xl">Travel Insurance & Liability Requirements</DialogTitle>
       </DialogHeader>
       <ScrollArea className="h-[60vh] pr-4">
         <div className="space-y-4 text-sm">

@@ -80,7 +80,7 @@ export default function CreatorDashboard() {
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Creator Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-2 font-secondary">Creator Dashboard</h1>
             <p className="text-muted-foreground">
               Track your content performance and earnings
             </p>

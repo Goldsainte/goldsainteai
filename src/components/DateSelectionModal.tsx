@@ -106,7 +106,7 @@ export const DateSelectionModal = ({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Select Your Stay</DialogTitle>
+          <DialogTitle className="text-2xl font-secondary">Select Your Stay</DialogTitle>
           <DialogDescription className="text-base">{hotelName}</DialogDescription>
         </DialogHeader>
         

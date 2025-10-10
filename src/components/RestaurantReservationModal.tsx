@@ -153,7 +153,7 @@ export const RestaurantReservationModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl">Reserve a Table</DialogTitle>
+          <DialogTitle className="text-2xl font-secondary">Reserve a Table</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">

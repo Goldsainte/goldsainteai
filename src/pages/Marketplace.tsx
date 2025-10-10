@@ -345,7 +345,7 @@ export default function Marketplace() {
             </DialogTrigger>
             <DialogContent className="max-w-5xl h-[95vh] flex flex-col p-0">
               <DialogHeader className="flex-shrink-0 px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
-                <DialogTitle className="font-chiffon text-lg md:text-2xl">Post a Comprehensive Travel Job</DialogTitle>
+                <DialogTitle className="font-secondary text-lg md:text-2xl">Post a Comprehensive Travel Job</DialogTitle>
                 <DialogDescription className="text-xs md:text-sm">
                   Provide detailed information about your travel needs and get bids from qualified agents
                 </DialogDescription>
@@ -494,7 +494,7 @@ export default function Marketplace() {
       <Dialog open={isViewJobDialogOpen} onOpenChange={setIsViewJobDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-chiffon">{selectedJob?.title}</DialogTitle>
+            <DialogTitle className="text-2xl font-secondary">{selectedJob?.title}</DialogTitle>
             <DialogDescription>
               <div className="flex items-center gap-4 mt-2">
                 <Badge variant={

@@ -132,7 +132,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 1: Basic Overview */}
         {step === 1 && (
           <div className="space-y-4">
-            <h3 className="text-base md:text-lg font-semibold">Basic Job Overview</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Basic Job Overview</h3>
             
             <div>
               <Label htmlFor="title" className="text-sm">Job Title *</Label>
@@ -177,7 +177,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <Separator />
 
-            <h4 className="text-sm md:text-base font-semibold">Client Information</h4>
+            <h4 className="text-sm md:text-base font-semibold font-secondary">Client Information</h4>
             
             <div>
               <Label htmlFor="clientName">Client Name (Optional)</Label>
@@ -229,7 +229,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 2: Transportation Details */}
         {step === 2 && (
           <div className="space-y-4">
-            <h3 className="text-base md:text-lg font-semibold">Transportation Details</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Transportation Details</h3>
             <p className="text-xs md:text-sm text-muted-foreground">
               Fill this section if your job involves flight or transportation booking
             </p>
@@ -349,7 +349,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 3: Accommodation Details */}
         {step === 3 && (
           <div className="space-y-4">
-            <h3 className="text-base md:text-lg font-semibold">Accommodation Details</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Accommodation Details</h3>
             <p className="text-xs md:text-sm text-muted-foreground">
               Fill this section if your job involves hotel or accommodation booking
             </p>
@@ -450,7 +450,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 4: Full Itinerary Details */}
         {step === 4 && (
           <div className="space-y-4">
-            <h3 className="text-base md:text-lg font-semibold">Full Travel Itinerary</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Full Travel Itinerary</h3>
             <p className="text-xs md:text-sm text-muted-foreground">
               Fill this section for complete trip planning services
             </p>
@@ -529,7 +529,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 5: Payment & Timeline */}
         {step === 5 && (
           <div className="space-y-4">
-            <h3 className="text-base md:text-lg font-semibold">Payment Details</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Payment Details</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
@@ -591,7 +591,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <Separator />
 
-            <h3 className="text-base md:text-lg font-semibold">Timeline & Urgency</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Timeline & Urgency</h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
@@ -643,7 +643,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 6: Agent Requirements & Deliverables */}
         {step === 6 && (
           <div className="space-y-4">
-            <h3 className="text-base md:text-lg font-semibold">Agent Requirements</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Agent Requirements</h3>
 
             <div>
               <Label htmlFor="languagesRequired">Languages Required</Label>
@@ -678,7 +678,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <Separator />
 
-            <h3 className="text-base md:text-lg font-semibold">Expected Deliverables</h3>
+            <h3 className="text-base md:text-lg font-semibold font-secondary">Expected Deliverables</h3>
 
             <div className="space-y-3">
               {["Proposed itinerary", "Booking confirmations", "Invoice", "Customer support post-booking", "Emergency contact", "Travel insurance documents"].map((deliverable) => (

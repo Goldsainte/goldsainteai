@@ -95,7 +95,7 @@ export const VisaServiceModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-chiffon">Goldsainte Visa Assistance</DialogTitle>
+          <DialogTitle className="text-2xl font-secondary">Goldsainte Visa Assistance</DialogTitle>
           <DialogDescription>
             Let our expert team handle your visa application for travel from {fromCountry} to {toCountry}.
           </DialogDescription>

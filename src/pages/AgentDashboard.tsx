@@ -211,7 +211,7 @@ export default function AgentDashboard() {
         </Button>
         
         <div className="mb-8">
-          <h1 className="text-4xl font-chiffon text-primary mb-2">Agent Dashboard</h1>
+          <h1 className="text-4xl font-chiffon text-primary mb-2 font-secondary">Agent Dashboard</h1>
           <p className="text-muted-foreground">{agent.agency_name} • Rating: {agent.rating}/5 ({agent.total_reviews} reviews)</p>
           {!agent.is_verified && (
             <Badge variant="secondary" className="mt-2">Pending Verification</Badge>

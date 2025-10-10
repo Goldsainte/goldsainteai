@@ -224,7 +224,7 @@ export default function Dashboard() {
         </Button>
         
         <div className="mb-8">
-          <h1 className="text-4xl font-chiffon text-primary mb-2">My Dashboard</h1>
+          <h1 className="text-4xl font-chiffon text-primary mb-2 font-secondary">My Dashboard</h1>
           <p className="text-muted-foreground">Manage your bookings and activity</p>
         </div>
 

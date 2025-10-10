@@ -338,7 +338,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader className="pb-4">
-          <DialogTitle className="text-xl sm:text-2xl">Complete Your Flight Booking</DialogTitle>
+          <DialogTitle className="text-xl sm:text-2xl font-secondary">Complete Your Flight Booking</DialogTitle>
         </DialogHeader>
 
         {/* Autofill Prompt */}

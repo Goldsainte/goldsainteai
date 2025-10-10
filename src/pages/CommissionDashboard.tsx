@@ -88,7 +88,7 @@ export default function CommissionDashboard() {
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Commission Dashboard</h1>
+          <h1 className="text-4xl font-bold mb-2 font-secondary">Commission Dashboard</h1>
           <p className="text-muted-foreground">Track your earnings and booking performance</p>
         </div>
 
