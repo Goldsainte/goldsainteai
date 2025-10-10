@@ -185,7 +185,7 @@ export const Header = () => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-80 bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                    className="w-80 max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
                   >
                     {/* Travel Section */}
                     <div className="px-4 py-3 border-b border-border/50">
