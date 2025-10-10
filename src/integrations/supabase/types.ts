@@ -640,6 +640,39 @@ export type Database = {
           },
         ]
       }
+      blocked_keywords: {
+        Row: {
+          action: string
+          category: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          keyword: string
+          severity: string
+          updated_at: string | null
+        }
+        Insert: {
+          action?: string
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keyword: string
+          severity?: string
+          updated_at?: string | null
+        }
+        Update: {
+          action?: string
+          category?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          keyword?: string
+          severity?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       booking_modifications: {
         Row: {
           amadeus_order_id: string | null
@@ -936,6 +969,96 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      community_guidelines: {
+        Row: {
+          category: string
+          content: string
+          created_at: string | null
+          effective_date: string | null
+          id: string
+          is_active: boolean | null
+          order_index: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string | null
+          effective_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string | null
+          effective_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          order_index?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      content_moderation_flags: {
+        Row: {
+          ai_analysis: Json | null
+          confidence_score: number | null
+          content_id: string
+          content_type: string
+          created_at: string | null
+          flag_source: string
+          flagged_by_user_id: string | null
+          id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by_admin_id: string | null
+          severity: string
+          status: string
+          updated_at: string | null
+          violation_type: string
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          confidence_score?: number | null
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          flag_source?: string
+          flagged_by_user_id?: string | null
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_admin_id?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string | null
+          violation_type: string
+        }
+        Update: {
+          ai_analysis?: Json | null
+          confidence_score?: number | null
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          flag_source?: string
+          flagged_by_user_id?: string | null
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by_admin_id?: string | null
+          severity?: string
+          status?: string
+          updated_at?: string | null
+          violation_type?: string
+        }
+        Relationships: []
       }
       conversation_messages: {
         Row: {
@@ -1995,6 +2118,68 @@ export type Database = {
           },
         ]
       }
+      moderation_actions: {
+        Row: {
+          action_type: string
+          appeal_status: string | null
+          appeal_text: string | null
+          appealed_at: string | null
+          created_at: string | null
+          duration_hours: number | null
+          enforced_at: string | null
+          enforced_by_admin_id: string | null
+          expires_at: string | null
+          id: string
+          is_active: boolean | null
+          metadata: Json | null
+          reason: string
+          related_flag_id: string | null
+          target_user_id: string
+        }
+        Insert: {
+          action_type: string
+          appeal_status?: string | null
+          appeal_text?: string | null
+          appealed_at?: string | null
+          created_at?: string | null
+          duration_hours?: number | null
+          enforced_at?: string | null
+          enforced_by_admin_id?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          reason: string
+          related_flag_id?: string | null
+          target_user_id: string
+        }
+        Update: {
+          action_type?: string
+          appeal_status?: string | null
+          appeal_text?: string | null
+          appealed_at?: string | null
+          created_at?: string | null
+          duration_hours?: number | null
+          enforced_at?: string | null
+          enforced_by_admin_id?: string | null
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          metadata?: Json | null
+          reason?: string
+          related_flag_id?: string | null
+          target_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_actions_related_flag_id_fkey"
+            columns: ["related_flag_id"]
+            isOneToOne: false
+            referencedRelation: "content_moderation_flags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -2610,6 +2795,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: string | null
           account_type: string | null
           avatar_url: string | null
           billing_address: Json | null
@@ -2623,19 +2809,24 @@ export type Database = {
           full_name: string | null
           id: string
           instagram_username: string | null
+          is_shadowbanned: boolean | null
           is_verified: boolean | null
           last_name: string | null
+          last_warning_at: string | null
           location: string | null
           phone: string | null
           preferences: Json | null
           preferred_currency: string | null
+          restriction_expires_at: string | null
           sms_notifications: boolean | null
           tax_id: string | null
           updated_at: string
           username: string | null
+          warning_count: number | null
           website: string | null
         }
         Insert: {
+          account_status?: string | null
           account_type?: string | null
           avatar_url?: string | null
           billing_address?: Json | null
@@ -2649,19 +2840,24 @@ export type Database = {
           full_name?: string | null
           id: string
           instagram_username?: string | null
+          is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          last_warning_at?: string | null
           location?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
+          restriction_expires_at?: string | null
           sms_notifications?: boolean | null
           tax_id?: string | null
           updated_at?: string
           username?: string | null
+          warning_count?: number | null
           website?: string | null
         }
         Update: {
+          account_status?: string | null
           account_type?: string | null
           avatar_url?: string | null
           billing_address?: Json | null
@@ -2675,16 +2871,20 @@ export type Database = {
           full_name?: string | null
           id?: string
           instagram_username?: string | null
+          is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
+          last_warning_at?: string | null
           location?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
+          restriction_expires_at?: string | null
           sms_notifications?: boolean | null
           tax_id?: string | null
           updated_at?: string
           username?: string | null
+          warning_count?: number | null
           website?: string | null
         }
         Relationships: []
@@ -2966,6 +3166,36 @@ export type Database = {
           search_params?: Json
           search_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sensitive_content_labels: {
+        Row: {
+          created_at: string | null
+          id: string
+          info_url: string | null
+          label_type: string
+          post_id: string
+          requires_click_through: boolean | null
+          warning_text: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          info_url?: string | null
+          label_type: string
+          post_id: string
+          requires_click_through?: boolean | null
+          warning_text: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          info_url?: string | null
+          label_type?: string
+          post_id?: string
+          requires_click_through?: boolean | null
+          warning_text?: string
         }
         Relationships: []
       }
@@ -4439,6 +4669,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_user_restricted: {
+        Args: { target_user_id: string }
         Returns: boolean
       }
       mark_conversation_messages_read: {
