@@ -714,10 +714,7 @@ export default function CoCuratedCreate() {
         return (
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Pricing & Payment Plan
-              </CardTitle>
+              <CardTitle>Pricing & Payment Plan</CardTitle>
               <CardDescription>Set pricing, deposits, and commission structure</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1137,7 +1134,6 @@ export default function CoCuratedCreate() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 container max-w-5xl mx-auto py-8 px-4">
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
@@ -1208,7 +1204,6 @@ export default function CoCuratedCreate() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
