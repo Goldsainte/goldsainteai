@@ -53,6 +53,9 @@ import CancellationRefundPolicy from "./pages/CancellationRefundPolicy";
 import Shop from "./pages/Shop";
 import AffiliateManager from "./pages/AffiliateManager";
 import SupplierManagement from "./pages/SupplierManagement";
+import CoCuratedDashboard from "./pages/CoCuratedDashboard";
+import { CoCuratedPackageBuilder } from "./components/CoCuratedPackageBuilder";
+import { CoCuratedMarketplace } from "./components/CoCuratedMarketplace";
 
 const queryClient = new QueryClient();
 
@@ -120,6 +123,9 @@ function AppContent() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/affiliate-manager" element={<AffiliateManager />} />
           <Route path="/supplier-management" element={<SupplierManagement />} />
+          <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
+          <Route path="/cocurated-create" element={<CoCuratedPackageBuilder />} />
+          <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
