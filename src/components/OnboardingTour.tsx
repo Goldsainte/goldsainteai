@@ -62,6 +62,12 @@ export const OnboardingTour = () => {
       disableBeacon: true,
     },
     {
+      target: '[data-tour="cocurated"]',
+      content: "CoCurated™ Packages - Where Experts Meet Adventure! Browse exclusive travel packages crafted by top creators and agents. From Bali retreats to Paris getaways, book curated experiences with transparent pricing.",
+      placement: "bottom",
+      disableBeacon: true,
+    },
+    {
       target: '[data-tour="send-gift-post"]',
       content: "Support Creators with Gifts! Send virtual gifts using coins to your favorite travel creators. They earn real money, encouraging amazing content.",
       placement: "top",
@@ -75,7 +81,7 @@ export const OnboardingTour = () => {
     },
     {
       target: '[data-tour="creator-dashboard"]',
-      content: "Become a Creator! Track your performance, earnings from gifts, manage travel packages, and grow your audience. Start monetizing your travel expertise.",
+      content: "Creator Dashboard - Your Revenue Command Center! Track views, engagement, package bookings, and earnings all in one place. Level up through Bronze to Platinum tiers for bigger commission bonuses. Time to monetize your wanderlust!",
       placement: "left",
       disableBeacon: true,
     },
