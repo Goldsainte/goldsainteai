@@ -18,6 +18,7 @@ const COIN_PACKAGES: CoinPackage[] = [
   { coins: 1000, price: 9.99, bonus: 150, popular: true },
   { coins: 2500, price: 24.99, bonus: 500 },
   { coins: 5000, price: 49.99, bonus: 1200 },
+  { coins: 10000, price: 99.00, bonus: 2500 },
 ];
 
 interface BuyCoinsModalProps {
