@@ -264,48 +264,14 @@ const TravelFeed = () => {
       ) : (
         /* Mobile Layout - Full Screen Vertical Scroll */
         <div className="relative h-screen w-full bg-black overflow-hidden">
-          {/* Moments Ring - Positioned at top */}
-          <div className="absolute top-14 left-0 right-0 z-20">
-            <MomentsRing />
-          </div>
-          
-          {/* Top Navigation - Minimal */}
-          <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-3 py-2 safe-top">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate('/travel-profile')}
-              className="text-white hover:bg-white/20 h-9 w-9 border-2 border-secondary backdrop-blur-sm rounded-full"
-              aria-label="Home"
-            >
-              <Home className="h-5 w-5" />
-            </Button>
-            
-            {isPersonalized && (
-              <div className="absolute left-1/2 -translate-x-1/2 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
-                <p className="text-white text-xs font-medium">For You</p>
+          {/* Top bar - minimal "For You" label only */}
+          {isPersonalized && (
+            <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center py-3 safe-top">
+              <div className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full">
+                <p className="text-white text-sm font-semibold">For You</p>
               </div>
-            )}
-            
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('/travel-settings')}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9 border-2 border-secondary"
-              >
-                <Settings className="h-5 w-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/20 backdrop-blur-sm rounded-full h-9 w-9 border-2 border-secondary"
-              >
-                <Plus className="h-5 w-5" />
-              </Button>
             </div>
-          </div>
+          )}
 
           {/* Video Feed - Full Screen Vertical Scroll */}
           <div
@@ -350,6 +316,51 @@ const TravelFeed = () => {
                 </div>
               ))
             )}
+          </div>
+
+          {/* Bottom Navigation Bar - Instagram Style */}
+          <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/80 backdrop-blur-md border-t border-white/10 safe-bottom">
+            <div className="flex items-center justify-around py-3 px-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/')}
+                className="text-white hover:bg-white/10 h-10 w-10"
+                aria-label="Home"
+              >
+                <Home className="h-6 w-6" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/search')}
+                className="text-white hover:bg-white/10 h-10 w-10"
+                aria-label="Search"
+              >
+                <SearchIcon className="h-6 w-6" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCreateSheetOpen(true)}
+                className="text-white hover:bg-white/10 h-10 w-10"
+                aria-label="Create"
+              >
+                <PlusSquare className="h-6 w-6" />
+              </Button>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/travel-profile')}
+                className="text-white hover:bg-white/10 h-10 w-10"
+                aria-label="Profile"
+              >
+                <User className="h-6 w-6" />
+              </Button>
+            </div>
           </div>
         </div>
       )}
