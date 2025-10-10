@@ -60,7 +60,7 @@ function AppContent() {
   usePresence(); // Initialize presence tracking
   
   // Don't show header on these pages as they have their own custom headers
-  const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings', '/shop'];
+  const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];
   const showHeader = !hideHeaderPages.some(page => location.pathname.startsWith(page));
 
   // Don't show AI Booking Concierge on Horizon pages
