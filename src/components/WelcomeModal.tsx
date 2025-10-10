@@ -119,10 +119,8 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm sm:text-base">CoCurated™ - Collaborative Travel Packages.</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Browse exclusive travel packages created by top creators and agents. Each CoCurated package includes detailed itineraries, 
-                  accommodation, activities, and dining recommendations. Choose from fixed dates or flexible options, 
-                  with secure booking and transparent pricing. Perfect for unique group experiences or solo adventures 
-                  curated by travel experts who know the destinations best.
+                  Browse exclusive packages created by top creators and agents. Fixed or flexible dates, 
+                  secure booking, transparent pricing—all curated by travel experts who know the destinations best.
                 </p>
               </div>
             </div>
@@ -135,11 +133,8 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm sm:text-base">Creator Dashboard - All Your Tools in One Place.</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Comprehensive analytics showing views, engagement, and earnings across all your content. 
-                  Manage your CoCurated packages, track bookings, and view customer details. 
-                  Handle brand partnerships and promotional deals. Create and edit travel products for the Shop. 
-                  Monitor your creator tier progress with Bronze, Silver, Gold, and Platinum levels unlocking higher commission bonuses. 
-                  Access detailed earnings breakdowns, payout history, and real-time revenue tracking.
+                  Track analytics, manage packages, handle partnerships, and create products for the Shop. 
+                  Level up through Bronze to Platinum tiers for higher commission bonuses with detailed earnings tracking.
                 </p>
               </div>
             </div>
@@ -152,11 +147,8 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm sm:text-base">Creator Payouts - Multiple Revenue Streams.</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Earn from multiple sources: content views and engagement, virtual gifts from fans, 
-                  CoCurated package bookings (up to 40% commission), product sales in the Shop, 
-                  brand partnerships and sponsorships, affiliate marketing commissions, and template resales. 
-                  Your creator tier level boosts all earnings - Platinum members earn up to 20% more on every transaction. 
-                  Secure Stripe Connect integration ensures fast, reliable payouts with detailed transaction history and tax reporting.
+                  Earn from content views, virtual gifts, package bookings (up to 40% commission), Shop sales, partnerships, and affiliate marketing. 
+                  Platinum tier members earn up to 20% more. Secure Stripe payouts with full transaction history.
                 </p>
               </div>
             </div>
@@ -178,7 +170,11 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
           </ScrollArea>
 
           <Button
-            onClick={onClose} 
+            onClick={() => {
+              onClose();
+              // Dispatch event for onboarding tour
+              window.dispatchEvent(new Event("welcomeDismissed"));
+            }} 
             className="w-full h-10 sm:h-11 text-xs sm:text-sm group"
             size="lg"
           >
