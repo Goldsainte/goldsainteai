@@ -139,10 +139,10 @@ export default function CoCuratedDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Sparkles className="h-8 w-8 text-primary" />
-                <h1 className="text-4xl font-bold">CoCurated™ Dashboard</h1>
+                <Sparkles className="h-6 w-6 text-primary" />
+                <h1 className="text-3xl font-bold">CoCurated™ Dashboard</h1>
               </div>
-              <p className="text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {isAgent ? 'Manage your packages and track influencer promotions' : 'Track your promotions and earnings'}
               </p>
             </div>

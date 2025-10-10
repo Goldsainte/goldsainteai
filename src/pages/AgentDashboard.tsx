@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle } from "lucide-react";
+import { Briefcase, MapPin, DollarSign, Clock, ArrowLeft, MessageSquare, CheckCircle, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { JobMessaging } from "@/components/JobMessaging";
 import { StripeConnectOnboarding } from "@/components/StripeConnectOnboarding";
@@ -216,6 +216,26 @@ export default function AgentDashboard() {
           {!agent.is_verified && (
             <Badge variant="secondary" className="mt-2">Pending Verification</Badge>
           )}
+        </div>
+
+        {/* Quick Access Navigation */}
+        <div className="flex gap-3 mb-6">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => navigate('/cocurated-dashboard')}
+          >
+            <Sparkles className="w-4 h-4" />
+            CoCurated™
+          </Button>
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => navigate('/marketplace')}
+          >
+            <Briefcase className="w-4 h-4" />
+            Job Marketplace
+          </Button>
         </div>
 
         {!agent.is_verified && (

@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Sparkles, MapPin, Calendar, Users, DollarSign, TrendingUp, Search } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 interface AgentPackage {
   id: string;
@@ -41,7 +43,7 @@ interface Promotion {
   total_commission_earned: number;
 }
 
-export const CoCuratedMarketplace = () => {
+export default function CoCuratedMarketplace() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [packages, setPackages] = useState<AgentPackage[]>([]);
@@ -155,14 +157,16 @@ export const CoCuratedMarketplace = () => {
   );
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">CoCurated™ Marketplace</h1>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 container mx-auto py-8 px-4">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles className="h-6 w-6 text-primary" />
+            <h1 className="text-3xl font-bold">CoCurated™ Marketplace</h1>
+          </div>
+          <p className="text-sm text-muted-foreground">Discover and promote travel packages with shared commissions</p>
         </div>
-        <p className="text-muted-foreground">Discover and promote travel packages with shared commissions</p>
-      </div>
 
       {/* Search */}
       <div className="mb-6">
@@ -282,6 +286,8 @@ export const CoCuratedMarketplace = () => {
           })}
         </div>
       )}
+      </main>
+      <Footer />
     </div>
   );
-};
+}

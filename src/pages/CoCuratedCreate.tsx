@@ -9,8 +9,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Plus, X, Upload, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
-export const CoCuratedPackageBuilder = () => {
+export default function CoCuratedCreate() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -117,14 +119,16 @@ export const CoCuratedPackageBuilder = () => {
   const { margin, agentCommission, influencerCommission, platformFee } = calculateMargin();
 
   return (
-    <div className="container max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Sparkles className="h-8 w-8 text-primary" />
-          <h1 className="text-4xl font-bold">CoCurated™</h1>
+    <div className="min-h-screen flex flex-col">
+      <Header />
+      <main className="flex-1 container max-w-4xl mx-auto py-8 px-4">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles className="h-6 w-6 text-primary" />
+            <h1 className="text-3xl font-bold">CoCurated™</h1>
+          </div>
+          <p className="text-sm text-muted-foreground">Create a travel package for influencers to promote with shared commissions</p>
         </div>
-        <p className="text-muted-foreground">Create a travel package for influencers to promote with shared commissions</p>
-      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
@@ -388,6 +392,8 @@ export const CoCuratedPackageBuilder = () => {
           </Button>
         </div>
       </form>
+      </main>
+      <Footer />
     </div>
   );
-};
+}

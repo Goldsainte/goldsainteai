@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus, MapPin, Calendar, Star } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus, MapPin, Calendar, Star, Sparkles } from "lucide-react";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
@@ -283,6 +283,14 @@ export default function CreatorDashboard() {
 
         {/* Quick Access Navigation */}
         <div className="flex gap-3 mb-8">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2"
+            onClick={() => navigate('/cocurated-dashboard')}
+          >
+            <Sparkles className="w-4 h-4" />
+            CoCurated™
+          </Button>
           <Button 
             variant="outline" 
             className="flex items-center gap-2"
