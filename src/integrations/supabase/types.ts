@@ -1448,6 +1448,48 @@ export type Database = {
           },
         ]
       }
+      creator_verification_status: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_verified_creator: boolean | null
+          last_checked: string | null
+          original_content_count: number | null
+          total_content_count: number | null
+          total_followers: number | null
+          updated_at: string | null
+          user_id: string
+          verification_date: string | null
+          views_last_30_days: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_verified_creator?: boolean | null
+          last_checked?: string | null
+          original_content_count?: number | null
+          total_content_count?: number | null
+          total_followers?: number | null
+          updated_at?: string | null
+          user_id: string
+          verification_date?: string | null
+          views_last_30_days?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_verified_creator?: boolean | null
+          last_checked?: string | null
+          original_content_count?: number | null
+          total_content_count?: number | null
+          total_followers?: number | null
+          updated_at?: string | null
+          user_id?: string
+          verification_date?: string | null
+          views_last_30_days?: number | null
+        }
+        Relationships: []
+      }
       currency_exchange_rates: {
         Row: {
           created_at: string
@@ -4417,6 +4459,7 @@ export type Database = {
       }
       travel_posts: {
         Row: {
+          average_watch_percentage: number | null
           caption: string | null
           comment_count: number | null
           created_at: string | null
@@ -4426,6 +4469,7 @@ export type Database = {
           id: string
           image_urls: string[] | null
           is_featured: boolean | null
+          is_original_content: boolean | null
           like_count: number | null
           location: string | null
           media_type: string | null
@@ -4433,12 +4477,16 @@ export type Database = {
           share_count: number | null
           status: string | null
           thumbnail_url: string | null
+          total_watch_time_seconds: number | null
           updated_at: string | null
           user_id: string
+          video_duration_seconds: number | null
           video_url: string | null
           view_count: number | null
+          viewer_region_data: Json | null
         }
         Insert: {
+          average_watch_percentage?: number | null
           caption?: string | null
           comment_count?: number | null
           created_at?: string | null
@@ -4448,6 +4496,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           is_featured?: boolean | null
+          is_original_content?: boolean | null
           like_count?: number | null
           location?: string | null
           media_type?: string | null
@@ -4455,12 +4504,16 @@ export type Database = {
           share_count?: number | null
           status?: string | null
           thumbnail_url?: string | null
+          total_watch_time_seconds?: number | null
           updated_at?: string | null
           user_id: string
+          video_duration_seconds?: number | null
           video_url?: string | null
           view_count?: number | null
+          viewer_region_data?: Json | null
         }
         Update: {
+          average_watch_percentage?: number | null
           caption?: string | null
           comment_count?: number | null
           created_at?: string | null
@@ -4470,6 +4523,7 @@ export type Database = {
           id?: string
           image_urls?: string[] | null
           is_featured?: boolean | null
+          is_original_content?: boolean | null
           like_count?: number | null
           location?: string | null
           media_type?: string | null
@@ -4477,10 +4531,13 @@ export type Database = {
           share_count?: number | null
           status?: string | null
           thumbnail_url?: string | null
+          total_watch_time_seconds?: number | null
           updated_at?: string | null
           user_id?: string
+          video_duration_seconds?: number | null
           video_url?: string | null
           view_count?: number | null
+          viewer_region_data?: Json | null
         }
         Relationships: []
       }
@@ -5489,6 +5546,19 @@ export type Database = {
         }
         Returns: boolean
       }
+      calculate_advanced_creator_earnings: {
+        Args: {
+          p_comments: number
+          p_likes: number
+          p_region_multiplier?: number
+          p_retention_rate: number
+          p_shares: number
+          p_video_duration: number
+          p_views: number
+          p_watch_time: number
+        }
+        Returns: number
+      }
       calculate_agent_trust_score: {
         Args: { agent_uuid: string }
         Returns: number
@@ -5508,6 +5578,10 @@ export type Database = {
       calculate_loyalty_tier: {
         Args: { lifetime_points_value: number }
         Returns: string
+      }
+      check_creator_eligibility: {
+        Args: { p_user_id: string }
+        Returns: boolean
       }
       convert_currency: {
         Args: { amount: number; from_curr: string; to_curr: string }
