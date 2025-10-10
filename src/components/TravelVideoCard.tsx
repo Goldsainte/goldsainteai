@@ -583,19 +583,30 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <button
-              onClick={handleSaveClick}
-              className="transition-transform active:scale-90"
-            >
-              <Bookmark className={`h-6 w-6 ${isSaved ? 'fill-current' : ''}`} />
-            </button>
-            <button
-              onClick={() => setGiftModalOpen(true)}
-              className="transition-transform active:scale-90"
-              data-tour="send-gift-post"
-            >
-              <Coins className="h-6 w-6 text-yellow-500" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleSaveClick}
+                className="transition-transform active:scale-90"
+              >
+                <Bookmark className={`h-6 w-6 ${isSaved ? 'fill-current' : ''}`} />
+              </button>
+              <button
+                onClick={() => setGiftModalOpen(true)}
+                className="transition-transform active:scale-90"
+                data-tour="send-gift-post"
+              >
+                <Coins className="h-6 w-6 text-yellow-500" />
+              </button>
+              {isOwnPost && (
+                <button
+                  onClick={() => setPromoteModalOpen(true)}
+                  className="transition-transform active:scale-90"
+                  title="Promote this post"
+                >
+                  <TrendingUp className="h-6 w-6 text-secondary" />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Like count */}
