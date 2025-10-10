@@ -530,8 +530,8 @@ const TravelProfile = () => {
               </Card>
             )}
 
-            {/* Coin Balance Card */}
-            <Card className="p-3 bg-coins-bg border-coins-bg flex-1">
+            {/* Coin Balance Card - Hidden on mobile */}
+            <Card className="hidden md:flex p-3 bg-coins-bg border-coins-bg flex-1">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Coins className="h-5 w-5 text-white" />
@@ -956,7 +956,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/')}
-            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
+            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
             aria-label="Home"
           >
             <Home className="h-8 w-8" />
@@ -966,7 +966,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/search')}
-            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
+            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
             aria-label="Search"
           >
             <SearchIcon className="h-8 w-8" />
@@ -976,7 +976,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => setCreateSheetOpen(true)}
-            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
+            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
             aria-label="Create"
           >
             <PlusSquare className="h-8 w-8" />
@@ -986,7 +986,7 @@ const TravelProfile = () => {
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-profile')}
-            className="hover:bg-accent h-16 w-16 rounded-full ring-1 ring-primary/30"
+            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
             aria-label="Profile"
           >
             <User className="h-8 w-8" />

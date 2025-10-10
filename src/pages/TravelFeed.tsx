@@ -325,7 +325,7 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/')}
-className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreground/30"
+                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
                 aria-label="Home"
               >
                 <Home className="h-8 w-8" />
@@ -335,7 +335,7 @@ className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreg
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/search')}
-className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreground/30"
+                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
                 aria-label="Search"
               >
                 <SearchIcon className="h-8 w-8" />
@@ -345,7 +345,7 @@ className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreg
                 variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreground/30"
+                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
                 aria-label="Create"
               >
                 <PlusSquare className="h-8 w-8" />
@@ -355,7 +355,7 @@ className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreg
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/20 h-16 w-16 rounded-full ring-1 ring-foreground/30"
+                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
                 aria-label="Profile"
               >
                 <User className="h-8 w-8" />
