@@ -115,7 +115,7 @@ export default function Shop() {
             )}
           </div>
 
-          <h1 className="text-4xl font-secondary font-bold mb-4">Travel Shop</h1>
+          <h1 className="text-4xl font-secondary font-bold mb-4">The Sainte Creator Travel Collection</h1>
           <p className="text-muted-foreground mb-6">
             Discover travel gear, packages, and experiences from creators
           </p>
