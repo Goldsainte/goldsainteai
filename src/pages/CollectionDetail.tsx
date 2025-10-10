@@ -127,7 +127,7 @@ export default function CollectionDetail() {
                 <p className="text-muted-foreground mb-2">{collection.description}</p>
               )}
               <p className="text-sm text-muted-foreground">
-                {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+                {posts.length} {posts.length === 1 ? 'sainte' : 'saintes'}
               </p>
             </div>
 
@@ -179,7 +179,7 @@ export default function CollectionDetail() {
               >
                 <img
                   src={post.thumbnail_url || post.video_url}
-                  alt={post.caption || 'Post'}
+                  alt={post.caption || 'Sainte'}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

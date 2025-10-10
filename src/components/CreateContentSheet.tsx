@@ -38,14 +38,14 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
     },
     { 
       id: "reel", 
-      label: "Reel", 
+      label: "Journey", 
       icon: Video, 
       description: "Short-form video content",
       available: true
     },
     { 
       id: "post", 
-      label: "Post", 
+      label: "Sainte", 
       icon: Grid3X3, 
       description: "Share photos and videos",
       available: true

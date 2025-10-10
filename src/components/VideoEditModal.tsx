@@ -187,7 +187,7 @@ const VideoEditModal = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
         <DialogHeader>
-          <DialogTitle>Edit Post</DialogTitle>
+          <DialogTitle>Edit Sainte</DialogTitle>
         </DialogHeader>
 
         {/* Sticky Video Preview with Capture Controls */}

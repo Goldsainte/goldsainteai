@@ -224,7 +224,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     if (navigator.share) {
       try {
         await navigator.share({
-          title: post.caption || 'Check out this travel video',
+          title: post.caption || 'Check out this journey',
           url: url,
         });
       } catch (error) {
@@ -238,7 +238,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
   const handleShareToTikTok = async () => {
     const url = `${window.location.origin}/travel-feed?postId=${post.id}`;
-    const caption = post.caption || 'Check out this travel video';
+    const caption = post.caption || 'Check out this journey';
     
     // Track share
     try {
@@ -376,7 +376,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => setEditOpen(true)}>
                   <Edit className="h-4 w-4 mr-2" />
-                  Edit Post
+                  Edit Sainte
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -812,7 +812,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => setEditOpen(true)}>
                     <Edit className="h-4 w-4 mr-2" />
-                    Edit Post
+                    Edit Sainte
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

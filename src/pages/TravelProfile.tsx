@@ -602,7 +602,7 @@ const TravelProfile = () => {
                   className="mt-4"
                   onClick={() => setCreateSheetOpen(true)}
                 >
-                  Create your first video
+                  Create your first journey
                 </Button>
               )}
             </div>

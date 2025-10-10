@@ -203,10 +203,10 @@ const TravelFeed = () => {
               ) : posts.length === 0 ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center space-y-4">
-                    <p className="text-muted-foreground">No videos yet</p>
+                    <p className="text-muted-foreground">No journeys yet</p>
                     <Button onClick={() => setCreateSheetOpen(true)}>
                       <Upload className="mr-2 h-4 w-4" />
-                      Upload First Video
+                      Upload First Journey
                     </Button>
                   </div>
                 </div>
@@ -297,10 +297,10 @@ const TravelFeed = () => {
             ) : posts.length === 0 ? (
               <div className="flex items-center justify-center h-full">
                 <div className="text-center space-y-4">
-                  <p className="text-muted-foreground">No videos yet</p>
+                  <p className="text-muted-foreground">No journeys yet</p>
                   <Button onClick={() => setUploadModalOpen(true)}>
                     <Upload className="mr-2 h-4 w-4" />
-                    Upload First Video
+                    Upload First Journey
                   </Button>
                 </div>
               </div>

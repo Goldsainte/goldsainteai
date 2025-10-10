@@ -84,7 +84,7 @@ export const CollectionSelector = ({ postId, open, onOpenChange }: CollectionSel
                   <div className="text-center py-8 text-muted-foreground">
                     <FolderPlus className="h-12 w-12 mx-auto mb-2 opacity-50" />
                     <p>No collections yet</p>
-                    <p className="text-sm">Create one to organize your saved posts</p>
+                    <p className="text-sm">Create one to organize your saved saintes</p>
                   </div>
                 ) : (
                   collections.map(collection => (
@@ -99,7 +99,7 @@ export const CollectionSelector = ({ postId, open, onOpenChange }: CollectionSel
                           <p className="text-sm text-muted-foreground">{collection.description}</p>
                         )}
                         <p className="text-xs text-muted-foreground mt-1">
-                          {collection.post_count || 0} posts
+                          {collection.post_count || 0} saintes
                         </p>
                       </div>
                       <div className="ml-4">

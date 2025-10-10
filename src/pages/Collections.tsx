@@ -70,7 +70,7 @@ export default function Collections() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">Collections</h1>
-            <p className="text-muted-foreground">Organize your saved posts into collections</p>
+            <p className="text-muted-foreground">Organize your saved saintes into collections</p>
           </div>
           <Button onClick={() => setShowCreateDialog(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -89,7 +89,7 @@ export default function Collections() {
             <Grid3x3 className="h-16 w-16 mx-auto mb-4 text-muted-foreground opacity-50" />
             <h3 className="text-xl font-semibold mb-2">No collections yet</h3>
             <p className="text-muted-foreground mb-6">
-              Start organizing your saved posts by creating collections
+              Start organizing your saved saintes by creating collections
             </p>
             <Button onClick={() => setShowCreateDialog(true)}>
               <Plus className="h-4 w-4 mr-2" />
