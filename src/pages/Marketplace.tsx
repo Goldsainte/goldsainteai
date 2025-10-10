@@ -344,14 +344,14 @@ export default function Marketplace() {
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-5xl h-[95vh] flex flex-col p-0">
-              <DialogHeader className="flex-shrink-0 px-6 pt-6 pb-4">
-                <DialogTitle className="font-chiffon text-2xl">Post a Comprehensive Travel Job</DialogTitle>
-                <DialogDescription>
+              <DialogHeader className="flex-shrink-0 px-4 md:px-6 pt-4 md:pt-6 pb-3 md:pb-4">
+                <DialogTitle className="font-chiffon text-lg md:text-2xl">Post a Comprehensive Travel Job</DialogTitle>
+                <DialogDescription className="text-xs md:text-sm">
                   Provide detailed information about your travel needs and get bids from qualified agents
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="flex-1 overflow-hidden px-6 pb-6">
+              <div className="flex-1 overflow-hidden px-4 md:px-6 pb-4 md:pb-6">
                 <ComprehensiveJobForm 
                   onSubmit={handleCreateJob}
                   onCancel={() => setIsCreateDialogOpen(false)}

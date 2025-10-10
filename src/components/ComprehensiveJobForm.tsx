@@ -132,10 +132,10 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 1: Basic Overview */}
         {step === 1 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Basic Job Overview</h3>
+            <h3 className="text-base md:text-lg font-semibold">Basic Job Overview</h3>
             
             <div>
-              <Label htmlFor="title">Job Title *</Label>
+              <Label htmlFor="title" className="text-sm">Job Title *</Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -146,7 +146,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
             </div>
 
             <div>
-              <Label htmlFor="jobCategory">Job Category *</Label>
+              <Label htmlFor="jobCategory" className="text-sm">Job Category *</Label>
               <select
                 id="jobCategory"
                 value={formData.jobCategory}
@@ -164,7 +164,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
             </div>
 
             <div>
-              <Label htmlFor="description">Brief Description *</Label>
+              <Label htmlFor="description" className="text-sm">Brief Description *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -177,7 +177,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <Separator />
 
-            <h4 className="font-semibold">Client Information</h4>
+            <h4 className="text-sm md:text-base font-semibold">Client Information</h4>
             
             <div>
               <Label htmlFor="clientName">Client Name (Optional)</Label>
@@ -203,7 +203,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="timeZone">Time Zone</Label>
                 <Input
@@ -229,12 +229,12 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 2: Transportation Details */}
         {step === 2 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Transportation Details</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-base md:text-lg font-semibold">Transportation Details</h3>
+            <p className="text-xs md:text-sm text-muted-foreground">
               Fill this section if your job involves flight or transportation booking
             </p>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="departureCity">Departure City/Airport</Label>
                 <Input
@@ -255,7 +255,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="departureDate">Departure Date</Label>
                 <Input
@@ -276,7 +276,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="numberOfTravelers">Number of Travelers</Label>
                 <Input
@@ -349,8 +349,8 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 3: Accommodation Details */}
         {step === 3 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Accommodation Details</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-base md:text-lg font-semibold">Accommodation Details</h3>
+            <p className="text-xs md:text-sm text-muted-foreground">
               Fill this section if your job involves hotel or accommodation booking
             </p>
 
@@ -364,7 +364,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="checkInDate">Check-in Date</Label>
                 <Input
@@ -385,7 +385,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="hotelStars">Hotel Star Rating</Label>
                 <select
@@ -450,8 +450,8 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 4: Full Itinerary Details */}
         {step === 4 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Full Travel Itinerary</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="text-base md:text-lg font-semibold">Full Travel Itinerary</h3>
+            <p className="text-xs md:text-sm text-muted-foreground">
               Fill this section for complete trip planning services
             </p>
 
@@ -478,7 +478,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <div>
               <Label>Type of Experience</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
                 {["luxury", "adventure", "cultural", "romantic", "family-friendly", "budget"].map((type) => (
                   <div key={type} className="flex items-center space-x-2">
                     <Checkbox
@@ -494,7 +494,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <div>
               <Label>Preferred Activities</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
                 {["tours", "culinary", "nature", "shopping", "nightlife", "museums"].map((activity) => (
                   <div key={activity} className="flex items-center space-x-2">
                     <Checkbox
@@ -510,7 +510,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <div>
               <Label>Included Services</Label>
-              <div className="grid grid-cols-2 gap-3 mt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
                 {["flights", "hotels", "transfers", "guides", "insurance", "visa"].map((service) => (
                   <div key={service} className="flex items-center space-x-2">
                     <Checkbox
@@ -529,9 +529,9 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 5: Payment & Timeline */}
         {step === 5 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Payment Details</h3>
+            <h3 className="text-base md:text-lg font-semibold">Payment Details</h3>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="budgetMin">Minimum Budget *</Label>
                 <Input
@@ -591,9 +591,9 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <Separator />
 
-            <h3 className="text-lg font-semibold">Timeline & Urgency</h3>
+            <h3 className="text-base md:text-lg font-semibold">Timeline & Urgency</h3>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="quoteDeadline">Quote Deadline</Label>
                 <Input
@@ -643,7 +643,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
         {/* Step 6: Agent Requirements & Deliverables */}
         {step === 6 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Agent Requirements</h3>
+            <h3 className="text-base md:text-lg font-semibold">Agent Requirements</h3>
 
             <div>
               <Label htmlFor="languagesRequired">Languages Required</Label>
@@ -678,7 +678,7 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
 
             <Separator />
 
-            <h3 className="text-lg font-semibold">Expected Deliverables</h3>
+            <h3 className="text-base md:text-lg font-semibold">Expected Deliverables</h3>
 
             <div className="space-y-3">
               {["Proposed itinerary", "Booking confirmations", "Invoice", "Customer support post-booking", "Emergency contact", "Travel insurance documents"].map((deliverable) => (
