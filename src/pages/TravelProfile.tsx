@@ -562,6 +562,7 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 className="w-full h-9 md:h-8 text-sm font-semibold"
+                style={{ backgroundColor: '#0c4d47', color: '#bfad72' }}
                 onClick={() => setEditProfileOpen(true)}
               >
                 Edit profile
@@ -569,6 +570,7 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 className="w-full h-9 md:h-8 text-sm font-semibold"
+                style={{ backgroundColor: '#0c4d47', color: '#bfad72' }}
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
                   toast.success("Profile link copied!");
