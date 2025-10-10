@@ -179,7 +179,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   };
 
   const handleShare = async () => {
-    const url = `${window.location.origin}/post/${post.id}`;
+    const url = `${window.location.origin}/travel-feed?postId=${post.id}`;
     
     // Track share
     try {
