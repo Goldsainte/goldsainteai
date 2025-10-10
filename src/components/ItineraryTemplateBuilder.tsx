@@ -37,6 +37,9 @@ export function ItineraryTemplateBuilder() {
   const [templateDescription, setTemplateDescription] = useState("");
   const [totalDays, setTotalDays] = useState(1);
   const [isPublic, setIsPublic] = useState(false);
+  const [monetizationType, setMonetizationType] = useState<string>("free");
+  const [coinPrice, setCoinPrice] = useState(0);
+  const [commissionPercentage, setCommissionPercentage] = useState(0);
   const [items, setItems] = useState<TemplateItem[]>([]);
   const [currentItem, setCurrentItem] = useState<Partial<TemplateItem>>({
     day_number: 1,
@@ -83,6 +86,9 @@ export function ItineraryTemplateBuilder() {
           description: templateDescription,
           total_days: totalDays,
           is_public: isPublic,
+          monetization_type: monetizationType,
+          coin_price: coinPrice,
+          commission_percentage: commissionPercentage,
         })
         .select()
         .single();
@@ -131,6 +137,9 @@ export function ItineraryTemplateBuilder() {
     setTemplateDescription("");
     setTotalDays(1);
     setIsPublic(false);
+    setMonetizationType("free");
+    setCoinPrice(0);
+    setCommissionPercentage(0);
     setItems([]);
     setCurrentItem({
       day_number: 1,
@@ -265,6 +274,70 @@ export function ItineraryTemplateBuilder() {
               />
               <Label htmlFor="is_public">Make template public (other creators can use it)</Label>
             </div>
+
+            {isPublic && (
+              <Card className="border-primary/20">
+                <CardHeader>
+                  <CardTitle className="text-base">Monetization Settings</CardTitle>
+                  <CardDescription>How do you want to earn when others use your template?</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="monetization_type">Monetization Type</Label>
+                    <Select
+                      value={monetizationType}
+                      onValueChange={setMonetizationType}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="free">Free (no charge)</SelectItem>
+                        <SelectItem value="coins">Charge Coins (one-time fee)</SelectItem>
+                        <SelectItem value="commission">Commission (% of bookings)</SelectItem>
+                        <SelectItem value="both">Both (coins + commission)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {(monetizationType === "coins" || monetizationType === "both") && (
+                    <div className="space-y-2">
+                      <Label htmlFor="coin_price">Coin Price</Label>
+                      <Input
+                        id="coin_price"
+                        type="number"
+                        min="0"
+                        value={coinPrice}
+                        onChange={(e) => setCoinPrice(parseInt(e.target.value) || 0)}
+                        placeholder="e.g., 100 coins"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        You'll receive 70% ({Math.floor(coinPrice * 0.7)} coins) after platform fee
+                      </p>
+                    </div>
+                  )}
+
+                  {(monetizationType === "commission" || monetizationType === "both") && (
+                    <div className="space-y-2">
+                      <Label htmlFor="commission_percentage">Commission Percentage</Label>
+                      <Input
+                        id="commission_percentage"
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={commissionPercentage}
+                        onChange={(e) => setCommissionPercentage(parseFloat(e.target.value) || 0)}
+                        placeholder="e.g., 10%"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Earn {commissionPercentage}% of every booking made with your template
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
 
             <Card className="border-2 border-dashed">
               <CardHeader>

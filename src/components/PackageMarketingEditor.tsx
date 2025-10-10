@@ -31,6 +31,8 @@ interface PackageFormData {
   requirements: string[];
   tags: string[];
   is_published: boolean;
+  allow_resale: boolean;
+  resale_commission_percentage: number;
 }
 
 export function PackageMarketingEditor() {
@@ -55,6 +57,8 @@ export function PackageMarketingEditor() {
     requirements: [],
     tags: [],
     is_published: false,
+    allow_resale: false,
+    resale_commission_percentage: 10,
   });
   const [newItem, setNewItem] = useState("");
   const [itemType, setItemType] = useState<"highlights" | "included" | "excluded" | "requirements" | "tags">("highlights");
@@ -155,6 +159,8 @@ export function PackageMarketingEditor() {
       requirements: [],
       tags: [],
       is_published: false,
+      allow_resale: false,
+      resale_commission_percentage: 10,
     });
     setNewItem("");
   };
@@ -214,6 +220,8 @@ export function PackageMarketingEditor() {
       requirements: pkg.requirements || [],
       tags: pkg.tags || [],
       is_published: pkg.is_published,
+      allow_resale: pkg.allow_resale || false,
+      resale_commission_percentage: pkg.resale_commission_percentage || 10,
     });
     setIsCreating(true);
   };
@@ -437,13 +445,51 @@ export function PackageMarketingEditor() {
               })}
             </div>
 
-            <div className="flex items-center space-x-2 border-t pt-4">
-              <Switch
-                id="is_published"
-                checked={formData.is_published}
-                onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked }))}
-              />
-              <Label htmlFor="is_published">Publish package (make visible to customers)</Label>
+            <div className="space-y-4 border-t pt-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is_published"
+                  checked={formData.is_published}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, is_published: checked }))}
+                />
+                <Label htmlFor="is_published">Publish package (make visible to customers)</Label>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="allow_resale"
+                  checked={formData.allow_resale}
+                  onCheckedChange={(checked) => setFormData(prev => ({ ...prev, allow_resale: checked }))}
+                />
+                <Label htmlFor="allow_resale">Allow other creators to resell this package</Label>
+              </div>
+
+              {formData.allow_resale && (
+                <div className="ml-6 space-y-2">
+                  <Label htmlFor="resale_commission">Your Commission Percentage</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="resale_commission"
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      value={formData.resale_commission_percentage}
+                      onChange={(e) => setFormData(prev => ({ 
+                        ...prev, 
+                        resale_commission_percentage: parseFloat(e.target.value) || 10 
+                      }))}
+                      className="w-32"
+                    />
+                    <span className="text-sm text-muted-foreground">
+                      % of every booking through resellers
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    When other creators sell your package, you earn {formData.resale_commission_percentage}% commission on each booking
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-2 border-t pt-4">

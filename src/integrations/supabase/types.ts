@@ -1974,11 +1974,14 @@ export type Database = {
       }
       itinerary_templates: {
         Row: {
+          coin_price: number | null
+          commission_percentage: number | null
           created_at: string
           creator_id: string
           description: string | null
           id: string
           is_public: boolean | null
+          monetization_type: string | null
           package_id: string | null
           template_name: string
           total_days: number
@@ -1986,11 +1989,14 @@ export type Database = {
           usage_count: number | null
         }
         Insert: {
+          coin_price?: number | null
+          commission_percentage?: number | null
           created_at?: string
           creator_id: string
           description?: string | null
           id?: string
           is_public?: boolean | null
+          monetization_type?: string | null
           package_id?: string | null
           template_name: string
           total_days: number
@@ -1998,11 +2004,14 @@ export type Database = {
           usage_count?: number | null
         }
         Update: {
+          coin_price?: number | null
+          commission_percentage?: number | null
           created_at?: string
           creator_id?: string
           description?: string | null
           id?: string
           is_public?: boolean | null
+          monetization_type?: string | null
           package_id?: string | null
           template_name?: string
           total_days?: number
@@ -2917,6 +2926,7 @@ export type Database = {
       }
       package_marketing_materials: {
         Row: {
+          allow_resale: boolean | null
           best_season: string | null
           booking_count: number | null
           created_at: string
@@ -2938,6 +2948,7 @@ export type Database = {
           package_name: string
           promotional_video_url: string | null
           requirements: string[] | null
+          resale_commission_percentage: number | null
           starting_price: number
           tagline: string | null
           tags: string[] | null
@@ -2946,6 +2957,7 @@ export type Database = {
           view_count: number | null
         }
         Insert: {
+          allow_resale?: boolean | null
           best_season?: string | null
           booking_count?: number | null
           created_at?: string
@@ -2967,6 +2979,7 @@ export type Database = {
           package_name: string
           promotional_video_url?: string | null
           requirements?: string[] | null
+          resale_commission_percentage?: number | null
           starting_price: number
           tagline?: string | null
           tags?: string[] | null
@@ -2975,6 +2988,7 @@ export type Database = {
           view_count?: number | null
         }
         Update: {
+          allow_resale?: boolean | null
           best_season?: string | null
           booking_count?: number | null
           created_at?: string
@@ -2996,6 +3010,7 @@ export type Database = {
           package_name?: string
           promotional_video_url?: string | null
           requirements?: string[] | null
+          resale_commission_percentage?: number | null
           starting_price?: number
           tagline?: string | null
           tags?: string[] | null
@@ -3004,6 +3019,76 @@ export type Database = {
           view_count?: number | null
         }
         Relationships: []
+      }
+      package_resale_transactions: {
+        Row: {
+          booking_amount: number
+          booking_id: string | null
+          commission_amount: number
+          commission_percentage: number
+          created_at: string
+          currency: string
+          id: string
+          original_creator_id: string
+          original_package_id: string
+          paid_at: string | null
+          reseller_creator_id: string
+          resold_package_id: string | null
+          status: string
+        }
+        Insert: {
+          booking_amount: number
+          booking_id?: string | null
+          commission_amount: number
+          commission_percentage: number
+          created_at?: string
+          currency?: string
+          id?: string
+          original_creator_id: string
+          original_package_id: string
+          paid_at?: string | null
+          reseller_creator_id: string
+          resold_package_id?: string | null
+          status?: string
+        }
+        Update: {
+          booking_amount?: number
+          booking_id?: string | null
+          commission_amount?: number
+          commission_percentage?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          original_creator_id?: string
+          original_package_id?: string
+          paid_at?: string | null
+          reseller_creator_id?: string
+          resold_package_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_resale_transactions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "package_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_resale_transactions_original_package_id_fkey"
+            columns: ["original_package_id"]
+            isOneToOne: false
+            referencedRelation: "package_marketing_materials"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "package_resale_transactions_resold_package_id_fkey"
+            columns: ["resold_package_id"]
+            isOneToOne: false
+            referencedRelation: "package_marketing_materials"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       paid_partnerships: {
         Row: {
@@ -4653,6 +4738,69 @@ export type Database = {
           },
         ]
       }
+      template_usage_transactions: {
+        Row: {
+          coins_paid: number | null
+          commission_amount: number | null
+          commission_percentage: number | null
+          created_at: string
+          currency: string | null
+          id: string
+          monetization_type: string
+          original_creator_id: string
+          package_booking_id: string | null
+          paid_at: string | null
+          status: string
+          template_id: string
+          user_creator_id: string
+        }
+        Insert: {
+          coins_paid?: number | null
+          commission_amount?: number | null
+          commission_percentage?: number | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          monetization_type: string
+          original_creator_id: string
+          package_booking_id?: string | null
+          paid_at?: string | null
+          status?: string
+          template_id: string
+          user_creator_id: string
+        }
+        Update: {
+          coins_paid?: number | null
+          commission_amount?: number | null
+          commission_percentage?: number | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          monetization_type?: string
+          original_creator_id?: string
+          package_booking_id?: string | null
+          paid_at?: string | null
+          status?: string
+          template_id?: string
+          user_creator_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "template_usage_transactions_package_booking_id_fkey"
+            columns: ["package_booking_id"]
+            isOneToOne: false
+            referencedRelation: "package_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "template_usage_transactions_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "itinerary_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       travel_agents: {
         Row: {
           accepted_gdpr: boolean | null
@@ -6216,6 +6364,14 @@ export type Database = {
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string; p_user_type: string }
         Returns: undefined
+      }
+      process_package_resale_commission: {
+        Args: { p_booking_id: string }
+        Returns: boolean
+      }
+      purchase_template_usage: {
+        Args: { p_template_id: string; p_user_creator_id: string }
+        Returns: Json
       }
       search_marketplace_jobs: {
         Args: {
