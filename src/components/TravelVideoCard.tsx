@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -236,6 +236,69 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     }
   };
 
+  const handleShareToTikTok = async () => {
+    const url = `${window.location.origin}/travel-feed?postId=${post.id}`;
+    const caption = post.caption || 'Check out this travel video';
+    
+    // Track share
+    try {
+      await supabase
+        .from('travel_posts')
+        .update({ share_count: (post.share_count || 0) + 1 })
+        .eq('id', post.id);
+    } catch (error) {
+      console.error('Error tracking share:', error);
+    }
+
+    // Try to open TikTok app first
+    const tiktokAppUrl = `tiktok://share?url=${encodeURIComponent(url)}&text=${encodeURIComponent(caption)}`;
+    
+    // Fallback to TikTok web upload
+    const tiktokWebUrl = `https://www.tiktok.com/upload?share_url=${encodeURIComponent(url)}`;
+    
+    // Try app first, then fallback to web
+    window.location.href = tiktokAppUrl;
+    
+    // Set timeout to check if app opened, otherwise open web
+    setTimeout(() => {
+      window.open(tiktokWebUrl, '_blank');
+    }, 1500);
+    
+    toast.success('Opening TikTok...');
+  };
+
+  const handleShareToInstagram = async () => {
+    const url = `${window.location.origin}/travel-feed?postId=${post.id}`;
+    
+    // Track share
+    try {
+      await supabase
+        .from('travel_posts')
+        .update({ share_count: (post.share_count || 0) + 1 })
+        .eq('id', post.id);
+    } catch (error) {
+      console.error('Error tracking share:', error);
+    }
+
+    // Try to open Instagram app
+    const instagramAppUrl = post.video_url 
+      ? `instagram://story-camera`
+      : `instagram://library?AssetPath=${encodeURIComponent(post.video_url || post.thumbnail_url || '')}`;
+    
+    // Fallback to Instagram web
+    const instagramWebUrl = `https://www.instagram.com/create/story/`;
+    
+    // Try app first, then fallback to web
+    window.location.href = instagramAppUrl;
+    
+    // Set timeout to check if app opened, otherwise open web
+    setTimeout(() => {
+      window.open(instagramWebUrl, '_blank');
+    }, 1500);
+    
+    toast.success('Opening Instagram...');
+  };
+
   const formatCount = (count: number) => {
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
     if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
@@ -389,12 +452,29 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               >
                 <MessageCircle className="h-6 w-6" />
               </button>
-              <button
-                onClick={handleShare}
-                className="transition-transform active:scale-90"
-              >
-                <Share2 className="h-6 w-6" />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="transition-transform active:scale-90">
+                    <Share2 className="h-6 w-6" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={handleShare}>
+                    <Share2 className="h-4 w-4 mr-2" />
+                    Share
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareToTikTok}>
+                    <Music className="h-4 w-4 mr-2" />
+                    Share to TikTok
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleShareToInstagram}>
+                    <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    Share to Instagram
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <button
               onClick={() => setCollectionSelectorOpen(true)}
@@ -677,14 +757,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </button>
 
             <button
-              onClick={handleShare}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
-            >
-              <Repeat2 className="h-7 w-7 text-white drop-shadow-lg" />
-              <span className="text-xs font-semibold drop-shadow-lg">0</span>
-            </button>
-
-            <button
               onClick={() => setCommentsOpen(true)}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
@@ -692,12 +764,29 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <span className="text-xs font-semibold drop-shadow-lg">{formatCount(localCommentCount)}</span>
             </button>
 
-            <button
-              onClick={handleShare}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
-            >
-              <Send className="h-7 w-7 text-white drop-shadow-lg" />
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex flex-col items-center gap-1 transition-transform active:scale-90">
+                  <Share2 className="h-7 w-7 text-white drop-shadow-lg" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                <DropdownMenuItem onClick={handleShare}>
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareToTikTok}>
+                  <Music className="h-4 w-4 mr-2" />
+                  Share to TikTok
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleShareToInstagram}>
+                  <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                  Share to Instagram
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <button
               onClick={() => setCollectionSelectorOpen(true)}
