@@ -11,7 +11,7 @@ export const CompactHeaderSearch = () => {
     <>
       <Button
         variant="outline"
-        className="flex items-center gap-2 px-3 h-10 rounded-full border-2 border-secondary shadow-sm hover:shadow-md hover:bg-secondary/10 hover:border-secondary transition-all bg-background w-full max-w-[280px] md:max-w-3xl"
+        className="flex items-center gap-2 px-3 h-10 rounded-full border-2 border-secondary shadow-sm hover:shadow-md hover:bg-secondary/10 hover:border-[#bfad72] transition-all bg-background w-full max-w-[280px] md:max-w-3xl"
         aria-label="Open search"
         onClick={() => setOpen(true)}
       >
