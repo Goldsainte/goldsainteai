@@ -98,9 +98,10 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
       <SheetContent 
         side="bottom" 
         className="h-auto max-h-[80vh] rounded-t-3xl"
+        style={{ backgroundColor: '#0c4d47' }}
       >
         <SheetHeader className="pb-6">
-          <SheetTitle className="text-center text-xl">Create</SheetTitle>
+          <SheetTitle className="text-center text-xl text-[#bfad72]">Create</SheetTitle>
         </SheetHeader>
         
         <div className="space-y-1 pb-6">
@@ -112,10 +113,10 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
                 onClick={() => handleSelect(option.id, option.available)}
                 disabled={!option.available}
                 className={cn(
-                  "w-full flex items-center gap-4 p-4 rounded-xl transition-colors text-left",
+                  "w-full flex items-center gap-4 p-4 rounded-xl transition-all text-left",
                   option.available 
-                    ? "hover:bg-muted/50 active:bg-muted cursor-pointer" 
-                    : "opacity-40 cursor-not-allowed"
+                    ? "text-[#bfad72] hover:bg-[#BFAD72] hover:text-white cursor-pointer" 
+                    : "opacity-40 cursor-not-allowed text-[#bfad72]"
                 )}
               >
                 <div className="flex-shrink-0">
@@ -124,7 +125,7 @@ const CreateContentSheet = ({ open, onOpenChange, onSelectType }: CreateContentS
                 <div className="flex-1 min-w-0">
                   <div className="font-medium">{option.label}</div>
                   {!option.available && (
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs opacity-60">
                       Coming soon
                     </div>
                   )}
