@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -552,59 +552,35 @@ const TravelProfile = () => {
           </div>
         )}
 
-        {/* Action Buttons - Mobile shows Edit & Share; others hidden */}
-        <div className="flex gap-2 flex-wrap">
+        {/* Action Buttons - Instagram-style layout */}
+        <div className="grid grid-cols-3 gap-2">
           {isOwnProfile ? (
             <>
               <Button
-                variant="default"
-                className="hidden md:inline-flex flex-1 min-w-[80px] h-9 md:h-8 text-sm font-semibold"
-                onClick={() => setUploadModalOpen(true)}
+                variant="secondary"
+                onClick={() => navigate('/dashboard')}
+                className="w-full h-9 md:h-8 text-sm font-semibold"
               >
-                <PlusCircle className="h-4 w-4 mr-1" />
-                Create
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
               </Button>
               <Button
                 variant="secondary"
-                className="flex-1 min-w-[100px] h-9 md:h-8 text-sm font-semibold"
+                className="w-full h-9 md:h-8 text-sm font-semibold"
                 onClick={() => setEditProfileOpen(true)}
               >
                 Edit profile
               </Button>
               <Button
                 variant="secondary"
-                size="icon"
-                className="h-9 w-9 md:h-8 md:w-8"
+                className="w-full h-9 md:h-8 text-sm font-semibold"
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
-                  toast.success("Profile link copied to clipboard!");
+                  toast.success("Profile link copied!");
                 }}
-                title="Share profile"
               >
-                <Share2 className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="hidden md:inline-flex h-9 w-9 md:h-8 md:w-8"
-                onClick={() => setCloseFriendsOpen(true)}
-                title="Manage Close Friends"
-              >
-                <Star className="h-4 w-4 text-dashboard-bg fill-dashboard-bg" />
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="hidden md:inline-flex relative h-9 w-9 md:h-8 md:w-8"
-                onClick={() => setCollaborationSheetOpen(true)}
-                aria-label="Collaboration invites"
-              >
-                <Video className="h-4 w-4" />
-                {unreadCollabCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 md:h-4 md:w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
-                    {unreadCollabCount}
-                  </span>
-                )}
+                <Share2 className="h-4 w-4 mr-2" />
+                Share
               </Button>
             </>
           ) : (
