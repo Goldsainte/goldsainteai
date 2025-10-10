@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Package, MapPin, Upload, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -36,13 +38,41 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
   const [packageForm, setPackageForm] = useState({
     title: "",
     description: "",
+    package_summary: "",
     destination: "",
+    country: "",
+    city: "",
+    region: "",
+    attractions: "",
     duration_days: "",
+    date_type: "flexible",
+    fixed_dates: "",
+    booking_deadline: "",
     price: "",
+    price_per_person: "",
+    price_per_couple: "",
+    deposit_required: "",
+    installment_available: false,
+    refund_policy: "",
+    early_bird_pricing: "",
     currency: "USD",
     max_travelers: "",
-    included_services: "",
-    itinerary: "",
+    spots_remaining: "",
+    accommodation_details: "",
+    transportation_details: "",
+    activities_included: "",
+    meals_included: "",
+    perks: "",
+    whats_not_included: "",
+    daily_itinerary: "",
+    passport_required: false,
+    visa_required: false,
+    age_minimum: "",
+    fitness_level: "",
+    accessibility_notes: "",
+    creator_story: "",
+    video_url: "",
+    booking_cta: "Book Now",
     images: [] as string[],
   });
 
@@ -141,25 +171,92 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
     }
 
     if (!packageForm.title || !packageForm.destination || !packageForm.duration_days || !packageForm.price) {
-      toast.error("Please fill in required fields");
+      toast.error("Please fill in required fields: Title, Destination, Duration, and Price");
       return;
     }
 
     setLoading(true);
     try {
+      // Parse daily itinerary if provided
+      let dailyItinerary = [];
+      if (packageForm.daily_itinerary) {
+        try {
+          dailyItinerary = JSON.parse(packageForm.daily_itinerary);
+        } catch {
+          dailyItinerary = packageForm.daily_itinerary.split('\n').filter(Boolean).map((line, idx) => ({
+            day: idx + 1,
+            description: line
+          }));
+        }
+      }
+
       const { error } = await supabase.from('travel_packages').insert({
         creator_id: user.id,
         title: packageForm.title,
         description: packageForm.description,
+        package_summary: packageForm.package_summary,
         destination: packageForm.destination,
         duration_days: parseInt(packageForm.duration_days),
         price: parseFloat(packageForm.price),
         currency: packageForm.currency,
         max_travelers: packageForm.max_travelers ? parseInt(packageForm.max_travelers) : null,
-        included_services: packageForm.included_services ? packageForm.included_services.split(',').map(s => s.trim()) : [],
-        itinerary: packageForm.itinerary ? JSON.parse(packageForm.itinerary) : {},
+        spots_total: packageForm.max_travelers ? parseInt(packageForm.max_travelers) : null,
+        spots_remaining: packageForm.spots_remaining ? parseInt(packageForm.spots_remaining) : (packageForm.max_travelers ? parseInt(packageForm.max_travelers) : null),
         images: packageForm.images,
+        video_url: packageForm.video_url || null,
+        creator_story: packageForm.creator_story || null,
+        booking_cta: packageForm.booking_cta || 'Book Now',
+        booking_deadline: packageForm.booking_deadline || null,
         is_active: true,
+        
+        // Location details
+        location_details: {
+          country: packageForm.country,
+          city: packageForm.city,
+          region: packageForm.region,
+          attractions: packageForm.attractions ? packageForm.attractions.split(',').map(s => s.trim()) : []
+        },
+        
+        // Dates info
+        dates_info: {
+          type: packageForm.date_type,
+          fixed_dates: packageForm.fixed_dates || null,
+          booking_deadline: packageForm.booking_deadline || null
+        },
+        
+        // What's included
+        whats_included: {
+          accommodation: packageForm.accommodation_details || '',
+          transportation: packageForm.transportation_details || '',
+          activities: packageForm.activities_included ? packageForm.activities_included.split(',').map(s => s.trim()) : [],
+          meals: packageForm.meals_included || '',
+          perks: packageForm.perks ? packageForm.perks.split(',').map(s => s.trim()) : []
+        },
+        
+        // What's not included
+        whats_not_included: packageForm.whats_not_included ? packageForm.whats_not_included.split(',').map(s => s.trim()) : [],
+        
+        // Pricing details
+        pricing_details: {
+          per_person: packageForm.price_per_person ? parseFloat(packageForm.price_per_person) : null,
+          per_couple: packageForm.price_per_couple ? parseFloat(packageForm.price_per_couple) : null,
+          deposit: packageForm.deposit_required ? parseFloat(packageForm.deposit_required) : null,
+          installments: packageForm.installment_available,
+          refund_policy: packageForm.refund_policy || '',
+          early_bird: packageForm.early_bird_pricing || null
+        },
+        
+        // Daily itinerary
+        daily_itinerary: dailyItinerary,
+        
+        // Travel requirements
+        travel_requirements: {
+          passport: packageForm.passport_required,
+          visa: packageForm.visa_required,
+          age_minimum: packageForm.age_minimum ? parseInt(packageForm.age_minimum) : null,
+          fitness_level: packageForm.fitness_level || null,
+          accessibility_notes: packageForm.accessibility_notes || null
+        }
       });
 
       if (error) throw error;
@@ -188,13 +285,41 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
     setPackageForm({
       title: "",
       description: "",
+      package_summary: "",
       destination: "",
+      country: "",
+      city: "",
+      region: "",
+      attractions: "",
       duration_days: "",
+      date_type: "flexible",
+      fixed_dates: "",
+      booking_deadline: "",
       price: "",
+      price_per_person: "",
+      price_per_couple: "",
+      deposit_required: "",
+      installment_available: false,
+      refund_policy: "",
+      early_bird_pricing: "",
       currency: "USD",
       max_travelers: "",
-      included_services: "",
-      itinerary: "",
+      spots_remaining: "",
+      accommodation_details: "",
+      transportation_details: "",
+      activities_included: "",
+      meals_included: "",
+      perks: "",
+      whats_not_included: "",
+      daily_itinerary: "",
+      passport_required: false,
+      visa_required: false,
+      age_minimum: "",
+      fitness_level: "",
+      accessibility_notes: "",
+      creator_story: "",
+      video_url: "",
+      booking_cta: "Book Now",
       images: [],
     });
   };
@@ -327,128 +452,510 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
             </Button>
           </TabsContent>
 
-          <TabsContent value="package" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="package-title">Title *</Label>
-              <Input
-                id="package-title"
-                value={packageForm.title}
-                onChange={(e) => setPackageForm({ ...packageForm, title: e.target.value })}
-                placeholder="e.g., 7-Day Bali Adventure"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="package-description">Description</Label>
-              <Textarea
-                id="package-description"
-                value={packageForm.description}
-                onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
-                placeholder="Describe your travel package..."
-                rows={4}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="package-destination">Destination *</Label>
-                <Input
-                  id="package-destination"
-                  value={packageForm.destination}
-                  onChange={(e) => setPackageForm({ ...packageForm, destination: e.target.value })}
-                  placeholder="e.g., Bali, Indonesia"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="package-duration">Duration (days) *</Label>
-                <Input
-                  id="package-duration"
-                  type="number"
-                  value={packageForm.duration_days}
-                  onChange={(e) => setPackageForm({ ...packageForm, duration_days: e.target.value })}
-                  placeholder="7"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="package-price">Price *</Label>
-                <Input
-                  id="package-price"
-                  type="number"
-                  step="0.01"
-                  value={packageForm.price}
-                  onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
-                  placeholder="1999.99"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="package-currency">Currency</Label>
-                <Select value={packageForm.currency} onValueChange={(value) => setPackageForm({ ...packageForm, currency: value })}>
-                  <SelectTrigger id="package-currency">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
-                    <SelectItem value="EUR">EUR</SelectItem>
-                    <SelectItem value="GBP">GBP</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="package-travelers">Max Travelers</Label>
-              <Input
-                id="package-travelers"
-                type="number"
-                value={packageForm.max_travelers}
-                onChange={(e) => setPackageForm({ ...packageForm, max_travelers: e.target.value })}
-                placeholder="Optional"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="package-services">Included Services (comma-separated)</Label>
-              <Input
-                id="package-services"
-                value={packageForm.included_services}
-                onChange={(e) => setPackageForm({ ...packageForm, included_services: e.target.value })}
-                placeholder="Accommodation, Meals, Transportation"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Images</Label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {packageForm.images.map((url, index) => (
-                  <div key={index} className="relative w-20 h-20">
-                    <img src={url} alt="" className="w-full h-full object-cover rounded" />
-                    <Button
-                      size="icon"
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 h-6 w-6"
-                      onClick={() => removeImage(index, "package")}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
+          <TabsContent value="package" className="space-y-4 max-h-[70vh] overflow-y-auto">
+            <Accordion type="multiple" className="w-full" defaultValue={["basic"]}>
+              {/* Basic Info */}
+              <AccordionItem value="basic">
+                <AccordionTrigger>📋 Basic Information (Required)</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="package-title">Title *</Label>
+                    <Input
+                      id="package-title"
+                      value={packageForm.title}
+                      onChange={(e) => setPackageForm({ ...packageForm, title: e.target.value })}
+                      placeholder="Bali Bliss: 6-Night Luxury Escape for Couples"
+                    />
                   </div>
-                ))}
-              </div>
-              <Input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(e) => handleImageUpload(e, "package")}
-                className="cursor-pointer"
-              />
-            </div>
 
-            <Button onClick={handleCreatePackage} disabled={loading} className="w-full">
-              {loading ? "Creating..." : "Create Package"}
+                  <div className="space-y-2">
+                    <Label htmlFor="package-summary">Package Summary *</Label>
+                    <Textarea
+                      id="package-summary"
+                      value={packageForm.package_summary}
+                      onChange={(e) => setPackageForm({ ...packageForm, package_summary: e.target.value })}
+                      placeholder="1-2 paragraph sales pitch. What's included, who it's for, what makes it special..."
+                      rows={4}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="package-description">Detailed Description</Label>
+                    <Textarea
+                      id="package-description"
+                      value={packageForm.description}
+                      onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
+                      placeholder="Additional details about the package..."
+                      rows={3}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Location */}
+              <AccordionItem value="location">
+                <AccordionTrigger>📍 Location Details (Required)</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="package-destination">Destination *</Label>
+                      <Input
+                        id="package-destination"
+                        value={packageForm.destination}
+                        onChange={(e) => setPackageForm({ ...packageForm, destination: e.target.value })}
+                        placeholder="Bali, Indonesia"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="package-country">Country</Label>
+                      <Input
+                        id="package-country"
+                        value={packageForm.country}
+                        onChange={(e) => setPackageForm({ ...packageForm, country: e.target.value })}
+                        placeholder="Indonesia"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="package-city">City</Label>
+                      <Input
+                        id="package-city"
+                        value={packageForm.city}
+                        onChange={(e) => setPackageForm({ ...packageForm, city: e.target.value })}
+                        placeholder="Ubud"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="package-region">Region</Label>
+                      <Input
+                        id="package-region"
+                        value={packageForm.region}
+                        onChange={(e) => setPackageForm({ ...packageForm, region: e.target.value })}
+                        placeholder="Central Bali"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="package-attractions">Key Attractions (comma-separated)</Label>
+                    <Input
+                      id="package-attractions"
+                      value={packageForm.attractions}
+                      onChange={(e) => setPackageForm({ ...packageForm, attractions: e.target.value })}
+                      placeholder="Tegallalang Rice Terraces, Monkey Forest, Sacred Springs"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Dates & Duration */}
+              <AccordionItem value="dates">
+                <AccordionTrigger>📅 Dates & Duration (Required)</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="package-duration">Duration (days) *</Label>
+                      <Input
+                        id="package-duration"
+                        type="number"
+                        value={packageForm.duration_days}
+                        onChange={(e) => setPackageForm({ ...packageForm, duration_days: e.target.value })}
+                        placeholder="6"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="date-type">Date Type</Label>
+                      <Select value={packageForm.date_type} onValueChange={(value) => setPackageForm({ ...packageForm, date_type: value })}>
+                        <SelectTrigger id="date-type">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="flexible">Flexible Dates</SelectItem>
+                          <SelectItem value="fixed">Fixed Dates</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {packageForm.date_type === "fixed" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="fixed-dates">Fixed Dates</Label>
+                      <Input
+                        id="fixed-dates"
+                        value={packageForm.fixed_dates}
+                        onChange={(e) => setPackageForm({ ...packageForm, fixed_dates: e.target.value })}
+                        placeholder="March 15-21, 2025"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="booking-deadline">Booking Deadline</Label>
+                    <Input
+                      id="booking-deadline"
+                      type="date"
+                      value={packageForm.booking_deadline}
+                      onChange={(e) => setPackageForm({ ...packageForm, booking_deadline: e.target.value })}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* What's Included */}
+              <AccordionItem value="included">
+                <AccordionTrigger>✅ What's Included</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="accommodation">🏨 Accommodation</Label>
+                    <Textarea
+                      id="accommodation"
+                      value={packageForm.accommodation_details}
+                      onChange={(e) => setPackageForm({ ...packageForm, accommodation_details: e.target.value })}
+                      placeholder="5-star resort, ocean view room, daily housekeeping..."
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="transportation">🚗 Transportation</Label>
+                    <Textarea
+                      id="transportation"
+                      value={packageForm.transportation_details}
+                      onChange={(e) => setPackageForm({ ...packageForm, transportation_details: e.target.value })}
+                      placeholder="Airport transfers, private car with driver..."
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="activities">🎯 Activities & Experiences (comma-separated)</Label>
+                    <Textarea
+                      id="activities"
+                      value={packageForm.activities_included}
+                      onChange={(e) => setPackageForm({ ...packageForm, activities_included: e.target.value })}
+                      placeholder="Temple tour, cooking class, spa treatment, sunset cruise"
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="meals">🍽️ Meals</Label>
+                    <Input
+                      id="meals"
+                      value={packageForm.meals_included}
+                      onChange={(e) => setPackageForm({ ...packageForm, meals_included: e.target.value })}
+                      placeholder="Daily breakfast, 2 dinners, welcome drink"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="perks">🎁 Special Perks (comma-separated)</Label>
+                    <Input
+                      id="perks"
+                      value={packageForm.perks}
+                      onChange={(e) => setPackageForm({ ...packageForm, perks: e.target.value })}
+                      placeholder="Welcome gift, spa credit, room upgrade"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* What's Not Included */}
+              <AccordionItem value="not-included">
+                <AccordionTrigger>🚫 What's Not Included</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="not-included">Items Not Included (comma-separated)</Label>
+                    <Textarea
+                      id="not-included"
+                      value={packageForm.whats_not_included}
+                      onChange={(e) => setPackageForm({ ...packageForm, whats_not_included: e.target.value })}
+                      placeholder="International flights, travel insurance, tips, optional activities"
+                      rows={3}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Pricing */}
+              <AccordionItem value="pricing">
+                <AccordionTrigger>💵 Pricing & Payment (Required)</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="package-price">Base Price *</Label>
+                      <Input
+                        id="package-price"
+                        type="number"
+                        step="0.01"
+                        value={packageForm.price}
+                        onChange={(e) => setPackageForm({ ...packageForm, price: e.target.value })}
+                        placeholder="1999.99"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="package-currency">Currency</Label>
+                      <Select value={packageForm.currency} onValueChange={(value) => setPackageForm({ ...packageForm, currency: value })}>
+                        <SelectTrigger id="package-currency">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="USD">USD</SelectItem>
+                          <SelectItem value="EUR">EUR</SelectItem>
+                          <SelectItem value="GBP">GBP</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="deposit">Deposit</Label>
+                      <Input
+                        id="deposit"
+                        type="number"
+                        step="0.01"
+                        value={packageForm.deposit_required}
+                        onChange={(e) => setPackageForm({ ...packageForm, deposit_required: e.target.value })}
+                        placeholder="500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="per-person">Price Per Person</Label>
+                      <Input
+                        id="per-person"
+                        type="number"
+                        step="0.01"
+                        value={packageForm.price_per_person}
+                        onChange={(e) => setPackageForm({ ...packageForm, price_per_person: e.target.value })}
+                        placeholder="1999"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="per-couple">Price Per Couple</Label>
+                      <Input
+                        id="per-couple"
+                        type="number"
+                        step="0.01"
+                        value={packageForm.price_per_couple}
+                        onChange={(e) => setPackageForm({ ...packageForm, price_per_couple: e.target.value })}
+                        placeholder="3499"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="installments"
+                      checked={packageForm.installment_available}
+                      onCheckedChange={(checked) => setPackageForm({ ...packageForm, installment_available: checked as boolean })}
+                    />
+                    <Label htmlFor="installments">Installment Plans Available</Label>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="refund-policy">Refund/Cancellation Policy</Label>
+                    <Textarea
+                      id="refund-policy"
+                      value={packageForm.refund_policy}
+                      onChange={(e) => setPackageForm({ ...packageForm, refund_policy: e.target.value })}
+                      placeholder="Full refund if cancelled 30+ days before, 50% refund 15-30 days..."
+                      rows={2}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="early-bird">Early Bird Pricing</Label>
+                    <Input
+                      id="early-bird"
+                      value={packageForm.early_bird_pricing}
+                      onChange={(e) => setPackageForm({ ...packageForm, early_bird_pricing: e.target.value })}
+                      placeholder="Save $200 if booked before Feb 1"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="max-travelers">Total Spots Available</Label>
+                      <Input
+                        id="max-travelers"
+                        type="number"
+                        value={packageForm.max_travelers}
+                        onChange={(e) => setPackageForm({ ...packageForm, max_travelers: e.target.value })}
+                        placeholder="12"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="spots-remaining">Spots Remaining</Label>
+                      <Input
+                        id="spots-remaining"
+                        type="number"
+                        value={packageForm.spots_remaining}
+                        onChange={(e) => setPackageForm({ ...packageForm, spots_remaining: e.target.value })}
+                        placeholder="4"
+                      />
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Itinerary */}
+              <AccordionItem value="itinerary">
+                <AccordionTrigger>📖 Day-by-Day Itinerary</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="itinerary">Daily Itinerary (JSON or one per line)</Label>
+                    <Textarea
+                      id="itinerary"
+                      value={packageForm.daily_itinerary}
+                      onChange={(e) => setPackageForm({ ...packageForm, daily_itinerary: e.target.value })}
+                      placeholder="Day 1: Arrival & welcome dinner&#10;Day 2: Island tour + beach picnic&#10;Day 3: Spa day & sunset sail"
+                      rows={6}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Enter one day per line or valid JSON array
+                    </p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Travel Requirements */}
+              <AccordionItem value="requirements">
+                <AccordionTrigger>🛂 Travel Requirements</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="passport"
+                        checked={packageForm.passport_required}
+                        onCheckedChange={(checked) => setPackageForm({ ...packageForm, passport_required: checked as boolean })}
+                      />
+                      <Label htmlFor="passport">Passport Required</Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="visa"
+                        checked={packageForm.visa_required}
+                        onCheckedChange={(checked) => setPackageForm({ ...packageForm, visa_required: checked as boolean })}
+                      />
+                      <Label htmlFor="visa">Visa Required</Label>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="age-min">Minimum Age</Label>
+                      <Input
+                        id="age-min"
+                        type="number"
+                        value={packageForm.age_minimum}
+                        onChange={(e) => setPackageForm({ ...packageForm, age_minimum: e.target.value })}
+                        placeholder="18"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="fitness">Fitness Level</Label>
+                      <Select value={packageForm.fitness_level} onValueChange={(value) => setPackageForm({ ...packageForm, fitness_level: value })}>
+                        <SelectTrigger id="fitness">
+                          <SelectValue placeholder="Select level" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="easy">Easy</SelectItem>
+                          <SelectItem value="moderate">Moderate</SelectItem>
+                          <SelectItem value="challenging">Challenging</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="accessibility">Accessibility Notes</Label>
+                    <Textarea
+                      id="accessibility"
+                      value={packageForm.accessibility_notes}
+                      onChange={(e) => setPackageForm({ ...packageForm, accessibility_notes: e.target.value })}
+                      placeholder="Wheelchair accessible, dietary accommodations available..."
+                      rows={2}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Creator Story & Media */}
+              <AccordionItem value="media">
+                <AccordionTrigger>📸 Photos, Video & Your Story</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="creator-story">Your Story (Why you curated this trip)</Label>
+                    <Textarea
+                      id="creator-story"
+                      value={packageForm.creator_story}
+                      onChange={(e) => setPackageForm({ ...packageForm, creator_story: e.target.value })}
+                      placeholder="Share your connection to this destination and why this trip is special..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="video">Video URL (YouTube, Vimeo, etc.)</Label>
+                    <Input
+                      id="video"
+                      value={packageForm.video_url}
+                      onChange={(e) => setPackageForm({ ...packageForm, video_url: e.target.value })}
+                      placeholder="https://youtube.com/watch?v=..."
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Images</Label>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {packageForm.images.map((url, index) => (
+                        <div key={index} className="relative w-20 h-20">
+                          <img src={url} alt="" className="w-full h-full object-cover rounded" />
+                          <Button
+                            size="icon"
+                            variant="destructive"
+                            className="absolute -top-2 -right-2 h-6 w-6"
+                            onClick={() => removeImage(index, "package")}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleImageUpload(e, "package")}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Booking CTA */}
+              <AccordionItem value="cta">
+                <AccordionTrigger>🛒 Booking Call-to-Action</AccordionTrigger>
+                <AccordionContent className="space-y-4 pt-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="booking-cta">Button Text</Label>
+                    <Input
+                      id="booking-cta"
+                      value={packageForm.booking_cta}
+                      onChange={(e) => setPackageForm({ ...packageForm, booking_cta: e.target.value })}
+                      placeholder="Book Now"
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <Button onClick={handleCreatePackage} disabled={loading} className="w-full mt-6">
+              {loading ? "Creating..." : "Create Travel Package"}
             </Button>
           </TabsContent>
         </Tabs>
