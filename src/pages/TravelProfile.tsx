@@ -553,17 +553,9 @@ const TravelProfile = () => {
         )}
 
         {/* Action Buttons - Instagram-style layout */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           {isOwnProfile ? (
             <>
-              <Button
-                variant="secondary"
-                onClick={() => navigate('/dashboard')}
-                className="w-full h-9 md:h-8 text-sm font-semibold"
-              >
-                <LayoutDashboard className="h-4 w-4 mr-2" />
-                Dashboard
-              </Button>
               <Button
                 variant="secondary"
                 className="w-full h-9 md:h-8 text-sm font-semibold"
@@ -580,7 +572,7 @@ const TravelProfile = () => {
                 }}
               >
                 <Share2 className="h-4 w-4 mr-2" />
-                Share
+                Share profile
               </Button>
             </>
           ) : (
@@ -623,8 +615,8 @@ const TravelProfile = () => {
           )}
         </div>
 
-        {/* Story Highlights */}
-        <StoryHighlights 
+        {/* Moments Vaults */}
+        <StoryHighlights
           userId={profileUserId!}
           isOwnProfile={isOwnProfile}
         />

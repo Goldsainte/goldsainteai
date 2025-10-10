@@ -66,12 +66,12 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
 
       if (error) throw error;
 
-      toast.success("Highlight created");
+      toast.success("Vault created");
       setNewHighlightTitle("");
       setCreateDialogOpen(false);
       fetchHighlights();
     } catch (error) {
-      toast.error("Failed to create highlight");
+      toast.error("Failed to create vault");
       console.error(error);
     } finally {
       setLoading(false);
@@ -87,10 +87,10 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
 
       if (error) throw error;
 
-      toast.success("Highlight deleted");
+      toast.success("Vault deleted");
       fetchHighlights();
     } catch (error) {
-      toast.error("Failed to delete highlight");
+      toast.error("Failed to delete vault");
       console.error(error);
     }
   };
@@ -135,11 +135,11 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Create Highlight</DialogTitle>
+              <DialogTitle>Create Moments Vault</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div>
-                <Label htmlFor="title">Highlight Title</Label>
+                <Label htmlFor="title">Vault Title</Label>
                 <Input
                   id="title"
                   value={newHighlightTitle}
@@ -149,7 +149,7 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
                 />
               </div>
               <Button onClick={createHighlight} disabled={loading} className="w-full">
-                Create Highlight
+                Create Vault
               </Button>
             </div>
           </DialogContent>
