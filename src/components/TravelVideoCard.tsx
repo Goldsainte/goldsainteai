@@ -715,6 +715,21 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           videoUrl={post.video_url || null}
           onSuccess={onUpdate}
         />
+
+        {/* Send Gift Modal */}
+        <SendGiftModal
+          open={giftModalOpen}
+          onOpenChange={setGiftModalOpen}
+          recipientId={post.user_id}
+          postId={post.id}
+        />
+
+        {/* Promote Post Modal */}
+        <PromotePostModal
+          open={promoteModalOpen}
+          onOpenChange={setPromoteModalOpen}
+          postId={post.id}
+        />
       </div>
     );
   }
