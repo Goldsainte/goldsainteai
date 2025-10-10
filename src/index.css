@@ -39,8 +39,8 @@ All colors MUST be HSL.
     --accent-gray: 0 0% 55%;
     
     /* Dashboard Colors */
-    --dashboard-bg: 174 74% 18%;
-    --dashboard-text: 42 44% 60%;
+    --dashboard-bg: 42 44% 60%;
+    --dashboard-text: 174 74% 18%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -94,8 +94,8 @@ All colors MUST be HSL.
     --accent-gray: 0 0% 55%;
     
     /* Dashboard Colors */
-    --dashboard-bg: 174 74% 18%;
-    --dashboard-text: 42 44% 60%;
+    --dashboard-bg: 42 44% 60%;
+    --dashboard-text: 174 74% 18%;
 
     --destructive: 0 62% 45%;
     --destructive-foreground: 0 0% 100%;
