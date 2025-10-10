@@ -320,45 +320,45 @@ const TravelFeed = () => {
 
           {/* Bottom Navigation Bar - Instagram Style */}
           <div className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20 pb-safe">
-            <div className="flex items-center justify-around py-2 px-4">
+            <div className="flex items-center justify-around py-3 px-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/')}
-                className="text-white hover:bg-white/20 h-12 w-12"
+                className="text-white hover:bg-white/20 h-14 w-14"
                 aria-label="Home"
               >
-                <Home className="h-7 w-7" />
+                <Home className="h-8 w-8" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/search')}
-                className="text-white hover:bg-white/20 h-12 w-12"
+                className="text-white hover:bg-white/20 h-14 w-14"
                 aria-label="Search"
               >
-                <SearchIcon className="h-7 w-7" />
+                <SearchIcon className="h-8 w-8" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/20 h-12 w-12"
+                className="text-white hover:bg-white/20 h-14 w-14"
                 aria-label="Create"
               >
-                <PlusSquare className="h-7 w-7" />
+                <PlusSquare className="h-8 w-8" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/20 h-12 w-12"
+                className="text-white hover:bg-white/20 h-14 w-14"
                 aria-label="Profile"
               >
-                <User className="h-7 w-7" />
+                <User className="h-8 w-8" />
               </Button>
             </div>
           </div>

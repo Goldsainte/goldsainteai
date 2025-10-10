@@ -428,12 +428,12 @@ const TravelProfile = () => {
       </div>
 
       {/* Profile Info */}
-      <div className="px-4 pt-4 pb-2 space-y-4">
+      <div className="px-4 pt-4 pb-2 space-y-3">
         <div className="flex items-start justify-between">
           <div className="relative">
-            <Avatar className="h-20 w-20">
+            <Avatar className="h-24 w-24 md:h-20 md:w-20">
               <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+              <AvatarFallback className="bg-primary text-primary-foreground text-3xl md:text-2xl">
                 {profile?.username?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
@@ -450,29 +450,29 @@ const TravelProfile = () => {
                 <button
                   onClick={() => document.getElementById('avatar-upload')?.click()}
                   disabled={uploadingAvatar}
-                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 md:p-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {uploadingAvatar ? (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                    <div className="h-5 w-5 md:h-4 md:w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                   ) : (
-                    <PlusCircle className="h-4 w-4" />
+                    <PlusCircle className="h-5 w-5 md:h-4 md:w-4" />
                   )}
                 </button>
               </>
             )}
           </div>
           
-          <div className="flex items-start gap-8 pt-2">
+          <div className="flex items-start gap-6 md:gap-8 pt-2">
             <button className="flex flex-col items-center">
-              <div className="text-xl font-bold">{formatNumber(stats.postsCount)}</div>
+              <div className="text-lg md:text-xl font-bold">{formatNumber(stats.postsCount)}</div>
               <div className="text-xs text-muted-foreground">posts</div>
             </button>
             <button className="flex flex-col items-center">
-              <div className="text-xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
+              <div className="text-lg md:text-xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
               <div className="text-xs text-muted-foreground">followers</div>
             </button>
             <button className="flex flex-col items-center">
-              <div className="text-xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
+              <div className="text-lg md:text-xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
               <div className="text-xs text-muted-foreground">following</div>
             </button>
           </div>
@@ -480,30 +480,30 @@ const TravelProfile = () => {
 
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-semibold text-sm">
+            <h2 className="font-semibold text-base md:text-sm">
               {profile?.first_name && profile?.last_name
                 ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
                 : (profile?.username || 'User').toUpperCase()}
             </h2>
             {profile?.is_verified && (
-              <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+              <CheckCircle2 className="h-5 w-5 md:h-4 md:w-4 text-blue-500 fill-blue-500" />
             )}
           </div>
           {profile?.bio && (
-            <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+            <p className="text-sm md:text-sm whitespace-pre-wrap">{profile.bio}</p>
           )}
           {profile?.website && (
             <a 
               href={profile.website} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline"
+              className="text-sm text-primary hover:underline block mt-1"
             >
               {profile.website.replace(/^https?:\/\//, '')}
             </a>
           )}
           {profile?.location && (
-            <p className="text-sm text-muted-foreground">📍 {profile.location}</p>
+            <p className="text-sm text-muted-foreground mt-1">📍 {profile.location}</p>
           )}
           
           {/* Activity Status */}
@@ -514,13 +514,13 @@ const TravelProfile = () => {
 
         {/* Dashboard and Coins Cards for own profile */}
         {isOwnProfile && (
-          <div className="flex gap-2">
+          <div className="flex flex-col md:flex-row gap-2">
             {/* Dashboard Card */}
             {stats.viewsCount > 0 && (
               <Card className="p-3 bg-dashboard-bg border-dashboard-bg flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="font-semibold text-sm text-dashboard-text">Your dashboard</p>
+                    <p className="font-semibold text-sm md:text-sm text-dashboard-text">Your dashboard</p>
                     <p className="text-xs text-dashboard-text flex items-center gap-1 mt-0.5">
                       <TrendingUp className="h-3 w-3" />
                       {formatNumber(stats.viewsCount)} views in the last 30 days.
@@ -532,7 +532,7 @@ const TravelProfile = () => {
 
             {/* Coin Balance Card */}
             <Card className="p-3 bg-coins-bg border-coins-bg flex-1">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Coins className="h-5 w-5 text-white" />
                   <div>
@@ -543,7 +543,7 @@ const TravelProfile = () => {
                 <Button
                   size="sm"
                   onClick={() => setBuyCoinsOpen(true)}
-                  className="h-8 bg-coins-button hover:bg-coins-button/90 text-coins-bg ml-auto"
+                  className="h-9 px-3 bg-coins-button hover:bg-coins-button/90 text-coins-bg"
                 >
                   Buy Coins
                 </Button>
@@ -553,12 +553,12 @@ const TravelProfile = () => {
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           {isOwnProfile ? (
             <>
               <Button
                 variant="default"
-                className="flex-1 h-8 text-sm font-semibold"
+                className="flex-1 min-w-[80px] h-9 md:h-8 text-sm font-semibold"
                 onClick={() => setUploadModalOpen(true)}
               >
                 <PlusCircle className="h-4 w-4 mr-1" />
@@ -566,25 +566,27 @@ const TravelProfile = () => {
               </Button>
               <Button
                 variant="secondary"
-                className="flex-1 h-8 text-sm font-semibold"
+                className="flex-1 min-w-[100px] h-9 md:h-8 text-sm font-semibold"
                 onClick={() => setEditProfileOpen(true)}
               >
                 Edit profile
               </Button>
               <Button
                 variant="secondary"
-                className="flex-1 h-8 text-sm font-semibold"
+                size="icon"
+                className="h-9 w-9 md:h-8 md:w-8"
                 onClick={() => {
                   navigator.clipboard.writeText(window.location.href);
                   toast.success("Profile link copied to clipboard!");
                 }}
+                title="Share profile"
               >
-                Share profile
+                <Share2 className="h-4 w-4" />
               </Button>
               <Button
                 variant="secondary"
                 size="icon"
-                className="h-8 w-8"
+                className="h-9 w-9 md:h-8 md:w-8"
                 onClick={() => setCloseFriendsOpen(true)}
                 title="Manage Close Friends"
               >
@@ -593,23 +595,16 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 size="icon"
-                className="relative h-8 w-8"
+                className="relative h-9 w-9 md:h-8 md:w-8"
                 onClick={() => setCollaborationSheetOpen(true)}
                 aria-label="Collaboration invites"
               >
                 <Video className="h-4 w-4" />
                 {unreadCollabCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 h-5 w-5 md:h-4 md:w-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">
                     {unreadCollabCount}
                   </span>
                 )}
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-8 w-8"
-              >
-                <Share2 className="h-4 w-4" />
               </Button>
             </>
           ) : (
@@ -617,7 +612,7 @@ const TravelProfile = () => {
               {user && <FollowButton targetUserId={profileUserId!} />}
               <Button
                 variant="secondary"
-                className="flex-1 h-8 text-sm font-semibold"
+                className="flex-1 h-9 md:h-8 text-sm font-semibold"
                 onClick={() => setPartnershipProposalOpen(true)}
               >
                 <Briefcase className="h-4 w-4 mr-1" />
@@ -625,7 +620,7 @@ const TravelProfile = () => {
               </Button>
               <Button
                 variant="secondary"
-                className="flex-1 h-8 text-sm font-semibold"
+                className="flex-1 h-9 md:h-8 text-sm font-semibold"
                 onClick={() => setPartnershipRequestOpen(true)}
               >
                 <Sparkles className="h-4 w-4 mr-1" />
@@ -634,7 +629,7 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 size="icon"
-                className="h-8 w-8"
+                className="h-9 w-9 md:h-8 md:w-8"
               >
                 <MessageCircle className="h-4 w-4" />
               </Button>
@@ -642,7 +637,7 @@ const TravelProfile = () => {
                 <Button
                   variant="secondary"
                   size="icon"
-                  className="h-8 w-8 bg-green-100 dark:bg-green-900"
+                  className="h-9 w-9 md:h-8 md:w-8 bg-green-100 dark:bg-green-900"
                   title="Close Friend"
                 >
                   <Star className="h-4 w-4 text-green-600 dark:text-green-400 fill-current" />

@@ -40,53 +40,22 @@ serve(async (req) => {
       throw new Error('Gift not found');
     }
 
-    // Get recipient's Stripe account
-    const { data: recipient } = await supabaseClient
-      .from('profiles')
-      .select('stripe_account_id, stripe_payouts_enabled')
-      .eq('id', recipientId)
-      .single();
-
-    if (!recipient?.stripe_account_id || !recipient.stripe_payouts_enabled) {
-      throw new Error('Recipient has not set up payouts');
-    }
-
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2025-08-27.basil',
-    });
-
-    // Calculate amounts (gift cost is in coins, convert to cents: 1 coin = $0.01)
-    const totalAmountCents = gift.coin_cost; // coins = cents
-    const creatorAmount = Math.floor(totalAmountCents * (gift.creator_payout_percentage / 100));
-    const platformFee = totalAmountCents - creatorAmount;
-
-    // Create payment intent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: totalAmountCents,
-      currency: 'usd',
-      application_fee_amount: platformFee,
-      transfer_data: {
-        destination: recipient.stripe_account_id,
-      },
-      metadata: {
-        sender_id: user.id,
-        recipient_id: recipientId,
-        gift_id: giftId,
-        post_id: postId || '',
-      },
-    });
+    // Calculate amounts
+    const creatorAmount = Math.floor(gift.coin_cost * (gift.creator_payout_percentage / 100));
+    const platformFee = gift.coin_cost - creatorAmount;
 
     // Get current balance and deduct coins
     const { data: currentBalance } = await supabaseClient
       .from('user_coin_balance')
       .select('balance')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!currentBalance || currentBalance.balance < gift.coin_cost) {
       throw new Error('Insufficient coins');
     }
 
+    // Deduct coins from sender
     await supabaseClient
       .from('user_coin_balance')
       .update({ 
@@ -94,6 +63,30 @@ serve(async (req) => {
         updated_at: new Date().toISOString()
       })
       .eq('user_id', user.id);
+
+    // Add coins to recipient (they can cash out later via Stripe)
+    const { data: recipientBalance } = await supabaseClient
+      .from('user_coin_balance')
+      .select('balance')
+      .eq('user_id', recipientId)
+      .maybeSingle();
+
+    if (recipientBalance) {
+      await supabaseClient
+        .from('user_coin_balance')
+        .update({ 
+          balance: recipientBalance.balance + creatorAmount,
+          updated_at: new Date().toISOString()
+        })
+        .eq('user_id', recipientId);
+    } else {
+      await supabaseClient
+        .from('user_coin_balance')
+        .insert({ 
+          user_id: recipientId,
+          balance: creatorAmount
+        });
+    }
 
     // Record transaction
     const { data: transaction } = await supabaseClient
@@ -104,15 +97,14 @@ serve(async (req) => {
         post_id: postId,
         gift_id: giftId,
         coin_amount: gift.coin_cost,
-        creator_earnings: creatorAmount / 100, // convert to dollars
+        creator_earnings: creatorAmount / 100, // convert to dollars for display
         platform_fee: platformFee / 100,
-        stripe_payment_intent_id: paymentIntent.id,
         processed_at: new Date().toISOString()
       })
       .select()
       .single();
 
-    // Record creator earning
+    // Record creator earning as pending (will be paid when they cash out)
     await supabaseClient
       .from('creator_earnings')
       .insert({
@@ -121,16 +113,16 @@ serve(async (req) => {
         earning_type: 'virtual_gift',
         amount: creatorAmount / 100,
         currency: 'USD',
-        status: 'paid',
-        platform_fee: platformFee / 100,
-        transfer_date: new Date().toISOString()
+        status: 'pending',
+        platform_fee: platformFee / 100
       });
 
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        paymentIntentId: paymentIntent.id,
-        transactionId: transaction.id
+        success: true,
+        transactionId: transaction.id,
+        coins_spent: gift.coin_cost,
+        creator_received: creatorAmount
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );

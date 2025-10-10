@@ -92,7 +92,7 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
       console.error('Error sending gift:', error);
       toast({
         title: "Error",
-        description: error.message || "Failed to send gift. Make sure the creator has set up payouts.",
+        description: error.message || "Failed to send gift. Please try again.",
         variant: "destructive",
       });
     } finally {
