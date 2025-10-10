@@ -438,10 +438,10 @@ export default function Marketplace() {
               myJobs.map((job) => (
                 <Card key={job.id}>
                   <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-xl font-chiffon">{job.title}</CardTitle>
-                        <CardDescription>{job.destination}</CardDescription>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-sm md:text-base font-chiffon line-clamp-1">{job.title}</CardTitle>
+                        <CardDescription className="text-xs line-clamp-2">{job.destination}</CardDescription>
                       </div>
                        <Badge variant={
                          job.status === 'open' ? 'default' :
@@ -457,25 +457,28 @@ export default function Marketplace() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{job.destination || 'Not specified'}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">
+                    <div className="flex flex-wrap gap-3 mb-4 text-xs md:text-sm text-muted-foreground">
+                      {job.destination && (
+                        <div className="flex items-center gap-1">
+                          <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" />
+                          <span>{job.destination}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-1">
+                        <span className="font-medium text-foreground">
                           {getCurrencySymbol(job.currency || 'USD')}{job.budget_min?.toLocaleString()} - {getCurrencySymbol(job.currency || 'USD')}{job.budget_max?.toLocaleString()}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-sm">{new Date(job.created_at).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 shrink-0" />
+                        <span>{new Date(job.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                     <Button 
                       onClick={() => handleViewJob(job)} 
+                      variant="outline" 
                       className="w-full"
-                      variant="outline"
+                      size="sm"
                     >
                       <MessageSquare className="h-4 w-4 mr-2" />
                       View Bids & Messages
