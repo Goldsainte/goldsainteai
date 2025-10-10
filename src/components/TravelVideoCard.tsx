@@ -61,6 +61,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const [localLikeCount, setLocalLikeCount] = useState(post.like_count);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasViewed, setHasViewed] = useState(false);
@@ -85,6 +86,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
   useEffect(() => {
     checkIfLiked();
+    checkIfSaved();
     fetchCollaborators();
     fetchPartnership();
   }, [post.id]);
@@ -115,11 +117,40 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         .select('id')
         .eq('post_id', post.id)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
       
       setIsLiked(!!data);
     } catch (error) {
-      // Not liked
+      console.error('Error checking if liked:', error);
+    }
+  };
+
+  const checkIfSaved = async () => {
+    if (!user) return;
+    
+    try {
+      const { data: collectionsData } = await supabase
+        .from('post_collections')
+        .select('id')
+        .eq('user_id', user.id);
+      
+      if (!collectionsData || collectionsData.length === 0) {
+        setIsSaved(false);
+        return;
+      }
+      
+      const collectionIds = collectionsData.map(c => c.id);
+      
+      const { data: savedData } = await supabase
+        .from('collection_posts')
+        .select('id')
+        .eq('post_id', post.id)
+        .in('collection_id', collectionIds)
+        .maybeSingle();
+      
+      setIsSaved(!!savedData);
+    } catch (error) {
+      console.error('Error checking if saved:', error);
     }
   };
   const handleSaveClick = async () => {
@@ -127,10 +158,31 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       navigate('/auth');
       return;
     }
+    
     try {
-      console.log('Attempting quick save...');
-      setCollectionSelectorOpen(true);
+      // If already saved, unsave it
+      if (isSaved) {
+        const { data: collectionsData } = await supabase
+          .from('post_collections')
+          .select('id')
+          .eq('user_id', user.id);
+        
+        if (collectionsData) {
+          const collectionIds = collectionsData.map(c => c.id);
+          await supabase
+            .from('collection_posts')
+            .delete()
+            .eq('post_id', post.id)
+            .in('collection_id', collectionIds);
+          
+          setIsSaved(false);
+          toast.success('Removed from Saved');
+        }
+        return;
+      }
 
+      // Save the post
+      console.log('Attempting quick save...');
       let target: any = collections?.find((c) => c.name?.toLowerCase?.() === 'saved');
       if (!target) {
         const created: any = await createCollection('Saved', 'Your saved items', true);
@@ -138,13 +190,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       }
       if (target) {
         await addPostToCollection(target.id, post.id);
+        setIsSaved(true);
         toast.success('Saved to "Saved"');
       } else {
         toast.error('Could not create/find a collection');
       }
     } catch (e) {
-      console.error('Quick save failed', e);
-      toast.error('Failed to save');
+      console.error('Save/unsave failed', e);
+      toast.error('Failed to update save status');
     }
   };
   const fetchCollaborators = async () => {
@@ -183,9 +236,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         `)
         .eq("post_id", post.id)
         .eq("status", "approved")
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== "PGRST116") throw error;
+      if (error) {
+        console.error("Error fetching partnership:", error);
+        return;
+      }
       setPartnership(data);
     } catch (error) {
       console.error("Error fetching partnership:", error);
@@ -529,7 +585,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               onClick={handleSaveClick}
               className="transition-transform active:scale-90"
             >
-              <Bookmark className="h-6 w-6" />
+              <Bookmark className={`h-6 w-6 ${isSaved ? 'fill-current' : ''}`} />
             </button>
             <button
               onClick={() => setGiftModalOpen(true)}
@@ -848,7 +904,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               onClick={handleSaveClick}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
             >
-              <Bookmark className="h-7 w-7 text-white drop-shadow-lg" />
+              <Bookmark className={`h-7 w-7 text-white drop-shadow-lg ${isSaved ? 'fill-white' : ''}`} />
             </button>
             <button
               onClick={() => setGiftModalOpen(true)}
