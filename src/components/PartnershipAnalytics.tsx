@@ -17,7 +17,10 @@ interface AnalyticsData {
   click_throughs: number;
   post: {
     caption: string;
-    media_url: string;
+    image_urls: string[] | null;
+    video_url: string | null;
+    thumbnail_url: string | null;
+    media_type: string | null;
   };
   creator: {
     username: string;
@@ -43,7 +46,7 @@ export const PartnershipAnalytics = () => {
         .from("paid_partnerships")
         .select(`
           id,
-          post:travel_posts(caption, media_url),
+          post:travel_posts(caption, image_urls, video_url, thumbnail_url, media_type),
           creator:profiles!paid_partnerships_creator_id_fkey(username, avatar_url)
         `)
         .eq("brand_id", user?.id)

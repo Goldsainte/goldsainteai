@@ -27,8 +27,11 @@ interface Partnership {
     avatar_url: string | null;
   };
   post: {
-    caption: string;
-    media_url: string;
+    caption: string | null;
+    image_urls: string[] | null;
+    video_url: string | null;
+    thumbnail_url: string | null;
+    media_type: string | null;
   };
 }
 
@@ -56,7 +59,7 @@ export const PartnershipApprovals = () => {
           status,
           created_at,
           creator:profiles!paid_partnerships_creator_id_fkey(username, avatar_url),
-          post:travel_posts(caption, media_url)
+          post:travel_posts(caption, image_urls, video_url, thumbnail_url, media_type)
         `)
         .eq("brand_id", user?.id)
         .eq("status", "pending")
@@ -151,22 +154,30 @@ export const PartnershipApprovals = () => {
                   </p>
                 </div>
 
-                {partnership.post.media_url && (
-                  <div className="relative w-full h-48 rounded-lg overflow-hidden bg-muted">
-                    {partnership.post.media_url.includes("video") ? (
-                      <video
-                        src={partnership.post.media_url}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <img
-                        src={partnership.post.media_url}
-                        alt="Post preview"
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-                )}
+                {(() => {
+                  const p = partnership.post;
+                  const mediaUrl = p.video_url ?? p.image_urls?.[0] ?? p.thumbnail_url;
+                  if (!mediaUrl) return null;
+                  const isVideo = p.media_type === 'video' || (!!p.video_url);
+                  return (
+                    <div className="relative w-full h-48 rounded-lg overflow-hidden bg-muted">
+                      {isVideo ? (
+                        <video
+                          src={mediaUrl}
+                          className="w-full h-full object-cover"
+                          controls={false}
+                          muted
+                        />
+                      ) : (
+                        <img
+                          src={mediaUrl}
+                          alt="Post preview"
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {partnership.post.caption && (
                   <p className="text-sm line-clamp-2">{partnership.post.caption}</p>
