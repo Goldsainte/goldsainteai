@@ -880,6 +880,27 @@ export type Database = {
           },
         ]
       }
+      close_friends: {
+        Row: {
+          created_at: string
+          friend_user_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_user_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_user_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       collection_posts: {
         Row: {
           added_at: string
@@ -2834,6 +2855,135 @@ export type Database = {
         }
         Relationships: []
       }
+      stories: {
+        Row: {
+          caption: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          media_type: string
+          media_url: string
+          user_id: string
+          view_count: number | null
+          visibility: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          media_type?: string
+          media_url: string
+          user_id: string
+          view_count?: number | null
+          visibility?: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          media_type?: string
+          media_url?: string
+          user_id?: string
+          view_count?: number | null
+          visibility?: string
+        }
+        Relationships: []
+      }
+      story_interaction_responses: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_id: string
+          response_data: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_id: string
+          response_data: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_id?: string
+          response_data?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_interaction_responses_interaction_id_fkey"
+            columns: ["interaction_id"]
+            isOneToOne: false
+            referencedRelation: "story_interactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          interaction_data: Json
+          interaction_type: string
+          story_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interaction_data?: Json
+          interaction_type: string
+          story_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interaction_data?: Json
+          interaction_type?: string
+          story_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_interactions_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_views: {
+        Row: {
+          id: string
+          story_id: string
+          viewed_at: string
+          viewer_id: string
+        }
+        Insert: {
+          id?: string
+          story_id: string
+          viewed_at?: string
+          viewer_id: string
+        }
+        Update: {
+          id?: string
+          story_id?: string
+          viewed_at?: string
+          viewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_views_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       travel_agents: {
         Row: {
           accepted_gdpr: boolean | null
@@ -3801,6 +3951,30 @@ export type Database = {
           follower_id?: string
           following_id?: string
           id?: string
+        }
+        Relationships: []
+      }
+      user_presence: {
+        Row: {
+          id: string
+          last_seen_at: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_seen_at?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_seen_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

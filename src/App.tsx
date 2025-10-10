@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
+import { usePresence } from "@/hooks/usePresence";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import HotelBooking from "./pages/HotelBooking";
@@ -51,6 +52,7 @@ const queryClient = new QueryClient();
 // Main app content with routing
 function AppContent() {
   const location = useLocation();
+  usePresence(); // Initialize presence tracking
   
   // Don't show header on these pages as they have their own custom headers
   const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];

@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 
@@ -14,6 +14,9 @@ import StoryHighlights from "@/components/StoryHighlights";
 import VideoEditModal from "@/components/VideoEditModal";
 import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { EditProfileDialog } from "@/components/EditProfileDialog";
+import { ActivityStatus } from "@/components/ActivityStatus";
+import { CloseFriendsManager } from "@/components/CloseFriendsManager";
+import { useCloseFriends } from "@/hooks/useCloseFriends";
 
 interface Profile {
   id: string;
@@ -62,7 +65,9 @@ const TravelProfile = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
+  const [closeFriendsOpen, setCloseFriendsOpen] = useState(false);
   const [unreadCollabCount, setUnreadCollabCount] = useState(0);
+  const { isCloseFriend } = useCloseFriends();
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -441,6 +446,11 @@ const TravelProfile = () => {
           {profile?.location && (
             <p className="text-sm text-muted-foreground">📍 {profile.location}</p>
           )}
+          
+          {/* Activity Status */}
+          {!isOwnProfile && profileUserId && (
+            <ActivityStatus userId={profileUserId} showText size="md" />
+          )}
         </div>
 
         {/* Dashboard Card for own profile */}
@@ -478,6 +488,15 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 size="icon"
+                className="h-8 w-8"
+                onClick={() => setCloseFriendsOpen(true)}
+                title="Manage Close Friends"
+              >
+                <Star className="h-4 w-4 text-green-500" />
+              </Button>
+              <Button
+                variant="secondary"
+                size="icon"
                 className="relative h-8 w-8"
                 onClick={() => setCollaborationSheetOpen(true)}
                 aria-label="Collaboration invites"
@@ -507,6 +526,16 @@ const TravelProfile = () => {
               >
                 <MessageCircle className="h-4 w-4" />
               </Button>
+              {user && profileUserId && isCloseFriend(profileUserId) && (
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="h-8 w-8 bg-green-100 dark:bg-green-900"
+                  title="Close Friend"
+                >
+                  <Star className="h-4 w-4 text-green-600 dark:text-green-400 fill-current" />
+                </Button>
+              )}
             </>
           )}
         </div>
@@ -762,6 +791,12 @@ const TravelProfile = () => {
             fetchCollabCount();
           }
         }}
+      />
+      
+      {/* Close Friends Manager */}
+      <CloseFriendsManager
+        open={closeFriendsOpen}
+        onOpenChange={setCloseFriendsOpen}
       />
     </div>
   );

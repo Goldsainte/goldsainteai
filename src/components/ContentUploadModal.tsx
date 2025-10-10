@@ -12,11 +12,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Loader2, Link2, Image } from "lucide-react";
+import { Upload, Loader2, Link2, Image, Star, BarChart3 } from "lucide-react";
 import { toast } from "sonner";
 import { extractMentions } from "@/lib/mentionHelpers";
 import { extractHashtags } from "@/lib/hashtagHelpers";
 import { CollaboratorSelector } from "./CollaboratorSelector";
+import { StoryInteractionCreator } from "./StoryInteractionCreator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ContentUploadModalProps {
   open: boolean;
@@ -37,6 +45,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string>("");
   const [photoPreviewUrls, setPhotoPreviewUrls] = useState<string[]>([]);
   const [collaborators, setCollaborators] = useState<string[]>([]);
+  const [visibility, setVisibility] = useState<'public' | 'close_friends'>('public');
+  const [showInteractionCreator, setShowInteractionCreator] = useState(false);
+  const [storyInteraction, setStoryInteraction] = useState<any>(null);
   const videoRef = useState<HTMLVideoElement | null>(null)[0];
 
   const detectPlatform = (url: string): string | null => {
@@ -605,6 +616,54 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
               onCollaboratorsChange={setCollaborators}
             />
 
+            <div className="space-y-2">
+              <Label>Visibility</Label>
+              <Select value={visibility} onValueChange={(v: any) => setVisibility(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="public">
+                    <div className="flex items-center gap-2">
+                      Public
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="close_friends">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4 text-green-500 fill-green-500" />
+                      Close Friends
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {visibility === 'close_friends' && (
+              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
+                <p className="text-xs text-green-700 dark:text-green-300">
+                  <Star className="h-3 w-3 inline mr-1" />
+                  Only your close friends will see this
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowInteractionCreator(true)}
+                className="w-full"
+                type="button"
+              >
+                <BarChart3 className="h-4 w-4 mr-2" />
+                {storyInteraction ? 'Change' : 'Add'} Story Interaction
+              </Button>
+              {storyInteraction && (
+                <p className="text-xs text-muted-foreground">
+                  Added: {storyInteraction.type}
+                </p>
+              )}
+            </div>
+
             <Button
               onClick={handleUpload}
               disabled={!videoFile || uploading}
@@ -690,6 +749,12 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
           </TabsContent>
         </Tabs>
       </DialogContent>
+      
+      <StoryInteractionCreator
+        open={showInteractionCreator}
+        onOpenChange={setShowInteractionCreator}
+        onSave={(interaction) => setStoryInteraction(interaction)}
+      />
     </Dialog>
   );
 };
