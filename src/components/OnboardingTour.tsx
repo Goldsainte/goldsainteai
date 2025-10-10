@@ -61,6 +61,24 @@ export const OnboardingTour = () => {
       placement: "bottom",
       disableBeacon: true,
     },
+    {
+      target: '[data-tour="send-gift-post"]',
+      content: "Send Gifts to Creators! Support your favorite travel creators by sending virtual gifts using coins. Creators earn real money from gifts, encouraging quality content.",
+      placement: "top",
+      disableBeacon: true,
+    },
+    {
+      target: '[data-tour="coin-balance"]',
+      content: "Your Coin Balance! Use coins to send virtual gifts to creators, unlock premium content, and support your favorite travel influencers. Coins help creators monetize their content.",
+      placement: "left",
+      disableBeacon: true,
+    },
+    {
+      target: '[data-tour="creator-dashboard"]',
+      content: "Creator Dashboard - Track your content performance, earnings from coins and gifts, manage your travel packages, and analyze your audience engagement all in one place.",
+      placement: "left",
+      disableBeacon: true,
+    },
   ];
 
   const handleJoyrideCallback = (data: CallBackProps) => {

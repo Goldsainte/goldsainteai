@@ -103,7 +103,7 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
+        <DialogContent data-tour="send-gift-modal">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span>Send a Gift</span>

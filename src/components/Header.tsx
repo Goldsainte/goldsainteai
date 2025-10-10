@@ -340,7 +340,7 @@ export const Header = () => {
                     {user ? (
                       <>
                         {/* Coin Balance Section */}
-                        <div className="px-4 py-3 border-b border-border/50">
+                        <div className="px-4 py-3 border-b border-border/50" data-tour="coin-balance">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
                               <Coins className="h-4 w-4 text-yellow-500" />
@@ -351,6 +351,7 @@ export const Header = () => {
                               size="sm"
                               onClick={() => setBuyCoinsOpen(true)}
                               className="h-7 text-xs hover:bg-secondary/10"
+                              data-tour="buy-coins"
                             >
                               Buy
                             </Button>
@@ -393,6 +394,7 @@ export const Header = () => {
                           <DropdownMenuItem 
                             onClick={() => navigate('/creator-dashboard')} 
                             className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                            data-tour="creator-dashboard"
                           >
                             <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Creator Dashboard</span>

@@ -67,7 +67,7 @@ export const BuyCoinsModal = ({ open, onOpenChange }: BuyCoinsModalProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl" data-tour="buy-coins-modal">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Coins className="h-6 w-6 text-yellow-500" />

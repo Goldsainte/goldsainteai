@@ -534,6 +534,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             <button
               onClick={() => setGiftModalOpen(true)}
               className="transition-transform active:scale-90"
+              data-tour="send-gift-post"
             >
               <Coins className="h-6 w-6 text-yellow-500" />
             </button>
@@ -852,6 +853,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             <button
               onClick={() => setGiftModalOpen(true)}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+              data-tour="send-gift-post"
             >
               <Coins className="h-7 w-7 text-yellow-500 drop-shadow-lg" />
             </button>
