@@ -130,7 +130,6 @@ export default function CreatorDashboard() {
           </div>
           <div className="flex gap-2">
             <Badge variant="outline" className="text-lg px-4 py-2">
-              <DollarSign className="w-4 h-4 mr-1" />
               {stats.estimated_earnings.toFixed(2)} earned
             </Badge>
             <Badge variant="outline" className="text-lg px-4 py-2 cursor-pointer" onClick={() => setBuyCoinsOpen(true)}>
