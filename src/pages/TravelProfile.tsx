@@ -542,8 +542,8 @@ const TravelProfile = () => {
 
         {/* Story Highlights */}
         <StoryHighlights 
+          userId={profileUserId!}
           isOwnProfile={isOwnProfile}
-          onAddNew={() => toast.info("Story highlights coming soon!")}
         />
       </div>
 
@@ -782,17 +782,14 @@ const TravelProfile = () => {
       )}
 
       {/* Collaboration Invites Sheet */}
-      <CollaborationInvites
-        open={collaborationSheetOpen}
-        onOpenChange={setCollaborationSheetOpen}
-        onUpdate={() => {
-          // Refresh collab count
-          if (user) {
-            fetchCollabCount();
-          }
-        }}
-      />
-      
+      {collaborationSheetOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+          <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <CollaborationInvites />
+          </div>
+        </div>
+      )}
+
       {/* Close Friends Manager */}
       <CloseFriendsManager
         open={closeFriendsOpen}

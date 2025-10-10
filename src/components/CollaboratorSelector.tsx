@@ -1,156 +1,144 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { X, Search } from "lucide-react";
+import { Check } from "lucide-react";
 import { toast } from "sonner";
 
 interface Profile {
   id: string;
-  username: string | null;
+  username: string;
   avatar_url: string | null;
 }
 
 interface CollaboratorSelectorProps {
-  selectedCollaborators: string[];
-  onCollaboratorsChange: (collaborators: string[]) => void;
+  postId: string;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export const CollaboratorSelector = ({ 
-  selectedCollaborators, 
-  onCollaboratorsChange 
-}: CollaboratorSelectorProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<Profile[]>([]);
-  const [selectedProfiles, setSelectedProfiles] = useState<Profile[]>([]);
-  const [searching, setSearching] = useState(false);
+export const CollaboratorSelector = ({ postId, open, onOpenChange }: CollaboratorSelectorProps) => {
+  const [search, setSearch] = useState("");
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [selectedCollaborators, setSelectedCollaborators] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const delaySearch = setTimeout(() => {
-      if (searchQuery.length >= 2) {
-        searchUsers();
-      } else {
-        setSearchResults([]);
-      }
-    }, 300);
-
-    return () => clearTimeout(delaySearch);
-  }, [searchQuery]);
-
-  const searchUsers = async () => {
-    setSearching(true);
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .ilike('username', `%${searchQuery}%`)
-        .limit(5);
-
-      if (error) throw error;
-      
-      // Filter out already selected users
-      const filtered = (data || []).filter(
-        profile => !selectedCollaborators.includes(profile.id)
-      );
-      
-      setSearchResults(filtered);
-    } catch (error) {
-      console.error('Error searching users:', error);
-    } finally {
-      setSearching(false);
+    if (open && search.length > 0) {
+      searchProfiles();
     }
+  }, [search, open]);
+
+  const searchProfiles = async () => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, username, avatar_url")
+      .ilike("username", `%${search}%`)
+      .limit(10);
+
+    if (error) {
+      console.error("Error searching profiles:", error);
+      return;
+    }
+
+    setProfiles(data || []);
   };
 
-  const handleSelectUser = (profile: Profile) => {
-    const newCollaborators = [...selectedCollaborators, profile.id];
-    onCollaboratorsChange(newCollaborators);
-    setSelectedProfiles([...selectedProfiles, profile]);
-    setSearchQuery("");
-    setSearchResults([]);
-    toast.success(`Added ${profile.username} as collaborator`);
+  const toggleCollaborator = (userId: string) => {
+    setSelectedCollaborators((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
+    );
   };
 
-  const handleRemoveUser = (userId: string) => {
-    const newCollaborators = selectedCollaborators.filter(id => id !== userId);
-    onCollaboratorsChange(newCollaborators);
-    setSelectedProfiles(selectedProfiles.filter(p => p.id !== userId));
+  const inviteCollaborators = async () => {
+    if (selectedCollaborators.length === 0) {
+      toast.error("Please select at least one collaborator");
+      return;
+    }
+
+    setLoading(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const invites = selectedCollaborators.map((collaboratorId) => ({
+      post_id: postId,
+      collaborator_id: collaboratorId,
+      invited_by: user.id,
+    }));
+
+    const { error } = await supabase
+      .from("post_collaborators")
+      .insert(invites);
+
+    setLoading(false);
+
+    if (error) {
+      toast.error("Failed to send invitations");
+      console.error(error);
+      return;
+    }
+
+    toast.success(`Invited ${selectedCollaborators.length} collaborator(s)`);
+    setSelectedCollaborators([]);
+    setSearch("");
+    onOpenChange(false);
   };
 
   return (
-    <div className="space-y-3">
-      <Label>Invite Collaborators</Label>
-      
-      {/* Selected Collaborators */}
-      {selectedProfiles.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {selectedProfiles.map(profile => (
-            <div
-              key={profile.id}
-              className="flex items-center gap-2 bg-secondary rounded-full pl-1 pr-3 py-1"
-            >
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={profile.avatar_url || undefined} />
-                <AvatarFallback className="text-xs">
-                  {profile.username?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm">{profile.username}</span>
-              <button
-                onClick={() => handleRemoveUser(profile.id)}
-                className="hover:bg-destructive/20 rounded-full p-0.5"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Invite Collaborators</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <Input
+            placeholder="Search users..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <ScrollArea className="h-[300px]">
+            {profiles.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">
+                {search.length === 0 ? "Start typing to search" : "No users found"}
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {profiles.map((profile) => (
+                  <div
+                    key={profile.id}
+                    className="flex items-center justify-between p-3 border rounded-lg cursor-pointer hover:bg-accent"
+                    onClick={() => toggleCollaborator(profile.id)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar>
+                        <AvatarImage src={profile.avatar_url || undefined} />
+                        <AvatarFallback>{profile.username[0]?.toUpperCase()}</AvatarFallback>
+                      </Avatar>
+                      <span className="font-medium">@{profile.username}</span>
+                    </div>
+                    {selectedCollaborators.includes(profile.id) && (
+                      <Check className="w-5 h-5 text-primary" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+          <Button
+            onClick={inviteCollaborators}
+            disabled={loading || selectedCollaborators.length === 0}
+            className="w-full"
+          >
+            Invite {selectedCollaborators.length > 0 && `(${selectedCollaborators.length})`}
+          </Button>
         </div>
-      )}
-
-      {/* Search Input */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Search users to collaborate with..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-9"
-        />
-      </div>
-
-      {/* Search Results */}
-      {searchResults.length > 0 && (
-        <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
-          {searchResults.map(profile => (
-            <button
-              key={profile.id}
-              onClick={() => handleSelectUser(profile)}
-              className="w-full flex items-center gap-3 p-3 hover:bg-accent transition-colors"
-            >
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={profile.avatar_url || undefined} />
-                <AvatarFallback className="text-sm">
-                  {profile.username?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <span className="text-sm font-medium">{profile.username}</span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {searching && (
-        <p className="text-xs text-muted-foreground">Searching...</p>
-      )}
-
-      {searchQuery.length >= 2 && searchResults.length === 0 && !searching && (
-        <p className="text-xs text-muted-foreground">No users found</p>
-      )}
-
-      <p className="text-xs text-muted-foreground">
-        Collaborators will receive an invite and the post will appear on both profiles once accepted
-      </p>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

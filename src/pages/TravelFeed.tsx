@@ -183,11 +183,6 @@ const TravelFeed = () => {
 
           {/* Center Feed */}
           <div className="flex-1 max-w-[630px] mx-auto">
-            {/* Stories Section */}
-            <div className="border-b border-border py-4 px-2">
-              <StoryHighlights />
-            </div>
-
             {/* Feed Posts */}
             <div className="py-6">
               {loading ? (

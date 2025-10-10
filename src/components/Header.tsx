@@ -148,6 +148,7 @@ export const Header = () => {
 
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                {user && <CollaborationInvites />}
                 {user && <NotificationCenter />}
                 
                 {/* Main Navigation - Desktop */}

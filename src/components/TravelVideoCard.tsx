@@ -4,12 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
 import VideoEditModal from "./VideoEditModal";
 import { CollectionSelector } from "./CollectionSelector";
+import { CollaboratorSelector } from "./CollaboratorSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -65,6 +66,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
   const [collectionSelectorOpen, setCollectionSelectorOpen] = useState(false);
+  const [collaboratorSelectorOpen, setCollaboratorSelectorOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
 
   const isOwnPost = user?.id === post.user_id;
@@ -672,6 +674,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <Bookmark className="h-7 w-7 text-white drop-shadow-lg" />
             </button>
 
+            <button
+              onClick={() => setCollaboratorSelectorOpen(true)}
+              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+            >
+              <Users className="h-7 w-7 text-white drop-shadow-lg" />
+            </button>
+
             {isOwnPost && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -719,6 +728,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         postId={post.id}
         open={collectionSelectorOpen}
         onOpenChange={setCollectionSelectorOpen}
+      />
+      <CollaboratorSelector
+        postId={post.id}
+        open={collaboratorSelectorOpen}
+        onOpenChange={setCollaboratorSelectorOpen}
       />
     </div>
   );
