@@ -8,8 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, MapPin, Users, DollarSign, Check, Clock, Tag, Sparkles } from "lucide-react";
+import { Calendar, MapPin, Users, DollarSign, Check, Clock, Tag, Sparkles, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { PackageDisputeModal } from "@/components/PackageDisputeModal";
 
 export default function CoCuratedPackage() {
   const { packageId } = useParams();
@@ -22,9 +23,14 @@ export default function CoCuratedPackage() {
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [disputeModalOpen, setDisputeModalOpen] = useState(false);
+  const [hasActiveBooking, setHasActiveBooking] = useState(false);
 
   useEffect(() => {
     fetchPackage();
+    if (user) {
+      checkExistingBooking();
+    }
     // Check for promo code in URL
     const urlPromo = searchParams.get('promo');
     if (urlPromo) {
@@ -34,7 +40,26 @@ export default function CoCuratedPackage() {
         applyPromoCode(urlPromo.toUpperCase());
       }, 500);
     }
-  }, [packageId, searchParams]);
+  }, [packageId]);
+
+  const checkExistingBooking = async () => {
+    if (!user) return;
+    try {
+      const { data } = await supabase
+        .from('package_bookings')
+        .select('id')
+        .eq('package_id', packageId)
+        .eq('customer_id', user.id)
+        .or('status.eq.confirmed,status.eq.pending')
+        .limit(1);
+      
+      if (data && data.length > 0) {
+        setHasActiveBooking(true);
+      }
+    } catch (error) {
+      console.error('Error checking booking:', error);
+    }
+  };
 
   const fetchPackage = async () => {
     try {
@@ -338,11 +363,38 @@ export default function CoCuratedPackage() {
                 <p className="text-xs text-center text-muted-foreground">
                   Secure payment via Stripe. You'll be redirected to complete booking.
                 </p>
+
+                {/* Dispute Button - Only show if user has an active booking */}
+                {hasActiveBooking && (
+                  <>
+                    <Separator />
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => setDisputeModalOpen(true)}
+                    >
+                      <AlertTriangle className="h-4 w-4 mr-2" />
+                      File a Dispute
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
+
+      {/* Dispute Modal */}
+      <PackageDisputeModal
+        open={disputeModalOpen}
+        onOpenChange={setDisputeModalOpen}
+        packageId={packageId || ''}
+        packageType="cocurated"
+        creatorId={packageData?.travel_agents?.user_id}
+        onSuccess={() => {
+          toast.success('Dispute submitted successfully');
+        }}
+      />
     </div>
   );
 }

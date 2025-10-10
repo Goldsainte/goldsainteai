@@ -6,8 +6,9 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus } from "lucide-react";
+import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus, AlertTriangle } from "lucide-react";
 import { CreateProductModal } from "@/components/CreateProductModal";
+import { PackageDisputeModal } from "@/components/PackageDisputeModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -19,6 +20,9 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [disputeModalOpen, setDisputeModalOpen] = useState(false);
+  const [disputePackageId, setDisputePackageId] = useState<string>("");
+  const [disputeCreatorId, setDisputeCreatorId] = useState<string>("");
 
   const handleBack = () => {
     if (window.history.length > 1) navigate(-1);
@@ -44,9 +48,9 @@ export default function Shop() {
     },
   });
 
-  // Fetch travel packages
+  // Fetch travel packages with user's purchase status
   const { data: packages = [], isLoading: packagesLoading, refetch: refetchPackages } = useQuery({
-    queryKey: ['travel-packages', searchQuery],
+    queryKey: ['travel-packages', searchQuery, user?.id],
     queryFn: async () => {
       let query = supabase
         .from('travel_packages')
@@ -60,6 +64,24 @@ export default function Shop() {
 
       const { data, error } = await query;
       if (error) throw error;
+
+      // Check if user has purchased each package
+      if (user && data) {
+        const packageIds = data.map(p => p.id);
+        const { data: bookings } = await supabase
+          .from('package_bookings')
+          .select('package_id')
+          .eq('customer_id', user.id)
+          .in('package_id', packageIds)
+          .or('status.eq.confirmed,status.eq.pending');
+
+        const purchasedIds = new Set((bookings || []).map(b => b.package_id));
+        return data.map(pkg => ({
+          ...pkg,
+          hasPurchased: purchasedIds.has(pkg.id)
+        }));
+      }
+
       return data || [];
     },
   });
@@ -267,6 +289,20 @@ export default function Shop() {
                         <ShoppingCart className="h-4 w-4 mr-2" />
                         Book Package
                       </Button>
+                      {(pkg as any).hasPurchased && (
+                        <Button
+                          variant="outline"
+                          className="w-full mt-2"
+                          onClick={() => {
+                            setDisputePackageId(pkg.id);
+                            setDisputeCreatorId(pkg.creator_id);
+                            setDisputeModalOpen(true);
+                          }}
+                        >
+                          <AlertTriangle className="h-4 w-4 mr-2" />
+                          File Dispute
+                        </Button>
+                      )}
                     </CardFooter>
                   </Card>
                 ))}
@@ -285,6 +321,19 @@ export default function Shop() {
             refetchPackages();
           }
         }} 
+      />
+
+      {/* Package Dispute Modal */}
+      <PackageDisputeModal
+        open={disputeModalOpen}
+        onOpenChange={setDisputeModalOpen}
+        packageId={disputePackageId}
+        packageType="creator_package"
+        creatorId={disputeCreatorId}
+        onSuccess={() => {
+          toast.success('Dispute submitted successfully');
+          setDisputeModalOpen(false);
+        }}
       />
     </div>
   );

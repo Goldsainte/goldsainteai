@@ -3378,6 +3378,68 @@ export type Database = {
           },
         ]
       }
+      package_disputes: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          creator_id: string | null
+          description: string
+          dispute_type: string
+          evidence_urls: Json | null
+          id: string
+          package_id: string
+          package_type: string
+          raised_by: string
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          creator_id?: string | null
+          description: string
+          dispute_type: string
+          evidence_urls?: Json | null
+          id?: string
+          package_id: string
+          package_type: string
+          raised_by: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          creator_id?: string | null
+          description?: string
+          dispute_type?: string
+          evidence_urls?: Json | null
+          id?: string
+          package_id?: string
+          package_type?: string
+          raised_by?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "package_disputes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "package_bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       package_itinerary: {
         Row: {
           accommodation: string | null
