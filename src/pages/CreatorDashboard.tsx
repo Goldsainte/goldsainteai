@@ -131,7 +131,7 @@ export default function CreatorDashboard() {
           <div className="flex gap-2">
             <Badge variant="outline" className="text-lg px-4 py-2">
               <DollarSign className="w-4 h-4 mr-1" />
-              ${stats.estimated_earnings.toFixed(2)} earned
+              {stats.estimated_earnings.toFixed(2)} earned
             </Badge>
             <Badge variant="outline" className="text-lg px-4 py-2 cursor-pointer" onClick={() => setBuyCoinsOpen(true)}>
               <Coins className="w-4 h-4 mr-1 text-yellow-500" />
@@ -194,7 +194,7 @@ export default function CreatorDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.total_views.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                ${(stats.total_views * 0.001).toFixed(2)} earned
+                {(stats.total_views * 0.001).toFixed(2)} earned
               </p>
             </CardContent>
           </Card>
@@ -207,7 +207,7 @@ export default function CreatorDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.total_likes.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                ${(stats.total_likes * 0.01).toFixed(2)} earned
+                {(stats.total_likes * 0.01).toFixed(2)} earned
               </p>
             </CardContent>
           </Card>
@@ -220,7 +220,7 @@ export default function CreatorDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.total_shares.toLocaleString()}</div>
               <p className="text-xs text-muted-foreground">
-                ${(stats.total_shares * 0.05).toFixed(2)} earned
+                {(stats.total_shares * 0.05).toFixed(2)} earned
               </p>
             </CardContent>
           </Card>
@@ -250,7 +250,7 @@ export default function CreatorDashboard() {
               <div>
                 <p className="font-medium">Views</p>
                 <p className="text-sm text-muted-foreground">
-                  Earn $0.001 per view on your travel content
+                  Earn 0.001 per view on your travel content
                 </p>
               </div>
             </div>
@@ -259,7 +259,7 @@ export default function CreatorDashboard() {
               <div>
                 <p className="font-medium">Likes</p>
                 <p className="text-sm text-muted-foreground">
-                  Earn $0.01 per like from engaged viewers
+                  Earn 0.01 per like from engaged viewers
                 </p>
               </div>
             </div>
@@ -268,7 +268,7 @@ export default function CreatorDashboard() {
               <div>
                 <p className="font-medium">Shares</p>
                 <p className="text-sm text-muted-foreground">
-                  Earn $0.05 per share - help your content go viral!
+                  Earn 0.05 per share - help your content go viral!
                 </p>
               </div>
             </div>
