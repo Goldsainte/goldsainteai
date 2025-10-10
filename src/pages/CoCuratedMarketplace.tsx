@@ -158,12 +158,11 @@ export default function CoCuratedMarketplace() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
       <main className="flex-1 container mx-auto py-8 px-4">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="h-6 w-6 text-primary" />
-            <h1 className="text-3xl font-bold">CoCurated™ Marketplace</h1>
+            <h1 className="text-3xl font-bold">CoCurated<span className="text-base align-super">™</span> Marketplace</h1>
           </div>
           <p className="text-sm text-muted-foreground">Discover and promote travel packages with shared commissions</p>
         </div>
@@ -287,7 +286,6 @@ export default function CoCuratedMarketplace() {
         </div>
       )}
       </main>
-      <Footer />
     </div>
   );
 }
