@@ -25,6 +25,7 @@ interface Profile {
   phone: string | null;
   website: string | null;
   location: string | null;
+  instagram_username: string | null;
   is_verified?: boolean;
   followers_count?: number;
   following_count?: number;
@@ -114,6 +115,7 @@ const TravelProfile = () => {
           phone: data.phone,
           website: data.website,
           location: data.location,
+          instagram_username: data.instagram_username,
           is_verified: data.is_verified,
           followers_count: data.followers_count,
           following_count: data.following_count,
@@ -129,6 +131,7 @@ const TravelProfile = () => {
           phone: null,
           website: null,
           location: null,
+          instagram_username: null,
         });
       }
     } catch (error) {

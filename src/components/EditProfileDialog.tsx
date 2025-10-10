@@ -19,6 +19,7 @@ interface Profile {
   phone: string | null;
   website: string | null;
   location: string | null;
+  instagram_username: string | null;
 }
 
 interface EditProfileDialogProps {
@@ -39,6 +40,7 @@ export function EditProfileDialog({ open, onOpenChange, profile, onProfileUpdate
     phone: profile.phone || "",
     website: profile.website || "",
     location: profile.location || "",
+    instagram_username: profile.instagram_username || "",
     avatar_url: profile.avatar_url || "",
   });
 
@@ -115,6 +117,7 @@ export function EditProfileDialog({ open, onOpenChange, profile, onProfileUpdate
           phone: formData.phone || null,
           website: formData.website || null,
           location: formData.location || null,
+          instagram_username: formData.instagram_username || null,
           avatar_url: formData.avatar_url || null,
         })
         .eq('id', profile.id);
@@ -257,6 +260,19 @@ export function EditProfileDialog({ open, onOpenChange, profile, onProfileUpdate
                 onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                 placeholder="+1 (555) 000-0000"
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="instagram">Instagram Username</Label>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">@</span>
+                <Input
+                  id="instagram"
+                  value={formData.instagram_username}
+                  onChange={(e) => setFormData(prev => ({ ...prev, instagram_username: e.target.value.replace('@', '') }))}
+                  placeholder="username"
+                />
+              </div>
             </div>
           </div>
 

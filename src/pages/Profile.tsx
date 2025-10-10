@@ -21,6 +21,7 @@ interface Profile {
   phone: string | null;
   website: string | null;
   location: string | null;
+  instagram_username: string | null;
 }
 
 export default function Profile() {
@@ -61,6 +62,7 @@ export default function Profile() {
           phone: data.phone,
           website: data.website,
           location: data.location,
+          instagram_username: data.instagram_username,
         });
       }
     } catch (error) {

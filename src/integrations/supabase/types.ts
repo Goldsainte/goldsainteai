@@ -2420,6 +2420,7 @@ export type Database = {
           following_count: number | null
           full_name: string | null
           id: string
+          instagram_username: string | null
           is_verified: boolean | null
           last_name: string | null
           location: string | null
@@ -2444,6 +2445,7 @@ export type Database = {
           following_count?: number | null
           full_name?: string | null
           id: string
+          instagram_username?: string | null
           is_verified?: boolean | null
           last_name?: string | null
           location?: string | null
@@ -2468,6 +2470,7 @@ export type Database = {
           following_count?: number | null
           full_name?: string | null
           id?: string
+          instagram_username?: string | null
           is_verified?: boolean | null
           last_name?: string | null
           location?: string | null

@@ -20,10 +20,11 @@ export const extractMentions = (text: string): string[] => {
  */
 export const renderTextWithMentions = (
   text: string,
-  onMentionClick: (username: string) => void
-): Array<string | { type: 'mention'; key: string; username: string }> => {
+  onMentionClick: (username: string) => void,
+  instagramUsername?: string
+): Array<string | { type: 'mention'; key: string; username: string; isInstagram?: boolean }> => {
   const mentionRegex = /@(\w+)/g;
-  const parts: Array<string | { type: 'mention'; key: string; username: string }> = [];
+  const parts: Array<string | { type: 'mention'; key: string; username: string; isInstagram?: boolean }> = [];
   let lastIndex = 0;
   let match;
 
@@ -35,10 +36,12 @@ export const renderTextWithMentions = (
 
     // Add mention data
     const username = match[1];
+    const isInstagram = instagramUsername?.toLowerCase() === username.toLowerCase();
     parts.push({
       type: 'mention',
       key: `mention-${match.index}`,
       username,
+      isInstagram,
     });
 
     lastIndex = match.index + match[0].length;
@@ -59,10 +62,11 @@ export const renderTextWithMentions = (
 export const renderTextWithMentionsAndHashtags = (
   text: string,
   onMentionClick: (username: string) => void,
-  onHashtagClick: (hashtag: string) => void
-): Array<string | { type: 'mention' | 'hashtag'; key: string; value: string }> => {
+  onHashtagClick: (hashtag: string) => void,
+  instagramUsername?: string
+): Array<string | { type: 'mention' | 'hashtag'; key: string; value: string; isInstagram?: boolean }> => {
   const combinedRegex = /(@\w+)|(#\w+)/g;
-  const parts: Array<string | { type: 'mention' | 'hashtag'; key: string; value: string }> = [];
+  const parts: Array<string | { type: 'mention' | 'hashtag'; key: string; value: string; isInstagram?: boolean }> = [];
   let lastIndex = 0;
   let match;
 
@@ -75,10 +79,12 @@ export const renderTextWithMentionsAndHashtags = (
     if (match[1]) {
       // It's a mention
       const username = match[1].substring(1);
+      const isInstagram = instagramUsername?.toLowerCase() === username.toLowerCase();
       parts.push({
         type: 'mention',
         key: `mention-${match.index}`,
         value: username,
+        isInstagram,
       });
     } else if (match[2]) {
       // It's a hashtag
