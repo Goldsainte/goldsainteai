@@ -240,4 +240,27 @@ All colors MUST be HSL.
   .animate-float {
     animation: float 3s ease-in-out infinite;
   }
+
+  /* Custom gold scrollbar for welcome modal */
+  .gold-scrollbar [data-radix-scroll-area-viewport] > div {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.6) transparent;
+  }
+  
+  .gold-scrollbar [data-radix-scroll-area-viewport] > div::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .gold-scrollbar [data-radix-scroll-area-viewport] > div::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .gold-scrollbar [data-radix-scroll-area-viewport] > div::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary) / 0.6);
+    border-radius: 4px;
+  }
+  
+  .gold-scrollbar [data-radix-scroll-area-viewport] > div::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary) / 0.8);
+  }
 }

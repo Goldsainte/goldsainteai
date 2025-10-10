@@ -23,7 +23,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
             </h2>
           </div>
 
-          <ScrollArea className="h-[60vh] sm:h-[65vh] pr-4">
+          <ScrollArea className="h-[60vh] sm:h-[65vh] pr-4 gold-scrollbar">
             <div className="space-y-3 sm:space-y-4">
             {/* Feature 1 - Voice AI */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
