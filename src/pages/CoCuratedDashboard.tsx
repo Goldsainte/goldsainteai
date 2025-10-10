@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { InfluencerPromoCodeManager } from "@/components/InfluencerPromoCodeManager";
+import { InfluencerPromotionRequests } from "@/components/InfluencerPromotionRequests";
 
 export default function CoCuratedDashboard() {
   const { user } = useAuth();
@@ -227,48 +228,59 @@ export default function CoCuratedDashboard() {
           {isAgent ? (
             <>
               <TabsContent value="packages" className="mt-6">
-                {packages.length === 0 ? (
-                  <Card>
-                    <CardContent className="py-12 text-center">
-                      <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground mb-4">No packages created yet</p>
-                      <Button onClick={() => navigate('/cocurated-create')}>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Create Your First Package
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="grid gap-4">
-                    {packages.map((pkg) => (
-                      <Card key={pkg.id}>
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle>{pkg.package_name}</CardTitle>
-                              <CardDescription>{pkg.destination} • {pkg.duration_days} days</CardDescription>
+                <div className="space-y-6">
+                  {packages.length === 0 ? (
+                    <Card>
+                      <CardContent className="py-12 text-center">
+                        <Package className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                        <p className="text-muted-foreground mb-4">No packages created yet</p>
+                        <Button onClick={() => navigate('/cocurated-create')}>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Your First Package
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <div className="grid gap-4">
+                      {packages.map((pkg) => (
+                        <Card key={pkg.id}>
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <div>
+                                <CardTitle>{pkg.package_name}</CardTitle>
+                                <CardDescription>{pkg.destination} • {pkg.duration_days} days</CardDescription>
+                              </div>
+                              <Badge variant={pkg.is_active ? 'default' : 'secondary'}>
+                                {pkg.is_active ? 'Active' : 'Inactive'}
+                              </Badge>
                             </div>
-                            <Badge variant={pkg.is_active ? 'default' : 'secondary'}>
-                              {pkg.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex gap-4 text-sm">
-                            <div>
-                              <span className="text-muted-foreground">Retail Price:</span>
-                              <span className="ml-2 font-semibold">${pkg.retail_price}</span>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex gap-4 text-sm">
+                              <div>
+                                <span className="text-muted-foreground">Retail Price:</span>
+                                <span className="ml-2 font-semibold">${pkg.retail_price}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground">Your Commission:</span>
+                                <span className="ml-2 font-semibold">{pkg.agent_commission_percentage}%</span>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-muted-foreground">Your Commission:</span>
-                              <span className="ml-2 font-semibold">{pkg.agent_commission_percentage}%</span>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+                  
+                  <Button
+                    onClick={() => navigate('/browse-influencers')}
+                    size="lg"
+                    className="w-full"
+                  >
+                    <Users className="h-5 w-5 mr-2" />
+                    Browse & Invite Influencers
+                  </Button>
+                </div>
               </TabsContent>
 
               <TabsContent value="approvals" className="mt-6">
@@ -278,7 +290,10 @@ export default function CoCuratedDashboard() {
           ) : (
             <>
               <TabsContent value="promotions" className="mt-6">
-                <InfluencerPromoCodeManager />
+                <div className="space-y-8">
+                  <InfluencerPromotionRequests />
+                  <InfluencerPromoCodeManager />
+                </div>
               </TabsContent>
 
               <TabsContent value="marketplace" className="mt-6">

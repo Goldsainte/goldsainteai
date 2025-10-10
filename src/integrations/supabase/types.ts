@@ -2210,6 +2210,7 @@ export type Database = {
           custom_influencer_commission_percentage: number | null
           id: string
           influencer_id: string
+          initiated_by: string
           package_id: string
           promo_code: string
           status: string
@@ -2225,6 +2226,7 @@ export type Database = {
           custom_influencer_commission_percentage?: number | null
           id?: string
           influencer_id: string
+          initiated_by?: string
           package_id: string
           promo_code: string
           status?: string
@@ -2240,6 +2242,7 @@ export type Database = {
           custom_influencer_commission_percentage?: number | null
           id?: string
           influencer_id?: string
+          initiated_by?: string
           package_id?: string
           promo_code?: string
           status?: string
