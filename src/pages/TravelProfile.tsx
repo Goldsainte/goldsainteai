@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -512,9 +512,9 @@ const TravelProfile = () => {
           )}
         </div>
 
-        {/* Dashboard and Coins Cards for own profile */}
+        {/* Dashboard and Coins Cards for own profile - Hidden on mobile */}
         {isOwnProfile && (
-          <div className="flex flex-col md:flex-row gap-2">
+          <div className="hidden md:flex flex-col md:flex-row gap-2">
             {/* Dashboard Card */}
             {stats.viewsCount > 0 && (
               <Card className="p-3 bg-dashboard-bg border-dashboard-bg flex-1">
@@ -552,8 +552,8 @@ const TravelProfile = () => {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 flex-wrap">
+        {/* Action Buttons - Hidden on mobile */}
+        <div className="hidden md:flex gap-2 flex-wrap">
           {isOwnProfile ? (
             <>
               <Button
@@ -948,6 +948,51 @@ const TravelProfile = () => {
           />
         </>
       )}
+
+      {/* Bottom Navigation Bar - Mobile Only, Instagram Style */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t md:hidden pb-safe">
+        <div className="flex items-center justify-around py-3 px-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="hover:bg-accent h-14 w-14"
+            aria-label="Home"
+          >
+            <Home className="h-8 w-8" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/search')}
+            className="hover:bg-accent h-14 w-14"
+            aria-label="Search"
+          >
+            <SearchIcon className="h-8 w-8" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setCreateSheetOpen(true)}
+            className="hover:bg-accent h-14 w-14"
+            aria-label="Create"
+          >
+            <PlusSquare className="h-8 w-8" />
+          </Button>
+          
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/travel-profile')}
+            className="hover:bg-accent h-14 w-14"
+            aria-label="Profile"
+          >
+            <User className="h-8 w-8" />
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
