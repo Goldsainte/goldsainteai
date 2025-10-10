@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +17,7 @@ import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { CollaborationInvites } from "@/components/CollaborationInvites";
+import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 
@@ -150,6 +151,23 @@ export const Header = () => {
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
                 {user && <CollaborationInvites />}
+                {user && (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button variant="ghost" size="icon" className="relative">
+                        <Briefcase className="h-5 w-5" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent>
+                      <SheetHeader>
+                        <SheetTitle>Partnership Requests</SheetTitle>
+                      </SheetHeader>
+                      <div className="mt-6">
+                        <PartnershipApprovals />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                )}
                 {user && <NotificationCenter />}
                 
                 {/* Main Navigation - Desktop */}

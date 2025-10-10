@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { PartnershipTagging } from "./PartnershipTagging";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,6 +48,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [showInteractionCreator, setShowInteractionCreator] = useState(false);
   const [storyInteraction, setStoryInteraction] = useState<any>(null);
   const videoRef = useState<HTMLVideoElement | null>(null)[0];
+  const [partnershipBrandId, setPartnershipBrandId] = useState<string | null>(null);
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
@@ -169,6 +171,24 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
       setPhotoPreviewUrls([]);
       setCaption("");
       setLocation("");
+      setPartnershipBrandId(null);
+
+      // Create paid partnership if brand is tagged
+      if (partnershipBrandId && postData) {
+        const { error: partnershipError } = await supabase
+          .from("paid_partnerships")
+          .insert({
+            post_id: postData.id,
+            creator_id: user.id,
+            brand_id: partnershipBrandId,
+            status: "pending",
+          });
+
+        if (partnershipError) {
+          console.error("Error creating partnership:", partnershipError);
+          toast.error("Photos uploaded but partnership request failed");
+        }
+      }
       
       onOpenChange(false);
       onSuccess();
@@ -376,6 +396,24 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
       setLocation("");
       setThumbnailFile(null);
       setVideoPreviewUrl("");
+      setPartnershipBrandId(null);
+
+      // Create paid partnership if brand is tagged
+      if (partnershipBrandId && postData) {
+        const { error: partnershipError } = await supabase
+          .from("paid_partnerships")
+          .insert({
+            post_id: postData.id,
+            creator_id: user.id,
+            brand_id: partnershipBrandId,
+            status: "pending",
+          });
+
+        if (partnershipError) {
+          console.error("Error creating partnership:", partnershipError);
+          toast.error("Video uploaded but partnership request failed");
+        }
+      }
       
       onOpenChange(false);
       onSuccess();
@@ -458,6 +496,11 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                 disabled={uploading}
               />
             </div>
+
+            <PartnershipTagging
+              onPartnershipChange={setPartnershipBrandId}
+              currentBrandId={partnershipBrandId}
+            />
 
             <Button
               onClick={handlePhotoUpload}
@@ -577,6 +620,11 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                 disabled={uploading}
               />
             </div>
+
+            <PartnershipTagging
+              onPartnershipChange={setPartnershipBrandId}
+              currentBrandId={partnershipBrandId}
+            />
 
             <div className="space-y-2">
               <Label>Visibility</Label>

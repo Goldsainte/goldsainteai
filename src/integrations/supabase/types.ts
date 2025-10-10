@@ -2037,6 +2037,117 @@ export type Database = {
         }
         Relationships: []
       }
+      paid_partnerships: {
+        Row: {
+          approved_at: string | null
+          brand_id: string
+          created_at: string
+          creator_id: string
+          id: string
+          post_id: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          approved_at?: string | null
+          brand_id: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          post_id: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          approved_at?: string | null
+          brand_id?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          post_id?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paid_partnerships_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partnership_analytics: {
+        Row: {
+          click_throughs: number | null
+          comments: number | null
+          created_at: string
+          date: string
+          id: string
+          likes: number | null
+          partnership_id: string
+          saves: number | null
+          shares: number | null
+          updated_at: string
+          views: number | null
+        }
+        Insert: {
+          click_throughs?: number | null
+          comments?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          likes?: number | null
+          partnership_id: string
+          saves?: number | null
+          shares?: number | null
+          updated_at?: string
+          views?: number | null
+        }
+        Update: {
+          click_throughs?: number | null
+          comments?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          likes?: number | null
+          partnership_id?: string
+          saves?: number | null
+          shares?: number | null
+          updated_at?: string
+          views?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partnership_analytics_partnership_id_fkey"
+            columns: ["partnership_id"]
+            isOneToOne: false
+            referencedRelation: "paid_partnerships"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_milestones: {
         Row: {
           amount: number
@@ -2499,6 +2610,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_type: string | null
           avatar_url: string | null
           billing_address: Json | null
           bio: string | null
@@ -2524,6 +2636,7 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          account_type?: string | null
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
@@ -2549,6 +2662,7 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          account_type?: string | null
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null

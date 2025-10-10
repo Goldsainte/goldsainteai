@@ -68,12 +68,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [collectionSelectorOpen, setCollectionSelectorOpen] = useState(false);
   const [collaboratorSelectorOpen, setCollaboratorSelectorOpen] = useState(false);
   const [collaborators, setCollaborators] = useState<Array<{id: string, username: string | null, avatar_url: string | null}>>([]);
+  const [partnership, setPartnership] = useState<any>(null);
 
   const isOwnPost = user?.id === post.user_id;
 
   useEffect(() => {
     checkIfLiked();
     fetchCollaborators();
+    fetchPartnership();
   }, [post.id]);
 
   useEffect(() => {
@@ -118,17 +120,40 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         .eq('post_id', post.id)
         .eq('status', 'accepted');
       
-      if (data && data.length > 0) {
-        const collabIds = data.map(c => c.collaborator_id);
-        const { data: profiles } = await supabase
-          .from('profiles')
-          .select('id, username, avatar_url')
-          .in('id', collabIds);
-        
-        setCollaborators(profiles || []);
+      if (!data || data.length === 0) {
+        setCollaborators([]);
+        return;
       }
+      
+      const collaboratorIds = data.map(c => c.collaborator_id);
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', collaboratorIds);
+      
+      setCollaborators(profiles || []);
     } catch (error) {
       console.error('Error fetching collaborators:', error);
+    }
+  };
+
+  const fetchPartnership = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("paid_partnerships")
+        .select(`
+          id,
+          status,
+          brand:profiles!paid_partnerships_brand_id_fkey(id, username, avatar_url, is_verified)
+        `)
+        .eq("post_id", post.id)
+        .eq("status", "approved")
+        .single();
+
+      if (error && error.code !== "PGRST116") throw error;
+      setPartnership(data);
+    } catch (error) {
+      console.error("Error fetching partnership:", error);
     }
   };
 
@@ -508,6 +533,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </div>
       )}
       
+      {/* Partnership Label */}
+      {partnership && (
+        <div className="absolute top-4 left-4 right-4 z-10 px-3 py-1.5 bg-background/95 backdrop-blur-sm rounded-lg text-xs font-medium border shadow-sm">
+          Paid Partnership with @{partnership.brand.username}
+        </div>
+      )}
+
       {/* Video or Embed */}
       {post.video_url ? (
         <>
