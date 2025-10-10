@@ -319,46 +319,46 @@ const TravelFeed = () => {
           </div>
 
           {/* Bottom Navigation Bar - Instagram Style */}
-          <div className="absolute bottom-0 left-0 right-0 z-30 bg-black/80 backdrop-blur-md border-t border-white/10 safe-bottom">
-            <div className="flex items-center justify-around py-3 px-4">
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20 pb-safe">
+            <div className="flex items-center justify-around py-2 px-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/')}
-                className="text-white hover:bg-white/10 h-10 w-10"
+                className="text-white hover:bg-white/20 h-12 w-12"
                 aria-label="Home"
               >
-                <Home className="h-6 w-6" />
+                <Home className="h-7 w-7" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/search')}
-                className="text-white hover:bg-white/10 h-10 w-10"
+                className="text-white hover:bg-white/20 h-12 w-12"
                 aria-label="Search"
               >
-                <SearchIcon className="h-6 w-6" />
+                <SearchIcon className="h-7 w-7" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/10 h-10 w-10"
+                className="text-white hover:bg-white/20 h-12 w-12"
                 aria-label="Create"
               >
-                <PlusSquare className="h-6 w-6" />
+                <PlusSquare className="h-7 w-7" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/10 h-10 w-10"
+                className="text-white hover:bg-white/20 h-12 w-12"
                 aria-label="Profile"
               >
-                <User className="h-6 w-6" />
+                <User className="h-7 w-7" />
               </Button>
             </div>
           </div>

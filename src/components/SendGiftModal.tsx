@@ -103,43 +103,43 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent data-tour="send-gift-modal">
+        <DialogContent className="sm:max-w-[500px]" data-tour="send-gift-modal">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
+            <DialogTitle className="flex items-center justify-between text-2xl font-serif">
               <span>Send a Gift</span>
-              <div className="flex items-center gap-1 text-sm font-normal">
-                <Coins className="h-4 w-4 text-yellow-500" />
-                <span>{balance} coins</span>
+              <div className="flex items-center gap-2 text-base font-normal">
+                <Coins className="h-5 w-5 text-[#BFAD72]" />
+                <span className="font-semibold text-[#BFAD72]">{balance} coins</span>
               </div>
             </DialogTitle>
           </DialogHeader>
           
           {balance === 0 && (
-            <div className="bg-muted/50 border border-border rounded-lg p-4 text-center space-y-2">
-              <p className="text-sm text-muted-foreground">You don't have any coins yet</p>
+            <div className="bg-[#0c4d47]/10 border-2 border-[#0c4d47] rounded-xl p-6 text-center space-y-3">
+              <p className="text-base text-muted-foreground">You don't have any coins yet</p>
               <Button 
                 onClick={() => setBuyCoinsOpen(true)}
-                className="w-full"
+                className="w-full bg-[#BFAD72] hover:bg-[#BFAD72]/90 text-[#0c4d47] font-semibold text-base h-12"
               >
-                <Coins className="h-4 w-4 mr-2" />
+                <Coins className="h-5 w-5 mr-2" />
                 Buy Coins
               </Button>
             </div>
           )}
           
-          <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="grid grid-cols-2 gap-4 mt-4">
             {gifts.map((gift) => (
               <Button
                 key={gift.id}
                 onClick={() => handleSendGift(gift.id, gift.coin_cost)}
                 disabled={loading || balance < gift.coin_cost}
                 variant="outline"
-                className="h-auto flex flex-col items-center gap-2 py-4"
+                className="h-auto flex flex-col items-center gap-3 py-6 border-2 hover:border-[#BFAD72] hover:bg-[#BFAD72]/5 transition-all disabled:opacity-50"
               >
-                <span className="text-3xl">{gift.display_name.split(' ')[0]}</span>
-                <span className="text-xs">{gift.display_name.split(' ').slice(1).join(' ')}</span>
-                <span className="text-xs font-medium flex items-center gap-1">
-                  <Coins className="h-3 w-3 text-yellow-500" />
+                <span className="text-5xl">{gift.display_name.split(' ')[0]}</span>
+                <span className="text-base font-semibold">{gift.display_name.split(' ').slice(1).join(' ')}</span>
+                <span className="text-sm font-bold flex items-center gap-1.5 text-[#BFAD72]">
+                  <Coins className="h-4 w-4" />
                   {gift.coin_cost}
                 </span>
               </Button>
@@ -149,8 +149,7 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
           {balance > 0 && balance < Math.min(...gifts.map(g => g.coin_cost)) && (
             <Button 
               onClick={() => setBuyCoinsOpen(true)}
-              variant="secondary"
-              className="w-full mt-2"
+              className="w-full mt-3 bg-[#BFAD72] hover:bg-[#BFAD72]/90 text-[#0c4d47] font-semibold h-11"
             >
               <Coins className="h-4 w-4 mr-2" />
               Need More Coins?

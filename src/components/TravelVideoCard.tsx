@@ -887,7 +887,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           </div>
 
           {/* Action Buttons - Only essential ones for mobile */}
-          <div className="flex flex-col items-center gap-5 pb-20">
+          <div className="flex flex-col items-center gap-5 pb-32">
             <button
               onClick={handleLike}
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
@@ -916,7 +916,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               className="flex flex-col items-center gap-1 transition-transform active:scale-90"
               data-tour="send-gift-post"
             >
-              <Coins className="h-8 w-8 text-yellow-500 drop-shadow-lg" />
+              <Coins className="h-8 w-8 text-[#BFAD72] drop-shadow-lg" />
             </button>
           </div>
         </div>
