@@ -8,6 +8,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
+import CreateContentSheet from "@/components/CreateContentSheet";
+import ContentUploadModal from "@/components/ContentUploadModal";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
@@ -67,6 +69,8 @@ const TravelProfile = () => {
   const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
   const [closeFriendsOpen, setCloseFriendsOpen] = useState(false);
   const [unreadCollabCount, setUnreadCollabCount] = useState(0);
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
 
   const profileUserId = userId || user?.id;
@@ -273,6 +277,18 @@ const TravelProfile = () => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
+  };
+
+  const handleCreateContent = (type: string) => {
+    if (type === 'reel' || type === 'post') {
+      setUploadModalOpen(true);
+    }
+  };
+
+  const handleUploadSuccess = () => {
+    setUploadModalOpen(false);
+    fetchUserPosts();
+    fetchVideoPosts();
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -584,7 +600,7 @@ const TravelProfile = () => {
               {isOwnProfile && (
                 <Button
                   className="mt-4"
-                  onClick={() => navigate('/travel-feed')}
+                  onClick={() => setCreateSheetOpen(true)}
                 >
                   Create your first video
                 </Button>
@@ -649,7 +665,7 @@ const TravelProfile = () => {
               {isOwnProfile && (
                 <Button
                   className="mt-4"
-                  onClick={() => navigate('/travel-feed')}
+                  onClick={() => setUploadModalOpen(true)}
                 >
                   Share your first photo
                 </Button>
@@ -794,6 +810,20 @@ const TravelProfile = () => {
       <CloseFriendsManager
         open={closeFriendsOpen}
         onOpenChange={setCloseFriendsOpen}
+      />
+
+      {/* Create Content Sheet */}
+      <CreateContentSheet
+        open={createSheetOpen}
+        onOpenChange={setCreateSheetOpen}
+        onSelectType={handleCreateContent}
+      />
+
+      {/* Upload Modal */}
+      <ContentUploadModal
+        open={uploadModalOpen}
+        onOpenChange={setUploadModalOpen}
+        onSuccess={handleUploadSuccess}
       />
     </div>
   );
