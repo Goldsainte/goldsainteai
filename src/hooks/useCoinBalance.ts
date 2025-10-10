@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -7,13 +7,14 @@ export const useCoinBalance = () => {
   const [balance, setBalance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!user) {
       setBalance(0);
       setLoading(false);
       return;
     }
 
+    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('user_coin_balance')
@@ -31,20 +32,24 @@ export const useCoinBalance = () => {
             .single();
           
           setBalance(newBalance?.balance || 0);
+        } else {
+          console.error('Error fetching balance:', error);
+          setBalance(0);
         }
       } else {
         setBalance(data?.balance || 0);
       }
     } catch (error) {
       console.error('Error fetching coin balance:', error);
+      setBalance(0);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     fetchBalance();
-  }, [user]);
+  }, [fetchBalance]);
 
   return { balance, loading, refetch: fetchBalance };
 };

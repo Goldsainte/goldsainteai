@@ -33,8 +33,9 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   useEffect(() => {
     if (open) {
       loadGifts();
+      refetch(); // Refresh coin balance when modal opens
     }
-  }, [open]);
+  }, [open, refetch]);
 
   const loadGifts = async () => {
     const { data } = await supabase
