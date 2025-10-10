@@ -106,6 +106,21 @@ serve(async (req) => {
         }
       );
     }
+
+    // Stripe requires confirming loss liability in the Platform Profile
+    if (error.message?.includes('managing losses') || error.message?.includes('platform-profile')) {
+      return new Response(
+        JSON.stringify({
+          error: 'Action required: confirm loss responsibility in Stripe Connect platform profile',
+          details: 'Open your Stripe Dashboard and complete the Platform Profile > Losses section so account creation can proceed.',
+          link: 'https://dashboard.stripe.com/settings/connect/platform-profile'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      );
+    }
     
     return new Response(
       JSON.stringify({ error: error.message }),

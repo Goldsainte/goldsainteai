@@ -94,11 +94,41 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error('Error in stripe-connect-onboarding:', error);
+
+    // Provide helpful error message for Stripe Connect setup
+    if (error.message?.includes('signed up for Connect')) {
+      return new Response(
+        JSON.stringify({
+          error: 'Stripe Connect is not enabled on this account. Please enable Stripe Connect in your Stripe Dashboard: https://dashboard.stripe.com/settings/connect',
+          details: 'To enable agent payouts, you need to activate Stripe Connect so the platform can create connected accounts.'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      );
+    }
+
+    // Stripe requires confirming loss liability in the Platform Profile
+    if (error.message?.includes('managing losses') || error.message?.includes('platform-profile')) {
+      return new Response(
+        JSON.stringify({
+          error: 'Action required: confirm loss responsibility in Stripe Connect platform profile',
+          details: 'Open your Stripe Dashboard and complete the Platform Profile > Losses section so account creation can proceed.',
+          link: 'https://dashboard.stripe.com/settings/connect/platform-profile'
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400
+        }
+      );
+    }
+
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+        status: 500
       }
     );
   }
