@@ -51,7 +51,7 @@ export function TierSystemExplainer() {
           </div>
 
           <div className="border-t pt-3">
-            <h4 className="font-semibold mb-2">How Commission Bonus Works:</h4>
+            <h4 className="text-sm font-semibold mb-2">How Commission Bonus Works:</h4>
             <p className="text-sm text-muted-foreground mb-2">
               Your tier commission bonus is an <strong>extra percentage boost</strong> applied on top of your base earnings. Think of it as a multiplier that increases all your payouts.
             </p>
@@ -60,7 +60,7 @@ export function TierSystemExplainer() {
               <div className="bg-muted/50 p-3 rounded-md">
                 <p className="text-sm font-semibold mb-1">Template Sales Example:</p>
                 <p className="text-sm text-muted-foreground mb-2">Base payout is 70% of sale price</p>
-                <div className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm text-muted-foreground">
                   <p><strong>Bronze Tier (0% bonus):</strong></p>
                   <p className="ml-4">$100 sale × 70% = <strong>$70.00</strong></p>
                   
@@ -77,7 +77,7 @@ export function TierSystemExplainer() {
               <div className="bg-muted/50 p-3 rounded-md">
                 <p className="text-sm font-semibold mb-1">Virtual Gifts Example:</p>
                 <p className="text-sm text-muted-foreground mb-2">Base payout varies by gift (e.g., 80% for standard gifts)</p>
-                <div className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm text-muted-foreground">
                   <p><strong>Bronze Tier (0% bonus):</strong></p>
                   <p className="ml-4">$50 gift × 80% = <strong>$40.00</strong></p>
                   
@@ -90,7 +90,7 @@ export function TierSystemExplainer() {
               <div className="bg-muted/50 p-3 rounded-md">
                 <p className="text-sm font-semibold mb-1">Package Resales Example:</p>
                 <p className="text-sm text-muted-foreground mb-2">You earn commission when others resell your packages</p>
-                <div className="space-y-1 text-sm">
+                <div className="space-y-1 text-sm text-muted-foreground">
                   <p><strong>Bronze Tier (0% bonus):</strong></p>
                   <p className="ml-4">$200 resale × 10% commission = <strong>$20.00</strong></p>
                   
