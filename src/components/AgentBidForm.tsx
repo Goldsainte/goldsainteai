@@ -162,7 +162,7 @@ export function AgentBidForm({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-chiffon">Submit Your Bid</CardTitle>
+        <CardTitle className="font-secondary">Submit Your Bid</CardTitle>
         <CardDescription>
           Provide your pricing and proposal for "{jobTitle}"
         </CardDescription>

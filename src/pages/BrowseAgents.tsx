@@ -198,7 +198,7 @@ export default function BrowseAgents() {
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-chiffon text-primary mb-2">Browse Travel Agents</h1>
+          <h1 className="text-4xl font-secondary text-primary mb-2">Browse Travel Agents</h1>
           <p className="text-muted-foreground">Find the perfect agent for your travel needs</p>
         </div>
 

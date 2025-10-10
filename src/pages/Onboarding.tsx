@@ -64,7 +64,7 @@ export default function Onboarding() {
         
         <div className="flex flex-col items-center mb-8">
           <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
-          <h1 className="text-4xl font-chiffon text-primary mb-2">Welcome to Goldsainte AI</h1>
+          <h1 className="text-4xl font-secondary text-primary mb-2">Welcome to Goldsainte AI</h1>
           <p className="text-lg text-muted-foreground text-center max-w-2xl">
             Let's personalize your travel experience. Fill out your preferences so we can provide you with the best recommendations.
           </p>

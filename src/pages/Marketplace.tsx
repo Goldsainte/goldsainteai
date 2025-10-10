@@ -332,7 +332,7 @@ export default function Marketplace() {
         
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
           <div>
-            <h1 className="text-2xl md:text-3xl font-chiffon text-primary mb-1 leading-tight">The Travel Agent Marketplace</h1>
+            <h1 className="text-2xl md:text-3xl font-secondary text-primary mb-1 leading-tight">The Travel Agent Marketplace</h1>
             <p className="text-sm text-muted-foreground">Connect with expert travel agents for complex bookings</p>
           </div>
           
@@ -384,7 +384,7 @@ export default function Marketplace() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-sm md:text-base font-chiffon line-clamp-1">{job.title}</CardTitle>
+                        <CardTitle className="text-sm md:text-base font-secondary line-clamp-1">{job.title}</CardTitle>
                         <CardDescription className="text-xs line-clamp-2">{job.description}</CardDescription>
                       </div>
                       <Badge className="shrink-0">{job.booking_type}</Badge>
@@ -440,7 +440,7 @@ export default function Marketplace() {
                   <CardHeader>
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <CardTitle className="text-sm md:text-base font-chiffon line-clamp-1">{job.title}</CardTitle>
+                        <CardTitle className="text-sm md:text-base font-secondary line-clamp-1">{job.title}</CardTitle>
                         <CardDescription className="text-xs line-clamp-2">{job.destination}</CardDescription>
                       </div>
                        <Badge variant={

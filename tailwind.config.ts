@@ -14,7 +14,6 @@ export default {
     },
     extend: {
       fontFamily: {
-        chiffon: ['Chiffon', 'serif'],
         covik: ['Covik Sans', 'sans-serif'],
         primary: ['Cormorant Garamond', 'serif'],
         secondary: ['Playfair Display', 'serif'],

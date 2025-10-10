@@ -137,7 +137,7 @@ export default function AgentOnboarding() {
           <CardHeader>
             <div className="flex items-center gap-3 mb-2">
               <Briefcase className="h-8 w-8 text-primary" />
-              <CardTitle className="text-3xl font-chiffon">Travel Agent Application</CardTitle>
+              <CardTitle className="text-3xl font-secondary">Travel Agent Application</CardTitle>
             </div>
             <CardDescription>
               Complete this comprehensive application to join our marketplace

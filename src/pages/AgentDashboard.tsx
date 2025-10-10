@@ -211,7 +211,7 @@ export default function AgentDashboard() {
         </Button>
         
         <div className="mb-8">
-          <h1 className="text-4xl font-chiffon text-primary mb-2 font-secondary">Agent Dashboard</h1>
+          <h1 className="text-4xl font-secondary text-primary mb-2">Agent Dashboard</h1>
           <p className="text-muted-foreground">{agent.agency_name} • Rating: {agent.rating}/5 ({agent.total_reviews} reviews)</p>
           {!agent.is_verified && (
             <Badge variant="secondary" className="mt-2">Pending Verification</Badge>
@@ -262,7 +262,7 @@ export default function AgentDashboard() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-xl font-chiffon">{job.title}</CardTitle>
+                        <CardTitle className="text-xl font-secondary">{job.title}</CardTitle>
                         <CardDescription>{job.description}</CardDescription>
                       </div>
                       <Badge>{job.booking_type}</Badge>
@@ -318,7 +318,7 @@ export default function AgentDashboard() {
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
-                        <CardTitle className="text-xl font-chiffon">{bid.marketplace_jobs?.title}</CardTitle>
+                        <CardTitle className="text-xl font-secondary">{bid.marketplace_jobs?.title}</CardTitle>
                         <CardDescription>{bid.marketplace_jobs?.destination}</CardDescription>
                       </div>
                       <div className="flex gap-2">
@@ -481,7 +481,7 @@ export default function AgentDashboard() {
         <Dialog open={isMessagingDialogOpen} onOpenChange={setIsMessagingDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-chiffon">
+              <DialogTitle className="text-2xl font-secondary">
                 Messaging: {selectedJobForMessaging?.title}
               </DialogTitle>
               <DialogDescription>
@@ -517,7 +517,7 @@ export default function AgentDashboard() {
         <Dialog open={bidDetailsOpen} onOpenChange={setBidDetailsOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-chiffon">
+              <DialogTitle className="text-2xl font-secondary">
                 Payment Management: {selectedBidForDetails?.marketplace_jobs?.title}
               </DialogTitle>
               <DialogDescription>

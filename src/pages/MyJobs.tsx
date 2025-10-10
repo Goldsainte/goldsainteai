@@ -170,7 +170,7 @@ export default function MyJobs() {
         </Button>
 
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-chiffon text-primary mb-1 leading-tight">My Jobs</h1>
+          <h1 className="text-2xl md:text-3xl font-secondary text-primary mb-1 leading-tight">My Jobs</h1>
           <p className="text-sm text-muted-foreground">Track and manage all your travel requests</p>
         </div>
 
@@ -294,7 +294,7 @@ export default function MyJobs() {
                 <CardHeader>
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <CardTitle className="text-base md:text-lg font-chiffon mb-2 line-clamp-1">{job.title}</CardTitle>
+                      <CardTitle className="text-base md:text-lg font-secondary mb-2 line-clamp-1">{job.title}</CardTitle>
                       <div className="flex flex-wrap items-center gap-2 text-xs md:text-sm text-muted-foreground">
                         {job.destination && (
                           <>
@@ -348,7 +348,7 @@ export default function MyJobs() {
       <Dialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-chiffon">{selectedJob?.title}</DialogTitle>
+            <DialogTitle className="text-2xl font-secondary">{selectedJob?.title}</DialogTitle>
             <DialogDescription>
               <div className="flex items-center gap-4 mt-2">
                 {selectedJob && getStatusBadge(selectedJob.status)}

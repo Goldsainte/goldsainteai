@@ -67,7 +67,7 @@ export const EnhancedAgentCard = ({ agent, metrics, badges, onClick }: EnhancedA
           </div>
           
           <div className="flex-1 min-w-0">
-            <CardTitle className="text-lg font-chiffon truncate group-hover:text-primary transition-colors">
+            <CardTitle className="text-lg font-secondary truncate group-hover:text-primary transition-colors">
               {agent.agency_name}
             </CardTitle>
             

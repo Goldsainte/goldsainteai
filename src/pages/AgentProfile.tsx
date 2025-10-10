@@ -142,7 +142,7 @@ export default function AgentProfile() {
                     </AvatarFallback>
                   </Avatar>
 
-                  <h1 className="text-2xl font-chiffon text-primary mb-1">
+                  <h1 className="text-2xl font-secondary text-primary mb-1">
                     {agent.agency_name}
                   </h1>
 

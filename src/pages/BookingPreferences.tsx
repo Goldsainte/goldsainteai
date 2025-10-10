@@ -143,7 +143,7 @@ export default function BookingPreferences() {
         
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-chiffon text-primary mb-2">Booking Preferences</h1>
+            <h1 className="text-4xl font-secondary text-primary mb-2">Booking Preferences</h1>
             <p className="text-muted-foreground">Customize your travel booking experience</p>
           </div>
           

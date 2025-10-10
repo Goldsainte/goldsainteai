@@ -561,7 +561,7 @@ const TravelPreferencesWizard = ({ preferences, onPreferencesChange }: TravelPre
               return <IconComponent className="h-10 w-10 sm:h-12 sm:w-12 text-primary" strokeWidth={1.5} />;
             })()}
           </div>
-          <h2 className="text-xl sm:text-2xl font-chiffon mb-2">{steps[currentStep].title}</h2>
+          <h2 className="text-xl sm:text-2xl font-secondary mb-2">{steps[currentStep].title}</h2>
           <p className="text-sm sm:text-base text-muted-foreground">{steps[currentStep].subtitle}</p>
         </div>
 

@@ -938,7 +938,7 @@ const Index = () => {
             <div className="px-4 sm:px-6 py-10 sm:py-14 md:py-18 bg-gradient-to-b from-background via-muted/10 to-background">
               <div className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 md:space-y-10">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-chiffon font-bold text-secondary leading-tight">
+                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-secondary font-bold text-secondary leading-tight">
                     How it Works
                   </h2>
                   <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed">
@@ -1110,7 +1110,7 @@ const Index = () => {
             <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10" data-tour="explore">
               <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-4">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
                     Get Inspired
                   </h2>
                   <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
@@ -1135,7 +1135,7 @@ const Index = () => {
               {/* Featured Restaurants */}
               <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-chiffon">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-secondary">
                     Fine Dining Experiences
                   </h2>
                   <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
@@ -1189,7 +1189,7 @@ const Index = () => {
               {/* Featured Flights */}
               <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-chiffon">
+                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
                     Premium Flight Services
                   </h2>
                   <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
@@ -1236,7 +1236,7 @@ const Index = () => {
                         </div>
                       </div>
                       <div className="flex-1 text-center md:text-left space-y-2">
-                        <h2 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent font-chiffon">
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent font-secondary">
                           Become a Travel Agent
                         </h2>
                         <p className="text-sm text-muted-foreground">
