@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, CheckCircle, Info } from "lucide-react";
+import { Clock, CheckCircle, Info, AlertTriangle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export const CreatorEscrowDashboard = () => {
@@ -8,11 +8,11 @@ export const CreatorEscrowDashboard = () => {
       <Alert>
         <Info className="h-4 w-4" />
         <AlertDescription>
-          Escrow system is now active! Your payments will be held securely and released according to your package milestones.
+          Escrow system is active! Payments are held securely and released when milestones are met.
         </AlertDescription>
       </Alert>
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending in Escrow</CardTitle>
@@ -20,22 +20,29 @@ export const CreatorEscrowDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">$0.00</div>
-            <p className="text-xs text-muted-foreground">
-              Will be released according to schedule
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Awaiting milestone completion</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Released</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
+            <CheckCircle className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">$0.00</div>
-            <p className="text-xs text-muted-foreground">
-              Transferred to your account
-            </p>
+            <div className="text-2xl font-bold">$0.00</div>
+            <p className="text-xs text-muted-foreground mt-1">Successfully paid out</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Under Dispute</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">$0.00</div>
+            <p className="text-xs text-muted-foreground mt-1">Being reviewed</p>
           </CardContent>
         </Card>
       </div>
@@ -48,31 +55,31 @@ export const CreatorEscrowDashboard = () => {
           <div className="space-y-2">
             <h4 className="font-semibold">Platform Fee: 15%</h4>
             <p className="text-sm text-muted-foreground">
-              Goldsainte collects a 15% platform fee from each booking to maintain the platform, provide customer support, and ensure secure transactions.
+              A 15% platform fee covers payment processing, support, and platform operations.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="font-semibold">Milestone-Based Releases</h4>
+            <p className="text-sm text-muted-foreground">
+              Earnings are released as you complete milestones. Submit evidence and get paid after customer approval.
             </p>
           </div>
 
           <div className="space-y-2">
             <h4 className="font-semibold">Upfront Payout (Verified Creators)</h4>
             <p className="text-sm text-muted-foreground">
-              If you're a verified creator, you can receive 20-30% of your payout upfront to cover deposits and initial costs. The remaining 70-80% is held in escrow.
+              Verified creators receive 20-30% upfront. The remaining 70-80% is held in escrow until milestones are met.
             </p>
           </div>
 
           <div className="space-y-2">
-            <h4 className="font-semibold">Final Release</h4>
-            <p className="text-sm text-muted-foreground">
-              Remaining funds are released 48-72 hours after trip completion (or 7 days before for high-trust creators). Customers can dispute within this window for protection.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            <h4 className="font-semibold">Payment Breakdown Example</h4>
-            <div className="text-sm space-y-1 pl-4">
+            <h4 className="font-semibold">Example Breakdown</h4>
+            <div className="bg-muted p-4 rounded-lg text-sm space-y-1">
               <p>• Customer pays: $5,000</p>
               <p>• Platform fee (15%): $750</p>
-              <p>• Your total earnings: $4,250</p>
-              <p>• Upfront to you (20%): $850</p>
+              <p>• Your earnings: $4,250</p>
+              <p>• Upfront (20%): $850</p>
               <p>• Held in escrow: $3,400</p>
             </div>
           </div>
