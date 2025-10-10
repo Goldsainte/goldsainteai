@@ -1448,6 +1448,120 @@ export type Database = {
           },
         ]
       }
+      creator_tier_memberships: {
+        Row: {
+          auto_upgrade_enabled: boolean | null
+          created_at: string
+          current_tier: string
+          id: string
+          next_evaluation_date: string | null
+          previous_tier: string | null
+          tier_since: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auto_upgrade_enabled?: boolean | null
+          created_at?: string
+          current_tier: string
+          id?: string
+          next_evaluation_date?: string | null
+          previous_tier?: string | null
+          tier_since?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auto_upgrade_enabled?: boolean | null
+          created_at?: string
+          current_tier?: string
+          id?: string
+          next_evaluation_date?: string | null
+          previous_tier?: string | null
+          tier_since?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_tier_memberships_current_tier_fkey"
+            columns: ["current_tier"]
+            isOneToOne: false
+            referencedRelation: "creator_tiers"
+            referencedColumns: ["tier_name"]
+          },
+          {
+            foreignKeyName: "creator_tier_memberships_previous_tier_fkey"
+            columns: ["previous_tier"]
+            isOneToOne: false
+            referencedRelation: "creator_tiers"
+            referencedColumns: ["tier_name"]
+          },
+        ]
+      }
+      creator_tiers: {
+        Row: {
+          analytics_access: boolean | null
+          api_access: boolean | null
+          benefits: Json | null
+          commission_bonus_percentage: number | null
+          created_at: string
+          custom_branding: boolean | null
+          description: string | null
+          display_name: string
+          early_access_features: boolean | null
+          id: string
+          min_engagement_rate: number | null
+          min_followers: number
+          min_monthly_earnings: number | null
+          min_posts: number
+          priority_support: boolean | null
+          tier_level: number
+          tier_name: string
+          updated_at: string
+        }
+        Insert: {
+          analytics_access?: boolean | null
+          api_access?: boolean | null
+          benefits?: Json | null
+          commission_bonus_percentage?: number | null
+          created_at?: string
+          custom_branding?: boolean | null
+          description?: string | null
+          display_name: string
+          early_access_features?: boolean | null
+          id?: string
+          min_engagement_rate?: number | null
+          min_followers?: number
+          min_monthly_earnings?: number | null
+          min_posts?: number
+          priority_support?: boolean | null
+          tier_level: number
+          tier_name: string
+          updated_at?: string
+        }
+        Update: {
+          analytics_access?: boolean | null
+          api_access?: boolean | null
+          benefits?: Json | null
+          commission_bonus_percentage?: number | null
+          created_at?: string
+          custom_branding?: boolean | null
+          description?: string | null
+          display_name?: string
+          early_access_features?: boolean | null
+          id?: string
+          min_engagement_rate?: number | null
+          min_followers?: number
+          min_monthly_earnings?: number | null
+          min_posts?: number
+          priority_support?: boolean | null
+          tier_level?: number
+          tier_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       creator_verification_status: {
         Row: {
           created_at: string | null
@@ -4801,6 +4915,87 @@ export type Database = {
           },
         ]
       }
+      tier_progress_metrics: {
+        Row: {
+          average_rating: number | null
+          completion_rate: number | null
+          created_at: string
+          current_engagement_rate: number | null
+          current_followers: number | null
+          current_posts: number | null
+          id: string
+          last_calculated_at: string
+          monthly_earnings: number | null
+          response_time_hours: number | null
+          total_bookings: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          average_rating?: number | null
+          completion_rate?: number | null
+          created_at?: string
+          current_engagement_rate?: number | null
+          current_followers?: number | null
+          current_posts?: number | null
+          id?: string
+          last_calculated_at?: string
+          monthly_earnings?: number | null
+          response_time_hours?: number | null
+          total_bookings?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          average_rating?: number | null
+          completion_rate?: number | null
+          created_at?: string
+          current_engagement_rate?: number | null
+          current_followers?: number | null
+          current_posts?: number | null
+          id?: string
+          last_calculated_at?: string
+          monthly_earnings?: number | null
+          response_time_hours?: number | null
+          total_bookings?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tier_upgrade_history: {
+        Row: {
+          created_at: string
+          from_tier: string
+          id: string
+          metrics_snapshot: Json | null
+          reason: string | null
+          to_tier: string
+          upgrade_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_tier: string
+          id?: string
+          metrics_snapshot?: Json | null
+          reason?: string | null
+          to_tier: string
+          upgrade_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          from_tier?: string
+          id?: string
+          metrics_snapshot?: Json | null
+          reason?: string | null
+          to_tier?: string
+          upgrade_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       travel_agents: {
         Row: {
           accepted_gdpr: boolean | null
@@ -6308,6 +6503,10 @@ export type Database = {
         Args: { post_uuid: string }
         Returns: number
       }
+      calculate_creator_tier_progress: {
+        Args: { p_user_id: string }
+        Returns: Json
+      }
       calculate_loyalty_tier: {
         Args: { lifetime_points_value: number }
         Returns: string
@@ -6327,6 +6526,10 @@ export type Database = {
       evaluate_agent_badges: {
         Args: { target_agent_id: string }
         Returns: boolean
+      }
+      evaluate_and_upgrade_creator_tier: {
+        Args: { p_user_id: string }
+        Returns: Json
       }
       expire_old_marketplace_jobs: {
         Args: Record<PropertyKey, never>

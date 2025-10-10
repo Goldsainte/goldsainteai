@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus, MapPin, Calendar } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase, ShoppingBag, Users, Plus, MapPin, Calendar, Star } from "lucide-react";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { PartnershipRequests } from "@/components/PartnershipRequests";
@@ -16,6 +16,9 @@ import { CreateProductModal } from "@/components/CreateProductModal";
 import { CreatorEscrowDashboard } from "@/components/CreatorEscrowDashboard";
 import { PackageMarketingEditor } from "@/components/PackageMarketingEditor";
 import { ItineraryTemplateBuilder } from "@/components/ItineraryTemplateBuilder";
+import { CreatorTierCard } from "@/components/CreatorTierCard";
+import { TierUpgradeHistory } from "@/components/TierUpgradeHistory";
+import { AllTiersOverview } from "@/components/AllTiersOverview";
 
 interface CreatorStats {
   total_views: number;
@@ -306,10 +309,14 @@ export default function CreatorDashboard() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Overview
+            </TabsTrigger>
+            <TabsTrigger value="tier" className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              Tier
             </TabsTrigger>
             <TabsTrigger value="escrow" className="flex items-center gap-2">
               <DollarSign className="h-4 w-4" />
@@ -560,6 +567,12 @@ export default function CreatorDashboard() {
                 </p>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="tier" className="space-y-6">
+            <CreatorTierCard />
+            <AllTiersOverview />
+            <TierUpgradeHistory />
           </TabsContent>
 
           <TabsContent value="escrow">
