@@ -18,16 +18,17 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<any>(null);
 
+  const handleBack = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
   // Fetch products
   const { data: products = [], isLoading: productsLoading } = useQuery({
     queryKey: ['products', searchQuery],
     queryFn: async () => {
       let query = supabase
         .from('products')
-        .select(`
-          *,
-          profiles:creator_id (username, avatar_url)
-        `)
+        .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
@@ -47,10 +48,7 @@ export default function Shop() {
     queryFn: async () => {
       let query = supabase
         .from('travel_packages')
-        .select(`
-          *,
-          profiles:creator_id (username, avatar_url)
-        `)
+        .select('*')
         .eq('is_active', true)
         .order('created_at', { ascending: false });
 
@@ -98,7 +96,7 @@ export default function Shop() {
           <div className="flex items-center justify-between mb-4">
             <Button 
               variant="ghost" 
-              onClick={() => navigate(-1)}
+              onClick={handleBack}
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -148,7 +146,7 @@ export default function Shop() {
               <p>Loading products...</p>
             ) : products.length === 0 ? (
               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
+                <CardContent className="flex flex-col items-center justify-center py-8">
                   <Package className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">No products found</p>
                 </CardContent>
@@ -170,9 +168,7 @@ export default function Shop() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="text-lg">{product.title}</CardTitle>
-                          <CardDescription className="mt-1">
-                            by @{product.profiles?.username}
-                          </CardDescription>
+                          {/* Creator attribution intentionally omitted until relation is added */}
                         </div>
                         <Badge variant="secondary">{product.product_type}</Badge>
                       </div>
@@ -212,7 +208,7 @@ export default function Shop() {
               <p>Loading packages...</p>
             ) : packages.length === 0 ? (
               <Card>
-                <CardContent className="flex flex-col items-center justify-center py-12">
+                <CardContent className="flex flex-col items-center justify-center py-8">
                   <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
                   <p className="text-muted-foreground">No packages found</p>
                 </CardContent>
@@ -234,9 +230,7 @@ export default function Shop() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <CardTitle className="text-lg">{pkg.title}</CardTitle>
-                          <CardDescription className="mt-1">
-                            by @{pkg.profiles?.username}
-                          </CardDescription>
+                          {/* Creator attribution intentionally omitted until relation is added */}
                         </div>
                         <Badge variant="secondary">{pkg.destination}</Badge>
                       </div>
