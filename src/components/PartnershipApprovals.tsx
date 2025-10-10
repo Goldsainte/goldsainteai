@@ -23,20 +23,21 @@ import {
 
 interface Partnership {
   id: string;
-  post_id: string;
-  creator_id: string;
+  package_id: string;
+  influencer_id: string;
   status: string;
   created_at: string;
-  creator: {
+  promo_code: string;
+  influencer: {
     username: string;
     avatar_url: string | null;
   };
-  post: {
-    caption: string | null;
-    image_urls: string[] | null;
-    video_url: string | null;
-    thumbnail_url: string | null;
-    media_type: string | null;
+  package: {
+    package_name: string;
+    destination: string;
+    duration_days: number;
+    retail_price: number;
+    cover_image_url: string | null;
   };
 }
 
@@ -56,18 +57,32 @@ export const PartnershipApprovals = () => {
 
   const fetchPendingPartnerships = async () => {
     try {
+      // Get agent's packages first
+      const { data: agentData } = await supabase
+        .from('travel_agents')
+        .select('id')
+        .eq('user_id', user?.id)
+        .single();
+
+      if (!agentData) {
+        setPartnerships([]);
+        setLoading(false);
+        return;
+      }
+
       const { data, error } = await supabase
-        .from("paid_partnerships")
+        .from("influencer_promotions")
         .select(`
           id,
-          post_id,
-          creator_id,
+          package_id,
+          influencer_id,
           status,
           created_at,
-          creator:profiles!paid_partnerships_creator_id_fkey(username, avatar_url),
-          post:travel_posts(caption, image_urls, video_url, thumbnail_url, media_type)
+          promo_code,
+          influencer:profiles!influencer_promotions_influencer_id_fkey(username, avatar_url),
+          package:agent_packages!influencer_promotions_package_id_fkey(package_name, destination, duration_days, retail_price, cover_image_url)
         `)
-        .eq("brand_id", user?.id)
+        .in("package_id", [agentData.id])
         .eq("status", "pending")
         .order("created_at", { ascending: false });
 
@@ -75,7 +90,7 @@ export const PartnershipApprovals = () => {
       setPartnerships(data as any || []);
     } catch (error) {
       console.error("Error fetching partnerships:", error);
-      toast.error("Failed to load partnership requests");
+      toast.error("Failed to load promotion requests");
     } finally {
       setLoading(false);
     }
@@ -84,20 +99,19 @@ export const PartnershipApprovals = () => {
   const handleApprove = async (partnershipId: string) => {
     try {
       const { error } = await supabase
-        .from("paid_partnerships")
+        .from("influencer_promotions")
         .update({
-          status: "approved",
-          approved_at: new Date().toISOString(),
+          status: "active"
         })
         .eq("id", partnershipId);
 
       if (error) throw error;
 
-      toast.success("Partnership approved!");
+      toast.success("Promotion approved! Influencer can now share their promo code.");
       fetchPendingPartnerships();
     } catch (error) {
-      console.error("Error approving partnership:", error);
-      toast.error("Failed to approve partnership");
+      console.error("Error approving promotion:", error);
+      toast.error("Failed to approve promotion");
     }
   };
 
@@ -106,23 +120,21 @@ export const PartnershipApprovals = () => {
 
     try {
       const { error } = await supabase
-        .from("paid_partnerships")
+        .from("influencer_promotions")
         .update({
-          status: "rejected",
-          rejected_at: new Date().toISOString(),
-          rejection_reason: rejectionReason || "No reason provided",
+          status: "rejected"
         })
         .eq("id", selectedPartnership.id);
 
       if (error) throw error;
 
-      toast.success("Partnership declined");
+      toast.success("Promotion declined");
       setSelectedPartnership(null);
       setRejectionReason("");
       fetchPendingPartnerships();
     } catch (error) {
-      console.error("Error rejecting partnership:", error);
-      toast.error("Failed to decline partnership");
+      console.error("Error rejecting promotion:", error);
+      toast.error("Failed to decline promotion");
     }
   };
 
@@ -130,7 +142,7 @@ export const PartnershipApprovals = () => {
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
-          <span className="text-sm font-medium">Partnership Requests</span>
+          <span className="text-sm font-medium">Promotion Requests</span>
           <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2">
@@ -144,14 +156,14 @@ export const PartnershipApprovals = () => {
     return (
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
-          <span className="text-sm font-medium">Partnership Requests</span>
+          <span className="text-sm font-medium">Promotion Requests</span>
           <Badge variant="secondary" className="ml-2">0</Badge>
           <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-2">
           <div className="text-center py-4 text-muted-foreground">
             <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">No pending requests</p>
+            <p className="text-sm">No pending promotion requests</p>
           </div>
         </CollapsibleContent>
       </Collapsible>
@@ -162,7 +174,7 @@ export const PartnershipApprovals = () => {
     <>
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
         <CollapsibleTrigger className="flex items-center justify-between w-full p-2 hover:bg-muted/50 rounded-lg transition-colors text-primary">
-          <span className="text-sm font-medium">Partnership Requests</span>
+          <span className="text-sm font-medium">Promotion Requests</span>
           <Badge variant="destructive" className="ml-2">{partnerships.length}</Badge>
           <ChevronDown className={`h-4 w-4 ml-auto transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </CollapsibleTrigger>
@@ -172,48 +184,40 @@ export const PartnershipApprovals = () => {
           <Card key={partnership.id} className="p-4">
             <div className="flex items-start gap-4">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={partnership.creator.avatar_url || ""} />
+                <AvatarImage src={partnership.influencer.avatar_url || ""} />
                 <AvatarFallback>
-                  {partnership.creator.username[0]?.toUpperCase()}
+                  {partnership.influencer.username[0]?.toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               
               <div className="flex-1 space-y-2">
                 <div>
-                  <p className="font-medium">@{partnership.creator.username}</p>
+                  <p className="font-medium">@{partnership.influencer.username}</p>
                   <p className="text-sm text-muted-foreground">
-                    wants to tag you in a paid partnership
+                    wants to promote your package
                   </p>
                 </div>
 
-                {(() => {
-                  const p = partnership.post;
-                  const mediaUrl = p.video_url ?? p.image_urls?.[0] ?? p.thumbnail_url;
-                  if (!mediaUrl) return null;
-                  const isVideo = p.media_type === 'video' || (!!p.video_url);
-                  return (
-                    <div className="relative w-full h-48 rounded-lg overflow-hidden bg-muted">
-                      {isVideo ? (
-                        <video
-                          src={mediaUrl}
-                          className="w-full h-full object-cover"
-                          controls={false}
-                          muted
-                        />
-                      ) : (
-                        <img
-                          src={mediaUrl}
-                          alt="Post preview"
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                  );
-                })()}
-
-                {partnership.post.caption && (
-                  <p className="text-sm line-clamp-2">{partnership.post.caption}</p>
+                {partnership.package.cover_image_url && (
+                  <div className="relative w-full h-48 rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={partnership.package.cover_image_url}
+                      alt={partnership.package.package_name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 )}
+
+                <div className="space-y-1">
+                  <p className="font-medium">{partnership.package.package_name}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {partnership.package.destination} • {partnership.package.duration_days} days • ${partnership.package.retail_price}
+                  </p>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Badge variant="outline">Promo: {partnership.promo_code}</Badge>
+                    <span className="text-muted-foreground">5% discount for customers</span>
+                  </div>
+                </div>
 
                 <div className="flex gap-2 pt-2">
                   <Button
@@ -248,18 +252,12 @@ export const PartnershipApprovals = () => {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Decline Partnership</DialogTitle>
+            <DialogTitle>Decline Promotion Request</DialogTitle>
             <DialogDescription>
-              Optionally provide a reason for declining this partnership request.
+              Are you sure you want to decline this promotion request from @{selectedPartnership?.influencer.username}?
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <Textarea
-              placeholder="Reason for declining (optional)"
-              value={rejectionReason}
-              onChange={(e) => setRejectionReason(e.target.value)}
-              rows={4}
-            />
             <div className="flex gap-2">
               <Button
                 variant="outline"
@@ -268,8 +266,8 @@ export const PartnershipApprovals = () => {
               >
                 Cancel
               </Button>
-              <Button onClick={handleReject} className="flex-1">
-                Confirm Decline
+              <Button onClick={handleReject} variant="destructive" className="flex-1">
+                Decline
               </Button>
             </div>
           </div>

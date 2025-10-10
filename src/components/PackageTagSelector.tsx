@@ -72,34 +72,37 @@ export function PackageTagSelector({ postId, onPackageTagged, selectedPackageIds
   };
 
   const tagPackage = async (packageId: string) => {
-    if (!postId) {
-      toast.error('Post must be created first');
-      return;
-    }
+    // If postId exists, tag immediately in database
+    if (postId) {
+      try {
+        const { error } = await supabase
+          .from('package_post_tags')
+          .insert({
+            post_id: postId,
+            package_id: packageId
+          });
 
-    try {
-      const { error } = await supabase
-        .from('package_post_tags')
-        .insert({
-          post_id: postId,
-          package_id: packageId
-        });
-
-      if (error) {
-        if (error.code === '23505') {
-          toast.error('Package already tagged in this post');
-        } else {
-          throw error;
+        if (error) {
+          if (error.code === '23505') {
+            toast.error('Package already tagged in this post');
+          } else {
+            throw error;
+          }
+          return;
         }
-        return;
-      }
 
-      toast.success('Package tagged in post!');
+        toast.success('Package tagged in post!');
+        onPackageTagged?.(packageId);
+        setOpen(false);
+      } catch (error: any) {
+        console.error('Error:', error);
+        toast.error('Failed to tag package');
+      }
+    } else {
+      // Otherwise, just track it locally for when post is created
       onPackageTagged?.(packageId);
+      toast.success('Package will be tagged when post is published');
       setOpen(false);
-    } catch (error: any) {
-      console.error('Error:', error);
-      toast.error('Failed to tag package');
     }
   };
 

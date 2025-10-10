@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ export default function CoCuratedPackage() {
   const { packageId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [packageData, setPackageData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [travelers, setTravelers] = useState(1);
@@ -24,7 +25,16 @@ export default function CoCuratedPackage() {
 
   useEffect(() => {
     fetchPackage();
-  }, [packageId]);
+    // Check for promo code in URL
+    const urlPromo = searchParams.get('promo');
+    if (urlPromo) {
+      setPromoCode(urlPromo.toUpperCase());
+      // Auto-apply if valid
+      setTimeout(() => {
+        applyPromoCode(urlPromo.toUpperCase());
+      }, 500);
+    }
+  }, [packageId, searchParams]);
 
   const fetchPackage = async () => {
     try {
@@ -53,14 +63,15 @@ export default function CoCuratedPackage() {
     }
   };
 
-  const applyPromoCode = async () => {
-    if (!promoCode.trim()) return;
+  const applyPromoCode = async (codeOverride?: string) => {
+    const code = codeOverride || promoCode;
+    if (!code.trim()) return;
 
     try {
       const { data, error } = await supabase
         .from('influencer_promotions')
         .select('*')
-        .eq('promo_code', promoCode.toUpperCase())
+        .eq('promo_code', code.toUpperCase())
         .eq('package_id', packageId)
         .eq('status', 'active')
         .single();
@@ -73,12 +84,13 @@ export default function CoCuratedPackage() {
       setDiscount(packageData.retail_price * 0.05); // 5% discount
       toast.success('Promo code applied! 5% discount');
 
-      // Track the click
-      await supabase.from('promo_code_usage').insert({
-        promo_code: promoCode.toUpperCase(),
-        package_id: packageId,
-        user_id: user?.id || null,
-        session_id: crypto.randomUUID()
+      // Track the click via edge function
+      await supabase.functions.invoke('track-promo-click', {
+        body: {
+          promoCode: code.toUpperCase(),
+          packageId: packageId,
+          sessionId: crypto.randomUUID()
+        }
       });
     } catch (error: any) {
       console.error('Error applying promo:', error);
@@ -297,7 +309,7 @@ export default function CoCuratedPackage() {
                     />
                     <Button
                       variant="outline"
-                      onClick={applyPromoCode}
+                      onClick={() => applyPromoCode()}
                       disabled={discount > 0 || !promoCode.trim()}
                     >
                       Apply

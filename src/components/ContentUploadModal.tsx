@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { PartnershipTagging } from "./PartnershipTagging";
+import { PackageTagSelector } from "./PackageTagSelector";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -49,6 +50,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [storyInteraction, setStoryInteraction] = useState<any>(null);
   const videoRef = useState<HTMLVideoElement | null>(null)[0];
   const [partnershipBrandId, setPartnershipBrandId] = useState<string | null>(null);
+  const [taggedPackageIds, setTaggedPackageIds] = useState<string[]>([]);
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
@@ -172,6 +174,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
       setCaption("");
       setLocation("");
       setPartnershipBrandId(null);
+      setTaggedPackageIds([]);
 
       // Create paid partnership if brand is tagged
       if (partnershipBrandId && postData) {
@@ -187,6 +190,22 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         if (partnershipError) {
           console.error("Error creating partnership:", partnershipError);
           toast.error("Photos uploaded but partnership request failed");
+        }
+      }
+
+      // Tag CoCurated packages
+      if (taggedPackageIds.length > 0 && postData) {
+        const packageTags = taggedPackageIds.map(packageId => ({
+          post_id: postData.id,
+          package_id: packageId
+        }));
+
+        const { error: packageTagError } = await supabase
+          .from('package_post_tags')
+          .insert(packageTags);
+
+        if (packageTagError) {
+          console.error("Error tagging packages:", packageTagError);
         }
       }
       
@@ -397,6 +416,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
       setThumbnailFile(null);
       setVideoPreviewUrl("");
       setPartnershipBrandId(null);
+      setTaggedPackageIds([]);
 
       // Create paid partnership if brand is tagged
       if (partnershipBrandId && postData) {
@@ -412,6 +432,22 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         if (partnershipError) {
           console.error("Error creating partnership:", partnershipError);
           toast.error("Video uploaded but partnership request failed");
+        }
+      }
+
+      // Tag CoCurated packages
+      if (taggedPackageIds.length > 0 && postData) {
+        const packageTags = taggedPackageIds.map(packageId => ({
+          post_id: postData.id,
+          package_id: packageId
+        }));
+
+        const { error: packageTagError } = await supabase
+          .from('package_post_tags')
+          .insert(packageTags);
+
+        if (packageTagError) {
+          console.error("Error tagging packages:", packageTagError);
         }
       }
       
@@ -500,6 +536,15 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             <PartnershipTagging
               onPartnershipChange={setPartnershipBrandId}
               currentBrandId={partnershipBrandId}
+            />
+
+            <PackageTagSelector
+              selectedPackageIds={taggedPackageIds}
+              onPackageTagged={(packageId) => {
+                if (!taggedPackageIds.includes(packageId)) {
+                  setTaggedPackageIds([...taggedPackageIds, packageId]);
+                }
+              }}
             />
 
             <Button
@@ -624,6 +669,15 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             <PartnershipTagging
               onPartnershipChange={setPartnershipBrandId}
               currentBrandId={partnershipBrandId}
+            />
+
+            <PackageTagSelector
+              selectedPackageIds={taggedPackageIds}
+              onPackageTagged={(packageId) => {
+                if (!taggedPackageIds.includes(packageId)) {
+                  setTaggedPackageIds([...taggedPackageIds, packageId]);
+                }
+              }}
             />
 
             <div className="space-y-2">

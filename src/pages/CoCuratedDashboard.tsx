@@ -11,6 +11,7 @@ import { Sparkles, Plus, DollarSign, TrendingUp, Package, Users } from "lucide-r
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
+import { InfluencerPromoCodeManager } from "@/components/InfluencerPromoCodeManager";
 
 export default function CoCuratedDashboard() {
   const { user } = useAuth();
@@ -277,54 +278,7 @@ export default function CoCuratedDashboard() {
           ) : (
             <>
               <TabsContent value="promotions" className="mt-6">
-                {promotions.length === 0 ? (
-                  <Card>
-                    <CardContent className="py-12 text-center">
-                      <TrendingUp className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <p className="text-muted-foreground mb-4">No active promotions yet</p>
-                      <Button onClick={() => navigate('/cocurated-marketplace')}>
-                        Browse Packages to Promote
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <div className="grid gap-4">
-                    {promotions.map((promo) => (
-                      <Card key={promo.id}>
-                        <CardHeader>
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <CardTitle>{promo.agent_packages?.package_name}</CardTitle>
-                              <CardDescription>Code: {promo.promo_code}</CardDescription>
-                            </div>
-                            <Badge variant={
-                              promo.status === 'active' ? 'default' :
-                              promo.status === 'pending' ? 'secondary' : 'outline'
-                            }>
-                              {promo.status}
-                            </Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-3 gap-4 text-center">
-                            <div>
-                              <div className="text-2xl font-bold text-primary">{promo.clicks}</div>
-                              <div className="text-xs text-muted-foreground">Clicks</div>
-                            </div>
-                            <div>
-                              <div className="text-2xl font-bold text-primary">{promo.conversions}</div>
-                              <div className="text-xs text-muted-foreground">Sales</div>
-                            </div>
-                            <div>
-                              <div className="text-2xl font-bold text-primary">${promo.total_commission_earned.toFixed(0)}</div>
-                              <div className="text-xs text-muted-foreground">Earned</div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
+                <InfluencerPromoCodeManager />
               </TabsContent>
 
               <TabsContent value="marketplace" className="mt-6">
