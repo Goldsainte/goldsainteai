@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins } from "lucide-react";
+import { TrendingUp, Eye, Heart, Share2, DollarSign, Coins, Briefcase } from "lucide-react";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
+import { PartnershipRequests } from "@/components/PartnershipRequests";
 
 interface CreatorStats {
   total_views: number;
@@ -86,7 +88,7 @@ export default function CreatorDashboard() {
           <div>
             <h1 className="text-3xl font-bold mb-2 font-secondary">Creator Dashboard</h1>
             <p className="text-muted-foreground">
-              Track your content performance and earnings
+              Track your content performance, earnings, and partnerships
             </p>
           </div>
           <div className="flex gap-2">
@@ -100,6 +102,20 @@ export default function CreatorDashboard() {
             </Badge>
           </div>
         </div>
+
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="partnerships" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Brand Partnerships
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-8">
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -215,29 +231,35 @@ export default function CreatorDashboard() {
           </CardContent>
         </Card>
 
-        {/* Coin Balance & Purchase */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Coins className="w-5 h-5 text-yellow-500" />
-              Virtual Coins
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-2xl font-bold">{coinBalance}</p>
-                <p className="text-sm text-muted-foreground">Available Coins</p>
-              </div>
-              <Button onClick={() => setBuyCoinsOpen(true)}>
-                Buy More Coins
-              </Button>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Use coins to send virtual gifts to other creators and show your support!
-            </p>
-          </CardContent>
-        </Card>
+            {/* Coin Balance & Purchase */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Coins className="w-5 h-5 text-yellow-500" />
+                  Virtual Coins
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-2xl font-bold">{coinBalance}</p>
+                    <p className="text-sm text-muted-foreground">Available Coins</p>
+                  </div>
+                  <Button onClick={() => setBuyCoinsOpen(true)}>
+                    Buy More Coins
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Use coins to send virtual gifts to other creators and show your support!
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="partnerships">
+            <PartnershipRequests />
+          </TabsContent>
+        </Tabs>
       </div>
 
       <BuyCoinsModal open={buyCoinsOpen} onOpenChange={setBuyCoinsOpen} />

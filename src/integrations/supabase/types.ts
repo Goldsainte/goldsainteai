@@ -837,6 +837,56 @@ export type Database = {
           },
         ]
       }
+      brand_partnerships: {
+        Row: {
+          brand_id: string
+          campaign_details: string
+          campaign_name: string
+          created_at: string
+          creator_id: string
+          deliverables: string
+          id: string
+          payment_amount: number
+          post_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          brand_id: string
+          campaign_details: string
+          campaign_name: string
+          created_at?: string
+          creator_id: string
+          deliverables: string
+          id?: string
+          payment_amount?: number
+          post_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          brand_id?: string
+          campaign_details?: string
+          campaign_name?: string
+          created_at?: string
+          creator_id?: string
+          deliverables?: string
+          id?: string
+          payment_amount?: number
+          post_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brand_partnerships_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "travel_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       calendar_events: {
         Row: {
           agent_id: string
