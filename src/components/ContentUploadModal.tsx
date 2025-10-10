@@ -463,13 +463,13 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Share Content</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="photo" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="photo" className="w-full flex flex-col overflow-hidden flex-1">
+          <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
             <TabsTrigger value="photo">
               <Image className="w-4 h-4 mr-2" />
               Photo
@@ -484,7 +484,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="photo" className="space-y-4 mt-4">
+          <TabsContent value="photo" className="space-y-4 mt-4 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label>Photos (up to 10)</Label>
               <Input
@@ -566,7 +566,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             </Button>
           </TabsContent>
 
-          <TabsContent value="video" className="space-y-4 mt-4">
+          <TabsContent value="video" className="space-y-4 mt-4 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label>Video</Label>
               <div className="flex items-center gap-2">
@@ -747,7 +747,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             </Button>
           </TabsContent>
 
-          <TabsContent value="embed" className="space-y-4 mt-4">
+          <TabsContent value="embed" className="space-y-4 mt-4 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label htmlFor="embedUrl">Video URL</Label>
               <Input

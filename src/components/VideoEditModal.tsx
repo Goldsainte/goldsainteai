@@ -186,15 +186,15 @@ const VideoEditModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col">
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>Edit Sainte</DialogTitle>
         </DialogHeader>
 
         {/* Sticky Video Preview with Capture Controls */}
         {videoUrl && (
-          <div className="space-y-2 border-b pb-4">
+          <div className="space-y-2 border-b pb-4 flex-shrink-0">
             <Label>Video Preview & Capture</Label>
-            <div className="relative w-full aspect-[9/16] max-h-[400px] rounded-lg overflow-hidden bg-black">
+            <div className="relative w-full aspect-[9/16] max-h-[300px] rounded-lg overflow-hidden bg-black">
               <video
                 ref={videoRef}
                 src={videoUrl}
@@ -243,7 +243,7 @@ const VideoEditModal = ({
         )}
 
         {/* Scrollable Content */}
-        <div className="space-y-4 overflow-y-auto flex-1 pr-2">
+        <div className="space-y-4 overflow-y-auto flex-1 pr-2 min-h-0">
           {previewThumbnail && (
             <div className="space-y-2">
               <Label>Current Cover Photo</Label>
@@ -282,7 +282,7 @@ const VideoEditModal = ({
         </div>
 
         {/* Sticky Save Button */}
-        <div className="border-t pt-4 mt-4 bg-background">
+        <div className="border-t pt-4 mt-4 bg-background flex-shrink-0">
           <Button
             onClick={handleSave}
             disabled={saving}
