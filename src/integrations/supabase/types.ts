@@ -2416,10 +2416,13 @@ export type Database = {
           created_at: string
           email_notifications: boolean | null
           first_name: string | null
+          followers_count: number | null
+          following_count: number | null
           full_name: string | null
           id: string
           is_verified: boolean | null
           last_name: string | null
+          location: string | null
           phone: string | null
           preferences: Json | null
           preferred_currency: string | null
@@ -2427,6 +2430,7 @@ export type Database = {
           tax_id: string | null
           updated_at: string
           username: string | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -2436,10 +2440,13 @@ export type Database = {
           created_at?: string
           email_notifications?: boolean | null
           first_name?: string | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           id: string
           is_verified?: boolean | null
           last_name?: string | null
+          location?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
@@ -2447,6 +2454,7 @@ export type Database = {
           tax_id?: string | null
           updated_at?: string
           username?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -2456,10 +2464,13 @@ export type Database = {
           created_at?: string
           email_notifications?: boolean | null
           first_name?: string | null
+          followers_count?: number | null
+          following_count?: number | null
           full_name?: string | null
           id?: string
           is_verified?: boolean | null
           last_name?: string | null
+          location?: string | null
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
@@ -2467,6 +2478,7 @@ export type Database = {
           tax_id?: string | null
           updated_at?: string
           username?: string | null
+          website?: string | null
         }
         Relationships: []
       }

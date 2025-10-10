@@ -13,6 +13,7 @@ import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
 import VideoEditModal from "@/components/VideoEditModal";
 import { CollaborationInvites } from "@/components/CollaborationInvites";
+import { EditProfileDialog } from "@/components/EditProfileDialog";
 
 interface Profile {
   id: string;
@@ -21,6 +22,9 @@ interface Profile {
   first_name: string | null;
   last_name: string | null;
   bio: string | null;
+  phone: string | null;
+  website: string | null;
+  location: string | null;
   is_verified?: boolean;
   followers_count?: number;
   following_count?: number;
@@ -53,6 +57,7 @@ const TravelProfile = () => {
     likesCount: 0,
     viewsCount: 0,
   });
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [collaborationSheetOpen, setCollaborationSheetOpen] = useState(false);
@@ -97,14 +102,35 @@ const TravelProfile = () => {
         .maybeSingle();
 
       if (error) throw error;
-      setProfile(data || {
-        id: profileUserId!,
-        username: 'User',
-        avatar_url: null,
-        first_name: null,
-        last_name: null,
-        bio: null,
-      });
+      
+      if (data) {
+        setProfile({
+          id: data.id,
+          username: data.username,
+          avatar_url: data.avatar_url,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          bio: data.bio,
+          phone: data.phone,
+          website: data.website,
+          location: data.location,
+          is_verified: data.is_verified,
+          followers_count: data.followers_count,
+          following_count: data.following_count,
+        });
+      } else {
+        setProfile({
+          id: profileUserId!,
+          username: 'User',
+          avatar_url: null,
+          first_name: null,
+          last_name: null,
+          bio: null,
+          phone: null,
+          website: null,
+          location: null,
+        });
+      }
     } catch (error) {
       console.error('Error fetching profile:', error);
       toast.error('Failed to load profile');
@@ -399,6 +425,19 @@ const TravelProfile = () => {
           {profile?.bio && (
             <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
           )}
+          {profile?.website && (
+            <a 
+              href={profile.website} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-sm text-primary hover:underline"
+            >
+              {profile.website.replace(/^https?:\/\//, '')}
+            </a>
+          )}
+          {profile?.location && (
+            <p className="text-sm text-muted-foreground">📍 {profile.location}</p>
+          )}
         </div>
 
         {/* Dashboard Card for own profile */}
@@ -423,7 +462,7 @@ const TravelProfile = () => {
               <Button
                 variant="secondary"
                 className="flex-1 h-8 text-sm font-semibold"
-                onClick={() => navigate('/travel-settings/edit')}
+                onClick={() => setEditProfileOpen(true)}
               >
                 Edit profile
               </Button>
@@ -697,6 +736,16 @@ const TravelProfile = () => {
             fetchUserPosts();
             fetchVideoPosts();
           }}
+        />
+      )}
+
+      {/* Edit Profile Dialog */}
+      {isOwnProfile && profile && (
+        <EditProfileDialog
+          open={editProfileOpen}
+          onOpenChange={setEditProfileOpen}
+          profile={profile}
+          onProfileUpdated={fetchProfile}
         />
       )}
 
