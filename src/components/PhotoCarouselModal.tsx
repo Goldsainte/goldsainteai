@@ -56,13 +56,24 @@ const PhotoCarouselModal = ({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      setIndex(startIndex);
-      if (postId && user) {
+    if (!open) return;
+    setIndex(startIndex);
+
+    if (postId) {
+      // Always fetch comments when opening, regardless of auth state
+      fetchComments();
+
+      // Subscribe to new comments; cleanup on close/unmount
+      const unsubscribe = subscribeToComments();
+
+      // Only check like status if user is signed in
+      if (user) {
         checkIfLiked();
-        fetchComments();
-        subscribeToComments();
       }
+
+      return () => {
+        unsubscribe && unsubscribe();
+      };
     }
   }, [open, startIndex, postId, user]);
 
@@ -177,6 +188,8 @@ const PhotoCarouselModal = ({
       if (error) throw error;
 
       setNewComment("");
+      // Ensure UI updates immediately even if realtime is unavailable
+      await fetchComments();
       toast.success("Comment posted!");
     } catch (error) {
       console.error("Error posting comment:", error);
