@@ -685,7 +685,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-0.5">
+            <div className="grid grid-cols-3 gap-0.5 pb-20 md:pb-0">
               {videoPosts.map((post) => (
                 <div
                   key={post.id}
@@ -756,7 +756,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-0.5">
+            <div className="grid grid-cols-3 gap-0.5 pb-20 md:pb-0">
               {userPosts.map((post) => (
                 <div
                   key={post.id}
@@ -832,7 +832,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-0.5">
+              <div className="grid grid-cols-3 gap-0.5 pb-20 md:pb-0">
                 {likedPosts.map((post) => (
                   <div
                     key={post.id}
