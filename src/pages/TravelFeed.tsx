@@ -20,8 +20,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 interface TravelPost {
   id: string;
   user_id: string;
-  video_url: string;
+  video_url?: string;
   thumbnail_url: string | null;
+  image_urls?: string[];
+  media_type?: string;
   caption: string | null;
   location: string | null;
   view_count: number;
