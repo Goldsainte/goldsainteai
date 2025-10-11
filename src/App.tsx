@@ -82,8 +82,13 @@ function AppContent() {
       const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
       const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour') === 'true';
 
+      console.debug('[WelcomeModal] params', { forceWelcome, forceTour });
+      console.debug('[WelcomeModal] storage', { dismissed, hasSeenTour });
+
       // Always show if forced via query param, otherwise show if user hasn't dismissed or hasn't seen tour
-      setShowWelcomeModal(forceWelcome || (!dismissed || !hasSeenTour));
+      const shouldShow = forceWelcome || (!dismissed || !hasSeenTour);
+      console.debug('[WelcomeModal] shouldShow', shouldShow);
+      setShowWelcomeModal(shouldShow);
 
       // Allow forcing the tour to start via query param (useful for incognito/debug)
       if (forceTour) {
