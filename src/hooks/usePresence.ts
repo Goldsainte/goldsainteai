@@ -73,6 +73,8 @@ export const usePresence = () => {
               user_id: user.id,
               status: 'online',
               last_seen_at: new Date().toISOString(),
+            }, {
+              onConflict: 'user_id'
             });
         }
       });
@@ -91,6 +93,8 @@ export const usePresence = () => {
           user_id: user.id,
           status: 'online',
           last_seen_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
         });
     }, 30000);
 
@@ -105,6 +109,8 @@ export const usePresence = () => {
           user_id: user.id,
           status: 'offline',
           last_seen_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
         })
         .then(() => {
           channel.untrack();
