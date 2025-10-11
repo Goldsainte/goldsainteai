@@ -305,6 +305,13 @@ export const Header = () => {
                             <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Sign In</span>
                           </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/auth?mode=signup')} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 bg-secondary/20"
+                          >
+                            <User className="h-5 w-5 text-secondary flex-shrink-0" />
+                            <span className="text-sm font-medium text-secondary">Sign Up</span>
+                          </DropdownMenuItem>
                         </>
                       )}
                     </DropdownMenuContent>
