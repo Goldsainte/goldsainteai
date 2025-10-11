@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Coins, Heart, Star, Gem, Crown, Flower2, Sparkles, Gift } from "lucide-react";
+import { Coins, Plane, Hotel, Luggage, Compass, MapPin, Globe, Palmtree, Ticket } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,12 +30,19 @@ const getGiftName = (display: string) => {
 const renderGiftIcon = (name: string) => {
   const key = name.toLowerCase();
   const iconProps = { className: "h-10 w-10 text-accent" };
-  if (key.includes('heart')) return <Heart {...iconProps} />;
-  if (key.includes('rose') || key.includes('flower')) return <Flower2 {...iconProps} />;
-  if (key.includes('star')) return <Star {...iconProps} />;
-  if (key.includes('diamond') || key.includes('gem')) return <Gem {...iconProps} />;
-  if (key.includes('crown')) return <Crown {...iconProps} />;
-  return <Sparkles {...iconProps} />;
+  
+  // Travel-themed icon mapping
+  if (key.includes('flight') || key.includes('plane')) return <Plane {...iconProps} />;
+  if (key.includes('hotel') || key.includes('suite')) return <Hotel {...iconProps} />;
+  if (key.includes('journey') || key.includes('trip') || key.includes('luggage')) return <Luggage {...iconProps} />;
+  if (key.includes('adventure') || key.includes('compass')) return <Compass {...iconProps} />;
+  if (key.includes('destination') || key.includes('pin')) return <MapPin {...iconProps} />;
+  if (key.includes('world') || key.includes('globe')) return <Globe {...iconProps} />;
+  if (key.includes('paradise') || key.includes('palm') || key.includes('beach')) return <Palmtree {...iconProps} />;
+  if (key.includes('ticket') || key.includes('pass')) return <Ticket {...iconProps} />;
+  
+  // Fallback to generic travel icon
+  return <Compass {...iconProps} />;
 };
 
 export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendGiftModalProps) => {
