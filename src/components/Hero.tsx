@@ -29,10 +29,10 @@ export const Hero = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-            Your trip, your way: Book it. Share it. Earn from it.
+            Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-3xl">
-            Whether you travel solo, let AI plan and book it, or tap into our network of elite travel agents — Goldsainte is where creators monetize, travelers personalize, and luxury experts compete to curate your next journey.
+            AI-powered search, expert agents on demand, or full control — the choice is yours.
           </p>
 
           <form 
