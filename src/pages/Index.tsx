@@ -40,8 +40,6 @@ import { TripTypeSelector } from "@/components/TripTypeSelector";
 import { HotelFilters } from "@/components/HotelFilters";
 import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
-import { WelcomeModal } from "@/components/WelcomeModal";
-import { OnboardingTour } from "@/components/OnboardingTour";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import logomark from "@/assets/logomark-seal-gold.png";
@@ -144,29 +142,7 @@ const Index = () => {
   const lastRequestIdRef = useRef<number>(0);
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-
-  const handleCloseWelcome = () => {
-    setShowWelcomeModal(false);
-    try { 
-      localStorage.setItem('welcomeDismissed', 'true');
-      window.dispatchEvent(new Event('welcomeDismissed'));
-    } catch {}
-  };
-
-  useEffect(() => {
-    // Show welcome modal first for new users or if tour hasn't been seen yet
-    try {
-      const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
-      const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour') === 'true';
-      setShowWelcomeModal(!dismissed || !hasSeenTour);
-    } catch {
-      setShowWelcomeModal(true);
-    }
-    // Run only on mount
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const rotatingMessages = [
     "Where to next? Discover handpicked hotels tailored to your taste.",
@@ -901,19 +877,6 @@ const Index = () => {
                   </Button>
                 </div>
 
-                {/* What Goldsainte.AI can do button */}
-                <div className="flex items-center justify-center px-2 md:px-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowWelcomeModal(true)}
-                    className="rounded-full gap-2 h-11 md:h-10 px-4 sm:px-5 text-[#0C4D47] hover:text-[#0C4D47] border-[#BFAD72] touch-manipulation min-h-[44px] text-sm sm:text-base"
-                  >
-                    <Sparkles className="h-4 w-4" />
-                    What Goldsainte.Ai can do
-                  </Button>
-                </div>
-
                 {/* Footer */}
                 <p className="text-xs text-muted-foreground text-center pt-4">
                   By using Goldsainte.Ai, you agree to our{" "}
@@ -1623,12 +1586,6 @@ const Index = () => {
           fromCountry={visaModalData.fromCountry}
           toCountry={visaModalData.toCountry}
           visaInformation={visaModalData.visaInformation}
-        />
-
-        {/* Welcome Modal */}
-        <WelcomeModal
-          open={showWelcomeModal}
-          onClose={handleCloseWelcome}
         />
 
         {/* Package Booking Modal */}

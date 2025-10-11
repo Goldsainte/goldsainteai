@@ -8,7 +8,9 @@ import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
+import { WelcomeModal } from "@/components/WelcomeModal";
 import { usePresence } from "@/hooks/usePresence";
+import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import HotelBooking from "./pages/HotelBooking";
@@ -68,6 +70,26 @@ const queryClient = new QueryClient();
 function AppContent() {
   const location = useLocation();
   usePresence(); // Initialize presence tracking
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  // Check if welcome modal should show
+  useEffect(() => {
+    try {
+      const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
+      const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour') === 'true';
+      setShowWelcomeModal(!dismissed || !hasSeenTour);
+    } catch {
+      setShowWelcomeModal(true);
+    }
+  }, []);
+
+  const handleCloseWelcome = () => {
+    setShowWelcomeModal(false);
+    try { 
+      localStorage.setItem('welcomeDismissed', 'true');
+      window.dispatchEvent(new Event('welcomeDismissed'));
+    } catch {}
+  };
   
   // Don't show header on these pages as they have their own custom headers
   const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];
@@ -80,6 +102,7 @@ function AppContent() {
   return (
     <div className="min-h-screen w-full flex flex-col">
       <SkipNavigation />
+      <WelcomeModal open={showWelcomeModal} onClose={handleCloseWelcome} />
       <OnboardingTour />
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
