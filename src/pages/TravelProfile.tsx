@@ -88,6 +88,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
   const [photoModalImages, setPhotoModalImages] = useState<string[]>([]);
   const [photoStartIndex, setPhotoStartIndex] = useState(0);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -751,6 +752,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     if (post.image_urls && post.image_urls.length > 0) {
                       setPhotoModalImages(post.image_urls);
                       setPhotoStartIndex(0);
+                      setSelectedPost(post);
                       setPhotoModalOpen(true);
                     }
                   }}
@@ -820,6 +822,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       if (post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0) {
                         setPhotoModalImages(post.image_urls);
                         setPhotoStartIndex(0);
+                        setSelectedPost(post);
                         setPhotoModalOpen(true);
                       } else {
                         navigate(`/travel-feed?postId=${post.id}`);
@@ -919,6 +922,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         onOpenChange={setPhotoModalOpen}
         images={photoModalImages}
         startIndex={photoStartIndex}
+        postId={selectedPost?.id}
+        caption={selectedPost?.caption}
+        likeCount={selectedPost?.like_count}
+        username={profile?.username || undefined}
+        userAvatar={profile?.avatar_url || undefined}
       />
 
       {/* Upload Modal */}
