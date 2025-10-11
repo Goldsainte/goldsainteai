@@ -119,11 +119,13 @@ export const OnboardingTour = () => {
       <style>{`
         .react-joyride__tooltip {
           position: relative;
+          max-width: 100% !important;
         }
         .react-joyride__tooltip__footer {
           display: flex;
           justify-content: flex-end;
           gap: 8px;
+          flex-wrap: wrap;
         }
         .__floater__body > div > div:last-child > div:first-child {
           font-size: 12px;
@@ -134,14 +136,30 @@ export const OnboardingTour = () => {
           text-align: center;
         }
         .__floater { 
-          filter: none !important; 
+          filter: none !important;
+          max-width: 100vw !important;
         }
         .__floater__body { 
-          /* Allow Joyride to control transforms/positioning for accurate centering */
+          max-width: 100% !important;
+          box-sizing: border-box;
+        }
+        .__floater__container {
+          max-width: 100vw !important;
+          padding: 0 16px;
+          box-sizing: border-box;
         }
         @media (max-width: 768px) {
+          .__floater {
+            margin: 0 !important;
+          }
           .__floater__body {
-            /* Constrain width only; don't force left/right so centering works */
+            max-width: calc(100vw - 32px) !important;
+            margin: 0 auto;
+          }
+          .__floater__container {
+            padding: 0 8px;
+          }
+          .react-joyride__tooltip {
             max-width: calc(100vw - 32px) !important;
           }
         }
@@ -172,15 +190,16 @@ export const OnboardingTour = () => {
           },
           tooltip: {
             borderRadius: window.innerWidth < 768 ? "12px" : "16px",
-            padding: window.innerWidth < 768 ? "14px" : "18px 22px",
+            padding: window.innerWidth < 768 ? "12px 14px" : "18px 22px",
             fontSize: window.innerWidth < 768 ? "12px" : "13px",
-            maxWidth: window.innerWidth < 768 ? "calc(100vw - 32px)" : "320px",
-            width: window.innerWidth < 768 ? "calc(100vw - 32px)" : "auto",
+            maxWidth: window.innerWidth < 768 ? "calc(100vw - 48px)" : "min(320px, 90vw)",
+            width: window.innerWidth < 768 ? "calc(100vw - 48px)" : "auto",
             backgroundColor: "rgba(255, 255, 255, 0.98)",
             backdropFilter: "blur(24px) saturate(180%)",
             border: "1px solid rgba(255, 255, 255, 0.8)",
             boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.05), inset 0 1px 0 rgba(255, 255, 255, 1)",
-            margin: window.innerWidth < 768 ? "0 16px" : "0",
+            margin: "8px",
+            boxSizing: "border-box",
           },
           tooltipContainer: {
             textAlign: "left" as const,
@@ -231,6 +250,13 @@ export const OnboardingTour = () => {
         }}
         floaterProps={{
           disableAnimation: true,
+          styles: {
+            floater: {
+              maxWidth: "100vw",
+              padding: "0 16px",
+              boxSizing: "border-box",
+            },
+          },
         }}
       />
     </>
