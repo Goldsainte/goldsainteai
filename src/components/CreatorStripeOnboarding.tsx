@@ -69,7 +69,16 @@ export const CreatorStripeOnboarding = () => {
     setOnboarding(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
+      if (!session) {
+        toast({
+          title: "Not Authenticated",
+          description: "Please sign in to set up payouts",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('[STRIPE-ONBOARDING] Starting onboarding process...');
 
       const { data, error } = await supabase.functions.invoke('creator-stripe-onboarding', {
         headers: {
@@ -77,20 +86,49 @@ export const CreatorStripeOnboarding = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('[STRIPE-ONBOARDING] Error:', error);
+        throw error;
+      }
       
+      console.log('[STRIPE-ONBOARDING] Received URL:', data?.url);
+      
+      if (!data?.url) {
+        throw new Error('No onboarding URL received from server');
+      }
+
       // Open Stripe onboarding in new tab
-      window.open(data.url, '_blank');
+      const newWindow = window.open(data.url, '_blank');
+      
+      if (!newWindow) {
+        throw new Error('Popup blocked. Please allow popups for this site.');
+      }
       
       toast({
         title: "Redirecting to Stripe",
-        description: "Please complete the setup to receive payouts.",
+        description: "Complete the setup in the new tab, then return here and click 'Refresh Status'.",
       });
     } catch (error: any) {
-      console.error('Error starting onboarding:', error);
+      console.error('[STRIPE-ONBOARDING] Full error:', error);
+      
+      let errorTitle = "Error";
+      let errorMessage = error.message || "Failed to start onboarding";
+      
+      // Handle specific Stripe Connect errors
+      if (error.message?.includes('Connect')) {
+        errorTitle = "Stripe Connect Not Enabled";
+        errorMessage = "Please contact support to enable creator payouts. Stripe Connect must be activated for this feature.";
+      } else if (error.message?.includes('popup') || error.message?.includes('Popup')) {
+        errorTitle = "Popup Blocked";
+        errorMessage = "Please enable popups for this site and try again.";
+      } else if (error.message?.includes('managing losses') || error.message?.includes('platform-profile')) {
+        errorTitle = "Platform Setup Required";
+        errorMessage = "Administrator needs to complete Stripe platform profile setup. Please contact support.";
+      }
+      
       toast({
-        title: "Error",
-        description: error.message || "Failed to start onboarding",
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -161,14 +199,25 @@ export const CreatorStripeOnboarding = () => {
         <div className="space-y-2">
           <Button 
             onClick={status?.connected && status.onboarding_complete ? checkStatus : startOnboarding}
-            disabled={onboarding}
-            className="w-full"
+            disabled={onboarding || loading}
+            className="w-full h-12"
           >
-            {onboarding ? "Loading..." : 
+            {onboarding ? (
+              <span className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                Opening Stripe...
+              </span>
+            ) : 
              status?.connected && status.onboarding_complete ? "Refresh Status" : 
              status?.connected ? "Continue Setup" : 
              "Set Up Payouts"}
           </Button>
+          
+          {status?.connected && !status.onboarding_complete && (
+            <p className="text-xs text-center text-muted-foreground">
+              After completing setup in Stripe, return here and click "Refresh Status"
+            </p>
+          )}
         </div>
 
         <Alert>

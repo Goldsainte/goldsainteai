@@ -211,7 +211,7 @@ const PhotoCarouselModal = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 bg-black border-none [&>button]:hidden">
-        <div className="relative w-full h-full flex flex-col">
+        <div className="relative w-full h-full flex flex-col safe-top safe-bottom">
           {/* Close button */}
           <Button
             variant="ghost"
@@ -392,8 +392,8 @@ const PhotoCarouselModal = ({
               )}
             </ScrollArea>
 
-            {/* Comment input */}
-            <form onSubmit={handleSubmitComment} className="flex items-center gap-2 px-4 py-3 border-t">
+            {/* Comment input - Always visible with safe area support */}
+            <form onSubmit={handleSubmitComment} className="flex items-center gap-3 px-4 py-3 border-t bg-background sticky bottom-0 pb-safe">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={userAvatar || undefined} />
                 <AvatarFallback>

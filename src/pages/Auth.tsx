@@ -136,10 +136,10 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
-      <Card className="w-full max-w-md p-8">
+      <Card className="w-full max-w-md p-6 sm:p-8">
         <div className="flex flex-col items-center mb-8">
           <img src={logomark} alt="Logo" className="h-16 w-16 mb-4" />
-          <h1 className="text-2xl font-secondary text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
+          <h1 className="text-xl sm:text-2xl font-secondary text-center bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
             Welcome to Goldsainte Ai
           </h1>
           <p className="text-sm text-muted-foreground text-center mt-2">
