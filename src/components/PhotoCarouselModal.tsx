@@ -22,8 +22,8 @@ const PhotoCarouselModal = ({ open, onOpenChange, images, startIndex = 0 }: Phot
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black">
-        <div className="relative w-full h-[95vh] flex items-center justify-center">
+      <DialogContent className="max-w-full max-h-full h-screen p-0 bg-black border-none">
+        <div className="relative w-full h-full flex items-center justify-center">
           <Button
             variant="ghost"
             size="icon"
