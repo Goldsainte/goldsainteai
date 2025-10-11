@@ -39,10 +39,12 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (open) {
-      fetchComments();
-      subscribeToComments();
-    }
+    if (!open) return;
+    fetchComments();
+    const unsubscribe = subscribeToComments();
+    return () => {
+      unsubscribe?.();
+    };
   }, [open, postId]);
 
   const fetchComments = async () => {
@@ -52,7 +54,6 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
         .from("post_comments")
         .select("id, comment_text, created_at, user_id")
         .eq("post_id", postId)
-        .is("parent_comment_id", null)
         .order("created_at", { ascending: true });
 
       if (error) throw error;

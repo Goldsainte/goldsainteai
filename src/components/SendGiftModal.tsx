@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Coins } from "lucide-react";
+import { Coins, Heart, Star, Gem, Crown, Flower2, Sparkles, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,6 +21,22 @@ interface SendGiftModalProps {
   recipientId: string;
   postId: string;
 }
+
+const getGiftName = (display: string) => {
+  const parts = display.trim().split(' ');
+  return parts.length > 1 ? parts.slice(1).join(' ') : display;
+};
+
+const renderGiftIcon = (name: string) => {
+  const key = name.toLowerCase();
+  const iconProps = { className: "h-10 w-10 text-accent" };
+  if (key.includes('heart')) return <Heart {...iconProps} />;
+  if (key.includes('rose') || key.includes('flower')) return <Flower2 {...iconProps} />;
+  if (key.includes('star')) return <Star {...iconProps} />;
+  if (key.includes('diamond') || key.includes('gem')) return <Gem {...iconProps} />;
+  if (key.includes('crown')) return <Crown {...iconProps} />;
+  return <Sparkles {...iconProps} />;
+};
 
 export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendGiftModalProps) => {
   const { user } = useAuth();
@@ -150,8 +166,10 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
                 variant="outline"
                 className="h-auto flex flex-col items-center gap-4 py-8 px-4 border-2 border-accent/30 rounded-2xl bg-card hover:border-accent hover:bg-accent/10 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none group"
               >
-                <span className="text-6xl group-hover:scale-110 transition-transform duration-300">{gift.display_name.split(' ')[0]}</span>
-                <span className="font-secondary text-base font-medium text-foreground">{gift.display_name.split(' ').slice(1).join(' ')}</span>
+                <div className="h-12 w-12 rounded-full border border-accent/30 bg-accent/5 flex items-center justify-center">
+                  {renderGiftIcon(getGiftName(gift.display_name))}
+                </div>
+                <span className="font-secondary text-base font-medium text-foreground">{getGiftName(gift.display_name)}</span>
                 <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-gold shadow-md">
                   <Coins className="h-4 w-4 text-primary" />
                   <span className="text-sm font-bold text-primary">{gift.coin_cost}</span>

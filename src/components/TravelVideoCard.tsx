@@ -909,10 +909,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       ) : null}
 
       {/* Gradient Overlay - Stronger for better readability */}
-      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-24 md:bottom-0 h-2/5 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
 
       {/* Bottom Content */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 pb-6 text-white">
+      <div className="absolute left-0 right-0 bottom-24 md:bottom-6 p-4 pb-safe text-white">
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
           <div className="flex-1 space-y-3 max-w-[70%]">
