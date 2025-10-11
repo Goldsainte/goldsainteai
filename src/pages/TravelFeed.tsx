@@ -92,29 +92,32 @@ const TravelFeed = () => {
   const fetchPosts = async (focusPostId?: string) => {
     try {
       let loadedPosts: TravelPost[] = [];
-      // Use personalized feed if user is logged in and we're not targeting a specific post
-    if (user && !focusPostId) {
-      const { data, error } = await supabase.functions.invoke('get-personalized-feed');
-      if (error) {
-        console.error('Error fetching personalized feed:', error);
-        toast.error('Failed to load personalized feed, showing recent posts');
+      // Fast-first: show chronological quickly, then merge personalized when ready
+      if (user && !focusPostId) {
+        const chronoPromise = fetchChronologicalPostsRaw();
+        const personalizedPromise = supabase.functions.invoke('get-personalized-feed');
+
+        // Render chrono ASAP for faster first paint
+        const chrono = await chronoPromise;
+        setPosts(chrono);
+        loadedPosts = chrono;
         setIsPersonalized(false);
-        // Fallback to chronological feed
-        loadedPosts = await fetchChronologicalPosts();
+
+        // When personalized resolves, merge and update
+        const { data, error } = await personalizedPromise;
+        if (!error) {
+          const personalized = ((data as any)?.posts || []) as TravelPost[];
+          const map = new Map<string, TravelPost>();
+          chrono.forEach(p => map.set(p.id, p));
+          personalized.forEach(p => map.set(p.id, p));
+          const merged = Array.from(map.values());
+          setPosts(merged);
+          loadedPosts = merged;
+          setIsPersonalized(true);
+        } else {
+          console.error('Error fetching personalized feed:', error);
+        }
       } else {
-        const personalized = ((data as any)?.posts || []) as TravelPost[];
-        // Also load latest chronological posts to ensure photos + videos auto-populate first
-        const chrono = await fetchChronologicalPostsRaw();
-        // Merge with chronological first, then personalized (no duplicates)
-        const map = new Map<string, TravelPost>();
-        chrono.forEach(p => map.set(p.id, p));
-        personalized.forEach(p => map.set(p.id, p));
-        const merged = Array.from(map.values());
-        setPosts(merged);
-        loadedPosts = merged;
-        setIsPersonalized(true);
-      }
-    } else {
         // Show chronological feed for non-logged in users or when focusing specific post
         setIsPersonalized(false);
         loadedPosts = await fetchChronologicalPosts();
@@ -146,7 +149,7 @@ const TravelFeed = () => {
     console.log('Fetching chronological posts...');
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('*')
+      .select('id, user_id, video_url, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, created_at, is_suggested')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20);
@@ -157,22 +160,19 @@ const TravelFeed = () => {
     }
     
     console.log('Found posts:', data?.length || 0);
-    
-    // Fetch profile data separately with maybeSingle to handle missing profiles
-    const postsWithProfiles = await Promise.all(
-      (data || []).map(async (post) => {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, avatar_url, is_verified, instagram_username')
-          .eq('id', post.user_id)
-          .maybeSingle();
-        
-        return {
-          ...post,
-          profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
-        };
-      })
-    );
+
+    // Batch fetch profiles to avoid N+1
+    const userIds = Array.from(new Set((data || []).map((p: any) => p.user_id).filter(Boolean)));
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url, is_verified, instagram_username')
+      .in('id', userIds);
+    const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+
+    const postsWithProfiles = (data || []).map((post: any) => ({
+      ...post,
+      profiles: profilesMap.get(post.user_id) || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
+    }));
     
     console.log('Posts with profiles:', postsWithProfiles.length);
     setPosts(postsWithProfiles);
@@ -183,23 +183,24 @@ const TravelFeed = () => {
   const fetchChronologicalPostsRaw = async (): Promise<TravelPost[]> => {
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('*')
+      .select('id, user_id, video_url, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, created_at, is_suggested')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20);
 
     if (error) throw error;
 
-    const postsWithProfiles = await Promise.all(
-      (data || []).map(async (post) => {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, avatar_url, is_verified, instagram_username')
-          .eq('id', post.user_id)
-          .maybeSingle();
-        return { ...post, profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null } };
-      })
-    );
+    const userIds = Array.from(new Set((data || []).map((p: any) => p.user_id).filter(Boolean)));
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url, is_verified, instagram_username')
+      .in('id', userIds);
+    const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+
+    const postsWithProfiles = (data || []).map((post: any) => ({
+      ...post,
+      profiles: profilesMap.get(post.user_id) || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
+    }));
     return postsWithProfiles;
   };
 

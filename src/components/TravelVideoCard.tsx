@@ -886,7 +886,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </>
       ) : post.embed_url ? (
         getEmbedComponent()
-      ) : post.image_urls && post.image_urls.length > 0 ? (
+      ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <div 
           className="absolute inset-0 cursor-pointer"
           onClick={(e) => {
@@ -896,11 +896,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           }}
         >
           <img 
-            src={post.image_urls[0]} 
+            src={post.image_urls?.[0] || (post.thumbnail_url as string)} 
             alt="Post content"
+            loading="lazy"
             className="w-full h-full object-contain bg-black"
           />
-          {post.image_urls.length > 1 && (
+          {post.image_urls && post.image_urls.length > 1 && (
             <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
               1 / {post.image_urls.length}
             </div>
