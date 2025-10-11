@@ -305,7 +305,7 @@ const TravelFeed = () => {
         <div className="relative h-[100dvh] w-full bg-black overflow-hidden">
           {/* Top bar - minimal "For You" label only */}
           {isPersonalized && (
-            <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center py-3 safe-top">
+            <div id="feed-top-bar" className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center py-3 safe-top">
               <div className="px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full">
                 <p className="text-white text-sm font-semibold">For You</p>
               </div>
@@ -316,8 +316,13 @@ const TravelFeed = () => {
           <div
             ref={containerRef}
             onScroll={handleScroll}
-            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory overscroll-y-contain scroll-smooth touch-pan-y"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory overscroll-y-contain touch-pan-y"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              paddingTop: isPersonalized ? 44 : 0,
+              paddingBottom: 'calc(64px + env(safe-area-inset-bottom))',
+            }}
           >
             <style>{`
               div::-webkit-scrollbar {
