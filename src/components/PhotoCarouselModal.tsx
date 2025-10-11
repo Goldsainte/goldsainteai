@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 
 interface Comment {
   id: string;
@@ -54,6 +55,7 @@ const PhotoCarouselModal = ({
   const [newComment, setNewComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -76,6 +78,17 @@ const PhotoCarouselModal = ({
       };
     }
   }, [open, startIndex, postId, user]);
+
+  useEffect(() => {
+    if (!carouselApi) return;
+    // Sync selected slide with local index state
+    setIndex(carouselApi.selectedScrollSnap());
+    const onSelect = () => setIndex(carouselApi.selectedScrollSnap());
+    carouselApi.on('select', onSelect);
+    return () => {
+      carouselApi.off('select', onSelect as any);
+    };
+  }, [carouselApi]);
 
   const checkIfLiked = async () => {
     if (!postId || !user) return;
@@ -212,13 +225,20 @@ const PhotoCarouselModal = ({
   };
 
   const handlePrevious = () => {
+    if (carouselApi) {
+      carouselApi.scrollPrev();
+      return;
+    }
     if (index > 0) setIndex(index - 1);
   };
 
   const handleNext = () => {
+    if (carouselApi) {
+      carouselApi.scrollNext();
+      return;
+    }
     if (index < images.length - 1) setIndex(index + 1);
   };
-
   if (!images || images.length === 0) return null;
 
   return (
