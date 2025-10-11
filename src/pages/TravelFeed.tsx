@@ -363,7 +363,7 @@ const TravelFeed = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate('/')}
+                onClick={() => navigate('/home')}
                 className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
                 aria-label="Home"
               >

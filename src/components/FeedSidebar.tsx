@@ -7,10 +7,10 @@ export function FeedSidebar() {
   const { user } = useAuth();
 
   const navItems = [
-    { to: "/", icon: Home, label: "Home" },
+    { to: "/home", icon: Home, label: "Home" },
     { to: "/search", icon: Search, label: "Search" },
     { to: "/trending", icon: Compass, label: "Explore" },
-    { to: "/travel-feed", icon: Video, label: "Journeys" },
+    { to: "/", icon: Video, label: "Journeys" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
     { to: "/favorites", icon: Heart, label: "Notifications" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },
@@ -38,7 +38,7 @@ export function FeedSidebar() {
             key={item.to}
             to={item.to}
             className={getNavClass}
-            end={item.to === "/"}
+            end={item.to === "/" || item.to === "/home"}
           >
             <item.icon className="h-6 w-6" />
             <span className="text-base">{item.label}</span>

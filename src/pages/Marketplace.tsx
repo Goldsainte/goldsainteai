@@ -323,7 +323,7 @@ export default function Marketplace() {
       <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         <Button
           variant="ghost"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="mb-4 md:mb-6"
           size="sm"
         >

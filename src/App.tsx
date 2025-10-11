@@ -126,7 +126,8 @@ function AppContent() {
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<TravelFeed />} />
+          <Route path="/home" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />

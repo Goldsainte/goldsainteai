@@ -267,7 +267,7 @@ const BookingConfirmation = () => {
             View My Bookings
           </Button>
           <Button 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/home')} 
             size="lg"
             className="min-w-[200px]"
           >

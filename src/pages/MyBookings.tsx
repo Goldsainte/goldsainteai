@@ -196,7 +196,7 @@ export default function MyBookings() {
                     <p className="text-sm text-muted-foreground mb-4">
                       Start planning your next adventure
                     </p>
-                    <Button onClick={() => navigate('/')}>
+                    <Button onClick={() => navigate('/search')}>
                       Browse Destinations
                     </Button>
                   </CardContent>

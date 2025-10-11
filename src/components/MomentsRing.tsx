@@ -99,22 +99,33 @@ export const MomentsRing = () => {
     <>
       <ScrollArea className="w-full whitespace-nowrap border-b">
         <div className="flex gap-4 p-4">
-          {/* Create moment button */}
+          {/* Create moment button OR show user's existing moments */}
           {currentUserId && (
             <div
               className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0"
-              onClick={() => setCreateOpen(true)}
+              onClick={() => {
+                const userMoment = moments.find(m => m.user_id === currentUserId);
+                if (userMoment) {
+                  handleMomentClick(currentUserId);
+                } else {
+                  setCreateOpen(true);
+                }
+              }}
             >
               <div className="relative">
-                <Avatar className="w-16 h-16 ring-2 ring-primary">
+                <Avatar className={`w-16 h-16 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-gradient-gold ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
                   <AvatarImage src={moments.find(m => m.user_id === currentUserId)?.avatar_url || undefined} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>
-                <div className="absolute bottom-0 right-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center ring-2 ring-background">
-                  <Plus className="w-3 h-3 text-primary-foreground" />
-                </div>
+                {!moments.find(m => m.user_id === currentUserId) && (
+                  <div className="absolute bottom-0 right-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center ring-2 ring-background">
+                    <Plus className="w-3 h-3 text-primary-foreground" />
+                  </div>
+                )}
               </div>
-              <span className="text-xs font-medium">Your Moment</span>
+              <span className="text-xs font-medium">
+                {moments.find(m => m.user_id === currentUserId) ? 'Your Moment' : 'Add Moment'}
+              </span>
             </div>
           )}
 

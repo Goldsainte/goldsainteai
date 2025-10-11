@@ -533,7 +533,7 @@ if (minRating && searchType !== "restaurants") {
         <div className="flex items-center justify-between mb-6">
           <Button
             variant="ghost"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />

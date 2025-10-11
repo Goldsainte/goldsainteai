@@ -219,7 +219,7 @@ export default function Dashboard() {
       <main className="flex-1 container mx-auto px-4 py-8">
         <Button
           variant="ghost"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -255,7 +255,7 @@ export default function Dashboard() {
                   <p className="text-muted-foreground text-center mb-4">
                     Start planning your next adventure
                   </p>
-                  <Button onClick={() => navigate('/')}>
+                  <Button onClick={() => navigate('/search')}>
                     Explore Options
                   </Button>
                 </CardContent>

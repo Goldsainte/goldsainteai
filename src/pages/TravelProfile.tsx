@@ -412,9 +412,9 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
-            onClick={() => navigate('/')}
+            onClick={() => navigate(-1)}
             className="gap-1 hover:bg-transparent"
-            aria-label="Home"
+            aria-label="Back"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -986,7 +986,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/home')}
             className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
             aria-label="Home"
           >

@@ -38,7 +38,7 @@ const Favorites = () => {
       <div className="max-w-7xl mx-auto space-y-6">
         <Button
           variant="ghost"
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />

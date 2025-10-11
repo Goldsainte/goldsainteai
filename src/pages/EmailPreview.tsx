@@ -786,7 +786,7 @@ export default function EmailPreview() {
       <div className="max-w-6xl mx-auto">
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/home')}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
