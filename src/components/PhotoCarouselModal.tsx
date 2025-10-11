@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
+import { CommentsSheet } from "@/components/CommentsSheet";
 
 interface Comment {
   id: string;
@@ -56,6 +57,7 @@ const PhotoCarouselModal = ({
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
+  const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -334,6 +336,7 @@ const PhotoCarouselModal = ({
                 <Button
                   variant="ghost"
                   size="sm"
+                  onClick={() => setCommentsSheetOpen(true)}
                   className="hover:bg-transparent p-0 h-auto flex items-center gap-2"
                 >
                   <MessageCircle className="h-8 w-8" />
@@ -449,6 +452,14 @@ const PhotoCarouselModal = ({
           </div>
         </div>
       </DialogContent>
+      {postId && (
+        <CommentsSheet
+          open={commentsSheetOpen}
+          onOpenChange={setCommentsSheetOpen}
+          postId={postId}
+          onCommentAdded={fetchComments}
+        />
+      )}
     </Dialog>
   );
 };
