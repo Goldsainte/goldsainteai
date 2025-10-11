@@ -59,9 +59,29 @@ export const Header = () => {
   }, [user]);
 
   const handleCreateContent = (type: string) => {
+    if (!user) {
+      navigate('/auth');
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to create content",
+      });
+      return;
+    }
     if (type === "reel" || type === "post") {
       setUploadModalOpen(true);
     }
+  };
+
+  const handleCreateClick = () => {
+    if (!user) {
+      navigate('/auth');
+      toast({
+        title: "Sign in required",
+        description: "Please sign in to create content",
+      });
+      return;
+    }
+    setCreateSheetOpen(true);
   };
 
   const handleUploadSuccess = () => {
@@ -155,7 +175,7 @@ export const Header = () => {
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
-                          onClick={() => setCreateSheetOpen(true)} 
+                          onClick={handleCreateClick} 
                           className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
                         >
                           <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -422,7 +442,7 @@ export const Header = () => {
                     </div>
                     <div className="py-2">
                       <DropdownMenuItem 
-                        onClick={() => setCreateSheetOpen(true)} 
+                        onClick={handleCreateClick} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >
                         <Plus className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
