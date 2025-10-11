@@ -287,7 +287,7 @@ const PhotoCarouselModal = ({
           </div>
 
           {/* Instagram-style bottom section */}
-          <div className="bg-background border-t border-border max-h-[40vh] flex flex-col">
+          <div className="bg-background border-t border-border max-h-[40vh] flex flex-col pb-safe">
             {/* Action bar */}
             <div className="flex items-center justify-between px-4 py-3">
               <div className="flex items-center gap-4">
@@ -403,9 +403,9 @@ const PhotoCarouselModal = ({
               <Input
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Add a comment..."
+                placeholder={user ? "Add a comment..." : "Sign in to comment"}
                 disabled={submitting || !user}
-                className="flex-1 border-none focus-visible:ring-0 px-0 h-9"
+                className="flex-1 h-10"
               />
               {newComment.trim() && (
                 <Button 

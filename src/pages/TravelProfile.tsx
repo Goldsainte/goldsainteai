@@ -773,13 +773,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     <img
                       src={post.image_urls[0]}
                       alt={post.caption || 'Photo'}
-                      className="w-full h-full object-contain bg-muted"
+                      className="w-full h-full object-cover"
                     />
                   ) : post.thumbnail_url ? (
                     <img
                       src={post.thumbnail_url}
                       alt={post.caption || 'Photo'}
-                      className="w-full h-full object-contain bg-muted"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
@@ -851,7 +851,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       <img
                         src={post.image_urls[0]}
                         alt={post.caption || 'Photo'}
-                        className="w-full h-full object-contain bg-muted"
+                        className="w-full h-full object-cover"
                       />
                     ) : post.thumbnail_url ? (
                       <img
