@@ -998,36 +998,36 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           </div>
 
           {/* Action Buttons - Only essential ones for mobile */}
-          <div className="flex flex-col items-center gap-5 pb-32">
+          <div className="flex flex-col items-center gap-6 pb-32">
             <button
               onClick={handleLike}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <Heart className={`h-8 w-8 text-white drop-shadow-lg ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-              <span className="text-xs font-bold drop-shadow-lg">{formatCount(localLikeCount)}</span>
+              <Heart className={`h-9 w-9 text-white drop-shadow-2xl ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <span className="text-sm font-bold drop-shadow-2xl">{formatCount(localLikeCount)}</span>
             </button>
 
             <button
               onClick={() => setCommentsOpen(true)}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <MessageCircle className="h-8 w-8 text-white drop-shadow-lg" />
-              <span className="text-xs font-bold drop-shadow-lg">{formatCount(localCommentCount)}</span>
+              <MessageCircle className="h-9 w-9 text-white drop-shadow-2xl" />
+              <span className="text-sm font-bold drop-shadow-2xl">{formatCount(localCommentCount)}</span>
             </button>
 
             <button
               onClick={handleSaveClick}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <Bookmark className={`h-8 w-8 text-white drop-shadow-lg ${isSaved ? 'fill-white' : ''}`} />
+              <Bookmark className={`h-9 w-9 text-white drop-shadow-2xl ${isSaved ? 'fill-white' : ''}`} />
             </button>
 
             <button
               onClick={() => setGiftModalOpen(true)}
-              className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
               data-tour="send-gift-post"
             >
-              <Coins className="h-8 w-8 text-[#BFAD72] drop-shadow-lg" />
+              <Coins className="h-9 w-9 text-[#BFAD72] drop-shadow-2xl" />
             </button>
           </div>
         </div>

@@ -685,11 +685,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-1">
+            <div className="grid grid-cols-3 gap-0.5">
               {videoPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden rounded-md border border-border"
+                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden"
                   onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
                 >
                   {post.thumbnail_url ? (
@@ -756,11 +756,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-1">
+            <div className="grid grid-cols-3 gap-0.5">
               {userPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden rounded-md border border-border"
+                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden"
                   onClick={() => {
                     if (post.image_urls && post.image_urls.length > 0) {
                       setPhotoModalImages(post.image_urls);
@@ -832,11 +832,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-1">
+              <div className="grid grid-cols-3 gap-0.5">
                 {likedPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="relative aspect-square bg-muted cursor-pointer group overflow-hidden rounded-md border border-border"
+                    className="relative aspect-square bg-muted cursor-pointer group overflow-hidden"
                     onClick={() => {
                       if (post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0) {
                         setPhotoModalImages(post.image_urls);

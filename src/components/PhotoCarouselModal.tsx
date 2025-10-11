@@ -256,95 +256,90 @@ const PhotoCarouselModal = ({
             <X className="h-6 w-6" />
           </Button>
 
-          {/* Image area */}
+          {/* Image area - Swipeable Carousel */}
           <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
-            {/* Navigation arrows */}
-            {images.length > 1 && index > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handlePrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </Button>
-            )}
-            
-            {images.length > 1 && index < images.length - 1 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </Button>
-            )}
-
-            {/* Clickable areas for navigation */}
-            <div className="relative w-full h-full flex">
-              {images.length > 1 && index > 0 && (
-                <div 
-                  className="absolute left-0 top-0 w-1/3 h-full cursor-pointer z-5"
-                  onClick={handlePrevious}
-                />
-              )}
+            <Carousel
+              opts={{ startIndex, loop: false }}
+              setApi={setCarouselApi}
+              className="w-full h-full"
+            >
+              <CarouselContent className="h-full">
+                {images.map((img, idx) => (
+                  <CarouselItem key={idx} className="h-full flex items-center justify-center">
+                    <img 
+                      src={img} 
+                      alt={`Photo ${idx + 1}`} 
+                      className="w-full h-full object-contain"
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
               
-              <img 
-                src={images[index]} 
-                alt={`Photo ${index + 1}`} 
-                className="w-full h-full object-contain"
-              />
+              {/* Navigation arrows - only show if multiple images */}
+              {images.length > 1 && index > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handlePrevious}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+              )}
               
               {images.length > 1 && index < images.length - 1 && (
-                <div 
-                  className="absolute right-0 top-0 w-1/3 h-full cursor-pointer z-5"
+                <Button
+                  variant="ghost"
+                  size="icon"
                   onClick={handleNext}
-                />
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
               )}
-            </div>
 
-            {/* Photo counter */}
-            {images.length > 1 && (
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-1">
-                {images.map((_, idx) => (
-                  <div
-                    key={idx}
-                    className={`w-1.5 h-1.5 rounded-full ${
-                      idx === index ? 'bg-white' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
+              {/* Photo counter dots */}
+              {images.length > 1 && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                  {images.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        idx === index ? 'bg-white w-2' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </Carousel>
           </div>
 
           {/* Instagram-style bottom section */}
           <div className="bg-background border-t border-border max-h-[40vh] flex flex-col pb-safe">
-            {/* Action bar */}
+            {/* Action bar - Larger touch targets */}
             <div className="flex items-center justify-between px-4 py-3">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-5">
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={handleLike}
-                  className="hover:bg-transparent p-0 h-auto flex items-center gap-1.5"
+                  className="hover:bg-transparent p-0 h-auto flex items-center gap-2"
                 >
                   <Heart 
-                    className={`h-7 w-7 md:h-6 md:w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                    className={`h-8 w-8 transition-transform active:scale-110 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
                   />
                   {likeCount > 0 && (
-                    <span className="text-sm font-semibold">{likeCount}</span>
+                    <span className="text-base font-semibold">{likeCount}</span>
                   )}
                 </Button>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="hover:bg-transparent p-0 h-auto flex items-center gap-1.5"
+                  className="hover:bg-transparent p-0 h-auto flex items-center gap-2"
                 >
-                  <MessageCircle className="h-7 w-7 md:h-6 md:w-6" />
+                  <MessageCircle className="h-8 w-8" />
                   {comments.length > 0 && (
-                    <span className="text-sm font-semibold">{comments.length}</span>
+                    <span className="text-base font-semibold">{comments.length}</span>
                   )}
                 </Button>
                 <Button
@@ -353,7 +348,7 @@ const PhotoCarouselModal = ({
                   onClick={handleShare}
                   className="hover:bg-transparent p-0 h-auto"
                 >
-                  <Send className="h-7 w-7 md:h-6 md:w-6" />
+                  <Send className="h-8 w-8" />
                 </Button>
               </div>
             </div>
