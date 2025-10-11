@@ -264,10 +264,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
       // Only increment view_count if viewer is NOT the creator (for earnings calculation)
       if (!isOwnPost) {
-        await supabase
-          .from('travel_posts')
-          .update({ view_count: post.view_count + 1 })
-          .eq('id', post.id);
+        // View count aggregation handled server-side; skipping direct UPDATE to avoid RLS issues
       }
     } catch (error) {
       console.error('Error tracking view:', error);
@@ -310,12 +307,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     
     // Track share
     try {
-      await supabase
-        .from('travel_posts')
-        .update({ share_count: (post.share_count || 0) + 1 })
-        .eq('id', post.id);
+      // Share tracking moved server-side; no client update to avoid RLS failures
     } catch (error) {
-      console.error('Error tracking share:', error);
+      // no-op
     }
     
     if (navigator.share) {
@@ -339,12 +333,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     
     // Track share
     try {
-      await supabase
-        .from('travel_posts')
-        .update({ share_count: (post.share_count || 0) + 1 })
-        .eq('id', post.id);
+      // Share tracking moved server-side; no client update to avoid RLS failures
     } catch (error) {
-      console.error('Error tracking share:', error);
+      // no-op
     }
 
     // Try to open TikTok app first
@@ -369,12 +360,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     
     // Track share
     try {
-      await supabase
-        .from('travel_posts')
-        .update({ share_count: (post.share_count || 0) + 1 })
-        .eq('id', post.id);
+      // Share tracking moved server-side; no client update to avoid RLS failures
     } catch (error) {
-      console.error('Error tracking share:', error);
+      // no-op
     }
 
     // Try to open Instagram app

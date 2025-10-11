@@ -66,21 +66,21 @@ serve(async (req) => {
 
     if (postsError) throw postsError;
 
-    // Fetch profile data for all posts
-    const postsWithProfiles = await Promise.all(
-      (allPosts || []).map(async (post) => {
-        const { data: profile } = await supabaseClient
-          .from('profiles')
-          .select('username, avatar_url, is_verified, instagram_username')
-          .eq('id', post.user_id)
-          .maybeSingle();
-        
-        return {
-          ...post,
-          profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
-        };
-      })
-    );
+    // Batch-fetch profiles to avoid N+1 queries
+    const userIds = Array.from(new Set((allPosts || []).map((p: any) => p.user_id).filter(Boolean)));
+    let profilesMap = new Map<string, any>();
+    if (userIds.length) {
+      const { data: profilesData } = await supabaseClient
+        .from('profiles')
+        .select('id, username, avatar_url, is_verified, instagram_username')
+        .in('id', userIds);
+      profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
+    }
+
+    const postsWithProfiles = (allPosts || []).map((post: any) => ({
+      ...post,
+      profiles: profilesMap.get(post.user_id) || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
+    }));
 
     // Score and rank posts
     const scoredPosts = postsWithProfiles.map(post => {
