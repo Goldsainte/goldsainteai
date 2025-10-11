@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,8 +15,16 @@ import { toast } from "sonner";
 
 export default function AffiliateManager() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  // Require authentication
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+    }
+  }, [user, navigate]);
   const [newLink, setNewLink] = useState({
     productName: '',
     productUrl: '',
@@ -104,7 +113,7 @@ export default function AffiliateManager() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 mt-16 sm:mt-20">
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8 mt-2 sm:mt-4">
         <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-1.5">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-secondary font-bold leading-tight">Affiliate Manager</h1>
@@ -240,10 +249,7 @@ export default function AffiliateManager() {
               <Card>
                 <CardContent className="flex flex-col items-center justify-center py-12">
                   <Link2 className="h-12 w-12 text-muted-foreground mb-4" />
-                  <p className="text-muted-foreground mb-4">No affiliate links yet</p>
-                  <Button onClick={() => setIsCreateDialogOpen(true)}>
-                    Create Your First Link
-                  </Button>
+                  <p className="text-sm md:text-base text-muted-foreground">No affiliate links yet. Create one using the button above.</p>
                 </CardContent>
               </Card>
             ) : (
