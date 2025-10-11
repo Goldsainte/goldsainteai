@@ -187,19 +187,20 @@ export default function BrowseAgents() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-4 md:mb-6 min-h-[44px]"
+          size="default"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Button>
 
-        <div className="mb-8">
-          <h1 className="text-4xl font-secondary text-primary mb-2">Browse Travel Agents</h1>
-          <p className="text-muted-foreground">Find the perfect agent for your travel needs</p>
+        <div className="mb-6 md:mb-8 space-y-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-secondary text-primary leading-tight">Browse Travel Agents</h1>
+          <p className="text-sm md:text-base text-muted-foreground">Find the perfect agent for your travel needs</p>
         </div>
 
         {user && !myAgentProfile && (
@@ -236,22 +237,22 @@ export default function BrowseAgents() {
 
         {/* Filters */}
         <Card className="mb-6">
-          <CardContent className="pt-6">
+          <CardContent className="pt-4 md:pt-6">
             <div className="space-y-4">
               {/* Primary Filters */}
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                 <div className="relative">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search agents..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-9"
+                    className="pl-9 min-h-[44px]"
                   />
                 </div>
 
                 <Select value={filterSpecialization} onValueChange={setFilterSpecialization}>
-                  <SelectTrigger>
+                  <SelectTrigger className="min-h-[44px]">
                     <SelectValue placeholder="Specialization" />
                   </SelectTrigger>
                   <SelectContent>
@@ -263,7 +264,7 @@ export default function BrowseAgents() {
                 </Select>
 
                 <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger>
+                  <SelectTrigger className="min-h-[44px]">
                     <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
@@ -275,11 +276,11 @@ export default function BrowseAgents() {
               </div>
 
               {/* Advanced Filters */}
-              <div className="grid md:grid-cols-3 gap-4 pt-4 border-t">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 pt-3 md:pt-4 border-t">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Minimum Rating</label>
+                  <label className="text-xs sm:text-sm font-medium mb-2 block">Minimum Rating</label>
                   <Select value={minRating.toString()} onValueChange={(v) => setMinRating(Number(v))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="min-h-[44px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -292,9 +293,9 @@ export default function BrowseAgents() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Experience</label>
+                  <label className="text-xs sm:text-sm font-medium mb-2 block">Experience</label>
                   <Select value={experienceRange} onValueChange={(v: any) => setExperienceRange(v)}>
-                    <SelectTrigger>
+                    <SelectTrigger className="min-h-[44px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -307,9 +308,9 @@ export default function BrowseAgents() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Language</label>
+                  <label className="text-xs sm:text-sm font-medium mb-2 block">Language</label>
                   <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                    <SelectTrigger>
+                    <SelectTrigger className="min-h-[44px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -337,7 +338,7 @@ export default function BrowseAgents() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredAgents.map((agent) => (
               <EnhancedAgentCard
                 key={agent.id}

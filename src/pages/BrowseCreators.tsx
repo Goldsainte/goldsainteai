@@ -120,12 +120,12 @@ export default function BrowseCreators() {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-4xl font-bold mb-2">Discover Travel Creators</h1>
-          <p className="text-muted-foreground">
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">Discover Travel Creators</h1>
+          <p className="text-sm md:text-base text-muted-foreground">
             Partner with influential travel creators to promote your brand
           </p>
         </div>
@@ -137,7 +137,7 @@ export default function BrowseCreators() {
             placeholder="Search creators by name or bio..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="pl-10 min-h-[44px]"
           />
         </div>
 
@@ -178,62 +178,62 @@ export default function BrowseCreators() {
 
         {/* Creators Grid */}
         {!loading && filteredCreators.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {filteredCreators.map((creator) => (
               <Card key={creator.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-12 w-12">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5 sm:gap-3">
+                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                         <AvatarImage src={creator.avatar_url || undefined} />
                         <AvatarFallback>
                           {creator.username.substring(0, 2).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <div>
-                        <CardTitle className="text-lg">@{creator.username}</CardTitle>
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="text-sm sm:text-base lg:text-lg truncate">@{creator.username}</CardTitle>
                         <Badge variant="secondary" className="mt-1">
                           <Users className="h-3 w-3 mr-1" />
-                          {creator.follower_count.toLocaleString()}
+                          <span className="text-xs">{creator.follower_count.toLocaleString()}</span>
                         </Badge>
                       </div>
                     </div>
                   </div>
                   
                   {creator.bio && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                       {creator.bio}
                     </p>
                   )}
                 </CardHeader>
 
-                <CardContent className="space-y-3">
+                <CardContent className="space-y-3 pt-0">
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex items-center gap-2 text-sm">
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="font-medium">{creator.total_posts}</p>
+                      <TrendingUp className="h-4 w-4 text-primary shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm sm:text-base">{creator.total_posts}</p>
                         <p className="text-xs text-muted-foreground">Posts</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <Star className="h-4 w-4 text-primary" />
-                      <div>
-                        <p className="font-medium">{creator.engagement_rate}%</p>
+                      <Star className="h-4 w-4 text-primary shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-medium text-sm sm:text-base">{creator.engagement_rate}%</p>
                         <p className="text-xs text-muted-foreground">Engagement</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-3 border-t">
-                    <p className="text-sm text-muted-foreground mb-1">Avg. Views per Post</p>
-                    <p className="text-lg font-semibold">{creator.average_views.toLocaleString()}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Avg. Views per Post</p>
+                    <p className="text-base sm:text-lg font-semibold">{creator.average_views.toLocaleString()}</p>
                   </div>
 
                   <Button 
                     onClick={() => handleSendProposal(creator)}
-                    className="w-full"
+                    className="w-full min-h-[44px] text-sm"
                   >
                     Send Partnership Proposal
                   </Button>

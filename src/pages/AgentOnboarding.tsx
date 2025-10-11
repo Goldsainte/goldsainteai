@@ -123,50 +123,51 @@ export default function AgentOnboarding() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
+      <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8 max-w-4xl">
         <Button
           variant="ghost"
           onClick={() => navigate('/')}
-          className="mb-6"
+          className="mb-4 md:mb-6 min-h-[44px]"
+          size="default"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
         </Button>
         
         <Card>
-          <CardHeader>
-            <div className="flex items-center gap-3 mb-2">
-              <Briefcase className="h-8 w-8 text-primary" />
-              <CardTitle className="text-3xl font-secondary">Travel Agent Application</CardTitle>
+          <CardHeader className="px-4 sm:px-6">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+              <Briefcase className="h-7 w-7 sm:h-8 sm:w-8 text-primary shrink-0" />
+              <CardTitle className="text-xl sm:text-2xl lg:text-3xl font-secondary leading-tight">Travel Agent Application</CardTitle>
             </div>
-            <CardDescription>
+            <CardDescription className="text-sm md:text-base">
               Complete this comprehensive application to join our marketplace
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <CardContent className="px-4 sm:px-6">
+            <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
               {/* Section 1: Business & Contact Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
+                <h3 className="text-base sm:text-lg font-semibold flex items-center gap-2">
                   1. Business & Contact Information
                 </h3>
                 <Separator />
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="col-span-2">
-                    <Label htmlFor="agency_name">Agency Name *</Label>
-                    <Input id="agency_name" name="agency_name" required placeholder="Your Travel Agency" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="agency_name" className="text-sm">Agency Name *</Label>
+                    <Input id="agency_name" name="agency_name" required placeholder="Your Travel Agency" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="business_registration_number">Business Registration Number</Label>
-                    <Input id="business_registration_number" name="business_registration_number" placeholder="Optional" />
+                    <Label htmlFor="business_registration_number" className="text-sm">Business Registration Number</Label>
+                    <Input id="business_registration_number" name="business_registration_number" placeholder="Optional" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="business_type">Business Type *</Label>
-                    <select id="business_type" name="business_type" required className="w-full h-10 px-3 rounded-md border border-input bg-background">
+                    <Label htmlFor="business_type" className="text-sm">Business Type *</Label>
+                    <select id="business_type" name="business_type" required className="w-full min-h-[44px] px-3 rounded-md border border-input bg-background text-sm">
                       <option value="">Select type</option>
                       <option value="independent">Independent Agent</option>
                       <option value="agency">Travel Agency</option>
@@ -176,43 +177,43 @@ export default function AgentOnboarding() {
                   </div>
                   
                   <div>
-                    <Label htmlFor="primary_contact_name">Primary Contact Name *</Label>
-                    <Input id="primary_contact_name" name="primary_contact_name" required placeholder="John Doe" />
+                    <Label htmlFor="primary_contact_name" className="text-sm">Primary Contact Name *</Label>
+                    <Input id="primary_contact_name" name="primary_contact_name" required placeholder="John Doe" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="primary_contact_title">Contact Title *</Label>
-                    <Input id="primary_contact_title" name="primary_contact_title" required placeholder="Managing Director" />
+                    <Label htmlFor="primary_contact_title" className="text-sm">Contact Title *</Label>
+                    <Input id="primary_contact_title" name="primary_contact_title" required placeholder="Managing Director" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="email">Business Email *</Label>
-                    <Input id="email" name="email" type="email" required placeholder="contact@agency.com" />
+                    <Label htmlFor="email" className="text-sm">Business Email *</Label>
+                    <Input id="email" name="email" type="email" required placeholder="contact@agency.com" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="phone">Phone Number *</Label>
-                    <Input id="phone" name="phone" type="tel" required placeholder="+1 (555) 123-4567" />
+                    <Label htmlFor="phone" className="text-sm">Phone Number *</Label>
+                    <Input id="phone" name="phone" type="tel" required placeholder="+1 (555) 123-4567" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="whatsapp_number">WhatsApp Number *</Label>
-                    <Input id="whatsapp_number" name="whatsapp_number" type="tel" required placeholder="+1 (555) 123-4567" />
+                    <Label htmlFor="whatsapp_number" className="text-sm">WhatsApp Number *</Label>
+                    <Input id="whatsapp_number" name="whatsapp_number" type="tel" required placeholder="+1 (555) 123-4567" className="min-h-[44px]" />
                   </div>
                   
-                  <div className="col-span-2">
-                    <Label htmlFor="business_address">Business Address *</Label>
-                    <Input id="business_address" name="business_address" required placeholder="Street, City, Country" />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="website">Website</Label>
-                    <Input id="website" name="website" type="url" placeholder="https://yourwebsite.com" />
+                  <div className="sm:col-span-2">
+                    <Label htmlFor="business_address" className="text-sm">Business Address *</Label>
+                    <Input id="business_address" name="business_address" required placeholder="Street, City, Country" className="min-h-[44px]" />
                   </div>
                   
                   <div>
-                    <Label htmlFor="social_media">Social Media Profiles</Label>
-                    <Input id="social_media" name="social_media" placeholder="Instagram, LinkedIn, etc." />
+                    <Label htmlFor="website" className="text-sm">Website</Label>
+                    <Input id="website" name="website" type="url" placeholder="https://yourwebsite.com" className="min-h-[44px]" />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="social_media" className="text-sm">Social Media Profiles</Label>
+                    <Input id="social_media" name="social_media" placeholder="Instagram, LinkedIn, etc." className="min-h-[44px]" />
                   </div>
                 </div>
               </div>
@@ -538,11 +539,16 @@ export default function AgentOnboarding() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading || !acceptedTerms || !acceptedPrivacy || !acceptedVendor || !acceptedGDPR}>
+              <Button 
+                type="submit" 
+                className="w-full min-h-[48px] text-base" 
+                size="lg"
+                disabled={loading || !acceptedTerms || !acceptedPrivacy || !acceptedVendor || !acceptedGDPR}
+              >
                 {loading ? 'Submitting Application...' : 'Submit Application'}
               </Button>
               
-              <p className="text-sm text-muted-foreground text-center">
+              <p className="text-xs sm:text-sm text-muted-foreground text-center px-2">
                 * Required fields. Your application will be reviewed within 2-3 business days.
               </p>
             </form>

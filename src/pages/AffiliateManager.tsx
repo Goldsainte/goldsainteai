@@ -104,18 +104,18 @@ export default function AffiliateManager() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8 mt-16">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-secondary font-bold mb-2">Affiliate Manager</h1>
-            <p className="text-muted-foreground">
+      <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8 mt-16 sm:mt-20">
+        <div className="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1.5">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-secondary font-bold leading-tight">Affiliate Manager</h1>
+            <p className="text-sm md:text-base text-muted-foreground">
               Create and track your affiliate links
             </p>
           </div>
 
           <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto min-h-[44px]" size="default">
                 <Link2 className="h-4 w-4 mr-2" />
                 Create Link
               </Button>
@@ -182,7 +182,7 @@ export default function AffiliateManager() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 md:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Earnings</CardTitle>
@@ -229,10 +229,10 @@ export default function AffiliateManager() {
           </Card>
         </div>
 
-        <Tabs defaultValue="links" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="links">My Links</TabsTrigger>
-            <TabsTrigger value="commissions">Commissions</TabsTrigger>
+        <Tabs defaultValue="links" className="space-y-4 md:space-y-6">
+          <TabsList className="w-full grid grid-cols-2 max-w-md">
+            <TabsTrigger value="links" className="text-sm md:text-base min-h-[44px]">My Links</TabsTrigger>
+            <TabsTrigger value="commissions" className="text-sm md:text-base min-h-[44px]">Commissions</TabsTrigger>
           </TabsList>
 
           <TabsContent value="links" className="space-y-4">
@@ -250,50 +250,52 @@ export default function AffiliateManager() {
               <div className="grid gap-4">
                 {links.map((link: any) => (
                   <Card key={link.id}>
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg">{link.product_name}</CardTitle>
-                          <CardDescription className="mt-1">
-                            {link.platform && `${link.platform} • `}
-                            {link.commission_rate}% commission
-                          </CardDescription>
-                        </div>
-                        <Badge variant={link.is_active ? 'default' : 'secondary'}>
-                          {link.is_active ? 'Active' : 'Inactive'}
-                        </Badge>
+                  <CardHeader>
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg line-clamp-2">{link.product_name}</CardTitle>
+                        <CardDescription className="mt-1.5 text-xs sm:text-sm">
+                          {link.platform && `${link.platform} • `}
+                          {link.commission_rate}% commission
+                        </CardDescription>
                       </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <code className="flex-1 bg-muted px-3 py-2 rounded text-sm">
-                            {window.location.origin}/aff/{link.affiliate_code}
-                          </code>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => copyToClipboard(link.affiliate_code)}
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
+                      <Badge variant={link.is_active ? 'default' : 'secondary'} className="self-start">
+                        {link.is_active ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                        <code className="flex-1 bg-muted px-3 py-2.5 rounded text-xs sm:text-sm break-all">
+                          {window.location.origin}/aff/{link.affiliate_code}
+                        </code>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyToClipboard(link.affiliate_code)}
+                          className="min-h-[44px] sm:min-h-0"
+                        >
+                          <Copy className="h-4 w-4 sm:mr-0 mr-2" />
+                          <span className="sm:hidden">Copy Link</span>
+                        </Button>
+                      </div>
+                      <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-2">
+                        <div className="text-center sm:text-left">
+                          <p className="text-xs text-muted-foreground mb-1">Clicks</p>
+                          <p className="text-base sm:text-lg font-semibold">{link.clicks}</p>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <span className="text-muted-foreground">Clicks: </span>
-                            <span className="font-semibold">{link.clicks}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Conversions: </span>
-                            <span className="font-semibold">{link.conversions}</span>
-                          </div>
-                          <div>
-                            <span className="text-muted-foreground">Earned: </span>
-                            <span className="font-semibold">${Number(link.total_earnings).toFixed(2)}</span>
-                          </div>
+                        <div className="text-center sm:text-left">
+                          <p className="text-xs text-muted-foreground mb-1">Conv.</p>
+                          <p className="text-base sm:text-lg font-semibold">{link.conversions}</p>
+                        </div>
+                        <div className="text-center sm:text-left">
+                          <p className="text-xs text-muted-foreground mb-1">Earned</p>
+                          <p className="text-base sm:text-lg font-semibold">${Number(link.total_earnings).toFixed(2)}</p>
                         </div>
                       </div>
-                    </CardContent>
+                    </div>
+                  </CardContent>
                   </Card>
                 ))}
               </div>
