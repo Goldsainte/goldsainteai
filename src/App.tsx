@@ -72,12 +72,26 @@ function AppContent() {
   usePresence(); // Initialize presence tracking
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
-  // Check if welcome modal should show
+  // Check if welcome modal should show (with URL overrides)
   useEffect(() => {
     try {
+      const params = new URLSearchParams(window.location.search);
+      const forceWelcome = params.get('welcome') === '1';
+      const forceTour = params.get('tour') === '1';
+
       const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
       const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour') === 'true';
-      setShowWelcomeModal(!dismissed || !hasSeenTour);
+
+      // Always show if forced via query param, otherwise show if user hasn't dismissed or hasn't seen tour
+      setShowWelcomeModal(forceWelcome || (!dismissed || !hasSeenTour));
+
+      // Allow forcing the tour to start via query param (useful for incognito/debug)
+      if (forceTour) {
+        try {
+          localStorage.removeItem('hasSeenOnboardingTour');
+        } catch {}
+        window.dispatchEvent(new Event('welcomeDismissed'));
+      }
     } catch {
       setShowWelcomeModal(true);
     }
