@@ -229,11 +229,13 @@ const PhotoCarouselModal = ({
         return;
       }
       const isVideo = /\.(mp4|mov|webm)$/i.test(current);
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
       const { error } = await supabase.from('moments').insert({
         user_id: user.id,
         media_url: current,
         media_type: isVideo ? 'video' : 'image',
         caption: caption || null,
+        expires_at: expiresAt,
       });
       if (error) throw error;
       toast.success("Shared as a Moment! Your ring is live.");
@@ -333,7 +335,7 @@ const PhotoCarouselModal = ({
           {/* Image area - Swipeable Carousel */}
           <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden touch-pan-x">
             <Carousel
-              opts={{ startIndex, loop: false, dragFree: true }}
+              opts={{ startIndex, loop: false, dragFree: false, align: 'center', containScroll: 'trimSnaps' }}
               setApi={setCarouselApi}
               className="w-full h-full cursor-grab active:cursor-grabbing"
             >
@@ -467,82 +469,12 @@ const PhotoCarouselModal = ({
               </div>
             )}
 
-            {/* Always show comments section label */}
-            <div className="px-4 pb-2 flex items-center justify-between">
-              <p className="text-sm font-semibold">
-                Comments {comments.length > 0 && `(${comments.length})`}
-              </p>
-              {comments.length === 0 && (
-                <p className="text-xs text-muted-foreground">Be the first to comment</p>
+            {/* Comments hidden until user taps the comment button */}
+            <div className="px-4 pb-3">
+              {comments.length > 0 && (
+                <p className="text-sm text-muted-foreground">{comments.length} comment{comments.length === 1 ? '' : 's'}</p>
               )}
             </div>
-
-            {/* Comments section - always visible, scrollable */}
-            <ScrollArea className="flex-1 px-4 min-h-[120px] max-h-[200px]">
-              {loading ? (
-                <div className="flex justify-center py-4">
-                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                </div>
-              ) : comments.length > 0 ? (
-                <div className="space-y-3 pb-2">
-                  {comments.map((comment) => (
-                    <div key={comment.id} className="flex gap-3">
-                      <Avatar className="h-8 w-8 flex-shrink-0">
-                        <AvatarImage src={comment.profiles?.avatar_url || undefined} />
-                        <AvatarFallback>
-                          {comment.profiles?.username?.[0]?.toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm">
-                          <span className="font-semibold mr-2">
-                            {comment.profiles?.username || "Anonymous"}
-                          </span>
-                          {comment.comment_text}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-6 text-center">
-                  <MessageCircle className="h-10 w-10 text-muted-foreground/50 mb-2" />
-                  <p className="text-sm text-muted-foreground">No comments yet</p>
-                  <p className="text-xs text-muted-foreground/70">Be the first to comment!</p>
-                </div>
-              )}
-            </ScrollArea>
-
-            {/* Comment input - Always visible with safe area support */}
-            <form onSubmit={handleSubmitComment} className="flex items-center gap-3 px-4 py-3 border-t bg-background sticky bottom-0 pb-safe">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={userAvatar || undefined} />
-                <AvatarFallback>
-                  {username?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <Input
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder={user ? "Add a comment..." : "Sign in to comment"}
-                disabled={submitting || !user}
-                className="flex-1 h-10"
-              />
-              {newComment.trim() && (
-                <Button 
-                  type="submit" 
-                  disabled={submitting}
-                  variant="ghost"
-                  size="sm"
-                  className="text-primary font-semibold hover:text-primary/80 h-auto p-0"
-                >
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Post"}
-                </Button>
-              )}
-            </form>
           </div>
         </div>
       </DialogContent>
