@@ -302,7 +302,7 @@ const TravelFeed = () => {
         </div>
       ) : (
         /* Mobile Layout - Full Screen Vertical Scroll */
-        <div className="relative h-[100dvh] w-full bg-black overflow-hidden">
+        <div className="relative h-[100dvh] w-full bg-black overflow-hidden fixed inset-0">
           {/* Top bar - minimal "For You" label only */}
           {isPersonalized && (
             <div id="feed-top-bar" className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center py-3 safe-top">
@@ -320,7 +320,6 @@ const TravelFeed = () => {
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              paddingTop: isPersonalized ? 44 : 0,
               paddingBottom: 'calc(64px + env(safe-area-inset-bottom))',
             }}
           >

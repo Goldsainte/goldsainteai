@@ -112,11 +112,20 @@ function AppContent() {
   
   // Don't show header on these pages as they have their own custom headers
   const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];
-  const showHeader = !hideHeaderPages.some(page => location.pathname.startsWith(page));
+  const showHeader = location.pathname !== '/' && !hideHeaderPages.some(page => location.pathname.startsWith(page));
 
   // Don't show AI Booking Concierge on Horizon pages
   const hideAIBookingPages = ['/travel-feed', '/travel-profile', '/travel-settings', '/search', '/trending'];
-  const showAIBooking = !hideAIBookingPages.some(page => location.pathname.startsWith(page));
+  const showAIBooking = location.pathname !== '/' && !hideAIBookingPages.some(page => location.pathname.startsWith(page));
+
+  // Hide Lovable badge on Journeys feed
+  useEffect(() => {
+    const isJourneysPage = location.pathname === '/' || location.pathname === '/travel-feed';
+    const badge = document.querySelector('.lovable-badge, [data-lovable-badge], iframe[src*="lovable"]');
+    if (badge instanceof HTMLElement) {
+      badge.style.display = isJourneysPage ? 'none' : 'block';
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen w-full flex flex-col">
