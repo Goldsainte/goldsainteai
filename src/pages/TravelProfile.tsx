@@ -639,22 +639,28 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         <TabsList className="w-full grid grid-cols-3 rounded-none h-11 bg-transparent">
           <TabsTrigger 
             value="posts" 
-            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
+            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none flex flex-col gap-0.5"
+            title="Photos"
           >
             <Grid3X3 className="h-5 w-5" />
+            <span className="text-[10px]">Posts</span>
           </TabsTrigger>
           <TabsTrigger 
             value="journeys"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
+            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none flex flex-col gap-0.5"
+            title="Videos - Your travel journeys"
           >
             <Video className="h-5 w-5" />
+            <span className="text-[10px]">Journeys</span>
           </TabsTrigger>
           {isOwnProfile && (
             <TabsTrigger 
               value="liked"
-              className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none"
+              className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none flex flex-col gap-0.5"
+              title="Liked content"
             >
               <Heart className="h-5 w-5" />
+              <span className="text-[10px]">Liked</span>
             </TabsTrigger>
           )}
         </TabsList>
@@ -696,28 +702,34 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       <Video className="h-8 w-8 text-white" />
                     </div>
                   )}
+                  {/* Instagram-style hover overlay for videos */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <div className="text-white text-sm space-y-1 flex items-center gap-3">
+                    <div className="text-white text-sm flex items-center gap-4">
                       <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4 fill-white" />
-                        <span>{formatNumber(post.like_count)}</span>
+                        <Heart className="h-5 w-5 fill-white" />
+                        <span className="font-semibold">{formatNumber(post.like_count)}</span>
                       </div>
-                      {isOwnProfile && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingPost(post);
-                            setEditOpen(true);
-                          }}
-                          className="ml-2"
-                        >
-                          <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <Video className="h-5 w-5 fill-white" />
+                        <span className="font-semibold">{formatNumber(post.view_count)}</span>
+                      </div>
                     </div>
                   </div>
+                  {/* Edit button in corner - only visible on hover */}
+                  {isOwnProfile && (
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPost(post);
+                        setEditOpen(true);
+                      }}
+                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 border-none"
+                    >
+                      <Edit className="h-4 w-4 text-white" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -774,28 +786,34 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       <Grid3X3 className="h-8 w-8 text-white" />
                     </div>
                   )}
+                  {/* Instagram-style hover overlay - NO edit button on photos */}
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                    <div className="text-white text-sm space-y-1 flex items-center gap-3">
+                    <div className="text-white text-sm flex items-center gap-4">
                       <div className="flex items-center gap-1">
-                        <Heart className="h-4 w-4 fill-white" />
-                        <span>{formatNumber(post.like_count)}</span>
+                        <Heart className="h-5 w-5 fill-white" />
+                        <span className="font-semibold">{formatNumber(post.like_count)}</span>
                       </div>
-                      {isOwnProfile && (
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingPost(post);
-                            setEditOpen(true);
-                          }}
-                          className="ml-2"
-                        >
-                          <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-1">
+                        <MessageCircle className="h-5 w-5 fill-white" />
+                        <span className="font-semibold">0</span>
+                      </div>
                     </div>
                   </div>
+                  {/* Edit button in corner - only visible on hover */}
+                  {isOwnProfile && (
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingPost(post);
+                        setEditOpen(true);
+                      }}
+                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 border-none"
+                    >
+                      <Edit className="h-4 w-4 text-white" />
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

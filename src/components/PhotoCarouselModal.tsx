@@ -343,22 +343,23 @@ const PhotoCarouselModal = ({
               </div>
             )}
 
-            {/* View all comments */}
-            {comments.length > 0 && (
-              <div className="px-4 pb-2">
-                <button className="text-sm text-muted-foreground">
-                  View all {comments.length} comments
-                </button>
-              </div>
-            )}
+            {/* Always show comments section label */}
+            <div className="px-4 pb-2 flex items-center justify-between">
+              <p className="text-sm font-semibold">
+                Comments {comments.length > 0 && `(${comments.length})`}
+              </p>
+              {comments.length === 0 && (
+                <p className="text-xs text-muted-foreground">Be the first to comment</p>
+              )}
+            </div>
 
-            {/* Comments section - scrollable */}
-            <ScrollArea className="flex-1 px-4 min-h-[100px] max-h-[200px]">
+            {/* Comments section - always visible, scrollable */}
+            <ScrollArea className="flex-1 px-4 min-h-[120px] max-h-[200px]">
               {loading ? (
                 <div className="flex justify-center py-4">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
-              ) : comments.length > 3 ? (
+              ) : comments.length > 0 ? (
                 <div className="space-y-3 pb-2">
                   {comments.map((comment) => (
                     <div key={comment.id} className="flex gap-3">
@@ -382,7 +383,13 @@ const PhotoCarouselModal = ({
                     </div>
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <MessageCircle className="h-10 w-10 text-muted-foreground/50 mb-2" />
+                  <p className="text-sm text-muted-foreground">No comments yet</p>
+                  <p className="text-xs text-muted-foreground/70">Be the first to comment!</p>
+                </div>
+              )}
             </ScrollArea>
 
             {/* Comment input */}
