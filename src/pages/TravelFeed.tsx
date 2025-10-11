@@ -92,22 +92,28 @@ const TravelFeed = () => {
     try {
       let loadedPosts: TravelPost[] = [];
       // Use personalized feed if user is logged in and we're not targeting a specific post
-      if (user && !focusPostId) {
-        const { data, error } = await supabase.functions.invoke('get-personalized-feed');
-        
-        if (error) {
-          console.error('Error fetching personalized feed:', error);
-          toast.error('Failed to load personalized feed, showing recent posts');
-          setIsPersonalized(false);
-          // Fallback to chronological feed
-          loadedPosts = await fetchChronologicalPosts();
-        } else {
-          const postsArr = (data as any)?.posts || [];
-          setPosts(postsArr);
-          loadedPosts = postsArr;
-          setIsPersonalized(true);
-        }
+    if (user && !focusPostId) {
+      const { data, error } = await supabase.functions.invoke('get-personalized-feed');
+      if (error) {
+        console.error('Error fetching personalized feed:', error);
+        toast.error('Failed to load personalized feed, showing recent posts');
+        setIsPersonalized(false);
+        // Fallback to chronological feed
+        loadedPosts = await fetchChronologicalPosts();
       } else {
+        const personalized = ((data as any)?.posts || []) as TravelPost[];
+        // Also load latest chronological posts to ensure photos + videos auto-populate first
+        const chrono = await fetchChronologicalPostsRaw();
+        // Merge with chronological first, then personalized (no duplicates)
+        const map = new Map<string, TravelPost>();
+        chrono.forEach(p => map.set(p.id, p));
+        personalized.forEach(p => map.set(p.id, p));
+        const merged = Array.from(map.values());
+        setPosts(merged);
+        loadedPosts = merged;
+        setIsPersonalized(true);
+      }
+    } else {
         // Show chronological feed for non-logged in users or when focusing specific post
         setIsPersonalized(false);
         loadedPosts = await fetchChronologicalPosts();
@@ -169,6 +175,30 @@ const TravelFeed = () => {
     
     console.log('Posts with profiles:', postsWithProfiles.length);
     setPosts(postsWithProfiles);
+    return postsWithProfiles;
+  };
+
+  // Raw chronological fetch that does NOT set state; used to merge with personalized results
+  const fetchChronologicalPostsRaw = async (): Promise<TravelPost[]> => {
+    const { data, error } = await supabase
+      .from('travel_posts')
+      .select('*')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
+      .limit(20);
+
+    if (error) throw error;
+
+    const postsWithProfiles = await Promise.all(
+      (data || []).map(async (post) => {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('username, avatar_url, is_verified, instagram_username')
+          .eq('id', post.user_id)
+          .maybeSingle();
+        return { ...post, profiles: profile || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null } };
+      })
+    );
     return postsWithProfiles;
   };
 
@@ -279,7 +309,7 @@ const TravelFeed = () => {
           <div
             ref={containerRef}
             onScroll={handleScroll}
-            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth pb-28 pb-safe"
+            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory overscroll-y-contain scroll-smooth"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style>{`
@@ -306,7 +336,7 @@ const TravelFeed = () => {
               posts.map((post, index) => (
                 <div
                   key={post.id}
-                  className="h-screen w-full snap-start snap-always"
+                  className="min-h-[100svh] h-[100svh] w-full snap-start snap-always"
                 >
                   <TravelVideoCard
                     post={post}
