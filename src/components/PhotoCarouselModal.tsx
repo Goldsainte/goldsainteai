@@ -298,7 +298,7 @@ const PhotoCarouselModal = ({
                   className="hover:bg-transparent p-0 h-auto flex items-center gap-1.5"
                 >
                   <Heart 
-                    className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                    className={`h-7 w-7 md:h-6 md:w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
                   />
                   {likeCount > 0 && (
                     <span className="text-sm font-semibold">{likeCount}</span>
@@ -309,7 +309,7 @@ const PhotoCarouselModal = ({
                   size="sm"
                   className="hover:bg-transparent p-0 h-auto flex items-center gap-1.5"
                 >
-                  <MessageCircle className="h-6 w-6" />
+                  <MessageCircle className="h-7 w-7 md:h-6 md:w-6" />
                   {comments.length > 0 && (
                     <span className="text-sm font-semibold">{comments.length}</span>
                   )}
@@ -320,7 +320,7 @@ const PhotoCarouselModal = ({
                   onClick={handleShare}
                   className="hover:bg-transparent p-0 h-auto"
                 >
-                  <Send className="h-6 w-6" />
+                  <Send className="h-7 w-7 md:h-6 md:w-6" />
                 </Button>
               </div>
             </div>
@@ -353,14 +353,14 @@ const PhotoCarouselModal = ({
             )}
 
             {/* Comments section - scrollable */}
-            <ScrollArea className="flex-1 px-4">
+            <ScrollArea className="flex-1 px-4 min-h-[100px] max-h-[200px]">
               {loading ? (
                 <div className="flex justify-center py-4">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                 </div>
-              ) : (
+              ) : comments.length > 3 ? (
                 <div className="space-y-3 pb-2">
-                  {comments.slice(0, 3).map((comment) => (
+                  {comments.map((comment) => (
                     <div key={comment.id} className="flex gap-3">
                       <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={comment.profiles?.avatar_url || undefined} />
@@ -382,7 +382,7 @@ const PhotoCarouselModal = ({
                     </div>
                   ))}
                 </div>
-              )}
+              ) : null}
             </ScrollArea>
 
             {/* Comment input */}
