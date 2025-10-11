@@ -124,14 +124,192 @@ export const Header = () => {
           {/* Mobile Layout */}
           {isMobile ? (
             <div className="flex flex-col gap-2 py-2">
-              {/* Top row: Logo + Notifications */}
+              {/* Top row: Logo + Navigation + User Menu */}
               <div className="flex items-center justify-between">
                 <a href="/" className="flex items-center hover:opacity-90 transition-opacity">
                   <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
                 </a>
-                {user && (
-                  <NotificationCenter />
-                )}
+                
+                <div className="flex items-center gap-2">
+                  {user && <NotificationCenter />}
+                  
+                  {/* Mobile Navigation Menu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-10 w-10 hover:bg-[#BFAD72] transition-all duration-300 group"
+                        aria-label="Main menu"
+                      >
+                        <Menu className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="w-80 max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
+                    >
+                      {/* Create Section */}
+                      <div className="px-4 py-3 border-b border-border/50">
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Create</p>
+                      </div>
+                      <div className="py-2">
+                        <DropdownMenuItem 
+                          onClick={() => setCreateSheetOpen(true)} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Create</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/travel-feed')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Journeys</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/browse-creators')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Browse Creators</span>
+                        </DropdownMenuItem>
+                      </div>
+                      
+                      <DropdownMenuSeparator className="bg-border/50" />
+                      
+                      {/* Travel Agent Marketplace Section */}
+                      <div className="px-4 py-3 border-b border-border/50">
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Agent Marketplace</p>
+                      </div>
+                      <div className="py-2">
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/browse-agents')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Browse Agents</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/marketplace')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Marketplace</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/agent-onboarding')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Become an Agent</span>
+                        </DropdownMenuItem>
+                      </div>
+                      
+                      <DropdownMenuSeparator className="bg-border/50" />
+                      
+                      {/* Shop & Commerce Section */}
+                      <div className="px-4 py-3 border-b border-border/50">
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Shop & Earn</p>
+                      </div>
+                      <div className="py-2">
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/shop')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Shop</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/affiliate-manager')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Link2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Affiliate Links</span>
+                        </DropdownMenuItem>
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  {/* Mobile User Menu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon"
+                        className="h-10 w-10 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group"
+                        aria-label="User menu"
+                      >
+                        <User className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent 
+                      align="end" 
+                      className="w-72 bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
+                    >
+                      {user ? (
+                        <>
+                          {/* Coin Balance Section */}
+                          <div className="px-4 py-3 border-b border-border/50">
+                            <div 
+                              className="flex items-center justify-between cursor-pointer hover:bg-secondary/10 -mx-2 px-2 py-1 rounded-lg transition-colors"
+                              onClick={() => setBuyCoinsOpen(true)}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Coins className="h-5 w-5 text-secondary" />
+                                <span className="text-sm font-medium">Coin Balance</span>
+                              </div>
+                              <span className="text-lg font-bold text-secondary">{balance}</span>
+                            </div>
+                          </div>
+
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/profile')} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          >
+                            <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Profile</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/dashboard')} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          >
+                            <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Dashboard</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/favorites')} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          >
+                            <Heart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Favorites</span>
+                          </DropdownMenuItem>
+                          
+                          <DropdownMenuSeparator className="bg-border/50" />
+                          
+                          <DropdownMenuItem 
+                            onClick={signOut} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 text-destructive"
+                          >
+                            <User className="h-5 w-5 flex-shrink-0" />
+                            <span className="text-sm font-medium">Sign Out</span>
+                          </DropdownMenuItem>
+                        </>
+                      ) : (
+                        <>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/auth')} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          >
+                            <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Sign In</span>
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </div>
               
               {/* Horizontal scrolling travel categories */}
