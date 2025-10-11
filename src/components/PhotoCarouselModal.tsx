@@ -219,29 +219,83 @@ const PhotoCarouselModal = ({
     }
   };
 
-  const handleShareToMoment = () => {
-    toast.success("Sharing as Moment...");
-    // Navigate to create moment with this image
+  const handleShareToMoment = async () => {
+    try {
+      const current = images[index];
+      if (!current) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("Please sign in to share a Moment");
+        return;
+      }
+      const isVideo = /\.(mp4|mov|webm)$/i.test(current);
+      const { error } = await supabase.from('moments').insert({
+        user_id: user.id,
+        media_url: current,
+        media_type: isVideo ? 'video' : 'image',
+        caption: caption || null,
+      });
+      if (error) throw error;
+      toast.success("Shared as a Moment! Your ring is live.");
+    } catch (err) {
+      console.error('Share as Moment failed', err);
+      toast.error("Could not share as a Moment");
+    }
   };
 
-  const handleShareToInstagram = () => {
-    const imageUrl = images[index];
-    // Instagram doesn't support direct sharing via URL, so we'll copy link
-    navigator.clipboard.writeText(`${window.location.origin}/travel-feed?postId=${postId}`);
-    toast.success("Link copied! Open Instagram to share");
+  const handleShareToInstagram = async () => {
+    const shareUrl = `${window.location.origin}/travel-feed?postId=${postId}`;
+    try {
+      // Try Web Share first
+      if (navigator.share) {
+        await navigator.share({ title: caption || 'Check this out', url: shareUrl });
+        return;
+      }
+    } catch {}
+
+    // Try app deep link
+    const appUrl = 'instagram://app';
+    const webUrl = 'https://www.instagram.com/';
+    const timer = setTimeout(() => {
+      window.open(webUrl, '_blank');
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied. Open Instagram to paste.');
+    }, 800);
+    window.location.href = appUrl;
+    setTimeout(() => clearTimeout(timer), 1500);
   };
 
-  const handleShareToTikTok = () => {
-    const imageUrl = images[index];
-    // TikTok doesn't support direct sharing via URL, so we'll copy link
-    navigator.clipboard.writeText(`${window.location.origin}/travel-feed?postId=${postId}`);
-    toast.success("Link copied! Open TikTok to share");
+  const handleShareToTikTok = async () => {
+    const shareUrl = `${window.location.origin}/travel-feed?postId=${postId}`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: caption || 'Check this out', url: shareUrl });
+        return;
+      }
+    } catch {}
+
+    const appUrl = 'tiktok://app';
+    const webUrl = 'https://www.tiktok.com/upload';
+    const timer = setTimeout(() => {
+      window.open(webUrl, '_blank');
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied. Open TikTok to paste.');
+    }, 800);
+    window.location.href = appUrl;
+    setTimeout(() => clearTimeout(timer), 1500);
   };
 
   const handleShareViaText = () => {
     const shareUrl = `${window.location.origin}/travel-feed?postId=${postId}`;
-    const smsUrl = `sms:?body=${encodeURIComponent(`Check out this post: ${shareUrl}`)}`;
-    window.location.href = smsUrl;
+    const ua = navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipad|ipod|android/.test(ua);
+    if (isMobile) {
+      const smsUrl = `sms:?body=${encodeURIComponent(`Check this out: ${shareUrl}`)}`;
+      window.location.href = smsUrl;
+    } else {
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Link copied. Paste into your messaging app.');
+    }
   };
 
   const handlePrevious = () => {
@@ -277,15 +331,15 @@ const PhotoCarouselModal = ({
           </Button>
 
           {/* Image area - Swipeable Carousel */}
-          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden touch-pan-y">
+          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden touch-pan-x">
             <Carousel
               opts={{ startIndex, loop: false, dragFree: true }}
               setApi={setCarouselApi}
-              className="w-full h-full"
+              className="w-full h-full cursor-grab active:cursor-grabbing"
             >
-              <CarouselContent className="h-full -ml-0">
+              <CarouselContent className="h-full -ml-0 select-none">
                 {images.map((img, idx) => (
-                  <CarouselItem key={idx} className="h-full flex items-center justify-center pl-0">
+                  <CarouselItem key={idx} className="h-full flex items-center justify-center pl-0 select-none">
                     <img 
                       src={img} 
                       alt={`Photo ${idx + 1}`} 
