@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
+import { OnboardingTour } from "@/components/OnboardingTour";
 import { usePresence } from "@/hooks/usePresence";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
@@ -79,6 +80,7 @@ function AppContent() {
   return (
     <div className="min-h-screen w-full flex flex-col">
       <SkipNavigation />
+      <OnboardingTour />
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Routes>

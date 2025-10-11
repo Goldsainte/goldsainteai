@@ -861,7 +861,6 @@ const Index = () => {
 
   return (
     <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
-      <OnboardingTour />
       <div className="w-full h-full flex flex-col">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
