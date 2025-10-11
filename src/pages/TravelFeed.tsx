@@ -320,47 +320,47 @@ const TravelFeed = () => {
             )}
           </div>
 
-          {/* Bottom Navigation Bar - Instagram Style */}
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-white/20 pb-safe">
-            <div className="flex items-center justify-around py-3 px-4">
+          {/* Bottom Navigation Bar - compact */}
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-black/90 backdrop-blur border-t border-white/20 pb-safe">
+            <div className="flex items-center justify-around py-1.5 px-4">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/')}
-                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
+                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
                 aria-label="Home"
               >
-                <Home className="h-8 w-8" />
+                <Home className="h-6 w-6" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/search')}
-                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
+                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
                 aria-label="Search"
               >
-                <SearchIcon className="h-8 w-8" />
+                <SearchIcon className="h-6 w-6" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
+                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
                 aria-label="Create"
               >
-                <PlusSquare className="h-8 w-8" />
+                <PlusSquare className="h-6 w-6" />
               </Button>
               
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/20 h-16 w-16 rounded-lg border-2 border-primary"
+                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
                 aria-label="Profile"
               >
-                <User className="h-8 w-8" />
+                <User className="h-6 w-6" />
               </Button>
             </div>
           </div>

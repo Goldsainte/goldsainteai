@@ -689,7 +689,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {videoPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group"
+                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden rounded-md border border-border"
                   onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
                 >
                   {post.thumbnail_url ? (
@@ -760,7 +760,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {userPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group"
+                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden rounded-md border border-border"
                   onClick={() => {
                     if (post.image_urls && post.image_urls.length > 0) {
                       setPhotoModalImages(post.image_urls);
@@ -836,7 +836,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 {likedPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="relative aspect-square bg-muted cursor-pointer group"
+                    className="relative aspect-square bg-muted cursor-pointer group overflow-hidden rounded-md border border-border"
                     onClick={() => {
                       if (post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0) {
                         setPhotoModalImages(post.image_urls);
@@ -977,47 +977,50 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </>
       )}
 
-      {/* Bottom Navigation Bar - Mobile Only, Instagram Style */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background border-t md:hidden pb-safe">
-        <div className="flex items-center justify-around py-3 px-4">
+      {/* Spacer for mobile nav to prevent overlap */}
+      <div className="h-16 md:hidden" aria-hidden />
+
+      {/* Bottom Navigation Bar - Mobile Only, compact */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/95 backdrop-blur border-t md:hidden pb-safe">
+        <div className="flex items-center justify-around py-1.5 px-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/')}
-            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
             aria-label="Home"
           >
-            <Home className="h-8 w-8" />
+            <Home className="h-6 w-6" />
           </Button>
           
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-feed')}
-            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
             aria-label="Journeys"
           >
-            <Video className="h-8 w-8" />
+            <Video className="h-6 w-6" />
           </Button>
           
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setCreateSheetOpen(true)}
-            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
             aria-label="Create"
           >
-            <PlusSquare className="h-8 w-8" />
+            <PlusSquare className="h-6 w-6" />
           </Button>
           
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-profile')}
-            className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
             aria-label="Profile"
           >
-            <User className="h-8 w-8" />
+            <User className="h-6 w-6" />
           </Button>
         </div>
       </div>
