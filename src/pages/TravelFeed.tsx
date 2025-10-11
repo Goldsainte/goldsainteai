@@ -203,7 +203,7 @@ const TravelFeed = () => {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold">Sign in to view Travel Feed</h2>
+          <h2 className="text-2xl font-bold">Sign in to View the Journeys Feed</h2>
           <Button onClick={() => navigate('/auth')}>Sign In</Button>
         </div>
       </div>
