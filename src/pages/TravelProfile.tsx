@@ -666,7 +666,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           )}
         </TabsList>
 
-        <TabsContent value="journeys" className="mt-0">
+        <TabsContent value="journeys" className="mt-4">
           {loading ? (
             <div className="flex items-center justify-center p-12">
               <div className="text-muted-foreground">Loading videos...</div>
@@ -737,7 +737,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           )}
         </TabsContent>
 
-        <TabsContent value="posts" className="mt-0">
+        <TabsContent value="posts" className="mt-4">
           {loading ? (
             <div className="flex items-center justify-center p-12">
               <div className="text-muted-foreground">Loading photos...</div>
@@ -822,7 +822,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </TabsContent>
 
         {isOwnProfile && (
-          <TabsContent value="liked" className="mt-0">
+          <TabsContent value="liked" className="mt-4">
             {likedPosts.length === 0 ? (
               <div className="flex flex-col items-center justify-center p-12 text-center">
                 <Heart className="h-12 w-12 text-muted-foreground mb-4" />
