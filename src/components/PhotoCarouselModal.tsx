@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Heart, Send, Loader2, ChevronLeft, ChevronRight, Smile } from "lucide-react";
+import { X, Heart, Send, Loader2, ChevronLeft, ChevronRight, Smile, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -210,21 +210,21 @@ const PhotoCarouselModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-background border-none [&>button]:hidden">
-        <div className="relative w-full h-[95vh] flex flex-col md:flex-row">
+      <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 bg-black border-none [&>button]:hidden">
+        <div className="relative w-full h-full flex flex-col">
           {/* Close button */}
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-2 right-2 z-50 hover:bg-muted rounded-full md:top-4 md:right-4"
+            className="absolute top-4 right-4 z-50 text-white hover:bg-white/10 rounded-full"
             onClick={() => onOpenChange(false)}
             aria-label="Close"
           >
             <X className="h-6 w-6" />
           </Button>
 
-          {/* Left: Image viewer */}
-          <div className="relative flex-1 bg-black flex items-center justify-center">
+          {/* Image area */}
+          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
             {/* Navigation arrows */}
             {images.length > 1 && index > 0 && (
               <Button
@@ -248,7 +248,7 @@ const PhotoCarouselModal = ({
               </Button>
             )}
 
-            {/* Clickable image areas for navigation */}
+            {/* Clickable areas for navigation */}
             <div className="relative w-full h-full flex">
               {images.length > 1 && index > 0 && (
                 <div 
@@ -273,67 +273,102 @@ const PhotoCarouselModal = ({
 
             {/* Photo counter */}
             {images.length > 1 && (
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-sm">
-                {index + 1} / {images.length}
+              <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-1">
+                {images.map((_, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-1.5 h-1.5 rounded-full ${
+                      idx === index ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
               </div>
             )}
           </div>
 
-          {/* Right: Comments panel (desktop only) */}
-          <div className="hidden md:flex md:w-[400px] bg-background border-l flex-col">
-            {/* Header */}
-            <div className="flex items-center gap-3 p-4 border-b">
-              <Avatar className="h-10 w-10">
-                <AvatarImage src={userAvatar || undefined} />
-                <AvatarFallback>
-                  {username?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="font-semibold text-sm">{username || 'Anonymous'}</p>
+          {/* Instagram-style bottom section */}
+          <div className="bg-background border-t border-border max-h-[40vh] flex flex-col">
+            {/* Action bar */}
+            <div className="flex items-center justify-between px-4 py-3">
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLike}
+                  className="hover:bg-transparent p-0 h-auto flex items-center gap-1.5"
+                >
+                  <Heart 
+                    className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                  />
+                  {likeCount > 0 && (
+                    <span className="text-sm font-semibold">{likeCount}</span>
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:bg-transparent p-0 h-auto flex items-center gap-1.5"
+                >
+                  <MessageCircle className="h-6 w-6" />
+                  {comments.length > 0 && (
+                    <span className="text-sm font-semibold">{comments.length}</span>
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleShare}
+                  className="hover:bg-transparent p-0 h-auto"
+                >
+                  <Send className="h-6 w-6" />
+                </Button>
               </div>
             </div>
 
-            {/* Comments */}
-            <ScrollArea className="flex-1 p-4">
-              {/* Caption as first "comment" */}
-              {caption && (
-                <div className="flex gap-3 mb-4">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={userAvatar || undefined} />
-                    <AvatarFallback>
-                      {username?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <p className="text-sm">
-                      <span className="font-semibold mr-2">{username}</span>
-                      {caption}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Comments list */}
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                </div>
-              ) : comments.length === 0 && !caption ? (
-                <p className="text-center text-muted-foreground py-8 text-sm">
-                  No comments yet.
+            {/* Liked by text */}
+            {likeCount > 0 && (
+              <div className="px-4 pb-2">
+                <p className="text-sm">
+                  <span className="font-semibold">{likeCount.toLocaleString()}</span> {likeCount === 1 ? 'like' : 'likes'}
                 </p>
+              </div>
+            )}
+
+            {/* Caption */}
+            {caption && (
+              <div className="px-4 pb-2">
+                <p className="text-sm">
+                  <span className="font-semibold">{username}</span> {caption}
+                </p>
+              </div>
+            )}
+
+            {/* View all comments */}
+            {comments.length > 0 && (
+              <div className="px-4 pb-2">
+                <button className="text-sm text-muted-foreground">
+                  View all {comments.length} comments
+                </button>
+              </div>
+            )}
+
+            {/* Comments section - scrollable */}
+            <ScrollArea className="flex-1 px-4">
+              {loading ? (
+                <div className="flex justify-center py-4">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
               ) : (
-                <div className="space-y-4">
-                  {comments.map((comment) => (
+                <div className="space-y-3 pb-2">
+                  {comments.slice(0, 3).map((comment) => (
                     <div key={comment.id} className="flex gap-3">
-                      <Avatar className="h-8 w-8">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={comment.profiles?.avatar_url || undefined} />
                         <AvatarFallback>
                           {comment.profiles?.username?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <p className="text-sm">
                           <span className="font-semibold mr-2">
                             {comment.profiles?.username || "Anonymous"}
@@ -350,53 +385,33 @@ const PhotoCarouselModal = ({
               )}
             </ScrollArea>
 
-            {/* Actions & Comment Input */}
-            <div className="border-t">
-              <div className="flex items-center gap-4 px-4 py-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleLike}
-                  className="hover:bg-transparent p-0 h-auto"
-                >
-                  <Heart 
-                    className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
-                  />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleShare}
-                  className="hover:bg-transparent p-0 h-auto"
-                >
-                  <Send className="h-6 w-6" />
-                </Button>
-              </div>
-
-              {likeCount > 0 && (
-                <p className="px-4 pb-2 font-semibold text-sm">
-                  {likeCount.toLocaleString()} {likeCount === 1 ? 'like' : 'likes'}
-                </p>
-              )}
-
-              <form onSubmit={handleSubmitComment} className="flex gap-2 p-4 border-t">
-                <Input
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  placeholder="Add a comment..."
-                  disabled={submitting || !user}
-                  className="flex-1 border-none focus-visible:ring-0 px-0"
-                />
+            {/* Comment input */}
+            <form onSubmit={handleSubmitComment} className="flex items-center gap-2 px-4 py-3 border-t">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={userAvatar || undefined} />
+                <AvatarFallback>
+                  {username?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <Input
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add a comment..."
+                disabled={submitting || !user}
+                className="flex-1 border-none focus-visible:ring-0 px-0 h-9"
+              />
+              {newComment.trim() && (
                 <Button 
                   type="submit" 
-                  disabled={submitting || !newComment.trim()}
+                  disabled={submitting}
                   variant="ghost"
-                  className="text-primary font-semibold hover:text-primary/80"
+                  size="sm"
+                  className="text-primary font-semibold hover:text-primary/80 h-auto p-0"
                 >
                   {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Post"}
                 </Button>
-              </form>
-            </div>
+              )}
+            </form>
           </div>
         </div>
       </DialogContent>
