@@ -24,6 +24,7 @@ import { CloseFriendsManager } from "@/components/CloseFriendsManager";
 import { useCloseFriends } from "@/hooks/useCloseFriends";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
+import PhotoCarouselModal from "@/components/PhotoCarouselModal";
 
 interface Profile {
   id: string;
@@ -81,7 +82,12 @@ const TravelProfile = () => {
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
-  const { balance, refetch: refetchCoins } = useCoinBalance();
+const { balance, refetch: refetchCoins } = useCoinBalance();
+
+  // Photo carousel modal state
+  const [photoModalOpen, setPhotoModalOpen] = useState(false);
+  const [photoModalImages, setPhotoModalImages] = useState<string[]>([]);
+  const [photoStartIndex, setPhotoStartIndex] = useState(0);
 
   const profileUserId = userId || user?.id;
   const isOwnProfile = user?.id === profileUserId;
@@ -741,19 +747,25 @@ const TravelProfile = () => {
                 <div
                   key={post.id}
                   className="relative aspect-square bg-muted cursor-pointer group"
-                  onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
+                  onClick={() => {
+                    if (post.image_urls && post.image_urls.length > 0) {
+                      setPhotoModalImages(post.image_urls);
+                      setPhotoStartIndex(0);
+                      setPhotoModalOpen(true);
+                    }
+                  }}
                 >
                   {post.image_urls && post.image_urls.length > 0 ? (
                     <img
                       src={post.image_urls[0]}
                       alt={post.caption || 'Photo'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-muted"
                     />
                   ) : post.thumbnail_url ? (
                     <img
                       src={post.thumbnail_url}
                       alt={post.caption || 'Photo'}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain bg-muted"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
@@ -804,13 +816,21 @@ const TravelProfile = () => {
                   <div
                     key={post.id}
                     className="relative aspect-square bg-muted cursor-pointer group"
-                    onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
+                    onClick={() => {
+                      if (post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0) {
+                        setPhotoModalImages(post.image_urls);
+                        setPhotoStartIndex(0);
+                        setPhotoModalOpen(true);
+                      } else {
+                        navigate(`/travel-feed?postId=${post.id}`);
+                      }
+                    }}
                   >
                     {post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0 ? (
                       <img
                         src={post.image_urls[0]}
                         alt={post.caption || 'Photo'}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-contain bg-muted"
                       />
                     ) : post.thumbnail_url ? (
                       <img
@@ -891,6 +911,14 @@ const TravelProfile = () => {
         open={createSheetOpen}
         onOpenChange={setCreateSheetOpen}
         onSelectType={handleCreateContent}
+      />
+
+      {/* Photo Carousel Modal */}
+      <PhotoCarouselModal
+        open={photoModalOpen}
+        onOpenChange={setPhotoModalOpen}
+        images={photoModalImages}
+        startIndex={photoStartIndex}
       />
 
       {/* Upload Modal */}
