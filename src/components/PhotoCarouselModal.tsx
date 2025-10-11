@@ -109,7 +109,6 @@ const PhotoCarouselModal = ({
         .from("post_comments")
         .select("id, comment_text, created_at, user_id")
         .eq("post_id", postId)
-        .is("parent_comment_id", null)
         .order("created_at", { ascending: true });
 
       if (error) throw error;
