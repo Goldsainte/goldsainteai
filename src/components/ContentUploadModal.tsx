@@ -63,9 +63,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
-    // Limit to 10 photos
-    if (files.length > 10) {
-      toast.error('Maximum 10 photos allowed');
+    // Limit to 20 photos
+    if (files.length > 20) {
+      toast.error('Maximum 20 photos allowed');
       return;
     }
 
@@ -486,7 +486,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
 
           <TabsContent value="photo" className="space-y-4 mt-4 overflow-y-auto flex-1">
             <div className="space-y-2">
-              <Label>Photos (up to 10)</Label>
+              <Label>Photos (up to 20)</Label>
               <Input
                 type="file"
                 accept="image/*"
