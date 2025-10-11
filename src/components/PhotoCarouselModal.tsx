@@ -374,19 +374,19 @@ const PhotoCarouselModal = ({
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem onClick={handleShareToMoment} className="cursor-pointer">
+                    <DropdownMenuItem onClick={handleShareToMoment} className="cursor-pointer text-[#BFAD72]">
                       <MessageCircle className="mr-2 h-4 w-4" />
                       Share as Moment
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareToInstagram} className="cursor-pointer">
+                    <DropdownMenuItem onClick={handleShareToInstagram} className="cursor-pointer text-[#BFAD72]">
                       <Instagram className="mr-2 h-4 w-4" />
                       Share to Instagram
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareToTikTok} className="cursor-pointer">
+                    <DropdownMenuItem onClick={handleShareToTikTok} className="cursor-pointer text-[#BFAD72]">
                       <Send className="mr-2 h-4 w-4" />
                       Share to TikTok
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareViaText} className="cursor-pointer">
+                    <DropdownMenuItem onClick={handleShareViaText} className="cursor-pointer text-[#BFAD72]">
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Share via Text Message
                     </DropdownMenuItem>
