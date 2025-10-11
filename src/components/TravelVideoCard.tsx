@@ -1003,23 +1003,23 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               onClick={handleLike}
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <Heart className={`h-9 w-9 text-white drop-shadow-2xl ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-              <span className="text-sm font-bold drop-shadow-2xl">{formatCount(localLikeCount)}</span>
+              <Heart className={`h-7 w-7 text-white drop-shadow-2xl ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <span className="text-xs font-bold drop-shadow-2xl">{formatCount(localLikeCount)}</span>
             </button>
 
             <button
               onClick={() => setCommentsOpen(true)}
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <MessageCircle className="h-9 w-9 text-white drop-shadow-2xl" />
-              <span className="text-sm font-bold drop-shadow-2xl">{formatCount(localCommentCount)}</span>
+              <MessageCircle className="h-7 w-7 text-white drop-shadow-2xl" />
+              <span className="text-xs font-bold drop-shadow-2xl">{formatCount(localCommentCount)}</span>
             </button>
 
             <button
               onClick={handleSaveClick}
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <Bookmark className={`h-9 w-9 text-white drop-shadow-2xl ${isSaved ? 'fill-white' : ''}`} />
+              <Bookmark className={`h-7 w-7 text-white drop-shadow-2xl ${isSaved ? 'fill-white' : ''}`} />
             </button>
 
             <button
@@ -1027,7 +1027,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
               data-tour="send-gift-post"
             >
-              <Coins className="h-9 w-9 text-[#BFAD72] drop-shadow-2xl" />
+              <Coins className="h-7 w-7 text-[#BFAD72] drop-shadow-2xl" />
             </button>
           </div>
         </div>

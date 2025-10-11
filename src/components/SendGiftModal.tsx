@@ -31,7 +31,14 @@ const renderGiftIcon = (name: string) => {
   const key = name.toLowerCase();
   const iconProps = { className: "h-10 w-10 text-accent" };
   
-  // Travel-themed icon mapping
+  // Map generic gift names to travel-themed icons
+  if (key.includes('heart')) return <Plane {...iconProps} />;
+  if (key.includes('rose') || key.includes('flower')) return <Palmtree {...iconProps} />;
+  if (key.includes('star')) return <Compass {...iconProps} />;
+  if (key.includes('diamond') || key.includes('gem')) return <Hotel {...iconProps} />;
+  if (key.includes('crown')) return <Globe {...iconProps} />;
+  
+  // Travel-themed keywords (if gifts are renamed in DB)
   if (key.includes('flight') || key.includes('plane')) return <Plane {...iconProps} />;
   if (key.includes('hotel') || key.includes('suite')) return <Hotel {...iconProps} />;
   if (key.includes('journey') || key.includes('trip') || key.includes('luggage')) return <Luggage {...iconProps} />;
@@ -41,7 +48,7 @@ const renderGiftIcon = (name: string) => {
   if (key.includes('paradise') || key.includes('palm') || key.includes('beach')) return <Palmtree {...iconProps} />;
   if (key.includes('ticket') || key.includes('pass')) return <Ticket {...iconProps} />;
   
-  // Fallback to generic travel icon
+  // Fallback
   return <Compass {...iconProps} />;
 };
 
