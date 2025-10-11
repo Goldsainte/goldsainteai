@@ -149,7 +149,7 @@ const TravelFeed = () => {
     console.log('Fetching chronological posts...');
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('id, user_id, video_url, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, created_at, is_suggested')
+      .select('id, user_id, video_url, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20);
@@ -163,10 +163,14 @@ const TravelFeed = () => {
 
     // Batch fetch profiles to avoid N+1
     const userIds = Array.from(new Set((data || []).map((p: any) => p.user_id).filter(Boolean)));
-    const { data: profilesData } = await supabase
-      .from('profiles')
-      .select('id, username, avatar_url, is_verified, instagram_username')
-      .in('id', userIds);
+    let profilesData: any[] = [];
+    if (userIds.length > 0) {
+      const { data: pData } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, is_verified, instagram_username')
+        .in('id', userIds);
+      profilesData = pData || [];
+    }
     const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
 
     const postsWithProfiles = (data || []).map((post: any) => ({
@@ -183,7 +187,7 @@ const TravelFeed = () => {
   const fetchChronologicalPostsRaw = async (): Promise<TravelPost[]> => {
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('id, user_id, video_url, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, created_at, is_suggested')
+      .select('id, user_id, video_url, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20);
@@ -191,10 +195,14 @@ const TravelFeed = () => {
     if (error) throw error;
 
     const userIds = Array.from(new Set((data || []).map((p: any) => p.user_id).filter(Boolean)));
-    const { data: profilesData } = await supabase
-      .from('profiles')
-      .select('id, username, avatar_url, is_verified, instagram_username')
-      .in('id', userIds);
+    let profilesData: any[] = [];
+    if (userIds.length > 0) {
+      const { data: pData } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url, is_verified, instagram_username')
+        .in('id', userIds);
+      profilesData = pData || [];
+    }
     const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
 
     const postsWithProfiles = (data || []).map((post: any) => ({
