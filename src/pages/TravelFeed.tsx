@@ -279,7 +279,7 @@ const TravelFeed = () => {
           <div
             ref={containerRef}
             onScroll={handleScroll}
-            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth"
+            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory scroll-smooth pb-28 pb-safe"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style>{`

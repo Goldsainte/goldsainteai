@@ -52,6 +52,7 @@ interface Post {
   location: string | null;
   view_count: number;
   like_count: number;
+  comment_count?: number;
 }
 
 const TravelProfile = () => {
@@ -205,7 +206,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       // Fetch only photo posts for the Posts tab
       let query: any = supabase
         .from('travel_posts')
-        .select('id, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count')
+        .select('id, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count')
         .eq('user_id', profileUserId)
         .eq('media_type', 'photo')
         .order('created_at', { ascending: false });
@@ -236,7 +237,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       // Fetch only video posts for the Journeys tab
       let query: any = supabase
         .from('travel_posts')
-        .select('id, video_url, media_type, thumbnail_url, caption, location, view_count, like_count')
+        .select('id, video_url, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count')
         .eq('user_id', profileUserId)
         .eq('media_type', 'video')
         .order('created_at', { ascending: false });
@@ -405,7 +406,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   }
 
   return (
-    <div className="min-h-screen bg-background pb-40 md:pb-0">
+    <div className="min-h-screen bg-background pb-28 pb-safe md:pb-0">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
         <div className="flex items-center justify-between p-4">
@@ -793,10 +794,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                         <Heart className="h-5 w-5 fill-white" />
                         <span className="font-semibold">{formatNumber(post.like_count)}</span>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <MessageCircle className="h-5 w-5 fill-white" />
-                        <span className="font-semibold">0</span>
-                      </div>
+                        <div className="flex items-center gap-1">
+                          <MessageCircle className="h-5 w-5 fill-white" />
+                          <span className="font-semibold">{formatNumber(post.comment_count || 0)}</span>
+                        </div>
                     </div>
                   </div>
                   {/* Edit button in corner - only visible on hover */}
