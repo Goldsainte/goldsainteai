@@ -302,7 +302,7 @@ const TravelFeed = () => {
         </div>
       ) : (
         /* Mobile Layout - Full Screen Vertical Scroll */
-        <div className="relative h-screen w-full bg-black overflow-hidden">
+        <div className="relative h-[100dvh] w-full bg-black overflow-hidden">
           {/* Top bar - minimal "For You" label only */}
           {isPersonalized && (
             <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-center py-3 safe-top">
@@ -343,7 +343,7 @@ const TravelFeed = () => {
               posts.map((post, index) => (
                 <div
                   key={post.id}
-                  className="min-h-[100svh] h-[100svh] w-full snap-start snap-always"
+                  className="min-h-[100dvh] h-[100dvh] w-full snap-start snap-always"
                 >
                   <TravelVideoCard
                     post={post}
