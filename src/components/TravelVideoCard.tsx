@@ -24,6 +24,8 @@ import { SendGiftModal } from "@/components/SendGiftModal";
 import { Coins } from "lucide-react";
 import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
 import { PromotePostModal } from "./PromotePostModal";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 interface TravelVideoCardProps {
   post: {
@@ -79,6 +81,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [giftModalOpen, setGiftModalOpen] = useState(false);
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [promoteModalOpen, setPromoteModalOpen] = useState(false);
+  const [photoGalleryOpen, setPhotoGalleryOpen] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -540,6 +544,26 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </>
           ) : post.embed_url ? (
             getEmbedComponent()
+          ) : post.image_urls && post.image_urls.length > 0 ? (
+            <div 
+              className="relative w-full h-full cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentPhotoIndex(0);
+                setPhotoGalleryOpen(true);
+              }}
+            >
+              <img 
+                src={post.image_urls[0]} 
+                alt="Post content"
+                className="w-full h-full object-contain bg-black"
+              />
+              {post.image_urls.length > 1 && (
+                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
+                  1 / {post.image_urls.length}
+                </div>
+              )}
+            </div>
           ) : null}
         </div>
 
@@ -730,6 +754,73 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           onOpenChange={setPromoteModalOpen}
           postId={post.id}
         />
+
+        {/* Photo Gallery Modal */}
+        {post.image_urls && post.image_urls.length > 0 && (
+          <Dialog open={photoGalleryOpen} onOpenChange={setPhotoGalleryOpen}>
+            <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black">
+              <div className="relative w-full h-[95vh] flex items-center justify-center">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-4 right-4 z-50 text-white hover:bg-white/20"
+                  onClick={() => setPhotoGalleryOpen(false)}
+                >
+                  <X className="h-6 w-6" />
+                </Button>
+
+                <div className="absolute top-4 left-4 z-50 bg-black/60 text-white px-4 py-2 rounded-lg">
+                  {currentPhotoIndex + 1} / {post.image_urls.length}
+                </div>
+
+                <img 
+                  src={post.image_urls[currentPhotoIndex]} 
+                  alt={`Photo ${currentPhotoIndex + 1}`}
+                  className="max-w-full max-h-full object-contain"
+                />
+
+                {post.image_urls.length > 1 && (
+                  <>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 h-12 w-12"
+                      onClick={() => setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length)}
+                    >
+                      <ChevronLeft className="h-8 w-8" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 h-12 w-12"
+                      onClick={() => setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length)}
+                    >
+                      <ChevronRight className="h-8 w-8" />
+                    </Button>
+                  </>
+                )}
+
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/60 p-2 rounded-lg max-w-[90vw] overflow-x-auto">
+                  {post.image_urls.map((img, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-16 h-16 rounded-md overflow-hidden cursor-pointer border-2 flex-shrink-0 ${
+                        currentPhotoIndex === idx ? "border-primary" : "border-transparent"
+                      }`}
+                      onClick={() => setCurrentPhotoIndex(idx)}
+                    >
+                      <img 
+                        src={img} 
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
     );
   }
@@ -760,7 +851,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </div>
       )}
 
-      {/* Video or Embed */}
+      {/* Video, Embed, or Photos */}
       {post.video_url ? (
         <>
           <video
@@ -795,6 +886,26 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </>
       ) : post.embed_url ? (
         getEmbedComponent()
+      ) : post.image_urls && post.image_urls.length > 0 ? (
+        <div 
+          className="absolute inset-0 cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+            setCurrentPhotoIndex(0);
+            setPhotoGalleryOpen(true);
+          }}
+        >
+          <img 
+            src={post.image_urls[0]} 
+            alt="Post content"
+            className="w-full h-full object-contain bg-black"
+          />
+          {post.image_urls.length > 1 && (
+            <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
+              1 / {post.image_urls.length}
+            </div>
+          )}
+        </div>
       ) : null}
 
       {/* Gradient Overlay - Stronger for better readability */}
@@ -979,6 +1090,73 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         onOpenChange={setPromoteModalOpen}
         postId={post.id}
       />
+
+      {/* Photo Gallery Modal for Mobile */}
+      {post.image_urls && post.image_urls.length > 0 && (
+        <Dialog open={photoGalleryOpen} onOpenChange={setPhotoGalleryOpen}>
+          <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black">
+            <div className="relative w-full h-[95vh] flex items-center justify-center">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20"
+                onClick={() => setPhotoGalleryOpen(false)}
+              >
+                <X className="h-6 w-6" />
+              </Button>
+
+              <div className="absolute top-4 left-4 z-50 bg-black/60 text-white px-4 py-2 rounded-lg">
+                {currentPhotoIndex + 1} / {post.image_urls.length}
+              </div>
+
+              <img 
+                src={post.image_urls[currentPhotoIndex]} 
+                alt={`Photo ${currentPhotoIndex + 1}`}
+                className="max-w-full max-h-full object-contain"
+              />
+
+              {post.image_urls.length > 1 && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 h-12 w-12"
+                    onClick={() => setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length)}
+                  >
+                    <ChevronLeft className="h-8 w-8" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white hover:bg-white/20 h-12 w-12"
+                    onClick={() => setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length)}
+                  >
+                    <ChevronRight className="h-8 w-8" />
+                  </Button>
+                </>
+              )}
+
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-black/60 p-2 rounded-lg max-w-[90vw] overflow-x-auto">
+                {post.image_urls.map((img, idx) => (
+                  <div
+                    key={idx}
+                    className={`w-16 h-16 rounded-md overflow-hidden cursor-pointer border-2 flex-shrink-0 ${
+                      currentPhotoIndex === idx ? "border-primary" : "border-transparent"
+                    }`}
+                    onClick={() => setCurrentPhotoIndex(idx)}
+                  >
+                    <img 
+                      src={img} 
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
