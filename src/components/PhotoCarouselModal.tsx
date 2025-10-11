@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Heart, Send, Loader2, ChevronLeft, ChevronRight, Smile, MessageCircle } from "lucide-react";
+import { X, Heart, Send, Loader2, ChevronLeft, ChevronRight, MessageCircle, Share2, Instagram, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -12,6 +12,12 @@ import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import { CommentsSheet } from "@/components/CommentsSheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Comment {
   id: string;
@@ -213,16 +219,29 @@ const PhotoCarouselModal = ({
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share && postId) {
-      navigator.share({
-        title: caption || 'Check out this post',
-        url: `${window.location.origin}/travel-feed?postId=${postId}`
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(`${window.location.origin}/travel-feed?postId=${postId}`);
-      toast.success("Link copied to clipboard");
-    }
+  const handleShareToMoment = () => {
+    toast.success("Sharing as Moment...");
+    // Navigate to create moment with this image
+  };
+
+  const handleShareToInstagram = () => {
+    const imageUrl = images[index];
+    // Instagram doesn't support direct sharing via URL, so we'll copy link
+    navigator.clipboard.writeText(`${window.location.origin}/travel-feed?postId=${postId}`);
+    toast.success("Link copied! Open Instagram to share");
+  };
+
+  const handleShareToTikTok = () => {
+    const imageUrl = images[index];
+    // TikTok doesn't support direct sharing via URL, so we'll copy link
+    navigator.clipboard.writeText(`${window.location.origin}/travel-feed?postId=${postId}`);
+    toast.success("Link copied! Open TikTok to share");
+  };
+
+  const handleShareViaText = () => {
+    const shareUrl = `${window.location.origin}/travel-feed?postId=${postId}`;
+    const smsUrl = `sms:?body=${encodeURIComponent(`Check out this post: ${shareUrl}`)}`;
+    window.location.href = smsUrl;
   };
 
   const handlePrevious = () => {
@@ -258,19 +277,19 @@ const PhotoCarouselModal = ({
           </Button>
 
           {/* Image area - Swipeable Carousel */}
-          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
+          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden touch-pan-y">
             <Carousel
-              opts={{ startIndex, loop: false }}
+              opts={{ startIndex, loop: false, dragFree: true }}
               setApi={setCarouselApi}
               className="w-full h-full"
             >
-              <CarouselContent className="h-full">
+              <CarouselContent className="h-full -ml-0">
                 {images.map((img, idx) => (
-                  <CarouselItem key={idx} className="h-full flex items-center justify-center">
+                  <CarouselItem key={idx} className="h-full flex items-center justify-center pl-0">
                     <img 
                       src={img} 
                       alt={`Photo ${idx + 1}`} 
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain select-none pointer-events-none"
                     />
                   </CarouselItem>
                 ))}
@@ -344,14 +363,35 @@ const PhotoCarouselModal = ({
                     <span className="text-base font-semibold">{comments.length}</span>
                   )}
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleShare}
-                  className="hover:bg-transparent p-0 h-auto"
-                >
-                  <Send className="h-8 w-8" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="hover:bg-transparent p-0 h-auto"
+                    >
+                      <Share2 className="h-8 w-8" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="w-56">
+                    <DropdownMenuItem onClick={handleShareToMoment} className="cursor-pointer">
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Share as Moment
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleShareToInstagram} className="cursor-pointer">
+                      <Instagram className="mr-2 h-4 w-4" />
+                      Share to Instagram
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleShareToTikTok} className="cursor-pointer">
+                      <Send className="mr-2 h-4 w-4" />
+                      Share to TikTok
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleShareViaText} className="cursor-pointer">
+                      <MessageSquare className="mr-2 h-4 w-4" />
+                      Share via Text Message
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
