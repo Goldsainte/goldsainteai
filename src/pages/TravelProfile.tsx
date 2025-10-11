@@ -405,7 +405,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
+    <div className="min-h-screen bg-background pb-40 md:pb-0">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
         <div className="flex items-center justify-between p-4">
@@ -992,11 +992,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/search')}
+            onClick={() => navigate('/travel-feed')}
             className="hover:bg-accent h-16 w-16 rounded-lg border-2 border-primary"
-            aria-label="Search"
+            aria-label="Journeys"
           >
-            <SearchIcon className="h-8 w-8" />
+            <Video className="h-8 w-8" />
           </Button>
           
           <Button
