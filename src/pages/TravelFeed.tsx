@@ -16,6 +16,7 @@ import StoryHighlights from "@/components/StoryHighlights";
 import { MomentsRing } from "@/components/MomentsRing";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { FeedSkeleton } from "@/components/FeedSkeleton";
 
 interface TravelPost {
   id: string;
@@ -91,6 +92,7 @@ const TravelFeed = () => {
 
   const fetchPosts = async (focusPostId?: string) => {
     try {
+      setLoading(true);
       let loadedPosts: TravelPost[] = [];
       // Fast-first: show chronological quickly, then merge personalized when ready
       if (user && !focusPostId) {
@@ -102,6 +104,7 @@ const TravelFeed = () => {
         setPosts(chrono);
         loadedPosts = chrono;
         setIsPersonalized(false);
+        setLoading(false); // Show posts immediately
 
         // When personalized resolves, merge and update
         const { data, error } = await personalizedPromise;
@@ -121,6 +124,7 @@ const TravelFeed = () => {
         // Show chronological feed for non-logged in users or when focusing specific post
         setIsPersonalized(false);
         loadedPosts = await fetchChronologicalPosts();
+        setLoading(false);
       }
 
       // If a specific post is requested (from profile grid), jump to it
@@ -274,9 +278,7 @@ const TravelFeed = () => {
             {/* Feed Posts */}
             <div className="py-6">
               {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-muted-foreground">Loading feed...</div>
-                </div>
+                <FeedSkeleton />
               ) : posts.length === 0 ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center space-y-4">

@@ -277,28 +277,35 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       return;
     }
 
+    // Optimistic update
+    const wasLiked = isLiked;
+    const prevCount = localLikeCount;
+    setIsLiked(!isLiked);
+    setLocalLikeCount(prev => isLiked ? Math.max(0, prev - 1) : prev + 1);
+
     try {
-      if (isLiked) {
-        await supabase
+      if (wasLiked) {
+        const { error } = await supabase
           .from('post_likes')
           .delete()
           .eq('post_id', post.id)
           .eq('user_id', user.id);
         
-        setIsLiked(false);
-        setLocalLikeCount(prev => Math.max(0, prev - 1));
+        if (error) throw error;
       } else {
-        await supabase.from('post_likes').insert({
+        const { error } = await supabase.from('post_likes').insert({
           post_id: post.id,
           user_id: user.id,
         });
         
-        setIsLiked(true);
-        setLocalLikeCount(prev => prev + 1);
+        if (error) throw error;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error liking post:', error);
-      toast.error('Failed to like post');
+      // Revert on error
+      setIsLiked(wasLiked);
+      setLocalLikeCount(prevCount);
+      toast.error(error.message || 'Failed to update like');
     }
   };
 

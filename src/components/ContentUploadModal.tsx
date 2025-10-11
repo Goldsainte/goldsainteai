@@ -99,26 +99,45 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
 
     try {
       const uploadedUrls: string[] = [];
+      const maxRetries = 3;
 
-      // Upload all photos
+      // Upload all photos with retry logic
       for (const photoFile of photoFiles) {
         const fileExt = photoFile.name.split('.').pop();
         const fileName = `${user.id}/photos/${Date.now()}-${Math.random()}.${fileExt}`;
         
-        const { error: uploadError } = await supabase.storage
-          .from('travel-videos')
-          .upload(fileName, photoFile, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) throw uploadError;
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('travel-videos')
-          .getPublicUrl(fileName);
+        let uploadSuccess = false;
+        let lastError = null;
         
-        uploadedUrls.push(publicUrl);
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+          try {
+            const { error: uploadError } = await supabase.storage
+              .from('travel-videos')
+              .upload(fileName, photoFile, {
+                cacheControl: '3600',
+                upsert: false
+              });
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+              .from('travel-videos')
+              .getPublicUrl(fileName);
+            
+            uploadedUrls.push(publicUrl);
+            uploadSuccess = true;
+            break;
+          } catch (err) {
+            lastError = err;
+            if (attempt < maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+            }
+          }
+        }
+        
+        if (!uploadSuccess) {
+          throw lastError || new Error('Upload failed after retries');
+        }
       }
 
       // Extract mentions and hashtags
@@ -324,22 +343,45 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
     setUploading(true);
 
     try {
-      // Upload video
+      const maxRetries = 3;
+      let uploadSuccess = false;
+      let publicUrl = '';
+      
+      // Upload video with retry logic
       const fileExt = videoFile.name.split('.').pop();
       const fileName = `${user.id}/${Date.now()}.${fileExt}`;
       
-      const { error: uploadError } = await supabase.storage
-        .from('travel-videos')
-        .upload(fileName, videoFile, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+          const { error: uploadError } = await supabase.storage
+            .from('travel-videos')
+            .upload(fileName, videoFile, {
+              cacheControl: '3600',
+              upsert: false
+            });
 
-      if (uploadError) throw uploadError;
+          if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('travel-videos')
-        .getPublicUrl(fileName);
+          const { data: { publicUrl: url } } = supabase.storage
+            .from('travel-videos')
+            .getPublicUrl(fileName);
+          
+          publicUrl = url;
+          uploadSuccess = true;
+          break;
+        } catch (err) {
+          if (attempt < maxRetries) {
+            toast.info(`Upload attempt ${attempt} failed, retrying...`);
+            await new Promise(resolve => setTimeout(resolve, 1000 * attempt));
+          } else {
+            throw err;
+          }
+        }
+      }
+      
+      if (!uploadSuccess) {
+        throw new Error('Video upload failed after retries');
+      }
 
       // Upload thumbnail if provided
       let thumbnailUrl = null;

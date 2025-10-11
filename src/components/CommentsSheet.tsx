@@ -113,21 +113,24 @@ export const CommentsSheet = ({ open, onOpenChange, postId, onCommentAdded }: Co
     }
 
     setSubmitting(true);
+    const commentText = newComment.trim();
+    setNewComment(""); // Clear immediately for better UX
+    
     try {
       const { error } = await supabase.from("post_comments").insert([{
         post_id: postId,
         user_id: user.id,
-        comment_text: newComment.trim(),
+        comment_text: commentText,
       }]);
 
       if (error) throw error;
 
-      setNewComment("");
       onCommentAdded?.();
       toast.success("Comment posted!");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error posting comment:", error);
-      toast.error("Failed to post comment");
+      setNewComment(commentText); // Restore on error
+      toast.error(error.message || "Failed to post comment. Please try again.");
     } finally {
       setSubmitting(false);
     }
