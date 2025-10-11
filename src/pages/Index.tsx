@@ -872,10 +872,9 @@ const Index = () => {
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
                   <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
-                  <div className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2 space-y-2">
-                    <p>Your trip, your way: Book it. Share it. Earn from it.</p>
-                    <p>Whether you travel solo, let AI plan and book it, or tap into our network of elite travel agents — Goldsainte is where creators monetize, travelers personalize, and luxury experts compete to curate your next journey.</p>
-                  </div>
+                  <p className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2">
+                    Your trip, your way: Book it. Share it. Earn from it. Whether you travel solo, let AI plan and book it, or tap into our network of elite travel agents — Goldsainte is where creators monetize, travelers personalize, and luxury experts compete to curate your next journey.
+                  </p>
                 </div>
 
                 {/* Main Search with rotating placeholder */}
