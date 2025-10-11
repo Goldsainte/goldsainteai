@@ -51,6 +51,7 @@ const TravelFeed = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [visibleVideoId, setVisibleVideoId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollSnapTimer = useRef<number | null>(null);
   const { isAdmin } = useUserRole();
   const [searchParams] = useSearchParams();
   const targetPostId = searchParams.get('postId');
@@ -204,13 +205,19 @@ const TravelFeed = () => {
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
-    const scrollPosition = container.scrollTop;
     const windowHeight = container.clientHeight;
-    const newIndex = Math.round(scrollPosition / windowHeight);
-    
+    const newIndex = Math.round(container.scrollTop / windowHeight);
+
     if (newIndex !== currentIndex && newIndex < posts.length) {
       setCurrentIndex(newIndex);
     }
+
+    // Hard snap after scrolling stops to prevent peeking
+    if (scrollSnapTimer.current) window.clearTimeout(scrollSnapTimer.current);
+    scrollSnapTimer.current = window.setTimeout(() => {
+      const targetTop = newIndex * windowHeight;
+      container.scrollTo({ top: targetTop, behavior: 'smooth' });
+    }, 80);
   };
 
   const handleVideoUpload = () => {
@@ -309,7 +316,7 @@ const TravelFeed = () => {
           <div
             ref={containerRef}
             onScroll={handleScroll}
-            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory overscroll-y-contain scroll-smooth"
+            className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory overscroll-y-contain scroll-smooth touch-pan-y"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             <style>{`
