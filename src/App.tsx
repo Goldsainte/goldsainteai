@@ -45,7 +45,7 @@ import VoiceCall from "./pages/VoiceCall";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
-import TravelFeed from "./pages/TravelFeed";
+import StreamActivityFeed from "./components/StreamActivityFeed";
 import TravelProfile from "./pages/TravelProfile";
 import TravelSettings from "./pages/TravelSettings";
 import TravelSettings2 from "./pages/TravelSettings2";
@@ -139,7 +139,7 @@ function AppContent() {
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Routes>
-          <Route path="/" element={<TravelFeed />} />
+          <Route path="/" element={<StreamActivityFeed />} />
           <Route path="/home" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
@@ -181,7 +181,7 @@ function AppContent() {
           <Route path="/my-jobs" element={<MyJobs />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
-          <Route path="/travel-feed" element={<TravelFeed />} />
+          <Route path="/travel-feed" element={<StreamActivityFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
