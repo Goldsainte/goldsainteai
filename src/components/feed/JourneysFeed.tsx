@@ -76,6 +76,7 @@ export const JourneysFeed = () => {
       
       const response = await feed.get({ 
         limit: 25,
+        enrich: true,
         withReactionCounts: true,
         withOwnReactions: true,
       });
@@ -167,6 +168,11 @@ export const JourneysFeed = () => {
 
   const currentJourney = journeys[currentIndex];
   const isLiked = currentJourney.own_reactions?.like && currentJourney.own_reactions.like.length > 0;
+
+  const rawActor: any = currentJourney.actor;
+  const actorId = typeof rawActor === 'string' ? rawActor.replace('User:', '') : rawActor.id;
+  const actorName = typeof rawActor === 'string' ? `@${actorId.slice(0, 6)}` : (rawActor.data?.name || `@${actorId.slice(0, 6)}`);
+  const actorImage = typeof rawActor === 'string' ? undefined : rawActor.data?.profileImage;
 
   return (
     <div 
@@ -271,16 +277,16 @@ export const JourneysFeed = () => {
             <div className="flex items-center gap-3">
               <Avatar
                 className="h-10 w-10 ring-2 ring-white cursor-pointer"
-                onClick={() => navigate(`/travel-profile/${currentJourney.actor.id}`)}
+                onClick={() => navigate(`/travel-profile/${actorId}`)}
               >
-                <AvatarImage src={currentJourney.actor.data.profileImage} />
-                <AvatarFallback>{currentJourney.actor.data.name[0]}</AvatarFallback>
+                <AvatarImage src={actorImage} />
+                <AvatarFallback>{actorName?.[0] ?? 'U'}</AvatarFallback>
               </Avatar>
               <button
-                onClick={() => navigate(`/travel-profile/${currentJourney.actor.id}`)}
+                onClick={() => navigate(`/travel-profile/${actorId}`)}
                 className="text-white font-semibold drop-shadow-lg hover:opacity-80"
               >
-                {currentJourney.actor.data.name}
+                {actorName}
               </button>
               <Button size="sm" variant="outline" className="ml-2">
                 Follow

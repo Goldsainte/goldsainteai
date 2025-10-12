@@ -60,6 +60,7 @@ export const SaintesFeed = () => {
       
       const response = await feed.get({ 
         limit: 25,
+        enrich: true,
         withReactionCounts: true,
         withOwnReactions: true,
       });
@@ -139,7 +140,12 @@ export const SaintesFeed = () => {
       {saintes.map((sainte) => {
         const isLiked = sainte.own_reactions?.like && sainte.own_reactions.like.length > 0;
         
-        return (
+         const rawActor: any = sainte.actor;
+         const actorId = typeof rawActor === 'string' ? rawActor.replace('User:', '') : rawActor.id;
+         const actorName = typeof rawActor === 'string' ? `@${actorId.slice(0,6)}` : (rawActor.data?.name || `@${actorId.slice(0,6)}`);
+         const actorImage = typeof rawActor === 'string' ? undefined : rawActor.data?.profileImage;
+         
+         return (
           <Card key={sainte.id} className="border-0 shadow-none">
             <CardContent className="p-0">
               {/* Header */}
