@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Home, Search, Compass, Video, MessageCircle, Heart, PlusSquare, BarChart3, User, Menu } from "lucide-react";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 export function FeedSidebar() {
   const { user } = useAuth();
@@ -12,7 +13,6 @@ export function FeedSidebar() {
     { to: "/trending", icon: Compass, label: "Explore" },
     { to: "/", icon: Video, label: "Journeys" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
-    { to: "/favorites", icon: Heart, label: "Notifications" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },
     { to: "/travel-profile", icon: User, label: "Profile" },
   ];
@@ -44,6 +44,11 @@ export function FeedSidebar() {
             <span className="text-base">{item.label}</span>
           </NavLink>
         ))}
+        {user && (
+          <div className="px-3">
+            <NotificationCenter />
+          </div>
+        )}
       </nav>
 
       {/* More Menu at bottom */}

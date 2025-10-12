@@ -119,12 +119,32 @@ export const NotificationCenter = () => {
 
     // Route based on notification type and metadata
     if (notification.link) {
+      // If a DB-provided link exists, prefer metadata-aware routes for follows
+      if (
+        notification.notification_type === "follow" &&
+        notification.metadata?.follower_id
+      ) {
+        navigate(`/travel-profile/${notification.metadata.follower_id}`);
+        return;
+      }
       navigate(notification.link);
-    } else if (notification.notification_type === "follow" && notification.metadata?.follower_id) {
+      return;
+    }
+
+    if (
+      notification.notification_type === "follow" &&
+      notification.metadata?.follower_id
+    ) {
       navigate(`/travel-profile/${notification.metadata.follower_id}`);
-    } else if (notification.notification_type === "like" || notification.notification_type === "comment") {
+    } else if (
+      notification.notification_type === "like" ||
+      notification.notification_type === "comment"
+    ) {
       navigate(`/travel-feed`);
-    } else if (notification.notification_type === "message") {
+    } else if (
+      notification.notification_type === "message" ||
+      notification.notification_type === "direct_message"
+    ) {
       navigate(`/messages`);
     } else if (notification.metadata?.post_id) {
       navigate(`/travel-feed`);
