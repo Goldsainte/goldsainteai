@@ -151,20 +151,20 @@ export const SaintesFeed = () => {
               {/* Header */}
               <div className="flex items-center justify-between p-3">
                 <div className="flex items-center gap-3">
-                  <Avatar
-                    className="h-10 w-10 cursor-pointer"
-                    onClick={() => navigate(`/travel-profile/${sainte.actor.id}`)}
+                <Avatar
+                  className="h-10 w-10 cursor-pointer"
+                  onClick={() => navigate(`/travel-profile/${actorId}`)}
+                >
+                  <AvatarImage src={actorImage} />
+                  <AvatarFallback>{actorName?.[0] ?? 'U'}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <button
+                    onClick={() => navigate(`/travel-profile/${actorId}`)}
+                    className="font-semibold text-sm hover:opacity-80"
                   >
-                    <AvatarImage src={sainte.actor.data.profileImage} />
-                    <AvatarFallback>{sainte.actor.data.name[0]}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <button
-                      onClick={() => navigate(`/travel-profile/${sainte.actor.id}`)}
-                      className="font-semibold text-sm hover:opacity-80"
-                    >
-                      {sainte.actor.data.name}
-                    </button>
+                    {actorName}
+                  </button>
                     {sainte.location && (
                       <p className="text-xs text-muted-foreground">{sainte.location}</p>
                     )}
@@ -253,9 +253,9 @@ export const SaintesFeed = () => {
                   <p className="text-sm">
                     <span
                       className="font-semibold mr-2 cursor-pointer hover:opacity-80"
-                      onClick={() => navigate(`/travel-profile/${sainte.actor.id}`)}
+                      onClick={() => navigate(`/travel-profile/${actorId}`)}
                     >
-                      {sainte.actor.data.name}
+                      {actorName}
                     </span>
                     {sainte.caption}
                   </p>
