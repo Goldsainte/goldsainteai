@@ -33,6 +33,31 @@ interface Journey {
   };
 }
 
+const getSampleJourneys = (): Journey[] => [
+  {
+    id: 'sample1',
+    actor: { id: 'sample', data: { name: 'Goldsainte AI', profileImage: '/logo-horizontal-green.png' } },
+    object: 'video:sample1',
+    verb: 'journey',
+    time: new Date().toISOString(),
+    video_url: '/videos/travel1.mp4',
+    caption: 'AI travel inspiration: Santorini sunset',
+    reaction_counts: { like: 128, comment: 12 },
+    own_reactions: { like: [] },
+  },
+  {
+    id: 'sample2',
+    actor: { id: 'sample', data: { name: 'Goldsainte AI', profileImage: '/logo-horizontal-green.png' } },
+    object: 'video:sample2',
+    verb: 'journey',
+    time: new Date().toISOString(),
+    video_url: '/videos/travel2.mp4',
+    caption: 'AI travel inspiration: Amalfi Coast drive',
+    reaction_counts: { like: 96, comment: 8 },
+    own_reactions: { like: [] },
+  },
+];
+
 export const JourneysFeed = () => {
   const { timelineFeed, userFeed, isReady } = useStreamActivity();
   const { user } = useAuth();
@@ -43,7 +68,8 @@ export const JourneysFeed = () => {
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
 
   useEffect(() => {
-    if (isReady && (timelineFeed || userFeed)) {
+    // Fetch once the Stream context has resolved, even in guest mode (no feed)
+    if (isReady) {
       fetchJourneys();
     }
   }, [isReady, timelineFeed, userFeed]);
@@ -70,8 +96,8 @@ export const JourneysFeed = () => {
       // Prefer timeline if available, otherwise user feed
       let feed = timelineFeed || userFeed;
       if (!feed) {
-        console.error('[JourneysFeed] No feed available (timeline or user)');
-        toast.error('Failed to connect to feed service');
+        console.warn('[JourneysFeed] No feed available (timeline or user). Falling back to local sample journeys.');
+        setJourneys(getSampleJourneys());
         return;
       }
       
@@ -146,10 +172,17 @@ export const JourneysFeed = () => {
         }
       }
 
-      setJourneys(journeyPosts);
+      if (journeyPosts.length === 0) {
+        console.info('[JourneysFeed] No journey posts found. Using local sample journeys.');
+        setJourneys(getSampleJourneys());
+      } else {
+        setJourneys(journeyPosts);
+      }
     } catch (error) {
       console.error('[JourneysFeed] Error fetching journeys:', error);
-      toast.error('Failed to load journeys');
+      // Fallback to local samples on any error so UI still works anonymously
+      setJourneys(getSampleJourneys());
+      toast.error('Showing sample journeys');
     } finally {
       setLoading(false);
     }
