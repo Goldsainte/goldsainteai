@@ -45,8 +45,9 @@ export function FeedSidebar() {
           </NavLink>
         ))}
         {user && (
-          <div className="px-3">
+          <div className="flex items-center gap-4 px-3 py-3">
             <NotificationCenter />
+            <span className="text-base">Notifications</span>
           </div>
         )}
       </nav>
