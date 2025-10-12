@@ -38,6 +38,9 @@ export const MomentDrawingCanvas = ({
     // Make canvas transparent to show background
     canvas.backgroundColor = null;
 
+    // Enable drawing mode first to initialize the brush
+    canvas.isDrawingMode = true;
+
     // Load initial drawing if provided
     if (initialDrawing) {
       try {
@@ -49,10 +52,11 @@ export const MomentDrawingCanvas = ({
       }
     }
 
-    // Initialize brush
-    canvas.freeDrawingBrush.color = brushColor;
-    canvas.freeDrawingBrush.width = brushSize;
-    canvas.isDrawingMode = true;
+    // Initialize brush after enabling drawing mode
+    if (canvas.freeDrawingBrush) {
+      canvas.freeDrawingBrush.color = brushColor;
+      canvas.freeDrawingBrush.width = brushSize;
+    }
 
     setFabricCanvas(canvas);
 
