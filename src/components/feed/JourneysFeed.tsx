@@ -246,15 +246,16 @@ export const JourneysFeed = () => {
 
   // (wheel handler replaced by scroll snapping + keyboard handlers)
 
-  // Add keyboard + wheel scroll mapping to index
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container) return;
+    if (!container || journeys.length === 0) return;
 
     const onScroll = () => {
       const h = container.clientHeight || 1;
       const idx = Math.round(container.scrollTop / h);
-      if (idx !== currentIndex) setCurrentIndex(Math.max(0, Math.min(journeys.length - 1, idx)));
+      if (idx !== currentIndex) {
+        setCurrentIndex(Math.max(0, Math.min(journeys.length - 1, idx)));
+      }
     };
     container.addEventListener('scroll', onScroll, { passive: true });
     return () => container.removeEventListener('scroll', onScroll);
@@ -262,7 +263,7 @@ export const JourneysFeed = () => {
 
   const handleScroll = (direction: 'up' | 'down') => {
     const container = scrollContainerRef.current;
-    if (!container) return;
+    if (!container || journeys.length === 0) return;
     if (direction === 'down' && currentIndex < journeys.length - 1) {
       container.scrollTo({ top: (currentIndex + 1) * container.clientHeight, behavior: 'smooth' });
     } else if (direction === 'up' && currentIndex > 0) {
@@ -272,6 +273,7 @@ export const JourneysFeed = () => {
 
   // Add keyboard navigation
   useEffect(() => {
+    if (journeys.length === 0) return;
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'ArrowDown') handleScroll('down');
       else if (e.key === 'ArrowUp') handleScroll('up');
@@ -296,14 +298,6 @@ export const JourneysFeed = () => {
       </div>
     );
   }
-
-  const currentJourney = journeys[currentIndex];
-  const isLiked = currentJourney.own_reactions?.like && currentJourney.own_reactions.like.length > 0;
-
-  const rawActor: any = currentJourney.actor;
-  const actorId = typeof rawActor === 'string' ? rawActor.replace('User:', '') : rawActor.id;
-  const actorName = typeof rawActor === 'string' ? `@${actorId.slice(0, 6)}` : (rawActor.data?.name || `@${actorId.slice(0, 6)}`);
-  const actorImage = typeof rawActor === 'string' ? undefined : rawActor.data?.profileImage;
 
   return (
     <div className="relative w-full bg-black">
