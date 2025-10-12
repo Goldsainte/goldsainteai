@@ -98,9 +98,9 @@ const TravelSettings2 = () => {
         <div className="py-6">
           <SettingsItem
             icon={UserCircle}
-            title="Accounts Center"
-            description="Password, security, personal details, ad preferences"
-            onClick={() => navigate('/travel-settings')}
+            title="Edit Profile"
+            description="Change your profile details and verification status"
+            onClick={() => navigate('/travel-settings/edit')}
           />
         </div>
 
