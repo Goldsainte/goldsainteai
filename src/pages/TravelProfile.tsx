@@ -590,8 +590,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
             {/* Your Dashboard Section - Desktop Only */}
             {isOwnProfile && (
-              <div className="rounded-lg p-3 space-y-2" style={{ backgroundColor: '#E5DFC6' }}>
-                <div className="flex items-center gap-2 mb-1">
+              <div className="rounded-lg p-2 space-y-1" style={{ backgroundColor: '#E5DFC6' }}>
+                <div className="flex items-center gap-2 mb-0.5">
                   <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
                   <h3 className="text-sm font-semibold">Your Dashboard</h3>
                 </div>
@@ -604,20 +604,22 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     <div className="text-base font-bold">{formatNumber(stats.likesCount)}</div>
                     <div className="text-xs text-muted-foreground">likes</div>
                   </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="text-base font-bold flex items-center gap-1">
-                      <Coins className="h-4 w-4 text-accent" />
-                      {balance}
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="text-base font-bold flex items-center gap-1">
+                        <Coins className="h-4 w-4 text-accent" />
+                        {balance}
+                      </div>
+                      <Button
+                        variant="link"
+                        size="sm"
+                        className="h-auto p-0 text-xs text-primary"
+                        onClick={() => setBuyCoinsOpen(true)}
+                      >
+                        Buy more
+                      </Button>
                     </div>
                     <div className="text-xs text-muted-foreground">coins</div>
-                    <Button
-                      variant="link"
-                      size="sm"
-                      className="h-auto p-0 text-xs text-primary"
-                      onClick={() => setBuyCoinsOpen(true)}
-                    >
-                      Buy more
-                    </Button>
                   </div>
                 </div>
               </div>
