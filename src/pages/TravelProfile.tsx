@@ -599,9 +599,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
         {/* Mobile Profile Layout - Instagram Style */}
         <div className="md:hidden space-y-2.5 mb-3">
-          {/* Avatar - Centered */}
-          <div className="flex justify-center">
-            <div className="relative">
+          {/* Profile Photo and Name Row */}
+          <div className="flex items-center gap-3">
+            {/* Avatar */}
+            <div className="relative flex-shrink-0">
               <Avatar className="h-20 w-20 ring-2 ring-border">
                 <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
@@ -632,22 +633,22 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 </>
               )}
             </div>
-          </div>
             
-          {/* Name - Centered */}
-          <div className="flex items-center justify-center gap-1">
-            <h2 className="font-bold text-sm">
-              {profile?.first_name && profile?.last_name
-                ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
-                : (profile?.username || 'User').toUpperCase()}
-            </h2>
-            {profile?.is_verified && (
-              <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
-            )}
+            {/* Name */}
+            <div className="flex items-center gap-1">
+              <h2 className="font-bold text-sm">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
+                  : (profile?.username || 'User').toUpperCase()}
+              </h2>
+              {profile?.is_verified && (
+                <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+              )}
+            </div>
           </div>
 
-          {/* Stats Row - Below Name */}
-          <div className="flex items-center justify-around px-4">
+          {/* Stats Row */}
+          <div className="flex items-center justify-around">
             <button className="flex flex-col items-center">
               <div className="text-sm font-bold">{formatNumber(stats.postsCount)}</div>
               <div className="text-[11px] text-muted-foreground">posts</div>
