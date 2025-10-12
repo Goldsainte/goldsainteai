@@ -685,45 +685,45 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
           {/* Your Dashboard Section */}
           {isOwnProfile && (
-            <div className="bg-muted/30 rounded-lg p-3 min-h-[80px] flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-2">
-                <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                <h3 className="text-sm font-semibold">Your Dashboard</h3>
+            <div className="bg-muted/30 rounded-lg p-1 space-y-1">
+              <div className="flex items-center gap-1 mb-0.5">
+                <LayoutDashboard className="h-3.5 w-3.5 text-muted-foreground" />
+                <h3 className="text-xs font-semibold">Your Dashboard</h3>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-1">
                 <div className="flex flex-col items-center">
-                  <div className="text-sm font-bold">{formatNumber(stats.viewsCount)}</div>
-                  <div className="text-xs text-muted-foreground">views</div>
+                  <div className="text-xs font-bold">{formatNumber(stats.viewsCount)}</div>
+                  <div className="text-[10px] text-muted-foreground">views</div>
                 </div>
                 <div className="flex flex-col items-center">
-                  <div className="text-sm font-bold">{formatNumber(stats.likesCount)}</div>
-                  <div className="text-xs text-muted-foreground">likes</div>
+                  <div className="text-xs font-bold">{formatNumber(stats.likesCount)}</div>
+                  <div className="text-[10px] text-muted-foreground">likes</div>
                 </div>
                 <div className="flex flex-col items-center">
-                  <div className="text-sm font-bold flex items-center gap-1">
-                    <Coins className="h-4 w-4 text-accent" />
+                  <div className="text-xs font-bold flex items-center gap-0.5">
+                    <Coins className="h-3 w-3 text-accent" />
                     {balance}
                   </div>
-                  <div className="text-xs text-muted-foreground">coins</div>
+                  <div className="text-[10px] text-muted-foreground">coins</div>
                 </div>
               </div>
             </div>
           )}
 
           {/* Action Buttons - Compact Style */}
-          <div className="flex gap-3 px-1">
+          <div className="flex gap-[1.6px]">
             {isOwnProfile ? (
               <>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-12 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-[15px] text-[11px] font-semibold rounded-md"
                   onClick={() => setEditProfileOpen(true)}
                 >
                   Edit profile
                 </Button>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-12 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-[15px] text-[11px] font-semibold rounded-md"
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     toast.success("Profile link copied!");
@@ -737,14 +737,14 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 {user && <FollowButton targetUserId={profileUserId!} />}
                 <Button
                   variant="secondary"
-                  className="flex-1 h-12 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-6 text-[11px] font-semibold rounded-md"
                   onClick={() => setPartnershipProposalOpen(true)}
                 >
                   Partner
                 </Button>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-12 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-6 text-[11px] font-semibold rounded-md"
                   onClick={() => setPartnershipRequestOpen(true)}
                 >
                   Request
