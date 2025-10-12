@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StreamProvider } from "@/contexts/StreamContext";
+import { StreamActivityProvider } from "@/contexts/StreamActivityContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -214,7 +215,9 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <StreamProvider>
-              <AppContent />
+              <StreamActivityProvider>
+                <AppContent />
+              </StreamActivityProvider>
             </StreamProvider>
           </AuthProvider>
         </BrowserRouter>
