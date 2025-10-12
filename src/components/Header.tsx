@@ -146,9 +146,9 @@ export const Header = () => {
             <div className="flex flex-col gap-2 py-2">
               {/* Top row: Logo + Navigation + User Menu */}
               <div className="flex items-center justify-between">
-                <a href="/home" className="flex items-center hover:opacity-90 transition-opacity">
+                <button onClick={() => navigate('/')} className="flex items-center hover:opacity-90 transition-opacity">
                   <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
-                </a>
+                </button>
                 
                 <div className="flex items-center gap-2">
                   {user && <NotificationCenter />}
@@ -285,7 +285,7 @@ export const Header = () => {
                           </div>
 
                           <DropdownMenuItem 
-                            onClick={() => navigate('/profile')} 
+                            onClick={() => navigate('/travel-profile')} 
                             className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
                           >
                             <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
@@ -362,9 +362,9 @@ export const Header = () => {
             /* Desktop Layout */
             <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
               {/* Logo - Left */}
-              <a href="/home" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
+              <button onClick={() => navigate('/')} className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
                 <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
-              </a>
+              </button>
 
               {/* Compact Search Bar - Center */}
               <div className="flex justify-center" data-tour="traditional-search">
@@ -486,7 +486,7 @@ export const Header = () => {
                         <span className="text-sm font-medium">Marketplace</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => navigate('/become an Agent')} 
+                        onClick={() => navigate('/agent-onboarding')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />

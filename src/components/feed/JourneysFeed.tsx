@@ -231,13 +231,26 @@ export const JourneysFeed = () => {
     toast.success('Link copied!');
   };
 
-  const handleScroll = (e: React.WheelEvent) => {
-    if (e.deltaY > 0 && currentIndex < journeys.length - 1) {
+  const handleScroll = (direction: 'up' | 'down') => {
+    if (direction === 'down' && currentIndex < journeys.length - 1) {
       setCurrentIndex(currentIndex + 1);
-    } else if (e.deltaY < 0 && currentIndex > 0) {
+    } else if (direction === 'up' && currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
     }
   };
+
+  // Add keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        handleScroll('down');
+      } else if (e.key === 'ArrowUp') {
+        handleScroll('up');
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentIndex, journeys.length]);
 
   if (loading) {
     return (
@@ -265,156 +278,155 @@ export const JourneysFeed = () => {
   const actorImage = typeof rawActor === 'string' ? undefined : rawActor.data?.profileImage;
 
   return (
-    <div 
-      className="relative h-screen w-full bg-black overflow-hidden"
-      onWheel={handleScroll}
-    >
-      {/* Content */}
-      <div className="h-full w-full relative">
-        {/* Video/Image */}
-        <div className="absolute inset-0">
-          {currentJourney.video_url ? (
-            <video
-              ref={(el) => {
-                if (el) videoRefs.current[currentJourney.id] = el;
-              }}
-              src={currentJourney.video_url}
-              className="w-full h-full object-cover"
-              loop
-              playsInline
-              muted
-            />
-          ) : currentJourney.image_url ? (
-            <img
-              src={currentJourney.image_url}
-              alt="Journey"
-              className="w-full h-full object-cover"
-            />
-          ) : null}
-        </div>
+    <div className="relative w-full bg-black">
+      {/* Vertical scroll container for journeys */}
+      <div className="snap-y snap-mandatory h-screen overflow-y-scroll">
+        {journeys.map((journey, index) => {
+          const isLiked = journey.own_reactions?.like && journey.own_reactions.like.length > 0;
+          const rawActor: any = journey.actor;
+          const actorId = typeof rawActor === 'string' ? rawActor.replace('User:', '') : rawActor.id;
+          const actorName = typeof rawActor === 'string' ? `@${actorId.slice(0, 6)}` : (rawActor.data?.name || `@${actorId.slice(0, 6)}`);
+          const actorImage = typeof rawActor === 'string' ? undefined : rawActor.data?.profileImage;
 
-        {/* Right Action Buttons */}
-        <div className="absolute right-4 bottom-24 flex flex-col gap-6 z-10">
-          {/* Like */}
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
-              onClick={() => handleLike(currentJourney)}
+          return (
+            <div 
+              key={journey.id}
+              className="relative h-screen w-full snap-start snap-always"
             >
-              <Heart
-                className={`h-7 w-7 ${isLiked ? 'fill-red-500 text-red-500' : 'text-white'}`}
-              />
-            </Button>
-            <span className="text-white text-sm font-semibold drop-shadow-lg">
-              {currentJourney.reaction_counts?.like || 0}
-            </span>
-          </div>
-
-          {/* Comment */}
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
-              onClick={() => handleComment(currentJourney)}
-            >
-              <MessageCircle className="h-7 w-7 text-white" />
-            </Button>
-            <span className="text-white text-sm font-semibold drop-shadow-lg">
-              {currentJourney.reaction_counts?.comment || 0}
-            </span>
-          </div>
-
-          {/* Save */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
-            onClick={() => handleSave(currentJourney)}
-          >
-            <Bookmark className="h-7 w-7 text-white" />
-          </Button>
-
-          {/* Share */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
-            onClick={() => handleShare(currentJourney)}
-          >
-            <Share2 className="h-7 w-7 text-white" />
-          </Button>
-
-          {/* Music (if available) */}
-          {currentJourney.music && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50 animate-spin-slow"
-            >
-              <Music className="h-6 w-6 text-white" />
-            </Button>
-          )}
-        </div>
-
-        {/* Bottom Info */}
-        <div className="absolute left-0 right-0 bottom-0 z-20 pb-safe">
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-32" />
-          <div className="relative px-4 pb-4 space-y-2">
-            {/* User Info */}
-            <div className="flex items-center gap-3">
-              <Avatar
-                className="h-10 w-10 ring-2 ring-white cursor-pointer"
-                onClick={() => navigate(`/travel-profile/${actorId}`)}
-              >
-                <AvatarImage src={actorImage} />
-                <AvatarFallback>{actorName?.[0] ?? 'U'}</AvatarFallback>
-              </Avatar>
-              <button
-                onClick={() => navigate(`/travel-profile/${actorId}`)}
-                className="text-white font-semibold drop-shadow-lg hover:opacity-80"
-              >
-                {actorName}
-              </button>
-              <Button size="sm" variant="outline" className="ml-2">
-                Follow
-              </Button>
-            </div>
-
-            {/* Caption */}
-            {currentJourney.caption && (
-              <p className="text-white text-sm drop-shadow-lg line-clamp-2">
-                {currentJourney.caption}
-              </p>
-            )}
-
-            {/* Music */}
-            {currentJourney.music && (
-              <div className="flex items-center gap-2">
-                <Music className="h-4 w-4 text-white" />
-                <p className="text-white text-xs drop-shadow-lg">
-                  {currentJourney.music}
-                </p>
+              {/* Video/Image */}
+              <div className="absolute inset-0">
+                {journey.video_url ? (
+                  <video
+                    ref={(el) => {
+                      if (el) videoRefs.current[journey.id] = el;
+                    }}
+                    src={journey.video_url}
+                    className="w-full h-full object-cover"
+                    loop
+                    playsInline
+                    muted
+                    autoPlay={index === currentIndex}
+                  />
+                ) : journey.image_url ? (
+                  <img
+                    src={journey.image_url}
+                    alt="Journey"
+                    className="w-full h-full object-cover"
+                  />
+                ) : null}
               </div>
-            )}
-          </div>
-        </div>
 
-        {/* Progress Indicator */}
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-1 z-20">
-          {journeys.map((_, index) => (
-            <div
-              key={index}
-              className={`h-1 rounded-full transition-all ${
-                index === currentIndex
-                  ? 'w-8 bg-white'
-                  : 'w-1 bg-white/50'
-              }`}
-            />
-          ))}
-        </div>
+              {/* Right Action Buttons */}
+              <div className="absolute right-4 bottom-24 flex flex-col gap-6 z-10">
+                {/* Like */}
+                <div className="flex flex-col items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
+                    onClick={() => handleLike(journey)}
+                  >
+                    <Heart
+                      className={`h-7 w-7 ${isLiked ? 'fill-red-500 text-red-500' : 'text-white'}`}
+                    />
+                  </Button>
+                  <span className="text-white text-sm font-semibold drop-shadow-lg">
+                    {journey.reaction_counts?.like || 0}
+                  </span>
+                </div>
+
+                {/* Comment */}
+                <div className="flex flex-col items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
+                    onClick={() => handleComment(journey)}
+                  >
+                    <MessageCircle className="h-7 w-7 text-white" />
+                  </Button>
+                  <span className="text-white text-sm font-semibold drop-shadow-lg">
+                    {journey.reaction_counts?.comment || 0}
+                  </span>
+                </div>
+
+                {/* Save */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
+                  onClick={() => handleSave(journey)}
+                >
+                  <Bookmark className="h-7 w-7 text-white" />
+                </Button>
+
+                {/* Share */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50"
+                  onClick={() => handleShare(journey)}
+                >
+                  <Share2 className="h-7 w-7 text-white" />
+                </Button>
+
+                {/* Music (if available) */}
+                {journey.music && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-12 w-12 rounded-full bg-black/30 hover:bg-black/50 animate-spin-slow"
+                  >
+                    <Music className="h-6 w-6 text-white" />
+                  </Button>
+                )}
+              </div>
+
+              {/* Bottom Info */}
+              <div className="absolute left-0 right-0 bottom-0 z-20 pb-safe">
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-32" />
+                <div className="relative px-4 pb-4 space-y-2">
+                  {/* User Info */}
+                  <div className="flex items-center gap-3">
+                    <Avatar
+                      className="h-10 w-10 ring-2 ring-white cursor-pointer"
+                      onClick={() => navigate(`/travel-profile/${actorId}`)}
+                    >
+                      <AvatarImage src={actorImage} />
+                      <AvatarFallback>{actorName?.[0] ?? 'U'}</AvatarFallback>
+                    </Avatar>
+                    <button
+                      onClick={() => navigate(`/travel-profile/${actorId}`)}
+                      className="text-white font-semibold drop-shadow-lg hover:opacity-80"
+                    >
+                      {actorName}
+                    </button>
+                    <Button size="sm" variant="outline" className="ml-2">
+                      Follow
+                    </Button>
+                  </div>
+
+                  {/* Caption */}
+                  {journey.caption && (
+                    <p className="text-white text-sm drop-shadow-lg line-clamp-2">
+                      {journey.caption}
+                    </p>
+                  )}
+
+                  {/* Music */}
+                  {journey.music && (
+                    <div className="flex items-center gap-2">
+                      <Music className="h-4 w-4 text-white" />
+                      <p className="text-white text-xs drop-shadow-lg">
+                        {journey.music}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
