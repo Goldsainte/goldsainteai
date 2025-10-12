@@ -38,7 +38,7 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
 
     const initStreamActivity = async () => {
       try {
-        console.log('[StreamActivity] Starting initialization...');
+        console.log('[StreamActivity] Starting initialization for user:', user.id);
         
         // Get user profile for name and image
         const { data: profile, error: profileError } = await supabase
@@ -62,12 +62,20 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
         });
 
         if (error) {
-          console.error('[StreamActivity] Token error:', error);
-          throw error;
+          console.error('[StreamActivity] Token fetch error:', error);
+          throw new Error(`Failed to get Stream token: ${error.message}`);
+        }
+
+        if (!data || !data.token || !data.apiKey || !data.userId) {
+          console.error('[StreamActivity] Invalid token response:', data);
+          throw new Error('Invalid token response from server');
         }
 
         const { token, apiKey, userId } = data;
-        console.log('[StreamActivity] Token received, initializing client...', { apiKey: apiKey?.substring(0, 8) });
+        console.log('[StreamActivity] Token received, initializing client...', { 
+          apiKey: apiKey?.substring(0, 8),
+          userId 
+        });
 
         // Initialize Stream Activity Feeds client
         const client = connect(apiKey, token, userId);
@@ -89,6 +97,11 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
         console.log('[StreamActivity] ✓ Stream Activity Feeds connected successfully');
       } catch (error) {
         console.error('[StreamActivity] ✗ Failed to initialize Stream Activity Feeds:', error);
+        console.error('[StreamActivity] Error details:', {
+          message: error instanceof Error ? error.message : 'Unknown error',
+          userId: user?.id,
+          userEmail: user?.email
+        });
         // Set ready anyway to show the UI with error handling
         setIsReady(true);
       }

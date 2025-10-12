@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStreamActivity } from '@/contexts/StreamActivityContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -24,6 +24,14 @@ export default function CreateContent() {
   const [location, setLocation] = useState('');
   const [posting, setPosting] = useState(false);
   const [uploading, setUploading] = useState(false);
+
+  // Redirect to auth if not logged in
+  useEffect(() => {
+    if (isReady && !user) {
+      toast.error('Please sign in to create content');
+      navigate('/auth');
+    }
+  }, [isReady, user, navigate]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -56,8 +64,14 @@ export default function CreateContent() {
   };
 
   const handlePost = async () => {
+    if (!user) {
+      toast.error('Please sign in to create content');
+      navigate('/auth');
+      return;
+    }
+
     if (!userFeed) {
-      toast.error('Feed service not available');
+      toast.error('Feed service is initializing. Please wait a moment and try again.');
       return;
     }
 
@@ -75,8 +89,15 @@ export default function CreateContent() {
       if (mediaFile) {
         setUploading(true);
         toast.info('Uploading file...');
-        finalMediaUrl = await uploadFile(mediaFile);
-        setUploading(false);
+        try {
+          finalMediaUrl = await uploadFile(mediaFile);
+          console.log('[CreateContent] File uploaded:', finalMediaUrl);
+          setUploading(false);
+        } catch (uploadError) {
+          console.error('[CreateContent] Upload error:', uploadError);
+          toast.error('Failed to upload file. Please try again.');
+          return;
+        }
       }
       
       // Create the activity
@@ -101,17 +122,26 @@ export default function CreateContent() {
       navigate('/');
     } catch (error) {
       console.error('[CreateContent] Error posting:', error);
-      toast.error('Failed to post content');
+      toast.error('Failed to post content. Please try again.');
     } finally {
       setPosting(false);
       setUploading(false);
     }
   };
 
-  if (!isReady) {
+  if (!isReady || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!userFeed) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <p className="text-muted-foreground">Initializing feed service...</p>
+        <p className="text-sm text-muted-foreground">If this persists, try refreshing the page</p>
       </div>
     );
   }
