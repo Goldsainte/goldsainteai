@@ -100,11 +100,11 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
   }
 
   return (
-    <div className="flex items-center gap-4 overflow-x-auto py-4 px-4 border-b">
+    <div className="flex items-center gap-3 overflow-x-auto py-3 md:px-4 md:border-b scrollbar-hide">
       {highlights.map((highlight) => (
-        <div key={highlight.id} className="flex flex-col items-center gap-1 min-w-[80px] group">
+        <div key={highlight.id} className="flex flex-col items-center gap-1 min-w-[64px] md:min-w-[80px] group">
           <div className="relative">
-            <Avatar className="w-16 h-16 ring-2 ring-primary cursor-pointer">
+            <Avatar className="w-14 h-14 md:w-16 md:h-16 ring-2 ring-primary cursor-pointer">
               <AvatarImage src={highlight.cover_image_url || undefined} />
               <AvatarFallback>{highlight.title[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
@@ -112,23 +112,23 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
               <Button
                 size="icon"
                 variant="destructive"
-                className="absolute -top-1 -right-1 w-6 h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => deleteHighlight(highlight.id)}
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-2.5 h-2.5 md:w-3 md:h-3" />
               </Button>
             )}
           </div>
-          <span className="text-xs text-center truncate w-full">{highlight.title}</span>
+          <span className="text-xs text-center truncate w-full max-w-[64px] md:max-w-[80px]">{highlight.title}</span>
         </div>
       ))}
 
       {isOwnProfile && (
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
-            <div className="flex flex-col items-center gap-1 min-w-[80px] cursor-pointer">
-              <div className="w-16 h-16 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center hover:bg-accent transition-colors">
-                <Plus className="w-6 h-6 text-muted-foreground" />
+            <div className="flex flex-col items-center gap-1 min-w-[64px] md:min-w-[80px] cursor-pointer">
+              <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center hover:bg-accent transition-colors">
+                <Plus className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
               </div>
               <span className="text-xs text-center">New</span>
             </div>

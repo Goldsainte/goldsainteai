@@ -597,10 +597,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           </div>
         </div>
 
-        {/* Mobile Profile Layout */}
-        <div className="md:hidden space-y-3 mb-4">
-          {/* Top Row: Avatar and Stats */}
-          <div className="flex items-center gap-5">
+        {/* Mobile Profile Layout - Instagram Style */}
+        <div className="md:hidden space-y-4 mb-4">
+          {/* Profile Photo and Name Row */}
+          <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar className="h-20 w-20 ring-2 ring-border">
@@ -634,37 +634,39 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
             
-            {/* Stats - Horizontal Layout */}
-            <div className="flex-1 flex items-center justify-around">
-              <button className="flex flex-col items-center min-w-[60px]">
-                <div className="text-base font-bold">{formatNumber(stats.postsCount)}</div>
-                <div className="text-xs">posts</div>
-              </button>
-              <button className="flex flex-col items-center min-w-[60px]">
-                <div className="text-base font-bold">{formatNumber(profile?.followers_count || 0)}</div>
-                <div className="text-xs">followers</div>
-              </button>
-              <button className="flex flex-col items-center min-w-[60px]">
-                <div className="text-base font-bold">{formatNumber(profile?.following_count || 0)}</div>
-                <div className="text-xs">following</div>
-              </button>
-            </div>
-          </div>
-
-          {/* Name and Bio */}
-          <div className="space-y-0.5">
-            <div className="flex items-center gap-1">
-              <h2 className="font-bold text-sm">
+            {/* Name */}
+            <div className="flex items-center gap-1.5">
+              <h2 className="font-bold text-base">
                 {profile?.first_name && profile?.last_name
                   ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
                   : (profile?.username || 'User').toUpperCase()}
               </h2>
               {profile?.is_verified && (
-                <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500" />
+                <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
               )}
             </div>
+          </div>
+
+          {/* Stats Row */}
+          <div className="flex items-center justify-around px-2">
+            <button className="flex flex-col items-center">
+              <div className="text-base font-bold">{formatNumber(stats.postsCount)}</div>
+              <div className="text-xs text-muted-foreground">posts</div>
+            </button>
+            <button className="flex flex-col items-center">
+              <div className="text-base font-bold">{formatNumber(profile?.followers_count || 0)}</div>
+              <div className="text-xs text-muted-foreground">followers</div>
+            </button>
+            <button className="flex flex-col items-center">
+              <div className="text-base font-bold">{formatNumber(profile?.following_count || 0)}</div>
+              <div className="text-xs text-muted-foreground">following</div>
+            </button>
+          </div>
+
+          {/* Bio Section - Standalone */}
+          <div className="space-y-1">
             {profile?.bio && (
-              <p className="text-sm leading-tight">{profile.bio}</p>
+              <p className="text-sm leading-snug">{profile.bio}</p>
             )}
             {profile?.website && (
               <a 
@@ -681,27 +683,53 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             )}
           </div>
 
-          {/* Action Buttons - Instagram Style */}
-          <div className="flex gap-2">
+          {/* Your Dashboard Section */}
+          {isOwnProfile && (
+            <div className="bg-muted/30 rounded-lg p-3 space-y-2">
+              <div className="flex items-center gap-2 mb-2">
+                <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+                <h3 className="text-sm font-semibold">Your Dashboard</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="text-sm font-bold">{formatNumber(stats.viewsCount)}</div>
+                  <div className="text-xs text-muted-foreground">views</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="text-sm font-bold">{formatNumber(stats.likesCount)}</div>
+                  <div className="text-xs text-muted-foreground">likes</div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="text-sm font-bold flex items-center gap-1">
+                    <Coins className="h-3.5 w-3.5 text-accent" />
+                    {balance}
+                  </div>
+                  <div className="text-xs text-muted-foreground">coins</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons - Compact Style */}
+          <div className="flex gap-1.5">
             {isOwnProfile ? (
               <>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-7 text-xs font-semibold rounded-md"
                   onClick={() => setEditProfileOpen(true)}
                 >
                   Edit profile
                 </Button>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-7 text-xs font-semibold rounded-md"
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     toast.success("Profile link copied!");
                   }}
                 >
-                  <Share2 className="h-4 w-4 mr-1.5" />
-                  Share
+                  Share profile
                 </Button>
               </>
             ) : (
@@ -709,18 +737,16 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 {user && <FollowButton targetUserId={profileUserId!} />}
                 <Button
                   variant="secondary"
-                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-7 text-xs font-semibold rounded-md"
                   onClick={() => setPartnershipProposalOpen(true)}
                 >
-                  <Briefcase className="h-4 w-4 mr-1" />
                   Partner
                 </Button>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
+                  className="flex-1 h-7 text-xs font-semibold rounded-md"
                   onClick={() => setPartnershipRequestOpen(true)}
                 >
-                  <Sparkles className="h-4 w-4 mr-1" />
                   Request
                 </Button>
               </>
@@ -728,8 +754,21 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           </div>
         </div>
 
-        {/* Story Highlights */}
-        <div className="border-t border-border pt-3 pb-2">
+        {/* Moments Vault - Smaller circles for better spacing */}
+        <div className="border-t border-border pt-3 pb-2 md:hidden">
+          <div className="px-4">
+            <h3 className="text-xs font-semibold mb-2 text-muted-foreground uppercase tracking-wide">Moments Vault</h3>
+            <div className="overflow-x-auto -mx-2 px-2">
+              <StoryHighlights
+                userId={profileUserId!}
+                isOwnProfile={isOwnProfile}
+              />
+            </div>
+          </div>
+        </div>
+        
+        {/* Desktop Story Highlights */}
+        <div className="hidden md:block border-t border-border pt-3 pb-2">
           <StoryHighlights
             userId={profileUserId!}
             isOwnProfile={isOwnProfile}
@@ -788,7 +827,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {videoPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden"
+                  className="relative aspect-[4/5] md:aspect-square bg-muted cursor-pointer group overflow-hidden"
                   onClick={() => navigate(`/travel-feed?postId=${post.id}`)}
                 >
                   {post.thumbnail_url ? (
@@ -857,7 +896,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {userPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden transition-transform active:scale-95"
+                  className="relative aspect-[4/5] md:aspect-square bg-muted cursor-pointer group overflow-hidden transition-transform active:scale-95"
                   onClick={() => {
                     if (post.image_urls && post.image_urls.length > 0) {
                       setPhotoModalImages(post.image_urls);
@@ -935,7 +974,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 {likedPosts.map((post) => (
                   <div
                     key={post.id}
-                    className="relative aspect-square bg-muted cursor-pointer group overflow-hidden"
+                    className="relative aspect-[4/5] md:aspect-square bg-muted cursor-pointer group overflow-hidden"
                     onClick={() => {
                       if (post.media_type === 'photo' && post.image_urls && post.image_urls.length > 0) {
                         setPhotoModalImages(post.image_urls);
