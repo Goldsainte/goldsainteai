@@ -58,12 +58,28 @@ export const SaintesFeed = () => {
         return;
       }
       
-      const response = await feed.get({ 
-        limit: 25,
-        enrich: true,
-        withReactionCounts: true,
-        withOwnReactions: true,
-      });
+      let response: any;
+      try {
+        response = await feed.get({ 
+          limit: 25,
+          enrich: true,
+          withReactionCounts: true,
+          withOwnReactions: true,
+        });
+      } catch (err: any) {
+        const msg = (err?.message || '').toLowerCase();
+        if (timelineFeed && userFeed && msg.includes('timeline feed group does not exist')) {
+          console.warn('[SaintesFeed] Timeline unavailable, retrying with user feed');
+          response = await userFeed.get({
+            limit: 25,
+            enrich: true,
+            withReactionCounts: true,
+            withOwnReactions: true,
+          });
+        } else {
+          throw err;
+        }
+      }
       
       console.log('[SaintesFeed] Response received:', response);
       

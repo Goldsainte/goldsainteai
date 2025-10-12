@@ -67,19 +67,38 @@ export const JourneysFeed = () => {
       setLoading(true);
       console.log('[JourneysFeed] Fetching journeys...', { timelineFeed, userFeed, isReady });
       
-      const feed = timelineFeed || userFeed;
+      // Prefer timeline if available, otherwise user feed
+      let feed = timelineFeed || userFeed;
       if (!feed) {
         console.error('[JourneysFeed] No feed available (timeline or user)');
         toast.error('Failed to connect to feed service');
         return;
       }
       
-      const response = await feed.get({ 
-        limit: 25,
-        enrich: true,
-        withReactionCounts: true,
-        withOwnReactions: true,
-      });
+      let response: any;
+      try {
+        response = await feed.get({ 
+          limit: 25,
+          enrich: true,
+          withReactionCounts: true,
+          withOwnReactions: true,
+        });
+      } catch (err: any) {
+        // If timeline group doesn't exist, retry using userFeed
+        const msg = (err?.message || '').toLowerCase();
+        if (timelineFeed && userFeed && msg.includes('timeline feed group does not exist')) {
+          console.warn('[JourneysFeed] Timeline unavailable, retrying with user feed');
+          feed = userFeed;
+          response = await userFeed.get({
+            limit: 25,
+            enrich: true,
+            withReactionCounts: true,
+            withOwnReactions: true,
+          });
+        } else {
+          throw err;
+        }
+      }
       
       console.log('[JourneysFeed] Response received:', response);
       
@@ -89,6 +108,44 @@ export const JourneysFeed = () => {
       );
       
       console.log('[JourneysFeed] Journey posts:', journeyPosts.length);
+
+      // If empty, seed a couple of example journeys once per browser
+      if (journeyPosts.length === 0 && userFeed && typeof window !== 'undefined') {
+        const seeded = localStorage.getItem('seededJourneys') === '1';
+        if (!seeded) {
+          try {
+            console.log('[JourneysFeed] Seeding example journeys...');
+            await userFeed.addActivity({
+              verb: 'journey',
+              object: 'video:travel1',
+              time: new Date().toISOString(),
+              video_url: '/videos/travel1.mp4',
+              caption: 'AI travel inspiration: Santorini sunset',
+            });
+            await userFeed.addActivity({
+              verb: 'journey',
+              object: 'video:travel2',
+              time: new Date().toISOString(),
+              video_url: '/videos/travel2.mp4',
+              caption: 'AI travel inspiration: Amalfi Coast drive',
+            });
+            localStorage.setItem('seededJourneys', '1');
+            // Fetch again to include seeded items
+            response = await userFeed.get({
+              limit: 25,
+              enrich: true,
+              withReactionCounts: true,
+              withOwnReactions: true,
+            });
+            const seededPosts = response.results.filter((a: any) => a.verb === 'journey' || a.video_url);
+            setJourneys(seededPosts);
+            return;
+          } catch (seedErr) {
+            console.warn('[JourneysFeed] Failed to seed example journeys:', seedErr);
+          }
+        }
+      }
+
       setJourneys(journeyPosts);
     } catch (error) {
       console.error('[JourneysFeed] Error fetching journeys:', error);

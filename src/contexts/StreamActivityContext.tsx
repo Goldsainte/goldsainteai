@@ -86,15 +86,23 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
         console.log('[StreamActivity] User feed created');
         
         // Create timeline feed (for viewing posts from followed users)
-        const timelineFeedInstance = client.feed('timeline', userId);
-        console.log('[StreamActivity] Timeline feed created');
-
-        // Ensure the user's timeline follows their own user feed (idempotent)
+        let timelineFeedInstance: any | null = null;
         try {
-          await timelineFeedInstance.follow('user', userId);
-          console.log('[StreamActivity] Timeline now follows user feed');
-        } catch (followErr) {
-          console.warn('[StreamActivity] Follow may already exist or failed:', followErr);
+          const candidate = client.feed('timeline', userId);
+          console.log('[StreamActivity] Timeline feed created, probing availability...');
+          // Probe the feed to verify the group exists in this Stream app
+          await candidate.get({ limit: 1 });
+          timelineFeedInstance = candidate;
+          // Ensure the user's timeline follows their own user feed (idempotent)
+          try {
+            await timelineFeedInstance.follow('user', userId);
+            console.log('[StreamActivity] Timeline now follows user feed');
+          } catch (followErr) {
+            console.warn('[StreamActivity] Follow may already exist or failed:', followErr);
+          }
+        } catch (e: any) {
+          console.warn('[StreamActivity] Timeline feed not available, falling back to user feed only.', e?.message || e);
+          timelineFeedInstance = null; // important so UI will use userFeed
         }
 
         setFeedClient(client);
@@ -102,7 +110,7 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
         setTimelineFeed(timelineFeedInstance);
         setIsReady(true);
         
-        console.log('[StreamActivity] ✓ Stream Activity Feeds connected successfully');
+        console.log('[StreamActivity] ✓ Stream Activity Feeds connected successfully (timeline available:', !!timelineFeedInstance, ')');
       } catch (error) {
         console.error('[StreamActivity] ✗ Failed to initialize Stream Activity Feeds:', error);
         console.error('[StreamActivity] Error details:', {
