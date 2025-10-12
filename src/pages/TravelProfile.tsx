@@ -711,7 +711,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           )}
 
           {/* Action Buttons - Compact Style */}
-          <div className="flex gap-1">
+          <div className="flex gap-[1.6px]">
             {isOwnProfile ? (
               <>
                 <Button
