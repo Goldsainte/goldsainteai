@@ -284,7 +284,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               className="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center p-8"
               style={{ background: bgGradient }}
             >
-              <div className="text-center max-w-md">
+              <div className="text-center max-w-md px-4">
                 {textContent ? (
                   <p
                     className={`
@@ -293,9 +293,22 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                       ${getTextAnimationClass()}
                       ${getTextBgClass()}
                     `}
-                    style={{ 
-                      color: textBgType === "solid" ? bgGradient : textColor,
-                    }}
+                    style={
+                      textBgType === "solid" 
+                        ? { 
+                            background: textColor,
+                            color: '#FFFFFF',
+                          }
+                        : textBgType === "outline"
+                        ? {
+                            WebkitTextStroke: `3px ${textColor}`,
+                            WebkitTextFillColor: 'white',
+                            color: textColor,
+                          }
+                        : { 
+                            color: textColor,
+                          }
+                    }
                   >
                     {textContent}
                   </p>

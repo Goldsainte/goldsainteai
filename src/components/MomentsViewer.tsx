@@ -331,7 +331,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 className="w-full h-full flex items-center justify-center p-8"
                 style={{ background: currentMoment.text_styling?.bgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
               >
-                <div className="text-center max-w-md">
+                <div className="text-center max-w-md px-4">
                   <p
                     className={`text-4xl font-bold ${
                       currentMoment.text_styling?.font === 'classic' ? 'font-story-classic' :
@@ -350,11 +350,22 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                       currentMoment.text_styling?.bgType === 'outline' ? 'text-bg-outline' :
                       ''
                     }`}
-                    style={{ 
-                      color: currentMoment.text_styling?.bgType === 'solid' 
-                        ? currentMoment.text_styling?.bgGradient 
-                        : currentMoment.text_styling?.color || '#FFFFFF',
-                    }}
+                    style={
+                      currentMoment.text_styling?.bgType === 'solid' 
+                        ? { 
+                            background: currentMoment.text_styling?.color || '#FFFFFF',
+                            color: '#FFFFFF',
+                          }
+                        : currentMoment.text_styling?.bgType === 'outline'
+                        ? {
+                            WebkitTextStroke: `3px ${currentMoment.text_styling?.color || '#FFFFFF'}`,
+                            WebkitTextFillColor: 'white',
+                            color: currentMoment.text_styling?.color || '#FFFFFF',
+                          }
+                        : { 
+                            color: currentMoment.text_styling?.color || '#FFFFFF',
+                          }
+                    }
                   >
                     {currentMoment.caption}
                   </p>

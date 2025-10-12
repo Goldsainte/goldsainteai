@@ -375,15 +375,15 @@ All colors MUST be HSL.
 
   /* Text Background Styles */
   .text-bg-solid {
-    background-color: currentColor;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    display: inline-block;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
   }
 
   .text-bg-outline {
-    -webkit-text-stroke: 3px currentColor;
-    -webkit-text-fill-color: white;
+    -webkit-text-stroke: 3px;
     paint-order: stroke fill;
   }
 
