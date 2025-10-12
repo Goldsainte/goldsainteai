@@ -1,5 +1,5 @@
-import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu, Store } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu } from "lucide-react";
+import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import logoHorizontal from "@/assets/primary-horizontal-logo-gold-2.png";
@@ -8,8 +8,8 @@ const navItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Search", url: "/search", icon: Search },
   { title: "Explore", url: "/trending", icon: Compass },
-  { title: "Reels", url: "/trending", icon: Film },
-  { title: "Messages", url: "/messages", icon: MessageCircle, badge: true },
+  { title: "Journeys", url: "/travel-feed", icon: Film },
+  { title: "Messages", url: "/messages", icon: MessageCircle },
   { title: "Notifications", url: "/notifications", icon: Bell },
   { title: "Create", url: "/travel-profile", icon: PlusSquare },
   { title: "Profile", url: "/travel-profile", icon: User },
@@ -17,7 +17,6 @@ const navItems = [
 
 export function TravelSidebar() {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   return (
     <div className="hidden md:flex md:flex-col fixed left-0 top-0 h-screen w-64 border-r border-border bg-background z-10">
@@ -41,11 +40,6 @@ export function TravelSidebar() {
               >
                 <item.icon className="h-6 w-6" strokeWidth={2} />
                 <span className="text-base">{item.title}</span>
-                {item.badge && (
-                  <span className="ml-auto bg-destructive text-destructive-foreground text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                    1
-                  </span>
-                )}
               </NavLink>
             </li>
           ))}
