@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useStream } from '@/contexts/StreamContext';
@@ -16,13 +16,12 @@ import {
 import 'stream-chat-react/dist/css/v2/index.css';
 import { Button } from '@/components/ui/button';
 import { Video, Phone, ArrowLeft } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { toast } from 'sonner';
 
 const StreamMessages = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { client, isReady } = useStream();
-  const { toast } = useToast();
   const [activeChannel, setActiveChannel] = useState<any>(null);
 
   useEffect(() => {
@@ -30,24 +29,6 @@ const StreamMessages = () => {
       navigate('/auth');
     }
   }, [user, navigate]);
-
-  const startVideoCall = () => {
-    if (activeChannel) {
-      toast({
-        title: "Starting Video Call",
-        description: "Video calling feature coming soon!",
-      });
-    }
-  };
-
-  const startAudioCall = () => {
-    if (activeChannel) {
-      toast({
-        title: "Starting Audio Call",
-        description: "Audio calling feature coming soon!",
-      });
-    }
-  };
 
   if (!isReady || !client) {
     return (
@@ -83,7 +64,7 @@ const StreamMessages = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={startAudioCall}
+              onClick={() => toast.info('Audio calls coming soon!')}
               title="Start Audio Call"
             >
               <Phone className="h-5 w-5" />
@@ -91,7 +72,7 @@ const StreamMessages = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={startVideoCall}
+              onClick={() => toast.info('Video calls coming soon!')}
               title="Start Video Call"
             >
               <Video className="h-5 w-5" />
