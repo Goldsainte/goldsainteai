@@ -337,7 +337,6 @@ const TravelFeed = () => {
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              paddingBottom: 'calc(64px + env(safe-area-inset-bottom))',
             }}
           >
             <style>{`
