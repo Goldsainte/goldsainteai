@@ -37,7 +37,7 @@ export const VoiceCallInterface = ({
     },
     onError: (error) => {
       console.error('Voice call error:', error);
-      toast.error('Call error: ' + error.message);
+      toast.error('Call error: ' + (typeof error === 'string' ? error : 'Unknown error'));
     },
   });
 
@@ -58,12 +58,23 @@ export const VoiceCallInterface = ({
       // Request microphone access
       await navigator.mediaDevices.getUserMedia({ audio: true });
       
-      // Start the conversation with the agent ID
-      await conversation.startSession({ agentId });
+      // Generate signed URL from the agent ID
+      const signedUrlResponse = await fetch(
+        `https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`
+      );
+      
+      if (!signedUrlResponse.ok) {
+        throw new Error('Failed to get signed URL');
+      }
+      
+      const { signed_url } = await signedUrlResponse.json();
+      
+      // Start the conversation with the signed URL
+      await conversation.startSession({ signedUrl: signed_url });
       toast.success('Starting call...');
     } catch (error: any) {
       console.error('Failed to start call:', error);
-      toast.error('Failed to start call: ' + error.message);
+      toast.error('Failed to start call: ' + (error?.message || 'Unknown error'));
     }
   };
 
