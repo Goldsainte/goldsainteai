@@ -157,6 +157,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     if (currentIndex < moments.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
+      setSaveDialogOpen(false); // Close save dialog if open
       onOpenChange(false);
     }
   };
@@ -370,24 +371,36 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             </AlertDialogDescription>
           </AlertDialogHeader>
           
-          <Select value={selectedHighlightId} onValueChange={setSelectedHighlightId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a vault" />
-            </SelectTrigger>
-            <SelectContent>
-              {highlights.length === 0 ? (
-                <SelectItem value="no-vaults" disabled>
-                  No vaults yet - create one from your profile
-                </SelectItem>
-              ) : (
-                highlights.map((highlight) => (
+          {highlights.length === 0 ? (
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground text-center">
+                You don't have any vaults yet. Create one to start saving moments!
+              </p>
+              <Button 
+                className="w-full" 
+                onClick={() => {
+                  setSaveDialogOpen(false);
+                  onOpenChange(false);
+                  window.location.href = '/travel-profile';
+                }}
+              >
+                Create Your First Vault
+              </Button>
+            </div>
+          ) : (
+            <Select value={selectedHighlightId} onValueChange={setSelectedHighlightId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a vault" />
+              </SelectTrigger>
+              <SelectContent>
+                {highlights.map((highlight) => (
                   <SelectItem key={highlight.id} value={highlight.id}>
                     {highlight.title}
                   </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
