@@ -1082,7 +1082,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             variant="ghost"
             size="icon"
             onClick={() => navigate('/home')}
-            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Home"
           >
             <Home className="h-6 w-6" />
@@ -1092,7 +1092,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-feed')}
-            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Journeys"
           >
             <Video className="h-6 w-6" />
@@ -1102,7 +1102,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             variant="ghost"
             size="icon"
             onClick={() => setCreateSheetOpen(true)}
-            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Create"
           >
             <PlusSquare className="h-6 w-6" />
@@ -1112,7 +1112,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             variant="ghost"
             size="icon"
             onClick={() => navigate('/travel-profile')}
-            className="hover:bg-accent h-12 w-12 rounded-lg border-2 border-primary"
+            className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Profile"
           >
             <User className="h-6 w-6" />

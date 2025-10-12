@@ -385,7 +385,7 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/home')}
-                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
+                className="hover:bg-white/20 h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
                 aria-label="Home"
               >
                 <Home className="h-6 w-6" />
@@ -395,7 +395,7 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/search')}
-                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
+                className="hover:bg-white/20 h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
                 aria-label="Search"
               >
                 <SearchIcon className="h-6 w-6" />
@@ -405,7 +405,7 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setCreateSheetOpen(true)}
-                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
+                className="hover:bg-white/20 h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
                 aria-label="Create"
               >
                 <PlusSquare className="h-6 w-6" />
@@ -415,7 +415,7 @@ const TravelFeed = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate('/travel-profile')}
-                className="text-white hover:bg-white/20 h-12 w-12 rounded-lg border-2 border-primary"
+                className="hover:bg-white/20 h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
                 aria-label="Profile"
               >
                 <User className="h-6 w-6" />

@@ -20,7 +20,7 @@ export function FeedSidebar() {
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     `flex items-center gap-4 px-3 py-3 rounded-lg transition-colors ${
       isActive
-        ? "font-semibold"
+        ? "font-semibold [&>svg]:text-[#BFAD72] [&>span]:text-[#BFAD72]"
         : "font-normal hover:bg-muted/50"
     }`;
 
