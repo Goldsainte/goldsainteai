@@ -196,12 +196,12 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               <img
                 src={currentMoment.media_url}
                 alt="Moment"
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
               />
             ) : (
               <video
                 src={currentMoment.media_url}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-cover"
                 autoPlay
                 muted
                 onEnded={handleNext}

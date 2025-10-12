@@ -133,9 +133,9 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           ) : (
             <div className="relative aspect-[9/16] max-h-[400px] bg-black rounded-lg overflow-hidden">
               {file?.type.startsWith('image/') ? (
-                <img src={preview} alt="Preview" className="w-full h-full object-contain" />
+                <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
-                <video src={preview} className="w-full h-full object-contain" controls />
+                <video src={preview} className="w-full h-full object-cover" controls />
               )}
               <Button
                 variant="destructive"
