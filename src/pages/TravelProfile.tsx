@@ -25,6 +25,8 @@ import { useCloseFriends } from "@/hooks/useCloseFriends";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import PhotoCarouselModal from "@/components/PhotoCarouselModal";
+import { OptimizedImage } from "@/components/OptimizedImage";
+import { PostGridSkeleton } from "@/components/PostGridSkeleton";
 
 interface Profile {
   id: string;
@@ -203,13 +205,14 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   const fetchUserPosts = async () => {
     try {
       console.log('Fetching photo posts for user:', profileUserId);
-      // Fetch only photo posts for the Posts tab
+      // Fetch only photo posts for the Posts tab - limit for faster initial load
       let query: any = supabase
         .from('travel_posts')
         .select('id, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count')
         .eq('user_id', profileUserId)
         .eq('media_type', 'photo')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(30); // Load first 30 for performance
 
       // Only show active posts for other users; show all on own profile
       if (!isOwnProfile) {
@@ -737,11 +740,9 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           )}
         </TabsContent>
 
-        <TabsContent value="posts" className="mt-4">
+        <TabsContent value="posts" className="mt-0">
           {loading ? (
-            <div className="flex items-center justify-center p-12">
-              <div className="text-muted-foreground">Loading photos...</div>
-            </div>
+            <PostGridSkeleton />
           ) : userPosts.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 text-center">
               <Grid3X3 className="h-12 w-12 text-muted-foreground mb-4" />
@@ -756,11 +757,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-0.5 pb-20 md:pb-0">
+            <div className="grid grid-cols-3 gap-1 pb-20 md:pb-0">
               {userPosts.map((post) => (
                 <div
                   key={post.id}
-                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden"
+                  className="relative aspect-square bg-muted cursor-pointer group overflow-hidden transition-transform active:scale-95"
                   onClick={() => {
                     if (post.image_urls && post.image_urls.length > 0) {
                       setPhotoModalImages(post.image_urls);
@@ -771,24 +772,26 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   }}
                 >
                   {post.image_urls && post.image_urls.length > 0 ? (
-                    <img
+                    <OptimizedImage
                       src={post.image_urls[0]}
                       alt={post.caption || 'Photo'}
-                      className="w-full h-full object-cover"
+                      aspectRatio="square"
+                      className="w-full h-full"
                     />
                   ) : post.thumbnail_url ? (
-                    <img
+                    <OptimizedImage
                       src={post.thumbnail_url}
                       alt={post.caption || 'Photo'}
-                      className="w-full h-full object-cover"
+                      aspectRatio="square"
+                      className="w-full h-full"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
                       <Grid3X3 className="h-8 w-8 text-white" />
                     </div>
                   )}
-                  {/* Instagram-style hover overlay - NO edit button on photos */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  {/* Instagram-style hover overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
                     <div className="text-white text-sm flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         <Heart className="h-5 w-5 fill-white" />
@@ -810,7 +813,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                         setEditingPost(post);
                         setEditOpen(true);
                       }}
-                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 border-none"
+                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 hover:bg-black/80 border-none shadow-lg"
                     >
                       <Edit className="h-4 w-4 text-white" />
                     </Button>

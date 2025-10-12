@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,7 @@ import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
 import { PromotePostModal } from "./PromotePostModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { OptimizedImage } from "./OptimizedImage";
 
 interface TravelVideoCardProps {
   post: {
@@ -427,34 +428,31 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   // Desktop Instagram-style layout
   if (layout === 'desktop') {
     return (
-      <div className="bg-card rounded-lg overflow-hidden">
+      <div className="bg-card border-b last:border-b-0 transition-colors duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between px-4 py-3">
           <div 
-            className="flex items-center gap-3 cursor-pointer flex-1"
+            className="flex items-center gap-3 cursor-pointer flex-1 hover:opacity-70 transition-opacity"
             onClick={() => navigate(`/travel-profile/${post.user_id}`)}
           >
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-8 w-8">
               <AvatarImage src={post.profiles?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
                 {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
-                <p className="font-semibold text-sm">{post.profiles?.username || 'Anonymous'}</p>
+                <p className="font-semibold text-sm truncate">{post.profiles?.username || 'Anonymous'}</p>
                 {post.profiles?.is_verified && (
-                  <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500 flex-shrink-0" />
                 )}
               </div>
               {post.location && (
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  {post.location}
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  <span className="truncate">{post.location}</span>
                 </div>
-              )}
-              {post.is_suggested && (
-                <p className="text-xs text-muted-foreground font-medium">Suggested for you</p>
               )}
             </div>
           </div>
@@ -489,77 +487,77 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           )}
         </div>
 
-        {/* Video/Image */}
+        {/* Video/Image - Optimized */}
         <div className="relative bg-black aspect-square">
-          {videoLoading && !videoError && post.video_url && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="text-white text-sm">Loading video...</div>
-            </div>
-          )}
-          
-          {videoError && (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
-              <div className="text-center space-y-2 p-4">
-                <p className="text-white text-sm">Video unavailable</p>
-              </div>
-            </div>
-          )}
-          
-          {post.video_url ? (
+          {post.image_urls && post.image_urls.length > 0 ? (
+            <OptimizedImage
+              src={post.image_urls[0]}
+              alt={post.caption || 'Post image'}
+              aspectRatio="square"
+              priority={isActive}
+              className="w-full"
+            />
+          ) : post.video_url ? (
             <>
-              <video
-                ref={videoRef}
-                src={post.video_url}
-                poster={post.thumbnail_url || undefined}
-                className="w-full h-full object-cover"
-                loop
-                playsInline
-                muted={isMuted}
-                preload="metadata"
-                crossOrigin="anonymous"
-                onLoadedData={() => setVideoLoading(false)}
-                onCanPlay={() => setVideoLoading(false)}
-                onError={() => {
-                  setVideoError(true);
-                  setVideoLoading(false);
-                }}
-              />
+              {videoLoading && !videoError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
+                </div>
+              )}
+              
+              {videoError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
+                  <div className="text-center space-y-2 p-4">
+                    <p className="text-white text-sm">Video unavailable</p>
+                  </div>
+                </div>
+              )}
+              
+              {!videoError && (
+                <video
+                  ref={videoRef}
+                  src={post.video_url}
+                  poster={post.thumbnail_url || undefined}
+                  className="w-full h-full object-cover"
+                  loop
+                  playsInline
+                  muted={isMuted}
+                  preload="metadata"
+                  crossOrigin="anonymous"
+                  onLoadedData={() => setVideoLoading(false)}
+                  onCanPlay={() => setVideoLoading(false)}
+                  onError={() => {
+                    setVideoError(true);
+                    setVideoLoading(false);
+                  }}
+                />
+              )}
+              
               {/* Mute Button */}
-              <button
-                onClick={onToggleMute}
-                className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110"
-                aria-label={isMuted ? "Unmute" : "Mute"}
-              >
-                {isMuted ? (
-                  <VolumeX className="h-5 w-5 text-white" />
-                ) : (
-                  <Volume2 className="h-5 w-5 text-white" />
-                )}
-              </button>
+              {!videoError && (
+                <button
+                  onClick={onToggleMute}
+                  className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-20"
+                  aria-label={isMuted ? "Unmute" : "Mute"}
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-5 w-5 text-white" />
+                  ) : (
+                    <Volume2 className="h-5 w-5 text-white" />
+                  )}
+                </button>
+              )}
             </>
           ) : post.embed_url ? (
             getEmbedComponent()
-          ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
-            <div 
-              className="relative w-full h-full cursor-pointer"
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentPhotoIndex(0);
-                setPhotoGalleryOpen(true);
-              }}
-            >
-              <img 
-                src={post.image_urls?.[0] || (post.thumbnail_url as string)} 
-                alt="Post content"
-                loading="lazy"
-                className="w-full h-full object-contain bg-black"
-              />
-              {post.image_urls && post.image_urls.length > 1 && (
-                <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-medium">
-                  1 / {post.image_urls.length}
-                </div>
-              )}
-            </div>
+          ) : (post.thumbnail_url) ? (
+            <OptimizedImage
+              src={post.thumbnail_url}
+              alt={post.caption || 'Post'}
+              aspectRatio="square"
+              priority={isActive}
+              className="w-full"
+            />
           ) : null}
         </div>
 

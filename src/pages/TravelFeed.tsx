@@ -264,35 +264,39 @@ const TravelFeed = () => {
 
   return (
     <>
-      {/* Desktop Layout - 3 columns */}
+      {/* Desktop Layout - Cleaner Instagram-style */}
       {!isMobile ? (
         <div className="flex w-full min-h-screen bg-background">
-          {/* Left Sidebar */}
-          <FeedSidebar />
+          {/* Left Sidebar - Sticky */}
+          <div className="sticky top-0 h-screen">
+            <FeedSidebar />
+          </div>
 
-          {/* Center Feed */}
-          <div className="flex-1 max-w-[630px] mx-auto">
-            {/* Moments Ring */}
-            <MomentsRing />
+          {/* Center Feed - Instagram width */}
+          <div className="flex-1 max-w-[470px] mx-auto border-x">
+            {/* Moments Ring - Compact */}
+            <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b">
+              <MomentsRing />
+            </div>
             
-            {/* Feed Posts */}
-            <div className="py-6">
+            {/* Feed Posts - No gaps like Instagram */}
+            <div>
               {loading ? (
                 <FeedSkeleton />
               ) : posts.length === 0 ? (
-                <div className="flex items-center justify-center py-12">
+                <div className="flex items-center justify-center py-20">
                   <div className="text-center space-y-4">
                     <p className="text-muted-foreground">No journeys yet</p>
-                    <Button onClick={() => setCreateSheetOpen(true)}>
+                    <Button onClick={() => setCreateSheetOpen(true)} variant="default">
                       <Upload className="mr-2 h-4 w-4" />
-                      Upload First Journey
+                      Share Your First Journey
                     </Button>
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
+                <div className="divide-y">
                   {posts.map((post) => (
-                    <div key={post.id} data-video-id={post.id}>
+                    <div key={post.id} data-video-id={post.id} className="animate-fade-in">
                       <TravelVideoCard
                         post={post}
                         isActive={visibleVideoId === post.id}
@@ -308,8 +312,10 @@ const TravelFeed = () => {
             </div>
           </div>
 
-          {/* Right Suggestions Panel */}
-          <FeedSuggestions />
+          {/* Right Suggestions Panel - Sticky */}
+          <div className="sticky top-0 h-screen">
+            <FeedSuggestions />
+          </div>
         </div>
       ) : (
         /* Mobile Layout - Full Screen Vertical Scroll */
