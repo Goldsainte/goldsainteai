@@ -605,6 +605,33 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 </Button>
               </div>
             )}
+
+            {/* Your Dashboard Section - Desktop Only */}
+            {isOwnProfile && (
+              <div className="rounded-lg p-3 space-y-2" style={{ backgroundColor: '#E5DFC6' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-semibold">Your Dashboard</h3>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className="text-base font-bold">{formatNumber(stats.viewsCount)}</div>
+                    <div className="text-xs text-muted-foreground">views</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="text-base font-bold">{formatNumber(stats.likesCount)}</div>
+                    <div className="text-xs text-muted-foreground">likes</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="text-base font-bold flex items-center gap-1">
+                      <Coins className="h-4 w-4 text-accent" />
+                      {balance}
+                    </div>
+                    <div className="text-xs text-muted-foreground">coins</div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -679,33 +706,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               <p className="text-[11px] text-muted-foreground">📍 {profile.location}</p>
             )}
           </div>
-
-          {/* Your Dashboard Section */}
-          {isOwnProfile && (
-            <div className="rounded-lg p-1 space-y-1" style={{ backgroundColor: '#E5DFC6' }}>
-              <div className="flex items-center gap-1 mb-0.5">
-                <LayoutDashboard className="h-3.5 w-3.5 text-muted-foreground" />
-                <h3 className="text-xs font-semibold">Your Dashboard</h3>
-              </div>
-              <div className="grid grid-cols-3 gap-1">
-                <div className="flex flex-col items-center">
-                  <div className="text-xs font-bold">{formatNumber(stats.viewsCount)}</div>
-                  <div className="text-[10px] text-muted-foreground">views</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-xs font-bold">{formatNumber(stats.likesCount)}</div>
-                  <div className="text-[10px] text-muted-foreground">likes</div>
-                </div>
-                <div className="flex flex-col items-center">
-                  <div className="text-xs font-bold flex items-center gap-0.5">
-                    <Coins className="h-3 w-3 text-accent" />
-                    {balance}
-                  </div>
-                  <div className="text-[10px] text-muted-foreground">coins</div>
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Action Buttons - Compact Style */}
           <div className="flex gap-[1.6px]">
