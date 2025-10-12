@@ -61,14 +61,14 @@ const StreamMessages = () => {
         </div>
         {activeChannel && (
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => toast.info('Audio calls coming soon!')}
-              title="Start Audio Call"
-            >
-              <Phone className="h-5 w-5" />
-            </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate('/voice-call')}
+                title="Start Audio Call"
+              >
+                <Phone className="h-5 w-5" />
+              </Button>
             <Button
               variant="ghost"
               size="icon"

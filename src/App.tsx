@@ -41,6 +41,7 @@ import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
 import StreamMessages from "./pages/StreamMessages";
+import VoiceCall from "./pages/VoiceCall";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
@@ -170,7 +171,8 @@ function AppContent() {
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/messages" element={<Messages />} />
-          <Route path="/stream-messages" element={<StreamMessages />} />
+            <Route path="/stream-messages" element={<StreamMessages />} />
+            <Route path="/voice-call" element={<VoiceCall />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search" element={<SearchResults />} />
