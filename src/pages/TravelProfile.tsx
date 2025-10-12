@@ -27,6 +27,7 @@ import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import PhotoCarouselModal from "@/components/PhotoCarouselModal";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { PostGridSkeleton } from "@/components/PostGridSkeleton";
+import { TravelSidebar } from "@/components/TravelSidebar";
 
 interface Profile {
   id: string;
@@ -409,9 +410,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   }
 
   return (
-    <div className="min-h-screen bg-background pb-28 pb-safe md:pb-0">
-      {/* Header - Instagram style */}
-      <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
+    <>
+      <TravelSidebar />
+      <div className="min-h-screen bg-background pb-28 pb-safe md:pb-0 md:ml-64">
+        {/* Header - Instagram style */}
+        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-6 h-14">
           <Button
             variant="ghost"
@@ -1163,6 +1166,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </div>
       </div>
     </div>
+    </>
   );
 };
 
