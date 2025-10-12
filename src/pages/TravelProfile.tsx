@@ -29,6 +29,7 @@ import { OptimizedImage } from "@/components/OptimizedImage";
 import { PostGridSkeleton } from "@/components/PostGridSkeleton";
 import { TravelSidebar } from "@/components/TravelSidebar";
 import { MomentsViewer } from "@/components/MomentsViewer";
+import { ProfilePhotoModal } from "@/components/ProfilePhotoModal";
 
 interface Profile {
   id: string;
@@ -90,6 +91,7 @@ const TravelProfile = () => {
 const { balance, refetch: refetchCoins } = useCoinBalance();
   const [hasActiveMoments, setHasActiveMoments] = useState(false);
   const [momentsViewerOpen, setMomentsViewerOpen] = useState(false);
+  const [profilePhotoModalOpen, setProfilePhotoModalOpen] = useState(false);
 
   // Photo carousel modal state
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
@@ -465,37 +467,20 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           {/* Profile Picture */}
           <div className="relative flex-shrink-0">
             <Avatar 
-              className={`h-40 w-40 cursor-pointer ${hasActiveMoments ? 'ring-4 ring-primary ring-offset-2 ring-offset-background' : ''}`}
-              onClick={() => hasActiveMoments && setMomentsViewerOpen(true)}
+              className="h-40 w-40 cursor-pointer"
+              onClick={() => {
+                if (hasActiveMoments) {
+                  setMomentsViewerOpen(true);
+                } else if (isOwnProfile) {
+                  setProfilePhotoModalOpen(true);
+                }
+              }}
             >
               <AvatarImage src={profile?.avatar_url || undefined} />
               <AvatarFallback className="bg-primary text-primary-foreground text-5xl">
                 {profile?.username?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
-            {isOwnProfile && (
-              <>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                  id="avatar-upload-desktop"
-                  disabled={uploadingAvatar}
-                />
-                <button
-                  onClick={() => document.getElementById('avatar-upload-desktop')?.click()}
-                  disabled={uploadingAvatar}
-                  className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
-                >
-                  {uploadingAvatar ? (
-                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                  ) : (
-                    <PlusCircle className="h-4 w-4" />
-                  )}
-                </button>
-              </>
-            )}
           </div>
 
           {/* Info Section */}
@@ -630,37 +615,20 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar 
-                className={`h-20 w-20 ring-2 ${hasActiveMoments ? 'ring-primary' : 'ring-border'} cursor-pointer`}
-                onClick={() => hasActiveMoments && setMomentsViewerOpen(true)}
+                className="h-20 w-20 cursor-pointer"
+                onClick={() => {
+                  if (hasActiveMoments) {
+                    setMomentsViewerOpen(true);
+                  } else if (isOwnProfile) {
+                    setProfilePhotoModalOpen(true);
+                  }
+                }}
               >
                 <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                   {profile?.username?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
-              {isOwnProfile && (
-                <>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarUpload}
-                    className="hidden"
-                    id="avatar-upload-mobile"
-                    disabled={uploadingAvatar}
-                  />
-                  <button
-                    onClick={() => document.getElementById('avatar-upload-mobile')?.click()}
-                    disabled={uploadingAvatar}
-                    className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 ring-2 ring-background hover:bg-primary/90 transition-colors disabled:opacity-50"
-                  >
-                    {uploadingAvatar ? (
-                      <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
-                    ) : (
-                      <PlusCircle className="h-3.5 w-3.5" />
-                    )}
-                  </button>
-                </>
-              )}
             </div>
             
             {/* Name */}
@@ -1133,6 +1101,15 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         open={momentsViewerOpen}
         onOpenChange={setMomentsViewerOpen}
         userId={profileUserId || ''}
+      />
+
+      {/* Profile Photo Modal */}
+      <ProfilePhotoModal
+        open={profilePhotoModalOpen}
+        onOpenChange={setProfilePhotoModalOpen}
+        userId={user?.id || ''}
+        currentAvatarUrl={profile?.avatar_url || null}
+        onSuccess={fetchProfile}
       />
 
       {/* Brand Partnership Proposal Modal */}

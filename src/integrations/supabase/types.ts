@@ -5123,6 +5123,33 @@ export type Database = {
         }
         Relationships: []
       }
+      story_highlights: {
+        Row: {
+          cover_image_url: string | null
+          created_at: string | null
+          id: string
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cover_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cover_image_url?: string | null
+          created_at?: string | null
+          id?: string
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       story_interaction_responses: {
         Row: {
           created_at: string

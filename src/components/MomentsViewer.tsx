@@ -148,8 +148,8 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg p-0 bg-black border-none">
-        <div className="relative aspect-[9/16] max-h-[80vh] bg-black">
+      <DialogContent className="max-w-lg h-[90vh] p-0 bg-black border-none overflow-hidden">
+        <div className="relative w-full h-full bg-black">
           {/* Progress bars */}
           <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
             {moments.map((_, idx) => (

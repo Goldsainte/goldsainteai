@@ -131,7 +131,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               </label>
             </div>
           ) : (
-            <div className="relative aspect-[9/16] max-h-[400px] bg-black rounded-lg overflow-hidden">
+            <div className="relative w-full h-[500px] bg-black rounded-lg overflow-hidden">
               {file?.type.startsWith('image/') ? (
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
