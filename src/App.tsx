@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { StreamProvider } from "@/contexts/StreamContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -39,6 +40,7 @@ import BookingDetails from "./pages/BookingDetails";
 import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
+import StreamMessages from "./pages/StreamMessages";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
@@ -168,6 +170,7 @@ function AppContent() {
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/stream-messages" element={<StreamMessages />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search" element={<SearchResults />} />
@@ -208,7 +211,9 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <AppContent />
+            <StreamProvider>
+              <AppContent />
+            </StreamProvider>
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
