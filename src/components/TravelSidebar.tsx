@@ -2,6 +2,9 @@ import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Men
 import { NavLink } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 import logoHorizontal from "@/assets/primary-horizontal-logo-gold-2.png";
 
 const navItems = [
@@ -17,6 +20,31 @@ const navItems = [
 
 export function TravelSidebar() {
   const { user } = useAuth();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
+
+  useEffect(() => {
+    if (user?.id) {
+      fetchProfile();
+    }
+  }, [user?.id]);
+
+  const fetchProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url, username')
+        .eq('id', user?.id)
+        .single();
+
+      if (error) throw error;
+      
+      setAvatarUrl(data?.avatar_url || null);
+      setUsername(data?.username || 'User');
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
 
   return (
     <div className="hidden md:flex md:flex-col fixed left-0 top-0 h-screen w-64 border-r border-border bg-background z-10">
@@ -38,7 +66,16 @@ export function TravelSidebar() {
                   }`
                 }
               >
-                <item.icon className="h-6 w-6" strokeWidth={2} />
+                {item.title === "Profile" ? (
+                  <Avatar className="h-7 w-7">
+                    <AvatarImage src={avatarUrl || undefined} />
+                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                      {username?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                ) : (
+                  <item.icon className="h-6 w-6" strokeWidth={2} />
+                )}
                 <span className="text-base">{item.title}</span>
               </NavLink>
             </li>
