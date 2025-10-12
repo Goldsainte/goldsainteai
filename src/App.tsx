@@ -185,6 +185,7 @@ function AppContent() {
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/travel-feed" element={<StreamActivityFeed />} />
+          <Route path="/goldsainte-live" element={<StreamActivityFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
