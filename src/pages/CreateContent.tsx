@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStreamActivity } from '@/contexts/StreamActivityContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,9 +19,41 @@ export default function CreateContent() {
   const [contentType, setContentType] = useState<'journey' | 'sainte'>('journey');
   const [caption, setCaption] = useState('');
   const [mediaUrl, setMediaUrl] = useState('');
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [music, setMusic] = useState('');
   const [location, setLocation] = useState('');
   const [posting, setPosting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setMediaFile(file);
+      setMediaUrl(''); // Clear URL if file is selected
+    }
+  };
+
+  const uploadFile = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
+    
+    const { data, error } = await supabase.storage
+      .from('user-content')
+      .upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('user-content')
+      .getPublicUrl(data.path);
+
+    return publicUrl;
+  };
 
   const handlePost = async () => {
     if (!userFeed) {
@@ -28,13 +61,23 @@ export default function CreateContent() {
       return;
     }
 
-    if (!mediaUrl) {
-      toast.error('Please provide a media URL');
+    if (!mediaUrl && !mediaFile) {
+      toast.error('Please provide a media file or URL');
       return;
     }
 
     try {
       setPosting(true);
+      
+      let finalMediaUrl = mediaUrl;
+      
+      // Upload file if selected
+      if (mediaFile) {
+        setUploading(true);
+        toast.info('Uploading file...');
+        finalMediaUrl = await uploadFile(mediaFile);
+        setUploading(false);
+      }
       
       // Create the activity
       const activity = {
@@ -43,7 +86,7 @@ export default function CreateContent() {
         object: `${contentType}:${Date.now()}`,
         foreign_id: `${contentType}:${user?.id}:${Date.now()}`,
         time: new Date().toISOString(),
-        ...(contentType === 'journey' ? { video_url: mediaUrl } : { images: [mediaUrl] }),
+        ...(contentType === 'journey' ? { video_url: finalMediaUrl } : { images: [finalMediaUrl] }),
         ...(caption && { caption }),
         ...(music && { music }),
         ...(location && { location }),
@@ -61,6 +104,7 @@ export default function CreateContent() {
       toast.error('Failed to post content');
     } finally {
       setPosting(false);
+      setUploading(false);
     }
   };
 
@@ -109,15 +153,41 @@ export default function CreateContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="video-file">Upload Video</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="video-file"
+                      type="file"
+                      accept="video/mp4,video/quicktime,video/webm"
+                      onChange={handleFileSelect}
+                      disabled={!!mediaUrl || uploading}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                  {mediaFile && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {mediaFile.name}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-sm text-muted-foreground">OR</span>
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="video-url">Video URL</Label>
                   <Input
                     id="video-url"
                     placeholder="https://example.com/video.mp4"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
+                    disabled={!!mediaFile || uploading}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Enter a direct link to your video (mp4, mov, etc.)
+                    Or enter a direct link to your video
                   </p>
                 </div>
 
@@ -145,9 +215,9 @@ export default function CreateContent() {
                 <Button 
                   className="w-full" 
                   onClick={handlePost}
-                  disabled={posting}
+                  disabled={posting || uploading}
                 >
-                  {posting ? 'Posting...' : 'Post Journey'}
+                  {uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Journey'}
                 </Button>
               </CardContent>
             </Card>
@@ -160,15 +230,41 @@ export default function CreateContent() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
+                  <Label htmlFor="image-file">Upload Image</Label>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      id="image-file"
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif,image/webp"
+                      onChange={handleFileSelect}
+                      disabled={!!mediaUrl || uploading}
+                      className="cursor-pointer"
+                    />
+                  </div>
+                  {mediaFile && (
+                    <p className="text-sm text-muted-foreground">
+                      Selected: {mediaFile.name}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 h-px bg-border" />
+                  <span className="text-sm text-muted-foreground">OR</span>
+                  <div className="flex-1 h-px bg-border" />
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="image-url">Image URL</Label>
                   <Input
                     id="image-url"
                     placeholder="https://example.com/image.jpg"
                     value={mediaUrl}
                     onChange={(e) => setMediaUrl(e.target.value)}
+                    disabled={!!mediaFile || uploading}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Enter a direct link to your image
+                    Or enter a direct link to your image
                   </p>
                 </div>
 
@@ -196,9 +292,9 @@ export default function CreateContent() {
                 <Button 
                   className="w-full" 
                   onClick={handlePost}
-                  disabled={posting}
+                  disabled={posting || uploading}
                 >
-                  {posting ? 'Posting...' : 'Post Sainte'}
+                  {uploading ? 'Uploading...' : posting ? 'Posting...' : 'Post Sainte'}
                 </Button>
               </CardContent>
             </Card>
