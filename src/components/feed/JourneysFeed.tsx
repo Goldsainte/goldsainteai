@@ -65,20 +65,31 @@ export const JourneysFeed = () => {
   const fetchJourneys = async () => {
     try {
       setLoading(true);
+      console.log('[JourneysFeed] Fetching journeys...', { timelineFeed, isReady });
+      
+      if (!timelineFeed) {
+        console.error('[JourneysFeed] No timeline feed available');
+        toast.error('Failed to connect to feed service');
+        return;
+      }
+      
       const response = await timelineFeed.get({ 
         limit: 25,
         withReactionCounts: true,
         withOwnReactions: true,
       });
       
+      console.log('[JourneysFeed] Response received:', response);
+      
       // Filter for journey-type posts (short videos)
       const journeyPosts = response.results.filter(
         (activity: any) => activity.verb === 'journey' || activity.video_url
       );
       
+      console.log('[JourneysFeed] Journey posts:', journeyPosts.length);
       setJourneys(journeyPosts);
     } catch (error) {
-      console.error('Error fetching journeys:', error);
+      console.error('[JourneysFeed] Error fetching journeys:', error);
       toast.error('Failed to load journeys');
     } finally {
       setLoading(false);

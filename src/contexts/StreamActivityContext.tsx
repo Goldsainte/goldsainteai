@@ -37,14 +37,21 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
 
     const initStreamActivity = async () => {
       try {
+        console.log('[StreamActivity] Starting initialization...');
+        
         // Get user profile for name and image
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('username, avatar_url')
           .eq('id', user.id)
           .single();
 
+        if (profileError) {
+          console.error('[StreamActivity] Profile error:', profileError);
+        }
+
         // Get Stream token from edge function
+        console.log('[StreamActivity] Fetching token...');
         const { data, error } = await supabase.functions.invoke('stream-token', {
           body: {
             userId: user.id,
@@ -53,27 +60,36 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
           },
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('[StreamActivity] Token error:', error);
+          throw error;
+        }
 
         const { token, apiKey, userId } = data;
+        console.log('[StreamActivity] Token received, initializing client...', { apiKey: apiKey?.substring(0, 8) });
 
         // Initialize Stream Activity Feeds client
         const client = connect(apiKey, token, userId);
+        console.log('[StreamActivity] Client created');
         
         // Create user feed (for posting)
         const userFeedInstance = client.feed('user', userId);
+        console.log('[StreamActivity] User feed created');
         
         // Create timeline feed (for viewing posts from followed users)
         const timelineFeedInstance = client.feed('timeline', userId);
+        console.log('[StreamActivity] Timeline feed created');
 
         setFeedClient(client);
         setUserFeed(userFeedInstance);
         setTimelineFeed(timelineFeedInstance);
         setIsReady(true);
         
-        console.log('Stream Activity Feeds connected successfully');
+        console.log('[StreamActivity] ✓ Stream Activity Feeds connected successfully');
       } catch (error) {
-        console.error('Failed to initialize Stream Activity Feeds:', error);
+        console.error('[StreamActivity] ✗ Failed to initialize Stream Activity Feeds:', error);
+        // Set ready anyway to show the UI with error handling
+        setIsReady(true);
       }
     };
 

@@ -49,20 +49,31 @@ export const SaintesFeed = () => {
   const fetchSaintes = async () => {
     try {
       setLoading(true);
+      console.log('[SaintesFeed] Fetching saintes...', { timelineFeed, isReady });
+      
+      if (!timelineFeed) {
+        console.error('[SaintesFeed] No timeline feed available');
+        toast.error('Failed to connect to feed service');
+        return;
+      }
+      
       const response = await timelineFeed.get({ 
         limit: 25,
         withReactionCounts: true,
         withOwnReactions: true,
       });
       
+      console.log('[SaintesFeed] Response received:', response);
+      
       // Filter for sainte-type posts (permanent posts with images)
       const saintePosts = response.results.filter(
         (activity: any) => activity.verb === 'sainte' || activity.verb === 'post'
       );
       
+      console.log('[SaintesFeed] Sainte posts:', saintePosts.length);
       setSaintes(saintePosts);
     } catch (error) {
-      console.error('Error fetching saintes:', error);
+      console.error('[SaintesFeed] Error fetching saintes:', error);
       toast.error('Failed to load posts');
     } finally {
       setLoading(false);

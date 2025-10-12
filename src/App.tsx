@@ -68,6 +68,7 @@ import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import InstagramAPI from "./pages/InstagramAPI";
+import CreateContent from "./pages/CreateContent";
 
 const queryClient = new QueryClient();
 
@@ -142,6 +143,7 @@ function AppContent() {
         <Routes>
           <Route path="/" element={<StreamActivityFeed />} />
           <Route path="/home" element={<Index />} />
+          <Route path="/create" element={<CreateContent />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
