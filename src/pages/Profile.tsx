@@ -80,11 +80,11 @@ export default function Profile() {
       <main className="flex-1 container mx-auto px-4 py-4 md:py-8 max-w-3xl">
         <Button
           variant="ghost"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
+          Back
         </Button>
 
         {/* Profile Header */}

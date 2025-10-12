@@ -323,12 +323,12 @@ export default function Marketplace() {
       <main className="flex-1 container mx-auto px-4 py-6 md:py-8">
         <Button
           variant="ghost"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(-1)}
           className="mb-4 md:mb-6"
           size="sm"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
+          Back
         </Button>
         
         <div className="flex flex-col gap-3 mb-6">

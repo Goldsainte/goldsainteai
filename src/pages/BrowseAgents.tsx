@@ -190,12 +190,12 @@ export default function BrowseAgents() {
       <main className="flex-1 container mx-auto px-4 sm:px-6 py-6 md:py-8">
         <Button
           variant="ghost"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(-1)}
           className="mb-4 md:mb-6 min-h-[44px]"
           size="default"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
+          Back
         </Button>
 
         <div className="mb-6 md:mb-8 space-y-2">

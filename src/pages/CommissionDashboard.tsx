@@ -78,13 +78,13 @@ export default function CommissionDashboard() {
       <Header />
       
       <main className="flex-1 container mx-auto px-4 py-8">
-        <Button 
+        <Button
           variant="ghost" 
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(-1)}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
+          Back
         </Button>
 
         <div className="mb-8">

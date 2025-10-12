@@ -22,12 +22,12 @@ export default function TestGroupPayment() {
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)}
           variant="ghost"
           className="mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
+          Back
         </Button>
 
         <div className="space-y-6">

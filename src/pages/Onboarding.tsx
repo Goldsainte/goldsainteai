@@ -55,11 +55,11 @@ export default function Onboarding() {
       <div className="container mx-auto max-w-5xl">
         <Button
           variant="ghost"
-          onClick={() => navigate('/home')}
+          onClick={() => navigate(-1)}
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
+          Back
         </Button>
         
         <div className="flex flex-col items-center mb-8">
