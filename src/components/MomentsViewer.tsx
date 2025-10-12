@@ -333,6 +333,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               >
                 <div className="text-center max-w-md px-4">
                   <p
+                    key={`${currentMoment.text_styling?.font}-${currentMoment.text_styling?.animation}-${currentMoment.text_styling?.bgType}-${currentMoment.text_styling?.color}-${(currentMoment.caption || '').length}`}
                     className={`text-4xl font-bold ${
                       currentMoment.text_styling?.font === 'classic' ? 'font-story-classic' :
                       currentMoment.text_styling?.font === 'modern' ? 'font-story-modern' :

@@ -287,6 +287,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               <div className="text-center max-w-md px-4">
                 {textContent ? (
                   <p
+                    key={`${textFont}-${textAnimation}-${textBgType}-${textColor}-${textContent.length}`}
                     className={`
                       text-4xl font-bold
                       ${getFontClass()}
