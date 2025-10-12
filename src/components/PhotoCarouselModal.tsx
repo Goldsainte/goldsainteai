@@ -461,7 +461,7 @@ const PhotoCarouselModal = ({
         {/* Desktop Layout (Horizontal - Instagram style) */}
         <div className="hidden md:flex h-[90vh] w-full bg-background">
           {/* Left side - Image */}
-          <div className="relative flex-1 bg-black flex items-center justify-center">
+          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
             <Carousel
               opts={{ startIndex, loop: false, dragFree: false, align: 'center', containScroll: 'trimSnaps' }}
               setApi={setCarouselApi}
@@ -469,11 +469,11 @@ const PhotoCarouselModal = ({
             >
               <CarouselContent className="h-full -ml-0">
                 {images.map((img, idx) => (
-                  <CarouselItem key={idx} className="h-full flex items-center justify-center pl-0">
+                  <CarouselItem key={idx} className="h-full flex items-center justify-center pl-0 p-4">
                     <img 
                       src={img} 
                       alt={`Photo ${idx + 1}`} 
-                      className="max-w-full max-h-full object-contain"
+                      className="w-full h-full object-contain"
                     />
                   </CarouselItem>
                 ))}
