@@ -33,13 +33,19 @@ export const MomentDrawingCanvas = ({
     const canvas = new FabricCanvas(canvasRef.current, {
       width,
       height,
+      backgroundColor: null,
     });
 
-    // Make canvas transparent to show background
-    canvas.backgroundColor = null;
-
-    // Enable drawing mode first to initialize the brush
+    // Enable drawing mode to initialize the brush
     canvas.isDrawingMode = true;
+
+    // Wait for next tick to ensure brush is initialized
+    setTimeout(() => {
+      if (canvas.freeDrawingBrush) {
+        canvas.freeDrawingBrush.color = brushColor;
+        canvas.freeDrawingBrush.width = brushSize;
+      }
+    }, 0);
 
     // Load initial drawing if provided
     if (initialDrawing) {
@@ -52,18 +58,16 @@ export const MomentDrawingCanvas = ({
       }
     }
 
-    // Initialize brush after enabling drawing mode
-    if (canvas.freeDrawingBrush) {
-      canvas.freeDrawingBrush.color = brushColor;
-      canvas.freeDrawingBrush.width = brushSize;
-    }
-
     setFabricCanvas(canvas);
 
     // Save drawing on changes
     const handleChange = () => {
-      const json = JSON.stringify(canvas.toJSON());
-      onDrawingChange(json);
+      try {
+        const json = JSON.stringify(canvas.toJSON());
+        onDrawingChange(json);
+      } catch (error) {
+        console.error("Error saving drawing:", error);
+      }
     };
 
     canvas.on("path:created", handleChange);
@@ -72,7 +76,7 @@ export const MomentDrawingCanvas = ({
     return () => {
       canvas.dispose();
     };
-  }, [width, height]);
+  }, [width, height, initialDrawing, onDrawingChange]);
 
   useEffect(() => {
     if (!fabricCanvas) return;
