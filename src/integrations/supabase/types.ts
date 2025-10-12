@@ -3223,7 +3223,8 @@ export type Database = {
           expires_at: string | null
           id: string
           media_type: string
-          media_url: string
+          media_url: string | null
+          text_styling: Json | null
           user_id: string
           view_count: number | null
         }
@@ -3234,7 +3235,8 @@ export type Database = {
           expires_at?: string | null
           id?: string
           media_type: string
-          media_url: string
+          media_url?: string | null
+          text_styling?: Json | null
           user_id: string
           view_count?: number | null
         }
@@ -3245,7 +3247,8 @@ export type Database = {
           expires_at?: string | null
           id?: string
           media_type?: string
-          media_url?: string
+          media_url?: string | null
+          text_styling?: Json | null
           user_id?: string
           view_count?: number | null
         }

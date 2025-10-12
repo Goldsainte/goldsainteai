@@ -27,12 +27,19 @@ import { Input } from "@/components/ui/input";
 interface Moment {
   id: string;
   user_id: string;
-  media_url: string;
-  media_type: 'image' | 'video';
+  media_url: string | null;
+  media_type: 'image' | 'video' | 'text';
   caption: string | null;
   duration_seconds: number;
   view_count: number;
   created_at: string;
+  text_styling?: {
+    font: string;
+    animation: string;
+    color: string;
+    bgType: string;
+    bgGradient: string;
+  } | null;
   profiles?: {
     username: string;
     avatar_url: string | null;
@@ -318,15 +325,39 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
           {/* Media */}
           <div className="w-full h-full flex items-center justify-center">
-            {currentMoment.media_type === 'image' ? (
+            {currentMoment.media_type === 'text' ? (
+              <div 
+                className="w-full h-full flex items-center justify-center p-8"
+                style={{ background: currentMoment.text_styling?.bgGradient || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+              >
+                <div className="text-center max-w-md">
+                  <p
+                    className={`
+                      text-4xl font-bold
+                      font-story-${currentMoment.text_styling?.font || 'classic'}
+                      ${currentMoment.text_styling?.animation !== 'none' ? `animate-${currentMoment.text_styling?.animation}` : ''}
+                      ${currentMoment.text_styling?.bgType === 'solid' ? 'text-bg-solid' : ''}
+                      ${currentMoment.text_styling?.bgType === 'outline' ? 'text-bg-outline' : ''}
+                    `}
+                    style={{ 
+                      color: currentMoment.text_styling?.bgType === 'solid' 
+                        ? currentMoment.text_styling?.bgGradient 
+                        : currentMoment.text_styling?.color || '#FFFFFF',
+                    }}
+                  >
+                    {currentMoment.caption}
+                  </p>
+                </div>
+              </div>
+            ) : currentMoment.media_type === 'image' ? (
               <img
-                src={currentMoment.media_url}
+                src={currentMoment.media_url || ''}
                 alt="Moment"
                 className="w-full h-full object-cover"
               />
             ) : (
               <video
-                src={currentMoment.media_url}
+                src={currentMoment.media_url || ''}
                 className="w-full h-full object-cover"
                 autoPlay
                 muted
