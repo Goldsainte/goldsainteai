@@ -27,6 +27,21 @@ export const MomentDrawingCanvas = ({
   const [brushColor, setBrushColor] = useState("#FFFFFF");
   const [brushSize, setBrushSize] = useState(5);
 
+  // Keep latest settings for event handlers
+  const settingsRef = useRef({ activeTool, brushType, brushColor, brushSize });
+
+  // Convert hex color to rgba for highlighter
+  const hexToRgba = (hex: string, alpha: number) => {
+    let h = hex.replace('#', '');
+    if (h.length === 3) {
+      h = h.split('').map((c) => c + c).join('');
+    }
+    const r = parseInt(h.substring(0, 2), 16);
+    const g = parseInt(h.substring(2, 4), 16);
+    const b = parseInt(h.substring(4, 6), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
   useEffect(() => {
     if (!canvasRef.current) return;
 
@@ -60,51 +75,84 @@ export const MomentDrawingCanvas = ({
 
     setFabricCanvas(canvas);
 
-    // Save drawing on changes
-    const handleChange = () => {
+    // Save drawing and apply mode on new paths
+    const handlePathCreated = (opt: any) => {
+      try {
+        const { activeTool } = settingsRef.current;
+        if (activeTool === "erase") {
+          if (opt?.path) {
+            opt.path.globalCompositeOperation = "destination-out";
+            opt.path.stroke = "rgba(0,0,0,1)";
+          }
+        } else {
+          if (opt?.path) opt.path.globalCompositeOperation = "source-over";
+        }
+        const json = JSON.stringify(canvas.toJSON());
+        onDrawingChange(json);
+      } catch (error) {
+        console.error("Error handling path:", error);
+      }
+    };
+
+    const handleObjectRemoved = () => {
       try {
         const json = JSON.stringify(canvas.toJSON());
         onDrawingChange(json);
       } catch (error) {
-        console.error("Error saving drawing:", error);
+        console.error("Error saving after remove:", error);
       }
     };
 
-    canvas.on("path:created", handleChange);
-    canvas.on("object:removed", handleChange);
+    canvas.on("path:created", handlePathCreated);
+    canvas.on("object:removed", handleObjectRemoved);
 
     return () => {
       canvas.dispose();
     };
   }, [width, height, initialDrawing, onDrawingChange]);
 
+  // Keep settings ref in sync
+  useEffect(() => {
+    settingsRef.current = { activeTool, brushType, brushColor, brushSize };
+  }, [activeTool, brushType, brushColor, brushSize]);
+
   useEffect(() => {
     if (!fabricCanvas) return;
 
-    fabricCanvas.isDrawingMode = activeTool === "draw";
+    // Enable drawing for draw and erase modes
+    fabricCanvas.isDrawingMode = activeTool === "draw" || activeTool === "erase";
 
-    if (activeTool === "draw" && fabricCanvas.freeDrawingBrush) {
-      // Apply brush type styles
-      switch (brushType) {
-        case "marker":
-          fabricCanvas.freeDrawingBrush.color = brushColor;
-          fabricCanvas.freeDrawingBrush.width = brushSize;
-          break;
-        case "highlighter":
-          fabricCanvas.freeDrawingBrush.color = brushColor + "80"; // 50% opacity
-          fabricCanvas.freeDrawingBrush.width = brushSize * 2;
-          break;
-        case "neon":
-          fabricCanvas.freeDrawingBrush.color = brushColor;
-          fabricCanvas.freeDrawingBrush.width = brushSize;
-          fabricCanvas.freeDrawingBrush.shadow = {
-            blur: 10,
-            color: brushColor,
-            offsetX: 0,
-            offsetY: 0,
-          } as any;
-          break;
-      }
+    const brush = fabricCanvas.freeDrawingBrush as any;
+    if (!brush) return;
+
+    // Reset shadow by default
+    brush.shadow = undefined;
+
+    if (activeTool === "erase") {
+      brush.color = "#000000"; // color doesn't matter for destination-out
+      brush.width = brushSize;
+      return;
+    }
+
+    switch (brushType) {
+      case "marker":
+        brush.color = brushColor;
+        brush.width = brushSize;
+        break;
+      case "highlighter":
+        brush.color = hexToRgba(brushColor, 0.5);
+        brush.width = brushSize * 2;
+        break;
+      case "neon":
+        brush.color = brushColor;
+        brush.width = brushSize;
+        brush.shadow = {
+          blur: 10,
+          color: brushColor,
+          offsetX: 0,
+          offsetY: 0,
+        };
+        break;
     }
   }, [activeTool, brushType, brushColor, brushSize, fabricCanvas]);
 
@@ -149,7 +197,6 @@ export const MomentDrawingCanvas = ({
           size="sm"
           onClick={() => {
             setActiveTool("erase");
-            handleErase();
           }}
           className="gap-1"
         >
