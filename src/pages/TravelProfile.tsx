@@ -685,12 +685,12 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
           {/* Your Dashboard Section */}
           {isOwnProfile && (
-            <div className="bg-muted/30 rounded-lg p-2 space-y-1.5">
-              <div className="flex items-center gap-1.5 mb-1">
+            <div className="bg-muted/30 rounded-lg p-1 space-y-1">
+              <div className="flex items-center gap-1 mb-0.5">
                 <LayoutDashboard className="h-3.5 w-3.5 text-muted-foreground" />
                 <h3 className="text-xs font-semibold">Your Dashboard</h3>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1">
                 <div className="flex flex-col items-center">
                   <div className="text-xs font-bold">{formatNumber(stats.viewsCount)}</div>
                   <div className="text-[10px] text-muted-foreground">views</div>
