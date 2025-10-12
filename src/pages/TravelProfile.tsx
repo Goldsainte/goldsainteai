@@ -75,6 +75,8 @@ const TravelProfile = () => {
     postsCount: 0,
     likesCount: 0,
     viewsCount: 0,
+    commentsCount: 0,
+    sharesCount: 0,
   });
   const [editProfileOpen, setEditProfileOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -325,7 +327,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     try {
       let query: any = supabase
         .from('travel_posts')
-        .select('view_count, like_count')
+        .select('view_count, like_count, comment_count, share_count')
         .eq('user_id', profileUserId);
 
       // Only count active posts for other users
@@ -338,11 +340,15 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       if (posts) {
         const totalViews = posts.reduce((sum, post) => sum + post.view_count, 0);
         const totalLikes = posts.reduce((sum, post) => sum + post.like_count, 0);
+        const totalComments = posts.reduce((sum, post) => sum + (post.comment_count || 0), 0);
+        const totalShares = posts.reduce((sum, post) => sum + (post.share_count || 0), 0);
         
         setStats({
           postsCount: posts.length,
           likesCount: totalLikes,
           viewsCount: totalViews,
+          commentsCount: totalComments,
+          sharesCount: totalShares,
         });
       }
     } catch (error) {
@@ -614,7 +620,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
                   <h3 className="text-sm font-semibold">Your Dashboard</h3>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-5 gap-3">
                   <div className="flex flex-col items-center">
                     <div className="text-base font-bold">{formatNumber(stats.viewsCount)}</div>
                     <div className="text-xs text-muted-foreground">views</div>
@@ -624,7 +630,15 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     <div className="text-xs text-muted-foreground">likes</div>
                   </div>
                   <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-2">
+                    <div className="text-base font-bold">{formatNumber(stats.commentsCount)}</div>
+                    <div className="text-xs text-muted-foreground">comments</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="text-base font-bold">{formatNumber(stats.sharesCount)}</div>
+                    <div className="text-xs text-muted-foreground">shares</div>
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <div className="flex items-center gap-1">
                       <div className="text-base font-bold flex items-center gap-1">
                         <Coins className="h-4 w-4 text-accent" />
                         {balance}
@@ -632,10 +646,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                       <Button
                         variant="link"
                         size="sm"
-                        className="h-auto p-0 text-xs text-primary"
+                        className="h-auto p-0 text-[10px] text-primary leading-tight"
                         onClick={() => setBuyCoinsOpen(true)}
                       >
-                        Buy more
+                        Buy
                       </Button>
                     </div>
                     <div className="text-xs text-muted-foreground">coins</div>
