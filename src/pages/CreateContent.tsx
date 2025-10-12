@@ -119,6 +119,44 @@ export default function CreateContent() {
       
       const response = await userFeed.addActivity(activity);
       console.log('[CreateContent] Posted successfully:', response);
+
+      // Also persist to profile posts so content appears on TravelProfile grids
+      try {
+        if (contentType === 'journey') {
+          const { error: insertError } = await supabase
+            .from('travel_posts')
+            .insert([
+              {
+                user_id: user.id,
+                media_type: 'video',
+                video_url: finalMediaUrl,
+                thumbnail_url: null,
+                caption: caption || null,
+                location: null,
+                status: 'active',
+              },
+            ]);
+          if (insertError) throw insertError;
+        } else {
+          const { error: insertError } = await supabase
+            .from('travel_posts')
+            .insert([
+              {
+                user_id: user.id,
+                media_type: 'photo',
+                image_urls: [finalMediaUrl],
+                thumbnail_url: finalMediaUrl,
+                caption: caption || null,
+                location: location || null,
+                status: 'active',
+              },
+            ]);
+          if (insertError) throw insertError;
+        }
+        console.log('[CreateContent] Synced to travel_posts for profile view');
+      } catch (dbErr) {
+        console.warn('[CreateContent] travel_posts insert failed (feed is still posted):', dbErr);
+      }
       
       toast.success(`${contentType === 'journey' ? 'Journey' : 'Sainte'} posted successfully!`);
       navigate('/');
