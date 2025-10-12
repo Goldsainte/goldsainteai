@@ -105,7 +105,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create a Moment</DialogTitle>
         </DialogHeader>
@@ -131,7 +131,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               </label>
             </div>
           ) : (
-            <div className="relative w-full h-[500px] bg-black rounded-lg overflow-hidden">
+            <div className="relative w-full h-[350px] bg-black rounded-lg overflow-hidden">
               {file?.type.startsWith('image/') ? (
                 <img src={preview} alt="Preview" className="w-full h-full object-cover" />
               ) : (
