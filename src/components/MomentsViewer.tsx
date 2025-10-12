@@ -186,6 +186,8 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   };
 
   const handleSaveToVault = async () => {
+    console.log('Save to vault clicked', { selectedHighlightId, highlightsCount: highlights.length });
+    
     if (!selectedHighlightId) {
       toast.error("Please select a vault");
       return;
@@ -194,16 +196,23 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     setSaving(true);
     try {
       const currentMoment = moments[currentIndex];
+      console.log('Saving moment to vault:', { momentId: currentMoment.id, highlightId: selectedHighlightId });
       
       // Check if already saved
-      const { data: existing } = await supabase
+      const { data: existing, error: checkError } = await supabase
         .from('moment_highlight_items')
         .select('id')
         .eq('highlight_id', selectedHighlightId)
         .eq('moment_id', currentMoment.id)
         .maybeSingle();
 
+      if (checkError) {
+        console.error('Error checking existing:', checkError);
+        throw checkError;
+      }
+
       if (existing) {
+        console.log('Moment already in vault');
         toast.info("This moment is already in this vault");
         setSaveDialogOpen(false);
         return;
@@ -217,8 +226,12 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           moment_id: currentMoment.id,
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error inserting:', error);
+        throw error;
+      }
 
+      console.log('Successfully saved moment to vault');
       toast.success("Moment saved to vault!");
       setSaveDialogOpen(false);
       setSelectedHighlightId("");
