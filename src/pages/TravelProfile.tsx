@@ -483,7 +483,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-8 px-4 text-sm font-semibold"
+                    className="h-[6px] px-4 text-sm font-semibold"
                     onClick={() => setEditProfileOpen(true)}
                   >
                     Edit profile
@@ -491,7 +491,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   <Button
                     variant="secondary"
                     size="sm"
-                    className="h-8 px-4 text-sm font-semibold"
+                    className="h-[6px] px-4 text-sm font-semibold"
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
                       toast.success("Profile link copied!");
