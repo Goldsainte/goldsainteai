@@ -4,9 +4,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Settings, Grid, Bookmark, Tag, UserPlus } from 'lucide-react';
+import { Settings, Grid, Bookmark, Tag, MoreHorizontal, Heart, MessageCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EditProfileDialog } from './EditProfileDialog';
+import { PostGridSkeleton } from './PostGridSkeleton';
 
 interface Profile {
   id: string;
@@ -79,131 +80,180 @@ export const InstagramProfile = () => {
     : profile.username || 'User';
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row gap-8 mb-12">
-        {/* Avatar */}
-        <div className="flex justify-center md:justify-start">
-          <Avatar className="h-32 w-32 md:h-40 md:w-40">
-            <AvatarImage src={profile.avatar_url || undefined} />
-            <AvatarFallback className="text-4xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
-              {displayName[0]?.toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-
-        {/* Profile Info */}
-        <div className="flex-1 space-y-4">
-          {/* Username and Actions */}
-          <div className="flex items-center gap-4 flex-wrap">
-            <h1 className="text-xl font-normal">{profile.username || 'user'}</h1>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setEditOpen(true)}
-            >
-              Edit profile
-            </Button>
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
-            </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="flex gap-8">
-            <div className="text-center md:text-left">
-              <span className="font-semibold">{stats.posts}</span> posts
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[935px] mx-auto px-4 sm:px-5 py-8">
+        {/* Profile Header */}
+        <header className="mb-11">
+          <div className="flex gap-7 md:gap-28 mb-11">
+            {/* Avatar */}
+            <div className="flex-shrink-0">
+              <Avatar className="h-20 w-20 md:h-[150px] md:w-[150px] ring-1 ring-border">
+                <AvatarImage src={profile.avatar_url || undefined} />
+                <AvatarFallback className="text-2xl md:text-5xl bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                  {displayName[0]?.toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
             </div>
-            <button className="text-center md:text-left hover:opacity-70 transition-opacity">
-              <span className="font-semibold">{stats.followers}</span> followers
-            </button>
-            <button className="text-center md:text-left hover:opacity-70 transition-opacity">
-              <span className="font-semibold">{stats.following}</span> following
-            </button>
+
+            {/* Profile Info */}
+            <div className="flex-1 min-w-0">
+              {/* Username and Actions */}
+              <div className="flex items-center gap-2 md:gap-5 mb-5 flex-wrap">
+                <h2 className="text-xl font-light">{profile.username || 'user'}</h2>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="px-4 py-1.5 h-8 font-semibold rounded-lg"
+                  onClick={() => setEditOpen(true)}
+                >
+                  Edit profile
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="px-4 py-1.5 h-8 font-semibold rounded-lg"
+                >
+                  View archive
+                </Button>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <Settings className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Stats - Desktop */}
+              <div className="hidden md:flex gap-10 mb-5">
+                <div>
+                  <span className="font-semibold">{stats.posts}</span>
+                  <span className="text-foreground ml-1">posts</span>
+                </div>
+                <button className="hover:opacity-70 transition-opacity">
+                  <span className="font-semibold">{stats.followers}</span>
+                  <span className="text-foreground ml-1">followers</span>
+                </button>
+                <button className="hover:opacity-70 transition-opacity">
+                  <span className="font-semibold">{stats.following}</span>
+                  <span className="text-foreground ml-1">following</span>
+                </button>
+              </div>
+
+              {/* Bio */}
+              <div className="hidden md:block">
+                <h1 className="font-semibold">{displayName}</h1>
+                {profile.bio && (
+                  <p className="text-sm whitespace-pre-wrap mt-1">{profile.bio}</p>
+                )}
+                {profile.website && (
+                  <a
+                    href={profile.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-semibold text-primary hover:text-primary/80 mt-1 inline-block"
+                  >
+                    {profile.website.replace(/^https?:\/\//, '')}
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
 
-          {/* Bio */}
-          <div className="space-y-1">
-            <p className="font-semibold">{displayName}</p>
+          {/* Bio - Mobile */}
+          <div className="md:hidden mb-5">
+            <h1 className="font-semibold">{displayName}</h1>
             {profile.bio && (
-              <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+              <p className="text-sm whitespace-pre-wrap mt-1">{profile.bio}</p>
             )}
             {profile.website && (
               <a
                 href={profile.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline block"
+                className="text-sm font-semibold text-primary hover:text-primary/80 mt-1 inline-block"
               >
                 {profile.website.replace(/^https?:\/\//, '')}
               </a>
             )}
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={() => navigate('/stream-messages')}
-            >
-              Message
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-            >
-              <UserPlus className="h-4 w-4 mr-2" />
-              Follow
-            </Button>
+          {/* Stats - Mobile */}
+          <div className="flex md:hidden border-t border-border pt-3">
+            <div className="flex-1 text-center">
+              <div className="font-semibold">{stats.posts}</div>
+              <div className="text-xs text-muted-foreground">posts</div>
+            </div>
+            <div className="flex-1 text-center border-l border-border">
+              <div className="font-semibold">{stats.followers}</div>
+              <div className="text-xs text-muted-foreground">followers</div>
+            </div>
+            <div className="flex-1 text-center border-l border-border">
+              <div className="font-semibold">{stats.following}</div>
+              <div className="text-xs text-muted-foreground">following</div>
+            </div>
           </div>
-        </div>
+        </header>
+
+        {/* Tabs */}
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList className="w-full h-auto p-0 bg-transparent border-t border-border">
+            <TabsTrigger
+              value="posts"
+              className="flex-1 data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none py-3 gap-1.5"
+            >
+              <Grid className="h-3 w-3" />
+              <span className="text-xs font-semibold uppercase tracking-wider">Posts</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="saved"
+              className="flex-1 data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none py-3 gap-1.5"
+            >
+              <Bookmark className="h-3 w-3" />
+              <span className="text-xs font-semibold uppercase tracking-wider">Saved</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="tagged"
+              className="flex-1 data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none py-3 gap-1.5"
+            >
+              <Tag className="h-3 w-3" />
+              <span className="text-xs font-semibold uppercase tracking-wider">Tagged</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="posts" className="mt-0 pt-7">
+            <div className="grid grid-cols-3 gap-1 md:gap-7">
+              {/* Empty state */}
+              <div className="col-span-3 flex flex-col items-center justify-center py-16">
+                <div className="rounded-full border-2 border-foreground p-8 mb-6">
+                  <Grid className="h-16 w-16" strokeWidth={1} />
+                </div>
+                <h3 className="text-3xl font-light mb-2">Share Photos</h3>
+                <p className="text-sm text-muted-foreground">When you share photos, they will appear on your profile.</p>
+                <Button variant="link" className="text-primary font-semibold mt-2">
+                  Share your first photo
+                </Button>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="saved" className="mt-0 pt-7">
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="rounded-full border-2 border-foreground p-8 mb-6">
+                <Bookmark className="h-16 w-16" strokeWidth={1} />
+              </div>
+              <h3 className="text-3xl font-light mb-2">Save</h3>
+              <p className="text-sm text-muted-foreground">Save photos and videos that you want to see again.</p>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="tagged" className="mt-0 pt-7">
+            <div className="flex flex-col items-center justify-center py-16">
+              <div className="rounded-full border-2 border-foreground p-8 mb-6">
+                <Tag className="h-16 w-16" strokeWidth={1} />
+              </div>
+              <h3 className="text-3xl font-light mb-2">Photos of you</h3>
+              <p className="text-sm text-muted-foreground">When people tag you in photos, they'll appear here.</p>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
-
-      {/* Tabs */}
-      <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="w-full justify-center border-t">
-          <TabsTrigger value="posts" className="flex-1">
-            <Grid className="h-4 w-4 mr-2" />
-            POSTS
-          </TabsTrigger>
-          <TabsTrigger value="saved" className="flex-1">
-            <Bookmark className="h-4 w-4 mr-2" />
-            SAVED
-          </TabsTrigger>
-          <TabsTrigger value="tagged" className="flex-1">
-            <Tag className="h-4 w-4 mr-2" />
-            TAGGED
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="posts" className="mt-4">
-          <div className="grid grid-cols-3 gap-1 md:gap-4">
-            {/* Posts grid would go here */}
-            <div className="aspect-square bg-muted rounded flex items-center justify-center text-muted-foreground">
-              No posts yet
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="saved" className="mt-4">
-          <div className="grid grid-cols-3 gap-1 md:gap-4">
-            <div className="aspect-square bg-muted rounded flex items-center justify-center text-muted-foreground">
-              No saved posts
-            </div>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="tagged" className="mt-4">
-          <div className="grid grid-cols-3 gap-1 md:gap-4">
-            <div className="aspect-square bg-muted rounded flex items-center justify-center text-muted-foreground">
-              No tagged posts
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
 
       {/* Edit Profile Dialog */}
       {profile && (
