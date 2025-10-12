@@ -53,61 +53,38 @@ export const MomentsRing = () => {
 
   const fetchMoments = async () => {
     try {
-      // 1) Get active moments (no embedded join)
+      // Get users with active moments
       const { data, error } = await supabase
         .from('moments')
-        .select(`user_id, id, created_at`)
+        .select(`
+          user_id,
+          id,
+          profiles:user_id (
+            username,
+            avatar_url
+          )
+        `)
         .gt('expires_at', new Date().toISOString())
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      if (!data || data.length === 0) {
-        setMoments([]);
-        return;
-      }
-
-      // 2) Aggregate by user_id
-      const userMoments: Record<string, { latest_moment_id: string; moment_count: number }> = {};
-      for (const m of data as Array<{ user_id: string; id: string }>) {
-        if (!userMoments[m.user_id]) {
-          userMoments[m.user_id] = { latest_moment_id: m.id, moment_count: 0 };
+      // Group by user
+      const userMoments: Record<string, UserMoment> = {};
+      data?.forEach((moment: any) => {
+        if (!userMoments[moment.user_id]) {
+          userMoments[moment.user_id] = {
+            user_id: moment.user_id,
+            username: moment.profiles?.username || 'User',
+            avatar_url: moment.profiles?.avatar_url,
+            moment_count: 0,
+            latest_moment_id: moment.id,
+          };
         }
-        userMoments[m.user_id].moment_count++;
-      }
-
-      const userIds = Object.keys(userMoments);
-      if (userIds.length === 0) {
-        setMoments([]);
-        return;
-      }
-
-      // 3) Fetch profiles separately for those users
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url')
-        .in('id', userIds);
-
-      if (profilesError) throw profilesError;
-
-      // 4) Build final array
-      const profileMap = new Map<string, { username: string; avatar_url: string | null }>();
-      profiles?.forEach((p: any) => {
-        profileMap.set(p.id, { username: p.username, avatar_url: p.avatar_url });
+        userMoments[moment.user_id].moment_count++;
       });
 
-      const result: UserMoment[] = userIds.map((uid) => {
-        const profile = profileMap.get(uid);
-        return {
-          user_id: uid,
-          username: profile?.username || 'User',
-          avatar_url: profile?.avatar_url || null,
-          moment_count: userMoments[uid].moment_count,
-          latest_moment_id: userMoments[uid].latest_moment_id,
-        };
-      });
-
-      setMoments(result);
+      setMoments(Object.values(userMoments));
     } catch (error) {
       console.error('Error fetching moments:', error);
     }

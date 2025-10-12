@@ -17,8 +17,4 @@ export default defineConfig(({ mode }) => ({
     // Ensure a single React instance to prevent ReactCurrentDispatcher errors
     dedupe: ["react", "react-dom"],
   },
-  define: {
-    // Polyfill global for browser compatibility with Node.js packages
-    global: 'globalThis',
-  },
 }));

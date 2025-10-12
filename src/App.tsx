@@ -6,8 +6,6 @@ import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { StreamProvider } from "@/contexts/StreamContext";
-import { StreamActivityProvider } from "@/contexts/StreamActivityContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -41,12 +39,10 @@ import BookingDetails from "./pages/BookingDetails";
 import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
-import StreamMessages from "./pages/StreamMessages";
-import VoiceCall from "./pages/VoiceCall";
 import NotFound from "./pages/NotFound";
 import Redirect from "./pages/Redirect";
 import TestGroupPayment from "./pages/TestGroupPayment";
-import StreamActivityFeed from "./components/StreamActivityFeed";
+import TravelFeed from "./pages/TravelFeed";
 import TravelProfile from "./pages/TravelProfile";
 import TravelSettings from "./pages/TravelSettings";
 import TravelSettings2 from "./pages/TravelSettings2";
@@ -68,7 +64,6 @@ import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import InstagramAPI from "./pages/InstagramAPI";
-import CreateContent from "./pages/CreateContent";
 
 const queryClient = new QueryClient();
 
@@ -141,9 +136,8 @@ function AppContent() {
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Routes>
-          <Route path="/" element={<StreamActivityFeed />} />
+          <Route path="/" element={<TravelFeed />} />
           <Route path="/home" element={<Index />} />
-          <Route path="/create" element={<CreateContent />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
@@ -164,8 +158,8 @@ function AppContent() {
           <Route path="/collections/:collectionId" element={<CollectionDetail />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/travel-profile" element={<Profile />} />
-          <Route path="/travel-profile/:userId" element={<Profile />} />
+          <Route path="/travel-profile" element={<TravelProfile />} />
+          <Route path="/travel-profile/:userId" element={<TravelProfile />} />
           <Route path="/travel-settings" element={<TravelSettings2 />} />
           <Route path="/travel-settings-2" element={<TravelSettings2 />} />
           <Route path="/travel-settings/edit" element={<TravelSettings />} />
@@ -174,8 +168,6 @@ function AppContent() {
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/messages" element={<Messages />} />
-            <Route path="/stream-messages" element={<StreamMessages />} />
-            <Route path="/voice-call" element={<VoiceCall />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search" element={<SearchResults />} />
@@ -184,8 +176,7 @@ function AppContent() {
           <Route path="/my-jobs" element={<MyJobs />} />
           <Route path="/my-trips" element={<MyTrips />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
-          <Route path="/travel-feed" element={<StreamActivityFeed />} />
-          <Route path="/goldsainte-live" element={<StreamActivityFeed />} />
+          <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
@@ -217,11 +208,7 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <StreamProvider>
-              <StreamActivityProvider>
-                <AppContent />
-              </StreamActivityProvider>
-            </StreamProvider>
+            <AppContent />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

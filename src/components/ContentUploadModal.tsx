@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -48,7 +48,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [visibility, setVisibility] = useState<'public' | 'close_friends'>('public');
   const [showInteractionCreator, setShowInteractionCreator] = useState(false);
   const [storyInteraction, setStoryInteraction] = useState<any>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoRef = useState<HTMLVideoElement | null>(null)[0];
   const [partnershipBrandId, setPartnershipBrandId] = useState<string | null>(null);
   const [taggedPackageIds, setTaggedPackageIds] = useState<string[]>([]);
 
@@ -270,18 +270,18 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   };
 
   const captureVideoFrame = () => {
-    if (!videoRef.current) {
+    if (!videoRef) {
       toast.error('Video not loaded');
       return;
     }
 
     const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
+    canvas.width = videoRef.videoWidth;
+    canvas.height = videoRef.videoHeight;
     const ctx = canvas.getContext('2d');
     
     if (ctx) {
-      ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(videoRef, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         if (blob) {
           const file = new File([blob], 'thumbnail.jpg', { type: 'image/jpeg' });
@@ -632,7 +632,12 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                 <Label>Cover Image</Label>
                 <div className="space-y-2">
                   <video
-                    ref={videoRef}
+                    ref={(el) => {
+                      if (el) {
+                        // @ts-ignore
+                        videoRef = el;
+                      }
+                    }}
                     src={videoPreviewUrl}
                     className="w-full rounded-lg bg-black"
                     controls
