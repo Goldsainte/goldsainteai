@@ -43,6 +43,23 @@ const TravelSettings = () => {
     }
   }, [user]);
 
+  // Check for verification success from redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('verification') === 'success') {
+      toast.success('Payment successful! Checking verification status...');
+      // Wait a moment for Stripe webhook to process, then check
+      setTimeout(() => {
+        checkVerificationStatus();
+      }, 2000);
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (params.get('verification') === 'cancelled') {
+      toast.info('Verification cancelled');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   const fetchProfile = async () => {
     try {
       const { data, error } = await supabase
@@ -170,7 +187,7 @@ const TravelSettings = () => {
       toast.loading('Opening checkout...');
       
       const { data, error } = await supabase.functions.invoke('create-verification-checkout', {
-        body: { returnUrl: window.location.origin + '/travel-settings' }
+        body: { returnUrl: window.location.origin + window.location.pathname }
       });
 
       if (error) throw error;
