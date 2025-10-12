@@ -161,8 +161,8 @@ function AppContent() {
           <Route path="/collections/:collectionId" element={<CollectionDetail />} />
           <Route path="/my-bookings" element={<MyBookings />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/travel-profile" element={<TravelProfile />} />
-          <Route path="/travel-profile/:userId" element={<TravelProfile />} />
+          <Route path="/travel-profile" element={<Profile />} />
+          <Route path="/travel-profile/:userId" element={<Profile />} />
           <Route path="/travel-settings" element={<TravelSettings2 />} />
           <Route path="/travel-settings-2" element={<TravelSettings2 />} />
           <Route path="/travel-settings/edit" element={<TravelSettings />} />
