@@ -101,16 +101,18 @@ export default function CreateContent() {
       }
       
       // Create the activity
-      const activity = {
-        actor: user?.id,
+      const activity: any = {
+        actor: `User:${user.id}`,
         verb: contentType,
         object: `${contentType}:${Date.now()}`,
-        foreign_id: `${contentType}:${user?.id}:${Date.now()}`,
+        foreign_id: `${contentType}:${user.id}:${Date.now()}`,
         time: new Date().toISOString(),
-        ...(contentType === 'journey' ? { video_url: finalMediaUrl } : { images: [finalMediaUrl] }),
+        ...(contentType === 'journey'
+          ? { video_url: finalMediaUrl }
+          : { images: [finalMediaUrl], image_url: finalMediaUrl }),
         ...(caption && { caption }),
-        ...(music && { music }),
-        ...(location && { location }),
+        ...(music && contentType === 'journey' && { music }),
+        ...(location && contentType === 'sainte' && { location }),
       };
 
       console.log('[CreateContent] Posting activity:', activity);
