@@ -25,7 +25,7 @@ serve(async (req) => {
       throw new Error('Stream credentials not configured');
     }
 
-    // Create JWT token for Stream
+    // Create JWT token for Stream (works for both Chat and Activity Feeds)
     const key = await crypto.subtle.importKey(
       "raw",
       new TextEncoder().encode(apiSecret),

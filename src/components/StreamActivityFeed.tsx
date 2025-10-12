@@ -1,216 +1,109 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Heart, MessageCircle, Bookmark, Share2 } from 'lucide-react';
-import { toast } from 'sonner';
-
-interface FeedItem {
-  id: string;
-  user: {
-    id: string;
-    username: string;
-    avatar: string;
-  };
-  mediaUrl: string;
-  mediaType: 'image' | 'video';
-  likes: number;
-  comments: number;
-  liked: boolean;
-  saved: boolean;
-}
+import { Home, Search, PlusSquare, ShoppingBag, Video, MessageCircle } from 'lucide-react';
+import { JourneysFeed } from './feed/JourneysFeed';
+import { SaintesFeed } from './feed/SaintesFeed';
+import { MomentsRing } from './MomentsRing';
+import { useStreamActivity } from '@/contexts/StreamActivityContext';
 
 const StreamActivityFeed = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [items, setItems] = useState<FeedItem[]>([]);
+  const { isReady } = useStreamActivity();
+  const [activeTab, setActiveTab] = useState<'journeys' | 'saintes'>('journeys');
 
-  useEffect(() => {
-    // Mock data - replace with actual API call
-    const mockItems: FeedItem[] = [
-      {
-        id: '1',
-        user: {
-          id: user?.id || '1',
-          username: 'andrepowelljr',
-          avatar: user?.user_metadata?.avatar_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=1',
-        },
-        mediaUrl: 'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800',
-        mediaType: 'image',
-        likes: 1234,
-        comments: 56,
-        liked: false,
-        saved: false,
-      },
-      {
-        id: '2',
-        user: {
-          id: '2',
-          username: 'traveler_jane',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=2',
-        },
-        mediaUrl: 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1',
-        mediaType: 'image',
-        likes: 892,
-        comments: 34,
-        liked: true,
-        saved: false,
-      },
-    ];
-    setItems(mockItems);
-  }, [user]);
-
-  const handleLike = (itemId: string) => {
-    setItems(items.map(item =>
-      item.id === itemId
-        ? { ...item, liked: !item.liked, likes: item.liked ? item.likes - 1 : item.likes + 1 }
-        : item
-    ));
-  };
-
-  const handleSave = (itemId: string) => {
-    setItems(items.map(item =>
-      item.id === itemId
-        ? { ...item, saved: !item.saved }
-        : item
-    ));
-    toast.success('Saved to collection');
-  };
-
-  const handleShare = () => {
-    toast.success('Share link copied!');
-  };
-
-  if (items.length === 0) {
+  if (!isReady) {
     return (
-      <div className="h-screen w-full flex items-center justify-center bg-black">
-        <p className="text-white">Loading...</p>
+      <div className="h-screen w-full flex items-center justify-center">
+        <p className="text-muted-foreground">Connecting to Goldsainte...</p>
       </div>
     );
   }
 
-  const currentItem = items[currentIndex];
-
   return (
-    <div className="relative h-screen w-full bg-black overflow-hidden">
-      {/* For You Header */}
-      <div className="absolute top-0 left-0 right-0 z-20 pt-safe">
-        <div className="flex items-center justify-center py-4">
-          <div className="bg-black/40 backdrop-blur-sm rounded-full px-6 py-2">
-            <h1 className="text-white font-semibold text-lg">For You</h1>
-          </div>
+    <div className="relative h-screen w-full flex flex-col">
+      {/* Top Navigation Bar */}
+      <div className="sticky top-0 z-50 bg-background border-b">
+        {/* Moments Ring */}
+        <MomentsRing />
+        
+        {/* Content Type Tabs */}
+        <div className="flex items-center justify-center py-2 gap-8">
+          <button
+            onClick={() => setActiveTab('journeys')}
+            className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${
+              activeTab === 'journeys'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground'
+            }`}
+          >
+            Journeys
+          </button>
+          <button
+            onClick={() => setActiveTab('saintes')}
+            className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${
+              activeTab === 'saintes'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground'
+            }`}
+          >
+            Sainte's
+          </button>
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="h-full w-full relative">
-        {/* Media - Full Screen */}
-        <div className="absolute inset-0">
-          {currentItem.mediaType === 'image' ? (
-            <img
-              src={currentItem.mediaUrl}
-              alt="Feed content"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <video
-              src={currentItem.mediaUrl}
-              className="w-full h-full object-cover"
-              autoPlay
-              loop
-              playsInline
-            />
-          )}
-        </div>
+      {/* Feed Content */}
+      <div className="flex-1 overflow-hidden">
+        {activeTab === 'journeys' && <JourneysFeed />}
+        {activeTab === 'saintes' && <SaintesFeed />}
+      </div>
 
-        {/* Right Action Buttons */}
-        <div className="absolute right-3 flex flex-col gap-6 z-10" style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
-          {/* Like Button */}
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-transparent hover:bg-transparent"
-              onClick={() => handleLike(currentItem.id)}
-            >
-              <Heart
-                className={`h-8 w-8 ${
-                  currentItem.liked ? 'fill-red-500 text-red-500' : 'text-white'
-                }`}
-                strokeWidth={1.5}
-              />
-            </Button>
-            <span className="text-white text-xs font-semibold drop-shadow-lg">
-              {currentItem.likes}
-            </span>
-          </div>
-
-          {/* Comment Button */}
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-transparent hover:bg-transparent"
-              onClick={() => toast.info('Comments feature coming soon')}
-            >
-              <MessageCircle className="h-8 w-8 text-white" strokeWidth={1.5} />
-            </Button>
-            <span className="text-white text-xs font-semibold drop-shadow-lg">
-              {currentItem.comments}
-            </span>
-          </div>
-
-          {/* Save Button */}
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-transparent hover:bg-transparent"
-              onClick={() => handleSave(currentItem.id)}
-            >
-              <Bookmark
-                className={`h-8 w-8 ${
-                  currentItem.saved ? 'fill-yellow-500 text-yellow-500' : 'text-white'
-                }`}
-                strokeWidth={1.5}
-              />
-            </Button>
-          </div>
-
-          {/* Share Button */}
-          <div className="flex flex-col items-center gap-1">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-12 w-12 rounded-full bg-transparent hover:bg-transparent"
-              onClick={handleShare}
-            >
-              <Share2 className="h-8 w-8 text-white" strokeWidth={1.5} />
-            </Button>
-          </div>
-        </div>
-
-        {/* Bottom Bar with User Info - Overlays the media */}
-        <div className="absolute left-0 right-0 bottom-0 z-20" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
-          {/* Gradient for readability */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-32" />
-          <div className="relative px-3 pb-3 flex items-center gap-3">
-            <Avatar
-              className="h-12 w-12 ring-2 ring-white cursor-pointer"
-              onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
-            >
-              <AvatarImage src={currentItem.user.avatar} />
-              <AvatarFallback>{currentItem.user.username[0]}</AvatarFallback>
-            </Avatar>
-            <button
-              onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
-              className="text-white font-semibold text-base drop-shadow-lg hover:opacity-80 transition-opacity"
-            >
-              {currentItem.user.username}
-            </button>
-          </div>
+      {/* Bottom Navigation Bar */}
+      <div className="sticky bottom-0 z-50 bg-background border-t">
+        <div className="flex items-center justify-around py-3 px-4 pb-safe">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/')}
+          >
+            <Home className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/search')}
+          >
+            <Search className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/create')}
+          >
+            <PlusSquare className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/goldsainte-live')}
+          >
+            <Video className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/messages')}
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/shop')}
+          >
+            <ShoppingBag className="h-6 w-6" />
+          </Button>
         </div>
       </div>
     </div>
