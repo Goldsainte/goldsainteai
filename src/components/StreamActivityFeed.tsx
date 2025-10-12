@@ -106,8 +106,8 @@ const StreamActivityFeed = () => {
 
       {/* Content Area */}
       <div className="h-full w-full relative">
-        {/* Media */}
-        <div className="h-full w-full flex items-center justify-center" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 110px)' }}>
+        {/* Media - Full Screen */}
+        <div className="absolute inset-0">
           {currentItem.mediaType === 'image' ? (
             <img
               src={currentItem.mediaUrl}
@@ -126,7 +126,7 @@ const StreamActivityFeed = () => {
         </div>
 
         {/* Right Action Buttons */}
-        <div className="absolute right-3 flex flex-col gap-6 z-10" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 120px)' }}>
+        <div className="absolute right-3 flex flex-col gap-6 z-10" style={{ bottom: 'calc(80px + env(safe-area-inset-bottom))' }}>
           {/* Like Button */}
           <div className="flex flex-col items-center gap-1">
             <Button
@@ -192,11 +192,11 @@ const StreamActivityFeed = () => {
           </div>
         </div>
 
-        {/* Bottom Bar with User Info (does not cover media) */}
-        <div className="absolute left-0 right-0 bottom-0 z-20">
+        {/* Bottom Bar with User Info - Overlays the media */}
+        <div className="absolute left-0 right-0 bottom-0 z-20" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {/* Gradient for readability */}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-          <div className="relative px-3 pt-4 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-3">
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent h-32" />
+          <div className="relative px-3 pb-3 flex items-center gap-3">
             <Avatar
               className="h-12 w-12 ring-2 ring-white cursor-pointer"
               onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
