@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { StreamChat } from "https://esm.sh/stream-chat@8.40.10";
+import { create } from "https://deno.land/x/djwt@v3.0.2/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -25,18 +25,20 @@ serve(async (req) => {
       throw new Error('Stream credentials not configured');
     }
 
-    // Initialize Stream server-side client
-    const serverClient = StreamChat.getInstance(apiKey, apiSecret);
+    // Create JWT token for Stream
+    const key = await crypto.subtle.importKey(
+      "raw",
+      new TextEncoder().encode(apiSecret),
+      { name: "HMAC", hash: "SHA-256" },
+      false,
+      ["sign"]
+    );
 
-    // Create or update user
-    await serverClient.upsertUser({
-      id: userId,
-      name: userName || userId,
-      image: userImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
-    });
-
-    // Generate user token
-    const token = serverClient.createToken(userId);
+    const token = await create(
+      { alg: "HS256", typ: "JWT" },
+      { user_id: userId },
+      key
+    );
 
     console.log(`Generated Stream token for user: ${userId}`);
 
@@ -44,7 +46,9 @@ serve(async (req) => {
       JSON.stringify({ 
         token,
         apiKey,
-        userId 
+        userId,
+        userName: userName || userId,
+        userImage: userImage || `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -52,8 +56,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error generating Stream token:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

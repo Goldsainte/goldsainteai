@@ -50,7 +50,7 @@ export const StreamProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
         if (error) throw error;
 
-        const { token, apiKey } = data;
+        const { token, apiKey, userName, userImage } = data;
 
         // Initialize Stream client
         const streamClient = StreamChat.getInstance(apiKey);
@@ -58,8 +58,8 @@ export const StreamProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         await streamClient.connectUser(
           {
             id: user.id,
-            name: profile?.username || user.email || 'User',
-            image: profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`,
+            name: userName || user.email || 'User',
+            image: userImage,
           },
           token
         );
