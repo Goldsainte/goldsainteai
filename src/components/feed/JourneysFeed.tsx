@@ -66,6 +66,7 @@ export const JourneysFeed = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     // Fetch once the Stream context has resolved, even in guest mode (no feed)
@@ -188,19 +189,31 @@ export const JourneysFeed = () => {
     }
   };
 
+  const isSample = (j: Journey) => j.id.startsWith('sample');
+
   const handleLike = async (journey: Journey) => {
     try {
+      // Local toggle for samples or when feed is unavailable
       const feed = timelineFeed || userFeed;
-      if (!feed) return;
+      if (!feed || isSample(journey)) {
+        setJourneys(prev => prev.map(j => {
+          if (j.id !== journey.id) return j;
+          const liked = !!(j.own_reactions?.like && j.own_reactions.like.length > 0);
+          const likeCount = j.reaction_counts?.like ?? 0;
+          return {
+            ...j,
+            reaction_counts: { ...j.reaction_counts, like: liked ? Math.max(0, likeCount - 1) : likeCount + 1 },
+            own_reactions: { ...j.own_reactions, like: liked ? [] : [{} as any] },
+          };
+        }));
+        return;
+      }
+
       if (journey.own_reactions?.like && journey.own_reactions.like.length > 0) {
-        // Unlike
         await feed.removeReaction(journey.own_reactions.like[0].id);
       } else {
-        // Like
         await feed.addReaction('like', journey.id);
       }
-      
-      // Refresh the feed
       await fetchJourneys();
     } catch (error) {
       console.error('Error toggling like:', error);
@@ -231,22 +244,37 @@ export const JourneysFeed = () => {
     toast.success('Link copied!');
   };
 
+  // (wheel handler replaced by scroll snapping + keyboard handlers)
+
+  // Add keyboard + wheel scroll mapping to index
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const onScroll = () => {
+      const h = container.clientHeight || 1;
+      const idx = Math.round(container.scrollTop / h);
+      if (idx !== currentIndex) setCurrentIndex(Math.max(0, Math.min(journeys.length - 1, idx)));
+    };
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, [journeys.length, currentIndex]);
+
   const handleScroll = (direction: 'up' | 'down') => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
     if (direction === 'down' && currentIndex < journeys.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      container.scrollTo({ top: (currentIndex + 1) * container.clientHeight, behavior: 'smooth' });
     } else if (direction === 'up' && currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
+      container.scrollTo({ top: (currentIndex - 1) * container.clientHeight, behavior: 'smooth' });
     }
   };
 
   // Add keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown') {
-        handleScroll('down');
-      } else if (e.key === 'ArrowUp') {
-        handleScroll('up');
-      }
+      if (e.key === 'ArrowDown') handleScroll('down');
+      else if (e.key === 'ArrowUp') handleScroll('up');
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -280,7 +308,7 @@ export const JourneysFeed = () => {
   return (
     <div className="relative w-full bg-black">
       {/* Vertical scroll container for journeys */}
-      <div className="snap-y snap-mandatory h-screen overflow-y-scroll">
+      <div ref={scrollContainerRef} className="snap-y snap-mandatory h-screen overflow-y-scroll">
         {journeys.map((journey, index) => {
           const isLiked = journey.own_reactions?.like && journey.own_reactions.like.length > 0;
           const rawActor: any = journey.actor;
@@ -401,9 +429,12 @@ export const JourneysFeed = () => {
                     >
                       {actorName}
                     </button>
-                    <Button size="sm" variant="outline" className="ml-2">
-                      Follow
-                    </Button>
+                <Button size="sm" variant="outline" className="ml-2" onClick={() => {
+                  navigate(`/travel-profile/${actorId}`);
+                  toast.info('Follow coming soon');
+                }}>
+                  View Profile
+                </Button>
                   </div>
 
                   {/* Caption */}
