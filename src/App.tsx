@@ -170,7 +170,7 @@ function AppContent() {
           <Route path="/messages" element={<Messages />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
-          <Route path="/search" element={<SearchResults />} />
+          <Route path="/search-results" element={<SearchResults />} />
           <Route path="/hotel-booking" element={<HotelBooking />} />
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
           <Route path="/my-jobs" element={<MyJobs />} />
