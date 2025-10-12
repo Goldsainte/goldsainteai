@@ -77,8 +77,8 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
           userId 
         });
 
-        // Initialize Stream Activity Feeds client
-        const client = connect(apiKey, token, userId);
+        // Initialize Stream Activity Feeds client (omit appId parameter)
+        const client = connect(apiKey, token);
         console.log('[StreamActivity] Client created');
         
         // Create user feed (for posting)
@@ -88,6 +88,14 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
         // Create timeline feed (for viewing posts from followed users)
         const timelineFeedInstance = client.feed('timeline', userId);
         console.log('[StreamActivity] Timeline feed created');
+
+        // Ensure the user's timeline follows their own user feed (idempotent)
+        try {
+          await timelineFeedInstance.follow('user', userId);
+          console.log('[StreamActivity] Timeline now follows user feed');
+        } catch (followErr) {
+          console.warn('[StreamActivity] Follow may already exist or failed:', followErr);
+        }
 
         setFeedClient(client);
         setUserFeed(userFeedInstance);
