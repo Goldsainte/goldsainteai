@@ -22,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Input } from "@/components/ui/input";
 
 interface Moment {
   id: string;
@@ -59,6 +60,8 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const [highlights, setHighlights] = useState<Highlight[]>([]);
   const [selectedHighlightId, setSelectedHighlightId] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  const [creatingVault, setCreatingVault] = useState(false);
+  const [newVaultTitle, setNewVaultTitle] = useState("");
 
   useEffect(() => {
     if (open && userId) {
@@ -75,6 +78,11 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
     // Record view
     recordView(currentMoment.id);
+
+    // If save dialog is open, pause auto-advance
+    if (saveDialogOpen) {
+      return;
+    }
 
     // Progress bar animation
     const duration = currentMoment.media_type === 'image' ? currentMoment.duration_seconds * 1000 : 15000;
@@ -93,7 +101,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     }, interval);
 
     return () => clearInterval(timer);
-  }, [currentIndex, moments]);
+  }, [currentIndex, moments, saveDialogOpen]);
 
   const fetchMoments = async () => {
     try {
@@ -253,6 +261,8 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg h-[90vh] p-0 bg-black border-none overflow-hidden">
+        <h2 className="sr-only">Moments Viewer</h2>
+        <p className="sr-only">View and save moments to your vault.</p>
         <div className="relative w-full h-full bg-black">
           {/* Progress bars */}
           <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
@@ -287,12 +297,13 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
-                size="icon"
+                size="sm"
                 onClick={() => setSaveDialogOpen(true)}
-                className="text-white hover:bg-white/20"
+                className="text-white bg-white/10 hover:bg-white/20 px-3"
                 title="Save to Vault"
               >
                 <Archive className="w-5 h-5" />
+                <span className="ml-2 text-sm">Save</span>
               </Button>
               <Button
                 variant="ghost"
@@ -319,7 +330,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 className="w-full h-full object-cover"
                 autoPlay
                 muted
-                onEnded={handleNext}
+                onEnded={() => { if (!saveDialogOpen) handleNext(); }}
               />
             )}
           </div>
@@ -372,19 +383,43 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           </AlertDialogHeader>
           
           {highlights.length === 0 ? (
-            <div className="space-y-4">
-              <p className="text-sm text-muted-foreground text-center">
-                You don't have any vaults yet. Create one to start saving moments!
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                Create a vault to save this moment.
               </p>
-              <Button 
-                className="w-full" 
-                onClick={() => {
-                  setSaveDialogOpen(false);
-                  onOpenChange(false);
-                  window.location.href = '/travel-profile';
+              <Input
+                placeholder="Vault name (e.g. Summer 2025)"
+                value={newVaultTitle}
+                onChange={(e) => setNewVaultTitle(e.target.value)}
+                disabled={creatingVault}
+              />
+              <Button
+                className="w-full"
+                disabled={!newVaultTitle || creatingVault}
+                onClick={async () => {
+                  try {
+                    setCreatingVault(true);
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (!user) { toast.error('You must be signed in'); setCreatingVault(false); return; }
+                    const { data, error } = await supabase
+                      .from('story_highlights')
+                      .insert({ user_id: user.id, title: newVaultTitle })
+                      .select('id, title')
+                      .single();
+                    if (error) throw error;
+                    setHighlights([data as Highlight, ...highlights]);
+                    setSelectedHighlightId((data as Highlight).id);
+                    setNewVaultTitle('');
+                    toast.success('Vault created');
+                  } catch (err) {
+                    console.error('Error creating vault:', err);
+                    toast.error('Failed to create vault');
+                  } finally {
+                    setCreatingVault(false);
+                  }
                 }}
               >
-                Create Your First Vault
+                {creatingVault ? 'Creating...' : 'Create Vault'}
               </Button>
             </div>
           ) : (
@@ -406,7 +441,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleSaveToVault}
-              disabled={!selectedHighlightId || saving || highlights.length === 0}
+              disabled={!selectedHighlightId || saving}
             >
               {saving ? "Saving..." : "Save to Vault"}
             </AlertDialogAction>
