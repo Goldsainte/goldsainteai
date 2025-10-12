@@ -114,7 +114,7 @@ export const MomentsRing = () => {
               }}
             >
               <div className="relative">
-                <Avatar className={`w-16 h-16 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-primary ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
+                <Avatar className={`w-16 h-16 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
                   <AvatarImage src={moments.find(m => m.user_id === currentUserId)?.avatar_url || undefined} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>
@@ -139,7 +139,7 @@ export const MomentsRing = () => {
                 className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0"
                 onClick={() => handleMomentClick(moment.user_id)}
               >
-                <Avatar className="w-16 h-16 ring-2 ring-primary">
+                <Avatar className="w-16 h-16 ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background">
                   <AvatarImage src={moment.avatar_url || undefined} />
                   <AvatarFallback>{moment.username[0]?.toUpperCase()}</AvatarFallback>
                 </Avatar>
