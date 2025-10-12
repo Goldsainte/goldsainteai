@@ -29,7 +29,7 @@ const getGiftName = (display: string) => {
 
 const renderGiftIcon = (name: string) => {
   const key = name.toLowerCase();
-  const iconProps = { className: "h-10 w-10 text-accent" };
+  const iconProps = { className: "h-8 w-8 text-accent", strokeWidth: 2 };
   
   // Map generic gift names to travel-themed icons
   if (key.includes('heart')) return <Plane {...iconProps} />;
@@ -142,19 +142,19 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[480px] border-accent/20 bg-card shadow-2xl z-[100]" data-tour="send-gift-modal">
-          <DialogHeader className="space-y-3 pb-2">
-            <DialogTitle className="flex items-center justify-between">
-              <span className="font-secondary text-2xl tracking-wide bg-gradient-gold bg-clip-text text-transparent">
+        <DialogContent className="sm:max-w-[540px] border-accent/20 bg-card shadow-2xl z-[100]" data-tour="send-gift-modal">
+          <DialogHeader className="space-y-4 pb-4">
+            <DialogTitle className="flex items-center justify-center">
+              <span className="font-secondary text-3xl tracking-wide bg-gradient-gold bg-clip-text text-transparent">
                 Send a Gift
               </span>
             </DialogTitle>
-            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-primary shadow-lg border border-accent/30">
-              <Coins className="h-5 w-5 text-accent" />
-              <span className="font-secondary text-lg font-bold text-primary-foreground">
+            <div className="flex items-center justify-center gap-3 px-6 py-4 rounded-2xl bg-gradient-primary shadow-lg border border-accent/30">
+              <Coins className="h-6 w-6 text-accent" />
+              <span className="font-secondary text-2xl font-bold text-primary-foreground">
                 {balance}
               </span>
-              <span className="text-sm text-primary-foreground/90 uppercase tracking-wider font-medium">Coins</span>
+              <span className="text-base text-primary-foreground/90 uppercase tracking-wider font-medium">Coins</span>
             </div>
           </DialogHeader>
           
@@ -171,24 +171,24 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
             </div>
           )}
           
-          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-2 gap-5 mt-2">
             {gifts.map((gift) => (
               <Button
                 key={gift.id}
                 onClick={() => handleSendGift(gift.id, gift.coin_cost)}
                 disabled={loading || balance < gift.coin_cost}
                 variant="outline"
-                className="h-auto flex flex-col items-center gap-3 py-6 px-4 border-2 border-border rounded-xl bg-background hover:border-accent hover:bg-accent/10 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none group"
+                className="h-auto flex flex-col items-center gap-4 py-7 px-5 border-2 border-border rounded-2xl bg-background hover:border-accent hover:bg-accent/10 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none group"
               >
-                <div className="h-12 w-12 rounded-full border-2 border-accent/40 bg-accent/10 flex items-center justify-center group-hover:border-accent transition-colors">
+                <div className="h-16 w-16 rounded-2xl border-2 border-accent/40 bg-accent/10 flex items-center justify-center group-hover:border-accent group-hover:bg-accent/20 transition-all duration-300">
                   {renderGiftIcon(getGiftName(gift.display_name))}
                 </div>
-                <span className="font-secondary text-sm font-semibold text-foreground leading-tight text-center min-h-[32px] flex items-center">
+                <span className="font-secondary text-base font-semibold text-foreground leading-tight text-center min-h-[36px] flex items-center px-1">
                   {getGiftName(gift.display_name)}
                 </span>
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-gold shadow-lg border border-accent/20">
-                  <Coins className="h-4 w-4 text-primary" />
-                  <span className="text-sm font-bold text-primary">{gift.coin_cost}</span>
+                <div className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-gold shadow-lg border border-accent/20 group-hover:shadow-xl transition-shadow">
+                  <Coins className="h-5 w-5 text-primary" />
+                  <span className="text-base font-bold text-primary">{gift.coin_cost}</span>
                 </div>
               </Button>
             ))}
