@@ -45,8 +45,10 @@ export function FeedSidebar() {
           </NavLink>
         ))}
         {user && (
-          <div className="flex items-center gap-4 px-3 py-3">
-            <NotificationCenter />
+          <div className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted/50 transition-colors font-normal">
+            <div className="flex items-center justify-center h-6 w-6">
+              <NotificationCenter />
+            </div>
             <span className="text-base">Notifications</span>
           </div>
         )}
