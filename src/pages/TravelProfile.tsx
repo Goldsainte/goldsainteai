@@ -410,44 +410,40 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
   return (
     <div className="min-h-screen bg-background pb-28 pb-safe md:pb-0">
-      {/* Header */}
+      {/* Header - Instagram style */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
-        <div className="flex items-center justify-between p-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-6 h-14">
           <Button
             variant="ghost"
+            size="icon"
             onClick={() => navigate(-1)}
-            className="gap-1 hover:bg-transparent"
+            className="md:invisible"
             aria-label="Back"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          <button className="flex items-center gap-1 font-semibold hover:opacity-70 transition-opacity">
-            <span>{profile?.username || 'Profile'}</span>
-            <ChevronDown className="h-4 w-4" />
-          </button>
-          <div className="flex items-center gap-2">
-            {isOwnProfile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate('/travel-settings')}
-                className="hover:bg-transparent"
-              >
-                <Settings className="h-6 w-6" />
-              </Button>
-            )}
-            {!isOwnProfile && <div className="w-10" />}
-          </div>
+          <h1 className="text-base font-semibold">{profile?.username || 'Profile'}</h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/travel-settings')}
+            className={isOwnProfile ? '' : 'invisible'}
+          >
+            <Settings className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
-      {/* Profile Info */}
-      <div className="px-4 pt-4 pb-2 space-y-3">
-        <div className="flex items-start justify-between">
-          <div className="relative">
-            <Avatar className="h-24 w-24 md:h-20 md:w-20">
+      {/* Main Content Container */}
+      <div className="max-w-4xl mx-auto px-4 md:px-6 pt-8">
+        
+        {/* Profile Info - Instagram Desktop Layout */}
+        <div className="hidden md:flex gap-8 mb-12 items-start">
+          {/* Profile Picture */}
+          <div className="relative flex-shrink-0">
+            <Avatar className="h-40 w-40">
               <AvatarImage src={profile?.avatar_url || undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-3xl md:text-2xl">
+              <AvatarFallback className="bg-primary text-primary-foreground text-5xl">
                 {profile?.username?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
@@ -458,213 +454,309 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   accept="image/*"
                   onChange={handleAvatarUpload}
                   className="hidden"
-                  id="avatar-upload"
+                  id="avatar-upload-desktop"
                   disabled={uploadingAvatar}
                 />
                 <button
-                  onClick={() => document.getElementById('avatar-upload')?.click()}
+                  onClick={() => document.getElementById('avatar-upload-desktop')?.click()}
                   disabled={uploadingAvatar}
-                  className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-2 md:p-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  className="absolute bottom-2 right-2 bg-primary text-primary-foreground rounded-full p-2 hover:bg-primary/90 transition-colors disabled:opacity-50"
                 >
                   {uploadingAvatar ? (
-                    <div className="h-5 w-5 md:h-4 md:w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                   ) : (
-                    <PlusCircle className="h-5 w-5 md:h-4 md:w-4" />
+                    <PlusCircle className="h-4 w-4" />
                   )}
                 </button>
               </>
             )}
           </div>
-          
-          <div className="flex items-start gap-6 md:gap-8 pt-2">
-            <button className="flex flex-col items-center">
-              <div className="text-lg md:text-xl font-bold">{formatNumber(stats.postsCount)}</div>
-              <div className="text-xs text-muted-foreground">posts</div>
-            </button>
-            <button className="flex flex-col items-center">
-              <div className="text-lg md:text-xl font-bold">{formatNumber(profile?.followers_count || 0)}</div>
-              <div className="text-xs text-muted-foreground">followers</div>
-            </button>
-            <button className="flex flex-col items-center">
-              <div className="text-lg md:text-xl font-bold">{formatNumber(profile?.following_count || 0)}</div>
-              <div className="text-xs text-muted-foreground">following</div>
-            </button>
-          </div>
-        </div>
 
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h2 className="font-semibold text-base md:text-sm">
-              {profile?.first_name && profile?.last_name
-                ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
-                : (profile?.username || 'User').toUpperCase()}
-            </h2>
-            {profile?.is_verified && (
-              <CheckCircle2 className="h-5 w-5 md:h-4 md:w-4 text-blue-500 fill-blue-500" />
-            )}
-          </div>
-          {profile?.bio && (
-            <p className="text-sm md:text-sm whitespace-pre-wrap">{profile.bio}</p>
-          )}
-          {profile?.website && (
-            <a 
-              href={profile.website} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline block mt-1"
-            >
-              {profile.website.replace(/^https?:\/\//, '')}
-            </a>
-          )}
-          {profile?.location && (
-            <p className="text-sm text-muted-foreground mt-1">📍 {profile.location}</p>
-          )}
-          
-          {/* Activity Status */}
-          {!isOwnProfile && profileUserId && (
-            <ActivityStatus userId={profileUserId} showText size="md" />
-          )}
-        </div>
+          {/* Info Section */}
+          <div className="flex-1 space-y-5">
+            {/* Username and Buttons Row */}
+            <div className="flex items-center gap-4">
+              <h2 className="text-xl font-light">{profile?.username || 'User'}</h2>
+              
+              {isOwnProfile ? (
+                <>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 px-4 text-sm font-semibold"
+                    onClick={() => setEditProfileOpen(true)}
+                  >
+                    Edit profile
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 px-4 text-sm font-semibold"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success("Profile link copied!");
+                    }}
+                  >
+                    Share profile
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => navigate('/travel-settings')}
+                  >
+                    <Settings className="h-5 w-5" />
+                  </Button>
+                </>
+              ) : (
+                <>
+                  {user && <FollowButton targetUserId={profileUserId!} />}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 px-4 text-sm font-semibold"
+                    onClick={() => setPartnershipProposalOpen(true)}
+                  >
+                    Partner
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="h-8 px-4 text-sm font-semibold"
+                    onClick={() => setPartnershipRequestOpen(true)}
+                  >
+                    Request
+                  </Button>
+                </>
+              )}
+            </div>
 
-        {/* Dashboard and Coins Cards for own profile - Hidden on mobile */}
-        {isOwnProfile && (
-          <div className="flex flex-col md:flex-row gap-2">
-            {/* Dashboard Card */}
-            {stats.viewsCount > 0 && (
-              <Card className="p-3 bg-dashboard-bg border-dashboard-bg flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-semibold text-sm md:text-sm text-dashboard-text">Your dashboard</p>
-                    <p className="text-xs text-dashboard-text flex items-center gap-1 mt-0.5">
-                      <TrendingUp className="h-3 w-3" />
-                      {formatNumber(stats.viewsCount)} views in the last 30 days.
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            )}
+            {/* Stats Row */}
+            <div className="flex items-center gap-10">
+              <button className="flex items-center gap-1">
+                <span className="font-semibold">{formatNumber(stats.postsCount)}</span>
+                <span className="text-sm">posts</span>
+              </button>
+              <button className="flex items-center gap-1">
+                <span className="font-semibold">{formatNumber(profile?.followers_count || 0)}</span>
+                <span className="text-sm">followers</span>
+              </button>
+              <button className="flex items-center gap-1">
+                <span className="font-semibold">{formatNumber(profile?.following_count || 0)}</span>
+                <span className="text-sm">following</span>
+              </button>
+            </div>
 
-            {/* Coin Balance Card - Hidden on mobile */}
-            <Card className="hidden md:flex p-3 bg-coins-bg border-coins-bg flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <Coins className="h-5 w-5 text-white" />
-                  <div>
-                    <p className="font-semibold text-sm text-white">Your Coins</p>
-                    <p className="text-xs text-white/80">{balance} coins available</p>
-                  </div>
+            {/* Bio Section */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <p className="font-semibold text-sm">
+                  {profile?.first_name && profile?.last_name
+                    ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
+                    : (profile?.username || '').toUpperCase()}
+                </p>
+                {profile?.is_verified && (
+                  <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                )}
+              </div>
+              {profile?.bio && (
+                <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+              )}
+              {profile?.website && (
+                <a 
+                  href={profile.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline block"
+                >
+                  {profile.website.replace(/^https?:\/\//, '')}
+                </a>
+              )}
+              {profile?.location && (
+                <p className="text-sm text-muted-foreground">📍 {profile.location}</p>
+              )}
+            </div>
+
+            {/* Coins Balance - Subtle on desktop */}
+            {isOwnProfile && (
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10">
+                  <Coins className="h-4 w-4 text-accent" />
+                  <span className="font-semibold">{balance} coins</span>
                 </div>
                 <Button
+                  variant="link"
                   size="sm"
+                  className="h-auto p-0 text-primary"
                   onClick={() => setBuyCoinsOpen(true)}
-                  className="h-9 px-3 bg-coins-button hover:bg-coins-button/90 text-coins-bg"
                 >
-                  Buy Coins
+                  Buy more
                 </Button>
               </div>
-            </Card>
+            )}
           </div>
-        )}
-
-        {/* Action Buttons - Instagram-style layout */}
-        <div className="grid grid-cols-2 gap-2">
-          {isOwnProfile ? (
-            <>
-              <Button
-                variant="secondary"
-                className="w-full h-9 md:h-8 text-sm font-semibold"
-                style={{ backgroundColor: '#0c4d47', color: '#bfad72' }}
-                onClick={() => setEditProfileOpen(true)}
-              >
-                Edit profile
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full h-9 md:h-8 text-sm font-semibold"
-                style={{ backgroundColor: '#0c4d47', color: '#bfad72' }}
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  toast.success("Profile link copied!");
-                }}
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share profile
-              </Button>
-            </>
-          ) : (
-            <>
-              {user && <FollowButton targetUserId={profileUserId!} />}
-              <Button
-                variant="secondary"
-                className="flex-1 h-9 md:h-8 text-sm font-semibold"
-                onClick={() => setPartnershipProposalOpen(true)}
-              >
-                <Briefcase className="h-4 w-4 mr-1" />
-                Partner
-              </Button>
-              <Button
-                variant="secondary"
-                className="flex-1 h-9 md:h-8 text-sm font-semibold"
-                onClick={() => setPartnershipRequestOpen(true)}
-              >
-                <Sparkles className="h-4 w-4 mr-1" />
-                Request
-              </Button>
-              <Button
-                variant="secondary"
-                size="icon"
-                className="h-9 w-9 md:h-8 md:w-8"
-              >
-                <MessageCircle className="h-4 w-4" />
-              </Button>
-              {user && profileUserId && isCloseFriend(profileUserId) && (
-                <Button
-                  variant="secondary"
-                  size="icon"
-                  className="h-9 w-9 md:h-8 md:w-8 bg-green-100 dark:bg-green-900"
-                  title="Close Friend"
-                >
-                  <Star className="h-4 w-4 text-green-600 dark:text-green-400 fill-current" />
-                </Button>
-              )}
-            </>
-          )}
         </div>
 
-        {/* Moments Vaults */}
-        <StoryHighlights
-          userId={profileUserId!}
-          isOwnProfile={isOwnProfile}
-        />
+        {/* Mobile Profile Layout */}
+        <div className="md:hidden space-y-4 mb-6">
+          <div className="flex items-start justify-between">
+            <div className="relative">
+              <Avatar className="h-20 w-20">
+                <AvatarImage src={profile?.avatar_url || undefined} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
+                  {profile?.username?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              {isOwnProfile && (
+                <>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    id="avatar-upload-mobile"
+                    disabled={uploadingAvatar}
+                  />
+                  <button
+                    onClick={() => document.getElementById('avatar-upload-mobile')?.click()}
+                    disabled={uploadingAvatar}
+                    className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                  >
+                    {uploadingAvatar ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                    ) : (
+                      <PlusCircle className="h-4 w-4" />
+                    )}
+                  </button>
+                </>
+              )}
+            </div>
+            
+            <div className="flex items-start gap-6 pt-2">
+              <button className="flex flex-col items-center">
+                <div className="text-lg font-bold">{formatNumber(stats.postsCount)}</div>
+                <div className="text-xs text-muted-foreground">posts</div>
+              </button>
+              <button className="flex flex-col items-center">
+                <div className="text-lg font-bold">{formatNumber(profile?.followers_count || 0)}</div>
+                <div className="text-xs text-muted-foreground">followers</div>
+              </button>
+              <button className="flex flex-col items-center">
+                <div className="text-lg font-bold">{formatNumber(profile?.following_count || 0)}</div>
+                <div className="text-xs text-muted-foreground">following</div>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="font-semibold text-sm">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
+                  : (profile?.username || 'User').toUpperCase()}
+              </h2>
+              {profile?.is_verified && (
+                <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+              )}
+            </div>
+            {profile?.bio && (
+              <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+            )}
+            {profile?.website && (
+              <a 
+                href={profile.website} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-primary hover:underline block mt-1"
+              >
+                {profile.website.replace(/^https?:\/\//, '')}
+              </a>
+            )}
+            {profile?.location && (
+              <p className="text-sm text-muted-foreground mt-1">📍 {profile.location}</p>
+            )}
+          </div>
+
+          {/* Mobile Action Buttons */}
+          <div className="grid grid-cols-2 gap-2">
+            {isOwnProfile ? (
+              <>
+                <Button
+                  variant="secondary"
+                  className="w-full h-9 text-sm font-semibold"
+                  onClick={() => setEditProfileOpen(true)}
+                >
+                  Edit profile
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="w-full h-9 text-sm font-semibold"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Profile link copied!");
+                  }}
+                >
+                  <Share2 className="h-4 w-4 mr-2" />
+                  Share
+                </Button>
+              </>
+            ) : (
+              <>
+                {user && <FollowButton targetUserId={profileUserId!} />}
+                <Button
+                  variant="secondary"
+                  className="flex-1 h-9 text-sm font-semibold"
+                  onClick={() => setPartnershipProposalOpen(true)}
+                >
+                  <Briefcase className="h-4 w-4 mr-1" />
+                  Partner
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="flex-1 h-9 text-sm font-semibold"
+                  onClick={() => setPartnershipRequestOpen(true)}
+                >
+                  <Sparkles className="h-4 w-4 mr-1" />
+                  Request
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Story Highlights */}
+        <div className="border-t pt-4 mb-2">
+          <StoryHighlights
+            userId={profileUserId!}
+            isOwnProfile={isOwnProfile}
+          />
+        </div>
       </div>
 
       {/* Content Tabs */}
-      <Tabs defaultValue="posts" className="w-full mt-2">
-        <TabsList className="w-full grid grid-cols-3 rounded-none h-11 bg-transparent">
+      <Tabs defaultValue="posts" className="w-full">
+        <TabsList className="w-full grid grid-cols-3 rounded-none h-12 bg-transparent border-t">
           <TabsTrigger 
             value="posts" 
-            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none flex flex-col gap-0.5"
+            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
             title="Photos"
           >
-            <Grid3X3 className="h-5 w-5" />
-            <span className="text-[10px]">Posts</span>
+            <Grid3X3 className="h-6 w-6" />
           </TabsTrigger>
           <TabsTrigger 
             value="journeys"
-            className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none flex flex-col gap-0.5"
-            title="Videos - Your travel journeys"
+            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+            title="Videos"
           >
-            <Video className="h-5 w-5" />
-            <span className="text-[10px]">Journeys</span>
+            <Video className="h-6 w-6" />
           </TabsTrigger>
           {isOwnProfile && (
             <TabsTrigger 
               value="liked"
-              className="data-[state=active]:border-b-2 data-[state=active]:border-foreground rounded-none flex flex-col gap-0.5"
-              title="Liked content"
+              className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+              title="Liked"
             >
-              <Heart className="h-5 w-5" />
-              <span className="text-[10px]">Liked</span>
+              <Heart className="h-6 w-6" />
             </TabsTrigger>
           )}
         </TabsList>
