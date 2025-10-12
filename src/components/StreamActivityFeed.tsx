@@ -107,7 +107,7 @@ const StreamActivityFeed = () => {
       {/* Content Area */}
       <div className="h-full w-full relative">
         {/* Media */}
-        <div className="h-full w-full flex items-center justify-center">
+        <div className="h-full w-full flex items-center justify-center" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 110px)' }}>
           {currentItem.mediaType === 'image' ? (
             <img
               src={currentItem.mediaUrl}
@@ -126,7 +126,7 @@ const StreamActivityFeed = () => {
         </div>
 
         {/* Right Action Buttons */}
-        <div className="absolute right-3 bottom-24 flex flex-col gap-6 z-10">
+        <div className="absolute right-3 flex flex-col gap-6 z-10" style={{ bottom: 'calc(env(safe-area-inset-bottom) + 120px)' }}>
           {/* Like Button */}
           <div className="flex flex-col items-center gap-1">
             <Button
@@ -192,21 +192,25 @@ const StreamActivityFeed = () => {
           </div>
         </div>
 
-        {/* User Info Bottom Left */}
-        <div className="absolute bottom-20 left-3 z-10 flex items-center gap-3">
-          <Avatar
-            className="h-12 w-12 ring-2 ring-white cursor-pointer"
-            onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
-          >
-            <AvatarImage src={currentItem.user.avatar} />
-            <AvatarFallback>{currentItem.user.username[0]}</AvatarFallback>
-          </Avatar>
-          <button
-            onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
-            className="text-white font-semibold text-base drop-shadow-lg hover:opacity-80 transition-opacity"
-          >
-            {currentItem.user.username}
-          </button>
+        {/* Bottom Bar with User Info (does not cover media) */}
+        <div className="absolute left-0 right-0 bottom-0 z-20">
+          {/* Gradient for readability */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+          <div className="relative px-3 pt-4 pb-[calc(env(safe-area-inset-bottom)+12px)] flex items-center gap-3">
+            <Avatar
+              className="h-12 w-12 ring-2 ring-white cursor-pointer"
+              onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
+            >
+              <AvatarImage src={currentItem.user.avatar} />
+              <AvatarFallback>{currentItem.user.username[0]}</AvatarFallback>
+            </Avatar>
+            <button
+              onClick={() => navigate(`/travel-profile/${currentItem.user.id}`)}
+              className="text-white font-semibold text-base drop-shadow-lg hover:opacity-80 transition-opacity"
+            >
+              {currentItem.user.username}
+            </button>
+          </div>
         </div>
       </div>
     </div>
