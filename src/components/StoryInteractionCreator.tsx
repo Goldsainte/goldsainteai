@@ -15,10 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { BarChart3, MessageCircleQuestion, ListChecks, Timer, Sliders } from 'lucide-react';
+import { BarChart3, MessageCircleQuestion, ListChecks, Timer, Sliders, Plus } from 'lucide-react';
 
 interface InteractionData {
-  type: 'poll' | 'question' | 'quiz' | 'countdown' | 'slider';
+  type: 'poll' | 'question' | 'quiz' | 'countdown' | 'slider' | 'add_yours';
   data: any;
 }
 
@@ -46,6 +46,7 @@ export const StoryInteractionCreator = ({
   const [sliderMin, setSliderMin] = useState('0');
   const [sliderMax, setSliderMax] = useState('100');
   const [sliderEmoji, setSliderEmoji] = useState('😍');
+  const [addYoursPrompt, setAddYoursPrompt] = useState('');
 
   const handleSave = () => {
     let data: any = {};
@@ -81,6 +82,11 @@ export const StoryInteractionCreator = ({
           min: parseInt(sliderMin),
           max: parseInt(sliderMax),
           emoji: sliderEmoji,
+        };
+        break;
+      case 'add_yours':
+        data = {
+          prompt: addYoursPrompt,
         };
         break;
     }
@@ -244,6 +250,21 @@ export const StoryInteractionCreator = ({
             </div>
           </div>
         );
+
+      case 'add_yours':
+        return (
+          <div className="space-y-2">
+            <Label>Add Yours Prompt</Label>
+            <Input
+              placeholder="e.g., Show us your travel style..."
+              value={addYoursPrompt}
+              onChange={(e) => setAddYoursPrompt(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Other users can respond with their own photos/videos
+            </p>
+          </div>
+        );
     }
   };
 
@@ -290,6 +311,12 @@ export const StoryInteractionCreator = ({
                   <div className="flex items-center gap-2">
                     <Sliders className="h-4 w-4" />
                     Slider
+                  </div>
+                </SelectItem>
+                <SelectItem value="add_yours">
+                  <div className="flex items-center gap-2">
+                    <Plus className="h-4 w-4" />
+                    Add Yours
                   </div>
                 </SelectItem>
               </SelectContent>

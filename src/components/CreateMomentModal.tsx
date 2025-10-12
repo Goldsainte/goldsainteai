@@ -5,10 +5,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X, Type, Sparkles, Paintbrush } from "lucide-react";
+import { Upload, X, Type, Sparkles, Paintbrush, Wand2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MomentDrawingCanvas } from "./MomentDrawingCanvas";
+import { StoryInteractionCreator } from "./StoryInteractionCreator";
 
 interface CreateMomentModalProps {
   open: boolean;
@@ -23,6 +24,8 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
   const [mode, setMode] = useState<"media" | "type">("media");
   const [showDrawing, setShowDrawing] = useState(false);
   const [drawingData, setDrawingData] = useState<string | null>(null);
+  const [showInteractionCreator, setShowInteractionCreator] = useState(false);
+  const [interaction, setInteraction] = useState<any>(null);
   
   // Text styling options
   const [textContent, setTextContent] = useState("");
@@ -130,6 +133,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           expires_at: expiresAt.toISOString(),
           duration_seconds: mediaType === 'video' ? null : 5,
           drawing_data: drawingData,
+          interactions: interaction,
           text_styling: mode === "type" ? {
             font: textFont,
             animation: textAnimation,
@@ -160,6 +164,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
     setMode("media");
     setShowDrawing(false);
     setDrawingData(null);
+    setInteraction(null);
     onOpenChange(false);
   };
 
@@ -296,6 +301,28 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               <p className="text-xs text-muted-foreground mt-1">
                 {caption.length}/200
               </p>
+            </div>
+
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowInteractionCreator(true)}
+                className="w-full"
+                type="button"
+              >
+                <Wand2 className="w-4 h-4 mr-2" />
+                {interaction ? 'Edit Interactive Element' : 'Add Interactive Element'}
+              </Button>
+              {interaction && (
+                <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                  {interaction.type === 'poll' && `Poll: ${interaction.data.question}`}
+                  {interaction.type === 'question' && `Question: ${interaction.data.text}`}
+                  {interaction.type === 'quiz' && `Quiz: ${interaction.data.question}`}
+                  {interaction.type === 'countdown' && `Countdown: ${interaction.data.label}`}
+                  {interaction.type === 'slider' && `Slider: ${interaction.data.question}`}
+                  {interaction.type === 'add_yours' && `Add Yours: ${interaction.data.prompt}`}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2">
@@ -490,6 +517,15 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           </TabsContent>
         </Tabs>
       </DialogContent>
+
+      <StoryInteractionCreator
+        open={showInteractionCreator}
+        onOpenChange={setShowInteractionCreator}
+        onSave={(data) => {
+          setInteraction(data);
+          setShowInteractionCreator(false);
+        }}
+      />
     </Dialog>
   );
 };

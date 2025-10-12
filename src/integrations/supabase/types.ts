@@ -3186,6 +3186,41 @@ export type Database = {
         }
         Relationships: []
       }
+      moment_interaction_responses: {
+        Row: {
+          created_at: string | null
+          id: string
+          interaction_type: string
+          moment_id: string
+          response_data: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          interaction_type: string
+          moment_id: string
+          response_data: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          interaction_type?: string
+          moment_id?: string
+          response_data?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moment_interaction_responses_moment_id_fkey"
+            columns: ["moment_id"]
+            isOneToOne: false
+            referencedRelation: "moments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       moment_views: {
         Row: {
           id: string
@@ -3223,6 +3258,7 @@ export type Database = {
           duration_seconds: number | null
           expires_at: string | null
           id: string
+          interactions: Json | null
           media_type: string
           media_url: string | null
           text_styling: Json | null
@@ -3236,6 +3272,7 @@ export type Database = {
           duration_seconds?: number | null
           expires_at?: string | null
           id?: string
+          interactions?: Json | null
           media_type: string
           media_url?: string | null
           text_styling?: Json | null
@@ -3249,6 +3286,7 @@ export type Database = {
           duration_seconds?: number | null
           expires_at?: string | null
           id?: string
+          interactions?: Json | null
           media_type?: string
           media_url?: string | null
           text_styling?: Json | null

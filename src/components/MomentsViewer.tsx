@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { MomentDrawingDisplay } from "./MomentDrawingDisplay";
+import { MomentInteractionDisplay } from "./MomentInteractionDisplay";
 
 interface Moment {
   id: string;
@@ -35,6 +36,7 @@ interface Moment {
   view_count: number;
   created_at: string;
   drawing_data?: string | null;
+  interactions?: any | null;
   text_styling?: {
     font: string;
     animation: string;
@@ -135,6 +137,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           ...moment,
           profiles: profile,
           text_styling: moment.text_styling as Moment['text_styling'],
+          interactions: moment.interactions,
         }));
 
         setMoments(momentsWithProfile as Moment[]);
@@ -409,8 +412,16 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             )}
           </div>
 
+          {/* Interactive Element */}
+          {currentMoment.interactions && (
+            <MomentInteractionDisplay
+              momentId={currentMoment.id}
+              interaction={currentMoment.interactions}
+            />
+          )}
+
           {/* Caption & Stats */}
-          {(currentMoment.caption || currentMoment.view_count > 0) && (
+          {!currentMoment.interactions && (currentMoment.caption || currentMoment.view_count > 0) && (
             <div className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-black/80 to-transparent">
               {currentMoment.caption && (
                 <p className="text-white text-sm mb-2">{currentMoment.caption}</p>
