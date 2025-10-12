@@ -233,6 +233,12 @@ const TravelSettings = () => {
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
+          <Avatar className="h-9 w-9">
+            <AvatarImage src={profile.avatar_url || undefined} />
+            <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+              {profile.username?.[0]?.toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Avatar>
           <h1 className="text-xl font-bold">Settings</h1>
         </div>
       </div>

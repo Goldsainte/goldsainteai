@@ -438,15 +438,34 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         {/* Header - Instagram style */}
         <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
         <div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-6 h-14">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="md:invisible"
-            aria-label="Back"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+              className="md:invisible"
+              aria-label="Back"
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            {isOwnProfile && (
+              <Avatar 
+                className={`h-9 w-9 cursor-pointer ${hasActiveMoments ? 'ring-2 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
+                onClick={() => {
+                  if (hasActiveMoments) {
+                    setMomentsViewerOpen(true);
+                  } else {
+                    setProfilePhotoModalOpen(true);
+                  }
+                }}
+              >
+                <AvatarImage src={profile?.avatar_url || undefined} />
+                <AvatarFallback className="bg-primary text-primary-foreground text-sm">
+                  {profile?.username?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+            )}
+          </div>
           <h1 className="text-base font-semibold">{profile?.username || 'Profile'}</h1>
           <Button
             variant="ghost"
@@ -467,7 +486,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           {/* Profile Picture */}
           <div className="relative flex-shrink-0">
             <Avatar 
-              className="h-40 w-40 cursor-pointer"
+              className={`h-40 w-40 cursor-pointer ${hasActiveMoments ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
               onClick={() => {
                 if (hasActiveMoments) {
                   setMomentsViewerOpen(true);
@@ -634,7 +653,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar 
-                className="h-20 w-20 cursor-pointer"
+                className={`h-20 w-20 cursor-pointer ${hasActiveMoments ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
                 onClick={() => {
                   if (hasActiveMoments) {
                     setMomentsViewerOpen(true);
