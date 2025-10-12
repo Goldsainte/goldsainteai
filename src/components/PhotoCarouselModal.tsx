@@ -319,8 +319,9 @@ const PhotoCarouselModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 bg-black border-none [&>button]:hidden">
-        <div className="relative w-full h-full flex flex-col safe-top safe-bottom">
+      <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 bg-black border-none [&>button]:hidden md:max-w-[90vw] md:max-h-[90vh] md:h-auto">
+        {/* Mobile Layout (Vertical) */}
+        <div className="relative w-full h-full flex flex-col safe-top safe-bottom md:hidden">
           {/* Close button */}
           <Button
             variant="ghost"
@@ -419,35 +420,14 @@ const PhotoCarouselModal = ({
                     <span className="text-base font-semibold">{comments.length}</span>
                   )}
                 </Button>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="hover:bg-transparent p-0 h-auto"
-                    >
-                      <Share2 className="h-8 w-8" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="w-56">
-                    <DropdownMenuItem onClick={handleShareToMoment} className="cursor-pointer text-[#BFAD72]">
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      Share as Moment
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareToInstagram} className="cursor-pointer text-[#BFAD72]">
-                      <Instagram className="mr-2 h-4 w-4" />
-                      Share to Instagram
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareToTikTok} className="cursor-pointer text-[#BFAD72]">
-                      <Send className="mr-2 h-4 w-4" />
-                      Share to TikTok
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleShareViaText} className="cursor-pointer text-[#BFAD72]">
-                      <MessageSquare className="mr-2 h-4 w-4" />
-                      Share via Text Message
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleShareToMoment}
+                  className="hover:bg-transparent p-0 h-auto"
+                >
+                  <Share2 className="h-8 w-8" />
+                </Button>
               </div>
             </div>
 
@@ -477,7 +457,206 @@ const PhotoCarouselModal = ({
             </div>
           </div>
         </div>
+
+        {/* Desktop Layout (Horizontal - Instagram style) */}
+        <div className="hidden md:flex h-[90vh] w-full bg-background">
+          {/* Left side - Image */}
+          <div className="relative flex-1 bg-black flex items-center justify-center">
+            <Carousel
+              opts={{ startIndex, loop: false, dragFree: false, align: 'center', containScroll: 'trimSnaps' }}
+              setApi={setCarouselApi}
+              className="w-full h-full"
+            >
+              <CarouselContent className="h-full -ml-0">
+                {images.map((img, idx) => (
+                  <CarouselItem key={idx} className="h-full flex items-center justify-center pl-0">
+                    <img 
+                      src={img} 
+                      alt={`Photo ${idx + 1}`} 
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              {/* Navigation arrows */}
+              {images.length > 1 && index > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handlePrevious}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </Button>
+              )}
+              
+              {images.length > 1 && index < images.length - 1 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleNext}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 hover:bg-black/70 text-white"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </Button>
+              )}
+
+              {/* Photo counter */}
+              {images.length > 1 && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
+                  {images.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`w-1.5 h-1.5 rounded-full transition-all ${
+                        idx === index ? 'bg-white w-2' : 'bg-white/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+              )}
+            </Carousel>
+          </div>
+
+          {/* Right side - Instagram-style sidebar */}
+          <div className="w-[400px] border-l border-border flex flex-col">
+            {/* Header with user info */}
+            <div className="flex items-center gap-3 p-4 border-b border-border">
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={userAvatar || undefined} />
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {username?.[0]?.toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <span className="font-semibold text-sm">{username}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="ml-auto"
+                onClick={() => onOpenChange(false)}
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Caption */}
+            {caption && (
+              <div className="p-4 border-b border-border">
+                <div className="flex items-start gap-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={userAvatar || undefined} />
+                    <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                      {username?.[0]?.toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-sm">
+                      <span className="font-semibold mr-2">{username}</span>
+                      {caption}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Comments section - Scrollable */}
+            <ScrollArea className="flex-1 px-4">
+              {loading ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-6 w-6 animate-spin" />
+                </div>
+              ) : comments.length === 0 ? (
+                <div className="py-8 text-center text-sm text-muted-foreground">
+                  No comments yet. Be the first to comment!
+                </div>
+              ) : (
+                <div className="space-y-4 py-4">
+                  {comments.map((comment) => (
+                    <div key={comment.id} className="flex items-start gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={comment.profiles?.avatar_url || undefined} />
+                        <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                          {comment.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <p className="text-sm">
+                          <span className="font-semibold mr-2">{comment.profiles?.username}</span>
+                          {comment.comment_text}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+
+            {/* Action buttons */}
+            <div className="border-t border-border p-4">
+              <div className="flex items-center gap-4 mb-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleLike}
+                  className="hover:bg-transparent p-0 h-auto"
+                >
+                  <Heart 
+                    className={`h-6 w-6 transition-transform active:scale-110 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} 
+                  />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:bg-transparent p-0 h-auto"
+                >
+                  <MessageCircle className="h-6 w-6" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleShareToMoment}
+                  className="hover:bg-transparent p-0 h-auto"
+                >
+                  <Share2 className="h-6 w-6" />
+                </Button>
+              </div>
+
+              {/* Like count */}
+              {likeCount > 0 && (
+                <p className="text-sm font-semibold mb-3">
+                  {likeCount.toLocaleString()} {likeCount === 1 ? 'like' : 'likes'}
+                </p>
+              )}
+
+              {/* Add comment input */}
+              <form onSubmit={handleSubmitComment} className="flex items-center gap-2">
+                <Input
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="flex-1 border-none focus-visible:ring-0 px-0"
+                  disabled={submitting || !user}
+                />
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  size="sm"
+                  disabled={!newComment.trim() || submitting}
+                  className="text-[#BFAD72] hover:text-[#BFAD72]/80 hover:bg-transparent p-0 h-auto font-semibold"
+                >
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Post'}
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
       </DialogContent>
+
+      {/* Comments sheet for mobile */}
       {postId && (
         <CommentsSheet
           open={commentsSheetOpen}
