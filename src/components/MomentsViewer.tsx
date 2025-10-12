@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
+import { MomentDrawingDisplay } from "./MomentDrawingDisplay";
 
 interface Moment {
   id: string;
@@ -33,6 +34,7 @@ interface Moment {
   duration_seconds: number;
   view_count: number;
   created_at: string;
+  drawing_data?: string | null;
   text_styling?: {
     font: string;
     animation: string;
@@ -373,19 +375,37 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 </div>
               </div>
             ) : currentMoment.media_type === 'image' ? (
-              <img
-                src={currentMoment.media_url || ''}
-                alt="Moment"
-                className="w-full h-full object-cover"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={currentMoment.media_url || ''}
+                  alt="Moment"
+                  className="w-full h-full object-cover"
+                />
+                {currentMoment.drawing_data && (
+                  <MomentDrawingDisplay
+                    drawingData={currentMoment.drawing_data}
+                    width={400}
+                    height={600}
+                  />
+                )}
+              </div>
             ) : (
-              <video
-                src={currentMoment.media_url || ''}
-                className="w-full h-full object-cover"
-                autoPlay
-                muted
-                onEnded={() => { if (!saveDialogOpen) handleNext(); }}
-              />
+              <div className="relative w-full h-full">
+                <video
+                  src={currentMoment.media_url || ''}
+                  className="w-full h-full object-cover"
+                  autoPlay
+                  muted
+                  onEnded={() => { if (!saveDialogOpen) handleNext(); }}
+                />
+                {currentMoment.drawing_data && (
+                  <MomentDrawingDisplay
+                    drawingData={currentMoment.drawing_data}
+                    width={400}
+                    height={600}
+                  />
+                )}
+              </div>
             )}
           </div>
 

@@ -5,9 +5,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Upload, X, Type, Sparkles } from "lucide-react";
+import { Upload, X, Type, Sparkles, Paintbrush } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MomentDrawingCanvas } from "./MomentDrawingCanvas";
 
 interface CreateMomentModalProps {
   open: boolean;
@@ -20,6 +21,8 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
   const [preview, setPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [mode, setMode] = useState<"media" | "type">("media");
+  const [showDrawing, setShowDrawing] = useState(false);
+  const [drawingData, setDrawingData] = useState<string | null>(null);
   
   // Text styling options
   const [textContent, setTextContent] = useState("");
@@ -126,6 +129,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           caption: mode === "type" ? textContent : (caption.trim() || null),
           expires_at: expiresAt.toISOString(),
           duration_seconds: mediaType === 'video' ? null : 5,
+          drawing_data: drawingData,
           text_styling: mode === "type" ? {
             font: textFont,
             animation: textAnimation,
@@ -154,6 +158,8 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
     setPreview(null);
     setTextContent("");
     setMode("media");
+    setShowDrawing(false);
+    setDrawingData(null);
     onOpenChange(false);
   };
 
@@ -223,25 +229,58 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                 </label>
               </div>
             ) : (
-              <div className="relative w-full h-[350px] bg-black rounded-lg overflow-hidden">
-                {file?.type.startsWith('image/') ? (
-                  <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+              <>
+                {!showDrawing ? (
+                  <div className="relative w-full h-[350px] bg-black rounded-lg overflow-hidden">
+                    {file?.type.startsWith('image/') ? (
+                      <img src={preview} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <video src={preview} className="w-full h-full object-cover" controls />
+                    )}
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2"
+                      onClick={() => {
+                        if (preview) URL.revokeObjectURL(preview);
+                        setFile(null);
+                        setPreview(null);
+                        setDrawingData(null);
+                      }}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                    {file?.type.startsWith('image/') && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="absolute bottom-2 right-2 gap-2"
+                        onClick={() => setShowDrawing(true)}
+                      >
+                        <Paintbrush className="w-4 h-4" />
+                        Draw
+                      </Button>
+                    )}
+                  </div>
                 ) : (
-                  <video src={preview} className="w-full h-full object-cover" controls />
+                  <div className="space-y-2">
+                    <MomentDrawingCanvas
+                      backgroundImage={preview}
+                      width={400}
+                      height={350}
+                      onDrawingChange={setDrawingData}
+                      initialDrawing={drawingData}
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowDrawing(false)}
+                      className="w-full"
+                    >
+                      Done Drawing
+                    </Button>
+                  </div>
                 )}
-                <Button
-                  variant="destructive"
-                  size="icon"
-                  className="absolute top-2 right-2"
-                  onClick={() => {
-                    if (preview) URL.revokeObjectURL(preview);
-                    setFile(null);
-                    setPreview(null);
-                  }}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
+              </>
             )}
 
             <div>

@@ -3219,6 +3219,7 @@ export type Database = {
         Row: {
           caption: string | null
           created_at: string | null
+          drawing_data: string | null
           duration_seconds: number | null
           expires_at: string | null
           id: string
@@ -3231,6 +3232,7 @@ export type Database = {
         Insert: {
           caption?: string | null
           created_at?: string | null
+          drawing_data?: string | null
           duration_seconds?: number | null
           expires_at?: string | null
           id?: string
@@ -3243,6 +3245,7 @@ export type Database = {
         Update: {
           caption?: string | null
           created_at?: string | null
+          drawing_data?: string | null
           duration_seconds?: number | null
           expires_at?: string | null
           id?: string
