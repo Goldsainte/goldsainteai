@@ -588,24 +588,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
 
-            {/* Coins Balance - Subtle on desktop */}
-            {isOwnProfile && (
-              <div className="flex items-center gap-3 text-sm">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-accent/10">
-                  <Coins className="h-4 w-4 text-accent" />
-                  <span className="font-semibold">{balance} coins</span>
-                </div>
-                <Button
-                  variant="link"
-                  size="sm"
-                  className="h-auto p-0 text-primary"
-                  onClick={() => setBuyCoinsOpen(true)}
-                >
-                  Buy more
-                </Button>
-              </div>
-            )}
-
             {/* Your Dashboard Section - Desktop Only */}
             {isOwnProfile && (
               <div className="rounded-lg p-3 space-y-2" style={{ backgroundColor: '#E5DFC6' }}>
@@ -622,12 +604,20 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     <div className="text-base font-bold">{formatNumber(stats.likesCount)}</div>
                     <div className="text-xs text-muted-foreground">likes</div>
                   </div>
-                  <div className="flex flex-col items-center">
+                  <div className="flex flex-col items-center gap-1">
                     <div className="text-base font-bold flex items-center gap-1">
                       <Coins className="h-4 w-4 text-accent" />
                       {balance}
                     </div>
                     <div className="text-xs text-muted-foreground">coins</div>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="h-auto p-0 text-xs text-primary"
+                      onClick={() => setBuyCoinsOpen(true)}
+                    >
+                      Buy more
+                    </Button>
                   </div>
                 </div>
               </div>
