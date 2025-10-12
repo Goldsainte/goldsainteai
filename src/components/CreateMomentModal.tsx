@@ -66,6 +66,9 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
       // Create moment record
       const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24); // Expire after 24 hours
+      
       const { error: insertError } = await supabase
         .from('moments')
         .insert({
@@ -73,6 +76,8 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           media_url: publicUrl,
           media_type: mediaType,
           caption: caption.trim() || null,
+          expires_at: expiresAt.toISOString(),
+          duration_seconds: mediaType === 'video' ? null : 5, // 5 seconds for images
         });
 
       if (insertError) throw insertError;
