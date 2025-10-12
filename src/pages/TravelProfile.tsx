@@ -600,7 +600,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         {/* Mobile Profile Layout - Instagram Style */}
         <div className="md:hidden space-y-2.5 mb-3">
           {/* Profile Photo and Name Row */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar className="h-20 w-20 ring-2 ring-border">
