@@ -2,9 +2,26 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, X, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Eye, Archive } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Moment {
   id: string;
@@ -28,15 +45,25 @@ interface MomentsViewerProps {
   initialMomentId?: string;
 }
 
+interface Highlight {
+  id: string;
+  title: string;
+}
+
 export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: MomentsViewerProps) => {
   const [moments, setMoments] = useState<Moment[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [highlights, setHighlights] = useState<Highlight[]>([]);
+  const [selectedHighlightId, setSelectedHighlightId] = useState<string>("");
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (open && userId) {
       fetchMoments();
+      fetchHighlights();
     }
   }, [open, userId]);
 
@@ -140,6 +167,69 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     }
   };
 
+  const fetchHighlights = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('story_highlights')
+        .select('id, title')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setHighlights(data || []);
+    } catch (error) {
+      console.error('Error fetching highlights:', error);
+    }
+  };
+
+  const handleSaveToVault = async () => {
+    if (!selectedHighlightId) {
+      toast.error("Please select a vault");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const currentMoment = moments[currentIndex];
+      
+      // Check if already saved
+      const { data: existing } = await supabase
+        .from('moment_highlight_items')
+        .select('id')
+        .eq('highlight_id', selectedHighlightId)
+        .eq('moment_id', currentMoment.id)
+        .maybeSingle();
+
+      if (existing) {
+        toast.info("This moment is already in this vault");
+        setSaveDialogOpen(false);
+        return;
+      }
+
+      // Save to vault
+      const { error } = await supabase
+        .from('moment_highlight_items')
+        .insert({
+          highlight_id: selectedHighlightId,
+          moment_id: currentMoment.id,
+        });
+
+      if (error) throw error;
+
+      toast.success("Moment saved to vault!");
+      setSaveDialogOpen(false);
+      setSelectedHighlightId("");
+    } catch (error) {
+      console.error('Error saving moment:', error);
+      toast.error("Failed to save moment to vault");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading || moments.length === 0) {
     return null;
   }
@@ -180,14 +270,25 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 {new Date(currentMoment.created_at).toLocaleString()}
               </span>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => onOpenChange(false)}
-              className="text-white hover:bg-white/20"
-            >
-              <X className="w-5 h-5" />
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSaveDialogOpen(true)}
+                className="text-white hover:bg-white/20"
+                title="Save to Vault"
+              >
+                <Archive className="w-5 h-5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onOpenChange(false)}
+                className="text-white hover:bg-white/20"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </div>
           </div>
 
           {/* Media */}
@@ -245,6 +346,47 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           )}
         </div>
       </DialogContent>
+
+      {/* Save to Vault Dialog */}
+      <AlertDialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Save Moment to Vault</AlertDialogTitle>
+            <AlertDialogDescription>
+              Choose a vault to save this moment permanently. It will be preserved even after it expires.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <Select value={selectedHighlightId} onValueChange={setSelectedHighlightId}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select a vault" />
+            </SelectTrigger>
+            <SelectContent>
+              {highlights.length === 0 ? (
+                <SelectItem value="no-vaults" disabled>
+                  No vaults yet - create one from your profile
+                </SelectItem>
+              ) : (
+                highlights.map((highlight) => (
+                  <SelectItem key={highlight.id} value={highlight.id}>
+                    {highlight.title}
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleSaveToVault}
+              disabled={!selectedHighlightId || saving || highlights.length === 0}
+            >
+              {saving ? "Saving..." : "Save to Vault"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   );
 };
