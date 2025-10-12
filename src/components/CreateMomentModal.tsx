@@ -166,6 +166,17 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
     }
   };
 
+  const getFontClass = () => {
+    switch (textFont) {
+      case "classic": return "font-story-classic";
+      case "modern": return "font-story-modern";
+      case "elegant": return "font-story-elegant";
+      case "typewriter": return "font-story-typewriter";
+      case "neon": return "font-story-neon";
+      default: return "font-story-classic";
+    }
+  };
+
   const getTextBgClass = () => {
     if (textBgType === "solid") return "text-bg-solid";
     if (textBgType === "outline") return "text-bg-outline";
@@ -278,7 +289,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                   <p
                     className={`
                       text-4xl font-bold
-                      ${fonts.find(f => f.value === textFont)?.className}
+                      ${getFontClass()}
                       ${getTextAnimationClass()}
                       ${getTextBgClass()}
                     `}

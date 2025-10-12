@@ -132,6 +132,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
         const momentsWithProfile = data.map(moment => ({
           ...moment,
           profiles: profile,
+          text_styling: moment.text_styling as Moment['text_styling'],
         }));
 
         setMoments(momentsWithProfile as Moment[]);
@@ -332,13 +333,23 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               >
                 <div className="text-center max-w-md">
                   <p
-                    className={`
-                      text-4xl font-bold
-                      font-story-${currentMoment.text_styling?.font || 'classic'}
-                      ${currentMoment.text_styling?.animation !== 'none' ? `animate-${currentMoment.text_styling?.animation}` : ''}
-                      ${currentMoment.text_styling?.bgType === 'solid' ? 'text-bg-solid' : ''}
-                      ${currentMoment.text_styling?.bgType === 'outline' ? 'text-bg-outline' : ''}
-                    `}
+                    className={`text-4xl font-bold ${
+                      currentMoment.text_styling?.font === 'classic' ? 'font-story-classic' :
+                      currentMoment.text_styling?.font === 'modern' ? 'font-story-modern' :
+                      currentMoment.text_styling?.font === 'elegant' ? 'font-story-elegant' :
+                      currentMoment.text_styling?.font === 'typewriter' ? 'font-story-typewriter' :
+                      currentMoment.text_styling?.font === 'neon' ? 'font-story-neon' :
+                      'font-story-classic'
+                    } ${
+                      currentMoment.text_styling?.animation === 'sparkle' ? 'animate-sparkle' :
+                      currentMoment.text_styling?.animation === 'pop' ? 'animate-pop' :
+                      currentMoment.text_styling?.animation === 'fadeIn' ? 'animate-fadeIn' :
+                      ''
+                    } ${
+                      currentMoment.text_styling?.bgType === 'solid' ? 'text-bg-solid' :
+                      currentMoment.text_styling?.bgType === 'outline' ? 'text-bg-outline' :
+                      ''
+                    }`}
                     style={{ 
                       color: currentMoment.text_styling?.bgType === 'solid' 
                         ? currentMoment.text_styling?.bgGradient 
