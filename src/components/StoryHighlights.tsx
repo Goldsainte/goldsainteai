@@ -100,7 +100,7 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
   }
 
   return (
-    <div className="flex items-center gap-2.5 overflow-x-auto py-[4.8px] md:px-4 md:border-b scrollbar-hide">
+    <div className="flex items-center gap-2.5 overflow-x-auto py-[2.4px] md:px-4 md:border-b scrollbar-hide">
       {highlights.map((highlight) => (
         <div key={highlight.id} className="flex flex-col items-center gap-0.5 min-w-[56px] md:min-w-[80px] group">
           <div className="relative">
