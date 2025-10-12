@@ -43,10 +43,10 @@ export const JourneysFeed = () => {
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
 
   useEffect(() => {
-    if (isReady && timelineFeed) {
+    if (isReady && (timelineFeed || userFeed)) {
       fetchJourneys();
     }
-  }, [isReady, timelineFeed]);
+  }, [isReady, timelineFeed, userFeed]);
 
   useEffect(() => {
     // Play current video, pause others
@@ -65,15 +65,16 @@ export const JourneysFeed = () => {
   const fetchJourneys = async () => {
     try {
       setLoading(true);
-      console.log('[JourneysFeed] Fetching journeys...', { timelineFeed, isReady });
+      console.log('[JourneysFeed] Fetching journeys...', { timelineFeed, userFeed, isReady });
       
-      if (!timelineFeed) {
-        console.error('[JourneysFeed] No timeline feed available');
+      const feed = timelineFeed || userFeed;
+      if (!feed) {
+        console.error('[JourneysFeed] No feed available (timeline or user)');
         toast.error('Failed to connect to feed service');
         return;
       }
       
-      const response = await timelineFeed.get({ 
+      const response = await feed.get({ 
         limit: 25,
         withReactionCounts: true,
         withOwnReactions: true,
@@ -98,12 +99,14 @@ export const JourneysFeed = () => {
 
   const handleLike = async (journey: Journey) => {
     try {
+      const feed = timelineFeed || userFeed;
+      if (!feed) return;
       if (journey.own_reactions?.like && journey.own_reactions.like.length > 0) {
         // Unlike
-        await timelineFeed.removeReaction(journey.own_reactions.like[0].id);
+        await feed.removeReaction(journey.own_reactions.like[0].id);
       } else {
         // Like
-        await timelineFeed.addReaction('like', journey.id);
+        await feed.addReaction('like', journey.id);
       }
       
       // Refresh the feed

@@ -31,7 +31,8 @@ export const StreamActivityProvider: React.FC<{ children: React.ReactNode }> = (
       setFeedClient(null);
       setUserFeed(null);
       setTimelineFeed(null);
-      setIsReady(false);
+      // Mark ready in guest mode so UI can render a CTA instead of hanging
+      setIsReady(true);
       return;
     }
 

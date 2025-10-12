@@ -41,23 +41,24 @@ export const SaintesFeed = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (isReady && timelineFeed) {
+    if (isReady && (timelineFeed || userFeed)) {
       fetchSaintes();
     }
-  }, [isReady, timelineFeed]);
+  }, [isReady, timelineFeed, userFeed]);
 
   const fetchSaintes = async () => {
     try {
       setLoading(true);
-      console.log('[SaintesFeed] Fetching saintes...', { timelineFeed, isReady });
+      console.log('[SaintesFeed] Fetching saintes...', { timelineFeed, userFeed, isReady });
       
-      if (!timelineFeed) {
-        console.error('[SaintesFeed] No timeline feed available');
+      const feed = timelineFeed || userFeed;
+      if (!feed) {
+        console.error('[SaintesFeed] No feed available (timeline or user)');
         toast.error('Failed to connect to feed service');
         return;
       }
       
-      const response = await timelineFeed.get({ 
+      const response = await feed.get({ 
         limit: 25,
         withReactionCounts: true,
         withOwnReactions: true,
@@ -82,10 +83,12 @@ export const SaintesFeed = () => {
 
   const handleLike = async (sainte: Sainte) => {
     try {
+      const feed = timelineFeed || userFeed;
+      if (!feed) return;
       if (sainte.own_reactions?.like && sainte.own_reactions.like.length > 0) {
-        await timelineFeed.removeReaction(sainte.own_reactions.like[0].id);
+        await feed.removeReaction(sainte.own_reactions.like[0].id);
       } else {
-        await timelineFeed.addReaction('like', sainte.id);
+        await feed.addReaction('like', sainte.id);
       }
       await fetchSaintes();
     } catch (error) {
