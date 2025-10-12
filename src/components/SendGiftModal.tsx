@@ -142,19 +142,19 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[480px] border-accent/20 bg-gradient-to-br from-card via-card to-accent/5" data-tour="send-gift-modal">
-          <DialogHeader className="space-y-2 pb-1">
+        <DialogContent className="sm:max-w-[480px] border-accent/20 bg-card shadow-2xl z-[100]" data-tour="send-gift-modal">
+          <DialogHeader className="space-y-3 pb-2">
             <DialogTitle className="flex items-center justify-between">
               <span className="font-secondary text-2xl tracking-wide bg-gradient-gold bg-clip-text text-transparent">
                 Send a Gift
               </span>
             </DialogTitle>
-            <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-gradient-primary shadow-lg border border-accent/30">
-              <Coins className="h-4 w-4 text-accent" />
-              <span className="font-secondary text-base font-semibold text-primary-foreground">
+            <div className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-primary shadow-lg border border-accent/30">
+              <Coins className="h-5 w-5 text-accent" />
+              <span className="font-secondary text-lg font-bold text-primary-foreground">
                 {balance}
               </span>
-              <span className="text-xs text-primary-foreground/80 uppercase tracking-wider">Coins</span>
+              <span className="text-sm text-primary-foreground/90 uppercase tracking-wider font-medium">Coins</span>
             </div>
           </DialogHeader>
           
@@ -171,22 +171,24 @@ export const SendGiftModal = ({ open, onOpenChange, recipientId, postId }: SendG
             </div>
           )}
           
-          <div className="grid grid-cols-2 gap-3 mt-1">
+          <div className="grid grid-cols-2 gap-4 mt-2">
             {gifts.map((gift) => (
               <Button
                 key={gift.id}
                 onClick={() => handleSendGift(gift.id, gift.coin_cost)}
                 disabled={loading || balance < gift.coin_cost}
                 variant="outline"
-                className="h-auto flex flex-col items-center gap-3 py-5 px-3 border-2 border-accent/30 rounded-xl bg-card hover:border-accent hover:bg-accent/10 hover:shadow-lg transition-all duration-300 hover:scale-[1.02] disabled:opacity-40 disabled:hover:scale-100 disabled:hover:shadow-none group"
+                className="h-auto flex flex-col items-center gap-3 py-6 px-4 border-2 border-border rounded-xl bg-background hover:border-accent hover:bg-accent/10 hover:shadow-xl transition-all duration-300 hover:scale-[1.03] disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none group"
               >
-                <div className="h-10 w-10 rounded-full border border-accent/30 bg-accent/5 flex items-center justify-center">
+                <div className="h-12 w-12 rounded-full border-2 border-accent/40 bg-accent/10 flex items-center justify-center group-hover:border-accent transition-colors">
                   {renderGiftIcon(getGiftName(gift.display_name))}
                 </div>
-                <span className="font-secondary text-sm font-medium text-foreground leading-tight text-center">{getGiftName(gift.display_name)}</span>
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-gold shadow-md">
-                  <Coins className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-bold text-primary">{gift.coin_cost}</span>
+                <span className="font-secondary text-sm font-semibold text-foreground leading-tight text-center min-h-[32px] flex items-center">
+                  {getGiftName(gift.display_name)}
+                </span>
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-gold shadow-lg border border-accent/20">
+                  <Coins className="h-4 w-4 text-primary" />
+                  <span className="text-sm font-bold text-primary">{gift.coin_cost}</span>
                 </div>
               </Button>
             ))}
