@@ -685,7 +685,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
           {/* Your Dashboard Section */}
           {isOwnProfile && (
-            <div className="bg-muted/30 rounded-lg p-1 space-y-1">
+            <div className="rounded-lg p-1 space-y-1" style={{ backgroundColor: '#E5DFC6' }}>
               <div className="flex items-center gap-1 mb-0.5">
                 <LayoutDashboard className="h-3.5 w-3.5 text-muted-foreground" />
                 <h3 className="text-xs font-semibold">Your Dashboard</h3>
