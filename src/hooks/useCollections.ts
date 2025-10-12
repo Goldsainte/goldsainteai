@@ -28,27 +28,42 @@ export const useCollections = () => {
     }
 
     try {
-      const { data, error } = await supabase
+      // Fetch collections without count first
+      const { data: collectionsData, error: collectionsError } = await supabase
         .from('post_collections')
-        .select(`
-          *,
-          collection_posts (count)
-        `)
+        .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (collectionsError) throw collectionsError;
 
-      const collectionsWithCount = data.map(collection => ({
-        ...collection,
-        post_count: collection.collection_posts?.[0]?.count || 0,
-        collection_posts: undefined
-      }));
+      // Fetch counts separately for each collection
+      const collectionsWithCount = await Promise.all(
+        (collectionsData || []).map(async (collection) => {
+          try {
+            const { count, error: countError } = await supabase
+              .from('collection_posts')
+              .select('*', { count: 'exact', head: true })
+              .eq('collection_id', collection.id);
+
+            return {
+              ...collection,
+              post_count: countError ? 0 : (count || 0)
+            };
+          } catch {
+            return {
+              ...collection,
+              post_count: 0
+            };
+          }
+        })
+      );
 
       setCollections(collectionsWithCount);
     } catch (error) {
       console.error('Error fetching collections:', error);
-      toast.error('Failed to load collections');
+      // Don't show error toast, just log it
+      setCollections([]);
     } finally {
       setIsLoading(false);
     }
