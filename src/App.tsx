@@ -64,7 +64,6 @@ import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import InstagramAPI from "./pages/InstagramAPI";
-import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -169,7 +168,6 @@ function AppContent() {
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/messages" element={<Messages />} />
-          <Route path="/notifications" element={<Notifications />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search" element={<SearchResults />} />
