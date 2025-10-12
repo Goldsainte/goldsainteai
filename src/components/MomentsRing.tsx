@@ -59,7 +59,8 @@ export const MomentsRing = () => {
         .select(`
           user_id,
           id,
-          profiles:user_id (
+          created_at,
+          profiles!moments_user_id_fkey (
             username,
             avatar_url
           )
@@ -113,7 +114,7 @@ export const MomentsRing = () => {
               }}
             >
               <div className="relative">
-                <Avatar className={`w-16 h-16 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-gradient-gold ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
+                <Avatar className={`w-16 h-16 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-primary ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
                   <AvatarImage src={moments.find(m => m.user_id === currentUserId)?.avatar_url || undefined} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>

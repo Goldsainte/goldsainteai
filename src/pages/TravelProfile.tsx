@@ -28,6 +28,7 @@ import PhotoCarouselModal from "@/components/PhotoCarouselModal";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { PostGridSkeleton } from "@/components/PostGridSkeleton";
 import { TravelSidebar } from "@/components/TravelSidebar";
+import { MomentsViewer } from "@/components/MomentsViewer";
 
 interface Profile {
   id: string;
@@ -87,6 +88,8 @@ const TravelProfile = () => {
   const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
 const { balance, refetch: refetchCoins } = useCoinBalance();
+  const [hasActiveMoments, setHasActiveMoments] = useState(false);
+  const [momentsViewerOpen, setMomentsViewerOpen] = useState(false);
 
   // Photo carousel modal state
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
@@ -104,6 +107,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       fetchVideoPosts();
       fetchLikedPosts();
       fetchStats();
+      checkActiveMoments();
       
       // Fetch collaboration invites count only for own profile
       if (isOwnProfile && user) {
@@ -299,6 +303,22 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     }
   };
 
+  const checkActiveMoments = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('moments')
+        .select('id')
+        .eq('user_id', profileUserId)
+        .gt('expires_at', new Date().toISOString())
+        .limit(1);
+
+      if (error) throw error;
+      setHasActiveMoments((data?.length || 0) > 0);
+    } catch (error) {
+      console.error('Error checking moments:', error);
+    }
+  };
+
   const fetchStats = async () => {
     try {
       let query: any = supabase
@@ -444,7 +464,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         <div className="hidden md:flex gap-8 mb-12 items-start">
           {/* Profile Picture */}
           <div className="relative flex-shrink-0">
-            <Avatar className="h-40 w-40">
+            <Avatar 
+              className={`h-40 w-40 cursor-pointer ${hasActiveMoments ? 'ring-4 ring-primary ring-offset-2 ring-offset-background' : ''}`}
+              onClick={() => hasActiveMoments && setMomentsViewerOpen(true)}
+            >
               <AvatarImage src={profile?.avatar_url || undefined} />
               <AvatarFallback className="bg-primary text-primary-foreground text-5xl">
                 {profile?.username?.[0]?.toUpperCase() || 'U'}
@@ -606,7 +629,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <div className="flex items-center gap-1">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
-              <Avatar className="h-20 w-20 ring-2 ring-border">
+              <Avatar 
+                className={`h-20 w-20 ring-2 ${hasActiveMoments ? 'ring-primary' : 'ring-border'} cursor-pointer`}
+                onClick={() => hasActiveMoments && setMomentsViewerOpen(true)}
+              >
                 <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                   {profile?.username?.[0]?.toUpperCase() || 'U'}
@@ -1100,6 +1126,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       <BuyCoinsModal
         open={buyCoinsOpen}
         onOpenChange={setBuyCoinsOpen}
+      />
+
+      {/* Moments Viewer */}
+      <MomentsViewer
+        open={momentsViewerOpen}
+        onOpenChange={setMomentsViewerOpen}
+        userId={profileUserId || ''}
       />
 
       {/* Brand Partnership Proposal Modal */}
