@@ -117,9 +117,19 @@ export const NotificationCenter = () => {
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification.id);
 
+    // Route based on notification type and metadata
     if (notification.link) {
       navigate(notification.link);
+    } else if (notification.notification_type === "follow" && notification.metadata?.follower_id) {
+      navigate(`/travel-profile/${notification.metadata.follower_id}`);
+    } else if (notification.notification_type === "like" || notification.notification_type === "comment") {
+      navigate(`/travel-feed`);
+    } else if (notification.notification_type === "message") {
+      navigate(`/messages`);
     } else if (notification.metadata?.post_id) {
+      navigate(`/travel-feed`);
+    } else {
+      // Default to travel feed for other notification types
       navigate(`/travel-feed`);
     }
   };
