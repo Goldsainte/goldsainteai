@@ -42,6 +42,100 @@ serve(async (req) => {
 
     console.log(`Generated Stream token for user: ${userId}`);
 
+    // Initialize feed groups if they don't exist (idempotent)
+    try {
+      console.log('[Stream Setup] Ensuring feed groups exist...');
+      
+      // Create server-side auth header
+      const serverAuthHeader = `${apiKey} ${apiSecret}`;
+      
+      // Try to create 'user' feed group (will fail silently if exists)
+      await fetch(`https://api.stream-io-api.com/api/v3.0/feed_groups`, {
+        method: 'POST',
+        headers: {
+          'Authorization': serverAuthHeader,
+          'Content-Type': 'application/json',
+          'Stream-Auth-Type': 'jwt',
+        },
+        body: JSON.stringify({
+          id: 'user',
+          default_visibility: 'public',
+        })
+      }).catch(() => console.log('[Stream Setup] User feed group already exists'));
+
+      // Try to create 'timeline' feed group (will fail silently if exists)
+      await fetch(`https://api.stream-io-api.com/api/v3.0/feed_groups`, {
+        method: 'POST',
+        headers: {
+          'Authorization': serverAuthHeader,
+          'Content-Type': 'application/json',
+          'Stream-Auth-Type': 'jwt',
+        },
+        body: JSON.stringify({
+          id: 'timeline',
+          default_visibility: 'public',
+        })
+      }).catch(() => console.log('[Stream Setup] Timeline feed group already exists'));
+
+      console.log('[Stream Setup] Feed groups ensured');
+
+      // Get or create user's feeds
+      console.log(`[Stream Setup] Creating feeds for user: ${userId}`);
+      
+      // Create user feed
+      const userFeedRes = await fetch(`https://api.stream-io-api.com/api/v3.0/feeds/user:${userId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': serverAuthHeader,
+          'Content-Type': 'application/json',
+          'Stream-Auth-Type': 'jwt',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+        })
+      });
+      
+      if (userFeedRes.ok) {
+        console.log(`[Stream Setup] User feed created for ${userId}`);
+      }
+
+      // Create timeline feed
+      const timelineFeedRes = await fetch(`https://api.stream-io-api.com/api/v3.0/feeds/timeline:${userId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': serverAuthHeader,
+          'Content-Type': 'application/json',
+          'Stream-Auth-Type': 'jwt',
+        },
+        body: JSON.stringify({
+          user_id: userId,
+        })
+      });
+      
+      if (timelineFeedRes.ok) {
+        console.log(`[Stream Setup] Timeline feed created for ${userId}`);
+      }
+
+      // Make timeline follow user feed
+      await fetch(`https://api.stream-io-api.com/api/v1.0/feed/timeline/${userId}/follows/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': serverAuthHeader,
+          'Content-Type': 'application/json',
+          'Stream-Auth-Type': 'jwt',
+        },
+        body: JSON.stringify({
+          target: `user:${userId}`,
+          activity_copy_limit: 300,
+        })
+      });
+
+      console.log(`[Stream Setup] Timeline following user feed for ${userId}`);
+    } catch (setupError) {
+      console.error('[Stream Setup] Error during setup:', setupError);
+      // Continue anyway - feeds may already exist
+    }
+
     return new Response(
       JSON.stringify({ 
         token,
