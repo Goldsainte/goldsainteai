@@ -598,10 +598,12 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </div>
 
         {/* Mobile Profile Layout */}
-        <div className="md:hidden space-y-4 mb-6">
-          <div className="flex items-start justify-between">
-            <div className="relative">
-              <Avatar className="h-20 w-20">
+        <div className="md:hidden space-y-3 mb-4">
+          {/* Top Row: Avatar and Stats */}
+          <div className="flex items-center gap-5">
+            {/* Avatar */}
+            <div className="relative flex-shrink-0">
+              <Avatar className="h-20 w-20 ring-2 ring-border">
                 <AvatarImage src={profile?.avatar_url || undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground text-2xl">
                   {profile?.username?.[0]?.toUpperCase() || 'U'}
@@ -620,83 +622,85 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   <button
                     onClick={() => document.getElementById('avatar-upload-mobile')?.click()}
                     disabled={uploadingAvatar}
-                    className="absolute bottom-0 right-0 bg-primary text-primary-foreground rounded-full p-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+                    className="absolute -bottom-1 -right-1 bg-primary text-primary-foreground rounded-full p-1.5 ring-2 ring-background hover:bg-primary/90 transition-colors disabled:opacity-50"
                   >
                     {uploadingAvatar ? (
-                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
+                      <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
                     ) : (
-                      <PlusCircle className="h-4 w-4" />
+                      <PlusCircle className="h-3.5 w-3.5" />
                     )}
                   </button>
                 </>
               )}
             </div>
             
-            <div className="flex items-start gap-6 pt-2">
-              <button className="flex flex-col items-center">
-                <div className="text-lg font-bold">{formatNumber(stats.postsCount)}</div>
-                <div className="text-xs text-muted-foreground">posts</div>
+            {/* Stats - Horizontal Layout */}
+            <div className="flex-1 flex items-center justify-around">
+              <button className="flex flex-col items-center min-w-[60px]">
+                <div className="text-base font-bold">{formatNumber(stats.postsCount)}</div>
+                <div className="text-xs">posts</div>
               </button>
-              <button className="flex flex-col items-center">
-                <div className="text-lg font-bold">{formatNumber(profile?.followers_count || 0)}</div>
-                <div className="text-xs text-muted-foreground">followers</div>
+              <button className="flex flex-col items-center min-w-[60px]">
+                <div className="text-base font-bold">{formatNumber(profile?.followers_count || 0)}</div>
+                <div className="text-xs">followers</div>
               </button>
-              <button className="flex flex-col items-center">
-                <div className="text-lg font-bold">{formatNumber(profile?.following_count || 0)}</div>
-                <div className="text-xs text-muted-foreground">following</div>
+              <button className="flex flex-col items-center min-w-[60px]">
+                <div className="text-base font-bold">{formatNumber(profile?.following_count || 0)}</div>
+                <div className="text-xs">following</div>
               </button>
             </div>
           </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h2 className="font-semibold text-sm">
+          {/* Name and Bio */}
+          <div className="space-y-0.5">
+            <div className="flex items-center gap-1">
+              <h2 className="font-bold text-sm">
                 {profile?.first_name && profile?.last_name
                   ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
                   : (profile?.username || 'User').toUpperCase()}
               </h2>
               {profile?.is_verified && (
-                <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500" />
               )}
             </div>
             {profile?.bio && (
-              <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
+              <p className="text-sm leading-tight">{profile.bio}</p>
             )}
             {profile?.website && (
               <a 
                 href={profile.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline block mt-1"
+                className="text-sm text-primary hover:underline block"
               >
                 {profile.website.replace(/^https?:\/\//, '')}
               </a>
             )}
             {profile?.location && (
-              <p className="text-sm text-muted-foreground mt-1">📍 {profile.location}</p>
+              <p className="text-xs text-muted-foreground">📍 {profile.location}</p>
             )}
           </div>
 
-          {/* Mobile Action Buttons */}
-          <div className="grid grid-cols-2 gap-2">
+          {/* Action Buttons - Instagram Style */}
+          <div className="flex gap-2">
             {isOwnProfile ? (
               <>
                 <Button
                   variant="secondary"
-                  className="w-full h-9 text-sm font-semibold"
+                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
                   onClick={() => setEditProfileOpen(true)}
                 >
                   Edit profile
                 </Button>
                 <Button
                   variant="secondary"
-                  className="w-full h-9 text-sm font-semibold"
+                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     toast.success("Profile link copied!");
                   }}
                 >
-                  <Share2 className="h-4 w-4 mr-2" />
+                  <Share2 className="h-4 w-4 mr-1.5" />
                   Share
                 </Button>
               </>
@@ -705,7 +709,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 {user && <FollowButton targetUserId={profileUserId!} />}
                 <Button
                   variant="secondary"
-                  className="flex-1 h-9 text-sm font-semibold"
+                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
                   onClick={() => setPartnershipProposalOpen(true)}
                 >
                   <Briefcase className="h-4 w-4 mr-1" />
@@ -713,7 +717,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 </Button>
                 <Button
                   variant="secondary"
-                  className="flex-1 h-9 text-sm font-semibold"
+                  className="flex-1 h-8 text-sm font-semibold rounded-lg"
                   onClick={() => setPartnershipRequestOpen(true)}
                 >
                   <Sparkles className="h-4 w-4 mr-1" />
@@ -725,7 +729,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </div>
 
         {/* Story Highlights */}
-        <div className="border-t pt-4 mb-2">
+        <div className="border-t border-border pt-3 pb-2">
           <StoryHighlights
             userId={profileUserId!}
             isOwnProfile={isOwnProfile}
@@ -733,30 +737,30 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </div>
       </div>
 
-      {/* Content Tabs */}
+      {/* Content Tabs - Instagram Style */}
       <Tabs defaultValue="posts" className="w-full">
-        <TabsList className="w-full grid grid-cols-3 rounded-none h-12 bg-transparent border-t">
+        <TabsList className="w-full grid grid-cols-2 md:grid-cols-3 rounded-none h-11 bg-transparent border-t border-border">
           <TabsTrigger 
             value="posts" 
-            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none h-full flex items-center justify-center gap-0"
             title="Photos"
           >
-            <Grid3X3 className="h-6 w-6" />
+            <Grid3X3 className="h-6 w-6 md:h-5 md:w-5" />
           </TabsTrigger>
           <TabsTrigger 
             value="journeys"
-            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+            className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none h-full flex items-center justify-center gap-0"
             title="Videos"
           >
-            <Video className="h-6 w-6" />
+            <Video className="h-6 w-6 md:h-5 md:w-5" />
           </TabsTrigger>
           {isOwnProfile && (
             <TabsTrigger 
               value="liked"
-              className="data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none"
+              className="hidden md:flex data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none h-full items-center justify-center gap-0"
               title="Liked"
             >
-              <Heart className="h-6 w-6" />
+              <Heart className="h-5 w-5" />
             </TabsTrigger>
           )}
         </TabsList>
@@ -849,7 +853,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-1 pb-20 md:pb-0">
+            <div className="grid grid-cols-3 gap-0.5 pb-20 md:pb-0">
               {userPosts.map((post) => (
                 <div
                   key={post.id}
