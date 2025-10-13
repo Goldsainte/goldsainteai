@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, X, Eye, Archive } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Eye, Archive, Volume2, VolumeX, Trash } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import {
@@ -82,17 +82,29 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const [newVaultTitle, setNewVaultTitle] = useState("");
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const [autoplayBlocked, setAutoplayBlocked] = useState(false);
+  const [isSoundOn, setIsSoundOn] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open && userId) {
-      fetchMoments();
-      fetchHighlights();
-    } else if (!open && audio) {
-      // Clean up audio when dialog closes
-      audio.pause();
-      audio.currentTime = 0;
-      setAudio(null);
-    }
+    const init = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setCurrentUserId(user?.id || null);
+      } catch {}
+
+      if (open && userId) {
+        fetchMoments();
+        fetchHighlights();
+      } else if (!open && audio) {
+        // Clean up audio when dialog closes
+        audio.pause();
+        audio.currentTime = 0;
+        setAudio(null);
+      }
+    };
+
+    init();
   }, [open, userId]);
 
   useEffect(() => {
@@ -265,6 +277,46 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     }
   };
 
+  const handleToggleSound = () => {
+    const next = !isSoundOn;
+    setIsSoundOn(next);
+    // Toggle video audio
+    if (currentMoment?.media_type === 'video' && videoRef.current) {
+      videoRef.current.muted = !next;
+      if (next) {
+        videoRef.current.play().catch(() => {});
+      }
+    }
+    // Toggle Spotify preview audio
+    if (audio) {
+      if (next) {
+        audio.play().then(() => setAutoplayBlocked(false)).catch(() => setAutoplayBlocked(true));
+      } else {
+        audio.pause();
+      }
+    }
+  };
+
+  const handleDeleteMoment = async () => {
+    if (!currentUserId || currentUserId !== currentMoment.user_id) return;
+    const confirmDel = window.confirm('Delete this story? This cannot be undone.');
+    if (!confirmDel) return;
+    try {
+      const { error } = await supabase.from('moments').delete().eq('id', currentMoment.id);
+      if (error) throw error;
+      toast.success('Moment deleted');
+      const newMoments = moments.filter((m) => m.id !== currentMoment.id);
+      setMoments(newMoments);
+      if (newMoments.length === 0) {
+        onOpenChange(false);
+      } else if (currentIndex >= newMoments.length) {
+        setCurrentIndex(newMoments.length - 1);
+      }
+    } catch (e) {
+      console.error('Delete failed:', e);
+      toast.error('Failed to delete moment');
+    }
+  };
   const fetchHighlights = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -383,6 +435,28 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 {new Date(currentMoment.created_at).toLocaleString()}
               </span>
             </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggleSound}
+                className="text-white hover:bg-white/20"
+                title={isSoundOn ? 'Sound on' : 'Sound off'}
+              >
+                {isSoundOn ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+              </Button>
+              {currentUserId === currentMoment.user_id && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleDeleteMoment}
+                  className="text-white hover:bg-white/20"
+                  title="Delete story"
+                >
+                  <Trash className="w-5 h-5" />
+                </Button>
+              )}
+            </div>
           </div>
 
           {/* Save Button - Bottom Right */}
@@ -484,10 +558,13 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             ) : (
               <div className="relative w-full h-full">
                 <video
+                  ref={videoRef}
                   src={currentMoment.media_url || ''}
                   className="w-full h-full object-cover"
                   autoPlay
-                  muted
+                  muted={!isSoundOn}
+                  playsInline
+                  onPlay={() => setAutoplayBlocked(false)}
                   onEnded={() => { if (!saveDialogOpen) handleNext(); }}
                 />
                 {currentMoment.drawing_data && (

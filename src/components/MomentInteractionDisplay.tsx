@@ -297,11 +297,13 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   }
 
   if (interaction.type === 'countdown') {
-
+ 
     return (
-      <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-6 text-center">
-        <p className="text-white/70 text-sm mb-2">{interaction.data.label}</p>
-        <p className="text-white text-3xl font-bold">{timeLeft}</p>
+      <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
+        <div className="bg-black/70 backdrop-blur-sm rounded-2xl p-6 text-center max-w-[80%]">
+          <p className="text-white/70 text-sm mb-2">{interaction.data.label}</p>
+          <p className="text-white text-3xl font-bold">{timeLeft}</p>
+        </div>
       </div>
     );
   }
