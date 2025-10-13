@@ -74,6 +74,11 @@ import destination7 from "@/assets/destination7.jpg";
 import destination8 from "@/assets/destination8.jpg";
 import cyclingTour from "@/assets/cycling-tour.jpg";
 import spaWellness from "@/assets/spa-wellness.jpg";
+import property1 from "@/assets/property1.jpg";
+import property2 from "@/assets/property2.jpg";
+import property3 from "@/assets/property3.jpg";
+import property4 from "@/assets/property4.jpg";
+import property5 from "@/assets/property5.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
@@ -1079,6 +1084,50 @@ const Index = () => {
 
                       {/* Padding element to ensure last card is fully visible */}
                       <div className="flex-shrink-0 w-6" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Creator Hero Section */}
+            <div className="px-4 sm:px-6 py-16 sm:py-20 md:py-24 bg-gradient-to-br from-background via-muted/20 to-background">
+              <div className="w-full max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                  {/* Left: Text Content */}
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary">
+                        Create.
+                      </h2>
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-secondary">
+                        Share.
+                      </h2>
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground">
+                        Make Money.
+                      </h2>
+                    </div>
+                    <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl">
+                      Connect, inspire, and earn: a social platform empowering content creators to showcase luxury travel, design interactive trip plans, and generate income from their journeys.
+                    </p>
+                  </div>
+
+                  {/* Right: Photo Grid */}
+                  <div className="relative h-[500px] sm:h-[600px]">
+                    <div className="absolute top-0 right-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                      <img src={property1} alt="Luxury travel" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute top-[15%] left-0 w-[52%] h-[40%] rounded-2xl overflow-hidden shadow-xl">
+                      <img src={property2} alt="Travel destination" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute top-[38%] right-[8%] w-[48%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                      <img src={property3} alt="Adventure" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute bottom-0 left-[5%] w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
+                      <img src={property4} alt="Luxury dining" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute bottom-[8%] right-0 w-[45%] h-[42%] rounded-2xl overflow-hidden shadow-xl">
+                      <img src={property5} alt="Coastal view" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
