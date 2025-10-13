@@ -899,15 +899,15 @@ const Index = () => {
                   </Button>
                 </div>
 
-                {/* What Goldsainte AI Can Do Button */}
+                {/* What Goldsainte.Ai Can Do Button (Original style) */}
                 <div className="flex justify-center pt-2">
                   <Button
                     variant="outline"
                     onClick={() => setShowWelcomeModal(true)}
-                    className="border-2 border-[#BFAD72] text-foreground hover:bg-[#BFAD72]/10 gap-2 px-6"
+                    className="border-2 border-secondary text-secondary bg-transparent hover:bg-secondary/10 rounded-full h-12 px-6 sm:px-8 gap-2"
                   >
-                    <Star className="h-4 w-4 text-[#BFAD72]" />
-                    What Goldsainte AI can do
+                    <Sparkles className="h-4 w-4" />
+                    What Goldsainte.Ai can do
                   </Button>
                 </div>
 
