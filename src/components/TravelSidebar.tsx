@@ -1,10 +1,14 @@
-import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu, Settings, Activity, Bookmark, Sun, Moon, AlertCircle, LogOut } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
+import { toast } from "sonner";
 import logoHorizontal from "@/assets/primary-horizontal-logo-gold-2.png";
 
 const navItems = [
@@ -19,9 +23,12 @@ const navItems = [
 ];
 
 export function TravelSidebar() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { theme, setTheme } = useTheme();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -44,6 +51,22 @@ export function TravelSidebar() {
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    setOpen(false);
+    navigate('/auth');
+    toast.success('Signed out successfully');
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+    setOpen(false);
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -85,13 +108,77 @@ export function TravelSidebar() {
 
       {/* More Menu */}
       <div className="p-3 border-t border-border">
-        <Button
-          variant="ghost"
-          className="w-full justify-start gap-4 px-3 py-6 h-auto hover:bg-muted/50"
-        >
-          <Menu className="h-6 w-6" />
-          <span className="text-base">More</span>
-        </Button>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              className="w-full justify-start gap-4 px-3 py-6 h-auto hover:bg-muted/50"
+            >
+              <Menu className="h-6 w-6" />
+              <span className="text-base">More</span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent 
+            side="top" 
+            align="start" 
+            className="w-64 p-0 bg-background border-border shadow-lg z-50"
+            sideOffset={8}
+          >
+            <div className="py-2">
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                onClick={() => handleNavigation('/travel-settings-2')}
+              >
+                <Settings className="h-5 w-5" />
+                <span>Settings</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                onClick={() => handleNavigation('/my-bookings')}
+              >
+                <Activity className="h-5 w-5" />
+                <span>Your activity</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                onClick={() => handleNavigation('/favorites')}
+              >
+                <Bookmark className="h-5 w-5" />
+                <span>Saved</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                onClick={toggleTheme}
+              >
+                {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+                <span>Switch appearance</span>
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                onClick={() => handleNavigation('/trust-safety')}
+              >
+                <AlertCircle className="h-5 w-5" />
+                <span>Report a problem</span>
+              </Button>
+              
+              <Separator className="my-2" />
+              
+              <Button
+                variant="ghost"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                onClick={handleSignOut}
+              >
+                <LogOut className="h-5 w-5" />
+                <span>Log out</span>
+              </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
