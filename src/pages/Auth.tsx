@@ -150,7 +150,7 @@ const Auth = () => {
       const { data, error } = await supabase.functions.invoke('request-password-reset', {
         body: {
           email: resetEmail,
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/reset-password`,
         },
       });
 

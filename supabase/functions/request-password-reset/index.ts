@@ -37,7 +37,7 @@ const handler = async (req: Request): Promise<Response> => {
           type: "recovery",
           email: email,
           options: {
-            redirect_to: redirectTo || `${new URL(req.url).origin}/`,
+            redirect_to: redirectTo || `${new URL(req.url).origin}/reset-password`,
           },
         }),
       }

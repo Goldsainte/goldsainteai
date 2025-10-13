@@ -16,6 +16,7 @@ import SearchResults from "./pages/SearchResults";
 import HotelBooking from "./pages/HotelBooking";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import Onboarding from "./pages/Onboarding";
 import AIAgentOnboarding from "./pages/AIAgentOnboarding";
 import Favorites from "./pages/Favorites";
@@ -125,6 +126,7 @@ function AppContent() {
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/journeys" element={<TravelFeed />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
           <Route path="/dashboard" element={<Dashboard />} />
