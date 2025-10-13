@@ -904,9 +904,10 @@ const Index = () => {
                   <Button
                     variant="outline"
                     onClick={() => setShowWelcomeModal(true)}
-                    className="border-2 border-secondary text-secondary bg-transparent hover:bg-secondary/10 rounded-full h-12 px-6 sm:px-8 gap-2"
+                    className="border-2 border-secondary bg-transparent hover:bg-secondary/10 rounded-full h-12 px-6 sm:px-8 gap-2 font-secondary"
+                    style={{ color: '#0c4d47' }}
                   >
-                    <Sparkles className="h-4 w-4" />
+                    <Sparkles className="h-4 w-4" style={{ color: '#0c4d47' }} />
                     What Goldsainte.Ai can do
                   </Button>
                 </div>
