@@ -47,7 +47,7 @@ export const OnboardingTour = () => {
     },
     {
       target: '[data-tour="places"]',
-      content: "Explore Goldsainte Create! Discover travel content, videos, and inspiration from creators worldwide. Get ideas for your next adventure.",
+      content: "Goldsainte Journeys! Discover travel content, videos, and inspiration from creators worldwide. Get ideas for your next adventure.",
       placement: "bottom",
       disableBeacon: true,
     },
