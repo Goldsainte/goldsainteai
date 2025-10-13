@@ -3,9 +3,34 @@ import { Home, Search, Compass, Video, MessageCircle, Heart, PlusSquare, BarChar
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export function FeedSidebar() {
   const { user } = useAuth();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  const fetchProfile = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url, username')
+      .eq('id', user.id)
+      .single();
+    
+    if (data) {
+      setAvatarUrl(data.avatar_url);
+      setUsername(data.username);
+    }
+  };
 
   const navItems = [
     { to: "/home", icon: Home, label: "Home" },
@@ -14,7 +39,6 @@ export function FeedSidebar() {
     { to: "/", icon: Video, label: "Journeys" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },
-    { to: "/travel-profile", icon: User, label: "Profile" },
   ];
 
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
@@ -44,6 +68,25 @@ export function FeedSidebar() {
             <span className="text-base">{item.label}</span>
           </NavLink>
         ))}
+        
+        {/* Profile with Avatar */}
+        <NavLink
+          to="/travel-profile"
+          className={getNavClass}
+        >
+          {avatarUrl ? (
+            <Avatar className="h-6 w-6">
+              <AvatarImage src={avatarUrl} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+                {username?.[0]?.toUpperCase() || 'U'}
+              </AvatarFallback>
+            </Avatar>
+          ) : (
+            <User className="h-6 w-6" />
+          )}
+          <span className="text-base">Profile</span>
+        </NavLink>
+        
         {user && <NotificationCenter />}
       </nav>
 
