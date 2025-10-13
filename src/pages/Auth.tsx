@@ -147,15 +147,18 @@ const Auth = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-        redirectTo: `${window.location.origin}/`,
+      const { data, error } = await supabase.functions.invoke('request-password-reset', {
+        body: {
+          email: resetEmail,
+          redirectTo: `${window.location.origin}/`,
+        },
       });
 
       if (error) throw error;
 
       toast({
         title: "Reset email sent",
-        description: "Check your email for a branded password reset link from Goldsainte.",
+        description: "Check your email for a password reset link from Goldsainte.",
       });
       setShowForgotPassword(false);
       setResetEmail('');
