@@ -30,6 +30,7 @@ const handler = async (req: Request): Promise<Response> => {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+          "apikey": SUPABASE_SERVICE_ROLE_KEY || "",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
