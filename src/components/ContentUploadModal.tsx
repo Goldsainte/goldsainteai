@@ -20,6 +20,9 @@ import { toast } from "sonner";
 import { extractMentions } from "@/lib/mentionHelpers";
 import { extractHashtags } from "@/lib/hashtagHelpers";
 import { StoryInteractionCreator } from "./StoryInteractionCreator";
+import { GifSelector } from "./GifSelector";
+import { BoomerangRecorder } from "./BoomerangRecorder";
+import { SpotifyTrackSelector } from "./SpotifyTrackSelector";
 import {
   Select,
   SelectContent,
@@ -54,6 +57,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [taggedPackageIds, setTaggedPackageIds] = useState<string[]>([]);
   const [editingPhotoIndex, setEditingPhotoIndex] = useState<number | null>(null);
   const [generatingCaption, setGeneratingCaption] = useState(false);
+  const [selectedGifUrl, setSelectedGifUrl] = useState<string | null>(null);
+  const [selectedMusicTrack, setSelectedMusicTrack] = useState<any>(null);
+  const [boomerangVideo, setBoomerangVideo] = useState<Blob | null>(null);
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
@@ -883,7 +889,212 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             </Button>
           </TabsContent>
 
-          <TabsContent value="embed" className="space-y-4 mt-4 overflow-y-auto flex-1">
+          <TabsContent value="gif" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">
+            <GifSelector onSelectGif={(gifUrl) => {
+              setSelectedGifUrl(gifUrl);
+              toast.success("GIF selected! Add caption and location to post.");
+            }} />
+            
+            {selectedGifUrl && (
+              <>
+                <div className="space-y-2">
+                  <Label>Selected GIF Preview</Label>
+                  <img src={selectedGifUrl} alt="Selected GIF" className="w-full rounded-lg" />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Caption</Label>
+                  <Textarea
+                    placeholder="Add a caption..."
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Input
+                    placeholder="Where was this?"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    if (!selectedGifUrl || !user) return;
+                    setUploading(true);
+                    try {
+                      const { error } = await supabase.from("travel_posts").insert([{
+                        user_id: user.id,
+                        image_urls: [selectedGifUrl],
+                        media_type: 'gif',
+                        caption: caption || null,
+                        location: location || null,
+                        status: 'active',
+                      }]);
+                      if (error) throw error;
+                      toast.success('GIF posted!');
+                      setSelectedGifUrl(null);
+                      setCaption("");
+                      setLocation("");
+                      onOpenChange(false);
+                      onSuccess();
+                    } catch (error: any) {
+                      toast.error(error.message || 'Failed to post GIF');
+                    } finally {
+                      setUploading(false);
+                    }
+                  }}
+                  disabled={!selectedGifUrl || uploading}
+                  className="w-full"
+                >
+                  {uploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Posting...</> : 'Post GIF'}
+                </Button>
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="boomerang" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">
+            <BoomerangRecorder onRecordingComplete={(blob) => {
+              setBoomerangVideo(blob);
+              toast.success("Boomerang recorded! Add caption to post.");
+            }} />
+
+            {boomerangVideo && (
+              <>
+                <div className="space-y-2">
+                  <Label>Caption</Label>
+                  <Textarea
+                    placeholder="Add a caption..."
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Location</Label>
+                  <Input
+                    placeholder="Where was this?"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  />
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    if (!boomerangVideo || !user) return;
+                    setUploading(true);
+                    try {
+                      const fileName = `${user.id}/boomerang/${Date.now()}.webm`;
+                      const { error: uploadError } = await supabase.storage
+                        .from('travel-videos')
+                        .upload(fileName, boomerangVideo);
+                      if (uploadError) throw uploadError;
+
+                      const { data: { publicUrl } } = supabase.storage
+                        .from('travel-videos')
+                        .getPublicUrl(fileName);
+
+                      const { error } = await supabase.from("travel_posts").insert([{
+                        user_id: user.id,
+                        video_url: publicUrl,
+                        media_type: 'boomerang',
+                        caption: caption || null,
+                        location: location || null,
+                        status: 'active',
+                      }]);
+                      if (error) throw error;
+                      toast.success('Boomerang posted!');
+                      setBoomerangVideo(null);
+                      setCaption("");
+                      setLocation("");
+                      onOpenChange(false);
+                      onSuccess();
+                    } catch (error: any) {
+                      toast.error(error.message || 'Failed to post Boomerang');
+                    } finally {
+                      setUploading(false);
+                    }
+                  }}
+                  disabled={!boomerangVideo || uploading}
+                  className="w-full"
+                >
+                  {uploading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Posting...</> : 'Post Boomerang'}
+                </Button>
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="music" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">
+            <SpotifyTrackSelector 
+              selectedTrack={selectedMusicTrack}
+              onSelectTrack={(track) => {
+                setSelectedMusicTrack(track);
+                if (track) {
+                  toast.success(`Selected: ${track.name} by ${track.artist}`);
+                }
+              }} 
+            />
+
+            {selectedMusicTrack && (
+              <>
+                <div className="space-y-2">
+                  <Label>Selected Track</Label>
+                  <div className="p-3 border rounded-lg">
+                    <p className="font-medium">{selectedMusicTrack.name}</p>
+                    <p className="text-sm text-muted-foreground">{selectedMusicTrack.artist}</p>
+                  </div>
+                </div>
+
+                {photoPreviewUrls.length === 0 && (
+                  <div className="space-y-2">
+                    <Label>Add Photo or Video</Label>
+                    <Input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.type.startsWith('image/')) {
+                            setPhotoFiles([file]);
+                            setPhotoPreviewUrls([URL.createObjectURL(file)]);
+                          } else if (file.type.startsWith('video/')) {
+                            setVideoFile(file);
+                            setVideoPreviewUrl(URL.createObjectURL(file));
+                          }
+                        }
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label>Caption</Label>
+                  <Textarea
+                    placeholder="Add a caption..."
+                    value={caption}
+                    onChange={(e) => setCaption(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                <Button
+                  onClick={async () => {
+                    toast.info("Music story posting coming soon!");
+                  }}
+                  disabled={uploading}
+                  className="w-full"
+                >
+                  Post with Music
+                </Button>
+              </>
+            )}
+          </TabsContent>
+
+          <TabsContent value="embed" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">
             <div className="space-y-2">
               <Label htmlFor="embedUrl">Video URL</Label>
               <Input

@@ -6,7 +6,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Paperclip, Video, MoreVertical, Check, CheckCheck } from "lucide-react";
+import { Send, Paperclip, Video, MoreVertical, Check, CheckCheck, Mic } from "lucide-react";
+import { VoiceMessageRecorder } from "./VoiceMessageRecorder";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   useEffect(() => {
     fetchMessages();
@@ -141,6 +143,36 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
     }
   };
 
+  const handleVoiceMessageSend = async (voiceUrl: string, duration: number) => {
+    setSending(true);
+    try {
+      // Send message with voice URL and duration
+      const { error } = await (supabase as any)
+        .from("conversation_messages")
+        .insert({
+          conversation_id: conversationId,
+          sender_id: userId,
+          sender_type: userType,
+          message_text: "🎤 Voice message",
+          voice_url: voiceUrl,
+          voice_duration: duration,
+        });
+
+      if (error) throw error;
+
+      setShowVoiceRecorder(false);
+    } catch (error) {
+      console.error("Error sending voice message:", error);
+      toast({
+        title: "Failed to send",
+        description: "Could not send voice message. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <Card className="h-full flex flex-col">
       <CardHeader className="border-b">
@@ -222,20 +254,41 @@ export const MessageThread = ({ conversationId, userId, userType }: MessageThrea
       </CardContent>
 
       <div className="p-4 border-t">
-        <form onSubmit={handleSendMessage} className="flex gap-2">
-          <Button type="button" variant="ghost" size="icon">
-            <Paperclip className="h-4 w-4" />
-          </Button>
-          <Input
-            placeholder="Type a message..."
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            disabled={sending}
-          />
-          <Button type="submit" size="icon" disabled={sending || !newMessage.trim()}>
-            <Send className="h-4 w-4" />
-          </Button>
-        </form>
+        {showVoiceRecorder ? (
+          <div className="flex items-center gap-2">
+            <VoiceMessageRecorder onSend={handleVoiceMessageSend} />
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => setShowVoiceRecorder(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSendMessage} className="flex gap-2">
+            <Button type="button" variant="ghost" size="icon">
+              <Paperclip className="h-4 w-4" />
+            </Button>
+            <Input
+              placeholder="Type a message..."
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              disabled={sending}
+            />
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="icon"
+              onClick={() => setShowVoiceRecorder(true)}
+            >
+              <Mic className="h-4 w-4" />
+            </Button>
+            <Button type="submit" size="icon" disabled={sending || !newMessage.trim()}>
+              <Send className="h-4 w-4" />
+            </Button>
+          </form>
+        )}
       </div>
     </Card>
   );

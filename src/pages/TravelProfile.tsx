@@ -30,6 +30,8 @@ import { PostGridSkeleton } from "@/components/PostGridSkeleton";
 import { TravelSidebar } from "@/components/TravelSidebar";
 import { MomentsViewer } from "@/components/MomentsViewer";
 import { ProfilePhotoModal } from "@/components/ProfilePhotoModal";
+import { PinnedPosts } from "@/components/PinnedPosts";
+import { ShareToStoryButton } from "@/components/ShareToStoryButton";
 
 interface Profile {
   id: string;
@@ -925,6 +927,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </TabsContent>
 
         <TabsContent value="posts" className="mt-0">
+          {isOwnProfile && <PinnedPosts userId={profileUserId!} />}
+          
           {loading ? (
             <PostGridSkeleton />
           ) : userPosts.length === 0 ? (
