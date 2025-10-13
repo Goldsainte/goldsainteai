@@ -154,7 +154,41 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
       if (insertError) throw insertError;
 
-      toast.success("Moment created!");
+      // Check if user has Instagram auto-share enabled
+      if (mediaUrl && mediaType === 'image') {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('auto_share_instagram')
+            .eq('id', user.id)
+            .single();
+
+          if (profile?.auto_share_instagram) {
+            // Cross-post to Instagram
+            const { data: authData } = await supabase.auth.getSession();
+            
+            await supabase.functions.invoke('instagram-post', {
+              body: {
+                imageUrl: mediaUrl,
+                caption: mode === "type" ? textContent : (caption.trim() || ''),
+              },
+              headers: {
+                Authorization: `Bearer ${authData?.session?.access_token}`,
+              },
+            });
+            
+            toast.success("Moment created and shared to Instagram!");
+          } else {
+            toast.success("Moment created!");
+          }
+        } catch (igError) {
+          console.error('Instagram post error:', igError);
+          toast.success("Moment created, but Instagram post failed");
+        }
+      } else {
+        toast.success("Moment created!");
+      }
+
       handleClose();
     } catch (error) {
       console.error('Error creating moment:', error);

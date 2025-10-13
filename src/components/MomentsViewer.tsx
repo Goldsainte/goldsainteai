@@ -38,6 +38,11 @@ interface Moment {
   created_at: string;
   drawing_data?: string | null;
   interactions?: any | null;
+  spotify_track_id?: string | null;
+  spotify_track_name?: string | null;
+  spotify_track_artist?: string | null;
+  spotify_track_preview_url?: string | null;
+  spotify_track_album_art?: string | null;
   text_styling?: {
     font: string;
     animation: string;
@@ -129,11 +134,11 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const fetchMoments = async () => {
     try {
       const { data, error } = await supabase
-        .from('moments')
-        .select('*')
-        .eq('user_id', userId)
-        .gt('expires_at', new Date().toISOString())
-        .order('created_at', { ascending: false });
+    .from('moments')
+    .select('*, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art')
+    .eq('user_id', userId)
+    .gt('expires_at', new Date().toISOString())
+    .order('created_at', { ascending: false });
 
       if (error) throw error;
 
@@ -426,6 +431,29 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               momentId={currentMoment.id}
               interaction={currentMoment.interactions}
             />
+          )}
+
+          {/* Spotify Track Display */}
+          {currentMoment.spotify_track_id && (
+            <div className="absolute top-16 right-4 z-20 bg-black/60 backdrop-blur-sm rounded-lg p-2 max-w-[200px]">
+              <div className="flex items-center gap-2">
+                {currentMoment.spotify_track_album_art && (
+                  <img 
+                    src={currentMoment.spotify_track_album_art} 
+                    alt="Album art" 
+                    className="w-10 h-10 rounded"
+                  />
+                )}
+                <div className="flex-1 min-w-0">
+                  <p className="text-white text-xs font-medium truncate">
+                    {currentMoment.spotify_track_name}
+                  </p>
+                  <p className="text-white/70 text-xs truncate">
+                    {currentMoment.spotify_track_artist}
+                  </p>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* Caption, Stats & Reactions */}
