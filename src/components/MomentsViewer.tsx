@@ -288,6 +288,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const handleToggleSound = () => {
     const next = !isSoundOn;
     setIsSoundOn(next);
+
     // Toggle video audio
     if (currentMoment?.media_type === 'video' && videoRef.current) {
       videoRef.current.muted = !next;
@@ -295,13 +296,29 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
         videoRef.current.play().catch(() => {});
       }
     }
+
     // Toggle Spotify preview audio
-    if (audio) {
-      if (next) {
-        audio.play().then(() => setAutoplayBlocked(false)).catch(() => setAutoplayBlocked(true));
-      } else {
-        audio.pause();
+    if (next) {
+      if (audio) {
+        audio
+          .play()
+          .then(() => setAutoplayBlocked(false))
+          .catch(() => setAutoplayBlocked(true));
+      } else if (currentMoment?.spotify_track_preview_url) {
+        const a = new Audio(currentMoment.spotify_track_preview_url);
+        a.preload = 'auto';
+        a.volume = 0.7;
+        try {
+          a.currentTime = currentMoment.spotify_audio_start_time || 0;
+        } catch {}
+        a
+          .play()
+          .then(() => setAutoplayBlocked(false))
+          .catch(() => setAutoplayBlocked(true));
+        setAudio(a);
       }
+    } else {
+      if (audio) audio.pause();
     }
   };
 
@@ -487,7 +504,25 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               className="absolute inset-0 z-30 flex items-center justify-center bg-black/30"
               onClick={() => {
                 setIsSoundOn(true);
-                if (audio) audio.play().catch(() => {});
+                // Ensure we start the audio on this user gesture
+                if (!audio && currentMoment.spotify_track_preview_url) {
+                  const a = new Audio(currentMoment.spotify_track_preview_url);
+                  a.preload = 'auto';
+                  a.volume = 0.7;
+                  try {
+                    a.currentTime = currentMoment.spotify_audio_start_time || 0;
+                  } catch {}
+                  a.play()
+                    .then(() => setAutoplayBlocked(false))
+                    .catch((e) => {
+                      console.error('Overlay audio play failed:', e);
+                      toast.error('Unable to play audio');
+                      setAutoplayBlocked(true);
+                    });
+                  setAudio(a);
+                } else if (audio) {
+                  audio.play().catch(() => {});
+                }
                 if (currentMoment.media_type === 'video' && videoRef.current) {
                   videoRef.current.muted = false;
                   videoRef.current.play().catch(() => {});
