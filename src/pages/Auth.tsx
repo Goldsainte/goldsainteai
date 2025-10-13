@@ -27,13 +27,13 @@ const Auth = () => {
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) {
+    if (user && !isLoading) {
       // Prefer returning to the page that triggered login
       const params = new URLSearchParams(window.location.search);
       const returnTo = params.get('returnTo');
@@ -44,21 +44,27 @@ const Auth = () => {
 
       // Check if user has AI agent profile
       const checkAIAgent = async () => {
-        const { data } = await supabase
-          .from('ai_agent_profiles')
-          .select('id')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        
-        if (data) {
+        try {
+          const { data } = await supabase
+            .from('ai_agent_profiles')
+            .select('id')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
+          if (data) {
+            navigate('/', { replace: true });
+          } else {
+            navigate('/ai-agent-setup', { replace: true });
+          }
+        } catch (error) {
+          console.error('Error checking AI agent profile:', error);
+          // Default to home page if check fails
           navigate('/', { replace: true });
-        } else {
-          navigate('/ai-agent-setup', { replace: true });
         }
       };
       checkAIAgent();
     }
-  }, [user, navigate]);
+  }, [user, isLoading, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,9 +78,9 @@ const Auth = () => {
         description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
+    // Keep loading state true on success - redirect will happen via useEffect
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -133,6 +139,18 @@ const Auth = () => {
     
     setIsLoading(false);
   };
+
+  // Show loading state while auth is processing or redirecting
+  if (authLoading || (user && isLoading)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-4">
