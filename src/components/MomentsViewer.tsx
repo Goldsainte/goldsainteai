@@ -79,11 +79,17 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const [saving, setSaving] = useState(false);
   const [creatingVault, setCreatingVault] = useState(false);
   const [newVaultTitle, setNewVaultTitle] = useState("");
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (open && userId) {
       fetchMoments();
       fetchHighlights();
+    } else if (!open && audio) {
+      // Clean up audio when dialog closes
+      audio.pause();
+      audio.currentTime = 0;
+      setAudio(null);
     }
   }, [open, userId]);
 
@@ -130,6 +136,40 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
     return () => clearInterval(timer);
   }, [currentIndex, moments, saveDialogOpen, onOpenChange]);
+
+  // Handle Spotify audio playback
+  useEffect(() => {
+    if (moments.length === 0) return;
+
+    const currentMoment = moments[currentIndex];
+    if (!currentMoment) return;
+
+    // Clean up previous audio
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+
+    // Play new audio if available
+    if (currentMoment.spotify_track_preview_url) {
+      const newAudio = new Audio(currentMoment.spotify_track_preview_url);
+      newAudio.volume = 0.5; // Set volume to 50%
+      newAudio.loop = true; // Loop the preview
+      newAudio.play().catch((error) => {
+        console.error("Error playing audio:", error);
+      });
+      setAudio(newAudio);
+    } else {
+      setAudio(null);
+    }
+
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    };
+  }, [currentIndex, moments]);
 
   const fetchMoments = async () => {
     try {
