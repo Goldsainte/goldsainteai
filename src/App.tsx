@@ -77,40 +77,14 @@ function AppContent() {
 
   // Check if welcome modal should show (with URL overrides)
   useEffect(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const forceWelcome = params.get('welcome') === '1';
-      const forceTour = params.get('tour') === '1';
-
-      const dismissed = localStorage.getItem('welcomeDismissed') === 'true';
-      const hasSeenTour = localStorage.getItem('hasSeenOnboardingTour') === 'true';
-
-      console.debug('[WelcomeModal] params', { forceWelcome, forceTour });
-      console.debug('[WelcomeModal] storage', { dismissed, hasSeenTour });
-
-      // Only show welcome if user hasn't dismissed it yet
-      const shouldShow = forceWelcome || !dismissed;
-      console.debug('[WelcomeModal] shouldShow', shouldShow);
-      setShowWelcomeModal(shouldShow);
-
-      // Allow forcing the tour to start via query param (useful for incognito/debug)
-      if (forceTour) {
-        try {
-          localStorage.removeItem('hasSeenOnboardingTour');
-        } catch {}
-        window.dispatchEvent(new Event('welcomeDismissed'));
-      }
-    } catch {
-      setShowWelcomeModal(true);
-    }
+    // Always show welcome modal on every visit
+    setShowWelcomeModal(true);
   }, []);
 
   const handleCloseWelcome = () => {
     setShowWelcomeModal(false);
-    try { 
-      localStorage.setItem('welcomeDismissed', 'true');
-      window.dispatchEvent(new Event('welcomeDismissed'));
-    } catch {}
+    // Don't save to localStorage - let tour start immediately
+    window.dispatchEvent(new Event('welcomeDismissed'));
   };
   
   // Don't show header on these pages as they have their own custom headers

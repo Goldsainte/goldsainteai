@@ -5,18 +5,10 @@ export const OnboardingTour = () => {
   const [run, setRun] = useState(false);
 
   useEffect(() => {
-    const hasSeenTour = localStorage.getItem("hasSeenOnboardingTour") === "true";
-    const welcomeDismissed = localStorage.getItem("welcomeDismissed") === "true";
-
+    // Start tour immediately after welcome modal is dismissed
     const startTour = () => {
-      if (!hasSeenTour) {
-        setTimeout(() => setRun(true), 800);
-      }
+      setTimeout(() => setRun(true), 800);
     };
-
-    if (!hasSeenTour && welcomeDismissed) {
-      startTour();
-    }
 
     const handleWelcomeDismissed = () => startTour();
     window.addEventListener("welcomeDismissed", handleWelcomeDismissed);
@@ -93,7 +85,7 @@ export const OnboardingTour = () => {
 
     if (finishedStatuses.includes(status)) {
       setRun(false);
-      localStorage.setItem("hasSeenOnboardingTour", "true");
+      // Don't save to localStorage so tour always runs after welcome modal
     }
   };
 
