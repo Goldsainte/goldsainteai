@@ -1097,24 +1097,20 @@ const Index = () => {
                   {/* Left: Text Content */}
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary">
-                        Create.
-                      </h2>
-                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-secondary">
-                        Share.
-                      </h2>
-                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground">
-                        Make Money.
+                      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">
+                        Create. Share. Make Money.
                       </h2>
                     </div>
-                     <div className="space-y-4 max-w-xl">
-                      <h3 className="text-2xl font-bold text-foreground">Join the Ultimate Travel Community</h3>
-                      <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                        Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages. Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.
-                      </p>
-                      <p className="text-lg sm:text-xl text-muted-foreground leading-relaxed">
-                        Collaborate with top brands, access powerful creator tools, and inspire a global community of explorers. Whether you're a seasoned influencer or just getting started, this is where your travel story becomes your business.
-                      </p>
+                     <div className="space-y-2 sm:space-y-3 max-w-[1008px]">
+                      <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground">Join the Ultimate Travel Community</h3>
+                      <div className="text-sm sm:text-base md:text-lg text-muted-foreground leading-relaxed space-y-4">
+                        <p>
+                          Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages. Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.
+                        </p>
+                        <p>
+                          Collaborate with top brands, access powerful creator tools, and inspire a global community of explorers. Whether you're a seasoned influencer or just getting started, this is where your travel story becomes your business.
+                        </p>
+                      </div>
                     </div>
                   </div>
 
