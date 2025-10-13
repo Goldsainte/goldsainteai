@@ -1121,26 +1121,26 @@ const Index = () => {
 
                   {/* Right: Photo Grid */}
                   <div className="relative h-[500px] sm:h-[600px]">
-                    <div className="absolute top-0 right-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property1} alt="Luxury travel" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute top-[15%] left-0 w-[52%] h-[40%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute top-[20%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property2} alt="Travel destination" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute top-[38%] right-[8%] w-[48%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl z-20">
+                      <img src={creatorYachtParty} alt="Creator lifestyle" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property3} alt="Adventure" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute top-[30%] left-[10%] w-[38%] h-[30%] rounded-2xl overflow-hidden shadow-xl z-10">
+                    <div className="absolute top-[40%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-10">
                       <img src={creatorBeachSelfie} alt="Creator content" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute bottom-0 left-[5%] w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property4} alt="Luxury dining" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute bottom-[8%] right-0 w-[45%] h-[42%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-0 right-0 w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property5} alt="Coastal view" className="w-full h-full object-cover" />
-                    </div>
-                    <div className="absolute top-[5%] left-[20%] w-[35%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-20">
-                      <img src={creatorYachtParty} alt="Creator lifestyle" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
