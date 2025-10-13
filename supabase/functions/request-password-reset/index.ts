@@ -233,7 +233,7 @@ const handler = async (req: Request): Promise<Response> => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Goldsainte Security <security@goldsainte.com>",
+        from: "Goldsainte Security <security@goldsainte.ai>",
         to: [email],
         subject: "Reset Your Goldsainte Password",
         html: emailHtml,
