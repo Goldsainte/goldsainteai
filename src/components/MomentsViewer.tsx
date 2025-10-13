@@ -320,18 +320,20 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 {new Date(currentMoment.created_at).toLocaleString()}
               </span>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSaveDialogOpen(true)}
-                className="text-white bg-white/10 hover:bg-white/20 px-3"
-                title="Save to Vault"
-              >
-                <Archive className="w-5 h-5" />
-                <span className="ml-2 text-sm">Save</span>
-              </Button>
-            </div>
+          </div>
+
+          {/* Save Button - Bottom Right */}
+          <div className="absolute bottom-20 right-4 z-20">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSaveDialogOpen(true)}
+              className="text-white bg-white/10 hover:bg-white/20 px-3"
+              title="Save to Vault"
+            >
+              <Archive className="w-5 h-5" />
+              <span className="ml-2 text-sm">Save</span>
+            </Button>
           </div>
 
           {/* Media */}
