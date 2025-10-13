@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Canvas as FabricCanvas } from "fabric";
+import { Canvas as FabricCanvas, Shadow } from "fabric";
 import { Button } from "@/components/ui/button";
 import { Pen, Eraser, Palette, Minus, Plus } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -54,13 +54,9 @@ export const MomentDrawingCanvas = ({
     // Enable drawing mode to initialize the brush
     canvas.isDrawingMode = true;
 
-    // Wait for next tick to ensure brush is initialized
-    setTimeout(() => {
-      if (canvas.freeDrawingBrush) {
-        canvas.freeDrawingBrush.color = brushColor;
-        canvas.freeDrawingBrush.width = brushSize;
-      }
-    }, 0);
+    // Initialize the freeDrawingBrush immediately after enabling drawing mode
+    canvas.freeDrawingBrush.color = brushColor;
+    canvas.freeDrawingBrush.width = brushSize;
 
     // Load initial drawing if provided
     if (initialDrawing) {
@@ -122,14 +118,19 @@ export const MomentDrawingCanvas = ({
     // Enable drawing for draw and erase modes
     fabricCanvas.isDrawingMode = activeTool === "draw" || activeTool === "erase";
 
-    const brush = fabricCanvas.freeDrawingBrush as any;
-    if (!brush) return;
+    // Ensure brush exists
+    if (!fabricCanvas.freeDrawingBrush) {
+      console.error("Free drawing brush not initialized");
+      return;
+    }
+
+    const brush = fabricCanvas.freeDrawingBrush;
 
     // Reset shadow by default
     brush.shadow = undefined;
 
     if (activeTool === "erase") {
-      brush.color = "#000000"; // color doesn't matter for destination-out
+      brush.color = "#000000";
       brush.width = brushSize;
       return;
     }
@@ -146,12 +147,12 @@ export const MomentDrawingCanvas = ({
       case "neon":
         brush.color = brushColor;
         brush.width = brushSize;
-        brush.shadow = {
+        brush.shadow = new Shadow({
           blur: 10,
           color: brushColor,
           offsetX: 0,
           offsetY: 0,
-        };
+        });
         break;
     }
   }, [activeTool, brushType, brushColor, brushSize, fabricCanvas]);
