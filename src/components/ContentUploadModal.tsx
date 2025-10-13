@@ -373,7 +373,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
 
     setUploading(true);
     try {
-      const { error } = await supabase.from("travel_posts").insert([{
+      const { data: postData, error } = await supabase.from("travel_posts").insert([{
         user_id: user.id,
         caption,
         location: location || null,
@@ -381,9 +381,29 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         embed_platform: platform,
         original_creator: originalCreator || null,
         status: 'active',
-      }]);
+      }]).select().single();
 
       if (error) throw error;
+
+      // Check if auto-share to Instagram is enabled
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('auto_share_instagram, instagram_username')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.auto_share_instagram && profile?.instagram_username && postData?.image_urls?.[0]) {
+        // Auto-share to Instagram
+        await supabase.functions.invoke('instagram-post', {
+          body: { 
+            imageUrl: postData.image_urls[0],
+            caption: caption || ''
+          }
+        }).catch(err => {
+          console.error('Instagram auto-share failed:', err);
+          toast.error('Posted, but Instagram share failed');
+        });
+      }
 
       toast.success('Embed posted successfully!');
 
@@ -926,15 +946,35 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                     if (!selectedGifUrl || !user) return;
                     setUploading(true);
                     try {
-                      const { error } = await supabase.from("travel_posts").insert([{
+                      const { data: postData, error } = await supabase.from("travel_posts").insert([{
                         user_id: user.id,
                         image_urls: [selectedGifUrl],
                         media_type: 'gif',
                         caption: caption || null,
                         location: location || null,
                         status: 'active',
-                      }]);
+                      }]).select().single();
                       if (error) throw error;
+
+                      // Check if auto-share to Instagram is enabled
+                      const { data: profile } = await supabase
+                        .from('profiles')
+                        .select('auto_share_instagram, instagram_username')
+                        .eq('id', user.id)
+                        .single();
+
+                      if (profile?.auto_share_instagram && profile?.instagram_username) {
+                        await supabase.functions.invoke('instagram-post', {
+                          body: { 
+                            imageUrl: selectedGifUrl,
+                            caption: caption || ''
+                          }
+                        }).catch(err => {
+                          console.error('Instagram auto-share failed:', err);
+                          toast.error('Posted, but Instagram share failed');
+                        });
+                      }
+
                       toast.success('GIF posted!');
                       setSelectedGifUrl(null);
                       setCaption("");
@@ -998,15 +1038,19 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                         .from('travel-videos')
                         .getPublicUrl(fileName);
 
-                      const { error } = await supabase.from("travel_posts").insert([{
+                      const { data: postData, error } = await supabase.from("travel_posts").insert([{
                         user_id: user.id,
                         video_url: publicUrl,
                         media_type: 'boomerang',
                         caption: caption || null,
                         location: location || null,
                         status: 'active',
-                      }]);
+                      }]).select().single();
                       if (error) throw error;
+
+                      // Note: Instagram API doesn't support video posts via auto-share for Basic Display API
+                      // This would require Instagram Content Publishing API with additional permissions
+                      
                       toast.success('Boomerang posted!');
                       setBoomerangVideo(null);
                       setCaption("");
