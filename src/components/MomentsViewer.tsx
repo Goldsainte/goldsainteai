@@ -148,42 +148,43 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     // Clean up previous audio
     if (audio) {
       audio.pause();
-      audio.currentTime = 0;
+      audio.src = '';
     }
 
     // Play new audio if available
     if (currentMoment.spotify_track_preview_url) {
       const newAudio = new Audio(currentMoment.spotify_track_preview_url);
-      newAudio.currentTime = currentMoment.spotify_audio_start_time || 0; // Start from selected time
-      newAudio.volume = 0.5; // Set volume to 50%
+      newAudio.volume = 0.5;
       
-      // Stop after 30 seconds from start time
-      const stopTimeout = setTimeout(() => {
-        newAudio.pause();
-      }, 30000);
-      
-      newAudio.play().catch((error) => {
-        console.error("Error playing audio:", error);
+      let stopTimeout: NodeJS.Timeout;
+
+      // Wait for audio to load before setting start time
+      newAudio.addEventListener('loadedmetadata', () => {
+        const startTime = currentMoment.spotify_audio_start_time || 0;
+        newAudio.currentTime = startTime;
+        
+        // Stop after 30 seconds
+        stopTimeout = setTimeout(() => {
+          newAudio.pause();
+        }, 30000);
       });
+      
+      // Try to play - will fail if browser blocks autoplay
+      newAudio.play().catch((error) => {
+        console.error("Audio autoplay blocked:", error);
+        toast.error("Click anywhere to play audio");
+      });
+      
       setAudio(newAudio);
 
       return () => {
-        clearTimeout(stopTimeout);
-        if (newAudio) {
-          newAudio.pause();
-          newAudio.currentTime = 0;
-        }
+        if (stopTimeout) clearTimeout(stopTimeout);
+        newAudio.pause();
+        newAudio.src = '';
       };
     } else {
       setAudio(null);
     }
-
-    return () => {
-      if (audio) {
-        audio.pause();
-        audio.currentTime = 0;
-      }
-    };
   }, [currentIndex, moments]);
 
   const fetchMoments = async () => {
