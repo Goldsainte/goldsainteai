@@ -5,7 +5,9 @@ import { Slider } from '@/components/ui/slider';
 import { Progress } from '@/components/ui/progress';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Check, X, Eye, EyeOff } from 'lucide-react';
+import { Check, X, Eye, EyeOff, Plus, Users } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 interface InteractionData {
   type: 'poll' | 'question' | 'quiz' | 'countdown' | 'slider' | 'add_yours';
@@ -34,9 +36,20 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
     userResponse?.value || (interaction.data?.min && interaction.data?.max ? Math.round((interaction.data.min + interaction.data.max) / 2) : 50)
   );
 
+  // State for add_yours type
+  const [showAddYoursDialog, setShowAddYoursDialog] = useState(false);
+  const [showAddYoursResponses, setShowAddYoursResponses] = useState(false);
+  const [addYoursResponses, setAddYoursResponses] = useState<any[]>([]);
+  const [uploadingAddYours, setUploadingAddYours] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
   useEffect(() => {
     fetchUserResponse();
     fetchResponseStats();
+    if (interaction.type === 'add_yours') {
+      fetchAddYoursResponses();
+    }
   }, [momentId, interaction.type]);
 
   const fetchUserResponse = async () => {
@@ -341,20 +354,222 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
     );
   }
 
+  const fetchAddYoursResponses = async () => {
+    try {
+      const { data } = await supabase
+        .from('moment_interaction_responses')
+        .select(`
+          response_data,
+          created_at,
+          profiles:user_id (
+            id,
+            username,
+            avatar_url
+          )
+        `)
+        .eq('moment_id', momentId)
+        .eq('interaction_type', 'add_yours')
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (data) {
+        setAddYoursResponses(data);
+      }
+    } catch (error) {
+      console.error('Error fetching add yours responses:', error);
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+      toast.error('Please select an image or video file');
+      return;
+    }
+
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleAddYoursSubmit = async () => {
+    if (!selectedFile) {
+      toast.error('Please select a file');
+      return;
+    }
+
+    setUploadingAddYours(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      // Upload file to storage
+      const fileExt = selectedFile.name.split('.').pop();
+      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const filePath = `add-yours/${fileName}`;
+
+      const { error: uploadError, data: uploadData } = await supabase.storage
+        .from('moments')
+        .upload(filePath, selectedFile);
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('moments')
+        .getPublicUrl(filePath);
+
+      // Submit response
+      await submitResponse({
+        mediaUrl: publicUrl,
+        mediaType: selectedFile.type.startsWith('image/') ? 'image' : 'video',
+      });
+
+      setShowAddYoursDialog(false);
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      await fetchAddYoursResponses();
+      toast.success('Your response has been shared!');
+    } catch (error) {
+      console.error('Error uploading:', error);
+      toast.error('Failed to share response');
+    } finally {
+      setUploadingAddYours(false);
+    }
+  };
+
   if (interaction.type === 'add_yours') {
+    const responseCount = addYoursResponses.length;
+    
     return (
-      <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4">
-        <div className="flex items-center justify-between">
-          <p className="text-white font-medium">{interaction.data.prompt}</p>
-          <Button
-            size="sm"
-            onClick={() => toast.info('Add Yours feature coming soon!')}
-            className="bg-primary hover:bg-primary/90"
-          >
-            Add Yours
-          </Button>
+      <>
+        <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4">
+          <div className="space-y-3">
+            <p className="text-white font-medium">{interaction.data.prompt}</p>
+            <div className="flex gap-2">
+              {!userResponse ? (
+                <Button
+                  size="sm"
+                  onClick={() => setShowAddYoursDialog(true)}
+                  className="flex-1 bg-primary hover:bg-primary/90"
+                  disabled={loading}
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Yours
+                </Button>
+              ) : (
+                <div className="flex-1 bg-white/20 rounded-lg p-2 text-white text-sm text-center">
+                  ✓ You've shared your response
+                </div>
+              )}
+              {responseCount > 0 && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setShowAddYoursResponses(true)}
+                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                >
+                  <Users className="w-4 h-4 mr-1" />
+                  {responseCount}
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Add Yours Upload Dialog */}
+        <Dialog open={showAddYoursDialog} onOpenChange={setShowAddYoursDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add Your Response</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Upload Photo or Video</Label>
+                <Input
+                  type="file"
+                  accept="image/*,video/*"
+                  onChange={handleFileSelect}
+                  disabled={uploadingAddYours}
+                />
+              </div>
+              
+              {previewUrl && (
+                <div className="rounded-lg overflow-hidden bg-muted">
+                  {selectedFile?.type.startsWith('image/') ? (
+                    <img src={previewUrl} alt="Preview" className="w-full h-auto" />
+                  ) : (
+                    <video src={previewUrl} className="w-full h-auto" controls />
+                  )}
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddYoursDialog(false);
+                    setSelectedFile(null);
+                    setPreviewUrl(null);
+                  }}
+                  className="flex-1"
+                  disabled={uploadingAddYours}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleAddYoursSubmit}
+                  className="flex-1"
+                  disabled={!selectedFile || uploadingAddYours}
+                >
+                  {uploadingAddYours ? 'Sharing...' : 'Share'}
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* View Responses Dialog */}
+        <Dialog open={showAddYoursResponses} onOpenChange={setShowAddYoursResponses}>
+          <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Responses ({responseCount})</DialogTitle>
+            </DialogHeader>
+            <div className="grid grid-cols-2 gap-4">
+              {addYoursResponses.map((response: any, index: number) => (
+                <div key={index} className="space-y-2">
+                  <div className="rounded-lg overflow-hidden bg-muted aspect-square">
+                    {response.response_data.mediaType === 'image' ? (
+                      <img
+                        src={response.response_data.mediaUrl}
+                        alt="Response"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={response.response_data.mediaUrl}
+                        className="w-full h-full object-cover"
+                        controls
+                      />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={response.profiles?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${response.profiles?.id}`}
+                      alt={response.profiles?.username}
+                      className="w-6 h-6 rounded-full"
+                    />
+                    <span className="text-sm font-medium">
+                      @{response.profiles?.username}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
