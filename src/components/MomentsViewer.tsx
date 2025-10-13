@@ -307,7 +307,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   const handleDeleteMoment = async () => {
     if (!currentUserId || currentUserId !== currentMoment.user_id) return;
-    const confirmDel = window.confirm('Delete this story? This cannot be undone.');
+    const confirmDel = window.confirm('Delete this story?');
     if (!confirmDel) return;
     try {
       const { error } = await supabase.from('moments').delete().eq('id', currentMoment.id);
