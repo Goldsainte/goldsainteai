@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_restrictions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean | null
+          lifted_at: string | null
+          lifted_by: string | null
+          reason: string
+          restricted_until: string
+          restriction_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          lifted_at?: string | null
+          lifted_by?: string | null
+          reason: string
+          restricted_until: string
+          restriction_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean | null
+          lifted_at?: string | null
+          lifted_by?: string | null
+          reason?: string
+          restricted_until?: string
+          restriction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       activity_logs: {
         Row: {
           action: string
@@ -1990,6 +2029,36 @@ export type Database = {
           relationship?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      engagement_rate_limits: {
+        Row: {
+          action_count: number
+          action_type: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          action_count?: number
+          action_type: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          action_count?: number
+          action_type?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+          window_start?: string
         }
         Relationships: []
       }
@@ -4318,6 +4387,7 @@ export type Database = {
           comment_text: string
           created_at: string | null
           id: string
+          ip_address: string | null
           post_id: string
           user_id: string
         }
@@ -4325,6 +4395,7 @@ export type Database = {
           comment_text: string
           created_at?: string | null
           id?: string
+          ip_address?: string | null
           post_id: string
           user_id: string
         }
@@ -4332,6 +4403,7 @@ export type Database = {
           comment_text?: string
           created_at?: string | null
           id?: string
+          ip_address?: string | null
           post_id?: string
           user_id?: string
         }
@@ -4385,18 +4457,21 @@ export type Database = {
         Row: {
           created_at: string | null
           id: string
+          ip_address: string | null
           post_id: string
           user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: string
+          ip_address?: string | null
           post_id: string
           user_id: string
         }
         Update: {
           created_at?: string | null
           id?: string
+          ip_address?: string | null
           post_id?: string
           user_id?: string
         }
@@ -5647,6 +5722,54 @@ export type Database = {
           verified_at?: string | null
           verified_by?: string | null
           website?: string | null
+        }
+        Relationships: []
+      }
+      suspicious_activity_logs: {
+        Row: {
+          action_taken: string | null
+          activity_type: string
+          created_at: string
+          details: Json
+          flagged_at: string
+          id: string
+          ip_address: string | null
+          reviewed: boolean | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_taken?: string | null
+          activity_type: string
+          created_at?: string
+          details?: Json
+          flagged_at?: string
+          id?: string
+          ip_address?: string | null
+          reviewed?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_taken?: string | null
+          activity_type?: string
+          created_at?: string
+          details?: Json
+          flagged_at?: string
+          id?: string
+          ip_address?: string | null
+          reviewed?: boolean | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -6992,18 +7115,51 @@ export type Database = {
           follower_id: string
           following_id: string
           id: string
+          ip_address: string | null
         }
         Insert: {
           created_at?: string | null
           follower_id: string
           following_id: string
           id?: string
+          ip_address?: string | null
         }
         Update: {
           created_at?: string | null
           follower_id?: string
           following_id?: string
           id?: string
+          ip_address?: string | null
+        }
+        Relationships: []
+      }
+      user_ip_tracking: {
+        Row: {
+          action_count: number | null
+          created_at: string
+          first_seen: string
+          id: string
+          ip_address: string
+          last_seen: string
+          user_id: string
+        }
+        Insert: {
+          action_count?: number | null
+          created_at?: string
+          first_seen?: string
+          id?: string
+          ip_address: string
+          last_seen?: string
+          user_id: string
+        }
+        Update: {
+          action_count?: number | null
+          created_at?: string
+          first_seen?: string
+          id?: string
+          ip_address?: string
+          last_seen?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -7410,13 +7566,29 @@ export type Database = {
         Args: { supplier_uuid: string }
         Returns: number
       }
+      can_perform_engagement: {
+        Args: {
+          p_action_type: string
+          p_ip_address?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       check_creator_eligibility: {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      cleanup_old_rate_limits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       convert_currency: {
         Args: { amount: number; from_curr: string; to_curr: string }
         Returns: number
+      }
+      detect_bot_pattern: {
+        Args: { p_user_id: string }
+        Returns: boolean
       }
       evaluate_agent_badges: {
         Args: { target_agent_id: string }
@@ -7474,6 +7646,15 @@ export type Database = {
       purchase_template_usage: {
         Args: { p_template_id: string; p_user_creator_id: string }
         Returns: Json
+      }
+      record_engagement_action: {
+        Args: {
+          p_action_type: string
+          p_ip_address?: string
+          p_user_agent?: string
+          p_user_id: string
+        }
+        Returns: undefined
       }
       search_marketplace_jobs: {
         Args: {
