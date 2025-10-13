@@ -46,7 +46,6 @@ interface TravelVideoCardProps {
     comment_count: number;
     share_count?: number;
     is_featured?: boolean;
-    is_suggested?: boolean;
     spotify_track_id?: string;
     spotify_track_name?: string;
     spotify_track_artist?: string;
@@ -1084,11 +1083,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     <MapPin className="h-3.5 w-3.5" />
                     {post.location}
                   </div>
-                )}
-                {post.is_suggested && (
-                  <p className="text-xs text-white/80 drop-shadow-md font-medium">
-                    Suggested for you
-                  </p>
                 )}
               </div>
             </div>
