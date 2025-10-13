@@ -81,6 +81,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const [creatingVault, setCreatingVault] = useState(false);
   const [newVaultTitle, setNewVaultTitle] = useState("");
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   useEffect(() => {
     if (open && userId) {
@@ -172,7 +173,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
       // Try to play - will fail if browser blocks autoplay
       newAudio.play().catch((error) => {
         console.error("Audio autoplay blocked:", error);
-        toast.error("Click anywhere to play audio");
+        setAutoplayBlocked(true);
       });
       
       setAudio(newAudio);
@@ -399,6 +400,25 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           </div>
 
           {/* Media */}
+
+          {autoplayBlocked && currentMoment.spotify_track_preview_url && (
+            <div className="absolute inset-0 z-30 flex items-start justify-center pt-24">
+              <button
+                onClick={() => {
+                  if (audio) {
+                    audio.play()
+                      .then(() => setAutoplayBlocked(false))
+                      .catch(() => toast.error("Unable to play audio"));
+                  }
+                }}
+                className="bg-black/60 text-white text-sm px-3 py-1.5 rounded-full backdrop-blur border border-white/20"
+                aria-label="Tap to play sound"
+              >
+                Tap for sound
+              </button>
+            </div>
+          )}
+
           <div className="w-full h-full flex items-center justify-center">
             {currentMoment.media_type === 'text' ? (
               <div 
