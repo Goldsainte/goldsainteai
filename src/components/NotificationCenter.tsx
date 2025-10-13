@@ -175,32 +175,20 @@ export const NotificationCenter = () => {
   return (
     <TooltipProvider>
       <Sheet>
-        <Tooltip>
-          <SheetTrigger asChild>
-            <TooltipTrigger asChild>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="relative group"
-                aria-label="Notifications"
-                title="Notifications"
+        <SheetTrigger asChild>
+          <button className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted/50 transition-colors font-normal w-full text-left relative">
+            <Bell className="h-6 w-6" />
+            <span className="text-base">Notifications</span>
+            {unreadCount > 0 && (
+              <Badge
+                variant="destructive"
+                className="absolute right-3 h-5 w-5 p-0 flex items-center justify-center text-xs"
               >
-                <Bell className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
-                {unreadCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-xs"
-                  >
-                    {unreadCount > 9 ? "9+" : unreadCount}
-                  </Badge>
-                )}
-              </Button>
-            </TooltipTrigger>
-          </SheetTrigger>
-          <TooltipContent>
-            <p>Notifications</p>
-          </TooltipContent>
-        </Tooltip>
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </Badge>
+            )}
+          </button>
+        </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md">
         <SheetHeader className="flex flex-row items-center justify-between">
           <SheetTitle>Notifications</SheetTitle>
