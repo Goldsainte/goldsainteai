@@ -114,16 +114,16 @@ function AppContent() {
   };
   
   // Don't show header on these pages as they have their own custom headers
-  const hideHeaderPages = ['/auth', '/travel-feed', '/travel-profile', '/travel-settings'];
-  const showHeader = location.pathname !== '/' && !hideHeaderPages.some(page => location.pathname.startsWith(page));
+  const hideHeaderPages = ['/', '/auth', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings'];
+  const showHeader = !hideHeaderPages.some(page => location.pathname === page || location.pathname.startsWith(page));
 
   // Don't show AI Booking Concierge on Horizon pages
-  const hideAIBookingPages = ['/travel-feed', '/travel-profile', '/travel-settings', '/search', '/trending'];
-  const showAIBooking = location.pathname !== '/' && !hideAIBookingPages.some(page => location.pathname.startsWith(page));
+  const hideAIBookingPages = ['/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/search', '/trending'];
+  const showAIBooking = !hideAIBookingPages.some(page => location.pathname === page || location.pathname.startsWith(page));
 
   // Hide Lovable badge on Journeys feed
   useEffect(() => {
-    const isJourneysPage = location.pathname === '/' || location.pathname === '/travel-feed';
+    const isJourneysPage = location.pathname === '/travel-feed' || location.pathname === '/journeys';
     const badge = document.querySelector('.lovable-badge, [data-lovable-badge], iframe[src*="lovable"]');
     if (badge instanceof HTMLElement) {
       badge.style.display = isJourneysPage ? 'none' : 'block';
@@ -138,8 +138,9 @@ function AppContent() {
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Routes>
-          <Route path="/" element={<TravelFeed />} />
-          <Route path="/home" element={<Index />} />
+          <Route path="/" element={<Index />} />
+          <Route path="/travel-feed" element={<TravelFeed />} />
+          <Route path="/journeys" element={<TravelFeed />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/onboarding" element={<Onboarding />} />
           <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
