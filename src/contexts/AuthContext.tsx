@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const inactivityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const INACTIVITY_LIMIT = 60 * 60 * 1000; // 1 hour in milliseconds
 
   useEffect(() => {
     // Set up auth state listener first
@@ -58,6 +60,45 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Auto sign-out after inactivity
+  useEffect(() => {
+    if (!user) return;
+
+    const resetInactivityTimer = () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+
+      inactivityTimeoutRef.current = setTimeout(() => {
+        signOut();
+        toast({
+          title: "Signed out due to inactivity",
+          description: "You've been signed out after 1 hour of inactivity.",
+          variant: "destructive",
+        });
+      }, INACTIVITY_LIMIT);
+    };
+
+    // Activity events to track
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    
+    events.forEach(event => {
+      window.addEventListener(event, resetInactivityTimer);
+    });
+
+    // Initial timer setup
+    resetInactivityTimer();
+
+    return () => {
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+      events.forEach(event => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+    };
+  }, [user, INACTIVITY_LIMIT]);
 
   const signIn = async (email: string, password: string) => {
     try {
