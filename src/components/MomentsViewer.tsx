@@ -43,6 +43,7 @@ interface Moment {
   spotify_track_artist?: string | null;
   spotify_track_preview_url?: string | null;
   spotify_track_album_art?: string | null;
+  spotify_audio_start_time?: number | null;
   text_styling?: {
     font: string;
     animation: string;
@@ -153,12 +154,26 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     // Play new audio if available
     if (currentMoment.spotify_track_preview_url) {
       const newAudio = new Audio(currentMoment.spotify_track_preview_url);
+      newAudio.currentTime = currentMoment.spotify_audio_start_time || 0; // Start from selected time
       newAudio.volume = 0.5; // Set volume to 50%
-      newAudio.loop = true; // Loop the preview
+      
+      // Stop after 30 seconds from start time
+      const stopTimeout = setTimeout(() => {
+        newAudio.pause();
+      }, 30000);
+      
       newAudio.play().catch((error) => {
         console.error("Error playing audio:", error);
       });
       setAudio(newAudio);
+
+      return () => {
+        clearTimeout(stopTimeout);
+        if (newAudio) {
+          newAudio.pause();
+          newAudio.currentTime = 0;
+        }
+      };
     } else {
       setAudio(null);
     }
@@ -175,7 +190,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     try {
       const { data, error } = await supabase
     .from('moments')
-    .select('*, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art')
+    .select('*, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art, spotify_audio_start_time')
     .eq('user_id', userId)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false });

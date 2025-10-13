@@ -28,6 +28,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
   const [showInteractionCreator, setShowInteractionCreator] = useState(false);
   const [interaction, setInteraction] = useState<any>(null);
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
+  const [audioStartTime, setAudioStartTime] = useState(0);
   
   // Text styling options
   const [textContent, setTextContent] = useState("");
@@ -149,6 +150,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             spotify_track_artist: selectedTrack.artist,
             spotify_track_preview_url: selectedTrack.previewUrl,
             spotify_track_album_art: selectedTrack.albumArt,
+            spotify_audio_start_time: audioStartTime,
           }),
         });
 
@@ -316,7 +318,10 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
             <SpotifyTrackSelector
               selectedTrack={selectedTrack}
-              onSelectTrack={setSelectedTrack}
+              onSelectTrack={(track, startTime) => {
+                setSelectedTrack(track);
+                setAudioStartTime(startTime || 0);
+              }}
             />
 
             <div className="space-y-2">

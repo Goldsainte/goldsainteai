@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect } from "react";
-import { Search, Music, X } from "lucide-react";
+import { Search, Music, X, Play, Pause } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -20,7 +21,7 @@ interface SpotifyTrack {
 
 interface SpotifyTrackSelectorProps {
   selectedTrack: SpotifyTrack | null;
-  onSelectTrack: (track: SpotifyTrack | null) => void;
+  onSelectTrack: (track: SpotifyTrack | null, startTime?: number) => void;
   className?: string;
 }
 
@@ -33,6 +34,9 @@ export const SpotifyTrackSelector = ({
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<SpotifyTrack[]>([]);
   const [showResults, setShowResults] = useState(false);
+  const [audioStartTime, setAudioStartTime] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,6 +50,62 @@ export const SpotifyTrackSelector = ({
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      if (audio) {
+        audio.pause();
+        audio.src = '';
+      }
+    };
+  }, [audio]);
+
+  const handlePlayPreview = () => {
+    if (!selectedTrack?.previewUrl) return;
+
+    if (isPlaying && audio) {
+      audio.pause();
+      setIsPlaying(false);
+    } else {
+      const newAudio = new Audio(selectedTrack.previewUrl);
+      newAudio.currentTime = audioStartTime;
+      newAudio.volume = 0.5;
+      
+      newAudio.addEventListener('ended', () => {
+        setIsPlaying(false);
+      });
+
+      newAudio.play();
+      setAudio(newAudio);
+      setIsPlaying(true);
+
+      // Stop after 30 seconds
+      setTimeout(() => {
+        if (newAudio) {
+          newAudio.pause();
+          setIsPlaying(false);
+        }
+      }, 30000);
+    }
+  };
+
+  const handleStartTimeChange = (value: number[]) => {
+    setAudioStartTime(value[0]);
+    onSelectTrack(selectedTrack, value[0]);
+    
+    // Stop current playback if any
+    if (audio) {
+      audio.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const handleSearch = useCallback(async () => {
     if (!searchQuery.trim()) return;
@@ -69,12 +129,20 @@ export const SpotifyTrackSelector = ({
   }, [searchQuery]);
 
   const handleSelectTrack = (track: SpotifyTrack) => {
-    onSelectTrack(track);
+    onSelectTrack(track, 0);
+    setAudioStartTime(0);
     setShowResults(false);
     setSearchQuery("");
   };
 
   const handleRemoveTrack = () => {
+    if (audio) {
+      audio.pause();
+      audio.src = '';
+      setAudio(null);
+    }
+    setIsPlaying(false);
+    setAudioStartTime(0);
     onSelectTrack(null);
   };
 
@@ -86,26 +154,72 @@ export const SpotifyTrackSelector = ({
       </div>
 
       {selectedTrack ? (
-        <div className="flex items-center gap-3 p-3 bg-card/50 border rounded-lg">
-          {selectedTrack.albumArt && (
-            <img
-              src={selectedTrack.albumArt}
-              alt={selectedTrack.name}
-              className="w-12 h-12 rounded object-cover"
-            />
-          )}
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{selectedTrack.name}</p>
-            <p className="text-xs text-muted-foreground truncate">{selectedTrack.artist}</p>
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 p-3 bg-card/50 border rounded-lg">
+            {selectedTrack.albumArt && (
+              <img
+                src={selectedTrack.albumArt}
+                alt={selectedTrack.name}
+                className="w-12 h-12 rounded object-cover"
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium truncate">{selectedTrack.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{selectedTrack.artist}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleRemoveTrack}
+              className="h-8 w-8 shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleRemoveTrack}
-            className="h-8 w-8 shrink-0"
-          >
-            <X className="w-4 h-4" />
-          </Button>
+
+          {selectedTrack.previewUrl && (
+            <div className="space-y-2 p-3 bg-card/30 border rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium">Select 30-second clip</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handlePlayPreview}
+                  className="h-7"
+                >
+                  {isPlaying ? (
+                    <>
+                      <Pause className="w-3 h-3 mr-1" />
+                      <span className="text-xs">Pause</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3 h-3 mr-1" />
+                      <span className="text-xs">Preview</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              <div className="space-y-1">
+                <Slider
+                  value={[audioStartTime]}
+                  onValueChange={handleStartTimeChange}
+                  max={Math.max(0, selectedTrack.duration - 30)}
+                  step={1}
+                  className="w-full"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>{formatTime(audioStartTime)}</span>
+                  <span>{formatTime(audioStartTime + 30)}</span>
+                </div>
+              </div>
+
+              <p className="text-xs text-muted-foreground">
+                Audio will play from {formatTime(audioStartTime)} to {formatTime(audioStartTime + 30)}
+              </p>
+            </div>
+          )}
         </div>
       ) : (
         <div className="relative">

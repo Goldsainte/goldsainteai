@@ -3293,6 +3293,7 @@ export type Database = {
           interactions: Json | null
           media_type: string
           media_url: string | null
+          spotify_audio_start_time: number | null
           spotify_track_album_art: string | null
           spotify_track_artist: string | null
           spotify_track_id: string | null
@@ -3312,6 +3313,7 @@ export type Database = {
           interactions?: Json | null
           media_type: string
           media_url?: string | null
+          spotify_audio_start_time?: number | null
           spotify_track_album_art?: string | null
           spotify_track_artist?: string | null
           spotify_track_id?: string | null
@@ -3331,6 +3333,7 @@ export type Database = {
           interactions?: Json | null
           media_type?: string
           media_url?: string | null
+          spotify_audio_start_time?: number | null
           spotify_track_album_art?: string | null
           spotify_track_artist?: string | null
           spotify_track_id?: string | null
