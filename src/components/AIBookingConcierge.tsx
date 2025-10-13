@@ -495,7 +495,7 @@ export const AIBookingConcierge = () => {
               console.log('[AIBookingConcierge] Button clicked, opening widget');
               setIsOpen(true);
             }}
-            className="fixed bottom-24 md:bottom-6 right-6 z-50 group"
+            className="fixed bottom-24 md:bottom-28 right-6 z-50 group"
             aria-label="Open AI Booking Concierge"
             data-tour="ai-widget"
           >
@@ -520,7 +520,7 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-24 md:bottom-6 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+      className={`fixed bottom-24 md:bottom-28 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
         isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
       } ${isMinimized ? 'h-16' : 'h-[80vh] md:h-[600px] max-h-[80vh] md:max-h-[600px]'}`}
     >
