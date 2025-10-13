@@ -69,6 +69,9 @@ export function FeedSidebar() {
           </NavLink>
         ))}
         
+        {/* Notifications */}
+        {user && <NotificationCenter />}
+        
         {/* Profile with Avatar */}
         <NavLink
           to="/travel-profile"
@@ -86,8 +89,6 @@ export function FeedSidebar() {
           )}
           <span className="text-base">Profile</span>
         </NavLink>
-        
-        {user && <NotificationCenter />}
       </nav>
 
       {/* More Menu at bottom */}
