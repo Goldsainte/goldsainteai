@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import FollowButton from "./FollowButton";
+import { SuggestedUsers } from "./SuggestedUsers";
+import { DraftPostsManager } from "./DraftPostsManager";
 
 interface SuggestedUser {
   id: string;
@@ -149,6 +151,12 @@ export function FeedSuggestions() {
             </div>
           ))}
         </div>
+
+        {/* Draft Posts */}
+        <DraftPostsManager />
+
+        {/* Suggested Users (Extended) */}
+        <SuggestedUsers />
 
       </div>
     </aside>

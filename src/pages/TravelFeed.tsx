@@ -17,6 +17,9 @@ import { MomentsRing } from "@/components/MomentsRing";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { FeedSkeleton } from "@/components/FeedSkeleton";
+import { SuggestedUsers } from "@/components/SuggestedUsers";
+import { DraftPostsManager } from "@/components/DraftPostsManager";
+import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 
 interface TravelPost {
   id: string;
