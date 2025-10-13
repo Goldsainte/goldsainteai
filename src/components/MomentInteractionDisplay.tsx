@@ -182,9 +182,12 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
     return () => clearInterval(interval);
   }, [interaction.type, interaction.data?.endTime]);
 
+  const position = interaction.data?.position || { x: 50, y: 80 };
+  const positionStyle = { left: `${position.x}%`, top: `${position.y}%`, transform: 'translate(-50%, -50%)' };
+
   if (interaction.type === 'poll') {
     return (
-      <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
+      <div className="absolute bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3 max-w-[90%]" style={positionStyle}>
         <p className="text-white font-medium">{interaction.data.question}</p>
         <div className="space-y-2">
           {interaction.data.options.map((option: string) => {
@@ -229,7 +232,7 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
 
   if (interaction.type === 'question') {
     return (
-      <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
+      <div className="absolute bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3 max-w-[90%]" style={positionStyle}>
         <p className="text-white font-medium">{interaction.data.text}</p>
         {!userResponse ? (
           <div className="flex gap-2">
@@ -255,7 +258,7 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
 
   if (interaction.type === 'quiz') {
     return (
-      <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
+      <div className="absolute bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3 max-w-[90%]" style={positionStyle}>
         <p className="text-white font-medium">{interaction.data.question}</p>
         <div className="space-y-2">
           {interaction.data.options.map((option: string, index: number) => {
@@ -299,18 +302,16 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   if (interaction.type === 'countdown') {
  
     return (
-      <div className="absolute inset-0 z-20 flex items-center justify-center px-6">
-        <div className="bg-black/70 backdrop-blur-sm rounded-2xl p-6 text-center max-w-[80%]">
-          <p className="text-white/70 text-sm mb-2">{interaction.data.label}</p>
-          <p className="text-white text-3xl font-bold">{timeLeft}</p>
-        </div>
+      <div className="absolute bg-black/70 backdrop-blur-sm rounded-2xl p-6 text-center max-w-[80%]" style={positionStyle}>
+        <p className="text-white/70 text-sm mb-2">{interaction.data.label}</p>
+        <p className="text-white text-3xl font-bold">{timeLeft}</p>
       </div>
     );
   }
 
   if (interaction.type === 'slider') {
     return (
-      <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
+      <div className="absolute bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3 max-w-[90%]" style={positionStyle}>
         <p className="text-white font-medium">{interaction.data.question}</p>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
@@ -446,7 +447,7 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
     
     return (
       <>
-        <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4">
+        <div className="absolute bg-black/70 backdrop-blur-sm rounded-2xl p-4 max-w-[90%]" style={positionStyle}>
           <div className="space-y-3">
             <p className="text-white font-medium">{interaction.data.prompt}</p>
             <div className="flex gap-2">

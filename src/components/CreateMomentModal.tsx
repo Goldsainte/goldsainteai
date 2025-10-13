@@ -141,7 +141,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           expires_at: expiresAt.toISOString(),
           duration_seconds: mediaType === 'video' ? null : 5,
           drawing_data: drawingData,
-          interactions: interaction,
+          interactions: interaction ? { ...interaction, data: { ...interaction.data, position: interactionPos } } : null,
           text_styling: mode === "type" ? {
             font: textFont,
             animation: textAnimation,

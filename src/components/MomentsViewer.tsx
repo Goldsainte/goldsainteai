@@ -481,9 +481,29 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             </Button>
           </div>
 
+          {/* Global tap-to-play overlay */}
+          {!isSoundOn && (currentMoment.spotify_track_preview_url || currentMoment.media_type === 'video') && (
+            <div 
+              className="absolute inset-0 z-30 flex items-center justify-center bg-black/30"
+              onClick={() => {
+                setIsSoundOn(true);
+                if (audio) audio.play().catch(() => {});
+                if (currentMoment.media_type === 'video' && videoRef.current) {
+                  videoRef.current.muted = false;
+                  videoRef.current.play().catch(() => {});
+                }
+              }}
+            >
+              <div className="bg-black/80 text-white px-6 py-3 rounded-full border border-white/30 flex items-center gap-2">
+                <Volume2 className="w-5 h-5" />
+                <span className="text-sm font-medium">Tap for sound</span>
+              </div>
+            </div>
+          )}
+
           {/* Media */}
 
-          {autoplayBlocked && currentMoment.spotify_track_preview_url && (
+          {autoplayBlocked && currentMoment.spotify_track_preview_url && isSoundOn && (
             <div className="absolute inset-0 z-30 flex items-start justify-center pt-24">
               <button
                 onClick={() => {
