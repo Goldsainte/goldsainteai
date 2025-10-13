@@ -136,7 +136,7 @@ export function TravelSidebar() {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
-                onClick={() => handleNavigation('/my-bookings')}
+                onClick={() => handleNavigation('/my-trips')}
               >
                 <Activity className="h-5 w-5" />
                 <span>Your activity</span>
@@ -160,7 +160,7 @@ export function TravelSidebar() {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
-                onClick={() => handleNavigation('/trust-safety')}
+                onClick={() => handleNavigation('/admin/trust-safety')}
               >
                 <AlertCircle className="h-5 w-5" />
                 <span>Report a problem</span>
