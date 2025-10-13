@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { PartnershipTagging } from "./PartnershipTagging";
 import { PackageTagSelector } from "./PackageTagSelector";
+import { PhotoEditor } from "./PhotoEditor";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Loader2, Link2, Image, Star, BarChart3 } from "lucide-react";
+import { Upload, Loader2, Link2, Image, Star, BarChart3, Wand2, Edit } from "lucide-react";
 import { toast } from "sonner";
 import { extractMentions } from "@/lib/mentionHelpers";
 import { extractHashtags } from "@/lib/hashtagHelpers";
@@ -51,12 +52,42 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const videoRef = useState<HTMLVideoElement | null>(null)[0];
   const [partnershipBrandId, setPartnershipBrandId] = useState<string | null>(null);
   const [taggedPackageIds, setTaggedPackageIds] = useState<string[]>([]);
+  const [editingPhotoIndex, setEditingPhotoIndex] = useState<number | null>(null);
+  const [generatingCaption, setGeneratingCaption] = useState(false);
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
     if (url.includes('instagram.com')) return 'instagram';
     if (url.includes('youtube.com') || url.includes('youtu.be')) return 'youtube';
     return null;
+  };
+
+  const generateAutoCaption = async () => {
+    if (photoPreviewUrls.length === 0 && !videoPreviewUrl) {
+      toast.error('Please upload media first');
+      return;
+    }
+
+    setGeneratingCaption(true);
+    try {
+      const imageUrl = photoPreviewUrls[0] || videoPreviewUrl;
+      
+      const { data, error } = await supabase.functions.invoke('generate-caption', {
+        body: { imageUrl }
+      });
+
+      if (error) throw error;
+
+      if (data?.caption) {
+        setCaption(data.caption);
+        toast.success('Caption generated!');
+      }
+    } catch (error) {
+      console.error('Error generating caption:', error);
+      toast.error('Failed to generate caption');
+    } finally {
+      setGeneratingCaption(false);
+    }
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,6 +118,36 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
     // Create preview URLs
     const urls = validFiles.map(file => URL.createObjectURL(file));
     setPhotoPreviewUrls(urls);
+  };
+
+  const handlePhotoEdit = (index: number) => {
+    setEditingPhotoIndex(index);
+  };
+
+  const handleEditSave = async (editedImageUrl: string) => {
+    if (editingPhotoIndex === null) return;
+
+    try {
+      // Convert blob URL to File
+      const response = await fetch(editedImageUrl);
+      const blob = await response.blob();
+      const file = new File([blob], `edited-${Date.now()}.jpg`, { type: 'image/jpeg' });
+
+      // Update the photo file and preview
+      const newPhotoFiles = [...photoFiles];
+      newPhotoFiles[editingPhotoIndex] = file;
+      setPhotoFiles(newPhotoFiles);
+
+      const newPreviewUrls = [...photoPreviewUrls];
+      newPreviewUrls[editingPhotoIndex] = editedImageUrl;
+      setPhotoPreviewUrls(newPreviewUrls);
+
+      setEditingPhotoIndex(null);
+      toast.success('Photo updated!');
+    } catch (error) {
+      console.error('Error saving edited photo:', error);
+      toast.error('Failed to save edits');
+    }
   };
 
   const handlePhotoUpload = async () => {
@@ -539,20 +600,53 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             </div>
 
             {photoPreviewUrls.length > 0 && (
-              <div className="grid grid-cols-2 gap-2">
-                {photoPreviewUrls.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Preview ${index + 1}`}
-                    className="w-full h-32 object-cover rounded-lg"
-                  />
-                ))}
+              <div className="space-y-2">
+                <Label>Photo Previews</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {photoPreviewUrls.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handlePhotoEdit(index)}
+                      >
+                        <Edit className="w-3 h-3 mr-1" />
+                        Edit
+                      </Button>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <Label>Caption</Label>
+              <div className="flex items-center justify-between">
+                <Label>Caption</Label>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={generateAutoCaption}
+                  disabled={generatingCaption || (photoPreviewUrls.length === 0 && !videoPreviewUrl)}
+                >
+                  {generatingCaption ? (
+                    <>
+                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-3 h-3 mr-1" />
+                      AI Caption
+                    </>
+                  )}
+                </Button>
+              </div>
               <Textarea
                 placeholder="Tell us about your adventure... Use #hashtags and @mentions"
                 value={caption}
@@ -861,6 +955,14 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         onOpenChange={setShowInteractionCreator}
         onSave={(interaction) => setStoryInteraction(interaction)}
       />
+
+      {editingPhotoIndex !== null && photoPreviewUrls[editingPhotoIndex] && (
+        <PhotoEditor
+          imageUrl={photoPreviewUrls[editingPhotoIndex]}
+          onSave={handleEditSave}
+          onCancel={() => setEditingPhotoIndex(null)}
+        />
+      )}
     </Dialog>
   );
 };

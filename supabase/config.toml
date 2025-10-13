@@ -171,3 +171,6 @@ verify_jwt = true
 [functions.instagram-post]
 verify_jwt = true
 
+[functions.generate-caption]
+verify_jwt = true
+
