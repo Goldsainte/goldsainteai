@@ -33,7 +33,7 @@ const Auth = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user && !authLoading) {
       // Prefer returning to the page that triggered login
       const params = new URLSearchParams(window.location.search);
       const returnTo = params.get('returnTo');
@@ -64,7 +64,7 @@ const Auth = () => {
       };
       checkAIAgent();
     }
-  }, [user, isLoading, navigate]);
+  }, [user, authLoading, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,9 +78,9 @@ const Auth = () => {
         description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
-      setIsLoading(false);
     }
-    // Keep loading state true on success - redirect will happen via useEffect
+    
+    setIsLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -141,7 +141,7 @@ const Auth = () => {
   };
 
   // Show loading state while auth is processing or redirecting
-  if (authLoading || (user && isLoading)) {
+  if (authLoading || user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
         <div className="text-center space-y-4">
