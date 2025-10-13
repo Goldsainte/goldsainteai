@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import FollowButton from "./FollowButton";
 
 interface SuggestedUser {
   id: string;
@@ -120,13 +121,9 @@ export function FeedSuggestions() {
                   </p>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-primary text-xs font-semibold hover:text-primary/80 flex-shrink-0"
-              >
-                Follow
-              </Button>
+              <div className="w-24 flex-shrink-0">
+                <FollowButton targetUserId={suggestion.id} />
+              </div>
             </div>
           ))}
         </div>
