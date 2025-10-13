@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useEngagementFraud } from "@/hooks/useEngagementFraud";
 
 interface FollowButtonProps {
   targetUserId: string;
@@ -12,6 +13,7 @@ interface FollowButtonProps {
 
 const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
   const { user } = useAuth();
+  const { checkEngagement } = useEngagementFraud();
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -47,6 +49,12 @@ const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
     if (!user) {
       toast.error('Sign in to follow users');
       return;
+    }
+
+    // Check fraud prevention before following (not for unfollows)
+    if (!isFollowing) {
+      const allowed = await checkEngagement('follow');
+      if (!allowed) return;
     }
 
     setActionLoading(true);

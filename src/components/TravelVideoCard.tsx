@@ -27,6 +27,7 @@ import { PromotePostModal } from "./PromotePostModal";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { OptimizedImage } from "./OptimizedImage";
+import { useEngagementFraud } from "@/hooks/useEngagementFraud";
 
 interface TravelVideoCardProps {
   post: {
@@ -290,10 +291,18 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     }
   };
 
+  const { checkEngagement } = useEngagementFraud();
+
   const handleLike = async () => {
     if (!user) {
       toast.error('Sign in to like videos');
       return;
+    }
+
+    // Check fraud prevention before liking (not for unlikes)
+    if (!isLiked) {
+      const allowed = await checkEngagement('like');
+      if (!allowed) return;
     }
 
     // Optimistic update

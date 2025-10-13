@@ -18,6 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useEngagementFraud } from "@/hooks/useEngagementFraud";
 
 interface Comment {
   id: string;
@@ -167,10 +168,18 @@ const PhotoCarouselModal = ({
     };
   };
 
+  const { checkEngagement } = useEngagementFraud();
+
   const handleLike = async () => {
     if (!postId || !user) {
       toast.error("Sign in to like posts");
       return;
+    }
+    
+    // Check fraud prevention before liking (not for unlikes)
+    if (!isLiked) {
+      const allowed = await checkEngagement('like');
+      if (!allowed) return;
     }
     
     if (isLiked) {
@@ -196,6 +205,10 @@ const PhotoCarouselModal = ({
       if (!user) toast.error("Please sign in to comment");
       return;
     }
+
+    // Check fraud prevention before commenting
+    const allowed = await checkEngagement('comment');
+    if (!allowed) return;
 
     setSubmitting(true);
     try {
