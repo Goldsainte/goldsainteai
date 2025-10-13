@@ -60,13 +60,23 @@ const CrosspostingSettings = () => {
   };
 
   const handleConnectInstagram = () => {
-    // Instagram OAuth flow would go here
+    const instagramAppId = import.meta.env.VITE_INSTAGRAM_APP_ID;
+    const redirectUri = `${window.location.origin}/instagram-callback`;
+    
+    if (!instagramAppId || instagramAppId === 'YOUR_INSTAGRAM_APP_ID_HERE') {
+      toast.error('Instagram App ID not configured', {
+        description: 'Please configure your Instagram App ID in the backend settings'
+      });
+      return;
+    }
+    
+    const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${instagramAppId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user_profile,user_media&response_type=code`;
+    
     toast.info('Opening Instagram authorization...', {
       description: 'You will be redirected to Instagram to authorize access'
     });
     
-    // Open Instagram OAuth (this would be replaced with actual OAuth flow)
-    window.open('https://api.instagram.com/oauth/authorize', '_blank');
+    window.location.href = authUrl;
   };
 
   const handleDisconnectTikTok = async () => {

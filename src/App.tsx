@@ -64,6 +64,7 @@ import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import InstagramAPI from "./pages/InstagramAPI";
+import InstagramCallback from "./pages/InstagramCallback";
 import YourActivity from "./pages/YourActivity";
 
 const queryClient = new QueryClient();
@@ -165,6 +166,7 @@ function AppContent() {
           <Route path="/travel-settings-2" element={<TravelSettings2 />} />
           <Route path="/travel-settings/edit" element={<TravelSettings />} />
           <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
+          <Route path="/instagram-callback" element={<InstagramCallback />} />
           <Route path="/creator-dashboard" element={<CreatorDashboard />} />
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
