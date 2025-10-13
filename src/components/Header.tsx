@@ -70,8 +70,10 @@ export const Header = () => {
       return;
     }
     if (type === "reel" || type === "post") {
+      setCreateSheetOpen(false);
       setUploadModalOpen(true);
     } else if (type === "moment") {
+      setCreateSheetOpen(false);
       setCreateMomentOpen(true);
     } else if (type === "moments-vault") {
       toast({

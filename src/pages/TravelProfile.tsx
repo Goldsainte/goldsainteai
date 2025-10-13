@@ -369,7 +369,9 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   const handleCreateContent = (type: string) => {
     if (type === 'reel' || type === 'post') {
       setUploadModalOpen(true);
+      setCreateSheetOpen(false);
     } else if (type === 'moment') {
+      setCreateSheetOpen(false);
       setCreateMomentOpen(true);
     } else if (type === 'moments-vault') {
       toast.info('Tap the + button in the Moments Vaults section below to create a new vault');
