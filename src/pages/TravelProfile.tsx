@@ -13,6 +13,7 @@ import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
 import { CreatorPartnershipRequest } from "@/components/CreatorPartnershipRequest";
+import { CreateMomentModal } from "@/components/CreateMomentModal";
 
 import FollowButton from "@/components/FollowButton";
 import StoryHighlights from "@/components/StoryHighlights";
@@ -91,6 +92,7 @@ const TravelProfile = () => {
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
+  const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const { isCloseFriend } = useCloseFriends();
 const { balance, refetch: refetchCoins } = useCoinBalance();
   const [hasActiveMoments, setHasActiveMoments] = useState(false);
@@ -367,6 +369,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   const handleCreateContent = (type: string) => {
     if (type === 'reel' || type === 'post') {
       setUploadModalOpen(true);
+    } else if (type === 'moment') {
+      setCreateMomentOpen(true);
     } else if (type === 'moments-vault') {
       toast.info('Tap the + button in the Moments Vaults section below to create a new vault');
       setCreateSheetOpen(false);
@@ -1144,6 +1148,12 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
+      />
+
+      {/* Create Moment Modal */}
+      <CreateMomentModal
+        open={createMomentOpen}
+        onOpenChange={setCreateMomentOpen}
       />
 
       {/* Buy Coins Modal */}

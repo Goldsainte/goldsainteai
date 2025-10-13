@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2 } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
+import { CreateMomentModal } from "@/components/CreateMomentModal";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
@@ -37,6 +38,7 @@ export const Header = () => {
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
+  const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const { balance } = useCoinBalance();
 
   // Fetch user's preference setting
@@ -69,6 +71,14 @@ export const Header = () => {
     }
     if (type === "reel" || type === "post") {
       setUploadModalOpen(true);
+    } else if (type === "moment") {
+      setCreateMomentOpen(true);
+    } else if (type === "moments-vault") {
+      toast({
+        title: "Moments Vault",
+        description: "Go to your profile to create moments vaults",
+      });
+      setCreateSheetOpen(false);
     }
   };
 
@@ -769,6 +779,12 @@ export const Header = () => {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
+      />
+
+      {/* Create Moment Modal */}
+      <CreateMomentModal
+        open={createMomentOpen}
+        onOpenChange={setCreateMomentOpen}
       />
 
       {/* Buy Coins Modal */}
