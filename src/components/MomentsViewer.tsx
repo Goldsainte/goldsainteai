@@ -167,27 +167,35 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     // Play new audio if available
     if (currentMoment.spotify_track_preview_url) {
       const newAudio = new Audio(currentMoment.spotify_track_preview_url);
-      newAudio.volume = 0.5;
-      
+      newAudio.preload = 'auto';
+      newAudio.crossOrigin = 'anonymous';
+      newAudio.volume = 0.7;
+
       let stopTimeout: NodeJS.Timeout;
 
-      // Wait for audio to load before setting start time
       newAudio.addEventListener('loadedmetadata', () => {
         const startTime = currentMoment.spotify_audio_start_time || 0;
-        newAudio.currentTime = startTime;
-        
+        try {
+          newAudio.currentTime = startTime;
+        } catch {}
         // Stop after 30 seconds
         stopTimeout = setTimeout(() => {
           newAudio.pause();
         }, 30000);
       });
-      
-      // Try to play - will fail if browser blocks autoplay
-      newAudio.play().catch((error) => {
-        console.error("Audio autoplay blocked:", error);
+
+      // Only auto-play if sound is toggled on
+      const tryPlay = () => newAudio.play().catch((error) => {
+        console.error('Audio play failed:', error);
         setAutoplayBlocked(true);
       });
-      
+
+      if (isSoundOn) {
+        tryPlay();
+      } else {
+        setAutoplayBlocked(true);
+      }
+
       setAudio(newAudio);
 
       return () => {
@@ -198,7 +206,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     } else {
       setAudio(null);
     }
-  }, [currentIndex, moments]);
+  }, [currentIndex, moments, isSoundOn]);
 
   const fetchMoments = async () => {
     try {

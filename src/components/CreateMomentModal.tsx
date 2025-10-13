@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,6 +30,11 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
   const [selectedTrack, setSelectedTrack] = useState<any>(null);
   const [audioStartTime, setAudioStartTime] = useState(0);
   
+  // Drag position for interaction overlay (percentages)
+  const [interactionPos, setInteractionPos] = useState<{x:number;y:number}>({ x: 50, y: 80 });
+  const dragContainerRef = useRef<HTMLDivElement | null>(null);
+  const isDraggingRef = useRef(false);
+
   // Text styling options
   const [textContent, setTextContent] = useState("");
   const [textFont, setTextFont] = useState("classic");
@@ -249,7 +254,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             ) : (
               <>
                 {!showDrawing ? (
-                  <div className="relative w-full h-[350px] bg-black rounded-lg overflow-hidden">
+                  <div ref={dragContainerRef} className="relative w-full h-[350px] bg-black rounded-lg overflow-hidden">
                     {file?.type.startsWith('image/') ? (
                       <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
@@ -278,6 +283,54 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                         <Paintbrush className="w-4 h-4" />
                         Draw
                       </Button>
+                    )}
+
+                    {interaction && (
+                      <div
+                        className="absolute"
+                        style={{ left: `${interactionPos.x}%`, top: `${interactionPos.y}%`, transform: 'translate(-50%, -50%)', zIndex: 20 }}
+                        onMouseDown={(e) => {
+                          const move = (ev: MouseEvent) => {
+                            if (!dragContainerRef.current) return;
+                            const rect = dragContainerRef.current.getBoundingClientRect();
+                            const x = ((ev.clientX - rect.left) / rect.width) * 100;
+                            const y = ((ev.clientY - rect.top) / rect.height) * 100;
+                            setInteractionPos({ x: Math.min(95, Math.max(5, x)), y: Math.min(95, Math.max(5, y)) });
+                          };
+                          const up = () => {
+                            document.removeEventListener('mousemove', move);
+                            document.removeEventListener('mouseup', up);
+                          };
+                          document.addEventListener('mousemove', move);
+                          document.addEventListener('mouseup', up);
+                        }}
+                        onTouchStart={(e) => {
+                          const move = (ev: TouchEvent) => {
+                            if (!dragContainerRef.current) return;
+                            const rect = dragContainerRef.current.getBoundingClientRect();
+                            const t = ev.touches[0];
+                            const x = ((t.clientX - rect.left) / rect.width) * 100;
+                            const y = ((t.clientY - rect.top) / rect.height) * 100;
+                            setInteractionPos({ x: Math.min(95, Math.max(5, x)), y: Math.min(95, Math.max(5, y)) });
+                          };
+                          const end = () => {
+                            document.removeEventListener('touchmove', move);
+                            document.removeEventListener('touchend', end);
+                          };
+                          document.addEventListener('touchmove', move, { passive: true } as any);
+                          document.addEventListener('touchend', end);
+                        }}
+                      >
+                        <div className="bg-black/70 text-white text-xs rounded-lg px-3 py-2 shadow">
+                          {interaction.type === 'countdown' ? (interaction.data.label || 'Countdown')
+                            : interaction.type === 'poll' ? (interaction.data.question || 'Poll')
+                            : interaction.type === 'question' ? (interaction.data.text || 'Question')
+                            : interaction.type === 'quiz' ? (interaction.data.question || 'Quiz')
+                            : interaction.type === 'slider' ? (interaction.data.question || 'Slider')
+                            : interaction.type === 'add_yours' ? (interaction.data.prompt || 'Add Yours')
+                            : 'Interaction'}
+                        </div>
+                      </div>
                     )}
                   </div>
                 ) : (
@@ -368,6 +421,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
           <TabsContent value="type" className="space-y-4">
             {/* Preview */}
             <div 
+              ref={dragContainerRef}
               className="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center p-8"
               style={{ background: bgGradient }}
             >
@@ -404,6 +458,54 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                   <p className="text-white/50 text-lg">Enter your text below</p>
                 )}
               </div>
+
+              {interaction && (
+                <div
+                  className="absolute"
+                  style={{ left: `${interactionPos.x}%`, top: `${interactionPos.y}%`, transform: 'translate(-50%, -50%)', zIndex: 20 }}
+                  onMouseDown={(e) => {
+                    const move = (ev: MouseEvent) => {
+                      if (!dragContainerRef.current) return;
+                      const rect = dragContainerRef.current.getBoundingClientRect();
+                      const x = ((ev.clientX - rect.left) / rect.width) * 100;
+                      const y = ((ev.clientY - rect.top) / rect.height) * 100;
+                      setInteractionPos({ x: Math.min(95, Math.max(5, x)), y: Math.min(95, Math.max(5, y)) });
+                    };
+                    const up = () => {
+                      document.removeEventListener('mousemove', move);
+                      document.removeEventListener('mouseup', up);
+                    };
+                    document.addEventListener('mousemove', move);
+                    document.addEventListener('mouseup', up);
+                  }}
+                  onTouchStart={(e) => {
+                    const move = (ev: TouchEvent) => {
+                      if (!dragContainerRef.current) return;
+                      const rect = dragContainerRef.current.getBoundingClientRect();
+                      const t = ev.touches[0];
+                      const x = ((t.clientX - rect.left) / rect.width) * 100;
+                      const y = ((t.clientY - rect.top) / rect.height) * 100;
+                      setInteractionPos({ x: Math.min(95, Math.max(5, x)), y: Math.min(95, Math.max(5, y)) });
+                    };
+                    const end = () => {
+                      document.removeEventListener('touchmove', move);
+                      document.removeEventListener('touchend', end);
+                    };
+                    document.addEventListener('touchmove', move, { passive: true } as any);
+                    document.addEventListener('touchend', end);
+                  }}
+                >
+                  <div className="bg-black/70 text-white text-xs rounded-lg px-3 py-2 shadow">
+                    {interaction.type === 'countdown' ? (interaction.data.label || 'Countdown')
+                      : interaction.type === 'poll' ? (interaction.data.question || 'Poll')
+                      : interaction.type === 'question' ? (interaction.data.text || 'Question')
+                      : interaction.type === 'quiz' ? (interaction.data.question || 'Quiz')
+                      : interaction.type === 'slider' ? (interaction.data.question || 'Slider')
+                      : interaction.type === 'add_yours' ? (interaction.data.prompt || 'Add Yours')
+                      : 'Interaction'}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Text Input */}
