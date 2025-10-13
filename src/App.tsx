@@ -66,6 +66,7 @@ import BrowseCreators from "./pages/BrowseCreators";
 import InstagramAPI from "./pages/InstagramAPI";
 import InstagramCallback from "./pages/InstagramCallback";
 import YourActivity from "./pages/YourActivity";
+import UploadEmailAssets from "./pages/UploadEmailAssets";
 
 const queryClient = new QueryClient();
 
@@ -135,6 +136,7 @@ function AppContent() {
           <Route path="/agent-dashboard" element={<AgentDashboard />} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
+          <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
           <Route path="/booking-preferences" element={<BookingPreferences />} />
           <Route path="/commission-dashboard" element={<CommissionDashboard />} />
           <Route path="/email-preview" element={<EmailPreview />} />
