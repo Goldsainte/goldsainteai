@@ -902,7 +902,7 @@ const Index = () => {
             {/* How it Works Section - Horizontal Scrolling */}
             <div className="px-4 sm:px-6 py-10 sm:py-14 md:py-18 bg-gradient-to-b from-background via-muted/10 to-background">
               <div className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 md:space-y-10">
-                <div className="text-center space-y-2 sm:space-y-3 px-2">
+                <div className="text-left space-y-2 sm:space-y-3 px-2">
                   <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-secondary font-bold text-secondary leading-tight">
                     How it Works
                   </h2>
