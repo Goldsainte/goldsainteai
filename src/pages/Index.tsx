@@ -853,46 +853,56 @@ const Index = () => {
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
-                  <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
-                  <p className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2">
+                  <img 
+                    src={logomark} 
+                    alt="Goldsainte.Ai logo" 
+                    className="h-20 w-20 md:h-16 md:w-16"
+                    width="80"
+                    height="80"
+                  />
+                  <h1 className="text-base md:text-lg font-medium text-center text-foreground max-w-xl px-4 leading-relaxed">
                     Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs
-                  </p>
-                  <p className="text-xs md:text-sm text-center text-muted-foreground/80 max-w-xl px-2">
+                  </h1>
+                  <p className="text-sm md:text-base text-center text-muted-foreground max-w-xl px-4 leading-relaxed">
                     Use AI to plan fast, get agents bidding to save more, or book CoCurated trips — built by pros, backed by influencers, and designed to deliver value.
                   </p>
                 </div>
 
                 {/* Main Search with rotating placeholder */}
                 <div className="relative pt-2 md:pt-3 px-2 md:px-0" data-tour="ai-search">
+                  <label htmlFor="ai-search-input" className="sr-only">Search for travel experiences</label>
                   <Input
+                    id="ai-search-input"
                     placeholder={rotatingMessages[currentMessageIndex]}
-                    className="w-full h-14 md:h-16 px-4 pr-14 text-base rounded-3xl border-[#BFAD72] shadow-sm focus-visible:ring-1 focus-visible:ring-[#BFAD72] placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 touch-manipulation"
+                    className="w-full h-16 md:h-16 px-5 pr-16 text-base rounded-3xl border-2 border-[#BFAD72] shadow-sm focus-visible:ring-2 focus-visible:ring-[#BFAD72] focus-visible:ring-offset-2 placeholder:text-sm sm:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 touch-manipulation"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
                     disabled={isLoading}
+                    aria-label="Search for travel experiences, hotels, flights, and more"
                   />
                   <Button
                     onClick={() => handleSearch()}
                     size="icon"
                     variant="ghost"
-                    className="absolute right-3 md:right-2 top-1/2 -translate-y-1/2 h-12 w-12 md:h-10 md:w-10 rounded-full hover:bg-muted touch-manipulation min-h-[44px] min-w-[44px]"
+                    className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full hover:bg-muted touch-manipulation min-h-[48px] min-w-[48px]"
                     disabled={isLoading}
+                    aria-label="Submit search"
                   >
                     {isLoading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
                     ) : (
-                      <Send className="h-5 w-5" />
+                      <Send className="h-6 w-6" aria-hidden="true" />
                     )}
                   </Button>
                 </div>
 
                 {/* Footer */}
-                <p className="text-xs text-muted-foreground text-center pt-4">
+                <p className="text-sm text-muted-foreground text-center pt-4 px-4 leading-relaxed">
                   By using Goldsainte.Ai, you agree to our{" "}
-                  <a href="#" className="underline hover:text-foreground">Terms</a>
+                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">Terms</a>
                   {" "}and{" "}
-                  <a href="#" className="underline hover:text-foreground">Privacy Policy</a>
+                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">Privacy Policy</a>
                 </p>
               </div>
             </div>
@@ -901,36 +911,39 @@ const Index = () => {
             <div className="w-full overflow-hidden max-h-[600px] md:max-h-[700px] lg:max-h-none">
               <img 
                 src={heroAiConcierge} 
-                alt="Introducing Goldsainte AI Assist: AI Travel Concierge" 
+                alt="Goldsainte AI Assist - Your personal AI travel concierge for booking flights, hotels and planning perfect trips" 
                 className="w-full h-full object-cover object-center"
+                loading="eager"
+                width="1920"
+                height="1080"
               />
             </div>
 
-            {/* How it Works Section - Horizontal Scrolling */}
-            <div className="px-4 sm:px-6 py-10 sm:py-14 md:py-18 bg-gradient-to-b from-background via-muted/10 to-background">
-              <div className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 md:space-y-10">
-                <div className="text-left space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-secondary font-bold text-secondary leading-tight">
-                    How it Works
-                  </h2>
-                  <div className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary leading-relaxed space-y-4">
-                    <p>
-                      Discover, plan, and share luxury travel — all in one intelligent platform.
-                    </p>
-                    <p>
-                      Start by chatting with our AI concierge or say "Hey Goldsainte" to activate voice planning. The more you chat, the smarter it gets — learning your travel style to tailor every recommendation.
-                    </p>
-                    <p>
-                      Need expert help? Post your trip details and let certified travel agents compete to offer you the best itinerary and pricing. Or browse CoCurated packages, where agents craft exclusive trips using their insider deals, and creators promote them — earning together through collaboration.
-                    </p>
-                    <p>
-                      Explore our social feed for real travel stories, split payments with friends, and as a creator, monetize your content through packages, partnerships, and commissions.
-                    </p>
-                    <p>
-                      From inspiration to booking, Goldsainte connects every step of your journey — all in one seamless platform.
-                    </p>
-                  </div>
-                </div>
+                {/* How it Works Section - Horizontal Scrolling */}
+                <section className="px-4 sm:px-6 py-10 sm:py-14 md:py-18 bg-gradient-to-b from-background via-muted/10 to-background" aria-labelledby="how-it-works-heading">
+                  <div className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 md:space-y-10">
+                    <div className="text-left space-y-3 sm:space-y-4 px-2">
+                      <h2 id="how-it-works-heading" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-secondary font-bold text-secondary leading-tight">
+                        How it Works
+                      </h2>
+                      <div className="text-base sm:text-lg md:text-xl text-muted-foreground font-secondary leading-relaxed space-y-4">
+                        <p>
+                          Discover, plan, and share luxury travel — all in one intelligent platform.
+                        </p>
+                        <p>
+                          Start by chatting with our AI concierge or say "Hey Goldsainte" to activate voice planning. The more you chat, the smarter it gets — learning your travel style to tailor every recommendation.
+                        </p>
+                        <p>
+                          Need expert help? Post your trip details and let certified travel agents compete to offer you the best itinerary and pricing. Or browse CoCurated packages, where agents craft exclusive trips using their insider deals, and creators promote them — earning together through collaboration.
+                        </p>
+                        <p>
+                          Explore our social feed for real travel stories, split payments with friends, and as a creator, monetize your content through packages, partnerships, and commissions.
+                        </p>
+                        <p>
+                          From inspiration to booking, Goldsainte connects every step of your journey — all in one seamless platform.
+                        </p>
+                      </div>
+                    </div>
 
                 {/* Horizontal Scrolling Container */}
                 <div className="relative -mx-4 sm:-mx-6 touch-manipulation">
@@ -1090,26 +1103,27 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
+            </section>
 
             {/* Creator Hero Section */}
-            <div className="px-4 sm:px-6 pt-1 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background">
+            <section className="px-4 sm:px-6 pt-1 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background" aria-labelledby="creator-section-heading">
               <div className="w-full max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                   {/* Left: Text Content */}
                   <div className="space-y-6">
                     <div className="space-y-2">
-                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary">
+                      <h2 id="creator-section-heading" className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary leading-tight">
                         Create.
                       </h2>
-                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-secondary">
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-secondary leading-tight" aria-label="Share">
                         Share.
                       </h2>
-                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground">
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground leading-tight" aria-label="Make Money">
                         Make Money.
                       </h2>
                     </div>
-                     <div className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed space-y-4">
+                     <div className="text-base sm:text-lg md:text-xl text-muted-foreground font-secondary leading-relaxed space-y-4">
                       <p>
                         Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages. Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.
                       </p>
@@ -1120,38 +1134,38 @@ const Index = () => {
                   </div>
 
                   {/* Right: Photo Grid */}
-                  <div className="relative h-[500px] sm:h-[600px]">
+                  <div className="relative h-[500px] sm:h-[600px]" role="img" aria-label="Collage of creator lifestyle images showing luxury travel experiences">
                     <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
-                      <img src={property1} alt="Luxury travel" className="w-full h-full object-cover" />
+                      <img src={property1} alt="Luxury travel accommodation" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
-                      <img src={property2} alt="Travel destination" className="w-full h-full object-cover" />
+                      <img src={property2} alt="Travel destination view" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl z-20">
-                      <img src={creatorYachtParty} alt="Creator lifestyle" className="w-full h-full object-cover" />
+                      <img src={creatorYachtParty} alt="Creator lifestyle on yacht" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
-                      <img src={property3} alt="Adventure" className="w-full h-full object-cover" />
+                      <img src={property3} alt="Adventure travel scene" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="absolute top-[40%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-10">
-                      <img src={creatorBeachSelfie} alt="Creator content" className="w-full h-full object-cover" />
+                      <img src={creatorBeachSelfie} alt="Creator content on beach" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl">
-                      <img src={property4} alt="Luxury dining" className="w-full h-full object-cover" />
+                      <img src={property4} alt="Luxury dining experience" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                     <div className="absolute bottom-0 right-[15%] w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
-                      <img src={property5} alt="Coastal view" className="w-full h-full object-cover" />
+                      <img src={property5} alt="Coastal travel view" className="w-full h-full object-cover" loading="lazy" />
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* Inspiration Content - Far below the fold */}
-            <div className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10" data-tour="explore">
-              <div className="w-full max-w-7xl mx-auto space-y-3 sm:space-y-4">
+            <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10" data-tour="explore" aria-labelledby="inspiration-heading">
+              <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
+                  <h2 id="inspiration-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary leading-tight">
                     Get Inspired
                   </h2>
                   <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
@@ -1174,9 +1188,9 @@ const Index = () => {
               </div>
 
               {/* Featured Restaurants */}
-              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
+              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12" aria-labelledby="dining-heading">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-secondary">
+                  <h2 id="dining-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-secondary leading-tight">
                     Fine Dining Experiences
                   </h2>
                   <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
