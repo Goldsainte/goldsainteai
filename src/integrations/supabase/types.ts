@@ -3261,6 +3261,11 @@ export type Database = {
           interactions: Json | null
           media_type: string
           media_url: string | null
+          spotify_track_album_art: string | null
+          spotify_track_artist: string | null
+          spotify_track_id: string | null
+          spotify_track_name: string | null
+          spotify_track_preview_url: string | null
           text_styling: Json | null
           user_id: string
           view_count: number | null
@@ -3275,6 +3280,11 @@ export type Database = {
           interactions?: Json | null
           media_type: string
           media_url?: string | null
+          spotify_track_album_art?: string | null
+          spotify_track_artist?: string | null
+          spotify_track_id?: string | null
+          spotify_track_name?: string | null
+          spotify_track_preview_url?: string | null
           text_styling?: Json | null
           user_id: string
           view_count?: number | null
@@ -3289,6 +3299,11 @@ export type Database = {
           interactions?: Json | null
           media_type?: string
           media_url?: string | null
+          spotify_track_album_art?: string | null
+          spotify_track_artist?: string | null
+          spotify_track_id?: string | null
+          spotify_track_name?: string | null
+          spotify_track_preview_url?: string | null
           text_styling?: Json | null
           user_id?: string
           view_count?: number | null
