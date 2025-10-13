@@ -906,9 +906,23 @@ const Index = () => {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-secondary font-bold text-secondary leading-tight">
                     How it Works
                   </h2>
-                  <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed">
-                    Chat with us to start planning your next adventure. Ask for recommendations for any destination or request a full itinerary tailored to you. The more specific you are about the experiences you enjoy, the better we can personalize your trip—or take our quiz to discover your unique travel style.
-                  </p>
+                  <div className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed space-y-4">
+                    <p>
+                      Discover, plan, and share luxury travel — all in one intelligent platform.
+                    </p>
+                    <p>
+                      Start by chatting with our AI concierge or say "Hey Goldsainte" to activate voice planning. The more you chat, the smarter it gets — learning your travel style to tailor every recommendation.
+                    </p>
+                    <p>
+                      Need expert help? Post your trip details and let certified travel agents compete to offer you the best itinerary and pricing. Or browse CoCurated packages, where agents craft exclusive trips using their insider deals, and creators promote them — earning together through collaboration.
+                    </p>
+                    <p>
+                      Explore our social feed for real travel stories, split payments with friends, and as a creator, monetize your content through packages, partnerships, and commissions.
+                    </p>
+                    <p>
+                      From inspiration to booking, Goldsainte connects every step of your journey — all in one seamless platform.
+                    </p>
+                  </div>
                 </div>
 
                 {/* Horizontal Scrolling Container */}
