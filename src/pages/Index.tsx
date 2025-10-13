@@ -1124,7 +1124,7 @@ const Index = () => {
                     <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property1} alt="Luxury travel" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute top-[20%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property2} alt="Travel destination" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl z-20">
