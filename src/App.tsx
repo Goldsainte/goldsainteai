@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -72,8 +72,16 @@ const queryClient = new QueryClient();
 // Main app content with routing
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
   usePresence(); // Initialize presence tracking
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+
+  // Force return to Home when the welcome modal is dismissed (first visit UX)
+  useEffect(() => {
+    const handler = () => navigate('/');
+    window.addEventListener('welcomeDismissed', handler);
+    return () => window.removeEventListener('welcomeDismissed', handler);
+  }, [navigate]);
 
   // Check if welcome modal should show (only on first visit)
   useEffect(() => {

@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import Joyride, { Step, CallBackProps, STATUS } from "react-joyride";
+import { useNavigate } from "react-router-dom";
 
 export const OnboardingTour = () => {
   const [run, setRun] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const tourSeen = localStorage.getItem("goldsainte-tour-seen");
     
@@ -89,12 +90,14 @@ export const OnboardingTour = () => {
     if (finishedStatuses.includes(status)) {
       setRun(false);
       localStorage.setItem("goldsainte-tour-seen", "true");
+      navigate('/');
     }
   };
 
   const handleSkipTour = () => {
     setRun(false);
     localStorage.setItem("goldsainte-tour-seen", "true");
+    navigate('/');
   };
 
   useEffect(() => {
