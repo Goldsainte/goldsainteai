@@ -331,14 +331,6 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 <Archive className="w-5 h-5" />
                 <span className="ml-2 text-sm">Save</span>
               </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => onOpenChange(false)}
-                className="text-white hover:bg-white/20"
-              >
-                <X className="w-5 h-5" />
-              </Button>
             </div>
           </div>
 
