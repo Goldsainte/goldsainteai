@@ -136,7 +136,7 @@ export function TravelSidebar() {
               <Button
                 variant="ghost"
                 className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
-                onClick={() => handleNavigation('/my-trips')}
+                onClick={() => handleNavigation('/your-activity')}
               >
                 <Activity className="h-5 w-5" />
                 <span>Your activity</span>

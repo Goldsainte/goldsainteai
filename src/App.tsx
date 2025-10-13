@@ -64,6 +64,7 @@ import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import InstagramAPI from "./pages/InstagramAPI";
+import YourActivity from "./pages/YourActivity";
 
 const queryClient = new QueryClient();
 
@@ -190,6 +191,7 @@ function AppContent() {
             <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
             <Route path="/browse-influencers" element={<BrowseInfluencers />} />
             <Route path="/instagram-api" element={<InstagramAPI />} />
+            <Route path="/your-activity" element={<YourActivity />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
