@@ -1104,7 +1104,6 @@ const Index = () => {
                 </div>
               </div>
             </section>
-            </section>
 
             {/* Creator Hero Section */}
             <section className="px-4 sm:px-6 pt-1 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background" aria-labelledby="creator-section-heading">
@@ -1327,9 +1326,10 @@ const Index = () => {
                   </CardContent>
                 </Card>
               </div>
+            </section>
 
-              {/* Cuisine Selector - Initial View */}
-              {showCuisineSelector && (
+            {/* Cuisine Selector - Initial View */}
+            {showCuisineSelector && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in">
                   <CuisineSelector
                     onCuisineSelected={handleCuisineSelected}
@@ -1337,7 +1337,6 @@ const Index = () => {
                   />
                 </div>
               )}
-            </div>
           </div>
         ) : (
           // Chat view - full screen
