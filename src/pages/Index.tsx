@@ -11,7 +11,7 @@ import {
   Sparkles, 
   ArrowLeft, 
   MapPinned, 
-  Star, 
+  Star,
   FileCheck, 
   Ticket, 
   Car, 
@@ -902,11 +902,11 @@ const Index = () => {
                 {/* What Goldsainte AI Can Do Button */}
                 <div className="flex justify-center pt-2">
                   <Button
-                    variant="ghost"
-                    size="sm"
+                    variant="outline"
                     onClick={() => setShowWelcomeModal(true)}
-                    className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+                    className="border-2 border-[#BFAD72] text-foreground hover:bg-[#BFAD72]/10 gap-2 px-6"
                   >
+                    <Star className="h-4 w-4 text-[#BFAD72]" />
                     What Goldsainte AI can do
                   </Button>
                 </div>
