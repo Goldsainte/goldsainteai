@@ -1133,7 +1133,7 @@ const Index = () => {
                     <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property3} alt="Adventure" className="w-full h-full object-cover" />
                     </div>
-                    <div className="absolute top-[70%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-10">
+                    <div className="absolute top-[45%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-10">
                       <img src={creatorBeachSelfie} alt="Creator content" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl">
