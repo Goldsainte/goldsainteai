@@ -29,6 +29,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
 import { InspirationCard } from "@/components/InspirationCard";
+import { WelcomeModal } from "@/components/WelcomeModal";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
 import { EventCard } from "@/components/EventCard";
@@ -150,6 +151,7 @@ const Index = () => {
   const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   const rotatingMessages = [
     "Where to next? Discover handpicked hotels tailored to your taste.",
@@ -894,6 +896,18 @@ const Index = () => {
                     ) : (
                       <Send className="h-6 w-6" aria-hidden="true" />
                     )}
+                  </Button>
+                </div>
+
+                {/* What Goldsainte AI Can Do Button */}
+                <div className="flex justify-center pt-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowWelcomeModal(true)}
+                    className="text-sm text-muted-foreground hover:text-primary underline-offset-4 hover:underline"
+                  >
+                    What Goldsainte AI can do
                   </Button>
                 </div>
 
@@ -1714,6 +1728,12 @@ const Index = () => {
             />
           </div>
         )}
+
+        {/* Welcome Modal */}
+        <WelcomeModal 
+          open={showWelcomeModal} 
+          onClose={() => setShowWelcomeModal(false)} 
+        />
       </div>
     </main>
   );
