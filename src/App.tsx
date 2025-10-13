@@ -75,16 +75,16 @@ function AppContent() {
   usePresence(); // Initialize presence tracking
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
-  // Check if welcome modal should show (with URL overrides)
+  // Check if welcome modal should show (only on first visit)
   useEffect(() => {
-    // Always show welcome modal on every visit
-    setShowWelcomeModal(true);
+    const hasSeenWelcome = localStorage.getItem("goldsainte-welcome-seen");
+    if (!hasSeenWelcome) {
+      setShowWelcomeModal(true);
+    }
   }, []);
 
   const handleCloseWelcome = () => {
     setShowWelcomeModal(false);
-    // Don't save to localStorage - let tour start immediately
-    window.dispatchEvent(new Event('welcomeDismissed'));
   };
   
   // Don't show header on these pages as they have their own custom headers

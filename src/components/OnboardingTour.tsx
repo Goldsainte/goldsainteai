@@ -5,9 +5,12 @@ export const OnboardingTour = () => {
   const [run, setRun] = useState(false);
 
   useEffect(() => {
-    // Start tour immediately after welcome modal is dismissed
+    const tourSeen = localStorage.getItem("goldsainte-tour-seen");
+    
     const startTour = () => {
-      setTimeout(() => setRun(true), 800);
+      if (!tourSeen) {
+        setTimeout(() => setRun(true), 800);
+      }
     };
 
     const handleWelcomeDismissed = () => startTour();
@@ -85,8 +88,13 @@ export const OnboardingTour = () => {
 
     if (finishedStatuses.includes(status)) {
       setRun(false);
-      // Don't save to localStorage so tour always runs after welcome modal
+      localStorage.setItem("goldsainte-tour-seen", "true");
     }
+  };
+
+  const handleSkipTour = () => {
+    setRun(false);
+    localStorage.setItem("goldsainte-tour-seen", "true");
   };
 
   useEffect(() => {
@@ -164,7 +172,7 @@ export const OnboardingTour = () => {
         run={run}
         continuous
         showProgress
-        showSkipButton={false}
+        showSkipButton
         disableScrolling={true}
         disableScrollParentFix={true}
         spotlightClicks={false}
@@ -234,11 +242,22 @@ export const OnboardingTour = () => {
           buttonBack: {
             display: "none",
           },
+          buttonSkip: {
+            color: "hsl(var(--muted-foreground))",
+            borderRadius: window.innerWidth < 768 ? "6px" : "8px",
+            padding: window.innerWidth < 768 ? "5px 12px" : "6px 14px",
+            fontSize: window.innerWidth < 768 ? "11px" : "12px",
+            fontWeight: "500",
+            fontFamily: "inherit",
+            backgroundColor: "transparent",
+            border: "1px solid hsl(var(--border))",
+          },
         }}
         locale={{
           close: "Close",
           last: "Finish",
           next: "Next",
+          skip: "Skip Tour",
         }}
         floaterProps={{
           disableAnimation: true,

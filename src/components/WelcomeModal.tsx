@@ -9,8 +9,14 @@ interface WelcomeModalProps {
 }
 
 export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
+  const handleClose = () => {
+    localStorage.setItem("goldsainte-welcome-seen", "true");
+    onClose();
+    window.dispatchEvent(new Event("welcomeDismissed"));
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-[95vw] sm:max-w-lg p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
         <DialogHeader>
           <DialogTitle className="sr-only">Welcome to Goldsainte.Ai</DialogTitle>
@@ -170,11 +176,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
           </ScrollArea>
 
           <Button
-            onClick={() => {
-              onClose();
-              // Dispatch event for onboarding tour
-              window.dispatchEvent(new Event("welcomeDismissed"));
-            }} 
+            onClick={handleClose} 
             className="w-full h-10 sm:h-11 text-xs sm:text-sm group"
             size="lg"
           >
