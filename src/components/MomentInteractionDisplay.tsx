@@ -22,6 +22,17 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   const [responseStats, setResponseStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [revealed, setRevealed] = useState(false);
+  
+  // State for quiz type
+  const [showResult, setShowResult] = useState(false);
+  
+  // State for countdown type
+  const [timeLeft, setTimeLeft] = useState('');
+  
+  // State for slider type
+  const [sliderValue, setSliderValue] = useState(
+    userResponse?.value || (interaction.data?.min && interaction.data?.max ? Math.round((interaction.data.min + interaction.data.max) / 2) : 50)
+  );
 
   useEffect(() => {
     fetchUserResponse();
@@ -198,8 +209,6 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   }
 
   if (interaction.type === 'quiz') {
-    const [showResult, setShowResult] = useState(false);
-
     return (
       <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
         <p className="text-white font-medium">{interaction.data.question}</p>
@@ -243,8 +252,6 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   }
 
   if (interaction.type === 'countdown') {
-    const [timeLeft, setTimeLeft] = useState('');
-
     useEffect(() => {
       const calculateTimeLeft = () => {
         const end = new Date(interaction.data.endTime).getTime();
@@ -278,10 +285,6 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   }
 
   if (interaction.type === 'slider') {
-    const [sliderValue, setSliderValue] = useState(
-      userResponse?.value || Math.round((interaction.data.min + interaction.data.max) / 2)
-    );
-
     return (
       <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
         <p className="text-white font-medium">{interaction.data.question}</p>
