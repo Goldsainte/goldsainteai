@@ -173,10 +173,10 @@ const handler = async (req: Request): Promise<Response> => {
         <body>
           <div class="container">
             <div class="header">
-              <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
+              <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/logo-horizontal-green.png" alt="GoldSainte" class="logo" />
             </div>
             
-            <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/assets/email-hero-password-reset.jpg" alt="Password Reset" class="hero-image" />
+            <img src="https://iwdevxltjuedijrcdejs.supabase.co/storage/v1/object/public/email-assets/email-hero-password-reset.jpg" alt="Password Reset" class="hero-image" />
             
             <div class="content">
               <h1>🔐 Password Reset Request</h1>
