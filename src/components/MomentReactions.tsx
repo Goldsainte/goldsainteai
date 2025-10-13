@@ -93,6 +93,27 @@ export const MomentReactions = ({ momentId, className = '' }: MomentReactionsPro
             onConflict: 'moment_id,user_id',
           });
         
+        // Get moment owner to send notification
+        const { data: moment } = await supabase
+          .from('moments')
+          .select('user_id')
+          .eq('id', momentId)
+          .single();
+        
+        // Send notification to moment owner (if not reacting to own moment)
+        if (moment && moment.user_id !== user.id) {
+          await supabase
+            .from('notifications')
+            .insert({
+              user_id: moment.user_id,
+              notification_type: 'moment_reaction',
+              title: 'New Reaction',
+              message: `Someone reacted ${reaction} to your moment`,
+              link: `/travel-profile/${moment.user_id}?momentId=${momentId}`,
+              metadata: { moment_id: momentId, reaction, from_user_id: user.id }
+            });
+        }
+        
         setUserReaction(reaction);
       }
     } catch (error) {

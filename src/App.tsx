@@ -88,8 +88,8 @@ function AppContent() {
       console.debug('[WelcomeModal] params', { forceWelcome, forceTour });
       console.debug('[WelcomeModal] storage', { dismissed, hasSeenTour });
 
-      // Always show if forced via query param, otherwise show if user hasn't dismissed or hasn't seen tour
-      const shouldShow = forceWelcome || (!dismissed || !hasSeenTour);
+      // Only show welcome if user hasn't dismissed it yet
+      const shouldShow = forceWelcome || !dismissed;
       console.debug('[WelcomeModal] shouldShow', shouldShow);
       setShowWelcomeModal(shouldShow);
 

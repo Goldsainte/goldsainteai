@@ -166,6 +166,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
     // Play new audio if available
     if (currentMoment.spotify_track_preview_url) {
+      console.log('🎵 Setting up audio:', currentMoment.spotify_track_preview_url);
       const newAudio = new Audio(currentMoment.spotify_track_preview_url);
       newAudio.preload = 'auto';
       newAudio.crossOrigin = 'anonymous';
@@ -174,25 +175,40 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
       let stopTimeout: NodeJS.Timeout;
 
       newAudio.addEventListener('loadedmetadata', () => {
+        console.log('🎵 Audio metadata loaded, duration:', newAudio.duration);
         const startTime = currentMoment.spotify_audio_start_time || 0;
         try {
           newAudio.currentTime = startTime;
-        } catch {}
+          console.log('🎵 Audio start time set to:', startTime);
+        } catch (e) {
+          console.error('Error setting currentTime:', e);
+        }
         // Stop after 30 seconds
         stopTimeout = setTimeout(() => {
           newAudio.pause();
+          console.log('🎵 Audio stopped after 30s');
         }, 30000);
       });
 
-      // Only auto-play if sound is toggled on
-      const tryPlay = () => newAudio.play().catch((error) => {
-        console.error('Audio play failed:', error);
-        setAutoplayBlocked(true);
+      newAudio.addEventListener('error', (e) => {
+        console.error('🎵 Audio error:', e);
+        toast.error('Failed to load audio preview');
       });
 
+      // Autoplay if sound is on
       if (isSoundOn) {
-        tryPlay();
+        console.log('🎵 Attempting to play audio (sound is ON)');
+        newAudio.play()
+          .then(() => {
+            console.log('🎵 Audio playing successfully');
+            setAutoplayBlocked(false);
+          })
+          .catch((error) => {
+            console.error('🎵 Audio play failed:', error);
+            setAutoplayBlocked(true);
+          });
       } else {
+        console.log('🎵 Sound is OFF, not autoplaying');
         setAutoplayBlocked(true);
       }
 
