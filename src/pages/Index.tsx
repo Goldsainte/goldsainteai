@@ -913,7 +913,7 @@ const Index = () => {
                   <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-secondary font-bold text-secondary leading-tight">
                     How it Works
                   </h2>
-                  <div className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] mx-auto leading-relaxed space-y-4">
+                  <div className="text-sm sm:text-base md:text-lg text-muted-foreground font-secondary max-w-[1008px] leading-relaxed space-y-4">
                     <p>
                       Discover, plan, and share luxury travel — all in one intelligent platform.
                     </p>
