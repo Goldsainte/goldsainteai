@@ -35,7 +35,6 @@ interface TravelPost {
   comment_count: number;
   share_count?: number;
   is_featured?: boolean;
-  is_suggested?: boolean;
   spotify_track_id?: string;
   spotify_track_name?: string;
   spotify_track_artist?: string;
@@ -164,7 +163,7 @@ const TravelFeed = () => {
     console.log('Fetching chronological posts...');
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, is_suggested, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art, created_at')
+      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20);
@@ -202,7 +201,7 @@ const TravelFeed = () => {
   const fetchChronologicalPostsRaw = async (): Promise<TravelPost[]> => {
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, is_suggested, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art, created_at')
+      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(20);
