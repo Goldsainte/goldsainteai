@@ -29,10 +29,10 @@ export const Hero = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-            Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
+            Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-3xl">
-            AI-powered search, expert agents on demand, or full control — the choice is yours.
+            Use AI to plan fast, get agents bidding to save more, or book CoCurated trips — built by pros, backed by influencers, and designed to deliver value.
           </p>
 
           <form 

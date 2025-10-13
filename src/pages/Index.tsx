@@ -848,7 +848,10 @@ const Index = () => {
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">
                   <img src={logomark} alt="Goldsainte.Ai" className="h-20 w-20 md:h-16 md:w-16" />
                   <p className="text-sm md:text-base font-medium text-center text-muted-foreground max-w-xl px-2">
-                    Your trip, your way: Book yourself, let AI handle it, or have luxury agents compete for you.
+                    Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs
+                  </p>
+                  <p className="text-xs md:text-sm text-center text-muted-foreground/80 max-w-xl px-2">
+                    Use AI to plan fast, get agents bidding to save more, or book CoCurated trips — built by pros, backed by influencers, and designed to deliver value.
                   </p>
                 </div>
 
