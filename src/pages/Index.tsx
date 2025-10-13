@@ -1733,7 +1733,8 @@ const Index = () => {
         {/* Welcome Modal */}
         <WelcomeModal 
           open={showWelcomeModal} 
-          onClose={() => setShowWelcomeModal(false)} 
+          onClose={() => setShowWelcomeModal(false)}
+          isFirstVisit={false}
         />
       </div>
     </main>

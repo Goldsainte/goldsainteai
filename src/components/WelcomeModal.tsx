@@ -6,13 +6,17 @@ import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star,
 interface WelcomeModalProps {
   open: boolean;
   onClose: () => void;
+  isFirstVisit?: boolean;
 }
 
-export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
+export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeModalProps) => {
   const handleClose = () => {
     localStorage.setItem("goldsainte-welcome-seen", "true");
     onClose();
-    window.dispatchEvent(new Event("welcomeDismissed"));
+    // Only trigger the tour on first visit
+    if (isFirstVisit) {
+      window.dispatchEvent(new Event("welcomeDismissed"));
+    }
   };
 
   return (

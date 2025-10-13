@@ -115,7 +115,7 @@ function AppContent() {
   return (
     <div className="min-h-screen w-full flex flex-col">
       <SkipNavigation />
-      <WelcomeModal open={showWelcomeModal} onClose={handleCloseWelcome} />
+      <WelcomeModal open={showWelcomeModal} onClose={handleCloseWelcome} isFirstVisit={true} />
       <OnboardingTour />
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
