@@ -208,6 +208,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     } catch (error) {
       console.error('Error fetching profile:', error);
       toast.error('Failed to load profile');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -271,8 +273,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     } catch (error) {
       console.error('Error fetching video posts:', error);
       toast.error('Failed to load videos');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -434,6 +434,33 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button onClick={() => navigate('/auth')}>Sign In</Button>
         </div>
       </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <>
+        <TravelSidebar />
+        <div className="min-h-screen bg-background pb-28 md:pb-0 md:ml-64">
+          <div className="max-w-4xl mx-auto px-4 md:px-6 pt-8">
+            <div className="flex gap-8 mb-12 items-start">
+              <div className="h-40 w-40 rounded-full bg-muted animate-pulse flex-shrink-0" />
+              <div className="flex-1 space-y-5">
+                <div className="h-6 w-32 bg-muted rounded animate-pulse" />
+                <div className="flex gap-10">
+                  <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+                </div>
+                <div className="space-y-2">
+                  <div className="h-4 w-48 bg-muted rounded animate-pulse" />
+                  <div className="h-4 w-64 bg-muted rounded animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
