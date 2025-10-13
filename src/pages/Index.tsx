@@ -1091,7 +1091,7 @@ const Index = () => {
             </div>
 
             {/* Creator Hero Section */}
-            <div className="px-4 sm:px-6 pt-3 sm:pt-4 md:pt-5 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background">
+            <div className="px-4 sm:px-6 pt-1 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background">
               <div className="w-full max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                   {/* Left: Text Content */}
