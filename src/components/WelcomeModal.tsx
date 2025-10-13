@@ -83,35 +83,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 5 - Group Bookings */}
-            <div className="flex gap-2.5 sm:gap-3 items-start">
-              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              </div>
-              <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Group bookings & split payments.</h3>
-                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Organize group trips with ease. Split costs among travelers with secure payment links, 
-                  track who's paid, and get instant notifications when payments complete.
-                </p>
-              </div>
-            </div>
-
-            {/* Feature 6 - Itinerary Management */}
-            <div className="flex gap-2.5 sm:gap-3 items-start">
-              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              </div>
-              <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Complete itinerary management.</h3>
-                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Build day-by-day itineraries, upload travel docs, sync calendars, 
-                  and share your plans with travel companions effortlessly.
-                </p>
-              </div>
-            </div>
-
-            {/* Feature 7 - CoCurated Packages */}
+            {/* Feature 5 - CoCurated Packages */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
@@ -125,7 +97,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 8 - Creator Dashboard */}
+            {/* Feature 6 - Creator Dashboard */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                 <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
@@ -139,7 +111,7 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
               </div>
             </div>
 
-            {/* Feature 9 - Creator Payouts */}
+            {/* Feature 7 - Creator Payouts */}
             <div className="flex gap-2.5 sm:gap-3 items-start">
               <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
                 <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
@@ -149,6 +121,34 @@ export const WelcomeModal = ({ open, onClose }: WelcomeModalProps) => {
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
                   Earn from content views, virtual gifts, package bookings (up to 40% commission), Shop sales, partnerships, and affiliate marketing. 
                   Platinum tier members earn up to 20% more. Secure Stripe payouts with full transaction history.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 8 - Group Bookings */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">Group bookings & split payments.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Organize group trips with ease. Split costs among travelers with secure payment links, 
+                  track who's paid, and get instant notifications when payments complete.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature 9 - Itinerary Management */}
+            <div className="flex gap-2.5 sm:gap-3 items-start">
+              <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              </div>
+              <div className="space-y-0.5">
+                <h3 className="font-semibold text-sm sm:text-base">Complete itinerary management.</h3>
+                <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
+                  Build day-by-day itineraries, upload travel docs, sync calendars, 
+                  and share your plans with travel companions effortlessly.
                 </p>
               </div>
             </div>
