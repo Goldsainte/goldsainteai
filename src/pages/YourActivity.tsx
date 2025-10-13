@@ -53,7 +53,8 @@ const YourActivity = () => {
           post_id,
           travel_posts (
             id,
-            media_urls,
+            image_urls,
+            thumbnail_url,
             caption
           )
         `)
@@ -68,7 +69,7 @@ const YourActivity = () => {
         type: 'like' as const,
         post_id: like.post_id,
         created_at: like.created_at,
-        post_media_url: like.travel_posts?.media_urls?.[0],
+        post_media_url: like.travel_posts?.thumbnail_url || like.travel_posts?.image_urls?.[0],
         post_caption: like.travel_posts?.caption,
       }));
       setLikes(formattedLikes);
@@ -83,7 +84,8 @@ const YourActivity = () => {
           post_id,
           travel_posts (
             id,
-            media_urls,
+            image_urls,
+            thumbnail_url,
             caption
           )
         `)
@@ -99,7 +101,7 @@ const YourActivity = () => {
         post_id: comment.post_id,
         content: comment.comment_text,
         created_at: comment.created_at,
-        post_media_url: comment.travel_posts?.media_urls?.[0],
+        post_media_url: comment.travel_posts?.thumbnail_url || comment.travel_posts?.image_urls?.[0],
         post_caption: comment.travel_posts?.caption,
       }));
       setComments(formattedComments);
