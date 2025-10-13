@@ -6223,6 +6223,11 @@ export type Database = {
           media_type: string | null
           original_creator: string | null
           share_count: number | null
+          spotify_track_album_art: string | null
+          spotify_track_artist: string | null
+          spotify_track_id: string | null
+          spotify_track_name: string | null
+          spotify_track_preview_url: string | null
           status: string | null
           thumbnail_url: string | null
           total_watch_time_seconds: number | null
@@ -6250,6 +6255,11 @@ export type Database = {
           media_type?: string | null
           original_creator?: string | null
           share_count?: number | null
+          spotify_track_album_art?: string | null
+          spotify_track_artist?: string | null
+          spotify_track_id?: string | null
+          spotify_track_name?: string | null
+          spotify_track_preview_url?: string | null
           status?: string | null
           thumbnail_url?: string | null
           total_watch_time_seconds?: number | null
@@ -6277,6 +6287,11 @@ export type Database = {
           media_type?: string | null
           original_creator?: string | null
           share_count?: number | null
+          spotify_track_album_art?: string | null
+          spotify_track_artist?: string | null
+          spotify_track_id?: string | null
+          spotify_track_name?: string | null
+          spotify_track_preview_url?: string | null
           status?: string | null
           thumbnail_url?: string | null
           total_watch_time_seconds?: number | null

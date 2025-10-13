@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Save, Camera, Upload as UploadIcon } from "lucide-react";
 import { toast } from "sonner";
+import { SpotifyTrackSelector } from "./SpotifyTrackSelector";
 
 interface VideoEditModalProps {
   open: boolean;
@@ -22,6 +23,13 @@ interface VideoEditModalProps {
   currentLocation: string | null;
   currentThumbnailUrl: string | null;
   videoUrl: string | null;
+  currentSpotifyTrack?: {
+    id: string;
+    name: string;
+    artist: string;
+    albumArt: string | null;
+    previewUrl: string | null;
+  } | null;
   onSuccess: () => void;
 }
 
@@ -33,6 +41,7 @@ const VideoEditModal = ({
   currentLocation,
   currentThumbnailUrl,
   videoUrl,
+  currentSpotifyTrack,
   onSuccess,
 }: VideoEditModalProps) => {
   const { user } = useAuth();
@@ -41,6 +50,7 @@ const VideoEditModal = ({
   const [saving, setSaving] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(currentThumbnailUrl);
+  const [selectedTrack, setSelectedTrack] = useState<any>(currentSpotifyTrack || null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,6 +177,11 @@ const VideoEditModal = ({
           caption: caption || null,
           location: location || null,
           thumbnail_url: thumbnailUrl,
+          spotify_track_id: selectedTrack?.id || null,
+          spotify_track_name: selectedTrack?.name || null,
+          spotify_track_artist: selectedTrack?.artist || null,
+          spotify_track_preview_url: selectedTrack?.previewUrl || null,
+          spotify_track_album_art: selectedTrack?.albumArt || null,
         })
         .eq("id", postId);
 
@@ -279,6 +294,11 @@ const VideoEditModal = ({
               disabled={saving}
             />
           </div>
+
+          <SpotifyTrackSelector
+            selectedTrack={selectedTrack}
+            onSelectTrack={setSelectedTrack}
+          />
         </div>
 
         {/* Sticky Save Button */}

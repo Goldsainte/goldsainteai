@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MomentDrawingCanvas } from "./MomentDrawingCanvas";
 import { StoryInteractionCreator } from "./StoryInteractionCreator";
+import { SpotifyTrackSelector } from "./SpotifyTrackSelector";
 
 interface CreateMomentModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
   const [drawingData, setDrawingData] = useState<string | null>(null);
   const [showInteractionCreator, setShowInteractionCreator] = useState(false);
   const [interaction, setInteraction] = useState<any>(null);
+  const [selectedTrack, setSelectedTrack] = useState<any>(null);
   
   // Text styling options
   const [textContent, setTextContent] = useState("");
@@ -141,6 +143,13 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             bgType: textBgType,
             bgGradient: bgGradient,
           } : null,
+          ...(selectedTrack && {
+            spotify_track_id: selectedTrack.id,
+            spotify_track_name: selectedTrack.name,
+            spotify_track_artist: selectedTrack.artist,
+            spotify_track_preview_url: selectedTrack.previewUrl,
+            spotify_track_album_art: selectedTrack.albumArt,
+          }),
         });
 
       if (insertError) throw insertError;
@@ -165,6 +174,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
     setShowDrawing(false);
     setDrawingData(null);
     setInteraction(null);
+    setSelectedTrack(null);
     onOpenChange(false);
   };
 
@@ -302,6 +312,11 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                 {caption.length}/200
               </p>
             </div>
+
+            <SpotifyTrackSelector
+              selectedTrack={selectedTrack}
+              onSelectTrack={setSelectedTrack}
+            />
 
             <div className="space-y-2">
               <Button

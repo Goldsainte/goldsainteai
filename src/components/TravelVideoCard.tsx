@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music, TrendingUp } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -47,6 +47,11 @@ interface TravelVideoCardProps {
     share_count?: number;
     is_featured?: boolean;
     is_suggested?: boolean;
+    spotify_track_id?: string;
+    spotify_track_name?: string;
+    spotify_track_artist?: string;
+    spotify_track_preview_url?: string;
+    spotify_track_album_art?: string;
     profiles?: {
       username: string | null;
       avatar_url: string | null;
@@ -84,6 +89,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [promoteModalOpen, setPromoteModalOpen] = useState(false);
   const [photoGalleryOpen, setPhotoGalleryOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -114,6 +121,18 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       videoRef.current.currentTime = 0;
     }
   }, [isActive]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      if (isActive && post.spotify_track_preview_url) {
+        audioRef.current.play().catch(() => {});
+        setAudioPlaying(true);
+      } else {
+        audioRef.current.pause();
+        setAudioPlaying(false);
+      }
+    }
+  }, [isActive, post.spotify_track_preview_url]);
 
   const checkIfLiked = async () => {
     if (!user) return;
@@ -372,6 +391,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
     if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
     return count.toString();
+  };
+
+  const toggleAudio = () => {
+    if (!audioRef.current) return;
+    
+    if (audioPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(() => {});
+    }
+    setAudioPlaying(!audioPlaying);
   };
 
   const getEmbedComponent = () => {
@@ -659,6 +689,47 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </div>
           )}
 
+          {/* Spotify Music Player */}
+          {post.spotify_track_name && (
+            <div className="flex items-center gap-2 text-sm bg-background/80 backdrop-blur-sm rounded-lg p-2">
+              {post.spotify_track_album_art && (
+                <img
+                  src={post.spotify_track_album_art}
+                  alt={post.spotify_track_name}
+                  className="w-10 h-10 rounded object-cover"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate">{post.spotify_track_name}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {post.spotify_track_artist}
+                </p>
+              </div>
+              {post.spotify_track_preview_url && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleAudio}
+                    className="h-8 w-8 shrink-0"
+                  >
+                    {audioPlaying ? (
+                      <Pause className="w-4 h-4" />
+                    ) : (
+                      <Play className="w-4 h-4" />
+                    )}
+                  </Button>
+                  <audio
+                    ref={audioRef}
+                    src={post.spotify_track_preview_url}
+                    onEnded={() => setAudioPlaying(false)}
+                  />
+                </>
+              )}
+              <Music2 className="w-4 h-4 text-[#1DB954] shrink-0" />
+            </div>
+          )}
+
           {/* View all comments */}
           {localCommentCount > 0 && (
             <button 
@@ -690,6 +761,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           currentLocation={post.location}
           currentThumbnailUrl={post.thumbnail_url}
           videoUrl={post.video_url || null}
+          currentSpotifyTrack={
+            post.spotify_track_id
+              ? {
+                  id: post.spotify_track_id,
+                  name: post.spotify_track_name || "",
+                  artist: post.spotify_track_artist || "",
+                  albumArt: post.spotify_track_album_art || null,
+                  previewUrl: post.spotify_track_preview_url || null,
+                }
+              : null
+          }
           onSuccess={onUpdate}
         />
 
@@ -984,6 +1066,49 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <Coins className="h-7 w-7 text-[#BFAD72] drop-shadow-2xl" />
             </button>
           </div>
+
+          {/* Spotify Music Player (Mobile) */}
+          {post.spotify_track_name && (
+            <div className="absolute bottom-20 left-4 right-20 flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full p-2 text-sm">
+              {post.spotify_track_album_art && (
+                <img
+                  src={post.spotify_track_album_art}
+                  alt={post.spotify_track_name}
+                  className="w-8 h-8 rounded-full object-cover"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-xs truncate text-foreground">
+                  {post.spotify_track_name}
+                </p>
+                <p className="text-[10px] text-muted-foreground truncate">
+                  {post.spotify_track_artist}
+                </p>
+              </div>
+              {post.spotify_track_preview_url && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={toggleAudio}
+                    className="h-6 w-6 shrink-0"
+                  >
+                    {audioPlaying ? (
+                      <Pause className="w-3 h-3" />
+                    ) : (
+                      <Play className="w-3 h-3" />
+                    )}
+                  </Button>
+                  <audio
+                    ref={audioRef}
+                    src={post.spotify_track_preview_url}
+                    onEnded={() => setAudioPlaying(false)}
+                  />
+                </>
+              )}
+              <Music2 className="w-3 h-3 text-[#1DB954] shrink-0" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -1007,6 +1132,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         currentLocation={post.location}
         currentThumbnailUrl={post.thumbnail_url}
         videoUrl={post.video_url || null}
+        currentSpotifyTrack={
+          post.spotify_track_id
+            ? {
+                id: post.spotify_track_id,
+                name: post.spotify_track_name || "",
+                artist: post.spotify_track_artist || "",
+                albumArt: post.spotify_track_album_art || null,
+                previewUrl: post.spotify_track_preview_url || null,
+              }
+            : null
+        }
         onSuccess={onUpdate}
       />
 
