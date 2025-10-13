@@ -595,13 +595,6 @@ export const Header = () => {
                             <span className="text-sm font-medium">Booking Preferences</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            onClick={() => setCreateSheetOpen(true)} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
-                          >
-                            <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Create</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
                             onClick={() => navigate('/creator-dashboard')} 
                             className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                             data-tour="creator-dashboard"
