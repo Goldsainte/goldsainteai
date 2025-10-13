@@ -90,6 +90,9 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     // Record view
     recordView(currentMoment.id);
 
+    // Reset progress when index changes
+    setProgress(0);
+
     // If save dialog is open, pause auto-advance
     if (saveDialogOpen) {
       return;
@@ -100,19 +103,27 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     const interval = 50;
     const increment = (interval / duration) * 100;
 
-    setProgress(0);
     const timer = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
-          handleNext();
-          return 0;
+        const newProgress = prev + increment;
+        if (newProgress >= 100) {
+          clearInterval(timer);
+          // Small delay before auto-advancing to next moment
+          setTimeout(() => {
+            if (currentIndex < moments.length - 1) {
+              setCurrentIndex(prev => prev + 1);
+            } else {
+              onOpenChange(false);
+            }
+          }, 100);
+          return 100;
         }
-        return prev + increment;
+        return newProgress;
       });
     }, interval);
 
     return () => clearInterval(timer);
-  }, [currentIndex, moments, saveDialogOpen]);
+  }, [currentIndex, moments, saveDialogOpen, onOpenChange]);
 
   const fetchMoments = async () => {
     try {
@@ -175,15 +186,17 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   };
 
   const handleNext = () => {
+    setProgress(0); // Reset progress immediately
     if (currentIndex < moments.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
-      setSaveDialogOpen(false); // Close save dialog if open
+      setSaveDialogOpen(false);
       onOpenChange(false);
     }
   };
 
   const handlePrevious = () => {
+    setProgress(0); // Reset progress immediately
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
     }
