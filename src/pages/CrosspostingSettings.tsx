@@ -277,38 +277,19 @@ const CrosspostingSettings = () => {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {instagramConnected ? (
-              <>
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <Label htmlFor="auto-instagram">Auto-share to Instagram</Label>
-                    <p className="text-xs text-muted-foreground">
-                      Automatically share new videos to Instagram
-                    </p>
-                  </div>
-                  <Switch
-                    id="auto-instagram"
-                    checked={autoShareInstagram}
-                    onCheckedChange={handleToggleAutoShareInstagram}
-                  />
-                </div>
-                <Button 
-                  variant="outline" 
-                  onClick={handleDisconnectInstagram}
-                  className="w-full"
-                >
-                  Disconnect Instagram
-                </Button>
-              </>
-            ) : (
-              <Button 
-                onClick={handleConnectInstagram}
-                className="w-full gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Connect Instagram Account
-              </Button>
-            )}
+            <div className="text-center py-6 space-y-2">
+              <p className="text-sm font-medium">Coming Soon</p>
+              <p className="text-xs text-muted-foreground">
+                Instagram crossposting will be available soon with full OAuth security
+              </p>
+            </div>
+            <Button 
+              disabled
+              className="w-full gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Connect Instagram Account
+            </Button>
             <p className="text-xs text-muted-foreground">
               Share your photos and videos to Instagram Stories and Reels
             </p>
