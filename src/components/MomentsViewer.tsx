@@ -442,7 +442,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg h-[90vh] p-0 bg-black border-none overflow-hidden">
+      <DialogContent className="max-w-lg h-[90vh] p-0 bg-black border-none overflow-hidden [&>button]:hidden">
         <DialogTitle className="sr-only">Moments Viewer</DialogTitle>
         <DialogDescription className="sr-only">View and save moments to your vault.</DialogDescription>
         <div className="relative w-full h-full bg-black">
