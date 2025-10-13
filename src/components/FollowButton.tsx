@@ -7,9 +7,10 @@ import { toast } from "sonner";
 
 interface FollowButtonProps {
   targetUserId: string;
+  onFollowSuccess?: () => void;
 }
 
-const FollowButton = ({ targetUserId }: FollowButtonProps) => {
+const FollowButton = ({ targetUserId, onFollowSuccess }: FollowButtonProps) => {
   const { user } = useAuth();
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -73,6 +74,11 @@ const FollowButton = ({ targetUserId }: FollowButtonProps) => {
         if (error) throw error;
         setIsFollowing(true);
         toast.success('Following!');
+        
+        // Call the success callback if provided
+        if (onFollowSuccess) {
+          onFollowSuccess();
+        }
       }
     } catch (error: any) {
       console.error('Error toggling follow:', error);

@@ -41,15 +41,34 @@ export function FeedSuggestions() {
   const fetchSuggestions = async () => {
     if (!user) return;
 
-    const { data } = await supabase
+    // Get users that the current user is NOT following
+    const { data: following } = await supabase
+      .from('user_follows')
+      .select('following_id')
+      .eq('follower_id', user.id);
+
+    const followingIds = following?.map(f => f.following_id) || [];
+
+    let query = supabase
       .from('profiles')
       .select('id, username, avatar_url, is_verified')
-      .neq('id', user.id)
-      .limit(5);
+      .neq('id', user.id);
+
+    // Only apply the filter if there are users being followed
+    if (followingIds.length > 0) {
+      query = query.not('id', 'in', `(${followingIds.join(',')})`);
+    }
+
+    const { data } = await query.limit(5);
 
     if (data) {
       setSuggestions(data);
     }
+  };
+
+  const handleFollowSuccess = (userId: string) => {
+    // Remove the followed user from suggestions
+    setSuggestions(prev => prev.filter(user => user.id !== userId));
   };
 
   if (!user) return null;
@@ -122,7 +141,10 @@ export function FeedSuggestions() {
                 </div>
               </div>
               <div className="w-24 flex-shrink-0">
-                <FollowButton targetUserId={suggestion.id} />
+                <FollowButton 
+                  targetUserId={suggestion.id} 
+                  onFollowSuccess={() => handleFollowSuccess(suggestion.id)}
+                />
               </div>
             </div>
           ))}

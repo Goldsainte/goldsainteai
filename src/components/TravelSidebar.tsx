@@ -121,13 +121,13 @@ export function TravelSidebar() {
           <PopoverContent 
             side="top" 
             align="start" 
-            className="w-64 p-0 bg-background border-border shadow-lg z-50"
+            className="w-64 p-0 bg-popover border shadow-lg z-[100]"
             sideOffset={8}
           >
             <div className="py-2">
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
                 onClick={() => handleNavigation('/travel-settings-2')}
               >
                 <Settings className="h-5 w-5" />
@@ -135,7 +135,7 @@ export function TravelSidebar() {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
                 onClick={() => handleNavigation('/your-activity')}
               >
                 <Activity className="h-5 w-5" />
@@ -143,7 +143,7 @@ export function TravelSidebar() {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
                 onClick={() => handleNavigation('/favorites')}
               >
                 <Bookmark className="h-5 w-5" />
@@ -151,7 +151,7 @@ export function TravelSidebar() {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
                 onClick={toggleTheme}
               >
                 {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
@@ -159,7 +159,7 @@ export function TravelSidebar() {
               </Button>
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
                 onClick={() => handleNavigation('/admin/trust-safety')}
               >
                 <AlertCircle className="h-5 w-5" />
@@ -170,7 +170,7 @@ export function TravelSidebar() {
               
               <Button
                 variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-muted/50 rounded-none"
+                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
                 onClick={handleSignOut}
               >
                 <LogOut className="h-5 w-5" />
