@@ -895,6 +895,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             className="absolute inset-0 w-full h-full object-cover"
             loop
             playsInline
+            webkit-playsinline="true"
             muted={isMuted}
             preload="metadata"
             crossOrigin="anonymous"
@@ -903,6 +904,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             onError={() => {
               setVideoError(true);
               setVideoLoading(false);
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (videoRef.current) {
+                if (videoRef.current.paused) {
+                  videoRef.current.play();
+                } else {
+                  videoRef.current.pause();
+                }
+              }
             }}
           />
           {/* More Options Button */}

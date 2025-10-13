@@ -214,7 +214,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-lg max-h-[90vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle>Create a Moment</DialogTitle>
         </DialogHeader>
@@ -233,20 +233,21 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
           <TabsContent value="media" className="space-y-4">
             {!preview ? (
-              <div className="border-2 border-dashed rounded-lg p-8 text-center">
+              <div className="border-2 border-dashed rounded-lg p-6 sm:p-8 text-center">
                 <input
                   type="file"
                   accept="image/*,video/*"
                   onChange={handleFileSelect}
                   className="hidden"
                   id="moment-file"
+                  capture="environment"
                 />
-                <label htmlFor="moment-file" className="cursor-pointer">
-                  <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">
-                    Click to upload an image or video
+                <label htmlFor="moment-file" className="cursor-pointer block">
+                  <Upload className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 sm:mb-4 text-muted-foreground" />
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Tap to upload an image or video
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                     Max size: 50MB
                   </p>
                 </label>
@@ -254,16 +255,19 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             ) : (
               <>
                 {!showDrawing ? (
-                  <div ref={dragContainerRef} className="relative w-full h-[350px] bg-black rounded-lg overflow-hidden">
+                  <div 
+                    ref={dragContainerRef} 
+                    className="relative w-full h-[280px] sm:h-[350px] bg-black rounded-lg overflow-hidden touch-none"
+                  >
                     {file?.type.startsWith('image/') ? (
                       <img src={preview} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <video src={preview} className="w-full h-full object-cover" controls />
+                      <video src={preview} className="w-full h-full object-cover" controls playsInline />
                     )}
                     <Button
                       variant="destructive"
                       size="icon"
-                      className="absolute top-2 right-2"
+                      className="absolute top-2 right-2 h-8 w-8 sm:h-10 sm:w-10"
                       onClick={() => {
                         if (preview) URL.revokeObjectURL(preview);
                         setFile(null);
@@ -271,25 +275,30 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                         setDrawingData(null);
                       }}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                     {file?.type.startsWith('image/') && (
                       <Button
                         variant="secondary"
                         size="sm"
-                        className="absolute bottom-2 right-2 gap-2"
-                        onClick={() => setShowDrawing(true)}
+                        className="absolute bottom-2 right-2 gap-2 text-xs sm:text-sm h-8 sm:h-9"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setShowDrawing(true);
+                        }}
                       >
-                        <Paintbrush className="w-4 h-4" />
+                        <Paintbrush className="w-3 h-3 sm:w-4 sm:h-4" />
                         Draw
                       </Button>
                     )}
 
                     {interaction && (
                       <div
-                        className="absolute"
+                        className="absolute cursor-move touch-none"
                         style={{ left: `${interactionPos.x}%`, top: `${interactionPos.y}%`, transform: 'translate(-50%, -50%)', zIndex: 20 }}
                         onMouseDown={(e) => {
+                          e.preventDefault();
                           const move = (ev: MouseEvent) => {
                             if (!dragContainerRef.current) return;
                             const rect = dragContainerRef.current.getBoundingClientRect();
@@ -305,6 +314,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                           document.addEventListener('mouseup', up);
                         }}
                         onTouchStart={(e) => {
+                          e.preventDefault();
                           const move = (ev: TouchEvent) => {
                             if (!dragContainerRef.current) return;
                             const rect = dragContainerRef.current.getBoundingClientRect();
@@ -317,11 +327,11 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                             document.removeEventListener('touchmove', move);
                             document.removeEventListener('touchend', end);
                           };
-                          document.addEventListener('touchmove', move, { passive: true } as any);
+                          document.addEventListener('touchmove', move);
                           document.addEventListener('touchend', end);
                         }}
                       >
-                        <div className="bg-black/70 text-white text-xs rounded-lg px-3 py-2 shadow">
+                        <div className="bg-black/70 text-white text-[10px] sm:text-xs rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg">
                           {interaction.type === 'countdown' ? (interaction.data.label || 'Countdown')
                             : interaction.type === 'poll' ? (interaction.data.question || 'Poll')
                             : interaction.type === 'question' ? (interaction.data.text || 'Question')
@@ -337,14 +347,17 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                   <div className="space-y-2">
                     <MomentDrawingCanvas
                       backgroundImage={preview}
-                      width={400}
-                      height={350}
+                      width={typeof window !== 'undefined' && window.innerWidth < 640 ? Math.min(350, window.innerWidth - 48) : 400}
+                      height={typeof window !== 'undefined' && window.innerWidth < 640 ? 280 : 350}
                       onDrawingChange={setDrawingData}
                       initialDrawing={drawingData}
                     />
                     <Button
                       variant="outline"
-                      onClick={() => setShowDrawing(false)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowDrawing(false);
+                      }}
                       className="w-full"
                     >
                       Done Drawing
@@ -380,11 +393,14 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             <div className="space-y-2">
               <Button
                 variant="outline"
-                onClick={() => setShowInteractionCreator(true)}
-                className="w-full"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowInteractionCreator(true);
+                }}
+                className="w-full text-xs sm:text-sm h-9 sm:h-10"
                 type="button"
               >
-                <Wand2 className="w-4 h-4 mr-2" />
+                <Wand2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
                 {interaction ? 'Edit Interactive Element' : 'Add Interactive Element'}
               </Button>
               {interaction && (
@@ -422,48 +438,28 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             {/* Preview */}
             <div 
               ref={dragContainerRef}
-              className="relative w-full h-[350px] rounded-lg overflow-hidden flex items-center justify-center p-8"
+              className="relative w-full h-[280px] sm:h-[350px] rounded-lg overflow-hidden flex items-center justify-center p-6 sm:p-8"
               style={{ background: bgGradient }}
             >
               <div className="text-center max-w-md px-4">
                 {textContent ? (
-                  <p
-                    key={`${textFont}-${textAnimation}-${textBgType}-${textColor}-${textContent.length}`}
-                    className={`
-                      text-4xl font-bold
-                      ${getFontClass()}
-                      ${getTextAnimationClass()}
-                      ${getTextBgClass()}
-                    `}
-                    style={
-                      textBgType === "solid" 
-                        ? { 
-                            background: textColor,
-                            color: '#FFFFFF',
-                          }
-                        : textBgType === "outline"
-                        ? {
-                            WebkitTextStroke: `3px ${textColor}`,
-                            WebkitTextFillColor: 'white',
-                            color: textColor,
-                          }
-                        : { 
-                            color: textColor,
-                          }
-                    }
+                  <p 
+                    className={`text-2xl sm:text-3xl md:text-4xl font-bold ${getFontClass()} ${getTextAnimationClass()} ${getTextBgClass()}`}
+                    style={{ color: textColor }}
                   >
                     {textContent}
                   </p>
                 ) : (
-                  <p className="text-white/50 text-lg">Enter your text below</p>
+                  <p className="text-white/50 text-sm sm:text-base">Type your text below...</p>
                 )}
               </div>
 
               {interaction && (
                 <div
-                  className="absolute"
+                  className="absolute cursor-move touch-none"
                   style={{ left: `${interactionPos.x}%`, top: `${interactionPos.y}%`, transform: 'translate(-50%, -50%)', zIndex: 20 }}
                   onMouseDown={(e) => {
+                    e.preventDefault();
                     const move = (ev: MouseEvent) => {
                       if (!dragContainerRef.current) return;
                       const rect = dragContainerRef.current.getBoundingClientRect();
@@ -479,6 +475,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                     document.addEventListener('mouseup', up);
                   }}
                   onTouchStart={(e) => {
+                    e.preventDefault();
                     const move = (ev: TouchEvent) => {
                       if (!dragContainerRef.current) return;
                       const rect = dragContainerRef.current.getBoundingClientRect();
@@ -491,11 +488,11 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                       document.removeEventListener('touchmove', move);
                       document.removeEventListener('touchend', end);
                     };
-                    document.addEventListener('touchmove', move, { passive: true } as any);
+                    document.addEventListener('touchmove', move);
                     document.addEventListener('touchend', end);
                   }}
                 >
-                  <div className="bg-black/70 text-white text-xs rounded-lg px-3 py-2 shadow">
+                  <div className="bg-black/70 text-white text-[10px] sm:text-xs rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg">
                     {interaction.type === 'countdown' ? (interaction.data.label || 'Countdown')
                       : interaction.type === 'poll' ? (interaction.data.question || 'Poll')
                       : interaction.type === 'question' ? (interaction.data.text || 'Question')
@@ -510,49 +507,47 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
 
             {/* Text Input */}
             <div>
-              <Label htmlFor="text">Your Text</Label>
+              <Label htmlFor="text-content">Your Text</Label>
               <Textarea
-                id="text"
+                id="text-content"
                 value={textContent}
                 onChange={(e) => setTextContent(e.target.value)}
-                placeholder="Type your message..."
+                placeholder="Type your moment..."
                 maxLength={150}
                 rows={3}
+                className="text-base sm:text-sm"
               />
               <p className="text-xs text-muted-foreground mt-1">
                 {textContent.length}/150
               </p>
             </div>
 
-            {/* Font Selection */}
+            {/* Font Selector */}
             <div>
-              <Label>Font Style</Label>
+              <Label htmlFor="font">Font</Label>
               <Select value={textFont} onValueChange={setTextFont}>
-                <SelectTrigger>
+                <SelectTrigger id="font">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {fonts.map((font) => (
+                  {fonts.map(font => (
                     <SelectItem key={font.value} value={font.value}>
-                      <span className={font.className}>{font.label}</span>
+                      {font.label}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Animation */}
+            {/* Animation Selector */}
             <div>
-              <Label>
-                <Sparkles className="w-4 h-4 inline mr-2" />
-                Animation
-              </Label>
+              <Label htmlFor="animation">Animation</Label>
               <Select value={textAnimation} onValueChange={setTextAnimation}>
-                <SelectTrigger>
+                <SelectTrigger id="animation">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {animations.map((anim) => (
+                  {animations.map(anim => (
                     <SelectItem key={anim.value} value={anim.value}>
                       {anim.label}
                     </SelectItem>
@@ -561,36 +556,32 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               </Select>
             </div>
 
-            {/* Text Color */}
+            {/* Color Picker */}
             <div>
-              <Label htmlFor="textColor">Text Color</Label>
-              <div className="flex gap-2 items-center">
+              <Label htmlFor="color">Text Color</Label>
+              <div className="flex gap-2">
                 <input
+                  id="color"
                   type="color"
-                  id="textColor"
                   value={textColor}
                   onChange={(e) => setTextColor(e.target.value)}
-                  className="w-12 h-12 rounded cursor-pointer"
+                  className="w-12 h-10 rounded cursor-pointer"
                 />
-                <div className="flex-1 grid grid-cols-6 gap-2">
-                  {["#FFFFFF", "#000000", "#FF6B6B", "#4ECDC4", "#FFE66D", "#A8E6CF"].map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setTextColor(color)}
-                      className="w-8 h-8 rounded-full border-2 border-border hover:scale-110 transition-transform"
-                      style={{ backgroundColor: color }}
-                      aria-label={`Set color to ${color}`}
-                    />
-                  ))}
-                </div>
+                <input
+                  type="text"
+                  value={textColor}
+                  onChange={(e) => setTextColor(e.target.value)}
+                  className="flex-1 px-3 py-2 rounded border text-sm"
+                  placeholder="#FFFFFF"
+                />
               </div>
             </div>
 
-            {/* Text Background */}
+            {/* Background Type */}
             <div>
-              <Label>Text Background</Label>
+              <Label htmlFor="bg-type">Background Style</Label>
               <Select value={textBgType} onValueChange={(v) => setTextBgType(v as any)}>
-                <SelectTrigger>
+                <SelectTrigger id="bg-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -601,23 +592,54 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               </Select>
             </div>
 
-            {/* Background Gradient */}
+            {/* Gradient Selector */}
             <div>
-              <Label>Background Gradient</Label>
-              <div className="grid grid-cols-4 gap-2 mt-2">
-                {gradients.map((grad) => (
-                  <button
-                    key={grad.value}
-                    onClick={() => setBgGradient(grad.value)}
-                    className={`h-12 rounded-lg border-2 transition-all ${
-                      bgGradient === grad.value ? "border-primary scale-105" : "border-border"
-                    }`}
-                    style={{ background: grad.value }}
-                    title={grad.label}
-                    aria-label={`Set gradient to ${grad.label}`}
-                  />
-                ))}
-              </div>
+              <Label htmlFor="gradient">Background Gradient</Label>
+              <Select value={bgGradient} onValueChange={setBgGradient}>
+                <SelectTrigger id="gradient">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {gradients.map(grad => (
+                    <SelectItem key={grad.value} value={grad.value}>
+                      {grad.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <SpotifyTrackSelector
+              selectedTrack={selectedTrack}
+              onSelectTrack={(track, startTime) => {
+                setSelectedTrack(track);
+                setAudioStartTime(startTime || 0);
+              }}
+            />
+
+            <div className="space-y-2">
+              <Button
+                variant="outline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowInteractionCreator(true);
+                }}
+                className="w-full text-xs sm:text-sm h-9 sm:h-10"
+                type="button"
+              >
+                <Wand2 className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+                {interaction ? 'Edit Interactive Element' : 'Add Interactive Element'}
+              </Button>
+              {interaction && (
+                <div className="text-xs text-muted-foreground bg-muted p-2 rounded">
+                  {interaction.type === 'poll' && `Poll: ${interaction.data.question}`}
+                  {interaction.type === 'question' && `Question: ${interaction.data.text}`}
+                  {interaction.type === 'quiz' && `Quiz: ${interaction.data.question}`}
+                  {interaction.type === 'countdown' && `Countdown: ${interaction.data.label}`}
+                  {interaction.type === 'slider' && `Slider: ${interaction.data.question}`}
+                  {interaction.type === 'add_yours' && `Add Yours: ${interaction.data.prompt}`}
+                </div>
+              )}
             </div>
 
             <div className="flex gap-2">
@@ -639,16 +661,17 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             </div>
           </TabsContent>
         </Tabs>
-      </DialogContent>
 
-      <StoryInteractionCreator
-        open={showInteractionCreator}
-        onOpenChange={setShowInteractionCreator}
-        onSave={(data) => {
-          setInteraction(data);
-          setShowInteractionCreator(false);
-        }}
-      />
+        {/* Interaction Creator Modal */}
+        <StoryInteractionCreator
+          open={showInteractionCreator}
+          onOpenChange={setShowInteractionCreator}
+          onSave={(newInteraction) => {
+            setInteraction(newInteraction);
+            setShowInteractionCreator(false);
+          }}
+        />
+      </DialogContent>
     </Dialog>
   );
 };
