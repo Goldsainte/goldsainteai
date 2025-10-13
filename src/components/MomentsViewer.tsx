@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { MomentDrawingDisplay } from "./MomentDrawingDisplay";
 import { MomentInteractionDisplay } from "./MomentInteractionDisplay";
+import { MomentReactions } from "./MomentReactions";
 
 interface Moment {
   id: string;
@@ -427,16 +428,17 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             />
           )}
 
-          {/* Caption & Stats */}
-          {!currentMoment.interactions && (currentMoment.caption || currentMoment.view_count > 0) && (
-            <div className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-black/80 to-transparent">
+          {/* Caption, Stats & Reactions */}
+          {!currentMoment.interactions && (
+            <div className="absolute bottom-0 left-0 right-0 z-20 p-4 bg-gradient-to-t from-black/80 to-transparent space-y-3">
               {currentMoment.caption && (
-                <p className="text-white text-sm mb-2">{currentMoment.caption}</p>
+                <p className="text-white text-sm">{currentMoment.caption}</p>
               )}
               <div className="flex items-center gap-1 text-white/70 text-xs">
                 <Eye className="w-4 h-4" />
                 <span>{currentMoment.view_count} views</span>
               </div>
+              <MomentReactions momentId={currentMoment.id} />
             </div>
           )}
 

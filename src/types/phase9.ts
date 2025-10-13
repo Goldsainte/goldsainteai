@@ -1,4 +1,40 @@
-// Temporary types for Phase 9 features until Supabase types regenerate
+// Temporary types for Phase 9 and Phase 10 features until Supabase types regenerate
+
+export interface MomentReaction {
+  id: string;
+  moment_id: string;
+  user_id: string;
+  reaction: string;
+  created_at: string;
+}
+
+export interface MomentPollResponse {
+  id: string;
+  moment_id: string;
+  user_id: string;
+  response_data: any;
+  created_at: string;
+}
+
+export interface MomentReply {
+  id: string;
+  moment_id: string;
+  from_user_id: string;
+  to_user_id: string;
+  message: string;
+  media_url: string | null;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface UserSuggestion {
+  id: string;
+  user_id: string;
+  suggested_user_id: string;
+  score: number;
+  reason: string | null;
+  created_at: string;
+}
 
 export interface InstantBookingSettings {
   id: string;
