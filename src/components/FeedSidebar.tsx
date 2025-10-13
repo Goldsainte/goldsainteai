@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Home, Search, Compass, Video, MessageCircle, Heart, PlusSquare, BarChart3, User, Menu } from "lucide-react";
+import { Home, Search, Compass, Video, MessageCircle, Heart, PlusSquare, BarChart3, User, Menu, LogOut } from "lucide-react";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export function FeedSidebar() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
 
@@ -91,10 +91,13 @@ export function FeedSidebar() {
         </NavLink>
       </nav>
 
-      {/* More Menu at bottom */}
-      <button className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted/50 transition-colors font-normal w-full">
-        <Menu className="h-6 w-6" />
-        <span className="text-base">More</span>
+      {/* Sign Out Button */}
+      <button 
+        onClick={signOut}
+        className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted/50 transition-colors font-normal w-full text-destructive hover:text-destructive"
+      >
+        <LogOut className="h-6 w-6" />
+        <span className="text-base">Sign Out</span>
       </button>
     </aside>
   );
