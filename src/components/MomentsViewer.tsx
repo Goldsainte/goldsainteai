@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { ChevronLeft, ChevronRight, X, Eye, Archive } from "lucide-react";
@@ -287,8 +287,8 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg h-[90vh] p-0 bg-black border-none overflow-hidden">
-        <h2 className="sr-only">Moments Viewer</h2>
-        <p className="sr-only">View and save moments to your vault.</p>
+        <DialogTitle className="sr-only">Moments Viewer</DialogTitle>
+        <DialogDescription className="sr-only">View and save moments to your vault.</DialogDescription>
         <div className="relative w-full h-full bg-black">
           {/* Progress bars */}
           <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2">
