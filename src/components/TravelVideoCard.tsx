@@ -906,10 +906,43 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               setVideoLoading(false);
             }}
           />
+          {/* More Options Button */}
+          <div className="absolute top-20 right-4 z-10">
+            {isOwnPost ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                  <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Sainte
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Propose Partnership
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+
           {/* Mute Button */}
           <button
             onClick={onToggleMute}
-            className="absolute top-20 right-4 rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
+            className="absolute top-36 right-4 rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
             aria-label={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? (
@@ -920,28 +953,98 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           </button>
         </>
       ) : post.embed_url ? (
-        getEmbedComponent()
+        <>
+          {getEmbedComponent()}
+          
+          {/* More Options Button for Embed */}
+          <div className="absolute top-20 right-4 z-10">
+            {isOwnPost ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                  <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Sainte
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Propose Partnership
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        </>
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
-        <div 
-          className="absolute inset-0 cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            setCurrentPhotoIndex(0);
-            setPhotoGalleryOpen(true);
-          }}
-        >
-          <img 
-            src={post.image_urls?.[0] || (post.thumbnail_url as string)} 
-            alt="Post content"
-            loading="lazy"
-            className="w-full h-full object-cover bg-black"
-          />
-          {post.image_urls && post.image_urls.length > 1 && (
-            <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
-              1 / {post.image_urls.length}
-            </div>
-          )}
-        </div>
+        <>
+          <div 
+            className="absolute inset-0 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCurrentPhotoIndex(0);
+              setPhotoGalleryOpen(true);
+            }}
+          >
+            <img 
+              src={post.image_urls?.[0] || (post.thumbnail_url as string)} 
+              alt="Post content"
+              loading="lazy"
+              className="w-full h-full object-cover bg-black"
+            />
+            {post.image_urls && post.image_urls.length > 1 && (
+              <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
+                1 / {post.image_urls.length}
+              </div>
+            )}
+          </div>
+
+          {/* More Options Button for Photos */}
+          <div className="absolute top-20 right-4 z-10">
+            {isOwnPost ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                  <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Sainte
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
+                  <DropdownMenuItem onClick={() => setPartnershipProposalOpen(true)}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Propose Partnership
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
+        </>
       ) : null}
 
       {/* Gradient Overlay - Stronger for better readability */}
