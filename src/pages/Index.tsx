@@ -79,6 +79,8 @@ import property2 from "@/assets/property2.jpg";
 import property3 from "@/assets/property3.jpg";
 import property4 from "@/assets/property4.jpg";
 import property5 from "@/assets/property5.jpg";
+import creatorYachtParty from "@/assets/creator-yacht-party.jpg";
+import creatorBeachSelfie from "@/assets/creator-beach-selfie.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
@@ -1128,11 +1130,17 @@ const Index = () => {
                     <div className="absolute top-[38%] right-[8%] w-[48%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property3} alt="Adventure" className="w-full h-full object-cover" />
                     </div>
+                    <div className="absolute top-[30%] left-[10%] w-[38%] h-[30%] rounded-2xl overflow-hidden shadow-xl z-10">
+                      <img src={creatorBeachSelfie} alt="Creator content" className="w-full h-full object-cover" />
+                    </div>
                     <div className="absolute bottom-0 left-[5%] w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property4} alt="Luxury dining" className="w-full h-full object-cover" />
                     </div>
                     <div className="absolute bottom-[8%] right-0 w-[45%] h-[42%] rounded-2xl overflow-hidden shadow-xl">
                       <img src={property5} alt="Coastal view" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="absolute top-[5%] left-[20%] w-[35%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-20">
+                      <img src={creatorYachtParty} alt="Creator lifestyle" className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
