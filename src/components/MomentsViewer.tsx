@@ -497,6 +497,15 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                   <Trash className="w-5 h-5" />
                 </Button>
               )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => onOpenChange(false)}
+                className="text-white hover:bg-white/20"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
           </div>
 
