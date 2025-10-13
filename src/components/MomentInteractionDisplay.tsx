@@ -137,6 +137,38 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
     }
   };
 
+  // Countdown timer effect
+  useEffect(() => {
+    if (interaction.type !== 'countdown') return;
+
+    const calculateTimeLeft = () => {
+      const end = new Date(interaction.data?.endTime).getTime();
+      const now = Date.now();
+      const diff = end - now;
+
+      if (Number.isNaN(end)) {
+        setTimeLeft('');
+        return;
+      }
+
+      if (diff <= 0) {
+        setTimeLeft('Time is up!');
+        return;
+      }
+
+      const days = Math.floor(diff / 86400000);
+      const hours = Math.floor((diff % 86400000) / 3600000);
+      const minutes = Math.floor((diff % 3600000) / 60000);
+      const seconds = Math.floor((diff % 60000) / 1000);
+
+      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+    };
+
+    calculateTimeLeft();
+    const interval = setInterval(calculateTimeLeft, 1000);
+    return () => clearInterval(interval);
+  }, [interaction.type, interaction.data?.endTime]);
+
   if (interaction.type === 'poll') {
     return (
       <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-4 space-y-3">
@@ -252,29 +284,6 @@ export const MomentInteractionDisplay = ({ momentId, interaction }: MomentIntera
   }
 
   if (interaction.type === 'countdown') {
-    useEffect(() => {
-      const calculateTimeLeft = () => {
-        const end = new Date(interaction.data.endTime).getTime();
-        const now = new Date().getTime();
-        const diff = end - now;
-
-        if (diff <= 0) {
-          setTimeLeft('Time is up!');
-          return;
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-      };
-
-      calculateTimeLeft();
-      const interval = setInterval(calculateTimeLeft, 1000);
-      return () => clearInterval(interval);
-    }, [interaction.data.endTime]);
 
     return (
       <div className="absolute bottom-20 left-4 right-4 bg-black/70 backdrop-blur-sm rounded-2xl p-6 text-center">
