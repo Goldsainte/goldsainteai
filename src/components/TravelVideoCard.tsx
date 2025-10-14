@@ -53,6 +53,7 @@ interface TravelVideoCardProps {
     music_preview_url?: string;
     music_album_art?: string;
     music_service?: string;
+    created_at: string;
     profiles?: {
       username: string | null;
       avatar_url: string | null;
@@ -396,10 +397,29 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     // This function is no longer used
   };
 
-  const formatCount = (count: number) => {
-    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
-    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
-    return count.toString();
+  const formatCount = (count: number): string => {
+    if (count >= 1000000) {
+      return `${(count / 1000000).toFixed(1)}M`;
+    }
+    if (count >= 10000) {
+      return `${(count / 1000).toFixed(1)}K`;
+    }
+    return count.toLocaleString();
+  };
+
+  const formatTimestamp = (createdAt: string): string => {
+    const now = new Date();
+    const postDate = new Date(createdAt);
+    const diffMs = now.getTime() - postDate.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    const diffWeeks = Math.floor(diffMs / 604800000);
+
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffHours < 24) return `${diffHours}h`;
+    if (diffDays < 7) return `${diffDays}d`;
+    return `${diffWeeks}w`;
   };
 
   const toggleAudio = () => {
@@ -445,9 +465,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     return (
       <div className="bg-card border-b last:border-b-0 transition-colors duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-3 py-2">
           <div 
-            className="flex items-center gap-3 cursor-pointer flex-1 hover:opacity-70 transition-opacity"
+            className="flex items-center gap-2 cursor-pointer flex-1 hover:opacity-70 transition-opacity"
             onClick={() => navigate(`/travel-profile/${post.user_id}`)}
           >
             <Avatar className="h-8 w-8">
@@ -457,17 +477,21 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1">
                 <p className="font-semibold text-sm truncate">{post.profiles?.username || 'Anonymous'}</p>
                 {post.profiles?.is_verified && (
                   <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500 flex-shrink-0" />
                 )}
               </div>
               {post.location && (
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  className="flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground leading-tight text-left"
+                >
                   <span className="truncate">{post.location}</span>
-                </div>
+                </button>
               )}
             </div>
           </div>
@@ -577,62 +601,53 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </div>
 
         {/* Actions */}
-        <div className="p-4 space-y-3">
+        <div className="px-3 py-2 space-y-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={handleLike}
-                className="transition-transform active:scale-90"
+                className="transition-transform active:scale-90 hover:opacity-70"
               >
-                <Heart className={`h-6 w-6 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+                <Heart className={`h-6 w-6 transition-all ${isLiked ? 'fill-red-500 text-red-500 scale-110' : ''}`} />
               </button>
               <button
                 onClick={() => setCommentsOpen(true)}
-                className="transition-transform active:scale-90"
+                className="transition-transform active:scale-90 hover:opacity-70"
               >
                 <MessageCircle className="h-6 w-6" />
               </button>
               <button
                 onClick={handleShare}
-                className="transition-transform active:scale-90"
+                className="transition-transform active:scale-90 hover:opacity-70"
               >
-                <Share2 className="h-6 w-6" />
+                <Send className="h-6 w-6" />
               </button>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <button
                 onClick={handleSaveClick}
-                className="transition-transform active:scale-90"
+                className="transition-transform active:scale-90 hover:opacity-70"
               >
-                <Bookmark className={`h-6 w-6 ${isSaved ? 'fill-current' : ''}`} />
+                <Bookmark className={`h-6 w-6 transition-all ${isSaved ? 'fill-current' : ''}`} />
               </button>
-              <button
-                onClick={() => setGiftModalOpen(true)}
-                className="transition-transform active:scale-90"
-                data-tour="send-gift-post"
-              >
-                <Coins className="h-6 w-6 text-yellow-500" />
-              </button>
-              {isOwnPost && (
-                <button
-                  onClick={() => setPromoteModalOpen(true)}
-                  className="transition-transform active:scale-90"
-                  title="Promote this post"
-                >
-                  <TrendingUp className="h-6 w-6 text-secondary" />
-                </button>
-              )}
             </div>
           </div>
 
           {/* Like count */}
-          <div className="text-sm font-semibold">
-            {formatCount(localLikeCount)} likes
-          </div>
+          {localLikeCount > 0 && (
+            <div className="text-sm font-semibold">
+              {formatCount(localLikeCount)} likes
+            </div>
+          )}
 
           {/* Caption */}
-          <div className="text-sm">
-            <span className="font-semibold mr-2">{post.profiles?.username || 'Anonymous'}</span>
+          <div className="text-sm leading-[18px]">
+            <span 
+              className="font-semibold cursor-pointer hover:opacity-70 mr-1"
+              onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+            >
+              {post.profiles?.username || 'Anonymous'}
+            </span>
             {post.caption && (
               <span>
                 {renderTextWithMentionsAndHashtags(
@@ -743,11 +758,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           {localCommentCount > 0 && (
             <button 
               onClick={() => setCommentsOpen(true)}
-              className="text-sm text-muted-foreground"
+              className="text-sm text-muted-foreground hover:text-foreground"
             >
-              View all {formatCount(localCommentCount)} comments
+              View all {localCommentCount} comments
             </button>
           )}
+
+          {/* Timestamp */}
+          <div className="text-[10px] uppercase text-muted-foreground pt-0.5">
+            {formatTimestamp(post.created_at)}
+          </div>
         </div>
 
         {/* Comments Sheet */}

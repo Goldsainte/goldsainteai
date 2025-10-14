@@ -58,6 +58,8 @@ const TravelFeed = () => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState<TravelPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
@@ -110,12 +112,11 @@ const TravelFeed = () => {
       let loadedPosts: TravelPost[] = [];
       // Fast-first: show chronological quickly, then merge personalized when ready
       if (user && !focusPostId) {
-        const chronoPromise = fetchChronologicalPostsRaw();
+        const chronoPromise = fetchChronologicalPosts(0, 12);
         const personalizedPromise = supabase.functions.invoke('get-personalized-feed');
 
         // Render chrono ASAP for faster first paint
         const chrono = await chronoPromise;
-        setPosts(chrono);
         loadedPosts = chrono;
         setIsPersonalized(false);
         setLoading(false); // Show posts immediately
@@ -137,7 +138,7 @@ const TravelFeed = () => {
       } else {
         // Show chronological feed for non-logged in users or when focusing specific post
         setIsPersonalized(false);
-        loadedPosts = await fetchChronologicalPosts();
+        loadedPosts = await fetchChronologicalPosts(0, 12);
         setLoading(false);
       }
 
@@ -163,14 +164,14 @@ const TravelFeed = () => {
     }
   };
 
-  const fetchChronologicalPosts = async (): Promise<TravelPost[]> => {
-    console.log('Fetching chronological posts...');
+  const fetchChronologicalPosts = async (offset = 0, limit = 12): Promise<TravelPost[]> => {
+    console.log('Fetching chronological posts...', { offset, limit });
     const { data, error } = await supabase
       .from('travel_posts')
       .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .range(offset, offset + limit - 1);
 
     if (error) {
       console.error('Error fetching posts:', error);
@@ -197,38 +198,48 @@ const TravelFeed = () => {
     }));
     
     console.log('Posts with profiles:', postsWithProfiles.length);
-    setPosts(postsWithProfiles);
-    return postsWithProfiles;
-  };
-
-  // Raw chronological fetch that does NOT set state; used to merge with personalized results
-  const fetchChronologicalPostsRaw = async (): Promise<TravelPost[]> => {
-    const { data, error } = await supabase
-      .from('travel_posts')
-      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, created_at')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .limit(20);
-
-    if (error) throw error;
-
-    const userIds = Array.from(new Set((data || []).map((p: any) => p.user_id).filter(Boolean)));
-    let profilesData: any[] = [];
-    if (userIds.length > 0) {
-      const { data: pData } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, is_verified, instagram_username')
-        .in('id', userIds);
-      profilesData = pData || [];
+    
+    if (offset === 0) {
+      setPosts(postsWithProfiles);
+    } else {
+      setPosts(prev => [...prev, ...postsWithProfiles]);
     }
-    const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
-
-    const postsWithProfiles = (data || []).map((post: any) => ({
-      ...post,
-      profiles: profilesMap.get(post.user_id) || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
-    }));
+    
+    setHasMore(postsWithProfiles.length === limit);
     return postsWithProfiles;
   };
+
+  const loadMorePosts = async () => {
+    if (loadingMore || !hasMore) return;
+    
+    try {
+      setLoadingMore(true);
+      await fetchChronologicalPosts(posts.length, 8);
+    } catch (error) {
+      console.error('Error loading more posts:', error);
+      toast.error('Failed to load more posts');
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isMobile) {
+      const handleScroll = () => {
+        if (
+          window.innerHeight + document.documentElement.scrollTop
+          >= document.documentElement.offsetHeight - 800 &&
+          !loadingMore &&
+          hasMore
+        ) {
+          loadMorePosts();
+        }
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [posts.length, loadingMore, hasMore, isMobile]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const container = e.currentTarget;
@@ -325,6 +336,21 @@ const TravelFeed = () => {
                       />
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* Loading more indicator */}
+              {loadingMore && (
+                <div className="flex justify-center py-8">
+                  <div className="text-muted-foreground text-sm">Loading more...</div>
+                </div>
+              )}
+
+              {/* End of feed message */}
+              {!hasMore && posts.length > 0 && (
+                <div className="text-center py-8 text-muted-foreground border-t">
+                  <p className="text-sm font-medium">You're all caught up</p>
+                  <p className="text-xs mt-1">You've seen all new posts</p>
                 </div>
               )}
             </div>
