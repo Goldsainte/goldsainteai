@@ -463,13 +463,13 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           {/* Header */}
           <div className="absolute top-4 left-0 right-0 z-20 px-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Avatar className="w-8 h-8 ring-2 ring-white">
+              <Avatar className="w-5 h-5 ring-2 ring-white">
                 <AvatarImage src={currentMoment.profiles?.avatar_url || undefined} />
                 <AvatarFallback>
                   {currentMoment.profiles?.username?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-white font-medium text-sm">
+              <span className="text-white font-medium text-[10px]">
                 {currentMoment.profiles?.username || 'User'}
               </span>
               <span className="text-white/70 text-xs">
