@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Save, Camera, Upload as UploadIcon } from "lucide-react";
 import { toast } from "sonner";
-import { SpotifyTrackSelector } from "./SpotifyTrackSelector";
+import { MusicTrackSelector } from "./MusicTrackSelector";
 
 interface VideoEditModalProps {
   open: boolean;
@@ -177,11 +177,12 @@ const VideoEditModal = ({
           caption: caption || null,
           location: location || null,
           thumbnail_url: thumbnailUrl,
-          spotify_track_id: selectedTrack?.id || null,
-          spotify_track_name: selectedTrack?.name || null,
-          spotify_track_artist: selectedTrack?.artist || null,
-          spotify_track_preview_url: selectedTrack?.previewUrl || null,
-          spotify_track_album_art: selectedTrack?.albumArt || null,
+          music_track_id: selectedTrack?.id || null,
+          music_track_name: selectedTrack?.name || null,
+          music_track_artist: selectedTrack?.artist || null,
+          music_preview_url: selectedTrack?.previewUrl || null,
+          music_album_art: selectedTrack?.albumArt || null,
+          music_service: 'apple_music',
         })
         .eq("id", postId);
 
@@ -295,9 +296,9 @@ const VideoEditModal = ({
             />
           </div>
 
-          <SpotifyTrackSelector
+          <MusicTrackSelector
             selectedTrack={selectedTrack}
-            onSelectTrack={setSelectedTrack}
+            onTrackSelect={setSelectedTrack}
           />
         </div>
 

@@ -38,12 +38,12 @@ interface Moment {
   created_at: string;
   drawing_data?: string | null;
   interactions?: any | null;
-  spotify_track_id?: string | null;
-  spotify_track_name?: string | null;
-  spotify_track_artist?: string | null;
-  spotify_track_preview_url?: string | null;
-  spotify_track_album_art?: string | null;
-  spotify_audio_start_time?: number | null;
+  music_track_id?: string | null;
+  music_track_name?: string | null;
+  music_track_artist?: string | null;
+  music_preview_url?: string | null;
+  music_album_art?: string | null;
+  music_service?: string | null;
   text_styling?: {
     font: string;
     animation: string;

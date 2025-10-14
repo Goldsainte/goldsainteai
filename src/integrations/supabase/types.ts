@@ -3362,12 +3362,13 @@ export type Database = {
           interactions: Json | null
           media_type: string
           media_url: string | null
+          music_album_art: string | null
+          music_preview_url: string | null
+          music_service: string | null
+          music_track_artist: string | null
+          music_track_id: string | null
+          music_track_name: string | null
           spotify_audio_start_time: number | null
-          spotify_track_album_art: string | null
-          spotify_track_artist: string | null
-          spotify_track_id: string | null
-          spotify_track_name: string | null
-          spotify_track_preview_url: string | null
           text_styling: Json | null
           user_id: string
           view_count: number | null
@@ -3382,12 +3383,13 @@ export type Database = {
           interactions?: Json | null
           media_type: string
           media_url?: string | null
+          music_album_art?: string | null
+          music_preview_url?: string | null
+          music_service?: string | null
+          music_track_artist?: string | null
+          music_track_id?: string | null
+          music_track_name?: string | null
           spotify_audio_start_time?: number | null
-          spotify_track_album_art?: string | null
-          spotify_track_artist?: string | null
-          spotify_track_id?: string | null
-          spotify_track_name?: string | null
-          spotify_track_preview_url?: string | null
           text_styling?: Json | null
           user_id: string
           view_count?: number | null
@@ -3402,12 +3404,13 @@ export type Database = {
           interactions?: Json | null
           media_type?: string
           media_url?: string | null
+          music_album_art?: string | null
+          music_preview_url?: string | null
+          music_service?: string | null
+          music_track_artist?: string | null
+          music_track_id?: string | null
+          music_track_name?: string | null
           spotify_audio_start_time?: number | null
-          spotify_track_album_art?: string | null
-          spotify_track_artist?: string | null
-          spotify_track_id?: string | null
-          spotify_track_name?: string | null
-          spotify_track_preview_url?: string | null
           text_styling?: Json | null
           user_id?: string
           view_count?: number | null
@@ -6394,13 +6397,14 @@ export type Database = {
           like_count: number | null
           location: string | null
           media_type: string | null
+          music_album_art: string | null
+          music_preview_url: string | null
+          music_service: string | null
+          music_track_artist: string | null
+          music_track_id: string | null
+          music_track_name: string | null
           original_creator: string | null
           share_count: number | null
-          spotify_track_album_art: string | null
-          spotify_track_artist: string | null
-          spotify_track_id: string | null
-          spotify_track_name: string | null
-          spotify_track_preview_url: string | null
           status: string | null
           thumbnail_url: string | null
           total_watch_time_seconds: number | null
@@ -6426,13 +6430,14 @@ export type Database = {
           like_count?: number | null
           location?: string | null
           media_type?: string | null
+          music_album_art?: string | null
+          music_preview_url?: string | null
+          music_service?: string | null
+          music_track_artist?: string | null
+          music_track_id?: string | null
+          music_track_name?: string | null
           original_creator?: string | null
           share_count?: number | null
-          spotify_track_album_art?: string | null
-          spotify_track_artist?: string | null
-          spotify_track_id?: string | null
-          spotify_track_name?: string | null
-          spotify_track_preview_url?: string | null
           status?: string | null
           thumbnail_url?: string | null
           total_watch_time_seconds?: number | null
@@ -6458,13 +6463,14 @@ export type Database = {
           like_count?: number | null
           location?: string | null
           media_type?: string | null
+          music_album_art?: string | null
+          music_preview_url?: string | null
+          music_service?: string | null
+          music_track_artist?: string | null
+          music_track_id?: string | null
+          music_track_name?: string | null
           original_creator?: string | null
           share_count?: number | null
-          spotify_track_album_art?: string | null
-          spotify_track_artist?: string | null
-          spotify_track_id?: string | null
-          spotify_track_name?: string | null
-          spotify_track_preview_url?: string | null
           status?: string | null
           thumbnail_url?: string | null
           total_watch_time_seconds?: number | null

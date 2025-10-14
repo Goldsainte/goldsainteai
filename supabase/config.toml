@@ -183,3 +183,6 @@ verify_jwt = false
 [functions.request-password-reset]
 verify_jwt = false
 
+[functions.apple-music-search]
+verify_jwt = false
+

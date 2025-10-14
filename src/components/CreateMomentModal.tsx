@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { MomentDrawingCanvas } from "./MomentDrawingCanvas";
 import { StoryInteractionCreator } from "./StoryInteractionCreator";
-import { SpotifyTrackSelector } from "./SpotifyTrackSelector";
+import { MusicTrackSelector } from "./MusicTrackSelector";
 
 interface CreateMomentModalProps {
   open: boolean;
@@ -150,11 +150,12 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
             bgGradient: bgGradient,
           } : null,
           ...(selectedTrack && {
-            spotify_track_id: selectedTrack.id,
-            spotify_track_name: selectedTrack.name,
-            spotify_track_artist: selectedTrack.artist,
-            spotify_track_preview_url: selectedTrack.previewUrl,
-            spotify_track_album_art: selectedTrack.albumArt,
+            music_track_id: selectedTrack.id,
+            music_track_name: selectedTrack.name,
+            music_track_artist: selectedTrack.artist,
+            music_preview_url: selectedTrack.previewUrl,
+            music_album_art: selectedTrack.albumArt,
+            music_service: 'apple_music',
             spotify_audio_start_time: audioStartTime,
           }),
         });
@@ -382,11 +383,11 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               </p>
             </div>
 
-            <SpotifyTrackSelector
+            <MusicTrackSelector
               selectedTrack={selectedTrack}
-              onSelectTrack={(track, startTime) => {
+              onTrackSelect={(track) => {
                 setSelectedTrack(track);
-                setAudioStartTime(startTime || 0);
+                setAudioStartTime(track?.startTime || 0);
               }}
             />
 
@@ -609,11 +610,11 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
               </Select>
             </div>
 
-            <SpotifyTrackSelector
+            <MusicTrackSelector
               selectedTrack={selectedTrack}
-              onSelectTrack={(track, startTime) => {
+              onTrackSelect={(track) => {
                 setSelectedTrack(track);
-                setAudioStartTime(startTime || 0);
+                setAudioStartTime(track?.startTime || 0);
               }}
             />
 

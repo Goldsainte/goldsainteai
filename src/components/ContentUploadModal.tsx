@@ -22,7 +22,7 @@ import { extractHashtags } from "@/lib/hashtagHelpers";
 import { StoryInteractionCreator } from "./StoryInteractionCreator";
 import { GifSelector } from "./GifSelector";
 import { BoomerangRecorder } from "./BoomerangRecorder";
-import { SpotifyTrackSelector } from "./SpotifyTrackSelector";
+import { MusicTrackSelector } from "./MusicTrackSelector";
 import {
   Select,
   SelectContent,
@@ -1068,9 +1068,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
           </TabsContent>
 
           <TabsContent value="music" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">
-            <SpotifyTrackSelector 
+            <MusicTrackSelector 
               selectedTrack={selectedMusicTrack}
-              onSelectTrack={(track) => {
+              onTrackSelect={(track) => {
                 setSelectedMusicTrack(track);
                 if (track) {
                   toast.success(`Selected: ${track.name} by ${track.artist}`);
