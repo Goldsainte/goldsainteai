@@ -38,12 +38,18 @@ export const SuggestedUsers = () => {
       const followingIds = (following as any[])?.map(f => f.following_id) || [];
 
       // Get suggested users (users not currently followed, with posts)
-      const { data, error } = await supabase
+      let query = supabase
         .from('profiles')
         .select('id, username, avatar_url, bio')
         .neq('id', user.id)
-        .not('id', 'in', `(${followingIds.join(',') || 'null'})`)
         .limit(5);
+      
+      // Only add the not filter if there are actual following IDs
+      if (followingIds.length > 0) {
+        query = query.not('id', 'in', `(${followingIds.join(',')})`);
+      }
+      
+      const { data, error } = await query;
 
       if (error) throw error;
 

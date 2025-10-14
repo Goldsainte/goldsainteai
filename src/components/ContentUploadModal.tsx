@@ -622,7 +622,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         </DialogHeader>
 
         <Tabs defaultValue="photo" className="w-full flex flex-col overflow-hidden flex-1">
-          <TabsList className="grid w-full grid-cols-3 flex-shrink-0">
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 flex-shrink-0">
             <TabsTrigger value="photo">
               <Image className="w-4 h-4 mr-2" />
               Photo
@@ -631,7 +631,10 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
               <Upload className="w-4 h-4 mr-2" />
               Video
             </TabsTrigger>
-            <TabsTrigger value="embed">
+            <TabsTrigger value="music" className="col-span-2 md:col-span-1">
+              🎵 Music
+            </TabsTrigger>
+            <TabsTrigger value="embed" className="hidden md:flex">
               <Link2 className="w-4 h-4 mr-2" />
               Embed
             </TabsTrigger>

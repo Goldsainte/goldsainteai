@@ -27,14 +27,23 @@ export const DraftPostsManager = () => {
       if (!user) return;
 
       const { data, error } = await supabase
-        .from('posts' as any)
-        .select('id, caption, media_url, created_at')
+        .from('travel_posts')
+        .select('id, caption, video_url, image_urls, created_at')
         .eq('user_id', user.id)
         .eq('status', 'draft')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setDrafts((data as unknown as DraftPost[]) || []);
+      
+      // Map to DraftPost format with first image or video as media_url
+      const mappedDrafts = (data || []).map(post => ({
+        id: post.id,
+        caption: post.caption,
+        media_url: post.image_urls?.[0] || post.video_url || null,
+        created_at: post.created_at
+      }));
+      
+      setDrafts(mappedDrafts);
     } catch (error) {
       console.error('Error fetching drafts:', error);
     } finally {
@@ -45,8 +54,8 @@ export const DraftPostsManager = () => {
   const publishDraft = async (draftId: string) => {
     try {
       const { error } = await supabase
-        .from('posts' as any)
-        .update({ status: 'published' } as any)
+        .from('travel_posts')
+        .update({ status: 'active' })
         .eq('id', draftId);
 
       if (error) throw error;
@@ -62,7 +71,7 @@ export const DraftPostsManager = () => {
   const deleteDraft = async (draftId: string) => {
     try {
       const { error } = await supabase
-        .from('posts' as any)
+        .from('travel_posts')
         .delete()
         .eq('id', draftId);
 

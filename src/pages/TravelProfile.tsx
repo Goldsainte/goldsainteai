@@ -1203,7 +1203,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/home')}
+            onClick={() => navigate('/')}
             className="hover:bg-accent h-12 w-12 rounded-lg [&>svg]:text-[#BFAD72]"
             aria-label="Home"
           >
