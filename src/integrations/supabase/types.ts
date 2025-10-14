@@ -6433,6 +6433,8 @@ export type Database = {
           music_track_artist: string | null
           music_track_id: string | null
           music_track_name: string | null
+          music_volume: number | null
+          native_video_volume: number | null
           original_creator: string | null
           share_count: number | null
           status: string | null
@@ -6466,6 +6468,8 @@ export type Database = {
           music_track_artist?: string | null
           music_track_id?: string | null
           music_track_name?: string | null
+          music_volume?: number | null
+          native_video_volume?: number | null
           original_creator?: string | null
           share_count?: number | null
           status?: string | null
@@ -6499,6 +6503,8 @@ export type Database = {
           music_track_artist?: string | null
           music_track_id?: string | null
           music_track_name?: string | null
+          music_volume?: number | null
+          native_video_volume?: number | null
           original_creator?: string | null
           share_count?: number | null
           status?: string | null

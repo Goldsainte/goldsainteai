@@ -77,6 +77,10 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
   const [locationDrawerOpen, setLocationDrawerOpen] = useState(false);
   const [taggingDrawerOpen, setTaggingDrawerOpen] = useState(false);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
+  
+  // Volume controls
+  const [nativeVideoVolume, setNativeVideoVolume] = useState(100);
+  const [musicVolume, setMusicVolume] = useState(80);
 
   // Sync activeTab with initialTab when modal opens
   useEffect(() => {
@@ -324,6 +328,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             music_album_art: selectedMusicTrack.albumArt,
             music_service: 'apple_music',
           }),
+          music_volume: selectedMusicTrack ? musicVolume : 80,
         }])
         .select()
         .single();
@@ -635,6 +640,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             music_album_art: selectedMusicTrack.albumArt,
             music_service: 'apple_music',
           }),
+          native_video_volume: nativeVideoVolume,
+          music_volume: selectedMusicTrack ? musicVolume : null,
         }])
         .select()
         .single();
@@ -686,6 +693,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
       setPartnershipBrandId(null);
       setTaggedPackageIds([]);
       setTaggedUserIds([]);
+      setNativeVideoVolume(100);
+      setMusicVolume(80);
 
       // Create paid partnership if brand is tagged
       if (partnershipBrandId && postData) {
@@ -970,13 +979,15 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                   {videoPreviewUrl && (
                     <div className="relative rounded-lg overflow-hidden bg-black">
                       <video
-                        ref={videoRef}
+                        ref={(el) => {
+                          videoRef.current = el;
+                          if (el) el.volume = nativeVideoVolume / 100;
+                        }}
                         src={videoPreviewUrl}
                         className="w-full max-h-[50vh] object-contain"
                         controls
                         playsInline
                         preload="metadata"
-                        muted
                       />
                       <Button
                         variant="destructive"
@@ -992,6 +1003,48 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                       </Button>
                     </div>
                   )}
+
+                  {/* Volume Controls */}
+                  <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="text-sm font-medium flex items-center gap-2">
+                          <Volume2 className="h-4 w-4" />
+                          Original Video Audio
+                        </label>
+                        <span className="text-sm text-muted-foreground">{nativeVideoVolume}%</span>
+                      </div>
+                      <Slider
+                        value={[nativeVideoVolume]}
+                        onValueChange={(value) => {
+                          setNativeVideoVolume(value[0]);
+                          if (videoRef.current) videoRef.current.volume = value[0] / 100;
+                        }}
+                        max={100}
+                        step={1}
+                        className="w-full"
+                      />
+                    </div>
+                    
+                    {selectedMusicTrack && (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium flex items-center gap-2">
+                            <Music className="h-4 w-4" />
+                            Background Music
+                          </label>
+                          <span className="text-sm text-muted-foreground">{musicVolume}%</span>
+                        </div>
+                        <Slider
+                          value={[musicVolume]}
+                          onValueChange={(value) => setMusicVolume(value[0])}
+                          max={100}
+                          step={1}
+                          className="w-full"
+                        />
+                      </div>
+                    )}
+                  </div>
 
                   {/* Compact Caption Input with AI Button */}
                   <div className="space-y-2">

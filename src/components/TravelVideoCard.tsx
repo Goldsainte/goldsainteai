@@ -54,6 +54,8 @@ interface TravelVideoCardProps {
     music_album_art?: string;
     music_service?: string;
     created_at: string;
+    native_video_volume?: number;
+    music_volume?: number;
     profiles?: {
       username: string | null;
       avatar_url: string | null;
@@ -147,15 +149,15 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
   useEffect(() => {
     if (audioRef.current) {
-      if (isActive && post.music_preview_url) {
-        audioRef.current.play().catch(() => {});
-        setAudioPlaying(true);
+      const audio = audioRef.current;
+      audio.volume = musicVolume / 100;
+      if (isActive && !isMuted) {
+        audio.play().catch(console.error);
       } else {
-        audioRef.current.pause();
-        setAudioPlaying(false);
+        audio.pause();
       }
     }
-  }, [isActive, post.music_preview_url]);
+  }, [isActive, isMuted, post.music_preview_url, musicVolume]);
 
   const checkIfLiked = async () => {
     if (!user) return;
@@ -581,7 +583,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   className="w-full h-full object-cover"
                   loop
                   playsInline
-                  muted={isMuted}
                   preload="metadata"
                   crossOrigin="anonymous"
                   onLoadedData={() => setVideoLoading(false)}
@@ -765,7 +766,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     )}
                   </Button>
                   <audio
-                    ref={audioRef}
+                    ref={(el) => {
+                      audioRef.current = el;
+                      if (el) el.volume = musicVolume / 100;
+                    }}
                     src={post.music_preview_url}
                     onEnded={() => setAudioPlaying(false)}
                   />
@@ -811,16 +815,18 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           currentLocation={post.location}
           currentThumbnailUrl={post.thumbnail_url}
           videoUrl={post.video_url || null}
+          currentNativeVolume={post.native_video_volume}
+          currentMusicVolume={post.music_volume}
           currentMusicTrack={
             post.music_track_id
               ? {
                   id: post.music_track_id,
                   name: post.music_track_name || "",
                   artist: post.music_track_artist || "",
-                  albumArt: post.music_album_art || null,
-                  previewUrl: post.music_preview_url || null,
+                  albumArt: post.music_album_art || "",
+                  previewUrl: post.music_preview_url || undefined,
                 }
-              : null
+              : undefined
           }
           onSuccess={onUpdate}
         />
@@ -947,7 +953,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             loop
             playsInline
             webkit-playsinline="true"
-            muted={isMuted}
             preload="metadata"
             crossOrigin="anonymous"
             onLoadedData={() => setVideoLoading(false)}
@@ -1271,7 +1276,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     )}
                   </Button>
                   <audio
-                    ref={audioRef}
+                    ref={(el) => {
+                      audioRef.current = el;
+                      if (el) el.volume = musicVolume / 100;
+                    }}
                     src={post.music_preview_url}
                     onEnded={() => setAudioPlaying(false)}
                   />

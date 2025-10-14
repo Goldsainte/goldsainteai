@@ -42,6 +42,8 @@ const VideoEditModal = ({
   currentThumbnailUrl,
   videoUrl,
   currentMusicTrack,
+  currentNativeVolume,
+  currentMusicVolume,
   onSuccess,
 }: VideoEditModalProps) => {
   const { user } = useAuth();
@@ -51,6 +53,8 @@ const VideoEditModal = ({
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(currentThumbnailUrl);
   const [selectedTrack, setSelectedTrack] = useState<any>(currentMusicTrack || null);
+  const [nativeVideoVolume, setNativeVideoVolume] = useState(currentNativeVolume || 100);
+  const [musicVolume, setMusicVolume] = useState(currentMusicVolume || 80);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,13 +182,15 @@ const VideoEditModal = ({
           location: location || null,
           thumbnail_url: thumbnailUrl,
           music_track_id: selectedTrack?.id || null,
-          music_track_name: selectedTrack?.name || null,
-          music_track_artist: selectedTrack?.artist || null,
-          music_preview_url: selectedTrack?.previewUrl || null,
-          music_album_art: selectedTrack?.albumArt || null,
-          music_service: 'apple_music',
-        })
-        .eq("id", postId);
+        music_track_name: selectedTrack?.name || null,
+        music_track_artist: selectedTrack?.artist || null,
+        music_preview_url: selectedTrack?.previewUrl || null,
+        music_album_art: selectedTrack?.albumArt || null,
+        music_service: 'apple_music',
+        native_video_volume: nativeVideoVolume,
+        music_volume: selectedTrack ? musicVolume : null,
+      })
+      .eq("id", postId);
 
       if (error) throw error;
 
@@ -211,17 +217,62 @@ const VideoEditModal = ({
           <div className="space-y-2 border-b pb-4 flex-shrink-0">
             <Label>Video Preview & Capture</Label>
             <div className="relative w-full aspect-[9/16] max-h-[300px] rounded-lg overflow-hidden bg-black">
-              <video
-                ref={videoRef}
-                src={videoUrl}
-                className="absolute inset-0 w-full h-full object-cover"
-                controls
-                preload="metadata"
-                crossOrigin="anonymous"
-                playsInline
+            <video
+              ref={(el) => {
+                videoRef.current = el;
+                if (el) el.volume = nativeVideoVolume / 100;
+              }}
+              src={videoUrl}
+              className="absolute inset-0 w-full h-full object-cover"
+              controls
+              preload="metadata"
+              crossOrigin="anonymous"
+              playsInline
+            />
+          </div>
+          
+          {/* Volume Controls */}
+          <div className="space-y-4 p-4 bg-muted/30 rounded-lg">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-sm font-medium flex items-center gap-2">
+                  <Volume2 className="h-4 w-4" />
+                  Original Video Audio
+                </label>
+                <span className="text-sm text-muted-foreground">{nativeVideoVolume}%</span>
+              </div>
+              <Slider
+                value={[nativeVideoVolume]}
+                onValueChange={(value) => {
+                  setNativeVideoVolume(value[0]);
+                  if (videoRef.current) videoRef.current.volume = value[0] / 100;
+                }}
+                max={100}
+                step={1}
+                className="w-full"
               />
             </div>
-            <div className="flex gap-2">
+            
+            {selectedTrack && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium flex items-center gap-2">
+                    <Music className="h-4 w-4" />
+                    Background Music
+                  </label>
+                  <span className="text-sm text-muted-foreground">{musicVolume}%</span>
+                </div>
+                <Slider
+                  value={[musicVolume]}
+                  onValueChange={(value) => setMusicVolume(value[0])}
+                  max={100}
+                  step={1}
+                  className="w-full"
+                />
+              </div>
+            )}
+          </div>
+          <div className="flex gap-2">
               <Button
                 type="button"
                 variant="outline"
