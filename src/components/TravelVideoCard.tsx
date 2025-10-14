@@ -110,6 +110,21 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [isDragging, setIsDragging] = useState(false);
   const [wasSwipe, setWasSwipe] = useState(false);
 
+  // Reset touch state on mount/unmount
+  useEffect(() => {
+    return () => {
+      setTouchStartX(0);
+      setTouchStartY(0);
+      setTouchEndX(0);
+      setTouchEndY(0);
+      setDragStart(0);
+      setIsDragging(false);
+      setWasSwipe(false);
+    };
+  }, []);
+
+  const [showPhotoGallery, setShowPhotoGallery] = useState(false);
+
   const isOwnPost = user?.id === post.user_id;
 
   const handleDelete = async () => {
@@ -390,22 +405,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   };
 
   const checkIfFollowing = async () => {
-    if (!user || !post.profiles?.username) return;
+    if (!user || !post.profiles?.id) return;
     
     try {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('username', post.profiles.username)
-        .maybeSingle();
-      
-      if (!profileData) return;
-      
       const { data } = await supabase
-        .from('user_follows')
-        .select('id')
-        .eq('follower_id', user.id)
-        .eq('following_id', profileData.id)
+        .from("user_follows")
+        .select("id")
+        .eq("follower_id", user.id)
+        .eq("following_id", post.profiles.id)
         .maybeSingle();
       
       setIsFollowing(!!data);
@@ -415,39 +422,31 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   };
 
   const handleFollow = async () => {
-    if (!user) {
-      navigate('/auth');
+    if (!user || !post.profiles?.id) {
+      toast.error("Cannot follow this user");
       return;
     }
-    
+
     try {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('username', post.profiles?.username)
-        .maybeSingle();
-      
-      if (!profileData) return;
-      
       if (isFollowing) {
         await supabase
-          .from('user_follows')
+          .from("user_follows")
           .delete()
-          .eq('follower_id', user.id)
-          .eq('following_id', profileData.id);
+          .eq("follower_id", user.id)
+          .eq("following_id", post.profiles.id);
         
         setIsFollowing(false);
-        toast.success('Unfollowed');
+        toast.success("Unfollowed successfully");
       } else {
         await supabase
-          .from('user_follows')
+          .from("user_follows")
           .insert({
             follower_id: user.id,
-            following_id: profileData.id,
+            following_id: post.profiles.id
           });
         
         setIsFollowing(true);
-        toast.success('Following');
+        toast.success("Following successfully");
       }
     } catch (error) {
       console.error('Error following user:', error);

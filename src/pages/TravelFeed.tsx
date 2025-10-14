@@ -128,6 +128,13 @@ const TravelFeed = () => {
   }, [targetPostId]);
 
   const fetchPosts = async (focusPostId?: string) => {
+    const loadingTimeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Loading timeout reached, showing available posts');
+        setLoading(false);
+      }
+    }, 10000);
+
     try {
       setLoading(true);
       let loadedPosts: TravelPost[] = [];
@@ -135,19 +142,28 @@ const TravelFeed = () => {
       if (user && !focusPostId) {
         const quickPosts = await fetchChronologicalPosts(0, 3);
         setPosts(quickPosts);
-        setLoading(false);
+        setLoading(false); // Show UI immediately
         
-        const remainingPromise = fetchChronologicalPosts(3, 9);
-        const personalizedPromise = supabase.functions.invoke('get-personalized-feed');
+        // Background: load more posts + personalized feed with individual error handling
+        const remainingPromise = fetchChronologicalPosts(3, 9).catch((err) => {
+          console.error('Failed to fetch remaining posts:', err);
+          return [];
+        });
+        
+        const personalizedPromise = supabase.functions.invoke('get-personalized-feed').catch((err) => {
+          console.error('Failed to fetch personalized feed:', err);
+          return { data: null, error: err };
+        });
         
         const [remaining, { data, error }] = await Promise.all([
           remainingPromise,
           personalizedPromise
         ]);
         
+        // Merge all posts safely
         const allPosts = [...quickPosts, ...remaining];
         
-        if (!error) {
+        if (!error && data) {
           const personalized = ((data as any)?.posts || []) as TravelPost[];
           const map = new Map<string, TravelPost>();
           allPosts.forEach(p => map.set(p.id, p));
@@ -182,6 +198,7 @@ const TravelFeed = () => {
       console.error('Error fetching posts:', error);
       toast.error("Failed to load posts");
     } finally {
+      clearTimeout(loadingTimeout);
       setLoading(false);
     }
   };
@@ -216,7 +233,7 @@ const TravelFeed = () => {
 
     const postsWithProfiles = (data || []).map((post: any) => ({
       ...post,
-      profiles: profilesMap.get(post.user_id) || { username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
+      profiles: profilesMap.get(post.user_id) || { id: post.user_id, username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
     }));
     
     console.log('Posts with profiles:', postsWithProfiles.length);
