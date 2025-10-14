@@ -73,6 +73,7 @@ const TravelFeed = () => {
   const [searchParams] = useSearchParams();
   const targetPostId = searchParams.get('postId');
   const isMobile = useIsMobile();
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   // Track which video is currently visible in viewport
   useEffect(() => {
@@ -104,6 +105,26 @@ const TravelFeed = () => {
 
   useEffect(() => {
     fetchPosts(targetPostId || undefined);
+    
+    // Capture first user interaction for autoplay compliance
+    const handleInteraction = () => {
+      setHasInteracted(true);
+      window.removeEventListener('pointerdown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('wheel', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
+    window.addEventListener('pointerdown', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+    window.addEventListener('wheel', handleInteraction);
+    window.addEventListener('keydown', handleInteraction);
+    
+    return () => {
+      window.removeEventListener('pointerdown', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      window.removeEventListener('wheel', handleInteraction);
+      window.removeEventListener('keydown', handleInteraction);
+    };
   }, [targetPostId]);
 
   const fetchPosts = async (focusPostId?: string) => {
@@ -336,6 +357,7 @@ const TravelFeed = () => {
                         layout="desktop"
                         isMuted={visibleVideoId !== post.id}
                         onToggleMute={() => setIsMuted(!isMuted)}
+                        hasInteracted={hasInteracted}
                       />
                     </div>
                   ))}
@@ -419,6 +441,7 @@ const TravelFeed = () => {
                     onUpdate={fetchPosts}
                     isMuted={isMuted}
                     onToggleMute={() => setIsMuted(!isMuted)}
+                    hasInteracted={hasInteracted}
                   />
                 </div>
               ))

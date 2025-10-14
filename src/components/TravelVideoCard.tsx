@@ -68,9 +68,10 @@ interface TravelVideoCardProps {
   layout?: 'mobile' | 'desktop';
   isMuted: boolean;
   onToggleMute: () => void;
+  hasInteracted?: boolean;
 }
 
-const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute }: TravelVideoCardProps) => {
+const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute, hasInteracted = false }: TravelVideoCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
@@ -157,39 +158,69 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     }
   }, [nativeVolume, isMuted]);
 
+  // Reset photo index when post changes
   useEffect(() => {
-    if (audioRef.current) {
-      const audio = audioRef.current;
-      audio.volume = musicVolume / 100;
-      
-      // Clear any pending pause debounce
-      if (pauseDebounceTimer.current) {
-        clearTimeout(pauseDebounceTimer.current);
-        pauseDebounceTimer.current = null;
-      }
-      
-      if (isMuted) {
-        audio.pause();
-        setAudioPlaying(false);
-      } else if (isActive && (audioPlaying || userInitiatedPlay.current)) {
+    setCurrentPhotoIndex(0);
+  }, [post.id]);
+
+  // Instagram-style autoplay audio effect
+  useEffect(() => {
+    if (!audioRef.current || !post.music_preview_url) return;
+
+    const audio = audioRef.current;
+
+    const handleStalled = () => {
+      if (isActive && !isMuted && hasInteracted) {
         audio.play().catch(console.error);
-      } else if (!isActive && audioPlaying && !userInitiatedPlay.current) {
-        // Debounce pause to avoid brief visibility flickers
-        pauseDebounceTimer.current = window.setTimeout(() => {
-          if (audioRef.current) {
-            audioRef.current.pause();
-            setAudioPlaying(false);
-          }
-        }, 500);
-      }
-    }
-    
-    return () => {
-      if (pauseDebounceTimer.current) {
-        clearTimeout(pauseDebounceTimer.current);
       }
     };
-  }, [isActive, isMuted, post.music_preview_url, musicVolume, audioPlaying]);
+
+    const handleSuspended = () => {
+      if (isActive && !isMuted && hasInteracted) {
+        audio.play().catch(console.error);
+      }
+    };
+
+    const handleEnded = () => {
+      setAudioPlaying(false);
+      userInitiatedPlay.current = false;
+    };
+
+    const handlePlay = () => {
+      // Isolate playback: pause all other audio
+      document.querySelectorAll('audio[data-post-id]').forEach((otherAudio) => {
+        if (otherAudio !== audio && !(otherAudio as HTMLAudioElement).paused) {
+          (otherAudio as HTMLAudioElement).pause();
+        }
+      });
+    };
+
+    audio.addEventListener('stalled', handleStalled);
+    audio.addEventListener('suspend', handleSuspended);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('play', handlePlay);
+
+    // Active-first autoplay logic
+    audio.volume = musicVolume / 100;
+    
+    if (!isActive || isMuted) {
+      // Always pause when not active or muted
+      audio.pause();
+      setAudioPlaying(false);
+    } else if (isActive && !isMuted && hasInteracted) {
+      // Auto-play when active, unmuted, and user has interacted
+      audio.play()
+        .then(() => setAudioPlaying(true))
+        .catch(console.error);
+    }
+
+    return () => {
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('stalled', handleStalled);
+      audio.removeEventListener('suspend', handleSuspended);
+      audio.removeEventListener('play', handlePlay);
+    };
+  }, [isActive, isMuted, post.music_preview_url, hasInteracted, musicVolume]);
 
   const checkIfLiked = async () => {
     if (!user) return;
@@ -635,11 +666,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </div>
               {post.image_urls.length > 1 && (
                 <>
-                  <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs z-10">
+                  <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs z-30 pointer-events-none">
                     {currentPhotoIndex + 1} / {post.image_urls.length}
                   </div>
                   <button
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2 z-10"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 z-30 pointer-events-auto transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
@@ -649,7 +680,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     <ChevronLeft className="h-6 w-6" />
                   </button>
                   <button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2 z-10"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 z-30 pointer-events-auto transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
                       setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
@@ -877,6 +908,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                       }
                     }}
                     src={post.music_preview_url}
+                    data-post-id={post.id}
                     onEnded={() => {
                       setAudioPlaying(false);
                       userInitiatedPlay.current = false;
