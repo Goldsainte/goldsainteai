@@ -228,18 +228,18 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     className="w-12 h-12 rounded object-cover flex-shrink-0"
                   />
                 )}
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 max-w-[calc(100%-180px)]">
                   <p className="font-medium text-sm truncate">{track.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
                   <p className="text-xs text-muted-foreground truncate">{track.album}</p>
                 </div>
-                <div className="flex gap-1 flex-shrink-0">
+                <div className="flex gap-1 flex-shrink-0 ml-auto">
                   {track.previewUrl ? (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => togglePlay(track)}
-                      className="flex-shrink-0"
+                      className="flex-shrink-0 h-8 w-8"
                     >
                       {playingTrackId === track.id ? (
                         <Pause className="h-4 w-4" />
@@ -263,7 +263,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     size="sm"
                     disabled={selectedTrack?.id === track.id}
                     onClick={() => handleSelectTrack(track)}
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 min-w-[70px]"
                   >
                     {selectedTrack?.id === track.id ? "Selected" : "Select"}
                   </Button>
