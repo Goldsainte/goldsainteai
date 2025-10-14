@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2 } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -571,14 +571,16 @@ export const Header = () => {
                         <div className="py-2">
                           <DropdownMenuItem 
                             onClick={() => navigate('/dashboard')} 
-                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                           >
+                            <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/my-bookings')} 
-                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                           >
+                            <Calendar className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">My Bookings</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
@@ -590,8 +592,9 @@ export const Header = () => {
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/booking-preferences')} 
-                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                           >
+                            <Settings className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Booking Preferences</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
