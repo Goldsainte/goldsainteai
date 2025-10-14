@@ -560,13 +560,26 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         {/* Video/Image - Optimized */}
         <div className="relative bg-black aspect-square">
           {post.image_urls && post.image_urls.length > 0 ? (
-            <OptimizedImage
-              src={post.image_urls[0]}
-              alt={post.caption || 'Post image'}
-              aspectRatio="square"
-              priority={isActive}
-              className="w-full"
-            />
+            <div
+              className="w-full h-full cursor-pointer relative"
+              onClick={() => {
+                setCurrentPhotoIndex(0);
+                setPhotoGalleryOpen(true);
+              }}
+            >
+              <OptimizedImage
+                src={post.image_urls[0]}
+                alt={post.caption || 'Post image'}
+                aspectRatio="square"
+                priority={isActive}
+                className="w-full"
+              />
+              {post.image_urls.length > 1 && (
+                <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
+                  1 / {post.image_urls.length}
+                </div>
+              )}
+            </div>
           ) : post.video_url ? (
             <>
               {videoLoading && !videoError && (
@@ -937,6 +950,31 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </div>
       )}
 
+      {/* Hidden Audio Element for Music Playback */}
+      {post.music_preview_url && (
+        <>
+          <audio
+            ref={(el) => {
+              audioRef.current = el;
+              if (el) el.volume = musicVolume / 100;
+            }}
+            src={post.music_preview_url}
+            preload="auto"
+            onEnded={() => setAudioPlaying(false)}
+          />
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleAudio();
+            }}
+            className="absolute bottom-36 right-16 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
+            aria-label={audioPlaying ? "Pause music" : "Play music"}
+          >
+            {audioPlaying ? <Pause className="h-4 w-4 text-white" /> : <Play className="h-4 w-4 text-white" />}
+          </button>
+        </>
+      )}
+
       {/* Loading State */}
       {videoLoading && !videoError && post.video_url && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -1083,24 +1121,43 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </>
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <>
-          <div 
-            className="absolute inset-0 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              setCurrentPhotoIndex(0);
-              setPhotoGalleryOpen(true);
-            }}
-          >
+          <div className="absolute inset-0">
             <img 
-              src={post.image_urls?.[0] || (post.thumbnail_url as string)} 
+              src={post.image_urls?.[currentPhotoIndex] || (post.thumbnail_url as string)} 
               alt="Post content"
-              loading="lazy"
               className="w-full h-full object-cover bg-black"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPhotoGalleryOpen(true);
+              }}
+              loading="lazy"
             />
             {post.image_urls && post.image_urls.length > 1 && (
-              <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
-                1 / {post.image_urls.length}
-              </div>
+              <>
+                <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
+                  {currentPhotoIndex + 1} / {post.image_urls.length}
+                </div>
+                <button
+                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                  }}
+                  aria-label="Previous photo"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+                <button
+                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                  }}
+                  aria-label="Next photo"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              </>
             )}
           </div>
 
