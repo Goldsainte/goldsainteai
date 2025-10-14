@@ -22,7 +22,11 @@ interface Notification {
   metadata: any;
 }
 
-export const NotificationCenter = () => {
+interface NotificationCenterProps {
+  showLabel?: boolean;
+}
+
+export const NotificationCenter = ({ showLabel = true }: NotificationCenterProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -176,13 +180,13 @@ export const NotificationCenter = () => {
     <TooltipProvider>
       <Sheet>
         <SheetTrigger asChild>
-          <button className="flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-muted/50 transition-colors font-normal w-full text-left relative">
+          <button className={`flex items-center ${showLabel ? 'gap-4 px-3 py-3 w-full text-left' : 'gap-0 h-10 w-10 justify-center'} rounded-lg hover:bg-muted/50 transition-colors font-normal relative`}>
             <Bell className="h-6 w-6" />
-            <span className="text-base">Notifications</span>
+            {showLabel && <span className="text-base">Notifications</span>}
             {unreadCount > 0 && (
               <Badge
                 variant="destructive"
-                className="absolute right-3 h-5 w-5 p-0 flex items-center justify-center text-xs"
+                className={`absolute ${showLabel ? 'right-3' : 'top-0 right-0 -translate-y-1 translate-x-1'} h-5 w-5 p-0 flex items-center justify-center text-xs`}
               >
                 {unreadCount > 9 ? "9+" : unreadCount}
               </Badge>
