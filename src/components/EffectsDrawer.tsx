@@ -15,11 +15,11 @@ export const EffectsDrawer = ({ open, onOpenChange, onSave }: EffectsDrawerProps
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
-      <DrawerContent className="h-[85vh] flex flex-col">
-        <DrawerHeader>
+      <DrawerContent className="h-[75vh] flex flex-col">
+        <DrawerHeader className="flex-shrink-0">
           <DrawerTitle>Add Interactive Element</DrawerTitle>
         </DrawerHeader>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto min-h-0 px-1">
           <StoryInteractionCreator
             open={open}
             onOpenChange={onOpenChange}

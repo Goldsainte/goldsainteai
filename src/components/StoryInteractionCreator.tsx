@@ -367,7 +367,7 @@ export const StoryInteractionCreator = ({
           Cancel
         </Button>
         <Button onClick={handleSave} className="flex-1">
-          Add to Story
+          Add to Moment
         </Button>
       </div>
     </div>
@@ -377,12 +377,14 @@ export const StoryInteractionCreator = ({
     <div className="px-4 pb-4">{innerContent}</div>
   ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Add Story Interaction</DialogTitle>
+      <DialogContent className="sm:max-w-md max-h-[85vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
+          <DialogTitle>Add Interactive Element</DialogTitle>
         </DialogHeader>
 
-        {innerContent}
+        <div className="flex-1 overflow-y-auto min-h-0 px-1">
+          {innerContent}
+        </div>
       </DialogContent>
     </Dialog>
   );
