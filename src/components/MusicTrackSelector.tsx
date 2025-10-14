@@ -73,12 +73,8 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
       const rawMsg = (error?.context?.value?.message as string) || (error?.message as string) || '';
       if (rawMsg.toLowerCase().includes('unauthorized')) {
         setErrorText('Please sign in to search for tracks.');
-      } else if (rawMsg.toLowerCase().includes('credentials')) {
-        setErrorText('Apple Music credentials not found. Connect your key to enable music search.');
-      } else if (rawMsg.toLowerCase().includes('failed to fetch')) {
-        setErrorText('Music search service is unreachable right now. Please try again.');
       } else {
-        setErrorText('Failed to search tracks. Please try again.');
+        setErrorText('Unable to search for music right now. Please try again.');
       }
       toast.error('Failed to search tracks');
     } finally {
@@ -159,13 +155,8 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
         </div>
         {errorText && (
           <Alert variant="destructive" className="mt-3">
-            <AlertDescription className="flex items-center justify-between gap-3 flex-wrap">
-              <span>{errorText}</span>
-              {errorText.includes('Apple Music credentials') || errorText.includes('Connect your key') ? (
-                <Button asChild size="sm" variant="outline">
-                  <a href="/upload-apple-music-key">Connect Apple Music Key</a>
-                </Button>
-              ) : null}
+            <AlertDescription>
+              {errorText}
             </AlertDescription>
           </Alert>
         )}

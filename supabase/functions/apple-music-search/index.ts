@@ -91,6 +91,8 @@ serve(async (req) => {
   }
 
   try {
+    console.log('[apple-music-search] Function invoked');
+    
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -104,46 +106,87 @@ serve(async (req) => {
     const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
     
     if (authError || !user) {
+      console.error('[apple-music-search] Authentication failed:', authError);
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log('[apple-music-search] User authenticated:', user.id);
+
     const { query } = await req.json();
     
     if (!query) {
+      console.error('[apple-music-search] No query provided');
       return new Response(
         JSON.stringify({ error: 'Query is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Searching Apple Music for:', query);
+    console.log('[apple-music-search] Searching for:', query);
 
     // Get credentials from database
-    const credentials = await getCredentials(user.id);
+    let credentials;
+    try {
+      credentials = await getCredentials(user.id);
+      console.log('[apple-music-search] Credentials retrieved:', {
+        hasP8Key: !!credentials.p8_key,
+        teamId: credentials.team_id,
+        keyId: credentials.key_id
+      });
+    } catch (error) {
+      console.error('[apple-music-search] Failed to get credentials:', error);
+      throw new Error('Apple Music credentials not found. Please upload your credentials first.');
+    }
 
     // Generate JWT token
-    const token = await generateToken(credentials.p8_key, credentials.team_id, credentials.key_id);
+    let token;
+    try {
+      console.log('[apple-music-search] Attempting JWT token generation');
+      token = await generateToken(credentials.p8_key, credentials.team_id, credentials.key_id);
+      console.log('[apple-music-search] JWT token generated successfully');
+    } catch (error) {
+      console.error('[apple-music-search] JWT generation failed:', error);
+      throw new Error('Failed to generate Apple Music token');
+    }
 
     // Search Apple Music API
     const searchUrl = `https://api.music.apple.com/v1/catalog/us/search?term=${encodeURIComponent(query)}&types=songs&limit=10`;
+    console.log('[apple-music-search] Calling Apple Music API:', searchUrl);
     
-    const response = await fetch(searchUrl, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
+    let response;
+    try {
+      response = await fetch(searchUrl, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Apple Music API error:', response.status, errorText);
-      throw new Error(`Apple Music API error: ${response.status}`);
+      console.log('[apple-music-search] Apple Music API response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('[apple-music-search] Apple Music API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`Apple Music API returned ${response.status}: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('[apple-music-search] Failed to call Apple Music API:', error);
+      throw new Error('Failed to connect to Apple Music service');
     }
 
     const data = await response.json();
+    console.log('[apple-music-search] Apple Music API response data:', {
+      hasResults: !!data.results,
+      hasSongs: !!data.results?.songs,
+      songCount: data.results?.songs?.data?.length || 0
+    });
     
     // Transform Apple Music response to our format
     const tracks = data.results?.songs?.data?.map((song: any) => ({
@@ -157,7 +200,7 @@ serve(async (req) => {
       appleMusicUrl: song.attributes.url
     })) || [];
 
-    console.log(`Found ${tracks.length} tracks`);
+    console.log(`[apple-music-search] Successfully found ${tracks.length} tracks`);
 
     return new Response(
       JSON.stringify({ tracks }),
@@ -165,7 +208,7 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error in apple-music-search:', error);
+    console.error('[apple-music-search] Error:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
