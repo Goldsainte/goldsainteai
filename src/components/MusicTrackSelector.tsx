@@ -104,8 +104,8 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
       audioElement?.pause();
       const audio = new Audio();
       (audio as any).crossOrigin = 'anonymous';
+      audio.volume = 1.0;
       audio.src = track.previewUrl;
-      audio.currentTime = clipStartTime;
       
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
@@ -119,6 +119,11 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
         setAudioElement(null);
       };
 
+      // Wait for audio to load before setting time
+      audio.onloadedmetadata = () => {
+        audio.currentTime = clipStartTime;
+      };
+
       try {
         await audio.play();
         setAudioElement(audio);
@@ -126,7 +131,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
         setCurrentTrack(track);
       } catch (error) {
         console.error('Play error:', error);
-        toast.error('Unable to play preview. Click play again or try another track.');
+        toast.error('Unable to play preview. Try again or select another track.');
         setPlayingTrackId(null);
         setAudioElement(null);
       }
@@ -219,27 +224,26 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
                 {track.albumArt && (
                   <img
                     src={track.albumArt}
                     alt={track.album}
-                    className="w-12 h-12 rounded object-cover flex-shrink-0"
+                    className="w-12 h-12 rounded object-cover"
                   />
                 )}
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0">
                   <p className="font-medium text-sm truncate">{track.name}</p>
                   <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
                   <p className="text-xs text-muted-foreground truncate">{track.album}</p>
                 </div>
-                <div className="flex gap-1 flex-shrink-0">
+                <div className="flex gap-1 shrink-0">
                   {track.previewUrl ? (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => togglePlay(track)}
-                      className="flex-shrink-0"
                     >
                       {playingTrackId === track.id ? (
                         <Pause className="h-4 w-4" />
@@ -252,7 +256,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                       variant="ghost"
                       size="icon"
                       disabled
-                      className="flex-shrink-0 opacity-30"
+                      className="opacity-30"
                       title="No preview available"
                     >
                       <Play className="h-4 w-4" />
@@ -263,7 +267,6 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     size="sm"
                     disabled={selectedTrack?.id === track.id}
                     onClick={() => handleSelectTrack(track)}
-                    className="flex-shrink-0"
                   >
                     {selectedTrack?.id === track.id ? "Selected" : "Select"}
                   </Button>

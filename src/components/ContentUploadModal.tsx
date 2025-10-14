@@ -320,7 +320,6 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
           caption: caption || null,
           location: location || null,
           status: 'active',
-          interactions: storyInteraction ? [storyInteraction] : null,
           ...(selectedMusicTrack && {
             music_track_id: selectedMusicTrack.id,
             music_track_name: selectedMusicTrack.name,
