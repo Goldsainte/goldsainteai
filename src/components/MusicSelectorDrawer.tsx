@@ -16,7 +16,7 @@ export const MusicSelectorDrawer = ({
   onTrackSelect,
 }: MusicSelectorDrawerProps) => {
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
       <DrawerContent className="h-[85vh] flex flex-col">
         <DrawerHeader>
           <DrawerTitle>Add Music</DrawerTitle>

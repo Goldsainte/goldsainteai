@@ -30,7 +30,7 @@ export const SettingsDrawer = ({
   };
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle className="flex items-center gap-2">

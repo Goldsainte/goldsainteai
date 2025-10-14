@@ -38,7 +38,7 @@ export const TaggingDrawer = ({
   };
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
       <DrawerContent className="h-[75vh] flex flex-col">
         <DrawerHeader>
           <DrawerTitle>Tag People & Packages</DrawerTitle>

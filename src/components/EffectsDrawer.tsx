@@ -14,7 +14,7 @@ export const EffectsDrawer = ({ open, onOpenChange, onSave }: EffectsDrawerProps
   };
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
+    <Drawer open={open} onOpenChange={onOpenChange} modal={false}>
       <DrawerContent className="h-[85vh] flex flex-col">
         <DrawerHeader>
           <DrawerTitle>Add Interactive Element</DrawerTitle>
