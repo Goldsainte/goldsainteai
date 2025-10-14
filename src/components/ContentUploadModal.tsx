@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Loader2, Link2, Image, Star, BarChart3, Wand2, Edit, X } from "lucide-react";
+import { Upload, Loader2, Link2, Image, Star, BarChart3, Wand2, Edit, X, Music, Sparkles, MapPin, Tag, Settings as SettingsIcon, Users } from "lucide-react";
 import { toast } from "sonner";
 import { extractMentions } from "@/lib/mentionHelpers";
 import { extractHashtags } from "@/lib/hashtagHelpers";
@@ -29,7 +29,7 @@ import { EffectsDrawer } from "./EffectsDrawer";
 import { LocationDrawer } from "./LocationDrawer";
 import { TaggingDrawer } from "./TaggingDrawer";
 import { SettingsDrawer } from "./SettingsDrawer";
-import { Music, Sparkles, MapPin, Tag, Settings as SettingsIcon } from "lucide-react";
+
 import {
   Select,
   SelectContent,
@@ -245,6 +245,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
           caption: caption || null,
           location: location || null,
           status: 'active',
+          interactions: storyInteraction ? [storyInteraction] : null,
           ...(selectedMusicTrack && {
             music_track_id: selectedMusicTrack.id,
             music_track_name: selectedMusicTrack.name,
@@ -663,119 +664,197 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="photo" className="space-y-4 mt-4 overflow-y-auto flex-1">
-            <div className="space-y-2">
-              <Label>Photos (up to 20)</Label>
-              <Input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handlePhotoChange}
-                disabled={uploading}
-              />
-            </div>
-
-            {photoPreviewUrls.length > 0 && (
-              <div className="space-y-2">
-                <Label>Photo Previews</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {photoPreviewUrls.map((url, index) => (
-                    <div key={index} className="relative group">
-                      <img
-                        src={url}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-32 object-cover rounded-lg"
-                      />
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => handlePhotoEdit(index)}
-                      >
-                        <Edit className="w-3 h-3 mr-1" />
-                        Edit
-                      </Button>
-                    </div>
-                  ))}
+          <TabsContent value="photo" className="flex flex-col h-full pb-20">
+            {/* Top Section - Photo Upload & Preview */}
+            <div className="flex-1 overflow-y-auto px-6 pt-4 space-y-4">
+              {photoPreviewUrls.length === 0 ? (
+                <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoChange}
+                    disabled={uploading}
+                    className="hidden"
+                    id="photo-upload"
+                  />
+                  <label htmlFor="photo-upload" className="cursor-pointer block">
+                    <Image className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Tap to select photos
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Up to 20 photos
+                    </p>
+                  </label>
                 </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>Caption</Label>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={generateAutoCaption}
-                  disabled={generatingCaption || (photoPreviewUrls.length === 0 && !videoPreviewUrl)}
-                >
-                  {generatingCaption ? (
-                    <>
-                      <Loader2 className="w-3 h-3 mr-1 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Wand2 className="w-3 h-3 mr-1" />
-                      AI Caption
-                    </>
-                  )}
-                </Button>
-              </div>
-              <Textarea
-                placeholder="Tell us about your adventure... Use #hashtags and @mentions"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                disabled={uploading}
-                rows={3}
-              />
-              <p className="text-xs text-muted-foreground">
-                Tip: Use #hashtags to help others discover your content and @username to tag people
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Location</Label>
-              <Input
-                placeholder="Where was this taken?"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                disabled={uploading}
-              />
-            </div>
-
-            <PartnershipTagging
-              onPartnershipChange={setPartnershipBrandId}
-              currentBrandId={partnershipBrandId}
-            />
-
-            <PackageTagSelector
-              selectedPackageIds={taggedPackageIds}
-              onPackageTagged={(packageId) => {
-                if (!taggedPackageIds.includes(packageId)) {
-                  setTaggedPackageIds([...taggedPackageIds, packageId]);
-                }
-              }}
-            />
-
-            <Button
-              onClick={handlePhotoUpload}
-              disabled={photoFiles.length === 0 || uploading}
-              className="w-full"
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
-                </>
               ) : (
                 <>
-                  <Image className="mr-2 h-4 w-4" />
-                  Upload Photos
+                  {/* Photo Grid Preview */}
+                  <div className="grid grid-cols-2 gap-2">
+                    {photoPreviewUrls.map((url, index) => (
+                      <div key={index} className="relative group aspect-square">
+                        <img
+                          src={url}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handlePhotoEdit(index)}
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Edit
+                        </Button>
+                        {index === 0 && (
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            className="absolute top-2 left-2"
+                            onClick={() => {
+                              setPhotoFiles([]);
+                              setPhotoPreviewUrls([]);
+                            }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Compact Caption Input with AI Button */}
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2">
+                      <Textarea
+                        placeholder="Write a caption..."
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                        disabled={uploading}
+                        rows={2}
+                        className="resize-none"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={generateAutoCaption}
+                        disabled={generatingCaption || photoPreviewUrls.length === 0}
+                        className="shrink-0"
+                      >
+                        {generatingCaption ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Selected Items Display */}
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMusicTrack && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <Music className="w-3 h-3" />
+                        <span className="truncate max-w-[150px]">{selectedMusicTrack.name}</span>
+                      </div>
+                    )}
+                    {location && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate max-w-[150px]">{location}</span>
+                      </div>
+                    )}
+                    {storyInteraction && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{storyInteraction.type}</span>
+                      </div>
+                    )}
+                    {(partnershipBrandId || taggedPackageIds.length > 0) && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <Tag className="w-3 h-3" />
+                        <span>
+                          {partnershipBrandId && taggedPackageIds.length > 0
+                            ? `Brand + ${taggedPackageIds.length} packages`
+                            : partnershipBrandId
+                            ? 'Brand tagged'
+                            : `${taggedPackageIds.length} packages`}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload Button */}
+                  <Button
+                    onClick={handlePhotoUpload}
+                    disabled={photoFiles.length === 0 || uploading}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Image className="mr-2 h-4 w-4" />
+                        Share Sainte
+                      </>
+                    )}
+                  </Button>
                 </>
               )}
-            </Button>
+            </div>
+
+            {/* Bottom Action Bar - Always visible with helper text */}
+            <div className="pb-safe">
+              {photoPreviewUrls.length === 0 && (
+                <p className="text-xs text-center text-muted-foreground px-4 py-2">
+                  Upload photos to use the buttons below
+                </p>
+              )}
+              <BottomActionBar
+                actions={[
+                  {
+                    icon: <Music className="w-5 h-5" />,
+                    label: "Music",
+                    onClick: () => setMusicDrawerOpen(true),
+                    badge: selectedMusicTrack ? 1 : 0,
+                    active: !!selectedMusicTrack,
+                  },
+                  {
+                    icon: <Sparkles className="w-5 h-5" />,
+                    label: "Effects",
+                    onClick: () => setEffectsDrawerOpen(true),
+                    badge: storyInteraction ? 1 : 0,
+                    active: !!storyInteraction,
+                  },
+                  {
+                    icon: <MapPin className="w-5 h-5" />,
+                    label: "Location",
+                    onClick: () => setLocationDrawerOpen(true),
+                    badge: location ? 1 : 0,
+                    active: !!location,
+                  },
+                  {
+                    icon: <Tag className="w-5 h-5" />,
+                    label: "Tag",
+                    onClick: () => setTaggingDrawerOpen(true),
+                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length,
+                    active: !!(partnershipBrandId || taggedPackageIds.length > 0),
+                  },
+                  {
+                    icon: <SettingsIcon className="w-5 h-5" />,
+                    label: "Settings",
+                    onClick: () => setSettingsDrawerOpen(true),
+                    active: visibility === 'close_friends',
+                  },
+                ]}
+              />
+            </div>
           </TabsContent>
 
           <TabsContent value="video" className="flex flex-col h-full pb-20">
@@ -829,16 +908,31 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                     </div>
                   )}
 
-                  {/* Compact Caption Input */}
+                  {/* Compact Caption Input with AI Button */}
                   <div className="space-y-2">
-                    <Textarea
-                      placeholder="Write a caption..."
-                      value={caption}
-                      onChange={(e) => setCaption(e.target.value)}
-                      disabled={uploading}
-                      rows={2}
-                      className="resize-none"
-                    />
+                    <div className="flex items-start gap-2">
+                      <Textarea
+                        placeholder="Write a caption..."
+                        value={caption}
+                        onChange={(e) => setCaption(e.target.value)}
+                        disabled={uploading}
+                        rows={2}
+                        className="resize-none"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={generateAutoCaption}
+                        disabled={generatingCaption || !videoPreviewUrl}
+                        className="shrink-0"
+                      >
+                        {generatingCaption ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Selected Items Display */}
