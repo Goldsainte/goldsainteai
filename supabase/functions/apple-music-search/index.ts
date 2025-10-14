@@ -33,7 +33,8 @@ async function getCredentials() {
 
 // Generate Apple Music JWT token
 async function generateToken(privateKey: string, teamId: string, keyId: string): Promise<string> {
-
+  console.log('[apple-music-search] Generating JWT with team_id:', teamId, 'key_id:', keyId);
+  
   // Create JWT header
   const header = {
     alg: 'ES256',
@@ -48,16 +49,20 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
     exp: now + (6 * 30 * 24 * 60 * 60) // 6 months
   };
 
+  console.log('[apple-music-search] JWT payload:', { iss: teamId, iat: now, exp: payload.exp });
+
   // Encode header and payload
   const encodedHeader = btoa(JSON.stringify(header));
   const encodedPayload = btoa(JSON.stringify(payload));
   const message = `${encodedHeader}.${encodedPayload}`;
 
-  // Import the private key
+  // Import the private key - handle both EC and standard PRIVATE KEY formats
   const pemKey = privateKey
-    .replace(/-----BEGIN PRIVATE KEY-----/, '')
-    .replace(/-----END PRIVATE KEY-----/, '')
-    .replace(/\s/g, '');
+    .replace(/-----BEGIN (EC )?PRIVATE KEY-----/g, '')
+    .replace(/-----END (EC )?PRIVATE KEY-----/g, '')
+    .replace(/[\r\n\s]/g, '');
+  
+  console.log('[apple-music-search] Cleaned key length:', pemKey.length);
   
   const binaryKey = Uint8Array.from(atob(pemKey), c => c.charCodeAt(0));
   
@@ -86,6 +91,7 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
   // Encode signature
   const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)));
   
+  console.log('[apple-music-search] JWT token generated, total length:', `${message}.${encodedSignature}`.length);
   return `${message}.${encodedSignature}`;
 }
 

@@ -186,9 +186,6 @@ verify_jwt = false
 [functions.request-password-reset]
 verify_jwt = false
 
-[functions.apple-music-search]
-verify_jwt = true
-
 [functions.save-apple-music-credentials]
 verify_jwt = true
 
