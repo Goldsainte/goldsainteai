@@ -662,7 +662,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           )}
 
           {/* Caption */}
-          <div className="text-sm leading-[18px]">
+          <div className="text-xs leading-[14px]">
             <span 
               className="font-semibold cursor-pointer hover:opacity-70 mr-1"
               onClick={() => navigate(`/travel-profile/${post.user_id}`)}
@@ -1171,7 +1171,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             )}
 
             {post.caption && (
-              <p className="text-base leading-relaxed drop-shadow-lg font-medium">
+              <p className="text-sm leading-relaxed drop-shadow-lg font-medium">
                 {renderTextWithMentionsAndHashtags(
                   post.caption,
                   (username) => navigate(`/travel-profile?user=${username}`),
