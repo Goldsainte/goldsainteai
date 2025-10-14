@@ -737,7 +737,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
           <DialogTitle>New Post</DialogTitle>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full flex flex-col overflow-hidden flex-1">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full flex flex-col overflow-hidden flex-1 min-h-0">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 flex-shrink-0">
             <TabsTrigger value="photo">
               <Image className="w-4 h-4 mr-2" />
@@ -756,9 +756,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="photo" className="flex flex-col h-full">
+          <TabsContent value="photo" className="flex flex-col flex-1 min-h-0">
             {/* Top Section - Photo Upload & Preview */}
-            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-48 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-6 space-y-4 min-h-0">
               {photoPreviewUrls.length === 0 ? (
                 <div className="border-2 border-dashed rounded-lg p-8 text-center">
                   <Input
@@ -948,9 +948,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             />
           </TabsContent>
 
-          <TabsContent value="video" className="flex flex-col h-full">
+          <TabsContent value="video" className="flex flex-col flex-1 min-h-0">
             {/* Top Section - Video Upload & Preview */}
-            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-48 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-6 space-y-4 min-h-0">
               {!videoFile ? (
                 <div className="border-2 border-dashed rounded-lg p-8 text-center">
                   <Input
