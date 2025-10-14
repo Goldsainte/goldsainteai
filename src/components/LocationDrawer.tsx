@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MapPin } from "lucide-react";
+import { CityAutocomplete } from "./CityAutocomplete";
 
 interface LocationDrawerProps {
   open: boolean;
@@ -41,12 +41,10 @@ export const LocationDrawer = ({
         <div className="px-4 pb-8 space-y-4">
           <div className="space-y-2">
             <Label htmlFor="location">Location</Label>
-            <Input
-              id="location"
+            <CityAutocomplete
               value={tempLocation}
-              onChange={(e) => setTempLocation(e.target.value)}
-              placeholder="Enter a location..."
-              maxLength={100}
+              onChange={setTempLocation}
+              placeholder="Search for a city..."
             />
             <p className="text-xs text-muted-foreground">
               {tempLocation.length}/100

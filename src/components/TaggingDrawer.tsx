@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PartnershipTagging } from "./PartnershipTagging";
 import { PackageTagSelector } from "./PackageTagSelector";
-import { Users, Package } from "lucide-react";
+import { PeopleTagSelector } from "./PeopleTagSelector";
+import { Users, Package, UserPlus } from "lucide-react";
 
 interface TaggingDrawerProps {
   open: boolean;
@@ -13,6 +14,8 @@ interface TaggingDrawerProps {
   onPartnershipChange: (brandId: string | null) => void;
   taggedPackageIds: string[];
   onPackageTagsChange: (packageIds: string[]) => void;
+  taggedUserIds: string[];
+  onPeopleTagsChange: (userIds: string[]) => void;
 }
 
 export const TaggingDrawer = ({
@@ -22,18 +25,23 @@ export const TaggingDrawer = ({
   onPartnershipChange,
   taggedPackageIds,
   onPackageTagsChange,
+  taggedUserIds,
+  onPeopleTagsChange,
 }: TaggingDrawerProps) => {
   const [tempBrandId, setTempBrandId] = useState(partnershipBrandId);
   const [tempPackageIds, setTempPackageIds] = useState(taggedPackageIds);
+  const [tempUserIds, setTempUserIds] = useState(taggedUserIds);
 
   useEffect(() => {
     setTempBrandId(partnershipBrandId);
     setTempPackageIds(taggedPackageIds);
-  }, [partnershipBrandId, taggedPackageIds]);
+    setTempUserIds(taggedUserIds);
+  }, [partnershipBrandId, taggedPackageIds, taggedUserIds]);
 
   const handleSave = () => {
     onPartnershipChange(tempBrandId);
     onPackageTagsChange(tempPackageIds);
+    onPeopleTagsChange(tempUserIds);
     onOpenChange(false);
   };
 
@@ -43,8 +51,12 @@ export const TaggingDrawer = ({
         <DrawerHeader>
           <DrawerTitle>Tag People & Packages</DrawerTitle>
         </DrawerHeader>
-        <Tabs defaultValue="brands" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="mx-4 grid w-auto grid-cols-2">
+        <Tabs defaultValue="people" className="flex-1 flex flex-col overflow-hidden">
+          <TabsList className="mx-4 grid w-auto grid-cols-3">
+            <TabsTrigger value="people" className="gap-2">
+              <UserPlus className="w-4 h-4" />
+              People
+            </TabsTrigger>
             <TabsTrigger value="brands" className="gap-2">
               <Users className="w-4 h-4" />
               Brands
@@ -54,6 +66,12 @@ export const TaggingDrawer = ({
               Packages
             </TabsTrigger>
           </TabsList>
+          <TabsContent value="people" className="flex-1 overflow-y-auto px-4 mt-4">
+            <PeopleTagSelector
+              selectedUserIds={tempUserIds}
+              onSelectionChange={setTempUserIds}
+            />
+          </TabsContent>
           <TabsContent value="brands" className="flex-1 overflow-y-auto px-4 mt-4">
             <PartnershipTagging
               onPartnershipChange={setTempBrandId}

@@ -69,6 +69,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
   const [selectedGifUrl, setSelectedGifUrl] = useState<string | null>(null);
   const [selectedMusicTrack, setSelectedMusicTrack] = useState<any>(null);
   const [boomerangVideo, setBoomerangVideo] = useState<Blob | null>(null);
+  const [taggedUserIds, setTaggedUserIds] = useState<string[]>([]);
   
   // Drawer states for Instagram-style bottom bar
   const [musicDrawerOpen, setMusicDrawerOpen] = useState(false);
@@ -99,21 +100,86 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
 
     setGeneratingCaption(true);
     try {
-      const imageUrl = photoPreviewUrls[0] || videoPreviewUrl;
+      let tempImageUrl = '';
+      let tempImagePath = '';
+
+      // Upload a temporary image for the AI to analyze
+      if (photoPreviewUrls.length > 0 && photoFiles[0]) {
+        // For photos, upload the first photo temporarily
+        const tempFileName = `${user?.id}/ai-temp/${Date.now()}.jpg`;
+        const { error: uploadError } = await supabase.storage
+          .from('travel-videos')
+          .upload(tempFileName, photoFiles[0], {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('travel-videos')
+          .getPublicUrl(tempFileName);
+        
+        tempImageUrl = publicUrl;
+        tempImagePath = tempFileName;
+      } else if (videoPreviewUrl && videoRef.current) {
+        // For videos, capture a frame and upload it
+        const canvas = document.createElement('canvas');
+        canvas.width = videoRef.current.videoWidth;
+        canvas.height = videoRef.current.videoHeight;
+        const ctx = canvas.getContext('2d');
+        
+        if (ctx) {
+          ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+          const blob = await new Promise<Blob>((resolve) => {
+            canvas.toBlob((b) => resolve(b!), 'image/jpeg', 0.9);
+          });
+
+          const tempFileName = `${user?.id}/ai-temp/${Date.now()}.jpg`;
+          const { error: uploadError } = await supabase.storage
+            .from('travel-videos')
+            .upload(tempFileName, blob, {
+              cacheControl: '3600',
+              upsert: false
+            });
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('travel-videos')
+            .getPublicUrl(tempFileName);
+          
+          tempImageUrl = publicUrl;
+          tempImagePath = tempFileName;
+        }
+      }
       
       const { data, error } = await supabase.functions.invoke('generate-caption', {
-        body: { imageUrl }
+        body: { imageUrl: tempImageUrl }
       });
 
-      if (error) throw error;
+      // Clean up temporary image
+      if (tempImagePath) {
+        await supabase.storage.from('travel-videos').remove([tempImagePath]);
+      }
+
+      if (error) {
+        if (error.message?.includes('429')) {
+          throw new Error('Rate limit exceeded. Please try again in a moment.');
+        }
+        if (error.message?.includes('402')) {
+          throw new Error('AI credits exhausted. Please add funds to your workspace.');
+        }
+        throw error;
+      }
 
       if (data?.caption) {
         setCaption(data.caption);
         toast.success('Caption generated!');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating caption:', error);
-      toast.error('Failed to generate caption');
+      toast.error(error.message || 'Failed to generate caption');
     } finally {
       setGeneratingCaption(false);
     }
@@ -277,6 +343,16 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
         }
       }
 
+      // Tag explicitly selected users
+      if (taggedUserIds.length > 0 && postData) {
+        const userTags = taggedUserIds.map(userId => ({
+          post_id: postData.id,
+          tagged_user_id: userId,
+        }));
+
+        await supabase.from('post_user_tags').insert(userTags);
+      }
+
       // Process hashtags (existing function will handle this)
       if (hashtags.length > 0 && postData) {
         await supabase.rpc('extract_and_store_hashtags', {
@@ -293,6 +369,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
       setLocation("");
       setPartnershipBrandId(null);
       setTaggedPackageIds([]);
+      setTaggedUserIds([]);
 
       // Create paid partnership if brand is tagged
       if (partnershipBrandId && postData) {
@@ -577,6 +654,16 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
         }
       }
 
+      // Tag explicitly selected users
+      if (taggedUserIds.length > 0 && postData) {
+        const userTags = taggedUserIds.map(userId => ({
+          post_id: postData.id,
+          tagged_user_id: userId,
+        }));
+
+        await supabase.from('post_user_tags').insert(userTags);
+      }
+
       // Process hashtags
       if (hashtags.length > 0 && postData) {
         await supabase.rpc('extract_and_store_hashtags', {
@@ -594,6 +681,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
       setVideoPreviewUrl("");
       setPartnershipBrandId(null);
       setTaggedPackageIds([]);
+      setTaggedUserIds([]);
 
       // Create paid partnership if brand is tagged
       if (partnershipBrandId && postData) {
@@ -843,8 +931,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                     icon: <Tag className="w-5 h-5" />,
                     label: "Tag",
                     onClick: () => setTaggingDrawerOpen(true),
-                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length,
-                    active: !!(partnershipBrandId || taggedPackageIds.length > 0),
+                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length + taggedUserIds.length,
+                    active: !!(partnershipBrandId || taggedPackageIds.length > 0 || taggedUserIds.length > 0),
                   },
                   {
                     icon: <SettingsIcon className="w-5 h-5" />,
@@ -853,6 +941,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                     active: visibility === 'close_friends',
                   },
                 ]}
+                showLabels
               />
             </div>
           </TabsContent>
@@ -1026,8 +1115,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                     icon: <Tag className="w-5 h-5" />,
                     label: "Tag",
                     onClick: () => setTaggingDrawerOpen(true),
-                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length,
-                    active: !!(partnershipBrandId || taggedPackageIds.length > 0),
+                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length + taggedUserIds.length,
+                    active: !!(partnershipBrandId || taggedPackageIds.length > 0 || taggedUserIds.length > 0),
                   },
                   {
                     icon: <SettingsIcon className="w-5 h-5" />,
@@ -1036,6 +1125,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                     active: visibility === 'close_friends',
                   },
                 ]}
+                showLabels
               />
             </div>
           </TabsContent>
@@ -1370,6 +1460,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
         onPartnershipChange={setPartnershipBrandId}
         taggedPackageIds={taggedPackageIds}
         onPackageTagsChange={setTaggedPackageIds}
+        taggedUserIds={taggedUserIds}
+        onPeopleTagsChange={setTaggedUserIds}
       />
 
       <SettingsDrawer

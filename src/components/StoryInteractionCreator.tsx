@@ -44,11 +44,13 @@ export const StoryInteractionCreator = ({
   const [correctAnswer, setCorrectAnswer] = useState(0);
   const [countdownDate, setCountdownDate] = useState('');
   const [countdownLabel, setCountdownLabel] = useState('');
-  const [sliderQuestion, setSliderQuestion] = useState('');
-  const [sliderMin, setSliderMin] = useState('0');
-  const [sliderMax, setSliderMax] = useState('100');
   const [sliderEmoji, setSliderEmoji] = useState('😍');
+  const [sliderShowLabels, setSliderShowLabels] = useState(true);
+  const [sliderLowLabel, setSliderLowLabel] = useState('Low');
+  const [sliderHighLabel, setSliderHighLabel] = useState('High');
   const [addYoursPrompt, setAddYoursPrompt] = useState('');
+
+  const quickEmojis = ['😍', '🔥', '😊', '👍', '🌟', '😎', '🥳', '❤️', '⭐', '💯'];
 
   const handleSave = () => {
     let data: any = {};
@@ -80,10 +82,10 @@ export const StoryInteractionCreator = ({
         break;
       case 'slider':
         data = {
-          question: sliderQuestion,
-          min: parseInt(sliderMin),
-          max: parseInt(sliderMax),
           emoji: sliderEmoji,
+          showLabels: sliderShowLabels,
+          lowLabel: sliderShowLabels ? sliderLowLabel : undefined,
+          highLabel: sliderShowLabels ? sliderHighLabel : undefined,
         };
         break;
       case 'add_yours':
@@ -216,39 +218,78 @@ export const StoryInteractionCreator = ({
         return (
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Question</Label>
-              <Input
-                placeholder="Rate this..."
-                value={sliderQuestion}
-                onChange={(e) => setSliderQuestion(e.target.value)}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Min Value</Label>
-                <Input
-                  type="number"
-                  value={sliderMin}
-                  onChange={(e) => setSliderMin(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Max Value</Label>
-                <Input
-                  type="number"
-                  value={sliderMax}
-                  onChange={(e) => setSliderMax(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
               <Label>Emoji</Label>
+              <div className="flex gap-2 flex-wrap">
+                {quickEmojis.map((emoji) => (
+                  <Button
+                    key={emoji}
+                    type="button"
+                    variant={sliderEmoji === emoji ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setSliderEmoji(emoji)}
+                    className="text-xl w-10 h-10 p-0"
+                  >
+                    {emoji}
+                  </Button>
+                ))}
+              </div>
               <Input
-                placeholder="😍"
+                placeholder="Or type your own emoji"
                 value={sliderEmoji}
                 onChange={(e) => setSliderEmoji(e.target.value)}
                 maxLength={2}
+                className="text-center text-xl"
               />
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label>Show Labels</Label>
+                <Button
+                  type="button"
+                  variant={sliderShowLabels ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSliderShowLabels(!sliderShowLabels)}
+                >
+                  {sliderShowLabels ? "On" : "Off"}
+                </Button>
+              </div>
+              {sliderShowLabels && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-1">
+                    <Label className="text-xs">Low Label</Label>
+                    <Input
+                      placeholder="Low"
+                      value={sliderLowLabel}
+                      onChange={(e) => setSliderLowLabel(e.target.value)}
+                      maxLength={20}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-xs">High Label</Label>
+                    <Input
+                      placeholder="High"
+                      value={sliderHighLabel}
+                      onChange={(e) => setSliderHighLabel(e.target.value)}
+                      maxLength={20}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Preview */}
+            <div className="border rounded-lg p-4 bg-muted/30">
+              <p className="text-xs text-muted-foreground mb-2">Preview:</p>
+              <div className="flex items-center gap-2">
+                {sliderShowLabels && <span className="text-xs">{sliderLowLabel}</span>}
+                <div className="flex-1 h-1 bg-border rounded-full relative">
+                  <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl">
+                    {sliderEmoji}
+                  </div>
+                </div>
+                {sliderShowLabels && <span className="text-xs">{sliderHighLabel}</span>}
+              </div>
             </div>
           </div>
         );
