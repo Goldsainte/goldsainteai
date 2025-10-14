@@ -976,6 +976,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                         controls
                         playsInline
                         preload="metadata"
+                        muted
                       />
                       <Button
                         variant="destructive"

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, Play, Pause, Music2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,14 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
   const [clipStartTime, setClipStartTime] = useState(0);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
+
+  // Cleanup audio on unmount
+  useEffect(() => {
+    return () => {
+      audioElement?.pause();
+      setAudioElement(null);
+    };
+  }, [audioElement]);
 
   const searchTracks = async () => {
     if (!searchQuery.trim()) return;
@@ -134,9 +142,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
       albumArt: track.albumArt,
       startTime: clipStartTime
     });
-    audioElement?.pause();
-    setPlayingTrackId(null);
-    setAudioElement(null);
+    // Keep preview playing so user can hear their selection
   };
 
   const handleClipTimeChange = (value: number[]) => {
