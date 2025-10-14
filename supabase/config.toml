@@ -184,5 +184,8 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.apple-music-search]
-verify_jwt = false
+verify_jwt = true
+
+[functions.save-apple-music-credentials]
+verify_jwt = true
 

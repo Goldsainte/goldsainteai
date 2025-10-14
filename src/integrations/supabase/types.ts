@@ -933,6 +933,36 @@ export type Database = {
           },
         ]
       }
+      apple_music_credentials: {
+        Row: {
+          created_at: string | null
+          id: string
+          key_id: string
+          p8_key: string
+          team_id: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          key_id: string
+          p8_key: string
+          team_id: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          key_id?: string
+          p8_key?: string
+          team_id?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       auto_assignment_rules: {
         Row: {
           agent_id: string

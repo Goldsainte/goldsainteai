@@ -1,20 +1,34 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Generate Apple Music JWT token
-async function generateToken(): Promise<string> {
-  const privateKey = Deno.env.get('APPLE_MUSIC_P8_KEY');
-  const teamId = Deno.env.get('APPLE_MUSIC_TEAM_ID');
-  const keyId = Deno.env.get('APPLE_MUSIC_KEY_ID');
+// Get credentials from database
+async function getCredentials(userId: string) {
+  const supabaseAdmin = createClient(
+    Deno.env.get('SUPABASE_URL') ?? '',
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+  );
 
-  if (!privateKey || !teamId || !keyId) {
-    throw new Error('Missing Apple Music credentials');
+  const { data, error } = await supabaseAdmin
+    .from('apple_music_credentials')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
+
+  if (error || !data) {
+    throw new Error('Apple Music credentials not found. Please upload your credentials first.');
   }
+
+  return data;
+}
+
+// Generate Apple Music JWT token
+async function generateToken(privateKey: string, teamId: string, keyId: string): Promise<string> {
 
   // Create JWT header
   const header = {
@@ -77,6 +91,25 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
+    );
+
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { query } = await req.json();
     
     if (!query) {
@@ -88,8 +121,11 @@ serve(async (req) => {
 
     console.log('Searching Apple Music for:', query);
 
+    // Get credentials from database
+    const credentials = await getCredentials(user.id);
+
     // Generate JWT token
-    const token = await generateToken();
+    const token = await generateToken(credentials.p8_key, credentials.team_id, credentials.key_id);
 
     // Search Apple Music API
     const searchUrl = `https://api.music.apple.com/v1/catalog/us/search?term=${encodeURIComponent(query)}&types=songs&limit=10`;

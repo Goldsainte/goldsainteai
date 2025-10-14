@@ -4,93 +4,55 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Upload, CheckCircle2 } from 'lucide-react';
+import { Upload, CheckCircle2, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 const UploadAppleMusicKey = () => {
   const [p8File, setP8File] = useState<File | null>(null);
+  const [p8Content, setP8Content] = useState<string>('');
   const [keyId, setKeyId] = useState('');
   const [teamId, setTeamId] = useState('');
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedP8, setUploadedP8] = useState(false);
-  const [uploadedKeyId, setUploadedKeyId] = useState(false);
-  const [uploadedTeamId, setUploadedTeamId] = useState(false);
+  const [allUploaded, setAllUploaded] = useState(false);
 
-  const handleP8FileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleP8FileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.name.endsWith('.p8')) {
       setP8File(file);
+      const content = await file.text();
+      setP8Content(content);
     } else {
       toast.error('Please select a valid .p8 file');
     }
   };
 
-  const handleUploadP8 = async () => {
-    if (!p8File) {
-      toast.error('Please select a .p8 file');
+  const handleUploadAll = async () => {
+    if (!p8Content || !keyId.trim() || !teamId.trim()) {
+      toast.error('Please provide all credentials');
       return;
     }
 
     setIsUploading(true);
     try {
-      const fileContent = await p8File.text();
-      
-      if (!fileContent.includes('BEGIN PRIVATE KEY')) {
-        toast.error('Invalid P8 file format');
-        setIsUploading(false);
-        return;
-      }
+      const { error } = await supabase.functions.invoke('save-apple-music-credentials', {
+        body: {
+          p8_key: p8Content,
+          key_id: keyId,
+          team_id: teamId,
+        }
+      });
 
-      // Store as secret (in a real implementation, this would call an edge function)
-      // For now, we'll just show success
-      setUploadedP8(true);
-      toast.success('P8 key uploaded successfully');
+      if (error) throw error;
+
+      setAllUploaded(true);
+      toast.success('All credentials saved successfully!');
     } catch (error) {
-      console.error('Error uploading P8 file:', error);
-      toast.error('Failed to upload P8 file');
+      console.error('Error saving credentials:', error);
+      toast.error('Failed to save credentials');
     } finally {
       setIsUploading(false);
     }
   };
-
-  const handleUploadKeyId = async () => {
-    if (!keyId.trim()) {
-      toast.error('Please enter a Key ID');
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      // Store as secret (in a real implementation, this would call an edge function)
-      setUploadedKeyId(true);
-      toast.success('Key ID saved successfully');
-    } catch (error) {
-      console.error('Error saving Key ID:', error);
-      toast.error('Failed to save Key ID');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const handleUploadTeamId = async () => {
-    if (!teamId.trim()) {
-      toast.error('Please enter a Team ID');
-      return;
-    }
-
-    setIsUploading(true);
-    try {
-      // Store as secret (in a real implementation, this would call an edge function)
-      setUploadedTeamId(true);
-      toast.success('Team ID saved successfully');
-    } catch (error) {
-      console.error('Error saving Team ID:', error);
-      toast.error('Failed to save Team ID');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const allUploaded = uploadedP8 && uploadedKeyId && uploadedTeamId;
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
@@ -104,156 +66,88 @@ const UploadAppleMusicKey = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>P8 Private Key File</CardTitle>
+            <CardTitle>Upload Apple Music Credentials</CardTitle>
             <CardDescription>
-              Upload your .p8 file from Apple Developer Console → Certificates, Identifiers & Profiles → Keys
+              Provide all three credentials to enable Apple Music search
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="p8-file">P8 Key File (.p8)</Label>
+              <Label htmlFor="p8-file">P8 Private Key File (.p8)</Label>
               <Input
                 id="p8-file"
                 type="file"
                 accept=".p8"
                 onChange={handleP8FileChange}
-                disabled={isUploading || uploadedP8}
+                disabled={isUploading || allUploaded}
                 className="mt-2"
               />
             </div>
-            <Button
-              onClick={handleUploadP8}
-              disabled={!p8File || isUploading || uploadedP8}
-              className="w-full"
-            >
-              {uploadedP8 ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  P8 Key Uploaded
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Upload P8 Key
-                </>
-              )}
-            </Button>
-            {uploadedP8 && (
-              <p className="text-sm text-green-600 dark:text-green-400">
-                ✓ P8 key file has been securely stored
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Key ID</CardTitle>
-            <CardDescription>
-              Find this in Apple Developer Console next to your MusicKit key (10-character string)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            
             <div>
-              <Label htmlFor="key-id">Apple Music Key ID</Label>
+              <Label htmlFor="key-id">Key ID (10 characters)</Label>
               <Input
                 id="key-id"
                 type="text"
-                placeholder="e.g., ABC123DEFG"
+                placeholder="ABC123DEFG"
                 value={keyId}
                 onChange={(e) => setKeyId(e.target.value)}
-                disabled={isUploading || uploadedKeyId}
+                disabled={isUploading || allUploaded}
                 className="mt-2"
                 maxLength={10}
               />
             </div>
-            <Button
-              onClick={handleUploadKeyId}
-              disabled={!keyId.trim() || isUploading || uploadedKeyId}
-              className="w-full"
-            >
-              {uploadedKeyId ? (
-                <>
-                  <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Key ID Saved
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Save Key ID
-                </>
-              )}
-            </Button>
-            {uploadedKeyId && (
-              <p className="text-sm text-green-600 dark:text-green-400">
-                ✓ Key ID has been securely stored
-              </p>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Team ID</CardTitle>
-            <CardDescription>
-              Find this in Apple Developer Console → Membership → Team ID (10-character string)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            
             <div>
-              <Label htmlFor="team-id">Apple Developer Team ID</Label>
+              <Label htmlFor="team-id">Team ID (10 characters)</Label>
               <Input
                 id="team-id"
                 type="text"
-                placeholder="e.g., XYZ987WXYZ"
+                placeholder="XYZ987WXYZ"
                 value={teamId}
                 onChange={(e) => setTeamId(e.target.value)}
-                disabled={isUploading || uploadedTeamId}
+                disabled={isUploading || allUploaded}
                 className="mt-2"
                 maxLength={10}
               />
             </div>
+
             <Button
-              onClick={handleUploadTeamId}
-              disabled={!teamId.trim() || isUploading || uploadedTeamId}
+              onClick={handleUploadAll}
+              disabled={!p8Content || !keyId.trim() || !teamId.trim() || isUploading || allUploaded}
               className="w-full"
             >
-              {uploadedTeamId ? (
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving Credentials...
+                </>
+              ) : allUploaded ? (
                 <>
                   <CheckCircle2 className="w-4 h-4 mr-2" />
-                  Team ID Saved
+                  All Credentials Saved
                 </>
               ) : (
                 <>
                   <Upload className="w-4 h-4 mr-2" />
-                  Save Team ID
+                  Save All Credentials
                 </>
               )}
             </Button>
-            {uploadedTeamId && (
-              <p className="text-sm text-green-600 dark:text-green-400">
-                ✓ Team ID has been securely stored
-              </p>
-            )}
           </CardContent>
         </Card>
 
         {allUploaded && (
           <Card className="border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
             <CardHeader>
-              <CardTitle className="text-green-700 dark:text-green-300">
-                <CheckCircle2 className="w-5 h-5 inline mr-2" />
+              <CardTitle className="text-green-700 dark:text-green-300 flex items-center">
+                <CheckCircle2 className="w-5 h-5 mr-2" />
                 Configuration Complete
               </CardTitle>
               <CardDescription className="text-green-600 dark:text-green-400">
-                All Apple Music credentials have been configured. The music search functionality should now work correctly.
+                All Apple Music credentials have been securely saved. Music search is now enabled.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-green-700 dark:text-green-300">
-                Next step: The apple-music-search edge function will automatically use these credentials for authentication.
-              </p>
-            </CardContent>
           </Card>
         )}
       </div>
