@@ -225,7 +225,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                   <img
                     src={track.albumArt}
                     alt={track.album}
-                    className="w-12 h-12 rounded object-cover"
+                    className="w-12 h-12 rounded object-cover flex-shrink-0"
                   />
                 )}
                 <div className="flex-1 min-w-0">
@@ -233,12 +233,13 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                   <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
                   <p className="text-xs text-muted-foreground truncate">{track.album}</p>
                 </div>
-                <div className="flex gap-1">
-                  {track.previewUrl && (
+                <div className="flex gap-1 flex-shrink-0">
+                  {track.previewUrl ? (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => togglePlay(track)}
+                      className="flex-shrink-0"
                     >
                       {playingTrackId === track.id ? (
                         <Pause className="h-4 w-4" />
@@ -246,12 +247,23 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                         <Play className="h-4 w-4" />
                       )}
                     </Button>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled
+                      className="flex-shrink-0 opacity-30"
+                      title="No preview available"
+                    >
+                      <Play className="h-4 w-4" />
+                    </Button>
                   )}
                   <Button
                     variant={selectedTrack?.id === track.id ? "secondary" : "default"}
                     size="sm"
                     disabled={selectedTrack?.id === track.id}
                     onClick={() => handleSelectTrack(track)}
+                    className="flex-shrink-0"
                   >
                     {selectedTrack?.id === track.id ? "Selected" : "Select"}
                   </Button>
