@@ -1162,7 +1162,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               className="flex items-center gap-3 cursor-pointer"
               onClick={() => navigate(`/travel-profile/${post.user_id}`)}
             >
-              <Avatar className="h-7 w-7 border-2 border-white ring-2 ring-black/20">
+              <Avatar className="h-11 w-11 border-2 border-white ring-2 ring-black/20">
                 <AvatarImage src={post.profiles?.avatar_url || undefined} />
                 <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
                   {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
@@ -1170,9 +1170,9 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </Avatar>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <p className="font-bold text-xs drop-shadow-lg">{post.profiles?.username || 'Anonymous'}</p>
+                  <p className="font-bold text-base drop-shadow-lg">{post.profiles?.username || 'Anonymous'}</p>
                   {post.profiles?.is_verified && (
-                    <CheckCircle2 className="h-3 w-3 text-blue-500 fill-blue-500 drop-shadow-lg" />
+                    <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500 drop-shadow-lg" />
                   )}
                 </div>
                 {post.location && (

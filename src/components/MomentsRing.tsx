@@ -114,17 +114,17 @@ export const MomentsRing = () => {
               }}
             >
               <div className="relative">
-                <Avatar className={`w-10 h-10 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
+                <Avatar className={`w-16 h-16 ${moments.find(m => m.user_id === currentUserId) ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : 'ring-2 ring-muted'}`}>
                   <AvatarImage src={moments.find(m => m.user_id === currentUserId)?.avatar_url || undefined} />
                   <AvatarFallback>You</AvatarFallback>
                 </Avatar>
                 {!moments.find(m => m.user_id === currentUserId) && (
-                  <div className="absolute bottom-0 right-0 w-4 h-4 bg-primary rounded-full flex items-center justify-center ring-2 ring-background">
-                    <Plus className="w-2 h-2 text-primary-foreground" />
+                  <div className="absolute bottom-0 right-0 w-5 h-5 bg-primary rounded-full flex items-center justify-center ring-2 ring-background">
+                    <Plus className="w-3 h-3 text-primary-foreground" />
                   </div>
                 )}
               </div>
-              <span className="text-[8px] font-medium">
+              <span className="text-xs font-medium">
                 {moments.find(m => m.user_id === currentUserId) ? 'Your Moment' : 'Add Moment'}
               </span>
             </div>
@@ -139,11 +139,11 @@ export const MomentsRing = () => {
                 className="flex flex-col items-center gap-1 cursor-pointer flex-shrink-0"
                 onClick={() => handleMomentClick(moment.user_id)}
               >
-                <Avatar className="w-10 h-10 ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background">
+                <Avatar className="w-16 h-16 ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background">
                   <AvatarImage src={moment.avatar_url || undefined} />
                   <AvatarFallback>{moment.username[0]?.toUpperCase()}</AvatarFallback>
                 </Avatar>
-                <span className="text-[8px] font-medium truncate max-w-[80px]">
+                <span className="text-xs font-medium truncate max-w-[80px]">
                   {moment.username}
                 </span>
                 {moment.moment_count > 1 && (
