@@ -181,7 +181,7 @@ export const NotificationCenter = ({ showLabel = true }: NotificationCenterProps
       <Sheet>
         <SheetTrigger asChild>
           <button className={`flex items-center ${showLabel ? 'gap-4 px-3 py-3 w-full text-left' : 'gap-0 h-10 w-10 justify-center'} rounded-lg hover:bg-muted/50 transition-colors font-normal relative`}>
-            <Bell className="h-6 w-6" />
+            <Bell className="h-6 w-6 text-[#BFAD72]" />
             {showLabel && <span className="text-base">Notifications</span>}
             {unreadCount > 0 && (
               <Badge
