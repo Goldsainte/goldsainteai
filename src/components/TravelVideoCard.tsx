@@ -981,7 +981,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             }}
           />
           {/* More Options Button */}
-          <div className="absolute top-20 right-4 z-10">
+          <div className="absolute bottom-20 right-4 z-10">
             {isOwnPost ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1020,13 +1020,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           {/* Mute Button */}
           <button
             onClick={onToggleMute}
-            className="absolute top-36 right-4 rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
+            className="absolute bottom-36 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
             aria-label={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? (
-              <VolumeX className="h-6 w-6 text-white" />
+              <VolumeX className="h-4 w-4 text-white" />
             ) : (
-              <Volume2 className="h-6 w-6 text-white" />
+              <Volume2 className="h-4 w-4 text-white" />
             )}
           </button>
         </>
@@ -1035,7 +1035,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           {getEmbedComponent()}
           
           {/* More Options Button for Embed */}
-          <div className="absolute top-20 right-4 z-10">
+          <div className="absolute bottom-20 right-4 z-10">
             {isOwnPost ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1095,7 +1095,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           </div>
 
           {/* More Options Button for Photos */}
-          <div className="absolute top-20 right-4 z-10">
+          <div className="absolute bottom-20 right-4 z-10">
             {isOwnPost ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -1174,6 +1174,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </div>
             </div>
 
+            {/* Small Music Display */}
+            {post.music_track_name && (
+              <div className="flex items-center gap-1.5 text-xs text-white drop-shadow-md mt-2">
+                <Music2 className="h-3 w-3" />
+                <span className="truncate max-w-[200px]">{post.music_track_name}</span>
+              </div>
+            )}
+
             {/* Original Creator Attribution */}
             {post.original_creator && (
               <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1 inline-block">
@@ -1184,7 +1192,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             )}
 
             {post.caption && (
-              <p className="text-sm leading-relaxed drop-shadow-lg font-medium">
+              <p className="text-xs leading-relaxed drop-shadow-lg font-medium">
                 {renderTextWithMentionsAndHashtags(
                   post.caption,
                   (username) => navigate(`/travel-profile?user=${username}`),
@@ -1218,12 +1226,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           </div>
 
           {/* Action Buttons - Only essential ones for mobile */}
-          <div className="flex flex-col items-center gap-6 pb-32">
+          <div className="flex flex-col items-center gap-3 pb-32">
             <button
               onClick={handleLike}
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <Heart className={`h-7 w-7 text-white drop-shadow-2xl ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <Heart className={`h-6 w-6 text-white drop-shadow-2xl ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
               <span className="text-xs font-bold drop-shadow-2xl">{formatCount(localLikeCount)}</span>
             </button>
 
@@ -1231,7 +1239,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               onClick={() => setCommentsOpen(true)}
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <MessageCircle className="h-7 w-7 text-white drop-shadow-2xl" />
+              <MessageCircle className="h-6 w-6 text-white drop-shadow-2xl" />
               <span className="text-xs font-bold drop-shadow-2xl">{formatCount(localCommentCount)}</span>
             </button>
 
@@ -1239,7 +1247,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               onClick={handleSaveClick}
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
             >
-              <Bookmark className={`h-7 w-7 text-white drop-shadow-2xl ${isSaved ? 'fill-white' : ''}`} />
+              <Bookmark className={`h-6 w-6 text-white drop-shadow-2xl ${isSaved ? 'fill-white' : ''}`} />
             </button>
 
             <button
@@ -1247,55 +1255,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
               data-tour="send-gift-post"
             >
-              <Coins className="h-7 w-7 text-[#BFAD72] drop-shadow-2xl" />
+              <Coins className="h-6 w-6 text-[#BFAD72] drop-shadow-2xl" />
             </button>
           </div>
 
-          {/* Music Player (Mobile) */}
-          {post.music_track_name && (
-            <div className="absolute bottom-20 left-4 right-20 flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full p-2 text-sm">
-              {post.music_album_art && (
-                <img
-                  src={post.music_album_art}
-                  alt={post.music_track_name}
-                  className="w-8 h-8 rounded-full object-cover"
-                />
-              )}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-xs truncate text-foreground">
-                  {post.music_track_name}
-                </p>
-                <p className="text-[10px] text-muted-foreground truncate">
-                  {post.music_track_artist}
-                </p>
-              </div>
-              {post.music_preview_url && (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleAudio}
-                    className="h-6 w-6 shrink-0"
-                  >
-                    {audioPlaying ? (
-                      <Pause className="w-3 h-3" />
-                    ) : (
-                      <Play className="w-3 h-3" />
-                    )}
-                  </Button>
-                  <audio
-                    ref={(el) => {
-                      audioRef.current = el;
-                      if (el) el.volume = musicVolume / 100;
-                    }}
-                    src={post.music_preview_url}
-                    onEnded={() => setAudioPlaying(false)}
-                  />
-                </>
-              )}
-              <Music2 className="w-3 h-3 text-[#1DB954] shrink-0" />
-            </div>
-          )}
         </div>
       </div>
 
