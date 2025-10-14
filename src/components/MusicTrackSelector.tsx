@@ -94,7 +94,9 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
       setAudioElement(null);
     } else {
       audioElement?.pause();
-      const audio = new Audio(track.previewUrl);
+      const audio = new Audio();
+      (audio as any).crossOrigin = 'anonymous';
+      audio.src = track.previewUrl;
       audio.currentTime = clipStartTime;
       
       audio.onerror = (e) => {
@@ -240,11 +242,12 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     </Button>
                   )}
                   <Button
-                    variant="default"
+                    variant={selectedTrack?.id === track.id ? "secondary" : "default"}
                     size="sm"
+                    disabled={selectedTrack?.id === track.id}
                     onClick={() => handleSelectTrack(track)}
                   >
-                    Select
+                    {selectedTrack?.id === track.id ? "Selected" : "Select"}
                   </Button>
                 </div>
               </div>

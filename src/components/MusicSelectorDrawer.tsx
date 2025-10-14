@@ -24,7 +24,7 @@ export const MusicSelectorDrawer = ({
         <div className="flex-1 overflow-y-auto px-4 pb-4">
           <MusicTrackSelector
             selectedTrack={selectedTrack}
-            onTrackSelect={onTrackSelect}
+            onTrackSelect={(track) => { onTrackSelect(track); onOpenChange(false); }}
             compact
           />
         </div>

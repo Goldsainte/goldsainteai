@@ -24,6 +24,7 @@ export const EffectsDrawer = ({ open, onOpenChange, onSave }: EffectsDrawerProps
             open={open}
             onOpenChange={onOpenChange}
             onSave={handleSave}
+            embedded
           />
         </div>
       </DrawerContent>

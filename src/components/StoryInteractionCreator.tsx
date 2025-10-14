@@ -26,12 +26,14 @@ interface StoryInteractionCreatorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (interaction: InteractionData) => void;
+  embedded?: boolean;
 }
 
 export const StoryInteractionCreator = ({
   open,
   onOpenChange,
   onSave,
+  embedded = false,
 }: StoryInteractionCreatorProps) => {
   const [interactionType, setInteractionType] = useState<InteractionData['type']>('poll');
   const [pollQuestion, setPollQuestion] = useState('');
@@ -268,72 +270,78 @@ export const StoryInteractionCreator = ({
     }
   };
 
-  return (
+  const innerContent = (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Interaction Type</Label>
+        <Select value={interactionType} onValueChange={(v: any) => setInteractionType(v)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="poll">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Poll
+              </div>
+            </SelectItem>
+            <SelectItem value="question">
+              <div className="flex items-center gap-2">
+                <MessageCircleQuestion className="h-4 w-4" />
+                Question
+              </div>
+            </SelectItem>
+            <SelectItem value="quiz">
+              <div className="flex items-center gap-2">
+                <ListChecks className="h-4 w-4" />
+                Quiz
+              </div>
+            </SelectItem>
+            <SelectItem value="countdown">
+              <div className="flex items-center gap-2">
+                <Timer className="h-4 w-4" />
+                Countdown
+              </div>
+            </SelectItem>
+            <SelectItem value="slider">
+              <div className="flex items-center gap-2">
+                <Sliders className="h-4 w-4" />
+                Slider
+              </div>
+            </SelectItem>
+            <SelectItem value="add_yours">
+              <div className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Add Yours
+              </div>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {renderForm()}
+
+      <div className="flex gap-2">
+        <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
+          Cancel
+        </Button>
+        <Button onClick={handleSave} className="flex-1">
+          Add to Story
+        </Button>
+      </div>
+    </div>
+  );
+
+  return embedded ? (
+    <div className="px-4 pb-4">{innerContent}</div>
+  ) : (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Add Story Interaction</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <Label>Interaction Type</Label>
-            <Select value={interactionType} onValueChange={(v: any) => setInteractionType(v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="poll">
-                  <div className="flex items-center gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    Poll
-                  </div>
-                </SelectItem>
-                <SelectItem value="question">
-                  <div className="flex items-center gap-2">
-                    <MessageCircleQuestion className="h-4 w-4" />
-                    Question
-                  </div>
-                </SelectItem>
-                <SelectItem value="quiz">
-                  <div className="flex items-center gap-2">
-                    <ListChecks className="h-4 w-4" />
-                    Quiz
-                  </div>
-                </SelectItem>
-                <SelectItem value="countdown">
-                  <div className="flex items-center gap-2">
-                    <Timer className="h-4 w-4" />
-                    Countdown
-                  </div>
-                </SelectItem>
-                <SelectItem value="slider">
-                  <div className="flex items-center gap-2">
-                    <Sliders className="h-4 w-4" />
-                    Slider
-                  </div>
-                </SelectItem>
-                <SelectItem value="add_yours">
-                  <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4" />
-                    Add Yours
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {renderForm()}
-
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} className="flex-1">
-              Add to Story
-            </Button>
-          </div>
-        </div>
+        {innerContent}
       </DialogContent>
     </Dialog>
   );
