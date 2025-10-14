@@ -258,8 +258,12 @@ const TravelFeed = () => {
       setCreateMomentOpen(true);
       return;
     }
-    if (type === "reel" || type === "post") {
+    if (type === "reel") {
       setUploadModalOpen(true);
+      setCreateSheetOpen(false);
+    } else if (type === "post") {
+      setUploadModalOpen(true);
+      setCreateSheetOpen(false);
     } else {
       toast.info(`${type} feature coming soon!`);
     }
@@ -450,6 +454,7 @@ const TravelFeed = () => {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleVideoUpload}
+        initialTab="video"
       />
 
       {/* Create Moment Modal */}

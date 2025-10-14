@@ -19,7 +19,7 @@ interface BottomActionBarProps {
 export const BottomActionBar = ({ actions, className }: BottomActionBarProps) => {
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-40",
+      "fixed bottom-0 left-0 right-0 z-[100]",
       "bg-background/95 backdrop-blur-md border-t border-border",
       "px-2 py-2 sm:px-4 sm:py-3",
       "safe-area-inset-bottom",

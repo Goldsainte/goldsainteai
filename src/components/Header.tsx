@@ -37,6 +37,7 @@ export const Header = () => {
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const { balance } = useCoinBalance();
@@ -69,8 +70,13 @@ export const Header = () => {
       });
       return;
     }
-    if (type === "reel" || type === "post") {
+    if (type === "reel") {
       setCreateSheetOpen(false);
+      setUploadInitialTab("video");
+      setUploadModalOpen(true);
+    } else if (type === "post") {
+      setCreateSheetOpen(false);
+      setUploadInitialTab("photo");
       setUploadModalOpen(true);
     } else if (type === "moment") {
       setCreateSheetOpen(false);
@@ -777,6 +783,7 @@ export const Header = () => {
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
+        initialTab={uploadInitialTab}
       />
 
       {/* Create Moment Modal */}

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -42,11 +42,13 @@ interface ContentUploadModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: () => void;
+  initialTab?: "photo" | "video" | "music" | "embed";
 }
 
-const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModalProps) => {
+const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo" }: ContentUploadModalProps) => {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
+  const [activeTab, setActiveTab] = useState(initialTab);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [caption, setCaption] = useState("");
@@ -74,6 +76,13 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [locationDrawerOpen, setLocationDrawerOpen] = useState(false);
   const [taggingDrawerOpen, setTaggingDrawerOpen] = useState(false);
   const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
+
+  // Sync activeTab with initialTab when modal opens
+  useEffect(() => {
+    if (open) {
+      setActiveTab(initialTab);
+    }
+  }, [open, initialTab]);
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
@@ -635,7 +644,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
           <DialogTitle>Share Content</DialogTitle>
         </DialogHeader>
 
-        <Tabs defaultValue="photo" className="w-full flex flex-col overflow-hidden flex-1">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full flex flex-col overflow-hidden flex-1">
           <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 flex-shrink-0">
             <TabsTrigger value="photo">
               <Image className="w-4 h-4 mr-2" />
@@ -889,8 +898,13 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
               )}
             </div>
 
-            {/* Bottom Action Bar - Only show when video is uploaded */}
-            {videoFile && (
+            {/* Bottom Action Bar - Always visible with helper text */}
+            <div className="pb-safe">
+              {!videoFile && (
+                <p className="text-xs text-center text-muted-foreground px-4 py-2">
+                  Upload a video to use the buttons below
+                </p>
+              )}
               <BottomActionBar
                 actions={[
                   {
@@ -929,7 +943,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
                   },
                 ]}
               />
-            )}
+            </div>
           </TabsContent>
 
           <TabsContent value="gif" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">

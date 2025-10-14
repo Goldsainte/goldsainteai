@@ -89,6 +89,7 @@ const TravelProfile = () => {
   const [unreadCollabCount, setUnreadCollabCount] = useState(0);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [partnershipProposalOpen, setPartnershipProposalOpen] = useState(false);
   const [partnershipRequestOpen, setPartnershipRequestOpen] = useState(false);
@@ -367,7 +368,12 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
   };
 
   const handleCreateContent = (type: string) => {
-    if (type === 'reel' || type === 'post') {
+    if (type === 'reel') {
+      setUploadInitialTab("video");
+      setUploadModalOpen(true);
+      setCreateSheetOpen(false);
+    } else if (type === 'post') {
+      setUploadInitialTab("photo");
       setUploadModalOpen(true);
       setCreateSheetOpen(false);
     } else if (type === 'moment') {
@@ -1148,6 +1154,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         open={uploadModalOpen}
         onOpenChange={setUploadModalOpen}
         onSuccess={handleUploadSuccess}
+        initialTab={uploadInitialTab}
       />
 
       {/* Create Moment Modal */}
