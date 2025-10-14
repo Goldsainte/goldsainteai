@@ -28,6 +28,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { OptimizedImage } from "./OptimizedImage";
 import { useEngagementFraud } from "@/hooks/useEngagementFraud";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
 interface TravelVideoCardProps {
   post: {
@@ -97,6 +98,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [nativeVolume, setNativeVolume] = useState(post.native_video_volume || 100);
   const [musicVolume, setMusicVolume] = useState(post.music_volume || 80);
+  const userInitiatedPlay = useRef(false);
+  const pauseDebounceTimer = useRef<number | null>(null);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -159,13 +162,36 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     if (audioRef.current) {
       const audio = audioRef.current;
       audio.volume = musicVolume / 100;
-      if (isActive && !isMuted) {
-        audio.play().catch(console.error);
-      } else {
+      
+      // Clear any pending pause debounce
+      if (pauseDebounceTimer.current) {
+        clearTimeout(pauseDebounceTimer.current);
+        pauseDebounceTimer.current = null;
+      }
+      
+      if (isMuted) {
         audio.pause();
+        setAudioPlaying(false);
+        userInitiatedPlay.current = false;
+      } else if (isActive && (audioPlaying || userInitiatedPlay.current)) {
+        audio.play().catch(console.error);
+      } else if (!isActive && audioPlaying) {
+        // Debounce pause to avoid brief visibility flickers
+        pauseDebounceTimer.current = window.setTimeout(() => {
+          if (audioRef.current) {
+            audioRef.current.pause();
+            setAudioPlaying(false);
+          }
+        }, 500);
       }
     }
-  }, [isActive, isMuted, post.music_preview_url, musicVolume]);
+    
+    return () => {
+      if (pauseDebounceTimer.current) {
+        clearTimeout(pauseDebounceTimer.current);
+      }
+    };
+  }, [isActive, isMuted, post.music_preview_url, musicVolume, audioPlaying]);
 
   const checkIfLiked = async () => {
     if (!user) return;
@@ -458,8 +484,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     
     if (audioPlaying) {
       audioRef.current.pause();
+      userInitiatedPlay.current = false;
     } else {
       audioRef.current.play().catch(() => {});
+      userInitiatedPlay.current = true;
     }
     setAudioPlaying(!audioPlaying);
   };
@@ -560,26 +588,52 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         {/* Video/Image - Optimized */}
         <div className="relative bg-black aspect-square">
           {post.image_urls && post.image_urls.length > 0 ? (
-            <div
-              className="w-full h-full cursor-pointer relative"
-              onClick={() => {
-                setCurrentPhotoIndex(0);
-                setPhotoGalleryOpen(true);
-              }}
-            >
-              <OptimizedImage
-                src={post.image_urls[0]}
-                alt={post.caption || 'Post image'}
-                aspectRatio="square"
-                priority={isActive}
-                className="w-full"
-              />
-              {post.image_urls.length > 1 && (
-                <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
-                  1 / {post.image_urls.length}
+            post.image_urls.length > 1 ? (
+              <Carousel className="w-full h-full">
+                <CarouselContent className="h-full">
+                  {post.image_urls.map((imgUrl, idx) => (
+                    <CarouselItem key={idx} className="h-full">
+                      <div
+                        className="w-full h-full cursor-pointer relative"
+                        onClick={() => {
+                          setCurrentPhotoIndex(idx);
+                          setPhotoGalleryOpen(true);
+                        }}
+                      >
+                        <OptimizedImage
+                          src={imgUrl}
+                          alt={`${post.caption || 'Post image'} ${idx + 1}`}
+                          aspectRatio="square"
+                          priority={isActive && idx === 0}
+                          className="w-full h-full"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs z-10">
+                  {currentPhotoIndex + 1} / {post.image_urls.length}
                 </div>
-              )}
-            </div>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </Carousel>
+            ) : (
+              <div
+                className="w-full h-full cursor-pointer relative"
+                onClick={() => {
+                  setCurrentPhotoIndex(0);
+                  setPhotoGalleryOpen(true);
+                }}
+              >
+                <OptimizedImage
+                  src={post.image_urls[0]}
+                  alt={post.caption || 'Post image'}
+                  aspectRatio="square"
+                  priority={isActive}
+                  className="w-full"
+                />
+              </div>
+            )
           ) : post.video_url ? (
             <>
               {videoLoading && !videoError && (
@@ -789,10 +843,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   <audio
                     ref={(el) => {
                       audioRef.current = el;
-                      if (el) el.volume = musicVolume / 100;
+                      if (el) {
+                        el.volume = musicVolume / 100;
+                        el.preload = 'auto';
+                        el.crossOrigin = 'anonymous';
+                      }
                     }}
                     src={post.music_preview_url}
-                    onEnded={() => setAudioPlaying(false)}
+                    onEnded={() => {
+                      setAudioPlaying(false);
+                      userInitiatedPlay.current = false;
+                    }}
                   />
                 </>
               )}
@@ -956,11 +1017,34 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           <audio
             ref={(el) => {
               audioRef.current = el;
-              if (el) el.volume = musicVolume / 100;
+              if (el) {
+                el.volume = musicVolume / 100;
+                el.preload = 'auto';
+                el.crossOrigin = 'anonymous';
+                
+                // Handle stalls and resume playback
+                el.onstalled = () => {
+                  if (el.readyState < 3 && audioPlaying) {
+                    setTimeout(() => {
+                      el.play().catch(console.error);
+                    }, 100);
+                  }
+                };
+                
+                el.onsuspend = () => {
+                  if (el.readyState < 3 && audioPlaying) {
+                    setTimeout(() => {
+                      el.play().catch(console.error);
+                    }, 100);
+                  }
+                };
+              }
             }}
             src={post.music_preview_url}
-            preload="auto"
-            onEnded={() => setAudioPlaying(false)}
+            onEnded={() => {
+              setAudioPlaying(false);
+              userInitiatedPlay.current = false;
+            }}
           />
           <button
             onClick={(e) => {

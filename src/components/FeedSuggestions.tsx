@@ -155,9 +155,6 @@ export function FeedSuggestions() {
         {/* Draft Posts */}
         <DraftPostsManager />
 
-        {/* Suggested Users (Extended) */}
-        <SuggestedUsers />
-
       </div>
     </aside>
   );

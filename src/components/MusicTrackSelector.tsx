@@ -103,7 +103,8 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
     } else {
       audioElement?.pause();
       const audio = new Audio();
-      (audio as any).crossOrigin = 'anonymous';
+      audio.crossOrigin = 'anonymous';
+      audio.preload = 'auto';
       audio.volume = 1.0;
       audio.src = track.previewUrl;
       
@@ -117,6 +118,23 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
       audio.onended = () => {
         setPlayingTrackId(null);
         setAudioElement(null);
+      };
+
+      // Handle stalls and resume playback
+      audio.onstalled = () => {
+        if (audio.readyState < 3) {
+          setTimeout(() => {
+            audio.play().catch(console.error);
+          }, 100);
+        }
+      };
+
+      audio.onsuspend = () => {
+        if (audio.readyState < 3) {
+          setTimeout(() => {
+            audio.play().catch(console.error);
+          }, 100);
+        }
       };
 
       // Wait for audio to load before setting time

@@ -375,6 +375,7 @@ const TravelFeed = () => {
 
           {/* Video Feed - Full Screen Vertical Scroll */}
           <div
+            id="feed-scroll"
             ref={containerRef}
             onScroll={handleScroll}
             className="absolute inset-0 overflow-y-scroll snap-y snap-mandatory overscroll-y-contain touch-pan-y"
@@ -384,7 +385,7 @@ const TravelFeed = () => {
             }}
           >
             <style>{`
-              div::-webkit-scrollbar {
+              #feed-scroll::-webkit-scrollbar {
                 display: none;
               }
             `}</style>
