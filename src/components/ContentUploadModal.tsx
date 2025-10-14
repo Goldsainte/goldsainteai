@@ -664,9 +664,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="photo" className="flex flex-col h-full pb-20">
+          <TabsContent value="photo" className="flex flex-col h-full">
             {/* Top Section - Photo Upload & Preview */}
-            <div className="flex-1 overflow-y-auto px-6 pt-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-4">
               {photoPreviewUrls.length === 0 ? (
                 <div className="border-2 border-dashed rounded-lg p-8 text-center">
                   <Input
@@ -809,8 +809,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
               )}
             </div>
 
-            {/* Bottom Action Bar - Always visible with helper text */}
-            <div className="pb-safe">
+            {/* Bottom Action Bar - Fixed at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 bg-background border-t pb-safe">
               {photoPreviewUrls.length === 0 && (
                 <p className="text-xs text-center text-muted-foreground px-4 py-2">
                   Upload photos to use the buttons below
@@ -857,9 +857,9 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             </div>
           </TabsContent>
 
-          <TabsContent value="video" className="flex flex-col h-full pb-20">
+          <TabsContent value="video" className="flex flex-col h-full">
             {/* Top Section - Video Upload & Preview */}
-            <div className="flex-1 overflow-y-auto px-6 pt-4 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-4">
               {!videoFile ? (
                 <div className="border-2 border-dashed rounded-lg p-8 text-center">
                   <Input
@@ -992,8 +992,8 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
               )}
             </div>
 
-            {/* Bottom Action Bar - Always visible with helper text */}
-            <div className="pb-safe">
+            {/* Bottom Action Bar - Fixed at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 bg-background border-t pb-safe">
               {!videoFile && (
                 <p className="text-xs text-center text-muted-foreground px-4 py-2">
                   Upload a video to use the buttons below
