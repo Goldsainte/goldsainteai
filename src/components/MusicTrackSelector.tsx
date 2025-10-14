@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -47,11 +48,13 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
   const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
   const [clipStartTime, setClipStartTime] = useState(0);
   const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
+  const [errorText, setErrorText] = useState<string | null>(null);
 
   const searchTracks = async () => {
     if (!searchQuery.trim()) return;
 
     setIsSearching(true);
+    setErrorText(null);
     try {
       const { data, error } = await supabase.functions.invoke('apple-music-search', {
         body: { query: searchQuery }
@@ -61,9 +64,22 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
 
       if (data?.tracks) {
         setTracks(data.tracks);
+        if (data.tracks.length === 0) {
+          setErrorText(null);
+        }
       }
     } catch (error: any) {
       console.error('Error searching tracks:', error);
+      const rawMsg = (error?.context?.value?.message as string) || (error?.message as string) || '';
+      if (rawMsg.toLowerCase().includes('unauthorized')) {
+        setErrorText('Please sign in to search for tracks.');
+      } else if (rawMsg.toLowerCase().includes('credentials')) {
+        setErrorText('Apple Music credentials not found. Connect your key to enable music search.');
+      } else if (rawMsg.toLowerCase().includes('failed to fetch')) {
+        setErrorText('Music search service is unreachable right now. Please try again.');
+      } else {
+        setErrorText('Failed to search tracks. Please try again.');
+      }
       toast.error('Failed to search tracks');
     } finally {
       setIsSearching(false);
@@ -141,6 +157,18 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
             <Search className="h-4 w-4" />
           </Button>
         </div>
+        {errorText && (
+          <Alert variant="destructive" className="mt-3">
+            <AlertDescription className="flex items-center justify-between gap-3 flex-wrap">
+              <span>{errorText}</span>
+              {errorText.includes('Apple Music credentials') || errorText.includes('Connect your key') ? (
+                <Button asChild size="sm" variant="outline">
+                  <a href="/upload-apple-music-key">Connect Apple Music Key</a>
+                </Button>
+              ) : null}
+            </AlertDescription>
+          </Alert>
+        )}
       </div>
 
       {selectedTrack && (
