@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -57,6 +57,7 @@ interface TravelVideoCardProps {
     native_video_volume?: number;
     music_volume?: number;
     profiles?: {
+      id?: string;
       username: string | null;
       avatar_url: string | null;
       is_verified?: boolean;
@@ -100,6 +101,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [musicVolume, setMusicVolume] = useState(post.music_volume || 80);
   const userInitiatedPlay = useRef(false);
   const pauseDebounceTimer = useRef<number | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -133,6 +135,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     checkIfSaved();
     fetchCollaborators();
     fetchPartnership();
+    checkIfFollowing();
   }, [post.id]);
 
   useEffect(() => {
@@ -376,6 +379,72 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       }
     } catch (error) {
       console.error('Error tracking view:', error);
+    }
+  };
+
+  const checkIfFollowing = async () => {
+    if (!user || !post.profiles?.username) return;
+    
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', post.profiles.username)
+        .maybeSingle();
+      
+      if (!profileData) return;
+      
+      const { data } = await supabase
+        .from('user_follows')
+        .select('id')
+        .eq('follower_id', user.id)
+        .eq('following_id', profileData.id)
+        .maybeSingle();
+      
+      setIsFollowing(!!data);
+    } catch (error) {
+      console.error('Error checking if following:', error);
+    }
+  };
+
+  const handleFollow = async () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
+    try {
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('username', post.profiles?.username)
+        .maybeSingle();
+      
+      if (!profileData) return;
+      
+      if (isFollowing) {
+        await supabase
+          .from('user_follows')
+          .delete()
+          .eq('follower_id', user.id)
+          .eq('following_id', profileData.id);
+        
+        setIsFollowing(false);
+        toast.success('Unfollowed');
+      } else {
+        await supabase
+          .from('user_follows')
+          .insert({
+            follower_id: user.id,
+            following_id: profileData.id,
+          });
+        
+        setIsFollowing(true);
+        toast.success('Following');
+      }
+    } catch (error) {
+      console.error('Error following user:', error);
+      toast.error('Failed to update follow status');
     }
   };
 
@@ -1060,15 +1129,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   // Mobile TikTok-style layout
   return (
     <div className="relative h-full w-full bg-black">
-      {/* Song Title - Top Overlay */}
-      {post.music_track_name && (
-        <div className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 z-30 max-w-[75%]">
-          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[10px] sm:text-xs text-white">
-            <Music2 className="h-3 w-3" />
-            <span className="truncate">{post.music_track_name}</span>
-          </div>
-        </div>
-      )}
+      {/* Music section removed from top - now integrated in bottom user info */}
 
       {/* Hidden Audio Element for Music Playback */}
       {post.music_preview_url && (
@@ -1105,16 +1166,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               userInitiatedPlay.current = false;
             }}
           />
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleAudio();
-            }}
-            className="absolute bottom-36 right-16 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
-            aria-label={audioPlaying ? "Pause music" : "Play music"}
-          >
-            {audioPlaying ? <Pause className="h-4 w-4 text-white" /> : <Play className="h-4 w-4 text-white" />}
-          </button>
         </>
       )}
 
@@ -1277,7 +1328,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             />
             {post.image_urls && post.image_urls.length > 1 && (
               <>
-                <div className="absolute top-24 right-4 bg-black/60 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-sm font-medium z-10">
+                <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2 py-0.5 rounded-full text-xs font-medium z-10">
                   {currentPhotoIndex + 1} / {post.image_urls.length}
                 </div>
                 <button
@@ -1344,120 +1395,163 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       ) : null}
 
       {/* Gradient Overlay - Stronger for better readability */}
-      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/70 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none" />
 
       {/* Bottom Content */}
-      <div className="absolute left-0 right-0 bottom-20 p-4 text-white" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+      <div className="absolute left-0 right-0 bottom-20 px-3 pb-4 text-white" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
-          <div className="flex-1 space-y-3 max-w-[70%]">
+          <div className="flex-1 space-y-2 max-w-[70%]">
             {/* Featured Badge */}
             {post.is_featured && (
-              <Badge className="mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-0 text-sm font-bold">
+              <Badge className="mb-1 bg-gradient-to-r from-yellow-500 to-orange-500 border-0 text-sm font-bold">
                 ⭐ Featured
               </Badge>
             )}
 
-            <div 
-              className="flex items-center gap-3 cursor-pointer"
-              onClick={() => navigate(`/travel-profile/${post.user_id}`)}
-            >
-              <Avatar className="h-11 w-11 border-2 border-white ring-2 ring-black/20">
-                <AvatarImage src={post.profiles?.avatar_url || undefined} />
-                <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
-                  {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <p className="font-bold text-base drop-shadow-lg">{post.profiles?.username || 'Anonymous'}</p>
-                  {post.profiles?.is_verified && (
-                    <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500 drop-shadow-lg" />
-                  )}
-                </div>
-                {post.location && (
-                  <div className="flex items-center gap-1 text-sm text-white drop-shadow-md">
-                    <MapPin className="h-3.5 w-3.5" />
-                    {post.location}
-                  </div>
+            <div className="space-y-1">
+              {/* User Info - Single Line */}
+              <div className="flex items-center gap-2">
+                <Avatar 
+                  className="h-8 w-8 cursor-pointer"
+                  onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+                >
+                  <AvatarImage src={post.profiles?.avatar_url || undefined} />
+                  <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+                    {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <button 
+                  onClick={() => navigate(`/travel-profile/${post.user_id}`)}
+                  className="font-semibold text-sm hover:opacity-80 transition-opacity"
+                >
+                  {post.profiles?.username || 'Anonymous'}
+                </button>
+                
+                {!isFollowing && post.profiles?.id !== user?.id && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-6 px-2 text-xs font-bold hover:bg-white/20"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFollow();
+                    }}
+                  >
+                    Follow
+                  </Button>
+                )}
+                
+                {post.profiles?.is_verified && (
+                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500" />
                 )}
               </div>
-            </div>
+              
+              {/* Music info - relocated from top */}
+              {post.music_track_name && (
+                <div className="flex items-center gap-1.5">
+                  <Music2 className="h-3 w-3" />
+                  <span className="text-xs font-normal truncate">{post.music_track_name}</span>
+                </div>
+              )}
+              
+              {/* Original Creator Attribution */}
+              {post.original_creator && (
+                <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1 inline-block">
+                  <p className="text-xs font-medium">
+                    Original: {post.original_creator}
+                  </p>
+                </div>
+              )}
 
-            {/* Original Creator Attribution */}
-            {post.original_creator && (
-              <div className="bg-black/40 backdrop-blur-sm rounded-full px-3 py-1 inline-block">
-                <p className="text-xs font-medium">
-                  Original: {post.original_creator}
-                </p>
-              </div>
-            )}
-
-            {post.caption && (
-              <p className="text-xs leading-relaxed drop-shadow-lg font-medium">
-                {renderTextWithMentionsAndHashtags(
-                  post.caption,
-                  (username) => navigate(`/travel-profile?user=${username}`),
-                  (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`),
-                  post.profiles?.instagram_username || undefined
-                ).map((part, idx) => {
-                  if (typeof part === 'string') return part;
-                  return (
-                    <span
-                      key={part.key}
-                      className="text-primary font-medium cursor-pointer hover:underline"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (part.type === 'mention') {
-                          if ('isInstagram' in part && part.isInstagram) {
-                            window.open(`https://instagram.com/${part.value}`, '_blank');
+              {/* Caption */}
+              {post.caption && (
+                <p className="text-[13px] leading-tight font-normal line-clamp-2">
+                  {renderTextWithMentionsAndHashtags(
+                    post.caption,
+                    (username) => navigate(`/travel-profile?user=${username}`),
+                    (hashtag) => navigate(`/search?q=${encodeURIComponent(`#${hashtag}`)}&tab=posts`),
+                    post.profiles?.instagram_username || undefined
+                  ).map((part, idx) => {
+                    if (typeof part === 'string') return part;
+                    return (
+                      <span
+                        key={part.key}
+                        className="text-primary font-medium cursor-pointer hover:underline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (part.type === 'mention') {
+                            if ('isInstagram' in part && part.isInstagram) {
+                              window.open(`https://instagram.com/${part.value}`, '_blank');
+                            } else {
+                              navigate(`/travel-profile?user=${part.value}`);
+                            }
                           } else {
-                            navigate(`/travel-profile?user=${part.value}`);
+                            navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
                           }
-                        } else {
-                          navigate(`/search?q=${encodeURIComponent(`#${part.value}`)}&tab=posts`);
-                        }
-                      }}
-                    >
-                      {part.type === 'mention' ? `@${part.value}` : `#${part.value}`}
-                    </span>
-                  );
-                })}
-              </p>
-            )}
+                        }}
+                      >
+                        {part.type === 'mention' ? `@${part.value}` : `#${part.value}`}
+                      </span>
+                    );
+                  })}
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Action Buttons - Only essential ones for mobile */}
-          <div className="flex flex-col items-center gap-3 pb-32">
+          {/* Action Buttons - Instagram Reels style */}
+          <div className="flex flex-col items-center gap-5 pb-16">
+            {/* Like button with "Likes" label */}
             <button
               onClick={handleLike}
-              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
+              className="flex flex-col items-center gap-1 transition-transform active:scale-95"
             >
-              <Heart className={`h-6 w-6 text-white drop-shadow-2xl ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
-              <span className="text-xs font-bold drop-shadow-2xl">{formatCount(localLikeCount)}</span>
+              <Heart className={`h-7 w-7 text-white ${isLiked ? 'fill-red-500 text-red-500' : ''}`} />
+              <span className="text-[11px] font-medium text-white">Likes</span>
+              {localLikeCount > 0 && (
+                <span className="text-[11px] font-extrabold text-white">{formatCount(localLikeCount)}</span>
+              )}
             </button>
 
+            {/* Comment button */}
             <button
               onClick={() => setCommentsOpen(true)}
-              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
+              className="flex flex-col items-center gap-1 transition-transform active:scale-95"
             >
-              <MessageCircle className="h-6 w-6 text-white drop-shadow-2xl" />
-              <span className="text-xs font-bold drop-shadow-2xl">{formatCount(localCommentCount)}</span>
+              <MessageCircle className="h-7 w-7 text-white" />
+              {localCommentCount > 0 && (
+                <span className="text-[11px] font-extrabold text-white">{formatCount(localCommentCount)}</span>
+              )}
             </button>
 
+            {/* Share button */}
+            <button
+              onClick={handleShare}
+              className="flex flex-col items-center gap-1 transition-transform active:scale-95"
+            >
+              <Send className="h-7 w-7 text-white" />
+              {post.share_count > 0 && (
+                <span className="text-[11px] font-extrabold text-white">{formatCount(post.share_count)}</span>
+              )}
+            </button>
+
+            {/* Save button */}
             <button
               onClick={handleSaveClick}
-              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
+              className="flex flex-col items-center gap-1 transition-transform active:scale-95"
             >
-              <Bookmark className={`h-6 w-6 text-white drop-shadow-2xl ${isSaved ? 'fill-white' : ''}`} />
+              <Bookmark className={`h-7 w-7 text-white ${isSaved ? 'fill-white' : ''}`} />
             </button>
 
+            {/* Gift button */}
             <button
               onClick={() => setGiftModalOpen(true)}
-              className="flex flex-col items-center gap-1.5 transition-transform active:scale-110"
+              className="flex flex-col items-center gap-1 transition-transform active:scale-95"
               data-tour="send-gift-post"
             >
-              <Coins className="h-6 w-6 text-[#BFAD72] drop-shadow-2xl" />
+              <Gift className="h-7 w-7 text-white" />
             </button>
           </div>
 
