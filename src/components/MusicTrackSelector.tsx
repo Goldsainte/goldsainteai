@@ -82,7 +82,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
     }
   };
 
-  const togglePlay = (track: Track) => {
+  const togglePlay = async (track: Track) => {
     if (!track.previewUrl) {
       toast.error('No preview available for this track');
       return;
@@ -96,15 +96,30 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
       audioElement?.pause();
       const audio = new Audio(track.previewUrl);
       audio.currentTime = clipStartTime;
-      audio.play();
-      setAudioElement(audio);
-      setPlayingTrackId(track.id);
-      setCurrentTrack(track);
+      
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        toast.error('Unable to play preview. Try another track.');
+        setPlayingTrackId(null);
+        setAudioElement(null);
+      };
 
       audio.onended = () => {
         setPlayingTrackId(null);
         setAudioElement(null);
       };
+
+      try {
+        await audio.play();
+        setAudioElement(audio);
+        setPlayingTrackId(track.id);
+        setCurrentTrack(track);
+      } catch (error) {
+        console.error('Play error:', error);
+        toast.error('Unable to play preview. Click play again or try another track.');
+        setPlayingTrackId(null);
+        setAudioElement(null);
+      }
     }
   };
 
