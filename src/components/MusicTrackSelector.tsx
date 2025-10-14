@@ -69,30 +69,14 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
         body: { query: searchQuery }
       });
 
-      if (!error && data?.tracks?.length) {
-        setTracks(data.tracks);
-        return;
-      }
+      if (error) throw error;
 
-      // Fallback: iTunes Search API to keep UX working if backend fails
-      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchQuery)}&entity=song&limit=25`);
-      const json = await res.json();
-
-      const mapped: Track[] = (json?.results || []).map((r: any) => ({
-        id: String(r.trackId ?? r.collectionId ?? r.artistId ?? Math.random()),
-        name: r.trackName ?? r.collectionName ?? 'Unknown',
-        artist: r.artistName ?? 'Unknown',
-        album: r.collectionName ?? '',
-        albumArt: r.artworkUrl100 ?? r.artworkUrl60 ?? null,
-        previewUrl: r.previewUrl ?? null,
-        duration: Math.round((r.trackTimeMillis ?? 0) / 1000),
-        appleMusicUrl: r.trackViewUrl ?? r.collectionViewUrl ?? ''
-      }));
-
-      setTracks(mapped);
-      if (mapped.length === 0) {
+      const list: Track[] = data?.tracks ?? [];
+      setTracks(list);
+      if (list.length === 0) {
         setErrorText(null);
       }
+
     } catch (error: any) {
       console.error('Error searching tracks:', error);
       const rawMsg = (error?.context?.value?.message as string) || (error?.message as string) || '';
@@ -236,27 +220,27 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors overflow-hidden"
+                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
                 {track.albumArt && (
                   <img
                     src={track.albumArt}
                     alt={track.album}
-                    className="w-12 h-12 rounded object-cover flex-shrink-0"
+                    className="w-12 h-12 rounded object-cover shrink-0"
                   />
                 )}
-                <div className="flex-1 min-w-0 pr-2">
-                  <p className="font-medium text-sm truncate">{track.name}</p>
-                  <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
-                  <p className="text-xs text-muted-foreground truncate">{track.album}</p>
+                <div className="min-w-0 pr-2">
+                  <p className="font-medium text-sm truncate break-words">{track.name}</p>
+                  <p className="text-xs text-muted-foreground truncate break-words">{track.artist}</p>
+                  <p className="text-xs text-muted-foreground truncate break-words">{track.album}</p>
                 </div>
-                <div className="flex gap-1 flex-none w-[120px] sm:w-[140px] justify-end ml-auto">
+                <div className="flex items-center gap-1 shrink-0 ml-auto">
                   {track.previewUrl ? (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => togglePlay(track)}
-                      className="flex-shrink-0 h-8 w-8"
+                      className="h-8 w-8"
                     >
                       {playingTrackId === track.id ? (
                         <Pause className="h-4 w-4" />
@@ -269,7 +253,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                       variant="ghost"
                       size="icon"
                       disabled
-                      className="flex-shrink-0 h-8 w-8 opacity-30"
+                      className="h-8 w-8 opacity-30"
                       title="No preview available"
                     >
                       <Play className="h-4 w-4" />
@@ -280,7 +264,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     size="sm"
                     disabled={selectedTrack?.id === track.id}
                     onClick={() => handleSelectTrack(track)}
-                    className="flex-shrink-0 min-w-[76px] whitespace-nowrap"
+                    className="min-w-[76px] whitespace-nowrap"
                   >
                     {selectedTrack?.id === track.id ? "Selected" : "Select"}
                   </Button>
