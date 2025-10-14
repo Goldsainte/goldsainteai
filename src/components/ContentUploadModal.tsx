@@ -222,6 +222,14 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
           caption: caption || null,
           location: location || null,
           status: 'active',
+          ...(selectedMusicTrack && {
+            music_track_id: selectedMusicTrack.id,
+            music_track_name: selectedMusicTrack.name,
+            music_track_artist: selectedMusicTrack.artist,
+            music_preview_url: selectedMusicTrack.previewUrl,
+            music_album_art: selectedMusicTrack.albumArt,
+            music_service: 'apple_music',
+          }),
         }])
         .select()
         .single();
@@ -381,6 +389,14 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         embed_platform: platform,
         original_creator: originalCreator || null,
         status: 'active',
+        ...(selectedMusicTrack && {
+          music_track_id: selectedMusicTrack.id,
+          music_track_name: selectedMusicTrack.name,
+          music_track_artist: selectedMusicTrack.artist,
+          music_preview_url: selectedMusicTrack.previewUrl,
+          music_album_art: selectedMusicTrack.albumArt,
+          music_service: 'apple_music',
+        }),
       }]).select().single();
 
       if (error) throw error;
@@ -506,6 +522,14 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
           caption: caption || null,
           location: location || null,
           status: 'active',
+          ...(selectedMusicTrack && {
+            music_track_id: selectedMusicTrack.id,
+            music_track_name: selectedMusicTrack.name,
+            music_track_artist: selectedMusicTrack.artist,
+            music_preview_url: selectedMusicTrack.previewUrl,
+            music_album_art: selectedMusicTrack.albumArt,
+            music_service: 'apple_music',
+          }),
         }])
         .select()
         .single();
