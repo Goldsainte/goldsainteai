@@ -23,7 +23,7 @@ interface VideoEditModalProps {
   currentLocation: string | null;
   currentThumbnailUrl: string | null;
   videoUrl: string | null;
-  currentSpotifyTrack?: {
+  currentMusicTrack?: {
     id: string;
     name: string;
     artist: string;
@@ -41,7 +41,7 @@ const VideoEditModal = ({
   currentLocation,
   currentThumbnailUrl,
   videoUrl,
-  currentSpotifyTrack,
+  currentMusicTrack,
   onSuccess,
 }: VideoEditModalProps) => {
   const { user } = useAuth();
@@ -50,7 +50,7 @@ const VideoEditModal = ({
   const [saving, setSaving] = useState(false);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(currentThumbnailUrl);
-  const [selectedTrack, setSelectedTrack] = useState<any>(currentSpotifyTrack || null);
+  const [selectedTrack, setSelectedTrack] = useState<any>(currentMusicTrack || null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -47,11 +47,12 @@ interface TravelVideoCardProps {
     comment_count: number;
     share_count?: number;
     is_featured?: boolean;
-    spotify_track_id?: string;
-    spotify_track_name?: string;
-    spotify_track_artist?: string;
-    spotify_track_preview_url?: string;
-    spotify_track_album_art?: string;
+    music_track_id?: string;
+    music_track_name?: string;
+    music_track_artist?: string;
+    music_preview_url?: string;
+    music_album_art?: string;
+    music_service?: string;
     profiles?: {
       username: string | null;
       avatar_url: string | null;
@@ -124,7 +125,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
   useEffect(() => {
     if (audioRef.current) {
-      if (isActive && post.spotify_track_preview_url) {
+      if (isActive && post.music_preview_url) {
         audioRef.current.play().catch(() => {});
         setAudioPlaying(true);
       } else {
@@ -132,7 +133,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         setAudioPlaying(false);
       }
     }
-  }, [isActive, post.spotify_track_preview_url]);
+  }, [isActive, post.music_preview_url]);
 
   const checkIfLiked = async () => {
     if (!user) return;
@@ -697,23 +698,23 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </div>
           )}
 
-          {/* Spotify Music Player */}
-          {post.spotify_track_name && (
+          {/* Music Player */}
+          {post.music_track_name && (
             <div className="flex items-center gap-2 text-sm bg-background/80 backdrop-blur-sm rounded-lg p-2">
-              {post.spotify_track_album_art && (
+              {post.music_album_art && (
                 <img
-                  src={post.spotify_track_album_art}
-                  alt={post.spotify_track_name}
+                  src={post.music_album_art}
+                  alt={post.music_track_name}
                   className="w-10 h-10 rounded object-cover"
                 />
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-medium truncate">{post.spotify_track_name}</p>
+                <p className="font-medium truncate">{post.music_track_name}</p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {post.spotify_track_artist}
+                  {post.music_track_artist}
                 </p>
               </div>
-              {post.spotify_track_preview_url && (
+              {post.music_preview_url && (
                 <>
                   <Button
                     variant="ghost"
@@ -729,7 +730,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </Button>
                   <audio
                     ref={audioRef}
-                    src={post.spotify_track_preview_url}
+                    src={post.music_preview_url}
                     onEnded={() => setAudioPlaying(false)}
                   />
                 </>
@@ -769,14 +770,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           currentLocation={post.location}
           currentThumbnailUrl={post.thumbnail_url}
           videoUrl={post.video_url || null}
-          currentSpotifyTrack={
-            post.spotify_track_id
+          currentMusicTrack={
+            post.music_track_id
               ? {
-                  id: post.spotify_track_id,
-                  name: post.spotify_track_name || "",
-                  artist: post.spotify_track_artist || "",
-                  albumArt: post.spotify_track_album_art || null,
-                  previewUrl: post.spotify_track_preview_url || null,
+                  id: post.music_track_id,
+                  name: post.music_track_name || "",
+                  artist: post.music_track_artist || "",
+                  albumArt: post.music_album_art || null,
+                  previewUrl: post.music_preview_url || null,
                 }
               : null
           }
@@ -1184,25 +1185,25 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             </button>
           </div>
 
-          {/* Spotify Music Player (Mobile) */}
-          {post.spotify_track_name && (
+          {/* Music Player (Mobile) */}
+          {post.music_track_name && (
             <div className="absolute bottom-20 left-4 right-20 flex items-center gap-2 bg-background/90 backdrop-blur-sm rounded-full p-2 text-sm">
-              {post.spotify_track_album_art && (
+              {post.music_album_art && (
                 <img
-                  src={post.spotify_track_album_art}
-                  alt={post.spotify_track_name}
+                  src={post.music_album_art}
+                  alt={post.music_track_name}
                   className="w-8 h-8 rounded-full object-cover"
                 />
               )}
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-xs truncate text-foreground">
-                  {post.spotify_track_name}
+                  {post.music_track_name}
                 </p>
                 <p className="text-[10px] text-muted-foreground truncate">
-                  {post.spotify_track_artist}
+                  {post.music_track_artist}
                 </p>
               </div>
-              {post.spotify_track_preview_url && (
+              {post.music_preview_url && (
                 <>
                   <Button
                     variant="ghost"
@@ -1218,7 +1219,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </Button>
                   <audio
                     ref={audioRef}
-                    src={post.spotify_track_preview_url}
+                    src={post.music_preview_url}
                     onEnded={() => setAudioPlaying(false)}
                   />
                 </>
@@ -1249,14 +1250,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         currentLocation={post.location}
         currentThumbnailUrl={post.thumbnail_url}
         videoUrl={post.video_url || null}
-        currentSpotifyTrack={
-          post.spotify_track_id
+        currentMusicTrack={
+          post.music_track_id
             ? {
-                id: post.spotify_track_id,
-                name: post.spotify_track_name || "",
-                artist: post.spotify_track_artist || "",
-                albumArt: post.spotify_track_album_art || null,
-                previewUrl: post.spotify_track_preview_url || null,
+                id: post.music_track_id,
+                name: post.music_track_name || "",
+                artist: post.music_track_artist || "",
+                albumArt: post.music_album_art || null,
+                previewUrl: post.music_preview_url || null,
               }
             : null
         }

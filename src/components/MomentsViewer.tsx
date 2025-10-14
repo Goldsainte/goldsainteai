@@ -165,9 +165,9 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     }
 
     // Play new audio if available
-    if (currentMoment.spotify_track_preview_url) {
-      console.log('🎵 Setting up audio:', currentMoment.spotify_track_preview_url);
-      const newAudio = new Audio(currentMoment.spotify_track_preview_url);
+    if (currentMoment.music_preview_url) {
+      console.log('🎵 Setting up audio:', currentMoment.music_preview_url);
+      const newAudio = new Audio(currentMoment.music_preview_url);
       newAudio.preload = 'auto';
       newAudio.crossOrigin = 'anonymous';
       newAudio.volume = 0.7;
@@ -176,7 +176,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
       newAudio.addEventListener('loadedmetadata', () => {
         console.log('🎵 Audio metadata loaded, duration:', newAudio.duration);
-        const startTime = currentMoment.spotify_audio_start_time || 0;
+        const startTime = 0; // Apple Music doesn't use start time
         try {
           newAudio.currentTime = startTime;
           console.log('🎵 Audio start time set to:', startTime);
@@ -228,7 +228,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     try {
       const { data, error } = await supabase
     .from('moments')
-    .select('*, spotify_track_id, spotify_track_name, spotify_track_artist, spotify_track_preview_url, spotify_track_album_art, spotify_audio_start_time')
+    .select('*, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service')
     .eq('user_id', userId)
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false });
@@ -320,12 +320,12 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           .play()
           .then(() => setAutoplayBlocked(false))
           .catch(() => setAutoplayBlocked(true));
-      } else if (currentMoment?.spotify_track_preview_url) {
-        const a = new Audio(currentMoment.spotify_track_preview_url);
+      } else if (currentMoment?.music_preview_url) {
+        const a = new Audio(currentMoment.music_preview_url);
         a.preload = 'auto';
         a.volume = 0.7;
         try {
-          a.currentTime = currentMoment.spotify_audio_start_time || 0;
+          a.currentTime = 0;
         } catch {}
         a
           .play()
@@ -524,18 +524,18 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
           </div>
 
           {/* Global tap-to-play overlay */}
-          {!isSoundOn && (currentMoment.spotify_track_preview_url || currentMoment.media_type === 'video') && (
+          {!isSoundOn && (currentMoment.music_preview_url || currentMoment.media_type === 'video') && (
             <div 
               className="absolute inset-0 z-30 flex items-center justify-center bg-black/30"
               onClick={() => {
                 setIsSoundOn(true);
                 // Ensure we start the audio on this user gesture
-                if (!audio && currentMoment.spotify_track_preview_url) {
-                  const a = new Audio(currentMoment.spotify_track_preview_url);
+                if (!audio && currentMoment.music_preview_url) {
+                  const a = new Audio(currentMoment.music_preview_url);
                   a.preload = 'auto';
                   a.volume = 0.7;
                   try {
-                    a.currentTime = currentMoment.spotify_audio_start_time || 0;
+                    a.currentTime = 0;
                   } catch {}
                   a.play()
                     .then(() => setAutoplayBlocked(false))
@@ -563,7 +563,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
           {/* Media */}
 
-          {autoplayBlocked && currentMoment.spotify_track_preview_url && isSoundOn && (
+          {autoplayBlocked && currentMoment.music_preview_url && isSoundOn && (
             <div className="absolute inset-0 z-30 flex items-start justify-center pt-24">
               <button
                 onClick={() => {
@@ -674,23 +674,23 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             />
           )}
 
-          {/* Spotify Track Display */}
-          {currentMoment.spotify_track_id && (
+          {/* Music Track Display */}
+          {currentMoment.music_track_id && (
             <div className="absolute top-16 right-4 z-20 bg-black/60 backdrop-blur-sm rounded-lg p-2 max-w-[200px]">
               <div className="flex items-center gap-2">
-                {currentMoment.spotify_track_album_art && (
+                {currentMoment.music_album_art && (
                   <img 
-                    src={currentMoment.spotify_track_album_art} 
+                    src={currentMoment.music_album_art} 
                     alt="Album art" 
                     className="w-10 h-10 rounded"
                   />
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-xs font-medium truncate">
-                    {currentMoment.spotify_track_name}
+                    {currentMoment.music_track_name}
                   </p>
                   <p className="text-white/70 text-xs truncate">
-                    {currentMoment.spotify_track_artist}
+                    {currentMoment.music_track_artist}
                   </p>
                 </div>
               </div>
