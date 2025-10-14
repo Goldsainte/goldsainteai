@@ -1141,6 +1141,14 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
           <div className="flex-1 space-y-3 max-w-[70%]">
+            {/* Small Music Display - At Very Top */}
+            {post.music_track_name && (
+              <div className="flex items-center gap-1.5 text-xs text-white drop-shadow-md">
+                <Music2 className="h-3 w-3" />
+                <span className="truncate max-w-[200px]">{post.music_track_name}</span>
+              </div>
+            )}
+
             {/* Featured Badge */}
             {post.is_featured && (
               <Badge className="mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-0 text-sm font-bold">
@@ -1173,14 +1181,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 )}
               </div>
             </div>
-
-            {/* Small Music Display */}
-            {post.music_track_name && (
-              <div className="flex items-center gap-1.5 text-xs text-white drop-shadow-md mt-2">
-                <Music2 className="h-3 w-3" />
-                <span className="truncate max-w-[200px]">{post.music_track_name}</span>
-              </div>
-            )}
 
             {/* Original Creator Attribution */}
             {post.original_creator && (
