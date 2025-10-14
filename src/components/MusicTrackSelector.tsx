@@ -64,17 +64,34 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
     setIsSearching(true);
     setErrorText(null);
     try {
+      // Primary: backend function
       const { data, error } = await supabase.functions.invoke('apple-music-search', {
         body: { query: searchQuery }
       });
 
-      if (error) throw error;
-
-      if (data?.tracks) {
+      if (!error && data?.tracks?.length) {
         setTracks(data.tracks);
-        if (data.tracks.length === 0) {
-          setErrorText(null);
-        }
+        return;
+      }
+
+      // Fallback: iTunes Search API to keep UX working if backend fails
+      const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(searchQuery)}&entity=song&limit=25`);
+      const json = await res.json();
+
+      const mapped: Track[] = (json?.results || []).map((r: any) => ({
+        id: String(r.trackId ?? r.collectionId ?? r.artistId ?? Math.random()),
+        name: r.trackName ?? r.collectionName ?? 'Unknown',
+        artist: r.artistName ?? 'Unknown',
+        album: r.collectionName ?? '',
+        albumArt: r.artworkUrl100 ?? r.artworkUrl60 ?? null,
+        previewUrl: r.previewUrl ?? null,
+        duration: Math.round((r.trackTimeMillis ?? 0) / 1000),
+        appleMusicUrl: r.trackViewUrl ?? r.collectionViewUrl ?? ''
+      }));
+
+      setTracks(mapped);
+      if (mapped.length === 0) {
+        setErrorText(null);
       }
     } catch (error: any) {
       console.error('Error searching tracks:', error);
