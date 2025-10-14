@@ -125,9 +125,9 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
     ['sign']
   );
 
-  // Sign the message (WebCrypto returns DER-encoded ECDSA signature)
+  // Sign the message (WebCrypto may return raw r||s or DER-encoded ECDSA signature)
   const encoder = new TextEncoder();
-  const derSignature = await crypto.subtle.sign(
+  const sigBuffer = await crypto.subtle.sign(
     {
       name: 'ECDSA',
       hash: { name: 'SHA-256' }
@@ -136,9 +136,17 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
     encoder.encode(message)
   );
 
-  // Convert DER -> JOSE (r||s) then Base64URL encode
-  const joseSig = derToJose(derSignature);
-  const encodedSignature = base64Url(joseSig);
+  // Normalize signature to JOSE (r||s)
+  let joseSigBytes: Uint8Array;
+  const sigBytes = new Uint8Array(sigBuffer);
+  if (sigBytes.length === 64 && sigBytes[0] !== 0x30) {
+    // Already r||s
+    joseSigBytes = sigBytes;
+  } else {
+    // Convert DER -> JOSE
+    joseSigBytes = derToJose(sigBuffer);
+  }
+  const encodedSignature = base64Url(joseSigBytes);
   
   console.log('[apple-music-search] JWT token parts length:', { header: encodedHeader.length, payload: encodedPayload.length, signature: encodedSignature.length });
   return `${message}.${encodedSignature}`;
