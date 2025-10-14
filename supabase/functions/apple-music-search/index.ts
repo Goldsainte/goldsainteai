@@ -34,11 +34,59 @@ async function getCredentials() {
 // Generate Apple Music JWT token
 async function generateToken(privateKey: string, teamId: string, keyId: string): Promise<string> {
   console.log('[apple-music-search] Generating JWT with team_id:', teamId, 'key_id:', keyId);
-  
+
+  // Helpers
+  const base64Url = (input: Uint8Array | string): string => {
+    const bytes = typeof input === 'string' ? new TextEncoder().encode(input) : input;
+    let binary = '';
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    const b64 = btoa(binary);
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  };
+
+  const derToJose = (der: ArrayBuffer): Uint8Array => {
+    const bytes = new Uint8Array(der);
+    let offset = 0;
+
+    if (bytes[offset++] !== 0x30) throw new Error('Invalid DER signature: missing SEQUENCE');
+    let seqLen = bytes[offset++];
+    if (seqLen & 0x80) {
+      const n = seqLen & 0x7f;
+      seqLen = 0;
+      for (let i = 0; i < n; i++) seqLen = (seqLen << 8) | bytes[offset++];
+    }
+
+    if (bytes[offset++] !== 0x02) throw new Error('Invalid DER signature: missing INTEGER (r)');
+    let rLen = bytes[offset++];
+    let r = bytes.slice(offset, offset + rLen);
+    offset += rLen;
+
+    if (bytes[offset++] !== 0x02) throw new Error('Invalid DER signature: missing INTEGER (s)');
+    let sLen = bytes[offset++];
+    let s = bytes.slice(offset, offset + sLen);
+
+    // Remove sign padding 0x00 if present
+    while (r.length > 0 && r[0] === 0x00) r = r.slice(1);
+    while (s.length > 0 && s[0] === 0x00) s = s.slice(1);
+
+    if (r.length > 32 || s.length > 32) throw new Error('Invalid ECDSA signature length');
+
+    const rPadded = new Uint8Array(32);
+    const sPadded = new Uint8Array(32);
+    rPadded.set(r, 32 - r.length);
+    sPadded.set(s, 32 - s.length);
+
+    const out = new Uint8Array(64);
+    out.set(rPadded, 0);
+    out.set(sPadded, 32);
+    return out;
+  };
+
   // Create JWT header
   const header = {
     alg: 'ES256',
-    kid: keyId
+    kid: keyId,
+    typ: 'JWT',
   };
 
   // Create JWT payload
@@ -51,9 +99,9 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
 
   console.log('[apple-music-search] JWT payload:', { iss: teamId, iat: now, exp: payload.exp });
 
-  // Encode header and payload
-  const encodedHeader = btoa(JSON.stringify(header));
-  const encodedPayload = btoa(JSON.stringify(payload));
+  // Encode header and payload (Base64URL)
+  const encodedHeader = base64Url(JSON.stringify(header));
+  const encodedPayload = base64Url(JSON.stringify(payload));
   const message = `${encodedHeader}.${encodedPayload}`;
 
   // Import the private key - handle both EC and standard PRIVATE KEY formats
@@ -77,9 +125,9 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
     ['sign']
   );
 
-  // Sign the message
+  // Sign the message (WebCrypto returns DER-encoded ECDSA signature)
   const encoder = new TextEncoder();
-  const signature = await crypto.subtle.sign(
+  const derSignature = await crypto.subtle.sign(
     {
       name: 'ECDSA',
       hash: { name: 'SHA-256' }
@@ -88,13 +136,13 @@ async function generateToken(privateKey: string, teamId: string, keyId: string):
     encoder.encode(message)
   );
 
-  // Encode signature
-  const encodedSignature = btoa(String.fromCharCode(...new Uint8Array(signature)));
+  // Convert DER -> JOSE (r||s) then Base64URL encode
+  const joseSig = derToJose(derSignature);
+  const encodedSignature = base64Url(joseSig);
   
-  console.log('[apple-music-search] JWT token generated, total length:', `${message}.${encodedSignature}`.length);
+  console.log('[apple-music-search] JWT token parts length:', { header: encodedHeader.length, payload: encodedPayload.length, signature: encodedSignature.length });
   return `${message}.${encodedSignature}`;
 }
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
