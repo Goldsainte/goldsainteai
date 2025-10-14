@@ -64,19 +64,18 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
     setIsSearching(true);
     setErrorText(null);
     try {
-      // Primary: backend function
       const { data, error } = await supabase.functions.invoke('apple-music-search', {
         body: { query: searchQuery }
       });
 
       if (error) throw error;
 
-      const list: Track[] = data?.tracks ?? [];
-      setTracks(list);
-      if (list.length === 0) {
-        setErrorText(null);
+      if (data?.tracks) {
+        setTracks(data.tracks);
+        if (data.tracks.length === 0) {
+          setErrorText(null);
+        }
       }
-
     } catch (error: any) {
       console.error('Error searching tracks:', error);
       const rawMsg = (error?.context?.value?.message as string) || (error?.message as string) || '';
@@ -220,27 +219,27 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
             {tracks.map((track) => (
               <div
                 key={track.id}
-                className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
               >
                 {track.albumArt && (
                   <img
                     src={track.albumArt}
                     alt={track.album}
-                    className="w-12 h-12 rounded object-cover shrink-0"
+                    className="w-12 h-12 rounded object-cover flex-shrink-0"
                   />
                 )}
-                <div className="min-w-0 pr-2">
-                  <p className="font-medium text-sm truncate break-words">{track.name}</p>
-                  <p className="text-xs text-muted-foreground truncate break-words">{track.artist}</p>
-                  <p className="text-xs text-muted-foreground truncate break-words">{track.album}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{track.name}</p>
+                  <p className="text-xs text-muted-foreground truncate">{track.artist}</p>
+                  <p className="text-xs text-muted-foreground truncate">{track.album}</p>
                 </div>
-                <div className="flex items-center gap-1 shrink-0 ml-auto">
+                <div className="flex gap-1 flex-shrink-0">
                   {track.previewUrl ? (
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => togglePlay(track)}
-                      className="h-8 w-8"
+                      className="flex-shrink-0"
                     >
                       {playingTrackId === track.id ? (
                         <Pause className="h-4 w-4" />
@@ -253,7 +252,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                       variant="ghost"
                       size="icon"
                       disabled
-                      className="h-8 w-8 opacity-30"
+                      className="flex-shrink-0 opacity-30"
                       title="No preview available"
                     >
                       <Play className="h-4 w-4" />
@@ -264,7 +263,7 @@ export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = fal
                     size="sm"
                     disabled={selectedTrack?.id === track.id}
                     onClick={() => handleSelectTrack(track)}
-                    className="min-w-[76px] whitespace-nowrap"
+                    className="flex-shrink-0"
                   >
                     {selectedTrack?.id === track.id ? "Selected" : "Select"}
                   </Button>
