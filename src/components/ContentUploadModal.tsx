@@ -116,11 +116,13 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
+        const { data: signedUrlData, error: signedUrlError } = await supabase.storage
           .from('travel-videos')
-          .getPublicUrl(tempFileName);
+          .createSignedUrl(tempFileName, 60);
         
-        tempImageUrl = publicUrl;
+        if (signedUrlError) throw signedUrlError;
+        
+        tempImageUrl = signedUrlData.signedUrl;
         tempImagePath = tempFileName;
       } else if (videoPreviewUrl && videoRef.current) {
         // For videos, capture a frame and upload it
@@ -145,11 +147,13 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
 
           if (uploadError) throw uploadError;
 
-          const { data: { publicUrl } } = supabase.storage
+          const { data: signedUrlData, error: signedUrlError } = await supabase.storage
             .from('travel-videos')
-            .getPublicUrl(tempFileName);
+            .createSignedUrl(tempFileName, 60);
           
-          tempImageUrl = publicUrl;
+          if (signedUrlError) throw signedUrlError;
+          
+          tempImageUrl = signedUrlData.signedUrl;
           tempImagePath = tempFileName;
         }
       }
@@ -730,7 +734,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader className="flex-shrink-0">
-          <DialogTitle>Share Content</DialogTitle>
+          <DialogTitle>New Post</DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)} className="w-full flex flex-col overflow-hidden flex-1">
@@ -754,7 +758,7 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
 
           <TabsContent value="photo" className="flex flex-col h-full">
             {/* Top Section - Photo Upload & Preview */}
-            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-48 space-y-4">
               {photoPreviewUrls.length === 0 ? (
                 <div className="border-2 border-dashed rounded-lg p-8 text-center">
                   <Input
@@ -886,10 +890,15 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Uploading...
                       </>
+                    ) : photoFiles.length === 0 ? (
+                      <>
+                        <Image className="mr-2 h-4 w-4" />
+                        Add photos to post
+                      </>
                     ) : (
                       <>
                         <Image className="mr-2 h-4 w-4" />
-                        Share Sainte
+                        Post Photo
                       </>
                     )}
                   </Button>
@@ -898,57 +907,50 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             </div>
 
             {/* Bottom Action Bar - Fixed at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 bg-background border-t pb-safe">
-              {photoPreviewUrls.length === 0 && (
-                <p className="text-xs text-center text-muted-foreground px-4 py-2">
-                  Upload photos to use the buttons below
-                </p>
-              )}
-              <BottomActionBar
-                actions={[
-                  {
-                    icon: <Music className="w-5 h-5" />,
-                    label: "Music",
-                    onClick: () => setMusicDrawerOpen(true),
-                    badge: selectedMusicTrack ? 1 : 0,
-                    active: !!selectedMusicTrack,
-                  },
-                  {
-                    icon: <Sparkles className="w-5 h-5" />,
-                    label: "Effects",
-                    onClick: () => setEffectsDrawerOpen(true),
-                    badge: storyInteraction ? 1 : 0,
-                    active: !!storyInteraction,
-                  },
-                  {
-                    icon: <MapPin className="w-5 h-5" />,
-                    label: "Location",
-                    onClick: () => setLocationDrawerOpen(true),
-                    badge: location ? 1 : 0,
-                    active: !!location,
-                  },
-                  {
-                    icon: <Tag className="w-5 h-5" />,
-                    label: "Tag",
-                    onClick: () => setTaggingDrawerOpen(true),
-                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length + taggedUserIds.length,
-                    active: !!(partnershipBrandId || taggedPackageIds.length > 0 || taggedUserIds.length > 0),
-                  },
-                  {
-                    icon: <SettingsIcon className="w-5 h-5" />,
-                    label: "Settings",
-                    onClick: () => setSettingsDrawerOpen(true),
-                    active: visibility === 'close_friends',
-                  },
-                ]}
-                showLabels
-              />
-            </div>
+            <BottomActionBar
+              actions={[
+                {
+                  icon: <Music className="w-5 h-5" />,
+                  label: "Music",
+                  onClick: () => setMusicDrawerOpen(true),
+                  badge: selectedMusicTrack ? 1 : 0,
+                  active: !!selectedMusicTrack,
+                },
+                {
+                  icon: <Sparkles className="w-5 h-5" />,
+                  label: "Effects",
+                  onClick: () => setEffectsDrawerOpen(true),
+                  badge: storyInteraction ? 1 : 0,
+                  active: !!storyInteraction,
+                },
+                {
+                  icon: <MapPin className="w-5 h-5" />,
+                  label: "Location",
+                  onClick: () => setLocationDrawerOpen(true),
+                  badge: location ? 1 : 0,
+                  active: !!location,
+                },
+                {
+                  icon: <Tag className="w-5 h-5" />,
+                  label: "Tag",
+                  onClick: () => setTaggingDrawerOpen(true),
+                  badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length + taggedUserIds.length,
+                  active: !!(partnershipBrandId || taggedPackageIds.length > 0 || taggedUserIds.length > 0),
+                },
+                {
+                  icon: <SettingsIcon className="w-5 h-5" />,
+                  label: "Settings",
+                  onClick: () => setSettingsDrawerOpen(true),
+                  active: visibility === 'close_friends',
+                },
+              ]}
+              showLabels
+            />
           </TabsContent>
 
           <TabsContent value="video" className="flex flex-col h-full">
             {/* Top Section - Video Upload & Preview */}
-            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-24 space-y-4">
+            <div className="flex-1 overflow-y-auto px-6 pt-4 pb-48 space-y-4">
               {!videoFile ? (
                 <div className="border-2 border-dashed rounded-lg p-8 text-center">
                   <Input
@@ -1070,10 +1072,15 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Uploading...
                       </>
+                    ) : !videoFile ? (
+                      <>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Add video to post
+                      </>
                     ) : (
                       <>
                         <Upload className="mr-2 h-4 w-4" />
-                        Share Journey
+                        Post Video
                       </>
                     )}
                   </Button>
@@ -1082,52 +1089,45 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess, initialTab = "photo
             </div>
 
             {/* Bottom Action Bar - Fixed at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 bg-background border-t pb-safe">
-              {!videoFile && (
-                <p className="text-xs text-center text-muted-foreground px-4 py-2">
-                  Upload a video to use the buttons below
-                </p>
-              )}
-              <BottomActionBar
-                actions={[
-                  {
-                    icon: <Music className="w-5 h-5" />,
-                    label: "Music",
-                    onClick: () => setMusicDrawerOpen(true),
-                    badge: selectedMusicTrack ? 1 : 0,
-                    active: !!selectedMusicTrack,
-                  },
-                  {
-                    icon: <Sparkles className="w-5 h-5" />,
-                    label: "Effects",
-                    onClick: () => setEffectsDrawerOpen(true),
-                    badge: storyInteraction ? 1 : 0,
-                    active: !!storyInteraction,
-                  },
-                  {
-                    icon: <MapPin className="w-5 h-5" />,
-                    label: "Location",
-                    onClick: () => setLocationDrawerOpen(true),
-                    badge: location ? 1 : 0,
-                    active: !!location,
-                  },
-                  {
-                    icon: <Tag className="w-5 h-5" />,
-                    label: "Tag",
-                    onClick: () => setTaggingDrawerOpen(true),
-                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length + taggedUserIds.length,
-                    active: !!(partnershipBrandId || taggedPackageIds.length > 0 || taggedUserIds.length > 0),
-                  },
-                  {
-                    icon: <SettingsIcon className="w-5 h-5" />,
-                    label: "Settings",
-                    onClick: () => setSettingsDrawerOpen(true),
-                    active: visibility === 'close_friends',
-                  },
-                ]}
-                showLabels
-              />
-            </div>
+            <BottomActionBar
+              actions={[
+                {
+                  icon: <Music className="w-5 h-5" />,
+                  label: "Music",
+                  onClick: () => setMusicDrawerOpen(true),
+                  badge: selectedMusicTrack ? 1 : 0,
+                  active: !!selectedMusicTrack,
+                },
+                {
+                  icon: <Sparkles className="w-5 h-5" />,
+                  label: "Effects",
+                  onClick: () => setEffectsDrawerOpen(true),
+                  badge: storyInteraction ? 1 : 0,
+                  active: !!storyInteraction,
+                },
+                {
+                  icon: <MapPin className="w-5 h-5" />,
+                  label: "Location",
+                  onClick: () => setLocationDrawerOpen(true),
+                  badge: location ? 1 : 0,
+                  active: !!location,
+                },
+                {
+                  icon: <Tag className="w-5 h-5" />,
+                  label: "Tag",
+                  onClick: () => setTaggingDrawerOpen(true),
+                  badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length + taggedUserIds.length,
+                  active: !!(partnershipBrandId || taggedPackageIds.length > 0 || taggedUserIds.length > 0),
+                },
+                {
+                  icon: <SettingsIcon className="w-5 h-5" />,
+                  label: "Settings",
+                  onClick: () => setSettingsDrawerOpen(true),
+                  active: visibility === 'close_friends',
+                },
+              ]}
+              showLabels
+            />
           </TabsContent>
 
           <TabsContent value="gif" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">

@@ -28,7 +28,10 @@ export const PeopleTagSelector = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    if (searchQuery.trim().length < 2) {
+    // Strip leading @ and whitespace for search
+    const sanitizedQuery = searchQuery.trim().replace(/^@+/, '');
+    
+    if (sanitizedQuery.length < 2) {
       setProfiles([]);
       return;
     }
@@ -39,7 +42,7 @@ export const PeopleTagSelector = ({
         const { data, error } = await supabase
           .from("profiles")
           .select("id, username, avatar_url")
-          .ilike("username", `%${searchQuery}%`)
+          .ilike("username", `%${sanitizedQuery}%`)
           .limit(10);
 
         if (error) throw error;
@@ -141,7 +144,7 @@ export const PeopleTagSelector = ({
         </div>
       )}
 
-      {!isLoading && searchQuery.trim().length >= 2 && profiles.length === 0 && (
+      {!isLoading && searchQuery.trim().replace(/^@+/, '').length >= 2 && profiles.length === 0 && (
         <div className="text-sm text-muted-foreground text-center py-4">
           No users found
         </div>
