@@ -127,7 +127,10 @@ const TravelFeed = () => {
           const personalized = ((data as any)?.posts || []) as TravelPost[];
           const map = new Map<string, TravelPost>();
           chrono.forEach(p => map.set(p.id, p));
-          personalized.forEach(p => map.set(p.id, p));
+          personalized.forEach(p => {
+            const existing = map.get(p.id) || ({} as TravelPost);
+            map.set(p.id, { ...existing, ...p });
+          });
           const merged = Array.from(map.values());
           setPosts(merged);
           loadedPosts = merged;
@@ -168,7 +171,7 @@ const TravelFeed = () => {
     console.log('Fetching chronological posts...', { offset, limit });
     const { data, error } = await supabase
       .from('travel_posts')
-      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, created_at')
+      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, native_video_volume, music_volume, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);

@@ -171,7 +171,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       if (isMuted) {
         audio.pause();
         setAudioPlaying(false);
-        userInitiatedPlay.current = false;
       } else if (isActive && (audioPlaying || userInitiatedPlay.current)) {
         audio.play().catch(console.error);
       } else if (!isActive && audioPlaying && !userInitiatedPlay.current) {
@@ -592,6 +591,38 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 className="w-full h-full cursor-pointer"
                 onClick={() => {
                   setPhotoGalleryOpen(true);
+                }}
+                onWheel={(e) => {
+                  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+                  if (Math.abs(delta) < 10 || !post.image_urls || post.image_urls.length < 2) return;
+                  e.preventDefault();
+                  setCurrentPhotoIndex((prev) =>
+                    delta > 0
+                      ? (prev + 1) % post.image_urls!.length
+                      : (prev - 1 + post.image_urls!.length) % post.image_urls!.length
+                  );
+                }}
+                onMouseDown={(e) => {
+                  if (!post.image_urls || post.image_urls.length < 2) return;
+                  const startX = e.clientX;
+                  let handled = false;
+                  const handleMove = (move: MouseEvent) => {
+                    const dx = move.clientX - startX;
+                    if (!handled && Math.abs(dx) > 30) {
+                      handled = true;
+                      setCurrentPhotoIndex((prev) =>
+                        dx < 0
+                          ? (prev + 1) % post.image_urls!.length
+                          : (prev - 1 + post.image_urls!.length) % post.image_urls!.length
+                      );
+                    }
+                  };
+                  const handleUp = () => {
+                    window.removeEventListener('mousemove', handleMove);
+                    window.removeEventListener('mouseup', handleUp);
+                  };
+                  window.addEventListener('mousemove', handleMove);
+                  window.addEventListener('mouseup', handleUp);
                 }}
               >
                 <OptimizedImage

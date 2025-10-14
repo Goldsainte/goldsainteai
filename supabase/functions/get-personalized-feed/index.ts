@@ -59,7 +59,7 @@ serve(async (req) => {
     // Fetch all active posts with profile data
     const { data: allPosts, error: postsError } = await supabaseClient
       .from('travel_posts')
-      .select('id, user_id, video_url, thumbnail_url, caption, location, view_count, like_count, comment_count, created_at')
+      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, native_video_volume, music_volume, created_at')
       .eq('status', 'active')
       .order('created_at', { ascending: false })
       .limit(100);
