@@ -927,6 +927,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   // Mobile TikTok-style layout
   return (
     <div className="relative h-full w-full bg-black">
+      {/* Song Title - Top Overlay */}
+      {post.music_track_name && (
+        <div className="pointer-events-none absolute top-2 left-1/2 -translate-x-1/2 z-30 max-w-[75%]">
+          <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/50 backdrop-blur-sm text-[10px] sm:text-xs text-white">
+            <Music2 className="h-3 w-3" />
+            <span className="truncate">{post.music_track_name}</span>
+          </div>
+        </div>
+      )}
+
       {/* Loading State */}
       {videoLoading && !videoError && post.video_url && (
         <div className="absolute inset-0 flex items-center justify-center">
@@ -1141,14 +1151,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         <div className="flex items-end justify-between gap-4">
           {/* User Info & Caption */}
           <div className="flex-1 space-y-3 max-w-[70%]">
-            {/* Small Music Display - At Very Top */}
-            {post.music_track_name && (
-              <div className="flex items-center gap-1.5 text-xs text-white drop-shadow-md">
-                <Music2 className="h-3 w-3" />
-                <span className="truncate max-w-[200px]">{post.music_track_name}</span>
-              </div>
-            )}
-
             {/* Featured Badge */}
             {post.is_featured && (
               <Badge className="mb-2 bg-gradient-to-r from-yellow-500 to-orange-500 border-0 text-sm font-bold">
