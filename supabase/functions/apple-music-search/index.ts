@@ -7,8 +7,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Get credentials from database
-async function getCredentials(userId: string) {
+// Get platform credentials from database
+async function getCredentials() {
+  console.log('[apple-music-search] Fetching platform credentials');
+  
   const supabaseAdmin = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -16,14 +18,16 @@ async function getCredentials(userId: string) {
 
   const { data, error } = await supabaseAdmin
     .from('apple_music_credentials')
-    .select('*')
-    .eq('user_id', userId)
+    .select('p8_key, team_id, key_id')
+    .limit(1)
     .single();
 
   if (error || !data) {
-    throw new Error('Apple Music credentials not found. Please upload your credentials first.');
+    console.error('[apple-music-search] Error fetching credentials:', error);
+    throw new Error('Apple Music credentials not configured');
   }
 
+  console.log('[apple-music-search] Credentials retrieved successfully');
   return data;
 }
 
@@ -92,28 +96,6 @@ serve(async (req) => {
 
   try {
     console.log('[apple-music-search] Function invoked');
-    
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    );
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    
-    if (authError || !user) {
-      console.error('[apple-music-search] Authentication failed:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    console.log('[apple-music-search] User authenticated:', user.id);
 
     const { query } = await req.json();
     
@@ -127,10 +109,10 @@ serve(async (req) => {
 
     console.log('[apple-music-search] Searching for:', query);
 
-    // Get credentials from database
+    // Get platform credentials
     let credentials;
     try {
-      credentials = await getCredentials(user.id);
+      credentials = await getCredentials();
       console.log('[apple-music-search] Credentials retrieved:', {
         hasP8Key: !!credentials.p8_key,
         teamId: credentials.team_id,
@@ -138,7 +120,7 @@ serve(async (req) => {
       });
     } catch (error) {
       console.error('[apple-music-search] Failed to get credentials:', error);
-      throw new Error('Apple Music credentials not found. Please upload your credentials first.');
+      throw new Error('Apple Music credentials not configured');
     }
 
     // Generate JWT token

@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.apple-music-search]
+verify_jwt = false
+
 [functions.amadeus-get-seatmap]
 verify_jwt = false
 
