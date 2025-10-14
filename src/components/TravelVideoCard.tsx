@@ -102,8 +102,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const userInitiatedPlay = useRef(false);
   const pauseDebounceTimer = useRef<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
+  const [touchStartX, setTouchStartX] = useState(0);
+  const [touchStartY, setTouchStartY] = useState(0);
+  const [touchEndX, setTouchEndX] = useState(0);
+  const [touchEndY, setTouchEndY] = useState(0);
   const [dragStart, setDragStart] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [wasSwipe, setWasSwipe] = useState(false);
@@ -1321,30 +1323,41 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <>
           <div 
-            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none"
-            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
-            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
-            onTouchEnd={() => {
-              if (!touchStart || !touchEnd) return;
+            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none touch-pan-y"
+            onTouchStart={(e) => {
+              setTouchStartX(e.targetTouches[0].clientX);
+              setTouchStartY(e.targetTouches[0].clientY);
+            }}
+            onTouchMove={(e) => {
+              setTouchEndX(e.targetTouches[0].clientX);
+              setTouchEndY(e.targetTouches[0].clientY);
+            }}
+            onTouchEnd={(e) => {
+              if (!touchStartX || !touchEndX) return;
               
-              const distance = touchStart - touchEnd;
-              const isLeftSwipe = distance > 50;
-              const isRightSwipe = distance < -50;
+              const deltaX = touchStartX - touchEndX;
+              const deltaY = touchStartY - touchEndY;
               
-              if (isLeftSwipe && post.image_urls) {
-                setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
-                setWasSwipe(true);
-                setTimeout(() => setWasSwipe(false), 100);
+              const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+              
+              if (isHorizontalSwipe && Math.abs(deltaX) > 50) {
+                e.stopPropagation();
+                
+                if (deltaX > 0 && post.image_urls) {
+                  setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                  setWasSwipe(true);
+                  setTimeout(() => setWasSwipe(false), 100);
+                } else if (deltaX < 0 && post.image_urls) {
+                  setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                  setWasSwipe(true);
+                  setTimeout(() => setWasSwipe(false), 100);
+                }
               }
               
-              if (isRightSwipe && post.image_urls) {
-                setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
-                setWasSwipe(true);
-                setTimeout(() => setWasSwipe(false), 100);
-              }
-              
-              setTouchStart(0);
-              setTouchEnd(0);
+              setTouchStartX(0);
+              setTouchStartY(0);
+              setTouchEndX(0);
+              setTouchEndY(0);
             }}
             onMouseDown={(e) => {
               setIsDragging(true);

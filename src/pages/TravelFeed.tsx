@@ -131,43 +131,38 @@ const TravelFeed = () => {
     try {
       setLoading(true);
       let loadedPosts: TravelPost[] = [];
-      // Fast-first: show chronological quickly, then merge personalized when ready
+      
       if (user && !focusPostId) {
-        const chronoPromise = fetchChronologicalPosts(0, 12);
+        const quickPosts = await fetchChronologicalPosts(0, 3);
+        setPosts(quickPosts);
+        setLoading(false);
+        
+        const remainingPromise = fetchChronologicalPosts(3, 9);
         const personalizedPromise = supabase.functions.invoke('get-personalized-feed');
-
-        // Render chrono ASAP for faster first paint
-        const chrono = await chronoPromise;
-        loadedPosts = chrono;
-        setIsPersonalized(false);
-        setLoading(false); // Show posts immediately
-
-        // When personalized resolves, merge and update
-        const { data, error } = await personalizedPromise;
+        
+        const [remaining, { data, error }] = await Promise.all([
+          remainingPromise,
+          personalizedPromise
+        ]);
+        
+        const allPosts = [...quickPosts, ...remaining];
+        
         if (!error) {
           const personalized = ((data as any)?.posts || []) as TravelPost[];
           const map = new Map<string, TravelPost>();
-          chrono.forEach(p => map.set(p.id, p));
+          allPosts.forEach(p => map.set(p.id, p));
           personalized.forEach(p => {
             const existing = map.get(p.id) || ({} as TravelPost);
             map.set(p.id, { ...existing, ...p });
           });
           const merged = Array.from(map.values());
           setPosts(merged);
-          loadedPosts = merged;
           setIsPersonalized(true);
         } else {
-          console.error('Error fetching personalized feed:', error);
+          setPosts(allPosts);
         }
-      } else {
-        // Show chronological feed for non-logged in users or when focusing specific post
-        setIsPersonalized(false);
+      } else if (focusPostId) {
         loadedPosts = await fetchChronologicalPosts(0, 12);
-        setLoading(false);
-      }
-
-      // If a specific post is requested (from profile grid), jump to it
-      if (focusPostId && loadedPosts.length) {
         const idx = loadedPosts.findIndex((p) => p.id === focusPostId);
         if (idx >= 0) {
           setCurrentIndex(idx);
@@ -178,11 +173,14 @@ const TravelFeed = () => {
             });
           }
         }
+        setPosts(loadedPosts);
+      } else {
+        loadedPosts = await fetchChronologicalPosts(0, 12);
+        setPosts(loadedPosts);
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
-      toast.error('Failed to load feed');
-      setIsPersonalized(false);
+      toast.error("Failed to load posts");
     } finally {
       setLoading(false);
     }
@@ -273,13 +271,6 @@ const TravelFeed = () => {
     if (newIndex !== currentIndex && newIndex < posts.length) {
       setCurrentIndex(newIndex);
     }
-
-    // Hard snap after scrolling stops to prevent peeking
-    if (scrollSnapTimer.current) window.clearTimeout(scrollSnapTimer.current);
-    scrollSnapTimer.current = window.setTimeout(() => {
-      const targetTop = newIndex * windowHeight;
-      container.scrollTo({ top: targetTop, behavior: 'smooth' });
-    }, 80);
   };
 
   const handleVideoUpload = () => {
@@ -416,8 +407,8 @@ const TravelFeed = () => {
             `}</style>
             
             {loading ? (
-              <div className="flex items-center justify-center h-full">
-                <div className="text-muted-foreground">Loading feed...</div>
+              <div className="h-[100dvh] w-full bg-black">
+                <FeedSkeleton />
               </div>
             ) : posts.length === 0 ? (
               <div className="flex items-center justify-center h-full">
