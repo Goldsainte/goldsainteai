@@ -102,6 +102,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const userInitiatedPlay = useRef(false);
   const pauseDebounceTimer = useRef<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+  const [dragStart, setDragStart] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [wasSwipe, setWasSwipe] = useState(false);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -1315,43 +1320,87 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </>
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <>
-          <div className="absolute inset-0">
+          <div 
+            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none"
+            onTouchStart={(e) => setTouchStart(e.targetTouches[0].clientX)}
+            onTouchMove={(e) => setTouchEnd(e.targetTouches[0].clientX)}
+            onTouchEnd={() => {
+              if (!touchStart || !touchEnd) return;
+              
+              const distance = touchStart - touchEnd;
+              const isLeftSwipe = distance > 50;
+              const isRightSwipe = distance < -50;
+              
+              if (isLeftSwipe && post.image_urls) {
+                setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                setWasSwipe(true);
+                setTimeout(() => setWasSwipe(false), 100);
+              }
+              
+              if (isRightSwipe && post.image_urls) {
+                setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                setWasSwipe(true);
+                setTimeout(() => setWasSwipe(false), 100);
+              }
+              
+              setTouchStart(0);
+              setTouchEnd(0);
+            }}
+            onMouseDown={(e) => {
+              setIsDragging(true);
+              setDragStart(e.clientX);
+            }}
+            onMouseMove={(e) => {
+              if (!isDragging) return;
+            }}
+            onMouseUp={(e) => {
+              if (!isDragging) return;
+              setIsDragging(false);
+              
+              const distance = dragStart - e.clientX;
+              const isLeftDrag = distance > 50;
+              const isRightDrag = distance < -50;
+              
+              if (isLeftDrag && post.image_urls) {
+                setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                setWasSwipe(true);
+                setTimeout(() => setWasSwipe(false), 100);
+              }
+              
+              if (isRightDrag && post.image_urls) {
+                setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                setWasSwipe(true);
+                setTimeout(() => setWasSwipe(false), 100);
+              }
+            }}
+            onMouseLeave={() => setIsDragging(false)}
+          >
             <img 
               src={post.image_urls?.[currentPhotoIndex] || (post.thumbnail_url as string)} 
               alt="Post content"
-              className="w-full h-full object-cover bg-black"
+              className="w-full h-full object-cover bg-black pointer-events-none"
               onClick={(e) => {
                 e.stopPropagation();
-                setPhotoGalleryOpen(true);
+                if (!wasSwipe) {
+                  setPhotoGalleryOpen(true);
+                }
               }}
               loading="lazy"
+              draggable="false"
             />
             {post.image_urls && post.image_urls.length > 1 && (
-              <>
-                <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white px-2 py-0.5 rounded-full text-xs font-medium z-10">
-                  {currentPhotoIndex + 1} / {post.image_urls.length}
-                </div>
-                <button
-                  className="absolute left-3 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
-                  }}
-                  aria-label="Previous photo"
-                >
-                  <ChevronLeft className="h-6 w-6" />
-                </button>
-                <button
-                  className="absolute right-3 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
-                  }}
-                  aria-label="Next photo"
-                >
-                  <ChevronRight className="h-6 w-6" />
-                </button>
-              </>
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 pointer-events-none">
+                {post.image_urls.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                      index === currentPhotoIndex
+                        ? "bg-white scale-110"
+                        : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
             )}
           </div>
 
