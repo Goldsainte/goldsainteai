@@ -34,13 +34,19 @@ const UploadAppleMusicKey = () => {
 
     setIsUploading(true);
     try {
-      const { error } = await supabase.functions.invoke('save-apple-music-credentials', {
-        body: {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { error } = await supabase
+        .from('apple_music_credentials')
+        .upsert({
+          user_id: user.id,
           p8_key: p8Content,
           key_id: keyId,
           team_id: teamId,
-        }
-      });
+        }, {
+          onConflict: 'user_id'
+        });
 
       if (error) throw error;
 
@@ -48,7 +54,7 @@ const UploadAppleMusicKey = () => {
       toast.success('All credentials saved successfully!');
     } catch (error) {
       console.error('Error saving credentials:', error);
-      toast.error('Failed to save credentials');
+      toast.error(error instanceof Error ? error.message : 'Failed to save credentials');
     } finally {
       setIsUploading(false);
     }
