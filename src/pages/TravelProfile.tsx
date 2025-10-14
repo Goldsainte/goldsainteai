@@ -363,7 +363,8 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
-    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    if (num >= 10000) return `${(num / 1000).toFixed(1)}K`;
+    if (num >= 1000) return num.toLocaleString('en-US');
     return num.toString();
   };
 
@@ -533,7 +534,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           {/* Profile Picture */}
           <div className="relative flex-shrink-0">
             <Avatar 
-              className={`h-40 w-40 cursor-pointer ${hasActiveMoments ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
+              className={`h-[150px] w-[150px] cursor-pointer ${hasActiveMoments ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
               onClick={() => {
                 if (hasActiveMoments) {
                   setMomentsViewerOpen(true);
@@ -558,17 +559,17 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               {isOwnProfile ? (
                 <>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="sm"
-                    className="h-[6px] px-4 text-sm font-semibold"
+                    className="h-8 px-4 bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold"
                     onClick={() => setEditProfileOpen(true)}
                   >
                     Edit profile
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="sm"
-                    className="h-[6px] px-4 text-sm font-semibold"
+                    className="h-8 px-4 bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold"
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
                       toast.success("Profile link copied!");
@@ -702,13 +703,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         </div>
 
         {/* Mobile Profile Layout - Instagram Style */}
-        <div className="md:hidden space-y-2.5 mb-3">
-          {/* Profile Photo and Name Row */}
-          <div className="flex items-center gap-1">
+        <div className="md:hidden space-y-3 mb-3 px-4">
+          {/* Profile Photo and Stats Row */}
+          <div className="flex items-center gap-4">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <Avatar 
-                className={`h-20 w-20 cursor-pointer ${hasActiveMoments ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
+                className={`h-[86px] w-[86px] cursor-pointer ${hasActiveMoments ? 'ring-4 ring-[#BFAD72] ring-offset-2 ring-offset-background' : ''}`}
                 onClick={() => {
                   if (hasActiveMoments) {
                     setMomentsViewerOpen(true);
@@ -724,69 +725,70 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               </Avatar>
             </div>
             
-            {/* Name */}
-            <div className="flex items-center gap-1">
-              <h2 className="font-bold text-sm">
+            {/* Stats */}
+            <div className="flex-1 flex justify-around">
+              <button className="flex flex-col items-center">
+                <span className="font-semibold text-base">{formatNumber(stats.postsCount)}</span>
+                <span className="text-xs text-muted-foreground font-normal">posts</span>
+              </button>
+              <button className="flex flex-col items-center">
+                <span className="font-semibold text-base">{formatNumber(profile?.followers_count || 0)}</span>
+                <span className="text-xs text-muted-foreground font-normal">followers</span>
+              </button>
+              <button className="flex flex-col items-center">
+                <span className="font-semibold text-base">{formatNumber(profile?.following_count || 0)}</span>
+                <span className="text-xs text-muted-foreground font-normal">following</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Name and Bio Section */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold text-sm uppercase">
                 {profile?.first_name && profile?.last_name
-                  ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
-                  : (profile?.username || 'User').toUpperCase()}
-              </h2>
+                  ? `${profile.first_name} ${profile.last_name}`
+                  : profile?.username || 'User'}
+              </p>
               {profile?.is_verified && (
                 <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
               )}
             </div>
-          </div>
 
-          {/* Stats Row */}
-          <div className="flex items-center justify-around">
-            <button className="flex flex-col items-center">
-              <div className="text-sm font-bold">{formatNumber(stats.postsCount)}</div>
-              <div className="text-[11px] text-muted-foreground">posts</div>
-            </button>
-            <button className="flex flex-col items-center">
-              <div className="text-sm font-bold">{formatNumber(profile?.followers_count || 0)}</div>
-              <div className="text-[11px] text-muted-foreground">followers</div>
-            </button>
-            <button className="flex flex-col items-center">
-              <div className="text-sm font-bold">{formatNumber(profile?.following_count || 0)}</div>
-              <div className="text-[11px] text-muted-foreground">following</div>
-            </button>
-          </div>
-
-          {/* Bio Section - Standalone */}
-          <div className="space-y-0.5">
             {profile?.bio && (
-              <p className="text-xs leading-snug">{profile.bio}</p>
+              <p className="text-sm whitespace-pre-wrap leading-tight">{profile.bio}</p>
             )}
             {profile?.website && (
               <a 
                 href={profile.website} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-xs text-primary hover:underline block"
+                className="text-sm text-primary hover:underline block"
               >
                 {profile.website.replace(/^https?:\/\//, '')}
               </a>
             )}
             {profile?.location && (
-              <p className="text-[11px] text-muted-foreground">📍 {profile.location}</p>
+              <p className="text-sm text-muted-foreground">📍 {profile.location}</p>
             )}
           </div>
 
-          {/* Action Buttons - Compact Style */}
-          <div className="flex gap-[1.6px]">
+          {/* Action Buttons */}
+          <div className="flex gap-2">
             {isOwnProfile ? (
               <>
                 <Button
-                  variant="secondary"
-                  className="flex-1 h-[6px] text-[11px] font-semibold rounded-md"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 h-[30px] bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold"
                   onClick={() => setEditProfileOpen(true)}
                 >
                   Edit profile
                 </Button>
                 <Button
-                  variant="secondary"
-                  className="flex-1 h-[6px] text-[11px] font-semibold rounded-md"
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 h-[30px] bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold"
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
                     toast.success("Profile link copied!");
