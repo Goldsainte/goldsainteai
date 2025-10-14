@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -95,6 +95,27 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const isOwnPost = user?.id === post.user_id;
+
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this Sainte? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('travel_posts')
+        .delete()
+        .eq('id', post.id);
+
+      if (error) throw error;
+
+      toast.success('Sainte deleted successfully');
+      onUpdate(); // Refresh the feed
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast.error('Failed to delete Sainte');
+    }
+  };
 
   useEffect(() => {
     console.log('Collection selector open state:', collectionSelectorOpen);
@@ -960,6 +981,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Sainte
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Sainte
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -1009,6 +1034,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   <DropdownMenuItem onClick={() => setEditOpen(true)}>
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Sainte
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Sainte
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -1065,6 +1094,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   <DropdownMenuItem onClick={() => setEditOpen(true)}>
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Sainte
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDelete} className="text-destructive focus:text-destructive">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Sainte
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
