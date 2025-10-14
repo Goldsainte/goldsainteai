@@ -36,9 +36,10 @@ interface MusicTrackSelectorProps {
     albumArt: string | null;
     startTime?: number;
   } | null;
+  compact?: boolean;
 }
 
-export const MusicTrackSelector = ({ onTrackSelect, selectedTrack }: MusicTrackSelectorProps) => {
+export const MusicTrackSelector = ({ onTrackSelect, selectedTrack, compact = false }: MusicTrackSelectorProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [tracks, setTracks] = useState<Track[]>([]);
   const [isSearching, setIsSearching] = useState(false);

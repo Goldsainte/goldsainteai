@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Loader2, Link2, Image, Star, BarChart3, Wand2, Edit } from "lucide-react";
+import { Upload, Loader2, Link2, Image, Star, BarChart3, Wand2, Edit, X } from "lucide-react";
 import { toast } from "sonner";
 import { extractMentions } from "@/lib/mentionHelpers";
 import { extractHashtags } from "@/lib/hashtagHelpers";
@@ -23,6 +23,13 @@ import { StoryInteractionCreator } from "./StoryInteractionCreator";
 import { GifSelector } from "./GifSelector";
 import { BoomerangRecorder } from "./BoomerangRecorder";
 import { MusicTrackSelector } from "./MusicTrackSelector";
+import { BottomActionBar } from "./BottomActionBar";
+import { MusicSelectorDrawer } from "./MusicSelectorDrawer";
+import { EffectsDrawer } from "./EffectsDrawer";
+import { LocationDrawer } from "./LocationDrawer";
+import { TaggingDrawer } from "./TaggingDrawer";
+import { SettingsDrawer } from "./SettingsDrawer";
+import { Music, Sparkles, MapPin, Tag, Settings as SettingsIcon } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -60,6 +67,13 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
   const [selectedGifUrl, setSelectedGifUrl] = useState<string | null>(null);
   const [selectedMusicTrack, setSelectedMusicTrack] = useState<any>(null);
   const [boomerangVideo, setBoomerangVideo] = useState<Blob | null>(null);
+  
+  // Drawer states for Instagram-style bottom bar
+  const [musicDrawerOpen, setMusicDrawerOpen] = useState(false);
+  const [effectsDrawerOpen, setEffectsDrawerOpen] = useState(false);
+  const [locationDrawerOpen, setLocationDrawerOpen] = useState(false);
+  const [taggingDrawerOpen, setTaggingDrawerOpen] = useState(false);
+  const [settingsDrawerOpen, setSettingsDrawerOpen] = useState(false);
 
   const detectPlatform = (url: string): string | null => {
     if (url.includes('tiktok.com')) return 'tiktok';
@@ -755,180 +769,167 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
             </Button>
           </TabsContent>
 
-          <TabsContent value="video" className="space-y-4 mt-4 overflow-y-auto flex-1">
-            <div className="space-y-2">
-              <Label>Video</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleFileChange}
-                  disabled={uploading}
-                  className="flex-1"
-                />
-                {videoFile && (
-                  <span className="text-xs text-muted-foreground">
-                    {(videoFile.size / (1024 * 1024)).toFixed(1)}MB
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {videoPreviewUrl && (
-              <div className="space-y-2">
-                <Label>Cover Image</Label>
-                <div className="space-y-2">
-                  <video
-                    ref={videoRef}
-                    src={videoPreviewUrl}
-                    className="w-full rounded-lg bg-black"
-                    controls
-                    preload="metadata"
+          <TabsContent value="video" className="flex flex-col h-full pb-20">
+            {/* Top Section - Video Upload & Preview */}
+            <div className="flex-1 overflow-y-auto px-6 pt-4 space-y-4">
+              {!videoFile ? (
+                <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                  <Input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileChange}
+                    disabled={uploading}
+                    className="hidden"
+                    id="video-upload"
                   />
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={captureVideoFrame}
-                      disabled={uploading}
-                      className="flex-1"
-                    >
-                      Capture Current Frame
-                    </Button>
-                    <div className="relative flex-1">
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleThumbnailChange}
-                        disabled={uploading}
-                        className="hidden"
-                        id="thumbnail-upload"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById('thumbnail-upload')?.click()}
-                        disabled={uploading}
-                        className="w-full"
-                      >
-                        Upload Cover Image
-                      </Button>
-                    </div>
-                  </div>
-                  {thumbnailFile && (
-                    <p className="text-xs text-muted-foreground">
-                      Cover image selected: {thumbnailFile.name}
+                  <label htmlFor="video-upload" className="cursor-pointer block">
+                    <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Tap to upload a video
                     </p>
-                  )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Max size: 500MB
+                    </p>
+                  </label>
                 </div>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label>Caption</Label>
-              <Textarea
-                placeholder="Tell us about your adventure... Use #hashtags and @mentions"
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                disabled={uploading}
-                rows={3}
-              />
-              <p className="text-xs text-muted-foreground">
-                Tip: Use #hashtags and @username to tag people
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Location</Label>
-              <Input
-                placeholder="Where was this taken?"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                disabled={uploading}
-              />
-            </div>
-
-            <PartnershipTagging
-              onPartnershipChange={setPartnershipBrandId}
-              currentBrandId={partnershipBrandId}
-            />
-
-            <PackageTagSelector
-              selectedPackageIds={taggedPackageIds}
-              onPackageTagged={(packageId) => {
-                if (!taggedPackageIds.includes(packageId)) {
-                  setTaggedPackageIds([...taggedPackageIds, packageId]);
-                }
-              }}
-            />
-
-            <div className="space-y-2">
-              <Label>Visibility</Label>
-              <Select value={visibility} onValueChange={(v: any) => setVisibility(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="public">
-                    <div className="flex items-center gap-2">
-                      Public
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="close_friends">
-                    <div className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-green-500 fill-green-500" />
-                      Close Friends
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {visibility === 'close_friends' && (
-              <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                <p className="text-xs text-green-700 dark:text-green-300">
-                  <Star className="h-3 w-3 inline mr-1" />
-                  Only your close friends will see this
-                </p>
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Button
-                variant="outline"
-                onClick={() => setShowInteractionCreator(true)}
-                className="w-full"
-                type="button"
-              >
-                <BarChart3 className="h-4 w-4 mr-2" />
-                {storyInteraction ? 'Change' : 'Add'} Story Interaction
-              </Button>
-              {storyInteraction && (
-                <p className="text-xs text-muted-foreground">
-                  Added: {storyInteraction.type}
-                </p>
-              )}
-            </div>
-
-            <Button
-              onClick={handleUpload}
-              disabled={!videoFile || uploading}
-              className="w-full"
-            >
-              {uploading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Uploading...
-                </>
               ) : (
                 <>
-                  <Upload className="mr-2 h-4 w-4" />
-                  Upload Video
+                  {/* Video Preview */}
+                  {videoPreviewUrl && (
+                    <div className="relative rounded-lg overflow-hidden bg-black">
+                      <video
+                        ref={videoRef}
+                        src={videoPreviewUrl}
+                        className="w-full max-h-[50vh] object-contain"
+                        controls
+                        playsInline
+                        preload="metadata"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-2 right-2"
+                        onClick={() => {
+                          setVideoFile(null);
+                          setVideoPreviewUrl("");
+                          setThumbnailFile(null);
+                        }}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Compact Caption Input */}
+                  <div className="space-y-2">
+                    <Textarea
+                      placeholder="Write a caption..."
+                      value={caption}
+                      onChange={(e) => setCaption(e.target.value)}
+                      disabled={uploading}
+                      rows={2}
+                      className="resize-none"
+                    />
+                  </div>
+
+                  {/* Selected Items Display */}
+                  <div className="flex flex-wrap gap-2">
+                    {selectedMusicTrack && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <Music className="w-3 h-3" />
+                        <span className="truncate max-w-[150px]">{selectedMusicTrack.name}</span>
+                      </div>
+                    )}
+                    {location && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate max-w-[150px]">{location}</span>
+                      </div>
+                    )}
+                    {storyInteraction && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <Sparkles className="w-3 h-3" />
+                        <span>{storyInteraction.type}</span>
+                      </div>
+                    )}
+                    {(partnershipBrandId || taggedPackageIds.length > 0) && (
+                      <div className="flex items-center gap-2 bg-muted px-3 py-1.5 rounded-full text-xs">
+                        <Tag className="w-3 h-3" />
+                        <span>
+                          {partnershipBrandId && taggedPackageIds.length > 0
+                            ? `Brand + ${taggedPackageIds.length} packages`
+                            : partnershipBrandId
+                            ? 'Brand tagged'
+                            : `${taggedPackageIds.length} packages`}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Upload Button */}
+                  <Button
+                    onClick={handleUpload}
+                    disabled={!videoFile || uploading}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Share Journey
+                      </>
+                    )}
+                  </Button>
                 </>
               )}
-            </Button>
+            </div>
+
+            {/* Bottom Action Bar - Only show when video is uploaded */}
+            {videoFile && (
+              <BottomActionBar
+                actions={[
+                  {
+                    icon: <Music className="w-5 h-5" />,
+                    label: "Music",
+                    onClick: () => setMusicDrawerOpen(true),
+                    badge: selectedMusicTrack ? 1 : 0,
+                    active: !!selectedMusicTrack,
+                  },
+                  {
+                    icon: <Sparkles className="w-5 h-5" />,
+                    label: "Effects",
+                    onClick: () => setEffectsDrawerOpen(true),
+                    badge: storyInteraction ? 1 : 0,
+                    active: !!storyInteraction,
+                  },
+                  {
+                    icon: <MapPin className="w-5 h-5" />,
+                    label: "Location",
+                    onClick: () => setLocationDrawerOpen(true),
+                    badge: location ? 1 : 0,
+                    active: !!location,
+                  },
+                  {
+                    icon: <Tag className="w-5 h-5" />,
+                    label: "Tag",
+                    onClick: () => setTaggingDrawerOpen(true),
+                    badge: (partnershipBrandId ? 1 : 0) + taggedPackageIds.length,
+                    active: !!(partnershipBrandId || taggedPackageIds.length > 0),
+                  },
+                  {
+                    icon: <SettingsIcon className="w-5 h-5" />,
+                    label: "Settings",
+                    onClick: () => setSettingsDrawerOpen(true),
+                    active: visibility === 'close_friends',
+                  },
+                ]}
+              />
+            )}
           </TabsContent>
 
           <TabsContent value="gif" className="space-y-4 mt-4 px-6 overflow-y-auto flex-1">
@@ -1231,6 +1232,43 @@ const ContentUploadModal = ({ open, onOpenChange, onSuccess }: ContentUploadModa
         open={showInteractionCreator}
         onOpenChange={setShowInteractionCreator}
         onSave={(interaction) => setStoryInteraction(interaction)}
+      />
+
+      {/* Instagram-style Drawers */}
+      <MusicSelectorDrawer
+        open={musicDrawerOpen}
+        onOpenChange={setMusicDrawerOpen}
+        selectedTrack={selectedMusicTrack}
+        onTrackSelect={setSelectedMusicTrack}
+      />
+
+      <EffectsDrawer
+        open={effectsDrawerOpen}
+        onOpenChange={setEffectsDrawerOpen}
+        onSave={setStoryInteraction}
+      />
+
+      <LocationDrawer
+        open={locationDrawerOpen}
+        onOpenChange={setLocationDrawerOpen}
+        location={location}
+        onLocationChange={setLocation}
+      />
+
+      <TaggingDrawer
+        open={taggingDrawerOpen}
+        onOpenChange={setTaggingDrawerOpen}
+        partnershipBrandId={partnershipBrandId}
+        onPartnershipChange={setPartnershipBrandId}
+        taggedPackageIds={taggedPackageIds}
+        onPackageTagsChange={setTaggedPackageIds}
+      />
+
+      <SettingsDrawer
+        open={settingsDrawerOpen}
+        onOpenChange={setSettingsDrawerOpen}
+        visibility={visibility}
+        onVisibilityChange={setVisibility}
       />
 
       {editingPhotoIndex !== null && photoPreviewUrls[editingPhotoIndex] && (
