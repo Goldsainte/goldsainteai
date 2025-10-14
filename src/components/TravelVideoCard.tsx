@@ -95,6 +95,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [nativeVolume, setNativeVolume] = useState(post.native_video_volume || 100);
+  const [musicVolume, setMusicVolume] = useState(post.music_volume || 80);
 
   const isOwnPost = user?.id === post.user_id;
 
@@ -146,6 +148,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       videoRef.current.currentTime = 0;
     }
   }, [isActive]);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.volume = isMuted ? 0 : nativeVolume / 100;
+    }
+  }, [nativeVolume, isMuted]);
 
   useEffect(() => {
     if (audioRef.current) {

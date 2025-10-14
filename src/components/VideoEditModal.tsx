@@ -11,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2, Save, Camera, Upload as UploadIcon } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { Loader2, Save, Camera, Upload as UploadIcon, Volume2, Music } from "lucide-react";
 import { toast } from "sonner";
 import { MusicTrackSelector } from "./MusicTrackSelector";
 
@@ -30,6 +31,8 @@ interface VideoEditModalProps {
     albumArt: string | null;
     previewUrl: string | null;
   } | null;
+  currentNativeVolume?: number;
+  currentMusicVolume?: number;
   onSuccess: () => void;
 }
 
