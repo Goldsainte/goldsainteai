@@ -28,7 +28,6 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { OptimizedImage } from "./OptimizedImage";
 import { useEngagementFraud } from "@/hooks/useEngagementFraud";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
 interface TravelVideoCardProps {
   post: {
@@ -175,7 +174,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         userInitiatedPlay.current = false;
       } else if (isActive && (audioPlaying || userInitiatedPlay.current)) {
         audio.play().catch(console.error);
-      } else if (!isActive && audioPlaying) {
+      } else if (!isActive && audioPlaying && !userInitiatedPlay.current) {
         // Debounce pause to avoid brief visibility flickers
         pauseDebounceTimer.current = window.setTimeout(() => {
           if (audioRef.current) {
@@ -588,52 +587,49 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         {/* Video/Image - Optimized */}
         <div className="relative bg-black aspect-square">
           {post.image_urls && post.image_urls.length > 0 ? (
-            post.image_urls.length > 1 ? (
-              <Carousel className="w-full h-full">
-                <CarouselContent className="h-full">
-                  {post.image_urls.map((imgUrl, idx) => (
-                    <CarouselItem key={idx} className="h-full">
-                      <div
-                        className="w-full h-full cursor-pointer relative"
-                        onClick={() => {
-                          setCurrentPhotoIndex(idx);
-                          setPhotoGalleryOpen(true);
-                        }}
-                      >
-                        <OptimizedImage
-                          src={imgUrl}
-                          alt={`${post.caption || 'Post image'} ${idx + 1}`}
-                          aspectRatio="square"
-                          priority={isActive && idx === 0}
-                          className="w-full h-full"
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs z-10">
-                  {currentPhotoIndex + 1} / {post.image_urls.length}
-                </div>
-                <CarouselPrevious className="left-2" />
-                <CarouselNext className="right-2" />
-              </Carousel>
-            ) : (
+            <div className="w-full h-full relative">
               <div
-                className="w-full h-full cursor-pointer relative"
+                className="w-full h-full cursor-pointer"
                 onClick={() => {
-                  setCurrentPhotoIndex(0);
                   setPhotoGalleryOpen(true);
                 }}
               >
                 <OptimizedImage
-                  src={post.image_urls[0]}
-                  alt={post.caption || 'Post image'}
+                  src={post.image_urls[currentPhotoIndex]}
+                  alt={`${post.caption || 'Post image'} ${currentPhotoIndex + 1}`}
                   aspectRatio="square"
                   priority={isActive}
-                  className="w-full"
+                  className="w-full h-full"
                 />
               </div>
-            )
+              {post.image_urls.length > 1 && (
+                <>
+                  <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs z-10">
+                    {currentPhotoIndex + 1} / {post.image_urls.length}
+                  </div>
+                  <button
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                    }}
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/40 text-white rounded-full p-2 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                    }}
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </>
+              )}
+            </div>
           ) : post.video_url ? (
             <>
               {videoLoading && !videoError && (
