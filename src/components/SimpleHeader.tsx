@@ -1,4 +1,3 @@
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +10,6 @@ export const SimpleHeader = () => {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="flex h-16 md:h-14 items-center px-3 md:px-4">
-        <SidebarTrigger className="mr-2 md:mr-4" />
         <div className="flex-1" />
         <div className="flex items-center gap-1.5 md:gap-2">
           {user ? (
