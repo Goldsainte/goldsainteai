@@ -13,22 +13,12 @@ interface PendingSupplier {
   id: string;
   name: string;
   supplier_type: string;
-  business_name: string;
   contact_email: string;
-  contact_phone: string;
-  description: string;
+  contact_phone: string | null;
   created_at: string;
-  verification_documents: any;
-}
-
-interface VettingRecord {
-  id: string;
-  supplier_id: string;
-  background_check_status: string;
-  license_check_status: string;
-  insurance_check_status: string;
-  reference_check_status: string;
-  vetting_notes: string;
+  verification_status: string;
+  insurance_verified: boolean;
+  license_verified: boolean;
 }
 
 export const SupplierVettingDashboard = () => {
@@ -45,14 +35,14 @@ export const SupplierVettingDashboard = () => {
   const loadPendingSuppliers = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('suppliers')
+      const { data, error }: any = await supabase
+        .from('suppliers' as any)
         .select('*')
         .eq('verification_status', 'pending')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setPendingSuppliers(data || []);
+      setPendingSuppliers((data || []) as PendingSupplier[]);
     } catch (error: any) {
       console.error('Error loading suppliers:', error);
       toast.error('Failed to load pending suppliers');
@@ -64,11 +54,10 @@ export const SupplierVettingDashboard = () => {
   const approveSupplier = async (supplierId: string) => {
     try {
       const { error } = await supabase
-        .from('suppliers')
+        .from('suppliers' as any)
         .update({
           verification_status: 'verified',
-          verified_at: new Date().toISOString(),
-          verified_by: user?.id
+          is_verified: true
         })
         .eq('id', supplierId);
 
@@ -76,20 +65,17 @@ export const SupplierVettingDashboard = () => {
 
       // Create vetting record
       await supabase
-        .from('supplier_vetting')
+        .from('supplier_vetting' as any)
         .insert({
           supplier_id: supplierId,
-          background_check_status: 'passed',
-          license_check_status: 'verified',
-          insurance_check_status: 'verified',
-          reference_check_status: 'verified',
+          vetting_status: 'approved',
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString(),
           vetting_notes: vettingNotes,
-          vetted_by: user?.id,
-          vetted_at: new Date().toISOString(),
           approval_decision: 'approved'
         });
 
-      toast.success('Supplier approved');
+      toast.success('Supplier approved successfully');
       loadPendingSuppliers();
       setSelectedSupplier(null);
       setVettingNotes("");
@@ -100,15 +86,11 @@ export const SupplierVettingDashboard = () => {
   };
 
   const rejectSupplier = async (supplierId: string) => {
-    const reason = prompt('Rejection reason:');
-    if (!reason) return;
-
     try {
       const { error } = await supabase
-        .from('suppliers')
+        .from('suppliers' as any)
         .update({
-          verification_status: 'rejected',
-          verified_by: user?.id
+          verification_status: 'rejected'
         })
         .eq('id', supplierId);
 
@@ -116,17 +98,18 @@ export const SupplierVettingDashboard = () => {
 
       // Create vetting record
       await supabase
-        .from('supplier_vetting')
+        .from('supplier_vetting' as any)
         .insert({
           supplier_id: supplierId,
+          vetting_status: 'rejected',
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString(),
           vetting_notes: vettingNotes,
-          vetted_by: user?.id,
-          vetted_at: new Date().toISOString(),
           approval_decision: 'rejected',
-          rejection_reason: reason
+          rejection_reason: vettingNotes
         });
 
-      toast.success('Supplier rejected');
+      toast.success('Supplier application rejected');
       loadPendingSuppliers();
       setSelectedSupplier(null);
       setVettingNotes("");
@@ -137,136 +120,120 @@ export const SupplierVettingDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold">Supplier Vetting</h2>
-          <p className="text-muted-foreground">Review and approve supplier applications</p>
-        </div>
-        <Badge variant="secondary">
-          {pendingSuppliers.length} Pending
-        </Badge>
+    <div className="container mx-auto py-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold mb-2">Supplier Vetting Dashboard</h1>
+        <p className="text-muted-foreground">Review and approve supplier applications</p>
       </div>
 
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="space-y-4">
-            <h3 className="font-semibold">Pending Applications</h3>
-            {pendingSuppliers.length === 0 ? (
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-center text-muted-foreground">
-                    No pending supplier applications
-                  </p>
-                </CardContent>
-              </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Pending Applications ({pendingSuppliers.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {loading ? (
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            ) : pendingSuppliers.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No pending applications
+              </p>
             ) : (
-              pendingSuppliers.map(supplier => (
-                <Card
-                  key={supplier.id}
-                  className={`cursor-pointer transition-all ${
-                    selectedSupplier?.id === supplier.id ? 'border-primary' : ''
-                  }`}
-                  onClick={() => setSelectedSupplier(supplier)}
-                >
-                  <CardHeader>
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <CardTitle className="text-base">{supplier.name}</CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          {supplier.business_name}
-                        </p>
-                      </div>
-                      <Badge variant="outline">
-                        {supplier.supplier_type}
-                      </Badge>
+              <div className="space-y-2">
+                {pendingSuppliers.map((supplier) => (
+                  <button
+                    key={supplier.id}
+                    onClick={() => setSelectedSupplier(supplier)}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      selectedSupplier?.id === supplier.id
+                        ? "bg-primary/10 border-primary"
+                        : "hover:bg-accent"
+                    }`}
+                  >
+                    <div className="font-medium">{supplier.name}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {supplier.supplier_type} • {new Date(supplier.created_at).toLocaleDateString()}
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">
-                      Applied: {new Date(supplier.created_at).toLocaleDateString()}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
+                  </button>
+                ))}
+              </div>
             )}
-          </div>
+          </CardContent>
+        </Card>
 
-          <div>
-            {selectedSupplier ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Application Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2">Business Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <p><span className="text-muted-foreground">Name:</span> {selectedSupplier.name}</p>
-                      <p><span className="text-muted-foreground">Business:</span> {selectedSupplier.business_name}</p>
-                      <p><span className="text-muted-foreground">Type:</span> {selectedSupplier.supplier_type}</p>
-                      <p><span className="text-muted-foreground">Email:</span> {selectedSupplier.contact_email}</p>
-                      <p><span className="text-muted-foreground">Phone:</span> {selectedSupplier.contact_phone}</p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-semibold mb-2">Description</h4>
-                    <p className="text-sm text-muted-foreground">{selectedSupplier.description}</p>
-                  </div>
-
-                  {selectedSupplier.verification_documents && Array.isArray(selectedSupplier.verification_documents) && selectedSupplier.verification_documents.length > 0 && (
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle>
+              {selectedSupplier ? "Supplier Details" : "Select an Application"}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!selectedSupplier ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Select a supplier application to review</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-semibold mb-4">{selectedSupplier.name}</h3>
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <h4 className="font-semibold mb-2">Documents</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {selectedSupplier.verification_documents.length} document(s) uploaded
+                      <p className="text-sm text-muted-foreground">Type</p>
+                      <Badge>{selectedSupplier.supplier_type}</Badge>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Contact Email</p>
+                      <p className="text-sm">{selectedSupplier.contact_email}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Contact Phone</p>
+                      <p className="text-sm">{selectedSupplier.contact_phone || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Applied</p>
+                      <p className="text-sm">
+                        {new Date(selectedSupplier.created_at).toLocaleDateString()}
                       </p>
                     </div>
-                  )}
-
-                  <div>
-                    <h4 className="font-semibold mb-2">Vetting Notes</h4>
-                    <Textarea
-                      value={vettingNotes}
-                      onChange={(e) => setVettingNotes(e.target.value)}
-                      placeholder="Add notes about background checks, references, etc."
-                      rows={4}
-                    />
                   </div>
+                </div>
 
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => approveSupplier(selectedSupplier.id)}
-                      className="flex-1"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      Approve
-                    </Button>
-                    <Button
-                      onClick={() => rejectSupplier(selectedSupplier.id)}
-                      variant="destructive"
-                      className="flex-1"
-                    >
-                      <XCircle className="h-4 w-4 mr-2" />
-                      Reject
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              <Card>
-                <CardContent className="pt-6">
-                  <p className="text-center text-muted-foreground">
-                    Select an application to review
-                  </p>
-                </CardContent>
-              </Card>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Vetting Notes</label>
+                  <Textarea
+                    value={vettingNotes}
+                    onChange={(e) => setVettingNotes(e.target.value)}
+                    placeholder="Add notes about this supplier..."
+                    rows={4}
+                  />
+                </div>
+
+                <div className="flex gap-3">
+                  <Button
+                    onClick={() => approveSupplier(selectedSupplier.id)}
+                    className="flex-1"
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Approve
+                  </Button>
+                  <Button
+                    onClick={() => rejectSupplier(selectedSupplier.id)}
+                    variant="destructive"
+                    className="flex-1"
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Reject
+                  </Button>
+                </div>
+              </div>
             )}
-          </div>
-        </div>
-      )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

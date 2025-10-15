@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Star, Shield, Check, X, Search, Building2, Plane, Hotel, Utensils, Car } from "lucide-react";
+import { Star, Shield, Check, Search, Building2, Hotel, Utensils, Car } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -12,16 +12,16 @@ interface Supplier {
   id: string;
   name: string;
   supplier_type: string;
-  description: string;
   rating: number;
   total_reviews: number;
-  trust_score: number;
   verification_status: string;
   insurance_verified: boolean;
   license_verified: boolean;
-  services_offered: string[];
   commission_rate: number;
-  is_featured: boolean;
+  contact_email: string;
+  contact_phone: string | null;
+  is_verified: boolean;
+  is_active: boolean;
 }
 
 export const SupplierDirectory = () => {
@@ -37,21 +37,21 @@ export const SupplierDirectory = () => {
   const loadSuppliers = async () => {
     try {
       setLoading(true);
-      let query = supabase
-        .from('suppliers')
+      let query: any = supabase
+        .from('suppliers' as any)
         .select('*')
         .eq('is_active', true)
-        .eq('verification_status', 'verified')
+        .eq('is_verified', true)
         .order('rating', { ascending: false });
 
       if (typeFilter !== 'all') {
-        query = query.eq('supplier_type', typeFilter as any);
+        query = query.eq('supplier_type', typeFilter);
       }
 
       const { data, error } = await query;
 
       if (error) throw error;
-      setSuppliers(data || []);
+      setSuppliers((data || []) as Supplier[]);
     } catch (error: any) {
       console.error('Error loading suppliers:', error);
       toast.error('Failed to load suppliers');
@@ -62,25 +62,25 @@ export const SupplierDirectory = () => {
 
   const filteredSuppliers = suppliers.filter(supplier =>
     supplier.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    supplier.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    supplier.contact_email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getTypeIcon = (type: string) => {
     const icons: Record<string, any> = {
       hotel: Hotel,
-      activity_provider: Plane,
-      tour_guide: Building2,
+      activity: Building2,
       restaurant: Utensils,
       transportation: Car,
+      other: Building2,
     };
     const Icon = icons[type] || Building2;
     return <Icon className="h-5 w-5" />;
   };
 
-  const getTrustBadge = (trustScore: number) => {
-    if (trustScore >= 4.5) return { label: 'Highly Trusted', color: 'bg-green-500' };
-    if (trustScore >= 3.5) return { label: 'Trusted', color: 'bg-blue-500' };
-    if (trustScore >= 2.5) return { label: 'Verified', color: 'bg-yellow-500' };
+  const getTrustBadge = (rating: number) => {
+    if (rating >= 4.5) return { label: 'Highly Trusted', color: 'bg-green-500' };
+    if (rating >= 3.5) return { label: 'Trusted', color: 'bg-blue-500' };
+    if (rating >= 2.5) return { label: 'Verified', color: 'bg-yellow-500' };
     return { label: 'New', color: 'bg-gray-500' };
   };
 
@@ -103,10 +103,10 @@ export const SupplierDirectory = () => {
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="hotel">Hotels</SelectItem>
-            <SelectItem value="activity_provider">Activities</SelectItem>
-            <SelectItem value="tour_guide">Tour Guides</SelectItem>
+            <SelectItem value="activity">Activities</SelectItem>
             <SelectItem value="restaurant">Restaurants</SelectItem>
             <SelectItem value="transportation">Transportation</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -116,23 +116,23 @@ export const SupplierDirectory = () => {
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {filteredSuppliers.map(supplier => {
-            const trustBadge = getTrustBadge(supplier.trust_score);
+            const trustBadge = getTrustBadge(supplier.rating);
             return (
-              <Card key={supplier.id} className={supplier.is_featured ? 'border-primary' : ''}>
+              <Card key={supplier.id}>
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2">
                       {getTypeIcon(supplier.supplier_type)}
                       <CardTitle className="text-base">{supplier.name}</CardTitle>
                     </div>
-                    {supplier.is_featured && (
-                      <Badge variant="default">Featured</Badge>
+                    {supplier.verification_status === 'verified' && (
+                      <Badge variant="default">Verified</Badge>
                     )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {supplier.description}
+                  <p className="text-sm text-muted-foreground">
+                    {supplier.contact_email}
                   </p>
 
                   <div className="flex items-center gap-4">
@@ -161,21 +161,6 @@ export const SupplierDirectory = () => {
                       </span>
                     )}
                   </div>
-
-                  {supplier.services_offered && supplier.services_offered.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {supplier.services_offered.slice(0, 3).map((service, idx) => (
-                        <Badge key={idx} variant="outline" className="text-xs">
-                          {service}
-                        </Badge>
-                      ))}
-                      {supplier.services_offered.length > 3 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{supplier.services_offered.length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  )}
 
                   <div className="pt-2 border-t">
                     <p className="text-xs text-muted-foreground">

@@ -5453,132 +5453,45 @@ export type Database = {
           },
         ]
       }
-      supplier_partnerships: {
-        Row: {
-          agent_id: string | null
-          commission_override: number | null
-          created_at: string
-          creator_id: string
-          discount_percentage: number | null
-          id: string
-          is_active: boolean | null
-          last_booking_date: string | null
-          partnership_end_date: string | null
-          partnership_start_date: string
-          partnership_type: string | null
-          supplier_id: string
-          total_bookings: number | null
-          total_revenue: number | null
-          updated_at: string
-        }
-        Insert: {
-          agent_id?: string | null
-          commission_override?: number | null
-          created_at?: string
-          creator_id: string
-          discount_percentage?: number | null
-          id?: string
-          is_active?: boolean | null
-          last_booking_date?: string | null
-          partnership_end_date?: string | null
-          partnership_start_date?: string
-          partnership_type?: string | null
-          supplier_id: string
-          total_bookings?: number | null
-          total_revenue?: number | null
-          updated_at?: string
-        }
-        Update: {
-          agent_id?: string | null
-          commission_override?: number | null
-          created_at?: string
-          creator_id?: string
-          discount_percentage?: number | null
-          id?: string
-          is_active?: boolean | null
-          last_booking_date?: string | null
-          partnership_end_date?: string | null
-          partnership_start_date?: string
-          partnership_type?: string | null
-          supplier_id?: string
-          total_bookings?: number | null
-          total_revenue?: number | null
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "supplier_partnerships_agent_id_fkey"
-            columns: ["agent_id"]
-            isOneToOne: false
-            referencedRelation: "travel_agents"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "supplier_partnerships_supplier_id_fkey"
-            columns: ["supplier_id"]
-            isOneToOne: false
-            referencedRelation: "suppliers"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       supplier_reviews: {
         Row: {
           booking_id: string | null
-          created_at: string
+          created_at: string | null
           id: string
-          is_featured: boolean | null
           is_verified: boolean | null
-          photos: Json | null
           rating: number
-          reliability_rating: number | null
           responded_at: string | null
-          response_from_supplier: string | null
+          response_text: string | null
           review_text: string | null
-          reviewer_id: string
-          service_quality_rating: number | null
           supplier_id: string
-          title: string | null
-          updated_at: string
-          value_for_money_rating: number | null
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
           booking_id?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
-          is_featured?: boolean | null
           is_verified?: boolean | null
-          photos?: Json | null
           rating: number
-          reliability_rating?: number | null
           responded_at?: string | null
-          response_from_supplier?: string | null
+          response_text?: string | null
           review_text?: string | null
-          reviewer_id: string
-          service_quality_rating?: number | null
           supplier_id: string
-          title?: string | null
-          updated_at?: string
-          value_for_money_rating?: number | null
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
           booking_id?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
-          is_featured?: boolean | null
           is_verified?: boolean | null
-          photos?: Json | null
           rating?: number
-          reliability_rating?: number | null
           responded_at?: string | null
-          response_from_supplier?: string | null
+          response_text?: string | null
           review_text?: string | null
-          reviewer_id?: string
-          service_quality_rating?: number | null
           supplier_id?: string
-          title?: string | null
-          updated_at?: string
-          value_for_money_rating?: number | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -5601,59 +5514,50 @@ export type Database = {
         Row: {
           approval_decision: string | null
           background_check_status: string | null
-          created_at: string
+          created_at: string | null
           id: string
           insurance_check_status: string | null
           license_check_status: string | null
-          red_flags: Json | null
           reference_check_status: string | null
           rejection_reason: string | null
-          renewal_required: boolean | null
-          strengths: Json | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           supplier_id: string
-          updated_at: string
-          vetted_at: string | null
-          vetted_by: string | null
-          vetting_expires_at: string | null
+          updated_at: string | null
           vetting_notes: string | null
+          vetting_status: string | null
         }
         Insert: {
           approval_decision?: string | null
           background_check_status?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
           insurance_check_status?: string | null
           license_check_status?: string | null
-          red_flags?: Json | null
           reference_check_status?: string | null
           rejection_reason?: string | null
-          renewal_required?: boolean | null
-          strengths?: Json | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           supplier_id: string
-          updated_at?: string
-          vetted_at?: string | null
-          vetted_by?: string | null
-          vetting_expires_at?: string | null
+          updated_at?: string | null
           vetting_notes?: string | null
+          vetting_status?: string | null
         }
         Update: {
           approval_decision?: string | null
           background_check_status?: string | null
-          created_at?: string
+          created_at?: string | null
           id?: string
           insurance_check_status?: string | null
           license_check_status?: string | null
-          red_flags?: Json | null
           reference_check_status?: string | null
           rejection_reason?: string | null
-          renewal_required?: boolean | null
-          strengths?: Json | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           supplier_id?: string
-          updated_at?: string
-          vetted_at?: string | null
-          vetted_by?: string | null
-          vetting_expires_at?: string | null
+          updated_at?: string | null
           vetting_notes?: string | null
+          vetting_status?: string | null
         }
         Relationships: [
           {
@@ -5667,94 +5571,58 @@ export type Database = {
       }
       suppliers: {
         Row: {
-          address: Json | null
-          business_name: string | null
-          business_registration_number: string | null
-          certifications: string[] | null
           commission_rate: number | null
           contact_email: string
           contact_phone: string | null
-          created_at: string
-          description: string | null
+          created_at: string | null
           id: string
           insurance_verified: boolean | null
           is_active: boolean | null
-          is_featured: boolean | null
+          is_verified: boolean | null
           license_verified: boolean | null
-          metadata: Json | null
           name: string
-          payment_terms: string | null
           rating: number | null
-          services_offered: string[] | null
-          supplier_type: Database["public"]["Enums"]["supplier_type"]
+          supplier_type: string
           total_reviews: number | null
-          trust_score: number | null
-          updated_at: string
-          verification_documents: Json | null
-          verification_status: Database["public"]["Enums"]["verification_status"]
-          verified_at: string | null
-          verified_by: string | null
-          website: string | null
+          updated_at: string | null
+          user_id: string
+          verification_status: string | null
         }
         Insert: {
-          address?: Json | null
-          business_name?: string | null
-          business_registration_number?: string | null
-          certifications?: string[] | null
           commission_rate?: number | null
           contact_email: string
           contact_phone?: string | null
-          created_at?: string
-          description?: string | null
+          created_at?: string | null
           id?: string
           insurance_verified?: boolean | null
           is_active?: boolean | null
-          is_featured?: boolean | null
+          is_verified?: boolean | null
           license_verified?: boolean | null
-          metadata?: Json | null
           name: string
-          payment_terms?: string | null
           rating?: number | null
-          services_offered?: string[] | null
-          supplier_type: Database["public"]["Enums"]["supplier_type"]
+          supplier_type: string
           total_reviews?: number | null
-          trust_score?: number | null
-          updated_at?: string
-          verification_documents?: Json | null
-          verification_status?: Database["public"]["Enums"]["verification_status"]
-          verified_at?: string | null
-          verified_by?: string | null
-          website?: string | null
+          updated_at?: string | null
+          user_id: string
+          verification_status?: string | null
         }
         Update: {
-          address?: Json | null
-          business_name?: string | null
-          business_registration_number?: string | null
-          certifications?: string[] | null
           commission_rate?: number | null
           contact_email?: string
           contact_phone?: string | null
-          created_at?: string
-          description?: string | null
+          created_at?: string | null
           id?: string
           insurance_verified?: boolean | null
           is_active?: boolean | null
-          is_featured?: boolean | null
+          is_verified?: boolean | null
           license_verified?: boolean | null
-          metadata?: Json | null
           name?: string
-          payment_terms?: string | null
           rating?: number | null
-          services_offered?: string[] | null
-          supplier_type?: Database["public"]["Enums"]["supplier_type"]
+          supplier_type?: string
           total_reviews?: number | null
-          trust_score?: number | null
-          updated_at?: string
-          verification_documents?: Json | null
-          verification_status?: Database["public"]["Enums"]["verification_status"]
-          verified_at?: string | null
-          verified_by?: string | null
-          website?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verification_status?: string | null
         }
         Relationships: []
       }
@@ -5862,13 +5730,6 @@ export type Database = {
           time_of_day?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "template_day_items_supplier_id_fkey"
-            columns: ["supplier_id"]
-            isOneToOne: false
-            referencedRelation: "suppliers"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "template_day_items_template_id_fkey"
             columns: ["template_id"]
@@ -6021,6 +5882,104 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      transportation_vendors: {
+        Row: {
+          amenities: string[] | null
+          average_response_time_minutes: number | null
+          base_hourly_rate: number | null
+          cancellation_policy: string | null
+          commercial_license_expiry: string | null
+          commercial_license_number: string | null
+          created_at: string | null
+          dot_number: string | null
+          featured_badge: string | null
+          fleet_size: number | null
+          id: string
+          insurance_expiry_date: string | null
+          insurance_policy_number: string | null
+          is_promoted_vendor: boolean | null
+          languages_supported: string[] | null
+          minimum_booking_hours: number | null
+          on_time_percentage: number | null
+          pricing_model: string | null
+          promoted_until: string | null
+          promotion_tier: string | null
+          service_areas: string[] | null
+          supplier_id: string
+          total_bookings: number | null
+          total_revenue: number | null
+          updated_at: string | null
+          vehicle_types: string[] | null
+          years_in_business: number | null
+        }
+        Insert: {
+          amenities?: string[] | null
+          average_response_time_minutes?: number | null
+          base_hourly_rate?: number | null
+          cancellation_policy?: string | null
+          commercial_license_expiry?: string | null
+          commercial_license_number?: string | null
+          created_at?: string | null
+          dot_number?: string | null
+          featured_badge?: string | null
+          fleet_size?: number | null
+          id?: string
+          insurance_expiry_date?: string | null
+          insurance_policy_number?: string | null
+          is_promoted_vendor?: boolean | null
+          languages_supported?: string[] | null
+          minimum_booking_hours?: number | null
+          on_time_percentage?: number | null
+          pricing_model?: string | null
+          promoted_until?: string | null
+          promotion_tier?: string | null
+          service_areas?: string[] | null
+          supplier_id: string
+          total_bookings?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+          vehicle_types?: string[] | null
+          years_in_business?: number | null
+        }
+        Update: {
+          amenities?: string[] | null
+          average_response_time_minutes?: number | null
+          base_hourly_rate?: number | null
+          cancellation_policy?: string | null
+          commercial_license_expiry?: string | null
+          commercial_license_number?: string | null
+          created_at?: string | null
+          dot_number?: string | null
+          featured_badge?: string | null
+          fleet_size?: number | null
+          id?: string
+          insurance_expiry_date?: string | null
+          insurance_policy_number?: string | null
+          is_promoted_vendor?: boolean | null
+          languages_supported?: string[] | null
+          minimum_booking_hours?: number | null
+          on_time_percentage?: number | null
+          pricing_model?: string | null
+          promoted_until?: string | null
+          promotion_tier?: string | null
+          service_areas?: string[] | null
+          supplier_id?: string
+          total_bookings?: number | null
+          total_revenue?: number | null
+          updated_at?: string | null
+          vehicle_types?: string[] | null
+          years_in_business?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transportation_vendors_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: true
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       travel_agents: {
         Row: {
@@ -7311,6 +7270,308 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      vendor_availability: {
+        Row: {
+          block_reason: string | null
+          booking_id: string | null
+          created_at: string | null
+          driver_id: string | null
+          end_datetime: string
+          id: string
+          is_blocked: boolean | null
+          start_datetime: string
+          updated_at: string | null
+          vehicle_id: string | null
+          vendor_id: string
+        }
+        Insert: {
+          block_reason?: string | null
+          booking_id?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          end_datetime: string
+          id?: string
+          is_blocked?: boolean | null
+          start_datetime: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+          vendor_id: string
+        }
+        Update: {
+          block_reason?: string | null
+          booking_id?: string | null
+          created_at?: string | null
+          driver_id?: string | null
+          end_datetime?: string
+          id?: string
+          is_blocked?: boolean | null
+          start_datetime?: string
+          updated_at?: string | null
+          vehicle_id?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_availability_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_availability_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_availability_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vendor_fleet"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vendor_availability_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_drivers: {
+        Row: {
+          background_check_date: string | null
+          background_check_status: string | null
+          certifications: Json | null
+          created_at: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          languages: string[] | null
+          license_expiry_date: string
+          license_number: string
+          name: string
+          phone: string | null
+          photo_url: string | null
+          rating: number | null
+          total_trips: number | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          background_check_date?: string | null
+          background_check_status?: string | null
+          certifications?: Json | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          languages?: string[] | null
+          license_expiry_date: string
+          license_number: string
+          name: string
+          phone?: string | null
+          photo_url?: string | null
+          rating?: number | null
+          total_trips?: number | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          background_check_date?: string | null
+          background_check_status?: string | null
+          certifications?: Json | null
+          created_at?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          languages?: string[] | null
+          license_expiry_date?: string
+          license_number?: string
+          name?: string
+          phone?: string | null
+          photo_url?: string | null
+          rating?: number | null
+          total_trips?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_drivers_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_fleet: {
+        Row: {
+          amenities: string[] | null
+          created_at: string | null
+          daily_rate: number | null
+          hourly_rate: number | null
+          id: string
+          insurance_expiry_date: string | null
+          is_available: boolean | null
+          last_maintenance_date: string | null
+          license_plate: string
+          luggage_capacity: number | null
+          make: string
+          model: string
+          next_maintenance_date: string | null
+          passenger_capacity: number
+          registration_expiry_date: string | null
+          updated_at: string | null
+          vehicle_photos: Json | null
+          vehicle_type: string
+          vendor_id: string
+          year: number
+        }
+        Insert: {
+          amenities?: string[] | null
+          created_at?: string | null
+          daily_rate?: number | null
+          hourly_rate?: number | null
+          id?: string
+          insurance_expiry_date?: string | null
+          is_available?: boolean | null
+          last_maintenance_date?: string | null
+          license_plate: string
+          luggage_capacity?: number | null
+          make: string
+          model: string
+          next_maintenance_date?: string | null
+          passenger_capacity: number
+          registration_expiry_date?: string | null
+          updated_at?: string | null
+          vehicle_photos?: Json | null
+          vehicle_type: string
+          vendor_id: string
+          year: number
+        }
+        Update: {
+          amenities?: string[] | null
+          created_at?: string | null
+          daily_rate?: number | null
+          hourly_rate?: number | null
+          id?: string
+          insurance_expiry_date?: string | null
+          is_available?: boolean | null
+          last_maintenance_date?: string | null
+          license_plate?: string
+          luggage_capacity?: number | null
+          make?: string
+          model?: string
+          next_maintenance_date?: string | null
+          passenger_capacity?: number
+          registration_expiry_date?: string | null
+          updated_at?: string | null
+          vehicle_photos?: Json | null
+          vehicle_type?: string
+          vendor_id?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_fleet_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_promotions: {
+        Row: {
+          amount_spent: number | null
+          bookings: number | null
+          campaign_description: string | null
+          campaign_name: string
+          clicks: number | null
+          created_at: string | null
+          daily_budget: number | null
+          discount_code: string | null
+          discount_percentage: number | null
+          end_date: string
+          id: string
+          impressions: number | null
+          is_active: boolean | null
+          payment_status: string | null
+          promotion_type: string
+          promotional_image_url: string | null
+          special_offer_text: string | null
+          start_date: string
+          target_locations: string[] | null
+          target_trip_types: string[] | null
+          total_budget: number | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          amount_spent?: number | null
+          bookings?: number | null
+          campaign_description?: string | null
+          campaign_name: string
+          clicks?: number | null
+          created_at?: string | null
+          daily_budget?: number | null
+          discount_code?: string | null
+          discount_percentage?: number | null
+          end_date: string
+          id?: string
+          impressions?: number | null
+          is_active?: boolean | null
+          payment_status?: string | null
+          promotion_type: string
+          promotional_image_url?: string | null
+          special_offer_text?: string | null
+          start_date: string
+          target_locations?: string[] | null
+          target_trip_types?: string[] | null
+          total_budget?: number | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          amount_spent?: number | null
+          bookings?: number | null
+          campaign_description?: string | null
+          campaign_name?: string
+          clicks?: number | null
+          created_at?: string | null
+          daily_budget?: number | null
+          discount_code?: string | null
+          discount_percentage?: number | null
+          end_date?: string
+          id?: string
+          impressions?: number | null
+          is_active?: boolean | null
+          payment_status?: string | null
+          promotion_type?: string
+          promotional_image_url?: string | null
+          special_offer_text?: string | null
+          start_date?: string
+          target_locations?: string[] | null
+          target_trip_types?: string[] | null
+          total_budget?: number | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_promotions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       verification_subscriptions: {
         Row: {
