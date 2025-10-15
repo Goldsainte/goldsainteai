@@ -26,28 +26,42 @@ export default function FleetManagementDashboard() {
         .from('transportation_vendors')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!vendor) return;
 
       const { data: fleetData, error: fleetError } = await supabase
         .from('transportation_fleet')
-        .select('*')
+        .select('id, vehicle_type, license_plate, status')
         .eq('vendor_id', vendor.id);
 
       if (fleetError) throw fleetError;
 
       const { data: logsData, error: logsError } = await supabase
         .from('fleet_maintenance_logs')
-        .select('*, transportation_fleet(vehicle_type, license_plate)')
+        .select('id, maintenance_type, scheduled_date, completed_date, vehicle_id')
         .eq('vendor_id', vendor.id)
         .order('scheduled_date', { ascending: false })
         .limit(10);
 
       if (logsError) throw logsError;
 
+      // Fetch vehicle details for logs
+      const enrichedLogs = await Promise.all((logsData || []).map(async (log) => {
+        const { data: vehicle } = await supabase
+          .from('transportation_fleet')
+          .select('vehicle_type, license_plate')
+          .eq('id', log.vehicle_id)
+          .maybeSingle();
+        
+        return {
+          ...log,
+          transportation_fleet: vehicle
+        };
+      }));
+
       setFleet(fleetData || []);
-      setMaintenanceLogs(logsData || []);
+      setMaintenanceLogs(enrichedLogs || []);
     } catch (error: any) {
       toast({
         title: "Error",
