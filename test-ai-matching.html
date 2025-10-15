@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test AI Agent Matching</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <h1>Test AI Agent Matching - Phase 7</h1>
+  <button onclick="testMatching()">Run AI Matching</button>
+  <pre id="output"></pre>
+
+  <script>
+    const { createClient } = supabase;
+    const supabaseClient = createClient(
+      'https://iwdevxltjuedijrcdejs.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml3ZGV2eGx0anVlZGlqcmNkZWpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNjQ4MDEsImV4cCI6MjA3NDc0MDgwMX0.syDQQrSgkyB1MEuE-OeMpxVt6wfoH17lDjMGGEzOiBc'
+    );
+
+    async function testMatching() {
+      const output = document.getElementById('output');
+      output.textContent = 'Testing AI matching...\n\n';
+
+      try {
+        // Call the edge function
+        output.textContent += '1. Invoking ai-agent-matching edge function...\n';
+        const { data, error } = await supabaseClient.functions.invoke('ai-agent-matching', {
+          body: {
+            jobId: '4ee86d93-39e6-4ddb-a556-30847e39b545',
+            generateScores: true
+          }
+        });
+
+        if (error) {
+          output.textContent += `ERROR: ${JSON.stringify(error, null, 2)}\n`;
+          return;
+        }
+
+        output.textContent += `✅ Success! Response:\n${JSON.stringify(data, null, 2)}\n\n`;
+
+        // Query the saved scores
+        output.textContent += '2. Querying ai_matching_scores table...\n';
+        const { data: scores, error: scoresError } = await supabaseClient
+          .from('ai_matching_scores')
+          .select('*')
+          .eq('job_id', '4ee86d93-39e6-4ddb-a556-30847e39b545')
+          .order('match_score', { ascending: false });
+
+        if (scoresError) {
+          output.textContent += `ERROR: ${JSON.stringify(scoresError, null, 2)}\n`;
+          return;
+        }
+
+        output.textContent += `✅ Scores saved: ${scores.length} agents matched\n`;
+        scores.forEach((score, i) => {
+          output.textContent += `\n${i + 1}. ${score.agent_id}\n`;
+          output.textContent += `   Score: ${score.match_score}\n`;
+          output.textContent += `   Confidence: ${score.confidence_level}\n`;
+          output.textContent += `   Factors: ${JSON.stringify(score.matching_factors)}\n`;
+        });
+
+      } catch (err) {
+        output.textContent += `EXCEPTION: ${err.message}\n`;
+      }
+    }
+  </script>
+</body>
+</html>
