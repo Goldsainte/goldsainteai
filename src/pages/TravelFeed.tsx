@@ -20,6 +20,7 @@ import { FeedSkeleton } from "@/components/FeedSkeleton";
 import { SuggestedUsers } from "@/components/SuggestedUsers";
 import { DraftPostsManager } from "@/components/DraftPostsManager";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
+import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 
 interface TravelPost {
   id: string;
@@ -438,21 +439,31 @@ const TravelFeed = () => {
                 </div>
               </div>
             ) : (
-              posts.map((post, index) => (
-                <div
-                  key={post.id}
-                  className="min-h-[100dvh] h-[100dvh] w-full snap-start snap-always"
-                >
-                  <TravelVideoCard
-                    post={post}
-                    isActive={index === currentIndex}
-                    onUpdate={fetchPosts}
-                    isMuted={isMuted}
-                    onToggleMute={() => setIsMuted(!isMuted)}
-                    hasInteracted={hasInteracted}
-                  />
-                </div>
-              ))
+              <>
+                {posts.map((post, index) => (
+                  <div
+                    key={post.id}
+                    className="min-h-[100dvh] h-[100dvh] w-full snap-start snap-always"
+                  >
+                    <TravelVideoCard
+                      post={post}
+                      isActive={index === currentIndex}
+                      onUpdate={fetchPosts}
+                      isMuted={isMuted}
+                      onToggleMute={() => setIsMuted(!isMuted)}
+                      hasInteracted={hasInteracted}
+                    />
+                  </div>
+                ))}
+                {/* Intermix promoted vendors after every 5 posts */}
+                {posts.length > 5 && Math.floor(posts.length / 5) > 0 && (
+                  <div className="min-h-[100dvh] h-[100dvh] w-full snap-start snap-always bg-background overflow-y-auto">
+                    <div className="h-full flex items-center justify-center p-4">
+                      <VendorPromotionFeed displayContext="journey_feed" limit={1} />
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

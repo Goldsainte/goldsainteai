@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -147,9 +148,10 @@ const PRICING_MODELS = [
 export default function TransportationVendorApplication() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
+  const { toast: toastHook } = useToast();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -388,7 +390,7 @@ export default function TransportationVendorApplication() {
 
       if (error) throw error;
 
-      toast({
+      toastHook({
         title: "Application Submitted!",
         description: "We'll review your application and get back to you within 3-5 business days."
       });
@@ -398,7 +400,7 @@ export default function TransportationVendorApplication() {
       const errorMessage = error.message || "Failed to submit application. Please try again.";
       setSubmitError(errorMessage);
       
-      toast({
+      toastHook({
         title: "Submission Failed",
         description: errorMessage,
         variant: "destructive"
@@ -1226,10 +1228,37 @@ export default function TransportationVendorApplication() {
                           type="file"
                           multiple
                           accept="image/*"
-                          onChange={(e) => {
+                          onChange={async (e) => {
                             const files = Array.from(e.target.files || []).slice(0, 10);
-                            const urls = files.map(f => URL.createObjectURL(f));
-                            updateFormData("currentPackagePhotos", urls);
+                            setUploading(true);
+                            try {
+                              const uploadedUrls = await Promise.all(
+                                files.map(async (file) => {
+                                  const fileExt = file.name.split('.').pop();
+                                  const fileName = `${Math.random()}.${fileExt}`;
+                                  const filePath = `packages/${fileName}`;
+                                  
+                                  const { error: uploadError, data } = await supabase.storage
+                                    .from('vendor-promotions')
+                                    .upload(filePath, file);
+                                  
+                                  if (uploadError) throw uploadError;
+                                  
+                                  const { data: { publicUrl } } = supabase.storage
+                                    .from('vendor-promotions')
+                                    .getPublicUrl(filePath);
+                                  
+                                  return publicUrl;
+                                })
+                              );
+                              updateFormData("currentPackagePhotos", [...(formData.currentPackagePhotos || []), ...uploadedUrls]);
+                              toast.success('Package photos uploaded successfully');
+                            } catch (error) {
+                              console.error('Error uploading package photos:', error);
+                              toast.error('Failed to upload package photos');
+                            } finally {
+                              setUploading(false);
+                            }
                           }}
                         />
                         {formData.currentPackagePhotos && formData.currentPackagePhotos.length > 0 && (
@@ -1318,17 +1347,17 @@ export default function TransportationVendorApplication() {
                           const pkg = formData.currentSpecialPackage;
                           if (pkg.name && pkg.description && pkg.price && pkg.promoPrice) {
                             updateFormData("promotionSpecialPackages", [
-                              ...formData.promotionSpecialPackages,
+                            ...formData.promotionSpecialPackages,
                               { ...pkg, photos: formData.currentPackagePhotos || [] }
                             ]);
                             updateFormData("currentSpecialPackage", { name: "", description: "", price: "", promoPrice: "" });
                             updateFormData("currentPackagePhotos", []);
-                            toast({
+                            toastHook({
                               title: "Package added!",
                               description: "Your promotional package has been created"
                             });
                           } else {
-                            toast({
+                            toastHook({
                               title: "Missing fields",
                               description: "Please fill in all package fields",
                               variant: "destructive"

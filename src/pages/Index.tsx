@@ -85,6 +85,7 @@ import creatorBeachSelfie from "@/assets/creator-beach-selfie.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
+import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -1229,6 +1230,11 @@ const Index = () => {
                   </div>
                 </div>
               </div>
+            </section>
+
+            {/* Featured Transportation Vendors - Promoted */}
+            <section className="px-4 sm:px-6 py-8 sm:py-10 bg-secondary/5">
+              <VendorPromotionFeed displayContext="homepage" limit={3} />
             </section>
 
             {/* Inspiration Content - Far below the fold */}

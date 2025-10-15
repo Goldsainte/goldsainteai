@@ -24,6 +24,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useAuth } from "@/contexts/AuthContext";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
+import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -754,6 +755,11 @@ if (minRating && searchType !== "restaurants") {
 
               {/* Results List */}
               <main className="lg:col-span-9">
+                {/* Promoted Transportation Vendors */}
+                <div className="mb-6">
+                  <VendorPromotionFeed displayContext="search" limit={2} />
+                </div>
+
                 {/* Map View at Top for hotels, restaurants, and events */}
                 {(searchType === "hotels" || searchType === "restaurants" || searchType === "events") && (
                   <ResultsMapView 
