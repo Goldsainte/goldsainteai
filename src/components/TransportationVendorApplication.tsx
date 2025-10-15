@@ -61,9 +61,23 @@ export default function TransportationVendorApplication() {
     
     // Fleet
     vehicles: [] as any[],
+    currentVehicle: {
+      vehicleType: "",
+      make: "",
+      model: "",
+      year: "",
+      licensePlate: "",
+      passengerCapacity: "",
+      features: ""
+    },
     
     // Drivers
     totalDrivers: "",
+    driverVettingProcess: "",
+    backgroundCheckPolicy: "",
+    averageDriverExperience: "",
+    driverTrainingProgram: "",
+    cdlCompliance: false,
     
     // Compliance
     insurancePolicyNumber: "",
@@ -83,9 +97,16 @@ export default function TransportationVendorApplication() {
     hasGpsTracking: false,
     hasBookingApi: false,
     apiEndpoint: "",
+    hasRealTimeTracking: false,
+    hasMobileApp: false,
+    hasAutomatedDispatch: false,
     
     // Promotion
     interestedInPromotion: false,
+    promotionBudget: "",
+    targetCustomerSegments: [] as string[],
+    marketingDescription: "",
+    specialOffers: "",
     
     // Agreement
     agreedToTerms: false,
@@ -107,6 +128,26 @@ export default function TransportationVendorApplication() {
 
   const removeServiceArea = (index: number) => {
     updateFormData("serviceAreas", formData.serviceAreas.filter((_, i) => i !== index));
+  };
+
+  const addVehicle = () => {
+    const vehicle = formData.currentVehicle;
+    if (vehicle.vehicleType && vehicle.make && vehicle.model) {
+      updateFormData("vehicles", [...formData.vehicles, { ...vehicle }]);
+      updateFormData("currentVehicle", {
+        vehicleType: "",
+        make: "",
+        model: "",
+        year: "",
+        licensePlate: "",
+        passengerCapacity: "",
+        features: ""
+      });
+    }
+  };
+
+  const removeVehicle = (index: number) => {
+    updateFormData("vehicles", formData.vehicles.filter((_, i) => i !== index));
   };
 
   const validateCurrentStep = (): boolean => {
@@ -154,6 +195,11 @@ export default function TransportationVendorApplication() {
           serviceAreas: formData.serviceAreas,
           vehicles: formData.vehicles,
           totalDrivers: parseInt(formData.totalDrivers) || 0,
+          driverVettingProcess: formData.driverVettingProcess,
+          backgroundCheckPolicy: formData.backgroundCheckPolicy,
+          averageDriverExperience: parseFloat(formData.averageDriverExperience) || 0,
+          driverTrainingProgram: formData.driverTrainingProgram,
+          cdlCompliance: formData.cdlCompliance,
           insurancePolicyNumber: formData.insurancePolicyNumber,
           insuranceExpiryDate: formData.insuranceExpiryDate,
           insuranceCoverageAmount: parseFloat(formData.insuranceCoverageAmount) || 0,
@@ -165,9 +211,15 @@ export default function TransportationVendorApplication() {
           minimumBookingHours: parseInt(formData.minimumBookingHours) || 2,
           cancellationPolicy: formData.cancellationPolicy,
           hasGpsTracking: formData.hasGpsTracking,
+          hasRealTimeTracking: formData.hasRealTimeTracking,
+          hasMobileApp: formData.hasMobileApp,
+          hasAutomatedDispatch: formData.hasAutomatedDispatch,
           hasBookingApi: formData.hasBookingApi,
           apiEndpoint: formData.apiEndpoint,
-          interestedInPromotion: formData.interestedInPromotion
+          interestedInPromotion: formData.interestedInPromotion,
+          promotionBudget: parseFloat(formData.promotionBudget) || 0,
+          marketingDescription: formData.marketingDescription,
+          specialOffers: formData.specialOffers
         }
       });
 
@@ -308,6 +360,184 @@ export default function TransportationVendorApplication() {
           </div>
         );
 
+      case 2:
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="vehicleType">Vehicle Type *</Label>
+                <Select 
+                  value={formData.currentVehicle.vehicleType} 
+                  onValueChange={(v) => updateFormData("currentVehicle", { ...formData.currentVehicle, vehicleType: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select vehicle type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {VEHICLE_TYPES.map(type => (
+                      <SelectItem key={type} value={type}>
+                        {type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="make">Make *</Label>
+                <Input
+                  id="make"
+                  value={formData.currentVehicle.make}
+                  onChange={(e) => updateFormData("currentVehicle", { ...formData.currentVehicle, make: e.target.value })}
+                  placeholder="e.g., Mercedes-Benz"
+                />
+              </div>
+              <div>
+                <Label htmlFor="model">Model *</Label>
+                <Input
+                  id="model"
+                  value={formData.currentVehicle.model}
+                  onChange={(e) => updateFormData("currentVehicle", { ...formData.currentVehicle, model: e.target.value })}
+                  placeholder="e.g., S-Class"
+                />
+              </div>
+              <div>
+                <Label htmlFor="year">Year</Label>
+                <Input
+                  id="year"
+                  value={formData.currentVehicle.year}
+                  onChange={(e) => updateFormData("currentVehicle", { ...formData.currentVehicle, year: e.target.value })}
+                  placeholder="2024"
+                />
+              </div>
+              <div>
+                <Label htmlFor="licensePlate">License Plate</Label>
+                <Input
+                  id="licensePlate"
+                  value={formData.currentVehicle.licensePlate}
+                  onChange={(e) => updateFormData("currentVehicle", { ...formData.currentVehicle, licensePlate: e.target.value })}
+                  placeholder="ABC-1234"
+                />
+              </div>
+              <div>
+                <Label htmlFor="passengerCapacity">Passenger Capacity</Label>
+                <Input
+                  id="passengerCapacity"
+                  type="number"
+                  value={formData.currentVehicle.passengerCapacity}
+                  onChange={(e) => updateFormData("currentVehicle", { ...formData.currentVehicle, passengerCapacity: e.target.value })}
+                  placeholder="4"
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="features">Features</Label>
+              <Input
+                id="features"
+                value={formData.currentVehicle.features}
+                onChange={(e) => updateFormData("currentVehicle", { ...formData.currentVehicle, features: e.target.value })}
+                placeholder="e.g., WiFi, leather seats, entertainment system"
+              />
+            </div>
+            <Button type="button" onClick={addVehicle}>
+              Add Vehicle to Fleet
+            </Button>
+            
+            {formData.vehicles.length > 0 && (
+              <div className="space-y-2">
+                <Label>Fleet ({formData.vehicles.length} vehicles):</Label>
+                <div className="space-y-2">
+                  {formData.vehicles.map((vehicle, index) => (
+                    <div key={index} className="flex items-center justify-between bg-secondary p-3 rounded-lg">
+                      <div>
+                        <p className="font-medium">
+                          {vehicle.year} {vehicle.make} {vehicle.model}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {vehicle.vehicleType.replace(/_/g, ' ')} • {vehicle.passengerCapacity} passengers
+                        </p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeVehicle(index)}
+                        className="text-destructive hover:text-destructive/80"
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+
+      case 3:
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="totalDrivers">Total Number of Drivers</Label>
+              <Input
+                id="totalDrivers"
+                type="number"
+                value={formData.totalDrivers}
+                onChange={(e) => updateFormData("totalDrivers", e.target.value)}
+                placeholder="10"
+              />
+            </div>
+            <div>
+              <Label htmlFor="driverVettingProcess">Driver Vetting Process</Label>
+              <Textarea
+                id="driverVettingProcess"
+                value={formData.driverVettingProcess}
+                onChange={(e) => updateFormData("driverVettingProcess", e.target.value)}
+                placeholder="Describe how you vet and screen your drivers..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label htmlFor="backgroundCheckPolicy">Background Check Policy</Label>
+              <Textarea
+                id="backgroundCheckPolicy"
+                value={formData.backgroundCheckPolicy}
+                onChange={(e) => updateFormData("backgroundCheckPolicy", e.target.value)}
+                placeholder="Describe your background check requirements..."
+                rows={3}
+              />
+            </div>
+            <div>
+              <Label htmlFor="averageDriverExperience">Average Driver Experience (years)</Label>
+              <Input
+                id="averageDriverExperience"
+                type="number"
+                value={formData.averageDriverExperience}
+                onChange={(e) => updateFormData("averageDriverExperience", e.target.value)}
+                placeholder="5"
+              />
+            </div>
+            <div>
+              <Label htmlFor="driverTrainingProgram">Driver Training Program</Label>
+              <Textarea
+                id="driverTrainingProgram"
+                value={formData.driverTrainingProgram}
+                onChange={(e) => updateFormData("driverTrainingProgram", e.target.value)}
+                placeholder="Describe your driver training and certification program..."
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="cdlCompliance"
+                checked={formData.cdlCompliance}
+                onCheckedChange={(checked) => updateFormData("cdlCompliance", checked)}
+              />
+              <Label htmlFor="cdlCompliance">
+                All drivers have valid Commercial Driver's Licenses (CDL) where required
+              </Label>
+            </div>
+          </div>
+        );
+
       case 4:
         return (
           <div className="space-y-4">
@@ -402,6 +632,115 @@ export default function TransportationVendorApplication() {
                 rows={4}
               />
             </div>
+          </div>
+        );
+
+      case 6:
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hasGpsTracking"
+                checked={formData.hasGpsTracking}
+                onCheckedChange={(checked) => updateFormData("hasGpsTracking", checked)}
+              />
+              <Label htmlFor="hasGpsTracking">GPS Tracking Capability</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hasRealTimeTracking"
+                checked={formData.hasRealTimeTracking}
+                onCheckedChange={(checked) => updateFormData("hasRealTimeTracking", checked)}
+              />
+              <Label htmlFor="hasRealTimeTracking">Real-Time Tracking for Customers</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hasMobileApp"
+                checked={formData.hasMobileApp}
+                onCheckedChange={(checked) => updateFormData("hasMobileApp", checked)}
+              />
+              <Label htmlFor="hasMobileApp">Mobile App for Drivers</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hasAutomatedDispatch"
+                checked={formData.hasAutomatedDispatch}
+                onCheckedChange={(checked) => updateFormData("hasAutomatedDispatch", checked)}
+              />
+              <Label htmlFor="hasAutomatedDispatch">Automated Dispatch System</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hasBookingApi"
+                checked={formData.hasBookingApi}
+                onCheckedChange={(checked) => updateFormData("hasBookingApi", checked)}
+              />
+              <Label htmlFor="hasBookingApi">Booking API Integration</Label>
+            </div>
+            {formData.hasBookingApi && (
+              <div>
+                <Label htmlFor="apiEndpoint">API Endpoint URL</Label>
+                <Input
+                  id="apiEndpoint"
+                  type="url"
+                  value={formData.apiEndpoint}
+                  onChange={(e) => updateFormData("apiEndpoint", e.target.value)}
+                  placeholder="https://api.yourtransportservice.com/bookings"
+                />
+              </div>
+            )}
+          </div>
+        );
+
+      case 7:
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="interestedInPromotion"
+                checked={formData.interestedInPromotion}
+                onCheckedChange={(checked) => updateFormData("interestedInPromotion", checked)}
+              />
+              <Label htmlFor="interestedInPromotion">
+                I'm interested in promoted listing on the platform
+              </Label>
+            </div>
+            
+            {formData.interestedInPromotion && (
+              <>
+                <div>
+                  <Label htmlFor="promotionBudget">Monthly Promotion Budget ($)</Label>
+                  <Input
+                    id="promotionBudget"
+                    type="number"
+                    value={formData.promotionBudget}
+                    onChange={(e) => updateFormData("promotionBudget", e.target.value)}
+                    placeholder="500"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="marketingDescription">Marketing Description</Label>
+                  <Textarea
+                    id="marketingDescription"
+                    value={formData.marketingDescription}
+                    onChange={(e) => updateFormData("marketingDescription", e.target.value)}
+                    placeholder="How would you like your service to be promoted? Describe your unique selling points..."
+                    rows={4}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="specialOffers">Special Offers for Platform Users</Label>
+                  <Textarea
+                    id="specialOffers"
+                    value={formData.specialOffers}
+                    onChange={(e) => updateFormData("specialOffers", e.target.value)}
+                    placeholder="Describe any special discounts or offers you'd like to provide to Goldsainte platform users..."
+                    rows={3}
+                  />
+                </div>
+              </>
+            )}
           </div>
         );
 
