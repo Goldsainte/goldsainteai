@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Mic, MapPin, Plane } from "lucide-react";
+import { ArrowRight, Mic, MapPin, Plane, Users2 } from "lucide-react";
 import heroImage from "@/assets/partners/hero-luxury-car.jpg";
 
 export const PartnersHero = () => {
@@ -15,13 +15,13 @@ export const PartnersHero = () => {
           alt="Premium luxury transportation partnership"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/50" />
       </div>
 
       {/* Content */}
       <div className="container relative z-10 px-4 py-20">
         <div className="max-w-3xl">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
             Partner with <span className="text-primary">Goldsainte</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-200 mb-4 leading-relaxed">
@@ -53,7 +53,7 @@ export const PartnersHero = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 max-w-2xl">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl">
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Mic className="h-6 w-6 text-primary" />
@@ -74,6 +74,13 @@ export const PartnersHero = () => {
                 <div className="text-2xl font-bold text-white">400+</div>
               </div>
               <div className="text-sm text-gray-300">Airports Worldwide</div>
+            </div>
+            <div className="text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Users2 className="h-6 w-6 text-primary" />
+                <div className="text-2xl font-bold text-white">Creator</div>
+              </div>
+              <div className="text-sm text-gray-300">Network Integrated</div>
             </div>
           </div>
         </div>
