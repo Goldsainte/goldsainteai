@@ -243,6 +243,13 @@ export const Header = () => {
                           <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Become an Agent</span>
                         </DropdownMenuItem>
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/transportation-vendor-partners')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Car className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Become a Transport Vendor</span>
+                        </DropdownMenuItem>
                       </div>
                       
                       <DropdownMenuSeparator className="bg-border/50" />
@@ -504,11 +511,18 @@ export const Header = () => {
                         <span className="text-sm font-medium">Marketplace</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => navigate('/become an Agent')} 
+                        onClick={() => navigate('/agent-onboarding')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Become an Agent</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/transportation-vendor-partners')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Car className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Become a Transport Vendor</span>
                       </DropdownMenuItem>
                     </div>
                     

@@ -1,0 +1,75 @@
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const faqs = [
+  {
+    question: "How do I get paid?",
+    answer: "We process payments weekly via direct deposit to your bank account. All completed bookings are paid out within 7 business days. You can track all earnings and upcoming payments in your vendor dashboard."
+  },
+  {
+    question: "What commission does Goldsainte take?",
+    answer: "Our standard commission is 15% of each booking. This covers payment processing, customer support, marketing, and platform maintenance. There are no hidden fees or additional charges beyond this transparent commission structure."
+  },
+  {
+    question: "Can I set my own prices?",
+    answer: "Absolutely! You have complete control over your pricing. Set base rates, add surcharges for peak times or special services, and adjust your pricing strategy anytime through your dashboard."
+  },
+  {
+    question: "What markets are you in?",
+    answer: "We currently operate in 50+ cities across North America, Europe, and Asia. We're rapidly expanding to new markets. If your city isn't listed yet, apply anyway – we prioritize expansion based on partner interest."
+  },
+  {
+    question: "How long is the approval process?",
+    answer: "Our verification process typically takes 3-5 business days. We review your business license, insurance, vehicle documentation, and conduct background checks. We'll communicate clearly throughout and let you know immediately if we need any additional information."
+  },
+  {
+    question: "What insurance do I need?",
+    answer: "You need commercial passenger transportation insurance with a minimum of $1 million liability coverage. This protects you, your passengers, and our platform. We can provide recommendations for insurance providers who specialize in luxury transportation if needed."
+  },
+  {
+    question: "Can I cancel bookings?",
+    answer: "Yes, but we encourage accepting all bookings to maintain a high reliability rating. If you must cancel, do so as early as possible through the app. Frequent cancellations may affect your visibility on the platform."
+  },
+  {
+    question: "Do you provide customer support for my passengers?",
+    answer: "Yes! We have a 24/7 customer support team that handles passenger inquiries, changes, and issues. This frees you to focus on driving. For any urgent on-trip issues, both you and passengers can reach our support team instantly."
+  }
+];
+
+export const PartnersFAQ = () => {
+  return (
+    <section className="py-20 bg-muted/30">
+      <div className="container px-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-xl text-muted-foreground">
+              Everything you need to know about partnering with Goldsainte
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="space-y-4">
+            {faqs.map((faq, index) => (
+              <AccordionItem
+                key={index}
+                value={`item-${index}`}
+                className="bg-card border border-border rounded-lg px-6"
+              >
+                <AccordionTrigger className="text-left text-lg font-semibold hover:no-underline py-6">
+                  {faq.question}
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
+                  {faq.answer}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
+      </div>
+    </section>
+  );
+};

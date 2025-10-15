@@ -72,6 +72,7 @@ import UploadAppleMusicKey from "./pages/UploadAppleMusicKey";
 import TransportationVendorApplication from "./pages/TransportationVendorApplication";
 import TransportationVendorDashboard from "./pages/TransportationVendorDashboard";
 import AdminTransportVendorVetting from "./pages/AdminTransportVendorVetting";
+import TransportationVendorPartners from "./pages/TransportationVendorPartners";
 import FleetManagementDashboard from "./components/FleetManagementDashboard";
 import DriverManagementPanel from "./components/DriverManagementPanel";
 import VendorPromotionManager from "./components/VendorPromotionManager";
@@ -186,6 +187,7 @@ function AppContent() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/affiliate-manager" element={<AffiliateManager />} />
           <Route path="/supplier-management" element={<SupplierManagement />} />
+          <Route path="/transportation-vendor-partners" element={<TransportationVendorPartners />} />
           <Route path="/transportation-vendor-application" element={<TransportationVendorApplication />} />
           <Route path="/transportation-vendor-dashboard" element={<TransportationVendorDashboard />} />
           <Route path="/admin/transport-vendor-vetting" element={<AdminTransportVendorVetting />} />
