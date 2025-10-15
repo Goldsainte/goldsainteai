@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
+import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -145,6 +146,8 @@ const PRICING_MODELS = [
   { value: "custom", label: "Custom Pricing" }
 ];
 
+const DRAFT_KEY = 'transport_vendor_application_draft';
+
 export default function TransportationVendorApplication() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,108 +156,133 @@ export default function TransportationVendorApplication() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { toast: toastHook } = useToast();
   const navigate = useNavigate();
+  const [draftRestored, setDraftRestored] = useState(false);
 
-  const [formData, setFormData] = useState({
-    // Business Info
-    businessName: "",
-    contactEmail: "",
-    contactPhone: "",
-    businessAddress: "",
-    yearsInBusiness: "",
-    businessDescription: "",
-    
-    // Social Media
-    instagramHandle: "",
-    tiktokHandle: "",
-    twitterHandle: "",
-    facebookPage: "",
-    linkedinPage: "",
-    
-    // Service Areas
-    serviceAreas: [] as string[],
-    serviceAreaInput: "",
-    
-    // Fleet
-    vehicles: [] as any[],
-    currentVehicle: {
-      vehicleType: "",
-      make: "",
-      model: "",
-      year: "",
-      licensePlate: "",
-      passengerCapacity: "",
-      features: ""
-    },
-    
-    // Drivers
-    totalDrivers: "",
-    driverVettingProcess: "",
-    backgroundCheckPolicy: "",
-    averageDriverExperience: "",
-    driverTrainingProgram: "",
-    cdlCompliance: false,
-    
-    // Compliance & Documents
-    insurancePolicyNumber: "",
-    insuranceExpiryDate: "",
-    insuranceCoverageAmount: "",
-    commercialLicenseNumber: "",
-    commercialLicenseExpiry: "",
-    dotNumber: "",
-    insuranceDocuments: [] as { id: string; fileName: string; fileUrl: string }[],
-    driverLicenseDocuments: [] as { id: string; fileName: string; fileUrl: string }[],
-    
-    // Pricing
-    pricingModel: "",
-    baseHourlyRate: "",
-    minimumBookingHours: "2",
-    cancellationPolicy: "",
-    
-    // Technology
-    hasGpsTracking: false,
-    hasBookingApi: false,
-    apiEndpoint: "",
-    hasRealTimeTracking: false,
-    hasMobileApp: false,
-    hasAutomatedDispatch: false,
-    
-    // Promotion - Enhanced
-    interestedInPromotion: false,
-    promotionBudget: "",
-    targetCustomerSegments: [] as string[],
-    marketingDescription: "",
-    specialOffers: "",
-    promotionPricingModel: "",
-    promotionTargetImpressions: "",
-    promotionTargetClicks: "",
-    promotionGeographicTargets: [] as string[],
-    targetCityInput: "",
-    promotionDiscountOffered: "",
-    promotionSpecialPackages: [] as Array<{
-      name: string;
-      description: string;
-      price: string;
-      promoPrice: string;
-      photos: string[];
-    }>,
-    currentSpecialPackage: { name: "", description: "", price: "", promoPrice: "" },
-    currentPackagePhotos: [] as string[],
-    selectedPromotionTier: 'free' as string,
-    promotionalMedia: [] as Array<{
-      id: string;
-      type: 'photo' | 'video';
-      url: string;
-      caption: string;
-      isCover: boolean;
-      displayOrder: number;
-    }>,
-    
-    // Agreement
-    agreedToTerms: false,
-    eSignature: ""
+  const [formData, setFormData] = useState(() => {
+    // Try to restore draft from localStorage
+    const savedDraft = localStorage.getItem(DRAFT_KEY);
+    if (savedDraft) {
+      try {
+        const parsed = JSON.parse(savedDraft);
+        setTimeout(() => {
+          toast.success("Draft restored", { description: "Your previous progress has been restored." });
+        }, 500);
+        return parsed;
+      } catch {
+        // Invalid draft, use default
+      }
+    }
+    return {
+      // Business Info
+      businessName: "",
+      contactEmail: "",
+      contactPhone: "",
+      businessAddress: "",
+      yearsInBusiness: "",
+      businessDescription: "",
+      
+      // Social Media
+      instagramHandle: "",
+      tiktokHandle: "",
+      twitterHandle: "",
+      facebookPage: "",
+      linkedinPage: "",
+      
+      // Service Areas
+      serviceAreas: [] as string[],
+      serviceAreaInput: "",
+      
+      // Fleet
+      vehicles: [] as any[],
+      currentVehicle: {
+        vehicleType: "",
+        make: "",
+        model: "",
+        year: "",
+        licensePlate: "",
+        passengerCapacity: "",
+        features: ""
+      },
+      
+      // Drivers
+      totalDrivers: "",
+      driverVettingProcess: "",
+      backgroundCheckPolicy: "",
+      averageDriverExperience: "",
+      driverTrainingProgram: "",
+      cdlCompliance: false,
+      
+      // Compliance & Documents
+      insurancePolicyNumber: "",
+      insuranceExpiryDate: "",
+      insuranceCoverageAmount: "",
+      commercialLicenseNumber: "",
+      commercialLicenseExpiry: "",
+      dotNumber: "",
+      insuranceDocuments: [] as { id: string; fileName: string; fileUrl: string }[],
+      driverLicenseDocuments: [] as { id: string; fileName: string; fileUrl: string }[],
+      
+      // Pricing
+      pricingModel: "",
+      baseHourlyRate: "",
+      minimumBookingHours: "2",
+      cancellationPolicy: "",
+      
+      // Technology
+      hasGpsTracking: false,
+      hasBookingApi: false,
+      apiEndpoint: "",
+      hasRealTimeTracking: false,
+      hasMobileApp: false,
+      hasAutomatedDispatch: false,
+      
+      // Promotion - Enhanced
+      interestedInPromotion: false,
+      promotionBudget: "",
+      targetCustomerSegments: [] as string[],
+      marketingDescription: "",
+      specialOffers: "",
+      promotionPricingModel: "",
+      promotionTargetImpressions: "",
+      promotionTargetClicks: "",
+      promotionGeographicTargets: [] as string[],
+      targetCityInput: "",
+      promotionDiscountOffered: "",
+      promotionSpecialPackages: [] as Array<{
+        name: string;
+        description: string;
+        price: string;
+        promoPrice: string;
+        photos: string[];
+      }>,
+      currentSpecialPackage: { name: "", description: "", price: "", promoPrice: "" },
+      currentPackagePhotos: [] as string[],
+      selectedPromotionTier: 'free' as string,
+      promotionalMedia: [] as Array<{
+        id: string;
+        type: 'photo' | 'video';
+        url: string;
+        caption: string;
+        isCover: boolean;
+        displayOrder: number;
+      }>,
+      
+      // Agreement
+      agreedToTerms: false,
+      eSignature: ""
+    };
   });
 
   const progress = ((currentStep + 1) / STEPS.length) * 100;
+
+  // Auto-save to localStorage on form changes
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
+    }, 1000); // Debounce 1 second
+
+    return () => clearTimeout(timeoutId);
+  }, [formData]);
 
   const updateFormData = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -331,10 +359,12 @@ export default function TransportationVendorApplication() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        throw new Error("You must be logged in to submit an application");
+        toast.error("Authentication required", { description: "You must be logged in to submit an application" });
+        setIsSubmitting(false);
+        return;
       }
 
-      const { data, error } = await supabase.functions.invoke("submit-transportation-vendor-application", {
+      const { data, error } = await invokeEdgeFunction("submit-transportation-vendor-application", {
         body: {
           businessName: formData.businessName,
           contactEmail: formData.contactEmail,
@@ -384,12 +414,26 @@ export default function TransportationVendorApplication() {
           promotionDiscountOffered: parseFloat(formData.promotionDiscountOffered) || 0,
           promotionSpecialPackages: formData.promotionSpecialPackages,
           selectedPromotionTier: formData.selectedPromotionTier,
-          promotionalMedia: formData.promotionalMedia
-        }
+          promotionalMedia: formData.promotionalMedia,
+          debug: false
+        },
+        timeout: 30000
       });
 
-      if (error) throw error;
+      if (error) {
+        const errorDetails = error.error || error.message || "Unknown error";
+        const errorContext = error.context || {};
+        toast.error("Submission failed", { 
+          description: `${errorDetails}${errorContext.step ? ` (at ${errorContext.step})` : ''}` 
+        });
+        setSubmitError(errorDetails);
+        setIsSubmitting(false);
+        return;
+      }
 
+      // Clear draft on success
+      localStorage.removeItem(DRAFT_KEY);
+      
       toastHook({
         title: "Application Submitted!",
         description: "We'll review your application and get back to you within 3-5 business days."

@@ -1,15 +1,48 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+
+console.log('[submit-transportation-vendor-application] v2025-01-15');
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Validation schema
+const ApplicationSchema = z.object({
+  businessName: z.string().trim().min(1, "Business name is required").max(200),
+  contactEmail: z.string().trim().email("Invalid email address").max(255),
+  contactPhone: z.string().trim().optional().nullable(),
+  businessAddress: z.string().trim().optional().nullable(),
+  businessDescription: z.string().trim().optional().nullable(),
+  yearsInBusiness: z.coerce.number().min(0).optional().nullable(),
+  serviceAreas: z.array(z.any()).optional().default([]),
+  totalDrivers: z.coerce.number().min(0).optional().nullable(),
+  insurancePolicyNumber: z.string().trim().optional().nullable(),
+  insuranceExpiryDate: z.string().optional().nullable(),
+  insuranceCoverageAmount: z.coerce.number().optional().nullable(),
+  commercialLicenseNumber: z.string().trim().optional().nullable(),
+  commercialLicenseExpiry: z.string().optional().nullable(),
+  dotNumber: z.string().trim().optional().nullable(),
+  pricingModel: z.string().optional().nullable(),
+  baseHourlyRate: z.coerce.number().optional().nullable(),
+  minimumBookingHours: z.coerce.number().optional().nullable(),
+  cancellationPolicy: z.string().optional().nullable(),
+  hasGpsTracking: z.boolean().optional().nullable(),
+  hasBookingApi: z.boolean().optional().nullable(),
+  apiEndpoint: z.string().trim().optional().nullable(),
+  vehicles: z.array(z.any()).optional().default([]),
+  debug: z.boolean().optional().default(false),
+}).passthrough();
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const debugId = crypto.randomUUID();
+  let step = 'init';
 
   try {
     const supabase = createClient(
@@ -22,110 +55,155 @@ serve(async (req) => {
       }
     );
 
+    step = 'auth';
     const { data: { user }, error: userError } = await supabase.auth.getUser();
     if (userError || !user) {
-      throw new Error('Not authenticated');
+      return new Response(
+        JSON.stringify({ 
+          error: 'authentication_failed', 
+          details: 'Not authenticated',
+          context: { step, debugId }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      );
     }
 
-    const applicationData = await req.json();
-    console.log('Processing transportation vendor application for user:', user.id);
+    step = 'parse_request';
+    const rawData = await req.json();
+    console.log(`[${debugId}] Processing application for user: ${user.id}`);
 
-    // Basic validation for required fields
-    const businessName = (applicationData.businessName ?? '').toString().trim();
-    const contactEmail = (applicationData.contactEmail ?? '').toString().trim();
-    if (!businessName || !contactEmail) {
+    step = 'validate_input';
+    const validationResult = ApplicationSchema.safeParse(rawData);
+    if (!validationResult.success) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: business name and contact email are required.' }),
+        JSON.stringify({ 
+          error: 'validation_failed', 
+          details: validationResult.error.issues.map(i => `${i.path.join('.')}: ${i.message}`).join(', '),
+          context: { step, debugId, userId: user.id }
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       );
     }
 
-    // Create supplier record (ensure NOT NULL name)
-    const { data: supplier, error: supplierError } = await supabase
-      .from('suppliers')
-      .insert({
-        user_id: user.id,
-        supplier_type: 'transportation',
-        name: businessName || 'Transportation Vendor',
-        business_name: businessName,
-        contact_email: contactEmail,
-        contact_phone: applicationData.contactPhone || null,
-        business_address: applicationData.businessAddress || null,
-        description: applicationData.businessDescription || null,
-        verification_status: 'pending',
-      })
-      .select()
-      .single();
+    const applicationData = validationResult.data;
+    const supplierName = applicationData.businessName || 'Transportation Vendor';
 
-    if (supplierError) {
-      console.error('Error creating supplier:', supplierError);
-      throw supplierError;
+    // Idempotent supplier creation: find or create
+    step = 'find_supplier';
+    let supplier;
+    const { data: existingSuppliers } = await supabase
+      .from('suppliers')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('supplier_type', 'transportation')
+      .limit(1);
+
+    if (existingSuppliers && existingSuppliers.length > 0) {
+      supplier = existingSuppliers[0];
+      console.log(`[${debugId}] Reusing supplier: ${supplier.id}`);
+    } else {
+      step = 'create_supplier';
+      const { data: newSupplier, error: supplierError } = await supabase
+        .from('suppliers')
+        .insert({
+          user_id: user.id,
+          supplier_type: 'transportation',
+          name: supplierName,
+          business_name: applicationData.businessName,
+          contact_email: applicationData.contactEmail,
+          contact_phone: applicationData.contactPhone || null,
+          business_address: applicationData.businessAddress || null,
+          description: applicationData.businessDescription || null,
+          verification_status: 'pending',
+        })
+        .select()
+        .single();
+
+      if (supplierError) {
+        console.error(`[${debugId}] Supplier insert failed:`, supplierError);
+        return new Response(
+          JSON.stringify({ 
+            error: 'supplier_insert_failed', 
+            details: supplierError.message,
+            context: { 
+              step, 
+              debugId, 
+              userId: user.id,
+              code: supplierError.code,
+              derivedName: supplierName
+            }
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        );
+      }
+
+      supplier = newSupplier;
+      console.log(`[${debugId}] Supplier created: ${supplier.id}`);
     }
 
-    console.log('Supplier created:', supplier.id);
-
     // Create transportation vendor record
+    step = 'create_vendor';
     const vendorData: any = {
       supplier_id: supplier.id,
-      years_in_business: applicationData.yearsInBusiness,
-      service_areas: applicationData.serviceAreas,
-      total_drivers: applicationData.totalDrivers,
-      insurance_policy_number: applicationData.insurancePolicyNumber,
-      insurance_expiry_date: applicationData.insuranceExpiryDate,
-      insurance_coverage_amount: applicationData.insuranceCoverageAmount,
-      commercial_license_number: applicationData.commercialLicenseNumber,
-      commercial_license_expiry: applicationData.commercialLicenseExpiry,
-      dot_number: applicationData.dotNumber,
-      pricing_model: applicationData.pricingModel,
-      base_hourly_rate: applicationData.baseHourlyRate,
-      minimum_booking_hours: applicationData.minimumBookingHours,
-      cancellation_policy: applicationData.cancellationPolicy,
-      has_gps_tracking: applicationData.hasGpsTracking,
-      has_booking_api: applicationData.hasBookingApi,
-      api_endpoint: applicationData.apiEndpoint,
+      years_in_business: applicationData.yearsInBusiness || null,
+      service_areas: applicationData.serviceAreas || [],
+      total_drivers: applicationData.totalDrivers || null,
+      insurance_policy_number: applicationData.insurancePolicyNumber || null,
+      insurance_expiry_date: applicationData.insuranceExpiryDate || null,
+      insurance_coverage_amount: applicationData.insuranceCoverageAmount || null,
+      commercial_license_number: applicationData.commercialLicenseNumber || null,
+      commercial_license_expiry: applicationData.commercialLicenseExpiry || null,
+      dot_number: applicationData.dotNumber || null,
+      pricing_model: applicationData.pricingModel || null,
+      base_hourly_rate: applicationData.baseHourlyRate || null,
+      minimum_booking_hours: applicationData.minimumBookingHours || null,
+      cancellation_policy: applicationData.cancellationPolicy || null,
+      has_gps_tracking: applicationData.hasGpsTracking || false,
+      has_booking_api: applicationData.hasBookingApi || false,
+      api_endpoint: applicationData.apiEndpoint || null,
     };
 
     // Add driver credentials
-    if (applicationData.driverVettingProcess) vendorData.driver_vetting_process = applicationData.driverVettingProcess;
-    if (applicationData.backgroundCheckPolicy) vendorData.background_check_policy = applicationData.backgroundCheckPolicy;
-    if (applicationData.averageDriverExperience) vendorData.average_driver_experience = applicationData.averageDriverExperience;
-    if (applicationData.driverTrainingProgram) vendorData.driver_training_program = applicationData.driverTrainingProgram;
-    if (applicationData.cdlCompliance !== undefined) vendorData.cdl_compliance = applicationData.cdlCompliance;
+    if (rawData.driverVettingProcess) vendorData.driver_vetting_process = rawData.driverVettingProcess;
+    if (rawData.backgroundCheckPolicy) vendorData.background_check_policy = rawData.backgroundCheckPolicy;
+    if (rawData.averageDriverExperience) vendorData.average_driver_experience = rawData.averageDriverExperience;
+    if (rawData.driverTrainingProgram) vendorData.driver_training_program = rawData.driverTrainingProgram;
+    if (rawData.cdlCompliance !== undefined) vendorData.cdl_compliance = rawData.cdlCompliance;
 
     // Add technology integration
-    if (applicationData.hasRealTimeTracking !== undefined) vendorData.has_real_time_tracking = applicationData.hasRealTimeTracking;
-    if (applicationData.hasMobileApp !== undefined) vendorData.has_mobile_app = applicationData.hasMobileApp;
-    if (applicationData.hasAutomatedDispatch !== undefined) vendorData.has_automated_dispatch = applicationData.hasAutomatedDispatch;
+    if (rawData.hasRealTimeTracking !== undefined) vendorData.has_real_time_tracking = rawData.hasRealTimeTracking;
+    if (rawData.hasMobileApp !== undefined) vendorData.has_mobile_app = rawData.hasMobileApp;
+    if (rawData.hasAutomatedDispatch !== undefined) vendorData.has_automated_dispatch = rawData.hasAutomatedDispatch;
 
     // Add document uploads
-    if (applicationData.insuranceDocuments) vendorData.insurance_documents = applicationData.insuranceDocuments;
-    if (applicationData.driverLicenseDocuments) vendorData.driver_license_documents = applicationData.driverLicenseDocuments;
+    if (rawData.insuranceDocuments) vendorData.insurance_documents = rawData.insuranceDocuments;
+    if (rawData.driverLicenseDocuments) vendorData.driver_license_documents = rawData.driverLicenseDocuments;
 
     // Add social media
-    if (applicationData.instagramHandle || applicationData.tiktokHandle || applicationData.twitterHandle || 
-        applicationData.facebookPage || applicationData.linkedinPage) {
+    if (rawData.instagramHandle || rawData.tiktokHandle || rawData.twitterHandle || 
+        rawData.facebookPage || rawData.linkedinPage) {
       vendorData.social_media = {
-        instagram: applicationData.instagramHandle || null,
-        tiktok: applicationData.tiktokHandle || null,
-        twitter: applicationData.twitterHandle || null,
-        facebook: applicationData.facebookPage || null,
-        linkedin: applicationData.linkedinPage || null,
+        instagram: rawData.instagramHandle || null,
+        tiktok: rawData.tiktokHandle || null,
+        twitter: rawData.twitterHandle || null,
+        facebook: rawData.facebookPage || null,
+        linkedin: rawData.linkedinPage || null,
       };
     }
 
     // Add promotion preferences
-    if (applicationData.selectedPromotionTier) {
+    if (rawData.selectedPromotionTier) {
       vendorData.promotion_preferences = {
-        tier: applicationData.selectedPromotionTier,
-        budget: applicationData.promotionBudget || null,
-        pricing_model: applicationData.promotionPricingModel || null,
-        target_impressions: applicationData.promotionTargetImpressions || null,
-        target_clicks: applicationData.promotionTargetClicks || null,
-        geographic_targets: applicationData.promotionGeographicTargets || [],
-        discount_offered: applicationData.promotionDiscountOffered || null,
-        special_packages: applicationData.promotionSpecialPackages || [],
-        marketing_description: applicationData.marketingDescription || null,
-        promotional_media: applicationData.promotionalMedia || [],
+        tier: rawData.selectedPromotionTier,
+        budget: rawData.promotionBudget || null,
+        pricing_model: rawData.promotionPricingModel || null,
+        target_impressions: rawData.promotionTargetImpressions || null,
+        target_clicks: rawData.promotionTargetClicks || null,
+        geographic_targets: rawData.promotionGeographicTargets || [],
+        discount_offered: rawData.promotionDiscountOffered || null,
+        special_packages: rawData.promotionSpecialPackages || [],
+        marketing_description: rawData.marketingDescription || null,
+        promotional_media: rawData.promotionalMedia || [],
       };
     }
 
@@ -136,77 +214,101 @@ serve(async (req) => {
       .single();
 
     if (vendorError) {
-      console.error('Error creating transport vendor:', vendorError);
-      throw vendorError;
+      console.error(`[${debugId}] Vendor insert failed:`, vendorError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'vendor_insert_failed', 
+          details: vendorError.message,
+          context: { step, debugId, userId: user.id, supplierId: supplier.id, code: vendorError.code }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      );
     }
 
-    console.log('Transport vendor created:', transportVendor.id);
+    console.log(`[${debugId}] Transport vendor created: ${transportVendor.id}`);
 
     // Create fleet records if vehicles provided
+    step = 'create_fleet';
     if (applicationData.vehicles && applicationData.vehicles.length > 0) {
-      const fleetRecords = applicationData.vehicles.map((vehicle: any) => ({
-        vendor_id: transportVendor.id,
-        vehicle_type: vehicle.vehicle_type,
-        make: vehicle.make,
-        model: vehicle.model,
-        year: vehicle.year,
-        passenger_capacity: vehicle.passenger_capacity,
-        hourly_rate: vehicle.hourly_rate,
-      }));
+      try {
+        const fleetRecords = applicationData.vehicles.map((vehicle: any) => ({
+          vendor_id: transportVendor.id,
+          vehicle_type: vehicle.vehicle_type || null,
+          make: vehicle.make || null,
+          model: vehicle.model || null,
+          year: vehicle.year || null,
+          passenger_capacity: vehicle.passenger_capacity || null,
+          hourly_rate: vehicle.hourly_rate || null,
+        }));
 
-      const { error: fleetError } = await supabase
-        .from('vendor_fleet')
-        .insert(fleetRecords);
+        const { error: fleetError } = await supabase
+          .from('vendor_fleet')
+          .insert(fleetRecords);
 
-      if (fleetError) {
-        console.error('Error creating fleet records:', fleetError);
-      } else {
-        console.log('Fleet records created:', fleetRecords.length);
+        if (fleetError) {
+          console.error(`[${debugId}] Fleet insert warning:`, fleetError);
+        } else {
+          console.log(`[${debugId}] Fleet records created: ${fleetRecords.length}`);
+        }
+      } catch (fleetErr) {
+        console.error(`[${debugId}] Fleet creation failed (non-critical):`, fleetErr);
       }
     }
 
-    // Create vetting record
-    const { error: vettingError } = await supabase
-      .from('supplier_vetting')
-      .insert({
-        supplier_id: supplier.id,
-        vetting_status: 'pending',
-        documents_submitted: true,
-        submitted_at: new Date().toISOString(),
-      });
-
-    if (vettingError) {
-      console.error('Error creating vetting record:', vettingError);
-    }
-
-    // Create notification for admins
-    const { data: adminRoles } = await supabase
-      .from('user_roles')
-      .select('user_id')
-      .eq('role', 'admin');
-
-    if (adminRoles && adminRoles.length > 0) {
-      const notifications = adminRoles.map((admin) => ({
-        user_id: admin.user_id,
-        notification_type: 'admin_alert',
-        title: 'New Transportation Vendor Application',
-        message: `${applicationData.businessName} has submitted an application for review`,
-        metadata: {
+    // Create vetting record (safe-guarded)
+    step = 'create_vetting';
+    try {
+      const { error: vettingError } = await supabase
+        .from('supplier_vetting')
+        .insert({
           supplier_id: supplier.id,
-          business_name: applicationData.businessName,
-        },
-        link: '/admin/transport-vendor-vetting',
-      }));
+          vetting_status: 'pending',
+          documents_submitted: true,
+          submitted_at: new Date().toISOString(),
+        });
 
-      await supabase.from('notifications').insert(notifications);
+      if (vettingError) {
+        console.error(`[${debugId}] Vetting insert warning:`, vettingError);
+      }
+    } catch (vettingErr) {
+      console.error(`[${debugId}] Vetting creation failed (non-critical):`, vettingErr);
     }
 
+    // Create notification for admins (safe-guarded)
+    step = 'create_notifications';
+    try {
+      const { data: adminRoles } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'admin');
+
+      if (adminRoles && adminRoles.length > 0) {
+        const notifications = adminRoles.map((admin) => ({
+          user_id: admin.user_id,
+          notification_type: 'admin_alert',
+          title: 'New Transportation Vendor Application',
+          message: `${applicationData.businessName} has submitted an application for review`,
+          metadata: {
+            supplier_id: supplier.id,
+            business_name: applicationData.businessName,
+          },
+          link: '/admin/transport-vendor-vetting',
+        }));
+
+        await supabase.from('notifications').insert(notifications);
+      }
+    } catch (notifErr) {
+      console.error(`[${debugId}] Notification creation failed (non-critical):`, notifErr);
+    }
+
+    console.log(`[${debugId}] Application completed successfully`);
     return new Response(
       JSON.stringify({
         success: true,
         supplier_id: supplier.id,
         vendor_id: transportVendor.id,
         message: 'Application submitted successfully',
+        ...(applicationData.debug ? { debugId } : {})
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -214,12 +316,16 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error('Error in submit-transportation-vendor-application:', error);
+    console.error(`[${debugId}] Unhandled error at step '${step}':`, error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: 'internal_server_error',
+        details: error.message,
+        context: { step, debugId }
+      }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: 500,
       }
     );
   }
