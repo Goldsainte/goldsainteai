@@ -11,8 +11,11 @@ import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, X } from "lucide-react";
 import { LoadingAnnouncement, ErrorAnnouncement } from "@/components/LoadingAnnouncement";
+import { CityAutocomplete } from "@/components/CityAutocomplete";
+import VendorDocumentUpload from "@/components/VendorDocumentUpload";
 
 const STEPS = [
   "Business Information",
@@ -55,6 +58,13 @@ export default function TransportationVendorApplication() {
     yearsInBusiness: "",
     businessDescription: "",
     
+    // Social Media
+    instagramHandle: "",
+    tiktokHandle: "",
+    twitterHandle: "",
+    facebookPage: "",
+    linkedinPage: "",
+    
     // Service Areas
     serviceAreas: [] as string[],
     serviceAreaInput: "",
@@ -79,13 +89,15 @@ export default function TransportationVendorApplication() {
     driverTrainingProgram: "",
     cdlCompliance: false,
     
-    // Compliance
+    // Compliance & Documents
     insurancePolicyNumber: "",
     insuranceExpiryDate: "",
     insuranceCoverageAmount: "",
     commercialLicenseNumber: "",
     commercialLicenseExpiry: "",
     dotNumber: "",
+    insuranceDocuments: [] as { id: string; fileName: string; fileUrl: string }[],
+    driverLicenseDocuments: [] as { id: string; fileName: string; fileUrl: string }[],
     
     // Pricing
     pricingModel: "",
@@ -101,12 +113,19 @@ export default function TransportationVendorApplication() {
     hasMobileApp: false,
     hasAutomatedDispatch: false,
     
-    // Promotion
+    // Promotion - Enhanced
     interestedInPromotion: false,
     promotionBudget: "",
     targetCustomerSegments: [] as string[],
     marketingDescription: "",
     specialOffers: "",
+    promotionPricingModel: "",
+    promotionTargetImpressions: "",
+    promotionTargetClicks: "",
+    promotionGeographicTargets: [] as string[],
+    promotionDiscountOffered: "",
+    promotionSpecialPackages: [] as { name: string; description: string; price: string }[],
+    currentSpecialPackage: { name: "", description: "", price: "" },
     
     // Agreement
     agreedToTerms: false,
@@ -161,6 +180,15 @@ export default function TransportationVendorApplication() {
     
     if (currentStep === 1 && formData.serviceAreas.length === 0) {
       errors.serviceAreas = "At least one service area is required";
+    }
+    
+    if (currentStep === 4) {
+      if (formData.insuranceDocuments.length === 0) {
+        errors.insuranceDocuments = "At least one insurance document is required";
+      }
+      if (formData.driverLicenseDocuments.length === 0) {
+        errors.driverLicenseDocuments = "At least one driver license is required";
+      }
     }
     
     if (currentStep === 8) {
@@ -219,7 +247,20 @@ export default function TransportationVendorApplication() {
           interestedInPromotion: formData.interestedInPromotion,
           promotionBudget: parseFloat(formData.promotionBudget) || 0,
           marketingDescription: formData.marketingDescription,
-          specialOffers: formData.specialOffers
+          specialOffers: formData.specialOffers,
+          insuranceDocuments: formData.insuranceDocuments,
+          driverLicenseDocuments: formData.driverLicenseDocuments,
+          instagramHandle: formData.instagramHandle,
+          tiktokHandle: formData.tiktokHandle,
+          twitterHandle: formData.twitterHandle,
+          facebookPage: formData.facebookPage,
+          linkedinPage: formData.linkedinPage,
+          promotionPricingModel: formData.promotionPricingModel,
+          promotionTargetImpressions: parseInt(formData.promotionTargetImpressions) || 0,
+          promotionTargetClicks: parseInt(formData.promotionTargetClicks) || 0,
+          promotionGeographicTargets: formData.promotionGeographicTargets,
+          promotionDiscountOffered: parseFloat(formData.promotionDiscountOffered) || 0,
+          promotionSpecialPackages: formData.promotionSpecialPackages
         }
       });
 
@@ -251,6 +292,8 @@ export default function TransportationVendorApplication() {
         return formData.businessName && formData.contactEmail && formData.contactPhone;
       case 1:
         return formData.serviceAreas.length > 0;
+      case 4:
+        return formData.insuranceDocuments.length > 0 && formData.driverLicenseDocuments.length > 0;
       case 8:
         return formData.agreedToTerms && formData.eSignature;
       default:
@@ -321,6 +364,67 @@ export default function TransportationVendorApplication() {
                 rows={4}
               />
             </div>
+            
+            <div className="space-y-4 mt-6 pt-6 border-t">
+              <h3 className="font-semibold text-lg">Social Media (Optional)</h3>
+              <p className="text-sm text-muted-foreground">
+                Link your social media accounts to help customers learn more about your business
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="instagramHandle">Instagram Handle</Label>
+                  <Input
+                    id="instagramHandle"
+                    value={formData.instagramHandle}
+                    onChange={(e) => updateFormData("instagramHandle", e.target.value)}
+                    placeholder="@yourcompany"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="tiktokHandle">TikTok Handle</Label>
+                  <Input
+                    id="tiktokHandle"
+                    value={formData.tiktokHandle}
+                    onChange={(e) => updateFormData("tiktokHandle", e.target.value)}
+                    placeholder="@yourcompany"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="twitterHandle">Twitter/X Handle</Label>
+                  <Input
+                    id="twitterHandle"
+                    value={formData.twitterHandle}
+                    onChange={(e) => updateFormData("twitterHandle", e.target.value)}
+                    placeholder="@yourcompany"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="facebookPage">Facebook Page URL</Label>
+                  <Input
+                    id="facebookPage"
+                    type="url"
+                    value={formData.facebookPage}
+                    onChange={(e) => updateFormData("facebookPage", e.target.value)}
+                    placeholder="https://facebook.com/yourcompany"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="linkedinPage">LinkedIn Page URL</Label>
+                  <Input
+                    id="linkedinPage"
+                    type="url"
+                    value={formData.linkedinPage}
+                    onChange={(e) => updateFormData("linkedinPage", e.target.value)}
+                    placeholder="https://linkedin.com/company/yourcompany"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         );
 
@@ -330,12 +434,13 @@ export default function TransportationVendorApplication() {
             <div>
               <Label>Service Areas *</Label>
               <div className="flex gap-2">
-                <Input
-                  value={formData.serviceAreaInput}
-                  onChange={(e) => updateFormData("serviceAreaInput", e.target.value)}
-                  placeholder="e.g., Los Angeles, CA"
-                  onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addServiceArea())}
-                />
+                <div className="flex-1">
+                  <CityAutocomplete
+                    value={formData.serviceAreaInput}
+                    onChange={(value) => updateFormData("serviceAreaInput", value)}
+                    placeholder="Enter city or region (e.g., Los Angeles, CA)"
+                  />
+                </div>
                 <Button type="button" onClick={addServiceArea}>Add</Button>
               </div>
             </div>
@@ -540,7 +645,26 @@ export default function TransportationVendorApplication() {
 
       case 4:
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
+            <VendorDocumentUpload
+              documentType="insurance"
+              documents={formData.insuranceDocuments}
+              onDocumentsChange={(docs) => updateFormData("insuranceDocuments", docs)}
+              label="Insurance Documents"
+              required
+            />
+            
+            <VendorDocumentUpload
+              documentType="driver_license"
+              documents={formData.driverLicenseDocuments}
+              onDocumentsChange={(docs) => updateFormData("driverLicenseDocuments", docs)}
+              label="Driver Licenses"
+              required
+            />
+            
+            <div className="pt-4 border-t">
+              <h3 className="font-semibold mb-4">Additional Compliance Information</h3>
+              <div className="space-y-4">
             <div>
               <Label htmlFor="insurancePolicyNumber">Insurance Policy Number</Label>
               <Input
@@ -583,6 +707,8 @@ export default function TransportationVendorApplication() {
                 value={formData.dotNumber}
                 onChange={(e) => updateFormData("dotNumber", e.target.value)}
               />
+            </div>
+            </div>
             </div>
           </div>
         );
@@ -695,7 +821,7 @@ export default function TransportationVendorApplication() {
 
       case 7:
         return (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="interestedInPromotion"
@@ -709,35 +835,29 @@ export default function TransportationVendorApplication() {
             
             {formData.interestedInPromotion && (
               <>
-                <div>
-                  <Label htmlFor="promotionBudget">Monthly Promotion Budget ($)</Label>
-                  <Input
-                    id="promotionBudget"
-                    type="number"
-                    value={formData.promotionBudget}
-                    onChange={(e) => updateFormData("promotionBudget", e.target.value)}
-                    placeholder="500"
-                  />
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h4 className="font-semibold">Pricing Model</h4>
+                  <Select value={formData.promotionPricingModel} onValueChange={(v) => updateFormData("promotionPricingModel", v)}>
+                    <SelectTrigger><SelectValue placeholder="Choose pricing model" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cpc">Cost Per Click (CPC)</SelectItem>
+                      <SelectItem value="cpm">Cost Per Thousand Impressions (CPM)</SelectItem>
+                      <SelectItem value="flat_monthly">Flat Monthly Rate</SelectItem>
+                      <SelectItem value="performance_based">Performance-Based</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <div>
+                    <Label htmlFor="promotionBudget">Monthly Budget ($)</Label>
+                    <Input id="promotionBudget" type="number" value={formData.promotionBudget} onChange={(e) => updateFormData("promotionBudget", e.target.value)} placeholder="1000" />
+                  </div>
+                  <div>
+                    <Label htmlFor="promotionDiscountOffered">Promotional Discount (%)</Label>
+                    <Input id="promotionDiscountOffered" type="number" value={formData.promotionDiscountOffered} onChange={(e) => updateFormData("promotionDiscountOffered", e.target.value)} placeholder="10" />
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="marketingDescription">Marketing Description</Label>
-                  <Textarea
-                    id="marketingDescription"
-                    value={formData.marketingDescription}
-                    onChange={(e) => updateFormData("marketingDescription", e.target.value)}
-                    placeholder="How would you like your service to be promoted? Describe your unique selling points..."
-                    rows={4}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="specialOffers">Special Offers for Platform Users</Label>
-                  <Textarea
-                    id="specialOffers"
-                    value={formData.specialOffers}
-                    onChange={(e) => updateFormData("specialOffers", e.target.value)}
-                    placeholder="Describe any special discounts or offers you'd like to provide to Goldsainte platform users..."
-                    rows={3}
-                  />
+                  <Textarea id="marketingDescription" value={formData.marketingDescription} onChange={(e) => updateFormData("marketingDescription", e.target.value)} placeholder="Describe your service..." rows={4} />
                 </div>
               </>
             )}

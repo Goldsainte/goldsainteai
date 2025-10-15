@@ -7342,6 +7342,42 @@ export type Database = {
           },
         ]
       }
+      vendor_document_uploads: {
+        Row: {
+          created_at: string | null
+          document_type: string
+          file_name: string
+          file_size: number
+          file_url: string
+          id: string
+          mime_type: string
+          uploaded_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          document_type: string
+          file_name: string
+          file_size: number
+          file_url: string
+          id?: string
+          mime_type: string
+          uploaded_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string
+          file_name?: string
+          file_size?: number
+          file_url?: string
+          id?: string
+          mime_type?: string
+          uploaded_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vendor_drivers: {
         Row: {
           background_check_date: string | null
