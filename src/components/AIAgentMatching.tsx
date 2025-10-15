@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
-import { Sparkles, Star, TrendingUp, MapPin } from "lucide-react";
+import { Sparkles, Star, TrendingUp, MapPin, RefreshCw } from "lucide-react";
 
 interface AgentMatch {
   agent_id: string;
@@ -26,6 +26,55 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
   const [matches, setMatches] = useState<AgentMatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [analyzed, setAnalyzed] = useState(false);
+  const [autoLoading, setAutoLoading] = useState(true);
+
+  // Auto-load pre-calculated matches on mount
+  useEffect(() => {
+    loadPreCalculatedMatches();
+  }, [jobId]);
+
+  const loadPreCalculatedMatches = async () => {
+    try {
+      const { data: scores, error } = await supabase
+        .from('ai_matching_scores')
+        .select(`
+          match_score,
+          confidence_level,
+          matching_factors,
+          agent_id,
+          travel_agents (
+            agency_name,
+            rating,
+            total_reviews
+          )
+        `)
+        .eq('job_id', jobId)
+        .order('match_score', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      if (scores && scores.length > 0) {
+        const formattedMatches = scores.map((score: any) => ({
+          agent_id: score.agent_id,
+          agent_name: score.travel_agents?.agency_name || 'Unknown Agent',
+          match_score: score.match_score,
+          confidence_level: score.confidence_level,
+          rating: score.travel_agents?.rating || 0,
+          total_reviews: score.travel_agents?.total_reviews || 0,
+          matching_factors: score.matching_factors || {},
+        }));
+        
+        setMatches(formattedMatches);
+        setAnalyzed(true);
+        console.log('✅ Loaded', formattedMatches.length, 'pre-calculated AI matches');
+      }
+    } catch (error) {
+      console.error('Error loading pre-calculated matches:', error);
+    } finally {
+      setAutoLoading(false);
+    }
+  };
 
   const runMatching = async () => {
     setLoading(true);
@@ -39,6 +88,9 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
       setMatches(data.matches || []);
       setAnalyzed(true);
       toast.success(`Found ${data.matches?.length || 0} matching agents`);
+      
+      // Reload from database to ensure we have the latest data
+      await loadPreCalculatedMatches();
     } catch (error) {
       console.error("Error running AI matching:", error);
       toast.error("Failed to find matching agents");
@@ -60,6 +112,27 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
       </Badge>
     );
   };
+
+  if (!analyzed && autoLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Sparkles className="h-5 w-5 animate-pulse text-primary" />
+            AI Agent Matching
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-8">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+            <RefreshCw className="h-6 w-6 text-primary animate-spin" />
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Loading AI-recommended agents...
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!analyzed) {
     return (
@@ -86,8 +159,12 @@ export function AIAgentMatching({ jobId, onSelectAgent }: AIAgentMatchingProps) 
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg">AI Recommended Agents ({matches.length})</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-primary" />
+            AI Recommended Agents ({matches.length})
+          </CardTitle>
           <Button variant="outline" size="sm" onClick={runMatching} disabled={loading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>

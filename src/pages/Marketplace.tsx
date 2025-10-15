@@ -266,19 +266,23 @@ export default function Marketplace() {
 
       if (newJob) {
         // Trigger AI matching in background (non-blocking)
-        try {
-          await invokeEdgeFunction('ai-agent-matching', {
-            body: {
-              jobId: newJob.id,
-              generateScores: true
-            },
-            timeout: 20000,
-            showToastOnError: false,
-          });
-          console.log('AI matching triggered for job:', newJob.id);
-        } catch (matchError) {
-          console.error('Error triggering AI matching:', matchError);
-        }
+        invokeEdgeFunction('ai-agent-matching', {
+          body: {
+            jobId: newJob.id,
+            generateScores: true
+          },
+          timeout: 30000,
+        }).then(({ data, error }) => {
+          if (error) {
+            console.error('Error triggering AI matching:', error);
+            toast.error('AI matching failed, but you can still view bids manually');
+          } else {
+            console.log('✅ AI matching completed:', data?.total_agents_evaluated, 'agents evaluated');
+            toast.success(`AI found ${data?.matches?.length || 0} matching agents for your job`);
+          }
+        }).catch(err => {
+          console.error('AI matching exception:', err);
+        });
 
         // Notify agents about the new job
         try {

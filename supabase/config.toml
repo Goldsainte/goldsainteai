@@ -207,3 +207,6 @@ verify_jwt = true
 [functions.log-activity]
 verify_jwt = true
 
+[functions.ai-agent-matching]
+verify_jwt = false
+
