@@ -189,3 +189,18 @@ verify_jwt = false
 [functions.save-apple-music-credentials]
 verify_jwt = true
 
+[functions.submit-transportation-vendor-application]
+verify_jwt = true
+
+[functions.approve-transportation-vendor]
+verify_jwt = true
+
+[functions.search-transportation-vendors]
+verify_jwt = false
+
+[functions.check-vendor-availability]
+verify_jwt = false
+
+[functions.create-vendor-promotion]
+verify_jwt = true
+
