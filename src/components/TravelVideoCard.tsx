@@ -215,21 +215,54 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     }
   }, [post.id]);
 
-  // Scroll-based photo index tracking
+  // Scroll-based photo index tracking for horizontal scroll
   const handleCarouselScroll = () => {
     const el = carouselRef.current;
-    if (!el) return;
-    const idx = Math.round(el.scrollLeft / el.clientWidth);
-    if (idx !== currentPhotoIndex) {
-      setCurrentPhotoIndex(idx);
+    if (!el || !post.image_urls) return;
+    
+    // Find which image is most visible in viewport
+    const containerLeft = el.scrollLeft;
+    const containerWidth = el.clientWidth;
+    const images = el.querySelectorAll('img');
+    
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+    
+    images.forEach((img, idx) => {
+      const imgLeft = (img as HTMLElement).offsetLeft;
+      const imgCenter = imgLeft + (img as HTMLElement).offsetWidth / 2;
+      const containerCenter = containerLeft + containerWidth / 2;
+      const distance = Math.abs(imgCenter - containerCenter);
+      
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = idx;
+      }
+    });
+    
+    if (closestIndex !== currentPhotoIndex) {
+      setCurrentPhotoIndex(closestIndex);
     }
   };
 
-  // Scroll to specific photo index
+  // Scroll to specific photo index - centers image in viewport
   const scrollToIndex = (targetIndex: number) => {
     const el = carouselRef.current;
     if (!el) return;
-    el.scrollTo({ left: targetIndex * el.clientWidth, behavior: 'smooth' });
+    
+    const images = el.querySelectorAll('img');
+    const targetImage = images[targetIndex] as HTMLElement;
+    
+    if (targetImage) {
+      const containerWidth = el.clientWidth;
+      const imageLeft = targetImage.offsetLeft;
+      const imageWidth = targetImage.offsetWidth;
+      
+      // Center the image in the viewport
+      const scrollTo = imageLeft - (containerWidth - imageWidth) / 2;
+      
+      el.scrollTo({ left: scrollTo, behavior: 'smooth' });
+    }
   };
 
   // Instagram-style autoplay audio effect
@@ -759,27 +792,25 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               <div
                 ref={carouselRef}
                 onScroll={handleCarouselScroll}
-                className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth cursor-pointer"
+                className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-2 p-2 cursor-pointer"
                 style={{
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehaviorX: 'contain',
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
-                  touchAction: 'pan-x',
                 }}
                 onClick={() => setPhotoGalleryOpen(true)}
               >
                 {post.image_urls.map((src, idx) => (
-                  <div key={idx} className="flex-[0_0_100%] w-full h-full snap-center">
-                    <OptimizedImage
-                      src={src}
-                      alt={`${post.caption || 'Post image'} ${idx + 1}`}
-                      aspectRatio="square"
-                      priority={isActive && idx === currentPhotoIndex}
-                      className="w-full h-full select-none pointer-events-none"
-                      draggable={false}
-                    />
-                  </div>
+                  <img
+                    key={idx}
+                    src={src}
+                    alt={`${post.caption || 'Post image'} ${idx + 1}`}
+                    className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
+                    style={{ width: 'auto' }}
+                    draggable={false}
+                    loading="lazy"
+                  />
                 ))}
               </div>
               {post.image_urls.length > 1 && (
@@ -1373,50 +1404,43 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           <div
             ref={carouselRef}
             onScroll={handleCarouselScroll}
-            className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+            className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-2 p-2"
             style={{
               WebkitOverflowScrolling: 'touch',
               overscrollBehaviorX: 'contain',
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
-              touchAction: 'pan-x',
             }}
           >
             {post.image_urls && post.image_urls.length > 0 ? (
               post.image_urls.map((src, idx) => (
-                <div 
-                  key={idx} 
-                  className="flex-[0_0_100%] w-full h-full snap-center"
+                <img
+                  key={idx}
+                  src={src}
+                  alt={`Photo ${idx + 1}`}
+                  className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
+                  style={{ width: 'auto' }}
+                  draggable={false}
+                  loading="lazy"
                   onClick={(e) => {
                     e.stopPropagation();
                     setPhotoGalleryOpen(true);
                   }}
-                >
-                  <img
-                    src={src}
-                    alt={`Photo ${idx + 1}`}
-                    className="w-full h-full object-cover select-none pointer-events-none"
-                    draggable="false"
-                    loading="lazy"
-                  />
-                </div>
+                />
               ))
             ) : post.thumbnail_url ? (
-              <div 
-                className="flex-[0_0_100%] w-full h-full snap-center"
+              <img
+                src={post.thumbnail_url}
+                alt="Post content"
+                className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
+                style={{ width: 'auto' }}
+                draggable={false}
+                loading="lazy"
                 onClick={(e) => {
                   e.stopPropagation();
                   setPhotoGalleryOpen(true);
                 }}
-              >
-                <img
-                  src={post.thumbnail_url}
-                  alt="Post content"
-                  className="w-full h-full object-cover select-none pointer-events-none"
-                  draggable="false"
-                  loading="lazy"
-                />
-              </div>
+              />
             ) : null}
           </div>
 
