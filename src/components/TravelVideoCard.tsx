@@ -70,10 +70,9 @@ interface TravelVideoCardProps {
   isMuted: boolean;
   onToggleMute: () => void;
   hasInteracted?: boolean;
-  isAdjacent?: boolean;
 }
 
-const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute, hasInteracted = false, isAdjacent = false }: TravelVideoCardProps) => {
+const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute, hasInteracted = false }: TravelVideoCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
@@ -97,16 +96,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [photoGalleryOpen, setPhotoGalleryOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
-  
-  // Initialize audio with preload settings
-  if (!audioRef.current) {
-    const audio = new Audio();
-    audio.preload = 'auto';
-    audio.crossOrigin = 'anonymous';
-    audioRef.current = audio;
-  }
-  
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   const [nativeVolume, setNativeVolume] = useState(post.native_video_volume || 100);
   const [musicVolume, setMusicVolume] = useState(post.music_volume || 80);
   const userInitiatedPlay = useRef(false);
@@ -119,7 +109,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [dragStart, setDragStart] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [wasSwipe, setWasSwipe] = useState(false);
-  const carouselRef = useRef<HTMLDivElement>(null);
 
   // Reset touch state on mount/unmount
   useEffect(() => {
@@ -133,19 +122,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       setWasSwipe(false);
     };
   }, []);
-
-  // Preload music when post becomes visible or is adjacent
-  useEffect(() => {
-    if (!post.music_preview_url || !audioRef.current) return;
-    
-    const audio = audioRef.current;
-    
-    if ((isActive || isAdjacent) && audio.src !== post.music_preview_url) {
-      audio.src = post.music_preview_url;
-      audio.preload = 'auto';
-      audio.load();
-    }
-  }, [post.music_preview_url, isActive, isAdjacent]);
 
   const [showPhotoGallery, setShowPhotoGallery] = useState(false);
 
@@ -210,72 +186,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   // Reset photo index when post changes
   useEffect(() => {
     setCurrentPhotoIndex(0);
-    if (carouselRef.current) {
-      carouselRef.current.scrollLeft = 0;
-    }
   }, [post.id]);
-
-  // Scroll-based photo index tracking for horizontal scroll
-  const handleCarouselScroll = () => {
-    const el = carouselRef.current;
-    if (!el || !post.image_urls) return;
-    
-    // Find which image is most visible in viewport
-    const containerLeft = el.scrollLeft;
-    const containerWidth = el.clientWidth;
-    const images = el.querySelectorAll('img');
-    
-    let closestIndex = 0;
-    let closestDistance = Infinity;
-    
-    images.forEach((img, idx) => {
-      const imgLeft = (img as HTMLElement).offsetLeft;
-      const imgCenter = imgLeft + (img as HTMLElement).offsetWidth / 2;
-      const containerCenter = containerLeft + containerWidth / 2;
-      const distance = Math.abs(imgCenter - containerCenter);
-      
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = idx;
-      }
-    });
-    
-    if (closestIndex !== currentPhotoIndex) {
-      setCurrentPhotoIndex(closestIndex);
-    }
-  };
-
-  // Scroll to specific photo index - centers image in viewport
-  const scrollToIndex = (targetIndex: number) => {
-    const el = carouselRef.current;
-    if (!el) return;
-    
-    const images = el.querySelectorAll('img');
-    const targetImage = images[targetIndex] as HTMLElement;
-    
-    if (targetImage) {
-      const containerWidth = el.clientWidth;
-      const imageLeft = targetImage.offsetLeft;
-      const imageWidth = targetImage.offsetWidth;
-      
-      // Center the image in the viewport
-      const scrollTo = imageLeft - (containerWidth - imageWidth) / 2;
-      
-      el.scrollTo({ left: scrollTo, behavior: 'smooth' });
-    }
-  };
 
   // Instagram-style autoplay audio effect
   useEffect(() => {
     if (!audioRef.current || !post.music_preview_url) return;
 
     const audio = audioRef.current;
-
-    if (audio.src !== post.music_preview_url) {
-      audio.src = post.music_preview_url;
-      audio.preload = 'auto';
-      audio.load();
-    }
 
     const handleStalled = () => {
       if (isActive && !isMuted && hasInteracted) {
@@ -295,6 +212,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     };
 
     const handlePlay = () => {
+      // Isolate playback: pause all other audio
       document.querySelectorAll('audio[data-post-id]').forEach((otherAudio) => {
         if (otherAudio !== audio && !(otherAudio as HTMLAudioElement).paused) {
           (otherAudio as HTMLAudioElement).pause();
@@ -302,33 +220,23 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       });
     };
 
-    const handleCanPlayThrough = () => {
-      if (isActive && !isMuted && hasInteracted && audio.paused) {
-        audio.play()
-          .then(() => setAudioPlaying(true))
-          .catch(console.error);
-      }
-    };
-
     audio.addEventListener('stalled', handleStalled);
     audio.addEventListener('suspend', handleSuspended);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('play', handlePlay);
-    audio.addEventListener('canplaythrough', handleCanPlayThrough);
 
+    // Active-first autoplay logic
     audio.volume = musicVolume / 100;
     
     if (!isActive || isMuted) {
+      // Always pause when not active or muted
       audio.pause();
       setAudioPlaying(false);
     } else if (isActive && !isMuted && hasInteracted) {
-      if (audio.readyState >= 3) {
-        audio.play()
-          .then(() => setAudioPlaying(true))
-          .catch(console.error);
-      } else {
-        audio.load();
-      }
+      // Auto-play when active, unmuted, and user has interacted
+      audio.play()
+        .then(() => setAudioPlaying(true))
+        .catch(console.error);
     }
 
     return () => {
@@ -336,7 +244,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       audio.removeEventListener('stalled', handleStalled);
       audio.removeEventListener('suspend', handleSuspended);
       audio.removeEventListener('play', handlePlay);
-      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
   }, [isActive, isMuted, post.music_preview_url, hasInteracted, musicVolume]);
 
@@ -786,62 +693,78 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         <div className="relative bg-black aspect-square">
           {post.image_urls && post.image_urls.length > 0 ? (
             <div className="w-full h-full relative">
-              <style>{`
-                .hide-scrollbar::-webkit-scrollbar { display: none; }
-              `}</style>
               <div
-                ref={carouselRef}
-                onScroll={handleCarouselScroll}
-                className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-2 p-2 cursor-pointer"
-                style={{
-                  WebkitOverflowScrolling: 'touch',
-                  overscrollBehaviorX: 'contain',
-                  scrollbarWidth: 'none',
-                  msOverflowStyle: 'none',
+                className="w-full h-full cursor-pointer"
+                onClick={() => {
+                  setPhotoGalleryOpen(true);
                 }}
-                onClick={() => setPhotoGalleryOpen(true)}
+                onWheel={(e) => {
+                  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+                  if (Math.abs(delta) < 10 || !post.image_urls || post.image_urls.length < 2) return;
+                  e.preventDefault();
+                  setCurrentPhotoIndex((prev) =>
+                    delta > 0
+                      ? (prev + 1) % post.image_urls!.length
+                      : (prev - 1 + post.image_urls!.length) % post.image_urls!.length
+                  );
+                }}
+                onMouseDown={(e) => {
+                  if (!post.image_urls || post.image_urls.length < 2) return;
+                  const startX = e.clientX;
+                  let handled = false;
+                  const handleMove = (move: MouseEvent) => {
+                    const dx = move.clientX - startX;
+                    if (!handled && Math.abs(dx) > 30) {
+                      handled = true;
+                      setCurrentPhotoIndex((prev) =>
+                        dx < 0
+                          ? (prev + 1) % post.image_urls!.length
+                          : (prev - 1 + post.image_urls!.length) % post.image_urls!.length
+                      );
+                    }
+                  };
+                  const handleUp = () => {
+                    window.removeEventListener('mousemove', handleMove);
+                    window.removeEventListener('mouseup', handleUp);
+                  };
+                  window.addEventListener('mousemove', handleMove);
+                  window.addEventListener('mouseup', handleUp);
+                }}
               >
-                {post.image_urls.map((src, idx) => (
-                <img
-                  key={idx}
-                  src={src}
-                  alt={`${post.caption || 'Post image'} ${idx + 1}`}
-                  className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
-                  style={{ width: '300px' }}
-                  draggable={false}
-                  loading="lazy"
+                <OptimizedImage
+                  src={post.image_urls[currentPhotoIndex]}
+                  alt={`${post.caption || 'Post image'} ${currentPhotoIndex + 1}`}
+                  aspectRatio="square"
+                  priority={isActive}
+                  className="w-full h-full"
                 />
-                ))}
               </div>
               {post.image_urls.length > 1 && (
                 <>
-                  <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-3 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1">
-                    {post.image_urls.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={(e) => { 
-                          e.stopPropagation(); 
-                          scrollToIndex(index); 
-                        }}
-                        className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentPhotoIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60'}`}
-                        aria-label={`Go to photo ${index + 1}`}
-                      />
-                    ))}
+                  <div className="absolute top-2 right-2 bg-black/60 text-white px-2 py-1 rounded text-xs z-30 pointer-events-none">
+                    {currentPhotoIndex + 1} / {post.image_urls.length}
                   </div>
+                  <button
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 z-30 pointer-events-auto transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                    }}
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                  <button
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 z-30 pointer-events-auto transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                    }}
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
                 </>
-              )}
-              {/* Mute Button for Photos with Music */}
-              {post.music_preview_url && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleMute();
-                  }}
-                  className="absolute top-4 right-4 rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110 z-40"
-                  aria-label={isMuted ? 'Unmute' : 'Mute'}
-                >
-                  {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
-                </button>
               )}
             </div>
           ) : post.video_url ? (
@@ -1398,97 +1321,108 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </>
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <>
-          <style>{`
-            .hide-scrollbar::-webkit-scrollbar { display: none; }
-          `}</style>
-          <div
-            ref={carouselRef}
-            onScroll={handleCarouselScroll}
-            className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth gap-2 p-2"
-            style={{
-              WebkitOverflowScrolling: 'touch',
-              overscrollBehaviorX: 'contain',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
+          <div 
+            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none touch-pan-y"
+            onTouchStart={(e) => {
+              setTouchStartX(e.targetTouches[0].clientX);
+              setTouchStartY(e.targetTouches[0].clientY);
             }}
+            onTouchMove={(e) => {
+              setTouchEndX(e.targetTouches[0].clientX);
+              setTouchEndY(e.targetTouches[0].clientY);
+            }}
+            onTouchEnd={(e) => {
+              if (!touchStartX || !touchEndX) return;
+              
+              const deltaX = touchStartX - touchEndX;
+              const deltaY = touchStartY - touchEndY;
+              
+              const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
+              
+              if (isHorizontalSwipe && Math.abs(deltaX) > 50) {
+                e.stopPropagation();
+                
+                if (deltaX > 0 && post.image_urls) {
+                  setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                  setWasSwipe(true);
+                  setTimeout(() => setWasSwipe(false), 100);
+                } else if (deltaX < 0 && post.image_urls) {
+                  setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                  setWasSwipe(true);
+                  setTimeout(() => setWasSwipe(false), 100);
+                }
+              }
+              
+              setTouchStartX(0);
+              setTouchStartY(0);
+              setTouchEndX(0);
+              setTouchEndY(0);
+            }}
+            onMouseDown={(e) => {
+              setIsDragging(true);
+              setDragStart(e.clientX);
+            }}
+            onMouseMove={(e) => {
+              if (!isDragging) return;
+            }}
+            onMouseUp={(e) => {
+              if (!isDragging) return;
+              setIsDragging(false);
+              
+              const distance = dragStart - e.clientX;
+              const isLeftDrag = distance > 50;
+              const isRightDrag = distance < -50;
+              
+              if (isLeftDrag && post.image_urls) {
+                setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                setWasSwipe(true);
+                setTimeout(() => setWasSwipe(false), 100);
+              }
+              
+              if (isRightDrag && post.image_urls) {
+                setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                setWasSwipe(true);
+                setTimeout(() => setWasSwipe(false), 100);
+              }
+            }}
+            onMouseLeave={() => setIsDragging(false)}
           >
-            {post.image_urls && post.image_urls.length > 0 ? (
-              post.image_urls.map((src, idx) => (
-              <img
-                key={idx}
-                src={src}
-                alt={`Photo ${idx + 1}`}
-                className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
-                style={{ width: '300px' }}
-                draggable={false}
-                loading="lazy"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPhotoGalleryOpen(true);
-                }}
-              />
-              ))
-            ) : post.thumbnail_url ? (
-            <img
-              src={post.thumbnail_url}
+            <img 
+              src={post.image_urls?.[currentPhotoIndex] || (post.thumbnail_url as string)} 
               alt="Post content"
-              className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
-              style={{ width: '300px' }}
-              draggable={false}
+              className="w-full h-full object-cover bg-black pointer-events-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!wasSwipe) {
+                  setPhotoGalleryOpen(true);
+                }
+              }}
               loading="lazy"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPhotoGalleryOpen(true);
-              }}
+              draggable="false"
             />
-            ) : null}
+            {post.image_urls && post.image_urls.length > 1 && (
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 pointer-events-none">
+                {post.image_urls.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                      index === currentPhotoIndex
+                        ? "bg-white scale-110"
+                        : "bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-10" />
-
-          {/* Photo carousel dots - positioned above bottom nav */}
-          {post.image_urls && post.image_urls.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-24 md:bottom-3 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1">
-              {post.image_urls.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={(e) => { 
-                    e.stopPropagation(); 
-                    scrollToIndex(index); 
-                  }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-                    index === currentPhotoIndex
-                      ? "bg-white w-6"
-                      : "bg-white/40 hover:bg-white/60"
-                  }`}
-                  aria-label={`Go to photo ${index + 1}`}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Mute Button for Photos with Music */}
-          {post.music_preview_url && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleMute();
-              }}
-              className="absolute bottom-36 right-4 rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110 z-40"
-              aria-label={isMuted ? 'Unmute' : 'Mute'}
-            >
-              {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
-            </button>
-          )}
 
           {/* More Options Button for Photos */}
           <div className="absolute bottom-20 right-4 z-10">
             {isOwnPost ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110">
-                    <MoreVertical className="h-5 w-5 text-white" />
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
@@ -1505,8 +1439,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110">
-                    <MoreVertical className="h-5 w-5 text-white" />
+                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
+                    <MoreVertical className="h-6 w-6 text-white" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
