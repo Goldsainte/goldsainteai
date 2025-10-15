@@ -30,14 +30,14 @@ export default function FleetManagementDashboard() {
 
       if (!vendor) return;
 
-      const { data: fleetData, error: fleetError } = await supabase
+      const { data: fleetData, error: fleetError } = await (supabase as any)
         .from('transportation_fleet')
         .select('id, vehicle_type, license_plate, status')
         .eq('vendor_id', vendor.id);
 
       if (fleetError) throw fleetError;
 
-      const { data: logsData, error: logsError } = await supabase
+      const { data: logsData, error: logsError } = await (supabase as any)
         .from('fleet_maintenance_logs')
         .select('id, maintenance_type, scheduled_date, completed_date, vehicle_id')
         .eq('vendor_id', vendor.id)
@@ -47,8 +47,8 @@ export default function FleetManagementDashboard() {
       if (logsError) throw logsError;
 
       // Fetch vehicle details for logs
-      const enrichedLogs = await Promise.all((logsData || []).map(async (log) => {
-        const { data: vehicle } = await supabase
+      const enrichedLogs = await Promise.all((logsData || []).map(async (log: any) => {
+        const { data: vehicle } = await (supabase as any)
           .from('transportation_fleet')
           .select('vehicle_type, license_plate')
           .eq('id', log.vehicle_id)

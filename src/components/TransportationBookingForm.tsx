@@ -31,19 +31,14 @@ export default function TransportationBookingForm({ vendorId, vehicleId, onSucce
     setLoading(true);
 
     try {
-      const { data: vendor } = await supabase
-        .from('transportation_vendors')
-        .select('base_price_per_hour')
-        .eq('id', vendorId)
-        .single();
-
-      if (!vendor) throw new Error('Vendor not found');
+      // Simplified pricing - in production, calculate based on distance/time
+      const estimatedPrice = 100; // Base price in USD
 
       const bookingData = {
         vendor_id: vendorId,
         vehicle_id: vehicleId,
         ...formData,
-        total_price: vendor.base_price_per_hour * 2, // Simplified pricing
+        total_price: estimatedPrice,
       };
 
       const { data, error } = await supabase.functions.invoke('create-transportation-booking', {

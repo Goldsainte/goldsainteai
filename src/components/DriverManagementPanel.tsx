@@ -22,7 +22,7 @@ export default function DriverManagementPanel() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: vendor } = await supabase
+      const { data: vendor } = await (supabase as any)
         .from('transportation_vendors')
         .select('id')
         .eq('user_id', user.id)
@@ -30,14 +30,14 @@ export default function DriverManagementPanel() {
 
       if (!vendor) return;
 
-      const { data: driversData, error: driversError } = await supabase
+      const { data: driversData, error: driversError } = await (supabase as any)
         .from('transportation_drivers')
         .select('*')
         .eq('vendor_id', vendor.id);
 
       if (driversError) throw driversError;
 
-      const { data: schedulesData, error: schedulesError } = await supabase
+      const { data: schedulesData, error: schedulesError } = await (supabase as any)
         .from('driver_schedules')
         .select('*')
         .eq('vendor_id', vendor.id)

@@ -27,7 +27,7 @@ export default function PlatformAnalyticsDashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('platform_analytics_aggregated')
         .select('*')
         .order('date', { ascending: false })
@@ -35,7 +35,7 @@ export default function PlatformAnalyticsDashboard() {
 
       if (error) throw error;
 
-      const summary = data.reduce((acc, day) => ({
+      const summary = (data || []).reduce((acc: any, day: any) => ({
         totalVendors: Math.max(acc.totalVendors, day.total_vendors || 0),
         activeVendors: Math.max(acc.activeVendors, day.active_vendors || 0),
         totalBookings: acc.totalBookings + (day.total_bookings || 0),

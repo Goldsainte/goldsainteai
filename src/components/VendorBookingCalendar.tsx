@@ -21,7 +21,7 @@ export default function VendorBookingCalendar() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: vendor } = await supabase
+      const { data: vendor } = await (supabase as any)
         .from('transportation_vendors')
         .select('id')
         .eq('user_id', user.id)
@@ -29,7 +29,7 @@ export default function VendorBookingCalendar() {
 
       if (!vendor) return;
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('transportation_bookings')
         .select('*')
         .eq('vendor_id', vendor.id)

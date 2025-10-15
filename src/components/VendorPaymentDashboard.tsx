@@ -22,23 +22,23 @@ export default function VendorPaymentDashboard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: vendor } = await supabase
+      const { data: vendor } = await (supabase as any)
         .from('transportation_vendors')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (!vendor) return;
 
-      const { data: escrow, error: escrowError } = await supabase
+      const { data: escrow, error: escrowError } = await (supabase as any)
         .from('vendor_escrow_accounts')
         .select('*')
         .eq('vendor_id', vendor.id)
-        .single();
+        .maybeSingle();
 
       if (escrowError && escrowError.code !== 'PGRST116') throw escrowError;
 
-      const { data: paymentsData, error: paymentsError } = await supabase
+      const { data: paymentsData, error: paymentsError } = await (supabase as any)
         .from('transportation_payments')
         .select('*, transportation_bookings(pickup_location, dropoff_location, pickup_datetime)')
         .eq('vendor_id', vendor.id)
