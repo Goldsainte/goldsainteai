@@ -69,6 +69,9 @@ import InstagramCallback from "./pages/InstagramCallback";
 import YourActivity from "./pages/YourActivity";
 import UploadEmailAssets from "./pages/UploadEmailAssets";
 import UploadAppleMusicKey from "./pages/UploadAppleMusicKey";
+import TransportationVendorApplication from "./pages/TransportationVendorApplication";
+import TransportationVendorDashboard from "./pages/TransportationVendorDashboard";
+import AdminTransportVendorVetting from "./pages/AdminTransportVendorVetting";
 
 const queryClient = new QueryClient();
 
@@ -175,6 +178,9 @@ function AppContent() {
           <Route path="/shop" element={<Shop />} />
           <Route path="/affiliate-manager" element={<AffiliateManager />} />
           <Route path="/supplier-management" element={<SupplierManagement />} />
+          <Route path="/transportation-vendor-application" element={<TransportationVendorApplication />} />
+          <Route path="/transportation-vendor-dashboard" element={<TransportationVendorDashboard />} />
+          <Route path="/admin/transport-vendor-vetting" element={<AdminTransportVendorVetting />} />
           <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
           <Route path="/cocurated-create" element={<CoCuratedCreate />} />
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
