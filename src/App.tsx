@@ -81,6 +81,7 @@ import VendorAnalyticsDashboard from "./components/VendorAnalyticsDashboard";
 import VendorBookingCalendar from "./components/VendorBookingCalendar";
 import EscrowTimelineDashboard from "./components/EscrowTimelineDashboard";
 import PlatformAnalyticsDashboard from "./components/PlatformAnalyticsDashboard";
+import ActivityLogs from "./pages/ActivityLogs";
 
 const queryClient = new QueryClient();
 
@@ -200,6 +201,7 @@ function AppContent() {
           <Route path="/vendor-booking-calendar" element={<VendorBookingCalendar />} />
           <Route path="/escrow-timeline" element={<EscrowTimelineDashboard />} />
           <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
+          <Route path="/activity-logs" element={<ActivityLogs />} />
           <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
           <Route path="/cocurated-create" element={<CoCuratedCreate />} />
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
