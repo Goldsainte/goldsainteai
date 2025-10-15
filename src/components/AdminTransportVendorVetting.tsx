@@ -5,15 +5,20 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CheckCircle, XCircle, Clock, FileText, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CheckCircle, XCircle, Clock, FileText, AlertTriangle, AlertCircle, RefreshCw, Loader2 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { LoadingAnnouncement, ErrorAnnouncement } from "@/components/LoadingAnnouncement";
 
 export default function AdminTransportVendorVetting() {
   const [pendingVendors, setPendingVendors] = useState<any[]>([]);
   const [selectedVendor, setSelectedVendor] = useState<any>(null);
   const [reviewNotes, setReviewNotes] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -22,7 +27,8 @@ export default function AdminTransportVendorVetting() {
 
   const loadPendingVendors = async () => {
     try {
-      const { data, error } = await supabase
+      setError(null);
+      const { data, error: queryError } = await supabase
         .from("suppliers" as any)
         .select(`
           *,
@@ -33,12 +39,18 @@ export default function AdminTransportVendorVetting() {
         .eq("verification_status", "pending")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (queryError) {
+        throw new Error(`Failed to load vendors: ${queryError.message}`);
+      }
+      
       setPendingVendors(data || []);
     } catch (error: any) {
+      const errorMessage = error.message || "Failed to load pending vendors. Please try again.";
+      setError(errorMessage);
+      
       toast({
         title: "Error",
-        description: "Failed to load pending vendors",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -47,6 +59,7 @@ export default function AdminTransportVendorVetting() {
   };
 
   const handleApprove = async (vendorId: string) => {
+    setProcessingAction(true);
     try {
       const { data, error } = await supabase.functions.invoke('approve-transportation-vendor', {
         body: {
@@ -63,15 +76,17 @@ export default function AdminTransportVendorVetting() {
         description: data.message || "The transportation vendor has been approved and activated."
       });
 
-      loadPendingVendors();
+      await loadPendingVendors();
       setSelectedVendor(null);
       setReviewNotes("");
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Approval Failed",
+        description: error.message || "Failed to approve vendor. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setProcessingAction(false);
     }
   };
 
@@ -85,6 +100,7 @@ export default function AdminTransportVendorVetting() {
       return;
     }
 
+    setProcessingAction(true);
     try {
       const { data, error } = await supabase.functions.invoke('approve-transportation-vendor', {
         body: {
@@ -101,24 +117,66 @@ export default function AdminTransportVendorVetting() {
         description: data.message || "The vendor application has been rejected."
       });
 
-      loadPendingVendors();
+      await loadPendingVendors();
       setSelectedVendor(null);
       setReviewNotes("");
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Rejection Failed",
+        description: error.message || "Failed to reject vendor. Please try again.",
         variant: "destructive"
       });
+    } finally {
+      setProcessingAction(false);
     }
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <LoadingAnnouncement message="Loading pending vendor applications" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-96" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Card className="lg:col-span-1">
+              <CardHeader><Skeleton className="h-6 w-48" /></CardHeader>
+              <CardContent className="space-y-2">
+                {[1, 2, 3].map((i) => <Skeleton key={i} className="h-20 w-full" />)}
+              </CardContent>
+            </Card>
+            <Card className="lg:col-span-2">
+              <CardHeader><Skeleton className="h-6 w-32" /></CardHeader>
+              <CardContent><Skeleton className="h-96 w-full" /></CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <ErrorAnnouncement message={error} />
+        <Card>
+          <CardContent className="text-center py-12">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+            <h2 className="text-2xl font-bold mb-4">Failed to Load Applications</h2>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <Button onClick={() => loadPendingVendors()}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto py-6 px-4">
+      {processingAction && <LoadingAnnouncement message="Processing vendor application" />}
+      
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Transportation Vendor Vetting</h1>
         <p className="text-muted-foreground">Review and approve vendor applications</p>
@@ -311,17 +369,25 @@ export default function AdminTransportVendorVetting() {
                   <Button
                     onClick={() => handleApprove(selectedVendor.id)}
                     className="flex-1"
+                    disabled={processingAction}
                   >
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Approve Vendor
+                    {processingAction ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
+                    ) : (
+                      <><CheckCircle className="mr-2 h-4 w-4" /> Approve Vendor</>
+                    )}
                   </Button>
                   <Button
                     onClick={() => handleReject(selectedVendor.id)}
                     variant="destructive"
                     className="flex-1"
+                    disabled={processingAction}
                   >
-                    <XCircle className="mr-2 h-4 w-4" />
-                    Reject
+                    {processingAction ? (
+                      <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Processing...</>
+                    ) : (
+                      <><XCircle className="mr-2 h-4 w-4" /> Reject</>
+                    )}
                   </Button>
                 </div>
               </div>

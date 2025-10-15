@@ -5,7 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Car, Users, FileText, TrendingUp, Star, Settings } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BarChart3, Car, Users, FileText, TrendingUp, Star, Settings, AlertCircle, RefreshCw, Loader2 } from "lucide-react";
+import { LoadingAnnouncement, ErrorAnnouncement } from "@/components/LoadingAnnouncement";
 
 interface VendorData {
   id: string;
@@ -34,6 +37,7 @@ interface VendorData {
 export default function TransportationVendorDashboard() {
   const [vendor, setVendor] = useState<VendorData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -42,8 +46,11 @@ export default function TransportationVendorDashboard() {
 
   const loadVendorData = async () => {
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      if (!authData.user) return;
+      setError(null);
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      
+      if (authError) throw new Error("Authentication failed. Please log in again.");
+      if (!authData.user) throw new Error("You must be logged in to view this page.");
 
       // Fetch supplier record first (using any to bypass type issues until regeneration)
       const { data: suppliers, error: supplierError } = await supabase
@@ -53,17 +60,23 @@ export default function TransportationVendorDashboard() {
         .eq('supplier_type', 'transportation')
         .limit(1);
 
-      if (supplierError) throw supplierError;
+      if (supplierError) {
+        throw new Error(`Failed to load vendor data: ${supplierError.message}`);
+      }
       
       if (suppliers && suppliers.length > 0) {
         const supplier: any = suppliers[0];
         
         // Then fetch transportation vendor details
-        const { data: transportVendors } = await supabase
+        const { data: transportVendors, error: vendorError } = await supabase
           .from('transportation_vendors' as any)
           .select('*')
           .eq('supplier_id', supplier.id)
           .limit(1);
+        
+        if (vendorError) {
+          throw new Error(`Failed to load vendor details: ${vendorError.message}`);
+        }
         
         const transportVendor: any = transportVendors?.[0];
         
@@ -91,9 +104,12 @@ export default function TransportationVendorDashboard() {
         });
       }
     } catch (error: any) {
+      const errorMessage = error.message || "Failed to load vendor data. Please try again.";
+      setError(errorMessage);
+      
       toast({
         title: "Error",
-        description: "Failed to load vendor data",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -102,19 +118,62 @@ export default function TransportationVendorDashboard() {
   };
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="container mx-auto py-6 px-4">
+        <LoadingAnnouncement message="Loading your vendor dashboard" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-64" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((i) => (
+              <Card key={i}>
+                <CardHeader className="pb-3">
+                  <Skeleton className="h-4 w-24" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-8 w-16" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-12 px-4">
+        <ErrorAnnouncement message={error} />
+        <Card>
+          <CardContent className="text-center py-12">
+            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
+            <h2 className="text-2xl font-bold mb-4">Failed to Load Dashboard</h2>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <Button onClick={() => loadVendorData()}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Try Again
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   if (!vendor) {
     return (
       <div className="container mx-auto py-12 text-center">
-        <h2 className="text-2xl font-bold mb-4">No Vendor Profile Found</h2>
-        <p className="text-muted-foreground mb-6">
-          You haven't applied as a transportation vendor yet.
-        </p>
-        <Button onClick={() => window.location.href = "/transportation-vendor-application"}>
-          Apply Now
-        </Button>
+        <Card className="max-w-md mx-auto">
+          <CardContent className="py-12">
+            <Car className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-2xl font-bold mb-4">No Vendor Profile Found</h2>
+            <p className="text-muted-foreground mb-6">
+              You haven't applied as a transportation vendor yet.
+            </p>
+            <Button onClick={() => window.location.href = "/transportation-vendor-application"}>
+              Apply Now
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }

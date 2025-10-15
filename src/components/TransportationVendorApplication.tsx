@@ -10,7 +10,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, ArrowRight, Upload, Check } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2 } from "lucide-react";
+import { LoadingAnnouncement, ErrorAnnouncement } from "@/components/LoadingAnnouncement";
 
 const STEPS = [
   "Business Information",
@@ -39,6 +41,8 @@ const PRICING_MODELS = [
 export default function TransportationVendorApplication() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -105,11 +109,39 @@ export default function TransportationVendorApplication() {
     updateFormData("serviceAreas", formData.serviceAreas.filter((_, i) => i !== index));
   };
 
+  const validateCurrentStep = (): boolean => {
+    const errors: Record<string, string> = {};
+    
+    if (currentStep === 0) {
+      if (!formData.businessName.trim()) errors.businessName = "Business name is required";
+      if (!formData.contactEmail.trim()) errors.contactEmail = "Contact email is required";
+      if (!formData.contactPhone.trim()) errors.contactPhone = "Contact phone is required";
+    }
+    
+    if (currentStep === 1 && formData.serviceAreas.length === 0) {
+      errors.serviceAreas = "At least one service area is required";
+    }
+    
+    if (currentStep === 8) {
+      if (!formData.agreedToTerms) errors.agreedToTerms = "You must agree to the terms";
+      if (!formData.eSignature.trim()) errors.eSignature = "Electronic signature is required";
+    }
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleSubmit = async () => {
+    if (!validateCurrentStep()) return;
+    
     setIsSubmitting(true);
+    setSubmitError(null);
+    
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
+      if (!user) {
+        throw new Error("You must be logged in to submit an application");
+      }
 
       const { data, error } = await supabase.functions.invoke("submit-transportation-vendor-application", {
         body: {
@@ -117,20 +149,20 @@ export default function TransportationVendorApplication() {
           contactEmail: formData.contactEmail,
           contactPhone: formData.contactPhone,
           businessAddress: formData.businessAddress,
-          yearsInBusiness: parseInt(formData.yearsInBusiness),
+          yearsInBusiness: parseInt(formData.yearsInBusiness) || 0,
           businessDescription: formData.businessDescription,
           serviceAreas: formData.serviceAreas,
           vehicles: formData.vehicles,
-          totalDrivers: parseInt(formData.totalDrivers),
+          totalDrivers: parseInt(formData.totalDrivers) || 0,
           insurancePolicyNumber: formData.insurancePolicyNumber,
           insuranceExpiryDate: formData.insuranceExpiryDate,
-          insuranceCoverageAmount: parseFloat(formData.insuranceCoverageAmount),
+          insuranceCoverageAmount: parseFloat(formData.insuranceCoverageAmount) || 0,
           commercialLicenseNumber: formData.commercialLicenseNumber,
           commercialLicenseExpiry: formData.commercialLicenseExpiry,
           dotNumber: formData.dotNumber,
           pricingModel: formData.pricingModel,
-          baseHourlyRate: parseFloat(formData.baseHourlyRate),
-          minimumBookingHours: parseInt(formData.minimumBookingHours),
+          baseHourlyRate: parseFloat(formData.baseHourlyRate) || 0,
+          minimumBookingHours: parseInt(formData.minimumBookingHours) || 2,
           cancellationPolicy: formData.cancellationPolicy,
           hasGpsTracking: formData.hasGpsTracking,
           hasBookingApi: formData.hasBookingApi,
@@ -148,9 +180,12 @@ export default function TransportationVendorApplication() {
 
       navigate("/supplier-management");
     } catch (error: any) {
+      const errorMessage = error.message || "Failed to submit application. Please try again.";
+      setSubmitError(errorMessage);
+      
       toast({
         title: "Submission Failed",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {
@@ -408,6 +443,9 @@ export default function TransportationVendorApplication() {
 
   return (
     <div className="container mx-auto max-w-3xl py-8 px-4">
+      {isSubmitting && <LoadingAnnouncement message="Submitting your vendor application" />}
+      {submitError && <ErrorAnnouncement message={submitError} />}
+      
       <Card>
         <CardHeader>
           <CardTitle>Transportation Vendor Application</CardTitle>
@@ -417,6 +455,22 @@ export default function TransportationVendorApplication() {
           <Progress value={progress} className="mt-2" />
         </CardHeader>
         <CardContent className="space-y-6">
+          {submitError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{submitError}</AlertDescription>
+            </Alert>
+          )}
+          
+          {Object.keys(fieldErrors).length > 0 && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Please correct the errors below before continuing.
+              </AlertDescription>
+            </Alert>
+          )}
+          
           {renderStep()}
 
           <div className="flex justify-between pt-6">
@@ -431,7 +485,11 @@ export default function TransportationVendorApplication() {
 
             {currentStep < STEPS.length - 1 ? (
               <Button
-                onClick={() => setCurrentStep(prev => prev + 1)}
+                onClick={() => {
+                  if (validateCurrentStep()) {
+                    setCurrentStep(prev => prev + 1);
+                  }
+                }}
                 disabled={!canProceed()}
               >
                 Next
@@ -442,8 +500,17 @@ export default function TransportationVendorApplication() {
                 onClick={handleSubmit}
                 disabled={!canProceed() || isSubmitting}
               >
-                {isSubmitting ? "Submitting..." : "Submit Application"}
-                <Check className="ml-2 h-4 w-4" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Application
+                    <Check className="ml-2 h-4 w-4" />
+                  </>
+                )}
               </Button>
             )}
           </div>
