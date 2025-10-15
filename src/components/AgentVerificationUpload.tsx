@@ -10,6 +10,33 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
+// Utility to sanitize file names for safe storage keys
+function sanitizeFileName(originalName: string): string {
+  const parts = originalName.split('.');
+  const extension = parts.length > 1 ? parts.pop()!.toLowerCase() : '';
+  let baseName = parts.join('.');
+  
+  // Normalize Unicode and strip diacritics
+  baseName = baseName.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  
+  // Replace all whitespace variants (including narrow no-break space U+202F) with dashes
+  baseName = baseName.replace(/[\s\u00A0\u202F\u2009\u200A]+/g, '-');
+  
+  // Remove all characters except alphanumeric, dots, dashes, underscores
+  baseName = baseName.replace(/[^a-zA-Z0-9._-]/g, '');
+  
+  // Remove leading/trailing dashes and collapse multiple dashes
+  baseName = baseName.replace(/^-+|-+$/g, '').replace(/-+/g, '-');
+  
+  // Truncate base name to 80 characters max
+  baseName = baseName.substring(0, 80);
+  
+  // If baseName is empty after sanitization, use a fallback
+  if (!baseName) baseName = 'file';
+  
+  return extension ? `${baseName}.${extension}` : baseName;
+}
+
 interface VerificationStatus {
   identity_verified: boolean;
   background_check_status: string;
@@ -41,14 +68,21 @@ export const AgentVerificationUpload = ({
       setUploading(verificationType);
 
       // Upload to storage
-      const fileExt = file.name.split(".").pop();
+      const sanitizedName = sanitizeFileName(file.name);
+      const fileExt = sanitizedName.split(".").pop();
       const filePath = `${agentId}/${verificationType}-${Date.now()}.${fileExt}`;
       
       const { error: uploadError } = await supabase.storage
         .from("verification-documents")
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        // Better error message for invalid file name characters
+        if (uploadError.message?.includes('Invalid key')) {
+          throw new Error(`File name contains unsupported characters. Please rename "${file.name}" and try again.`);
+        }
+        throw uploadError;
+      }
 
       // Get public URL
       const { data: urlData } = supabase.storage
