@@ -802,15 +802,15 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 onClick={() => setPhotoGalleryOpen(true)}
               >
                 {post.image_urls.map((src, idx) => (
-                  <img
-                    key={idx}
-                    src={src}
-                    alt={`${post.caption || 'Post image'} ${idx + 1}`}
-                    className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
-                    style={{ width: 'auto' }}
-                    draggable={false}
-                    loading="lazy"
-                  />
+                <img
+                  key={idx}
+                  src={src}
+                  alt={`${post.caption || 'Post image'} ${idx + 1}`}
+                  className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
+                  style={{ width: '300px' }}
+                  draggable={false}
+                  loading="lazy"
+                />
                 ))}
               </div>
               {post.image_urls.length > 1 && (
@@ -1414,26 +1414,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           >
             {post.image_urls && post.image_urls.length > 0 ? (
               post.image_urls.map((src, idx) => (
-                <img
-                  key={idx}
-                  src={src}
-                  alt={`Photo ${idx + 1}`}
-                  className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
-                  style={{ width: 'auto' }}
-                  draggable={false}
-                  loading="lazy"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setPhotoGalleryOpen(true);
-                  }}
-                />
-              ))
-            ) : post.thumbnail_url ? (
               <img
-                src={post.thumbnail_url}
-                alt="Post content"
+                key={idx}
+                src={src}
+                alt={`Photo ${idx + 1}`}
                 className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
-                style={{ width: 'auto' }}
+                style={{ width: '300px' }}
                 draggable={false}
                 loading="lazy"
                 onClick={(e) => {
@@ -1441,6 +1427,20 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   setPhotoGalleryOpen(true);
                 }}
               />
+              ))
+            ) : post.thumbnail_url ? (
+            <img
+              src={post.thumbnail_url}
+              alt="Post content"
+              className="flex-[0_0_auto] h-full object-cover rounded-lg snap-start select-none"
+              style={{ width: '300px' }}
+              draggable={false}
+              loading="lazy"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPhotoGalleryOpen(true);
+              }}
+            />
             ) : null}
           </div>
 
