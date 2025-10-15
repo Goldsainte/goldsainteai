@@ -72,6 +72,14 @@ import UploadAppleMusicKey from "./pages/UploadAppleMusicKey";
 import TransportationVendorApplication from "./pages/TransportationVendorApplication";
 import TransportationVendorDashboard from "./pages/TransportationVendorDashboard";
 import AdminTransportVendorVetting from "./pages/AdminTransportVendorVetting";
+import FleetManagementDashboard from "./components/FleetManagementDashboard";
+import DriverManagementPanel from "./components/DriverManagementPanel";
+import VendorPromotionManager from "./components/VendorPromotionManager";
+import VendorPaymentDashboard from "./components/VendorPaymentDashboard";
+import VendorAnalyticsDashboard from "./components/VendorAnalyticsDashboard";
+import VendorBookingCalendar from "./components/VendorBookingCalendar";
+import EscrowTimelineDashboard from "./components/EscrowTimelineDashboard";
+import PlatformAnalyticsDashboard from "./components/PlatformAnalyticsDashboard";
 
 const queryClient = new QueryClient();
 
@@ -181,6 +189,15 @@ function AppContent() {
           <Route path="/transportation-vendor-application" element={<TransportationVendorApplication />} />
           <Route path="/transportation-vendor-dashboard" element={<TransportationVendorDashboard />} />
           <Route path="/admin/transport-vendor-vetting" element={<AdminTransportVendorVetting />} />
+          {/* Phase 5: Transportation Vendor Features */}
+          <Route path="/fleet-management" element={<FleetManagementDashboard />} />
+          <Route path="/driver-management" element={<DriverManagementPanel />} />
+          <Route path="/vendor-promotions" element={<VendorPromotionManager />} />
+          <Route path="/vendor-payments" element={<VendorPaymentDashboard />} />
+          <Route path="/vendor-analytics" element={<VendorAnalyticsDashboard />} />
+          <Route path="/vendor-booking-calendar" element={<VendorBookingCalendar />} />
+          <Route path="/escrow-timeline" element={<EscrowTimelineDashboard />} />
+          <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
           <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
           <Route path="/cocurated-create" element={<CoCuratedCreate />} />
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
