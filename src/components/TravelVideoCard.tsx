@@ -119,6 +119,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [dragStart, setDragStart] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [wasSwipe, setWasSwipe] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   // Reset touch state on mount/unmount
   useEffect(() => {
@@ -209,7 +210,27 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   // Reset photo index when post changes
   useEffect(() => {
     setCurrentPhotoIndex(0);
+    if (carouselRef.current) {
+      carouselRef.current.scrollLeft = 0;
+    }
   }, [post.id]);
+
+  // Scroll-based photo index tracking
+  const handleCarouselScroll = () => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const idx = Math.round(el.scrollLeft / el.clientWidth);
+    if (idx !== currentPhotoIndex) {
+      setCurrentPhotoIndex(idx);
+    }
+  };
+
+  // Scroll to specific photo index
+  const scrollToIndex = (targetIndex: number) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    el.scrollTo({ left: targetIndex * el.clientWidth, behavior: 'smooth' });
+  };
 
   // Instagram-style autoplay audio effect
   useEffect(() => {
@@ -732,51 +753,34 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         <div className="relative bg-black aspect-square">
           {post.image_urls && post.image_urls.length > 0 ? (
             <div className="w-full h-full relative">
+              <style>{`
+                .hide-scrollbar::-webkit-scrollbar { display: none; }
+              `}</style>
               <div
-                className="w-full h-full cursor-pointer"
-                onClick={() => {
-                  setPhotoGalleryOpen(true);
+                ref={carouselRef}
+                onScroll={handleCarouselScroll}
+                className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth cursor-pointer"
+                style={{
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehaviorX: 'contain',
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  touchAction: 'pan-x',
                 }}
-                onWheel={(e) => {
-                  const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
-                  if (Math.abs(delta) < 10 || !post.image_urls || post.image_urls.length < 2) return;
-                  e.preventDefault();
-                  setCurrentPhotoIndex((prev) =>
-                    delta > 0
-                      ? (prev + 1) % post.image_urls!.length
-                      : (prev - 1 + post.image_urls!.length) % post.image_urls!.length
-                  );
-                }}
-                onMouseDown={(e) => {
-                  if (!post.image_urls || post.image_urls.length < 2) return;
-                  const startX = e.clientX;
-                  let handled = false;
-                  const handleMove = (move: MouseEvent) => {
-                    const dx = move.clientX - startX;
-                    if (!handled && Math.abs(dx) > 30) {
-                      handled = true;
-                      setCurrentPhotoIndex((prev) =>
-                        dx < 0
-                          ? (prev + 1) % post.image_urls!.length
-                          : (prev - 1 + post.image_urls!.length) % post.image_urls!.length
-                      );
-                    }
-                  };
-                  const handleUp = () => {
-                    window.removeEventListener('mousemove', handleMove);
-                    window.removeEventListener('mouseup', handleUp);
-                  };
-                  window.addEventListener('mousemove', handleMove);
-                  window.addEventListener('mouseup', handleUp);
-                }}
+                onClick={() => setPhotoGalleryOpen(true)}
               >
-                <OptimizedImage
-                  src={post.image_urls[currentPhotoIndex]}
-                  alt={`${post.caption || 'Post image'} ${currentPhotoIndex + 1}`}
-                  aspectRatio="square"
-                  priority={isActive}
-                  className="w-full h-full"
-                />
+                {post.image_urls.map((src, idx) => (
+                  <div key={idx} className="flex-[0_0_100%] w-full h-full snap-center">
+                    <OptimizedImage
+                      src={src}
+                      alt={`${post.caption || 'Post image'} ${idx + 1}`}
+                      aspectRatio="square"
+                      priority={isActive && idx === currentPhotoIndex}
+                      className="w-full h-full select-none pointer-events-none"
+                      draggable={false}
+                    />
+                  </div>
+                ))}
               </div>
               {post.image_urls.length > 1 && (
                 <>
@@ -787,7 +791,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 z-30 pointer-events-auto transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                      scrollToIndex((currentPhotoIndex - 1 + post.image_urls!.length) % post.image_urls!.length);
                     }}
                     aria-label="Previous photo"
                   >
@@ -797,13 +801,39 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 z-30 pointer-events-auto transition-colors"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                      scrollToIndex((currentPhotoIndex + 1) % post.image_urls!.length);
                     }}
                     aria-label="Next photo"
                   >
                     <ChevronRight className="h-6 w-6" />
                   </button>
+                  <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-3">
+                    {post.image_urls.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={(e) => { 
+                          e.stopPropagation(); 
+                          scrollToIndex(index); 
+                        }}
+                        className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentPhotoIndex ? 'bg-white scale-110' : 'bg-white/50'}`}
+                        aria-label={`Go to photo ${index + 1}`}
+                      />
+                    ))}
+                  </div>
                 </>
+              )}
+              {/* Mute Button for Photos with Music */}
+              {post.music_preview_url && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggleMute();
+                  }}
+                  className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-40"
+                  aria-label={isMuted ? 'Unmute' : 'Mute'}
+                >
+                  {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
+                </button>
               )}
             </div>
           ) : post.video_url ? (
@@ -1360,110 +1390,96 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
         </>
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <>
-          <div 
-            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none"
-            onTouchStart={(e) => {
-              const x = e.targetTouches[0].clientX;
-              const y = e.targetTouches[0].clientY;
-              setTouchStartX(x);
-              setTouchStartY(y);
-              setTouchEndX(x);
-              setTouchEndY(y);
+          <style>{`
+            .hide-scrollbar::-webkit-scrollbar { display: none; }
+          `}</style>
+          <div
+            ref={carouselRef}
+            onScroll={handleCarouselScroll}
+            className="hide-scrollbar absolute inset-0 flex overflow-x-auto snap-x snap-mandatory scroll-smooth"
+            style={{
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehaviorX: 'contain',
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              touchAction: 'pan-x',
             }}
-            onTouchMove={(e) => {
-              setTouchEndX(e.targetTouches[0].clientX);
-              setTouchEndY(e.targetTouches[0].clientY);
-            }}
-            onTouchEnd={(e) => {
-              const deltaX = touchStartX - touchEndX;
-              const deltaY = touchStartY - touchEndY;
-              
-              const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
-              
-              if (isHorizontalSwipe && Math.abs(deltaX) > 30) {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                if (deltaX > 0 && post.image_urls) {
-                  setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
-                  setWasSwipe(true);
-                  setTimeout(() => setWasSwipe(false), 100);
-                } else if (deltaX < 0 && post.image_urls) {
-                  setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
-                  setWasSwipe(true);
-                  setTimeout(() => setWasSwipe(false), 100);
-                }
-              }
-              
-              setTouchStartX(0);
-              setTouchStartY(0);
-              setTouchEndX(0);
-              setTouchEndY(0);
-            }}
-            onMouseDown={(e) => {
-              setIsDragging(true);
-              setDragStart(e.clientX);
-              e.preventDefault();
-            }}
-            onMouseMove={(e) => {
-              if (!isDragging) return;
-              const distance = Math.abs(dragStart - e.clientX);
-              if (distance > 10) {
-                e.currentTarget.style.cursor = 'grabbing';
-              }
-            }}
-            onMouseUp={(e) => {
-              if (!isDragging) return;
-              setIsDragging(false);
-              e.currentTarget.style.cursor = 'grab';
-              
-              const distance = dragStart - e.clientX;
-              const isLeftDrag = distance > 30;
-              const isRightDrag = distance < -30;
-              
-              if ((isLeftDrag || isRightDrag) && post.image_urls) {
-                e.stopPropagation();
-                e.preventDefault();
-                
-                if (isLeftDrag) {
-                  setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
-                } else {
-                  setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
-                }
-                setWasSwipe(true);
-                setTimeout(() => setWasSwipe(false), 100);
-              }
-            }}
-            onMouseLeave={() => setIsDragging(false)}
           >
-            <img 
-              src={post.image_urls?.[currentPhotoIndex] || (post.thumbnail_url as string)} 
-              alt="Post content"
-              className="w-full h-full object-cover bg-black pointer-events-none"
+            {post.image_urls && post.image_urls.length > 0 ? (
+              post.image_urls.map((src, idx) => (
+                <div 
+                  key={idx} 
+                  className="flex-[0_0_100%] w-full h-full snap-center"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPhotoGalleryOpen(true);
+                  }}
+                >
+                  <img
+                    src={src}
+                    alt={`Photo ${idx + 1}`}
+                    className="w-full h-full object-cover select-none pointer-events-none"
+                    draggable="false"
+                    loading="lazy"
+                  />
+                </div>
+              ))
+            ) : post.thumbnail_url ? (
+              <div 
+                className="flex-[0_0_100%] w-full h-full snap-center"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setPhotoGalleryOpen(true);
+                }}
+              >
+                <img
+                  src={post.thumbnail_url}
+                  alt="Post content"
+                  className="w-full h-full object-cover select-none pointer-events-none"
+                  draggable="false"
+                  loading="lazy"
+                />
+              </div>
+            ) : null}
+          </div>
+
+          {/* Gradient overlay */}
+          <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black/80 via-black/40 to-transparent pointer-events-none z-10" />
+
+          {/* Photo carousel dots - positioned above bottom nav */}
+          {post.image_urls && post.image_urls.length > 1 && (
+            <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-24 md:bottom-3">
+              {post.image_urls.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => { 
+                    e.stopPropagation(); 
+                    scrollToIndex(index); 
+                  }}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                    index === currentPhotoIndex
+                      ? "bg-white scale-110"
+                      : "bg-white/50"
+                  }`}
+                  aria-label={`Go to photo ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Mute Button for Photos with Music */}
+          {post.music_preview_url && (
+            <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (!wasSwipe) {
-                  setPhotoGalleryOpen(true);
-                }
+                onToggleMute();
               }}
-              loading="lazy"
-              draggable="false"
-            />
-            {post.image_urls && post.image_urls.length > 1 && (
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20 pointer-events-none">
-                {post.image_urls.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-1.5 h-1.5 rounded-full transition-all ${
-                      index === currentPhotoIndex
-                        ? "bg-white scale-110"
-                        : "bg-white/50"
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
+              className="absolute bottom-36 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-40"
+              aria-label={isMuted ? 'Unmute' : 'Mute'}
+            >
+              {isMuted ? <VolumeX className="h-4 w-4 text-white" /> : <Volume2 className="h-4 w-4 text-white" />}
+            </button>
+          )}
 
           {/* More Options Button for Photos */}
           <div className="absolute bottom-20 right-4 z-10">
