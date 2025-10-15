@@ -822,42 +822,239 @@ export default function TransportationVendorApplication() {
       case 7:
         return (
           <div className="space-y-6">
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="interestedInPromotion"
-                checked={formData.interestedInPromotion}
-                onCheckedChange={(checked) => updateFormData("interestedInPromotion", checked)}
-              />
-              <Label htmlFor="interestedInPromotion">
-                I'm interested in promoted listing on the platform
-              </Label>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Promoted Listing Options</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Increase your visibility and attract more customers with promoted listings
+              </p>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="interestedInPromotion"
+                  checked={formData.interestedInPromotion}
+                  onCheckedChange={(checked) => updateFormData("interestedInPromotion", checked)}
+                />
+                <Label htmlFor="interestedInPromotion">
+                  I'm interested in promoted listing on the platform
+                </Label>
+              </div>
             </div>
             
             {formData.interestedInPromotion && (
               <>
+                {/* Pricing Model Section */}
                 <div className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">Pricing Model</h4>
-                  <Select value={formData.promotionPricingModel} onValueChange={(v) => updateFormData("promotionPricingModel", v)}>
-                    <SelectTrigger><SelectValue placeholder="Choose pricing model" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cpc">Cost Per Click (CPC)</SelectItem>
-                      <SelectItem value="cpm">Cost Per Thousand Impressions (CPM)</SelectItem>
-                      <SelectItem value="flat_monthly">Flat Monthly Rate</SelectItem>
-                      <SelectItem value="performance_based">Performance-Based</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <h4 className="font-semibold">Promotion Pricing Model</h4>
+                  
                   <div>
-                    <Label htmlFor="promotionBudget">Monthly Budget ($)</Label>
-                    <Input id="promotionBudget" type="number" value={formData.promotionBudget} onChange={(e) => updateFormData("promotionBudget", e.target.value)} placeholder="1000" />
+                    <Label>Select Pricing Model</Label>
+                    <Select 
+                      value={formData.promotionPricingModel} 
+                      onValueChange={(v) => updateFormData("promotionPricingModel", v)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose pricing model" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cpc">Cost Per Click (CPC) - Pay only when customers click</SelectItem>
+                        <SelectItem value="cpm">Cost Per Thousand Impressions (CPM) - Pay per 1000 views</SelectItem>
+                        <SelectItem value="flat_monthly">Flat Monthly Rate - Fixed cost per month</SelectItem>
+                        <SelectItem value="performance_based">Performance-Based - Pay based on bookings generated</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+                  
                   <div>
-                    <Label htmlFor="promotionDiscountOffered">Promotional Discount (%)</Label>
-                    <Input id="promotionDiscountOffered" type="number" value={formData.promotionDiscountOffered} onChange={(e) => updateFormData("promotionDiscountOffered", e.target.value)} placeholder="10" />
+                    <Label htmlFor="promotionBudget">Monthly Promotion Budget ($)</Label>
+                    <Input
+                      id="promotionBudget"
+                      type="number"
+                      value={formData.promotionBudget}
+                      onChange={(e) => updateFormData("promotionBudget", e.target.value)}
+                      placeholder="1000"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Recommended: $500-$2000/month for optimal results
+                    </p>
                   </div>
                 </div>
+                
+                {/* Target Metrics Section */}
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h4 className="font-semibold">Target Metrics</h4>
+                  
+                  <div>
+                    <Label htmlFor="promotionTargetImpressions">Target Monthly Impressions</Label>
+                    <Input
+                      id="promotionTargetImpressions"
+                      type="number"
+                      value={formData.promotionTargetImpressions}
+                      onChange={(e) => updateFormData("promotionTargetImpressions", e.target.value)}
+                      placeholder="10000"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="promotionTargetClicks">Target Monthly Clicks</Label>
+                    <Input
+                      id="promotionTargetClicks"
+                      type="number"
+                      value={formData.promotionTargetClicks}
+                      onChange={(e) => updateFormData("promotionTargetClicks", e.target.value)}
+                      placeholder="500"
+                    />
+                  </div>
+                </div>
+                
+                {/* Geographic Targeting */}
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h4 className="font-semibold">Geographic Targeting</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Target specific cities or regions for your promotions
+                  </p>
+                  
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <CityAutocomplete
+                        value={formData.serviceAreaInput}
+                        onChange={(value) => updateFormData("serviceAreaInput", value)}
+                        placeholder="Add target location"
+                      />
+                    </div>
+                    <Button 
+                      type="button" 
+                      onClick={() => {
+                        const trimmed = formData.serviceAreaInput.trim();
+                        if (trimmed && !formData.promotionGeographicTargets.includes(trimmed)) {
+                          updateFormData("promotionGeographicTargets", [...formData.promotionGeographicTargets, trimmed]);
+                          updateFormData("serviceAreaInput", "");
+                        }
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </div>
+                  
+                  {formData.promotionGeographicTargets.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {formData.promotionGeographicTargets.map((target, index) => (
+                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                          {target}
+                          <X 
+                            className="h-3 w-3 cursor-pointer" 
+                            onClick={() => updateFormData("promotionGeographicTargets", 
+                              formData.promotionGeographicTargets.filter((_, i) => i !== index)
+                            )}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Special Offers & Packages */}
+                <div className="border rounded-lg p-4 space-y-4">
+                  <h4 className="font-semibold">Special Promotional Packages</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Create exclusive packages and discounts for promoted customers
+                  </p>
+                  
+                  <div>
+                    <Label htmlFor="promotionDiscountOffered">Promotional Discount (%)</Label>
+                    <Input
+                      id="promotionDiscountOffered"
+                      type="number"
+                      value={formData.promotionDiscountOffered}
+                      onChange={(e) => updateFormData("promotionDiscountOffered", e.target.value)}
+                      placeholder="10"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Offer a discount to customers who find you through promotions
+                    </p>
+                  </div>
+                  
+                  {/* Add Package Builder */}
+                  <div className="space-y-3 border-t pt-4">
+                    <Label>Create Special Package</Label>
+                    <Input
+                      placeholder="Package Name (e.g., Airport VIP Transfer)"
+                      value={formData.currentSpecialPackage.name}
+                      onChange={(e) => updateFormData("currentSpecialPackage", {
+                        ...formData.currentSpecialPackage,
+                        name: e.target.value
+                      })}
+                    />
+                    <Textarea
+                      placeholder="Package Description"
+                      value={formData.currentSpecialPackage.description}
+                      onChange={(e) => updateFormData("currentSpecialPackage", {
+                        ...formData.currentSpecialPackage,
+                        description: e.target.value
+                      })}
+                      rows={2}
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Package Price ($)"
+                      value={formData.currentSpecialPackage.price}
+                      onChange={(e) => updateFormData("currentSpecialPackage", {
+                        ...formData.currentSpecialPackage,
+                        price: e.target.value
+                      })}
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const pkg = formData.currentSpecialPackage;
+                        if (pkg.name && pkg.description && pkg.price) {
+                          updateFormData("promotionSpecialPackages", [
+                            ...formData.promotionSpecialPackages,
+                            { ...pkg }
+                          ]);
+                          updateFormData("currentSpecialPackage", { name: "", description: "", price: "" });
+                        }
+                      }}
+                    >
+                      Add Package
+                    </Button>
+                  </div>
+                  
+                  {/* Display added packages */}
+                  {formData.promotionSpecialPackages.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Created Packages:</Label>
+                      {formData.promotionSpecialPackages.map((pkg, index) => (
+                        <div key={index} className="flex items-start justify-between bg-secondary p-3 rounded-lg">
+                          <div className="flex-1">
+                            <p className="font-medium">{pkg.name}</p>
+                            <p className="text-sm text-muted-foreground">{pkg.description}</p>
+                            <p className="text-sm font-semibold mt-1">${pkg.price}</p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => updateFormData("promotionSpecialPackages",
+                              formData.promotionSpecialPackages.filter((_, i) => i !== index)
+                            )}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                
+                {/* Marketing Description */}
                 <div>
                   <Label htmlFor="marketingDescription">Marketing Description</Label>
-                  <Textarea id="marketingDescription" value={formData.marketingDescription} onChange={(e) => updateFormData("marketingDescription", e.target.value)} placeholder="Describe your service..." rows={4} />
+                  <Textarea
+                    id="marketingDescription"
+                    value={formData.marketingDescription}
+                    onChange={(e) => updateFormData("marketingDescription", e.target.value)}
+                    placeholder="Describe your unique selling points, service quality, fleet features, and what makes you stand out..."
+                    rows={5}
+                  />
                 </div>
               </>
             )}
