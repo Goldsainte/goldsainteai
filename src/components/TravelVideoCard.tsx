@@ -837,7 +837,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     e.stopPropagation();
                     onToggleMute();
                   }}
-                  className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-40"
+                  className="absolute top-4 right-4 rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110 z-40"
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
@@ -1475,10 +1475,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 e.stopPropagation();
                 onToggleMute();
               }}
-              className="absolute bottom-36 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-40"
+              className="absolute bottom-36 right-4 rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110 z-40"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
-              {isMuted ? <VolumeX className="h-4 w-4 text-white" /> : <Volume2 className="h-4 w-4 text-white" />}
+              {isMuted ? <VolumeX className="h-5 w-5 text-white" /> : <Volume2 className="h-5 w-5 text-white" />}
             </button>
           )}
 
@@ -1487,8 +1487,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             {isOwnPost ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
-                    <MoreVertical className="h-6 w-6 text-white" />
+                  <button className="rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110">
+                    <MoreVertical className="h-5 w-5 text-white" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
@@ -1505,8 +1505,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             ) : (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="rounded-full bg-black/40 backdrop-blur-md p-3 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110">
-                    <MoreVertical className="h-6 w-6 text-white" />
+                  <button className="rounded-full bg-black/60 backdrop-blur-sm p-2.5 shadow-lg border border-white/20 transition-all duration-200 hover:bg-black/70 hover:scale-110">
+                    <MoreVertical className="h-5 w-5 text-white" />
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-background/95 backdrop-blur-sm">
