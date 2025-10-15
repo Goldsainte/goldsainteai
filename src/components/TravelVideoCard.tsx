@@ -815,7 +815,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               </div>
               {post.image_urls.length > 1 && (
                 <>
-                  <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-3">
+                  <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-3 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1">
                     {post.image_urls.map((_, index) => (
                       <button
                         key={index}
@@ -823,7 +823,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                           e.stopPropagation(); 
                           scrollToIndex(index); 
                         }}
-                        className={`w-1.5 h-1.5 rounded-full transition-all ${index === currentPhotoIndex ? 'bg-white scale-110' : 'bg-white/50'}`}
+                        className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${index === currentPhotoIndex ? 'bg-white w-6' : 'bg-white/40 hover:bg-white/60'}`}
                         aria-label={`Go to photo ${index + 1}`}
                       />
                     ))}
@@ -1449,7 +1449,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
           {/* Photo carousel dots - positioned above bottom nav */}
           {post.image_urls && post.image_urls.length > 1 && (
-            <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-24 md:bottom-3">
+            <div className="absolute left-1/2 -translate-x-1/2 flex gap-1.5 z-40 pointer-events-auto bottom-24 md:bottom-3 bg-black/40 backdrop-blur-sm rounded-full px-2 py-1">
               {post.image_urls.map((_, index) => (
                 <button
                   key={index}
@@ -1457,10 +1457,10 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                     e.stopPropagation(); 
                     scrollToIndex(index); 
                   }}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
                     index === currentPhotoIndex
-                      ? "bg-white scale-110"
-                      : "bg-white/50"
+                      ? "bg-white w-6"
+                      : "bg-white/40 hover:bg-white/60"
                   }`}
                   aria-label={`Go to photo ${index + 1}`}
                 />
