@@ -450,6 +450,7 @@ const TravelFeed = () => {
                     isMuted={isMuted}
                     onToggleMute={() => setIsMuted(!isMuted)}
                     hasInteracted={hasInteracted}
+                    isAdjacent={Math.abs(index - currentIndex) === 1}
                   />
                 </div>
               ))

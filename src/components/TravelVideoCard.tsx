@@ -70,9 +70,10 @@ interface TravelVideoCardProps {
   isMuted: boolean;
   onToggleMute: () => void;
   hasInteracted?: boolean;
+  isAdjacent?: boolean;
 }
 
-const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute, hasInteracted = false }: TravelVideoCardProps) => {
+const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted, onToggleMute, hasInteracted = false, isAdjacent = false }: TravelVideoCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLiked, setIsLiked] = useState(false);
@@ -96,7 +97,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [photoGalleryOpen, setPhotoGalleryOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [audioPlaying, setAudioPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Initialize audio with preload settings
+  if (!audioRef.current) {
+    const audio = new Audio();
+    audio.preload = 'auto';
+    audio.crossOrigin = 'anonymous';
+    audioRef.current = audio;
+  }
+  
   const [nativeVolume, setNativeVolume] = useState(post.native_video_volume || 100);
   const [musicVolume, setMusicVolume] = useState(post.music_volume || 80);
   const userInitiatedPlay = useRef(false);
@@ -122,6 +132,19 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       setWasSwipe(false);
     };
   }, []);
+
+  // Preload music when post becomes visible or is adjacent
+  useEffect(() => {
+    if (!post.music_preview_url || !audioRef.current) return;
+    
+    const audio = audioRef.current;
+    
+    if ((isActive || isAdjacent) && audio.src !== post.music_preview_url) {
+      audio.src = post.music_preview_url;
+      audio.preload = 'auto';
+      audio.load();
+    }
+  }, [post.music_preview_url, isActive, isAdjacent]);
 
   const [showPhotoGallery, setShowPhotoGallery] = useState(false);
 
@@ -194,6 +217,12 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
 
     const audio = audioRef.current;
 
+    if (audio.src !== post.music_preview_url) {
+      audio.src = post.music_preview_url;
+      audio.preload = 'auto';
+      audio.load();
+    }
+
     const handleStalled = () => {
       if (isActive && !isMuted && hasInteracted) {
         audio.play().catch(console.error);
@@ -212,7 +241,6 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     };
 
     const handlePlay = () => {
-      // Isolate playback: pause all other audio
       document.querySelectorAll('audio[data-post-id]').forEach((otherAudio) => {
         if (otherAudio !== audio && !(otherAudio as HTMLAudioElement).paused) {
           (otherAudio as HTMLAudioElement).pause();
@@ -220,23 +248,33 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       });
     };
 
+    const handleCanPlayThrough = () => {
+      if (isActive && !isMuted && hasInteracted && audio.paused) {
+        audio.play()
+          .then(() => setAudioPlaying(true))
+          .catch(console.error);
+      }
+    };
+
     audio.addEventListener('stalled', handleStalled);
     audio.addEventListener('suspend', handleSuspended);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('play', handlePlay);
+    audio.addEventListener('canplaythrough', handleCanPlayThrough);
 
-    // Active-first autoplay logic
     audio.volume = musicVolume / 100;
     
     if (!isActive || isMuted) {
-      // Always pause when not active or muted
       audio.pause();
       setAudioPlaying(false);
     } else if (isActive && !isMuted && hasInteracted) {
-      // Auto-play when active, unmuted, and user has interacted
-      audio.play()
-        .then(() => setAudioPlaying(true))
-        .catch(console.error);
+      if (audio.readyState >= 3) {
+        audio.play()
+          .then(() => setAudioPlaying(true))
+          .catch(console.error);
+      } else {
+        audio.load();
+      }
     }
 
     return () => {
@@ -244,6 +282,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       audio.removeEventListener('stalled', handleStalled);
       audio.removeEventListener('suspend', handleSuspended);
       audio.removeEventListener('play', handlePlay);
+      audio.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
   }, [isActive, isMuted, post.music_preview_url, hasInteracted, musicVolume]);
 
@@ -1322,25 +1361,28 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       ) : (post.image_urls?.length > 0 || post.thumbnail_url) ? (
         <>
           <div 
-            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none touch-pan-y"
+            className="absolute inset-0 cursor-grab active:cursor-grabbing select-none"
             onTouchStart={(e) => {
-              setTouchStartX(e.targetTouches[0].clientX);
-              setTouchStartY(e.targetTouches[0].clientY);
+              const x = e.targetTouches[0].clientX;
+              const y = e.targetTouches[0].clientY;
+              setTouchStartX(x);
+              setTouchStartY(y);
+              setTouchEndX(x);
+              setTouchEndY(y);
             }}
             onTouchMove={(e) => {
               setTouchEndX(e.targetTouches[0].clientX);
               setTouchEndY(e.targetTouches[0].clientY);
             }}
             onTouchEnd={(e) => {
-              if (!touchStartX || !touchEndX) return;
-              
               const deltaX = touchStartX - touchEndX;
               const deltaY = touchStartY - touchEndY;
               
               const isHorizontalSwipe = Math.abs(deltaX) > Math.abs(deltaY);
               
-              if (isHorizontalSwipe && Math.abs(deltaX) > 50) {
+              if (isHorizontalSwipe && Math.abs(deltaX) > 30) {
                 e.stopPropagation();
+                e.preventDefault();
                 
                 if (deltaX > 0 && post.image_urls) {
                   setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
@@ -1361,26 +1403,33 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             onMouseDown={(e) => {
               setIsDragging(true);
               setDragStart(e.clientX);
+              e.preventDefault();
             }}
             onMouseMove={(e) => {
               if (!isDragging) return;
+              const distance = Math.abs(dragStart - e.clientX);
+              if (distance > 10) {
+                e.currentTarget.style.cursor = 'grabbing';
+              }
             }}
             onMouseUp={(e) => {
               if (!isDragging) return;
               setIsDragging(false);
+              e.currentTarget.style.cursor = 'grab';
               
               const distance = dragStart - e.clientX;
-              const isLeftDrag = distance > 50;
-              const isRightDrag = distance < -50;
+              const isLeftDrag = distance > 30;
+              const isRightDrag = distance < -30;
               
-              if (isLeftDrag && post.image_urls) {
-                setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
-                setWasSwipe(true);
-                setTimeout(() => setWasSwipe(false), 100);
-              }
-              
-              if (isRightDrag && post.image_urls) {
-                setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+              if ((isLeftDrag || isRightDrag) && post.image_urls) {
+                e.stopPropagation();
+                e.preventDefault();
+                
+                if (isLeftDrag) {
+                  setCurrentPhotoIndex((prev) => (prev + 1) % post.image_urls!.length);
+                } else {
+                  setCurrentPhotoIndex((prev) => (prev - 1 + post.image_urls!.length) % post.image_urls!.length);
+                }
                 setWasSwipe(true);
                 setTimeout(() => setWasSwipe(false), 100);
               }
