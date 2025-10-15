@@ -54,27 +54,73 @@ serve(async (req) => {
     console.log('Supplier created:', supplier.id);
 
     // Create transportation vendor record
+    const vendorData: any = {
+      supplier_id: supplier.id,
+      years_in_business: applicationData.yearsInBusiness,
+      service_areas: applicationData.serviceAreas,
+      total_drivers: applicationData.totalDrivers,
+      insurance_policy_number: applicationData.insurancePolicyNumber,
+      insurance_expiry_date: applicationData.insuranceExpiryDate,
+      insurance_coverage_amount: applicationData.insuranceCoverageAmount,
+      commercial_license_number: applicationData.commercialLicenseNumber,
+      commercial_license_expiry: applicationData.commercialLicenseExpiry,
+      dot_number: applicationData.dotNumber,
+      pricing_model: applicationData.pricingModel,
+      base_hourly_rate: applicationData.baseHourlyRate,
+      minimum_booking_hours: applicationData.minimumBookingHours,
+      cancellation_policy: applicationData.cancellationPolicy,
+      has_gps_tracking: applicationData.hasGpsTracking,
+      has_booking_api: applicationData.hasBookingApi,
+      api_endpoint: applicationData.apiEndpoint,
+    };
+
+    // Add driver credentials
+    if (applicationData.driverVettingProcess) vendorData.driver_vetting_process = applicationData.driverVettingProcess;
+    if (applicationData.backgroundCheckPolicy) vendorData.background_check_policy = applicationData.backgroundCheckPolicy;
+    if (applicationData.averageDriverExperience) vendorData.average_driver_experience = applicationData.averageDriverExperience;
+    if (applicationData.driverTrainingProgram) vendorData.driver_training_program = applicationData.driverTrainingProgram;
+    if (applicationData.cdlCompliance !== undefined) vendorData.cdl_compliance = applicationData.cdlCompliance;
+
+    // Add technology integration
+    if (applicationData.hasRealTimeTracking !== undefined) vendorData.has_real_time_tracking = applicationData.hasRealTimeTracking;
+    if (applicationData.hasMobileApp !== undefined) vendorData.has_mobile_app = applicationData.hasMobileApp;
+    if (applicationData.hasAutomatedDispatch !== undefined) vendorData.has_automated_dispatch = applicationData.hasAutomatedDispatch;
+
+    // Add document uploads
+    if (applicationData.insuranceDocuments) vendorData.insurance_documents = applicationData.insuranceDocuments;
+    if (applicationData.driverLicenseDocuments) vendorData.driver_license_documents = applicationData.driverLicenseDocuments;
+
+    // Add social media
+    if (applicationData.instagramHandle || applicationData.tiktokHandle || applicationData.twitterHandle || 
+        applicationData.facebookPage || applicationData.linkedinPage) {
+      vendorData.social_media = {
+        instagram: applicationData.instagramHandle || null,
+        tiktok: applicationData.tiktokHandle || null,
+        twitter: applicationData.twitterHandle || null,
+        facebook: applicationData.facebookPage || null,
+        linkedin: applicationData.linkedinPage || null,
+      };
+    }
+
+    // Add promotion preferences
+    if (applicationData.interestedInPromotion) {
+      vendorData.promotion_preferences = {
+        interested: true,
+        budget: applicationData.promotionBudget || null,
+        pricing_model: applicationData.promotionPricingModel || null,
+        target_impressions: applicationData.promotionTargetImpressions || null,
+        target_clicks: applicationData.promotionTargetClicks || null,
+        geographic_targets: applicationData.promotionGeographicTargets || [],
+        discount_offered: applicationData.promotionDiscountOffered || null,
+        special_packages: applicationData.promotionSpecialPackages || [],
+        marketing_description: applicationData.marketingDescription || null,
+        special_offers: applicationData.specialOffers || null,
+      };
+    }
+
     const { data: transportVendor, error: vendorError } = await supabase
       .from('transportation_vendors')
-      .insert({
-        supplier_id: supplier.id,
-        years_in_business: applicationData.yearsInBusiness,
-        service_areas: applicationData.serviceAreas,
-        total_drivers: applicationData.totalDrivers,
-        insurance_policy_number: applicationData.insurancePolicyNumber,
-        insurance_expiry_date: applicationData.insuranceExpiryDate,
-        insurance_coverage_amount: applicationData.insuranceCoverageAmount,
-        commercial_license_number: applicationData.commercialLicenseNumber,
-        commercial_license_expiry: applicationData.commercialLicenseExpiry,
-        dot_number: applicationData.dotNumber,
-        pricing_model: applicationData.pricingModel,
-        base_hourly_rate: applicationData.baseHourlyRate,
-        minimum_booking_hours: applicationData.minimumBookingHours,
-        cancellation_policy: applicationData.cancellationPolicy,
-        has_gps_tracking: applicationData.hasGpsTracking,
-        has_booking_api: applicationData.hasBookingApi,
-        api_endpoint: applicationData.apiEndpoint,
-      })
+      .insert(vendorData)
       .select()
       .single();
 
