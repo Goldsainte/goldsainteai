@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { DollarSign, Clock, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
+import { useActivityLogger } from "@/hooks/useActivityLogger";
 
 interface AgentBidFormProps {
   jobId: string;
@@ -28,6 +29,7 @@ export function AgentBidForm({
   onBidSubmitted 
 }: AgentBidFormProps) {
   const { user } = useAuth();
+  const { logActivity } = useActivityLogger();
   const [agentPrice, setAgentPrice] = useState("");
   const [completionDays, setCompletionDays] = useState("");
   const [proposal, setProposal] = useState("");
@@ -101,7 +103,7 @@ export function AgentBidForm({
       const agentPayout = price - successFee;
 
       // Insert bid
-      const { error: bidError } = await supabase
+      const { data: bidData, error: bidError } = await supabase
         .from('agent_bids')
         .insert({
           job_id: jobId,
@@ -118,9 +120,25 @@ export function AgentBidForm({
           proposal_details: proposal,
           currency: currency,
           status: 'pending',
-        });
+        })
+        .select()
+        .single();
 
       if (bidError) throw bidError;
+
+      // Log bid submission
+      await logActivity({
+        action: 'bid_submitted',
+        entity_type: 'agent_bid',
+        entity_id: bidData.id,
+        details: { 
+          jobId, 
+          agentPrice: price, 
+          customerPrice, 
+          estimatedDays: days,
+          agencyName: agentData.agency_name 
+        }
+      });
 
       // Get job owner ID for notification
       const { data: jobData } = await supabase

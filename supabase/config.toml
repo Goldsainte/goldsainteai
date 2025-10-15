@@ -204,3 +204,6 @@ verify_jwt = false
 [functions.create-vendor-promotion]
 verify_jwt = true
 
+[functions.log-activity]
+verify_jwt = true
+

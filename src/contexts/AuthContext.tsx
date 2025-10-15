@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
+import { useActivityLogger } from '@/hooks/useActivityLogger';
 
 interface AuthContextType {
   user: User | null;
@@ -19,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { logActivity } = useActivityLogger();
   const { toast } = useToast();
   const navigate = useNavigate();
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -102,12 +104,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
       
       if (error) throw error;
+      
+      // Log successful sign in
+      if (data.user) {
+        await logActivity({
+          action: 'user_login',
+          entity_type: 'auth',
+          entity_id: data.user.id,
+          details: { email, timestamp: new Date().toISOString() }
+        });
+      }
       
       toast({
         title: "Welcome back!",
@@ -141,7 +153,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (error) throw error;
       
+      // Log successful sign up
       if (data.user) {
+        await logActivity({
+          action: 'user_signup',
+          entity_type: 'auth',
+          entity_id: data.user.id,
+          details: { email, username: username || email.split('@')[0], timestamp: new Date().toISOString() }
+        });
+        
         setUser(data.user);
         setSession(data.session);
       }
@@ -153,6 +173,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signOut = async () => {
+    const currentUserId = user?.id;
+    
+    // Log sign out before clearing user data
+    if (currentUserId) {
+      await logActivity({
+        action: 'user_logout',
+        entity_type: 'auth',
+        entity_id: currentUserId,
+        details: { timestamp: new Date().toISOString() }
+      });
+    }
+    
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);

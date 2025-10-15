@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getCurrencySymbol } from "@/lib/currencyHelpers";
 import { useNavigate } from "react-router-dom";
 import { BookingPolicyBanner } from "./BookingPolicyBanner";
+import { useActivityLogger } from "@/hooks/useActivityLogger";
 
 const bookingFormSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -67,6 +68,7 @@ export const BookingModal = ({
 }: BookingModalProps) => {
   const { toast } = useToast();
   const { user } = useAuth();
+  const { logActivity } = useActivityLogger();
   const [loading, setLoading] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const navigate = useNavigate();
@@ -159,6 +161,19 @@ export const BookingModal = ({
       });
 
       if (bookingError) throw bookingError;
+
+      // Log booking creation
+      await logActivity({
+        action: 'booking_created',
+        entity_type: 'booking',
+        entity_id: bookingResult.booking.id,
+        details: { 
+          bookingType, 
+          totalPrice: total, 
+          currency,
+          bookingReference: bookingResult.bookingReference 
+        }
+      });
 
       const { data: checkoutResult, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
         body: {
