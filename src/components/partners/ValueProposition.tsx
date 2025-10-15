@@ -5,33 +5,58 @@ import { useNavigate } from "react-router-dom";
 const benefits = [
   {
     icon: Mic,
-    title: "Be Discoverable Through AI & Voice Search",
-    description: "With our voice-activated AI concierge, travelers can simply say 'Hey Goldsainte' from anywhere on the platform to start planning their journey. Your services become voice-searchable and bookable within conversations about flights, hotels, dining, and — most importantly — transportation. Goldsainte's personal AI agents learn each traveler's style, budget, and preferences, ensuring your offering reaches the right audience at the right time — hands-free and hyper-personalized."
+    title: "Voice-Activated, AI-Driven Discovery",
+    bullets: [
+      "Travelers use the \"Hey Goldsainte\" voice concierge to search and book — hands-free",
+      "Your services are surfaced in real-time conversations about flights, hotels, and transportation",
+      "Personalized AI agents match your offerings with traveler preferences and budgets"
+    ]
   },
   {
     icon: Users2,
-    title: "Get Pulled into Creator & Agent-Built Experiences",
-    description: "Become a trusted part of CoCurated™ travel packages, where verified agents and top creators design end-to-end itineraries featuring your services — from airport pickups to all-day private drivers. Whether it's a honeymoon in the Maldives or a girls' trip to Tulum, your brand travels with them. You can also be featured directly in creator content, trip planners, and interactive itineraries—building visibility and bookings through trusted recommendations."
+    title: "Integrated into Agent & Creator Experiences",
+    bullets: [
+      "Be included in agent-built itineraries and influencer-led CoCurated™ trips",
+      "Show up in interactive trip plans shared on social feeds",
+      "Gain trust by being part of fully packaged, luxury travel experiences"
+    ]
   },
   {
     icon: Megaphone,
-    title: "Unlock Premium Placement & Sponsored Exposure",
-    description: "As a Promoted Vendor, you'll receive elevated placement in our search results, trip-building tools, and social feed. Want even more visibility? Launch Sponsored Posts that appear alongside curated travel content from influencers, agents, and the Goldsainte editorial team. Position your brand directly in front of luxury travelers, with full control over your messaging and promotion strategy."
+    title: "Premium Placement & Sponsored Visibility",
+    bullets: [
+      "Upgrade to Promoted Vendor for top search and planner placement",
+      "Launch Sponsored Posts to appear in the social feed and booking flow",
+      "Boost visibility where travelers, agents, and creators spend their time"
+    ]
   },
   {
     icon: Wallet,
-    title: "Earn Through a Multi-Channel Booking Engine",
-    description: "You're not just joining a marketplace — you're plugging into a smart commerce platform where your service can be booked through: Agent-curated trips with milestone-based payments • Creator-led experiences and social itineraries • AI recommendations tailored to individual users • Group bookings with built-in split payment handling • A real-time communication hub for updates and traveler messaging. Every interaction is transparent, secure, and designed for high-value clientele."
+    title: "Multi-Channel Booking & Smart Payments",
+    bullets: [
+      "Bookings through agents, creators, AI, and direct customer searches",
+      "Support for group bookings, split payments, and secure milestone-based payouts",
+      "Real-time messaging and status updates keep everything transparent"
+    ]
   },
   {
     icon: Rocket,
-    title: "Join a Travel Ecosystem Built for Growth",
-    description: "Goldsainte is built from the ground up to empower not just travelers, but the vendors, creators, and agents behind the scenes. Transportation providers benefit from: Full-service vendor profiles with branding, reviews, and fleet showcases • Integration into creator dashboards for seamless collab setup • Potential revenue-sharing with creators and agents for featured inclusion • Access to performance analytics to track your visibility and conversion • A growing user base of travelers who value luxury, trust, and personalization."
+    title: "Built for Brand & Business Growth",
+    bullets: [
+      "Create a vendor profile with photos, service areas, reviews, and fleet details",
+      "Collaborate with creators and agents directly through their dashboards",
+      "Access analytics and insights to optimize performance and visibility",
+      "Be part of a curated marketplace that values quality and luxury"
+    ]
   },
   {
     icon: Tag,
-    title: "Create Curated Specials with Homepage Ads",
-    description: "Just like travel agents, vendors can build limited-time transportation packages or special offers—from event transfers to seasonal VIP experiences. These curated specials can be featured directly on the Goldsainte homepage, appear in search results, and run as native ads across the platform, driving bookings and brand awareness."
+    title: "Launch Your Own Curated Specials",
+    bullets: [
+      "Build and promote limited-time offers or premium ride packages",
+      "Feature them on the homepage or within search as native ads",
+      "Drive targeted bookings and brand recognition through curated campaigns"
+    ]
   }
 ];
 
@@ -63,9 +88,11 @@ export const ValueProposition = () => {
                 </div>
               </div>
               <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {benefit.description}
-              </p>
+              <ul className="list-disc ml-5 space-y-2 text-muted-foreground leading-relaxed">
+                {benefit.bullets.map((bullet, i) => (
+                  <li key={i}>{bullet}</li>
+                ))}
+              </ul>
             </div>
           ))}
         </div>
