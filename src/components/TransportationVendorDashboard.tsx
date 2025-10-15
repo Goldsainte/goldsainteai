@@ -45,17 +45,51 @@ export default function TransportationVendorDashboard() {
       const { data: authData } = await supabase.auth.getUser();
       if (!authData.user) return;
 
-      // Temporary mock data until types are regenerated
-      setVendor({
-        id: "temp-id",
-        name: "Sample Transportation Vendor",
-        supplier_type: "transportation",
-        verification_status: "pending",
-        is_active: false,
-        total_bookings: 0,
-        total_revenue: 0,
-        total_vehicles: 0
-      });
+      // Fetch supplier record first (using any to bypass type issues until regeneration)
+      const { data: suppliers, error: supplierError } = await supabase
+        .from('suppliers' as any)
+        .select('*')
+        .eq('user_id', authData.user.id)
+        .eq('supplier_type', 'transportation')
+        .limit(1);
+
+      if (supplierError) throw supplierError;
+      
+      if (suppliers && suppliers.length > 0) {
+        const supplier: any = suppliers[0];
+        
+        // Then fetch transportation vendor details
+        const { data: transportVendors } = await supabase
+          .from('transportation_vendors' as any)
+          .select('*')
+          .eq('supplier_id', supplier.id)
+          .limit(1);
+        
+        const transportVendor: any = transportVendors?.[0];
+        
+        setVendor({
+          id: supplier.id,
+          name: supplier.name,
+          supplier_type: supplier.supplier_type,
+          verification_status: supplier.verification_status,
+          is_active: supplier.is_active,
+          rating: supplier.rating,
+          total_bookings: transportVendor?.total_bookings || 0,
+          total_revenue: transportVendor?.total_revenue || 0,
+          total_vehicles: transportVendor?.fleet_size || 0,
+          service_areas: transportVendor?.service_areas || [],
+          vehicle_types: transportVendor?.vehicle_types || [],
+          base_hourly_rate: transportVendor?.base_hourly_rate,
+          on_time_percentage: transportVendor?.on_time_percentage,
+          is_promoted_vendor: transportVendor?.is_promoted_vendor || false,
+          promoted_until: transportVendor?.promoted_until,
+          promotion_tier: transportVendor?.promotion_tier,
+          insurance_policy_number: transportVendor?.insurance_policy_number,
+          insurance_expiry_date: transportVendor?.insurance_expiry_date,
+          commercial_license_number: transportVendor?.commercial_license_number,
+          commercial_license_expiry: transportVendor?.commercial_license_expiry
+        });
+      }
     } catch (error: any) {
       toast({
         title: "Error",
@@ -78,7 +112,7 @@ export default function TransportationVendorDashboard() {
         <p className="text-muted-foreground mb-6">
           You haven't applied as a transportation vendor yet.
         </p>
-        <Button onClick={() => window.location.href = "/apply-transportation-vendor"}>
+        <Button onClick={() => window.location.href = "/transportation-vendor-application"}>
           Apply Now
         </Button>
       </div>

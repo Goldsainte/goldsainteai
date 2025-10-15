@@ -23,7 +23,7 @@ export default function AdminTransportVendorVetting() {
   const loadPendingVendors = async () => {
     try {
       const { data, error } = await supabase
-        .from("suppliers")
+        .from("suppliers" as any)
         .select(`
           *,
           transportation_vendors (*),
@@ -48,30 +48,19 @@ export default function AdminTransportVendorVetting() {
 
   const handleApprove = async (vendorId: string) => {
     try {
-      const { error } = await supabase
-        .from("suppliers")
-        .update({ 
-          verification_status: "verified",
-          is_active: true 
-        })
-        .eq("id", vendorId);
+      const { data, error } = await supabase.functions.invoke('approve-transportation-vendor', {
+        body: {
+          supplierId: vendorId,
+          approved: true,
+          notes: reviewNotes
+        }
+      });
 
       if (error) throw error;
 
-      const { error: vettingError } = await supabase
-        .from("supplier_vetting")
-        .update({
-          approval_decision: "approved",
-          reviewed_at: new Date().toISOString(),
-          vetting_notes: reviewNotes
-        })
-        .eq("supplier_id", vendorId);
-
-      if (vettingError) throw vettingError;
-
       toast({
         title: "Vendor Approved",
-        description: "The transportation vendor has been approved and activated."
+        description: data.message || "The transportation vendor has been approved and activated."
       });
 
       loadPendingVendors();
@@ -97,27 +86,19 @@ export default function AdminTransportVendorVetting() {
     }
 
     try {
-      const { error } = await supabase
-        .from("suppliers")
-        .update({ verification_status: "rejected" })
-        .eq("id", vendorId);
+      const { data, error } = await supabase.functions.invoke('approve-transportation-vendor', {
+        body: {
+          supplierId: vendorId,
+          approved: false,
+          notes: reviewNotes
+        }
+      });
 
       if (error) throw error;
 
-      const { error: vettingError } = await supabase
-        .from("supplier_vetting")
-        .update({
-          approval_decision: "rejected",
-          reviewed_at: new Date().toISOString(),
-          vetting_notes: reviewNotes
-        })
-        .eq("supplier_id", vendorId);
-
-      if (vettingError) throw vettingError;
-
       toast({
         title: "Vendor Rejected",
-        description: "The vendor application has been rejected."
+        description: data.message || "The vendor application has been rejected."
       });
 
       loadPendingVendors();
