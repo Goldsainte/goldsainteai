@@ -69,34 +69,42 @@ export default function TransportationVendorDashboard() {
         return;
       }
 
-      // Fetch all data in parallel
-      const [supplierResult, vettingResult, promotionResult] = await Promise.all([
-        supabase
-          .from("suppliers")
-          .select("*, transportation_vendors(*)")
-          .eq("user_id", user.id)
-          .single(),
+      // Fetch supplier first
+      const { data: supplier, error: supplierError } = await supabase
+        .from("suppliers")
+        .select("*, transportation_vendors(*)")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (supplierError) throw supplierError;
+
+      if (!supplier) {
+        setError("No vendor profile found. Please apply to become a transportation vendor.");
+        return;
+      }
+
+      const transportVendor = supplier.transportation_vendors?.[0] ?? null;
+
+      // Load dependent data in parallel using correct IDs
+      const [vettingResult, promotionResult] = await Promise.all([
         supabase
           .from("supplier_vetting")
           .select("*")
-          .eq("supplier_id", user.id)
+          .eq("supplier_id", supplier.id)
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle(),
-        supabase
-          .from("vendor_promotion_subscriptions")
-          .select("*")
-          .eq("vendor_id", user.id)
-          .eq("status", "active")
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle()
+        transportVendor
+          ? supabase
+              .from("vendor_promotion_subscriptions")
+              .select("*")
+              .eq("vendor_id", transportVendor.id)
+              .eq("status", "active")
+              .order("created_at", { ascending: false })
+              .limit(1)
+              .maybeSingle()
+          : Promise.resolve({ data: null }) as any
       ]);
-
-      if (supplierResult.error) throw supplierResult.error;
-
-      const supplier = supplierResult.data;
-      const transportVendor = supplier.transportation_vendors?.[0];
 
       if (!transportVendor) {
         setError("No transportation vendor profile found");
@@ -105,7 +113,7 @@ export default function TransportationVendorDashboard() {
 
       setVendor({
         id: transportVendor.id,
-        name: transportVendor.supplier_name || "Transportation Vendor",
+        name: (supplier.business_name || (supplier as any).name || transportVendor.supplier_name || "Transportation Vendor"),
         rating: supplier.rating || 0,
         total_bookings: transportVendor.total_bookings || 0,
         total_revenue: transportVendor.total_revenue || 0,

@@ -30,17 +30,28 @@ serve(async (req) => {
     const applicationData = await req.json();
     console.log('Processing transportation vendor application for user:', user.id);
 
-    // Create supplier record
+    // Basic validation for required fields
+    const businessName = (applicationData.businessName ?? '').toString().trim();
+    const contactEmail = (applicationData.contactEmail ?? '').toString().trim();
+    if (!businessName || !contactEmail) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields: business name and contact email are required.' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    // Create supplier record (ensure NOT NULL name)
     const { data: supplier, error: supplierError } = await supabase
       .from('suppliers')
       .insert({
         user_id: user.id,
         supplier_type: 'transportation',
-        business_name: applicationData.businessName,
-        contact_email: applicationData.contactEmail,
-        contact_phone: applicationData.contactPhone,
-        business_address: applicationData.businessAddress,
-        description: applicationData.businessDescription,
+        name: businessName || 'Transportation Vendor',
+        business_name: businessName,
+        contact_email: contactEmail,
+        contact_phone: applicationData.contactPhone || null,
+        business_address: applicationData.businessAddress || null,
+        description: applicationData.businessDescription || null,
         verification_status: 'pending',
       })
       .select()

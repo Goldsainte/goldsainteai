@@ -9,6 +9,33 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, Loader2, X, Star, Image as ImageIcon, Video } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+// Utility to sanitize file names for safe storage keys
+function sanitizeFileName(originalName: string): string {
+  const parts = originalName.split('.')
+  const extension = parts.length > 1 ? parts.pop()!.toLowerCase() : ''
+  let baseName = parts.join('.')
+
+  // Normalize Unicode and strip diacritics
+  baseName = baseName.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+
+  // Replace all whitespace variants (including narrow no-break space U+202F) with dashes
+  baseName = baseName.replace(/[\s\u00A0\u202F\u2009\u200A]+/g, '-')
+
+  // Remove all characters except alphanumeric, dots, dashes, underscores
+  baseName = baseName.replace(/[^a-zA-Z0-9._-]/g, '')
+
+  // Remove leading/trailing dashes and collapse multiple dashes
+  baseName = baseName.replace(/^-+|-+$/g, '').replace(/-+/g, '-')
+
+  // Truncate base name to 80 characters max
+  baseName = baseName.substring(0, 80)
+
+  // If baseName is empty after sanitization, use a fallback
+  if (!baseName) baseName = 'file'
+
+  return extension ? `${baseName}.${extension}` : baseName
+}
+
 interface PromotionalMedia {
   id: string;
   type: 'photo' | 'video';
@@ -67,14 +94,20 @@ export default function VendorPromotionalMediaUpload({
       if (!user) throw new Error("Not authenticated");
 
       const uploadPromises = validFiles.map(async (file, index) => {
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
+        const sanitizedName = sanitizeFileName(file.name);
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${sanitizedName}`;
         const filePath = `${user.id}/photos/${fileName}`;
 
         const { error: uploadError } = await supabase.storage
           .from('vendor-promotions')
           .upload(filePath, file);
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          if (uploadError.message?.includes('Invalid key')) {
+            throw new Error(`File name contains unsupported characters. Please rename "${file.name}" and try again.`);
+          }
+          throw uploadError;
+        }
 
         const { data: { publicUrl } } = supabase.storage
           .from('vendor-promotions')
@@ -141,14 +174,20 @@ export default function VendorPromotionalMediaUpload({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const fileName = `${Date.now()}-${file.name}`;
+      const sanitizedName = sanitizeFileName(file.name);
+      const fileName = `${Date.now()}-${sanitizedName}`;
       const filePath = `${user.id}/videos/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('vendor-promotions')
         .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        if (uploadError.message?.includes('Invalid key')) {
+          throw new Error(`File name contains unsupported characters. Please rename "${file.name}" and try again.`);
+        }
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('vendor-promotions')
