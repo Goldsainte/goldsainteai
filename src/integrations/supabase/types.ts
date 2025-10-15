@@ -5571,10 +5571,13 @@ export type Database = {
       }
       suppliers: {
         Row: {
+          business_address: string | null
+          business_name: string | null
           commission_rate: number | null
           contact_email: string
           contact_phone: string | null
           created_at: string | null
+          description: string | null
           id: string
           insurance_verified: boolean | null
           is_active: boolean | null
@@ -5589,10 +5592,13 @@ export type Database = {
           verification_status: string | null
         }
         Insert: {
+          business_address?: string | null
+          business_name?: string | null
           commission_rate?: number | null
           contact_email: string
           contact_phone?: string | null
           created_at?: string | null
+          description?: string | null
           id?: string
           insurance_verified?: boolean | null
           is_active?: boolean | null
@@ -5607,10 +5613,13 @@ export type Database = {
           verification_status?: string | null
         }
         Update: {
+          business_address?: string | null
+          business_name?: string | null
           commission_rate?: number | null
           contact_email?: string
           contact_phone?: string | null
           created_at?: string | null
+          description?: string | null
           id?: string
           insurance_verified?: boolean | null
           is_active?: boolean | null
