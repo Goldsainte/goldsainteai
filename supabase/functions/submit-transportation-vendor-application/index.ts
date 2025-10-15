@@ -103,9 +103,9 @@ serve(async (req) => {
     }
 
     // Add promotion preferences
-    if (applicationData.interestedInPromotion) {
+    if (applicationData.selectedPromotionTier) {
       vendorData.promotion_preferences = {
-        interested: true,
+        tier: applicationData.selectedPromotionTier,
         budget: applicationData.promotionBudget || null,
         pricing_model: applicationData.promotionPricingModel || null,
         target_impressions: applicationData.promotionTargetImpressions || null,
@@ -114,7 +114,7 @@ serve(async (req) => {
         discount_offered: applicationData.promotionDiscountOffered || null,
         special_packages: applicationData.promotionSpecialPackages || [],
         marketing_description: applicationData.marketingDescription || null,
-        special_offers: applicationData.specialOffers || null,
+        promotional_media: applicationData.promotionalMedia || [],
       };
     }
 

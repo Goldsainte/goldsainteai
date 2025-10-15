@@ -12,10 +12,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Upload, Check, AlertCircle, Loader2, X, Plus, MapPin, Percent } from "lucide-react";
 import { LoadingAnnouncement, ErrorAnnouncement } from "@/components/LoadingAnnouncement";
 import { CityAutocomplete } from "@/components/CityAutocomplete";
 import VendorDocumentUpload from "@/components/VendorDocumentUpload";
+import VendorPromotionalMediaUpload from "@/components/VendorPromotionalMediaUpload";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 const STEPS = [
   "Business Information",
@@ -25,8 +28,108 @@ const STEPS = [
   "Compliance Documents",
   "Pricing Structure",
   "Technology Integration",
-  "Promotion Preferences",
+  "Promotional Content",
+  "Marketing Tier",
   "Terms & Agreement"
+];
+
+const PROMOTION_TIERS = [
+  {
+    id: 'free',
+    name: 'Free Listing',
+    icon: '📋',
+    monthlyPrice: 0,
+    commissionRate: 15.0,
+    subtitle: 'Basic visibility',
+    features: [
+      'Standard directory listing',
+      'Up to 5 fleet photos',
+      'Basic profile',
+      'Email support',
+      'Standard search placement'
+    ],
+    popular: false
+  },
+  {
+    id: 'bronze',
+    name: 'Bronze',
+    icon: '🥉',
+    monthlyPrice: 99,
+    commissionRate: 15.0,
+    subtitle: 'Enhanced presence',
+    features: [
+      'Everything in Free, PLUS:',
+      'Up to 15 fleet photos',
+      'Social media links',
+      'Priority email support',
+      'Basic analytics dashboard'
+    ],
+    popular: false
+  },
+  {
+    id: 'silver',
+    name: 'Silver',
+    icon: '🥈',
+    monthlyPrice: 299,
+    commissionRate: 13.5,
+    commissionSavings: 1.5,
+    subtitle: 'Featured vendor',
+    features: [
+      'Everything in Bronze, PLUS:',
+      'Featured Badge on profile',
+      'Top 10 search placement',
+      'Unlimited photos + 1 video',
+      'Homepage spotlight rotation',
+      '10% commission discount',
+      '24/7 priority support',
+      'Enhanced analytics'
+    ],
+    popular: true
+  },
+  {
+    id: 'gold',
+    name: 'Gold',
+    icon: '🥇',
+    monthlyPrice: 599,
+    commissionRate: 12.75,
+    commissionSavings: 2.25,
+    subtitle: 'Premium promoted',
+    features: [
+      'Everything in Silver, PLUS:',
+      '"Sponsored" label at top of search',
+      'Featured in Journey feed',
+      'Unlimited photos + 3 videos',
+      'Push notifications to customers',
+      'Custom branded landing page',
+      'Retargeting campaigns',
+      'Advanced ROI analytics',
+      '15% commission discount',
+      'Dedicated account manager'
+    ],
+    popular: false
+  },
+  {
+    id: 'platinum',
+    name: 'Platinum',
+    icon: '💎',
+    monthlyPrice: 1499,
+    commissionRate: 12.0,
+    commissionSavings: 3.0,
+    subtitle: 'White label partner',
+    features: [
+      'Everything in Gold, PLUS:',
+      'Co-branded app experience',
+      'API integration',
+      'Custom domain option',
+      'Unlimited promotional content',
+      'Featured in email marketing',
+      'Social media takeovers',
+      'White-glove onboarding',
+      '20% commission discount',
+      'Performance-based pricing option'
+    ],
+    popular: false
+  }
 ];
 
 const VEHICLE_TYPES = [
@@ -123,9 +226,26 @@ export default function TransportationVendorApplication() {
     promotionTargetImpressions: "",
     promotionTargetClicks: "",
     promotionGeographicTargets: [] as string[],
+    targetCityInput: "",
     promotionDiscountOffered: "",
-    promotionSpecialPackages: [] as { name: string; description: string; price: string }[],
-    currentSpecialPackage: { name: "", description: "", price: "" },
+    promotionSpecialPackages: [] as Array<{
+      name: string;
+      description: string;
+      price: string;
+      promoPrice: string;
+      photos: string[];
+    }>,
+    currentSpecialPackage: { name: "", description: "", price: "", promoPrice: "" },
+    currentPackagePhotos: [] as string[],
+    selectedPromotionTier: 'free' as string,
+    promotionalMedia: [] as Array<{
+      id: string;
+      type: 'photo' | 'video';
+      url: string;
+      caption: string;
+      isCover: boolean;
+      displayOrder: number;
+    }>,
     
     // Agreement
     agreedToTerms: false,
@@ -191,7 +311,7 @@ export default function TransportationVendorApplication() {
       }
     }
     
-    if (currentStep === 8) {
+    if (currentStep === 9) {
       if (!formData.agreedToTerms) errors.agreedToTerms = "You must agree to the terms";
       if (!formData.eSignature.trim()) errors.eSignature = "Electronic signature is required";
     }
@@ -260,7 +380,9 @@ export default function TransportationVendorApplication() {
           promotionTargetClicks: parseInt(formData.promotionTargetClicks) || 0,
           promotionGeographicTargets: formData.promotionGeographicTargets,
           promotionDiscountOffered: parseFloat(formData.promotionDiscountOffered) || 0,
-          promotionSpecialPackages: formData.promotionSpecialPackages
+          promotionSpecialPackages: formData.promotionSpecialPackages,
+          selectedPromotionTier: formData.selectedPromotionTier,
+          promotionalMedia: formData.promotionalMedia
         }
       });
 
@@ -294,7 +416,7 @@ export default function TransportationVendorApplication() {
         return formData.serviceAreas.length > 0;
       case 4:
         return formData.insuranceDocuments.length > 0 && formData.driverLicenseDocuments.length > 0;
-      case 8:
+      case 9:
         return formData.agreedToTerms && formData.eSignature;
       default:
         return true;
@@ -823,245 +945,506 @@ export default function TransportationVendorApplication() {
         return (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Promoted Listing Options</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Increase your visibility and attract more customers with promoted listings
+              <h2 className="text-2xl font-bold mb-2">Showcase Your Fleet</h2>
+              <p className="text-muted-foreground">
+                Upload photos and videos of your vehicles to attract more customers
               </p>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="interestedInPromotion"
-                  checked={formData.interestedInPromotion}
-                  onCheckedChange={(checked) => updateFormData("interestedInPromotion", checked)}
-                />
-                <Label htmlFor="interestedInPromotion">
-                  I'm interested in promoted listing on the platform
-                </Label>
-              </div>
             </div>
             
-            {formData.interestedInPromotion && (
-              <>
-                {/* Pricing Model Section */}
-                <div className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">Promotion Pricing Model</h4>
+            <VendorPromotionalMediaUpload
+              media={formData.promotionalMedia}
+              onMediaChange={(newMedia) => updateFormData("promotionalMedia", newMedia)}
+            />
+          </div>
+        );
+
+      case 8:
+        return (
+          <div className="space-y-8">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold mb-3">Choose Your Marketing Level</h2>
+              <p className="text-muted-foreground text-lg">
+                Increase your bookings with targeted promotions. Higher tiers unlock better placement, 
+                more visibility, and lower commission rates.
+              </p>
+            </div>
+            
+            {/* Tier Comparison Cards */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {PROMOTION_TIERS.map((tier) => (
+                <Card 
+                  key={tier.id}
+                  className={cn(
+                    "cursor-pointer transition-all hover:shadow-xl hover:scale-105 relative",
+                    formData.selectedPromotionTier === tier.id && "ring-4 ring-primary shadow-2xl"
+                  )}
+                  onClick={() => updateFormData("selectedPromotionTier", tier.id)}
+                >
+                  {tier.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+                      <Badge className="bg-primary text-primary-foreground shadow-lg">
+                        Most Popular
+                      </Badge>
+                    </div>
+                  )}
                   
-                  <div>
-                    <Label>Select Pricing Model</Label>
+                  <CardHeader className="text-center pb-4">
+                    <div className="text-4xl mb-2">{tier.icon}</div>
+                    <CardTitle className="text-xl">{tier.name}</CardTitle>
+                    <div className="text-3xl font-bold mt-3">
+                      {tier.monthlyPrice === 0 ? (
+                        <span>Free</span>
+                      ) : (
+                        <>
+                          ${tier.monthlyPrice}
+                          <span className="text-sm font-normal text-muted-foreground">/mo</span>
+                        </>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">{tier.subtitle}</p>
+                  </CardHeader>
+                  
+                  <CardContent className="space-y-4">
+                    <ul className="space-y-2.5">
+                      {tier.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm">
+                          <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
+                          <span className={feature.startsWith('Everything') ? 'font-semibold' : ''}>
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    {tier.id !== 'free' && (
+                      <div className="mt-4 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                        <p className="text-xs font-semibold text-center">Commission Rate</p>
+                        <p className="text-2xl font-bold text-primary text-center">
+                          {tier.commissionRate}%
+                        </p>
+                        {tier.commissionSavings && (
+                          <p className="text-xs text-center text-muted-foreground mt-1">
+                            Save {tier.commissionSavings}% per booking
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            
+            {/* Enhanced Options for Gold/Platinum Tiers */}
+            {(formData.selectedPromotionTier === 'gold' || formData.selectedPromotionTier === 'platinum') && (
+              <div className="space-y-6 mt-8 pt-8 border-t">
+                <h3 className="text-2xl font-semibold">Configure Your Promotion Campaign</h3>
+                
+                {/* Pricing Model Selection */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Pricing Model</CardTitle>
+                    <CardDescription>Choose how you want to pay for promotions</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                     <Select 
                       value={formData.promotionPricingModel} 
                       onValueChange={(v) => updateFormData("promotionPricingModel", v)}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Choose pricing model" />
+                        <SelectValue placeholder="Select pricing model" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="cpc">Cost Per Click (CPC) - Pay only when customers click</SelectItem>
-                        <SelectItem value="cpm">Cost Per Thousand Impressions (CPM) - Pay per 1000 views</SelectItem>
-                        <SelectItem value="flat_monthly">Flat Monthly Rate - Fixed cost per month</SelectItem>
-                        <SelectItem value="performance_based">Performance-Based - Pay based on bookings generated</SelectItem>
+                        <SelectItem value="flat_monthly">
+                          <div className="flex flex-col items-start">
+                            <span className="font-semibold">Flat Monthly Rate</span>
+                            <span className="text-xs text-muted-foreground">Fixed cost per month (recommended)</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="cpc">
+                          <div className="flex flex-col items-start">
+                            <span className="font-semibold">Cost Per Click (CPC)</span>
+                            <span className="text-xs text-muted-foreground">Pay when customers click</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="cpm">
+                          <div className="flex flex-col items-start">
+                            <span className="font-semibold">Cost Per 1000 Impressions (CPM)</span>
+                            <span className="text-xs text-muted-foreground">Pay per 1000 views</span>
+                          </div>
+                        </SelectItem>
+                        {formData.selectedPromotionTier === 'platinum' && (
+                          <SelectItem value="performance_based">
+                            <div className="flex flex-col items-start">
+                              <span className="font-semibold">Performance-Based</span>
+                              <span className="text-xs text-muted-foreground">Pay based on bookings (Platinum only)</span>
+                            </div>
+                          </SelectItem>
+                        )}
                       </SelectContent>
                     </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="promotionBudget">Monthly Promotion Budget ($)</Label>
-                    <Input
-                      id="promotionBudget"
-                      type="number"
-                      value={formData.promotionBudget}
-                      onChange={(e) => updateFormData("promotionBudget", e.target.value)}
-                      placeholder="1000"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Recommended: $500-$2000/month for optimal results
-                    </p>
-                  </div>
-                </div>
+                    
+                    <div>
+                      <Label htmlFor="promotionBudget">Monthly Marketing Budget ($)</Label>
+                      <Input
+                        id="promotionBudget"
+                        type="number"
+                        value={formData.promotionBudget}
+                        onChange={(e) => updateFormData("promotionBudget", e.target.value)}
+                        placeholder="1000"
+                        min="0"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        💡 Recommended: $500-$2000/month for optimal results
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
                 
-                {/* Target Metrics Section */}
-                <div className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">Target Metrics</h4>
-                  
-                  <div>
-                    <Label htmlFor="promotionTargetImpressions">Target Monthly Impressions</Label>
-                    <Input
-                      id="promotionTargetImpressions"
-                      type="number"
-                      value={formData.promotionTargetImpressions}
-                      onChange={(e) => updateFormData("promotionTargetImpressions", e.target.value)}
-                      placeholder="10000"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="promotionTargetClicks">Target Monthly Clicks</Label>
-                    <Input
-                      id="promotionTargetClicks"
-                      type="number"
-                      value={formData.promotionTargetClicks}
-                      onChange={(e) => updateFormData("promotionTargetClicks", e.target.value)}
-                      placeholder="500"
-                    />
-                  </div>
-                </div>
+                {/* Target Metrics */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Marketing Goals & Metrics</CardTitle>
+                    <CardDescription>Set your monthly performance targets</CardDescription>
+                  </CardHeader>
+                  <CardContent className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="promotionTargetImpressions">Target Monthly Impressions</Label>
+                      <Input
+                        id="promotionTargetImpressions"
+                        type="number"
+                        value={formData.promotionTargetImpressions}
+                        onChange={(e) => updateFormData("promotionTargetImpressions", e.target.value)}
+                        placeholder="10000"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Number of times your listing will be seen</p>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="promotionTargetClicks">Target Monthly Clicks</Label>
+                      <Input
+                        id="promotionTargetClicks"
+                        type="number"
+                        value={formData.promotionTargetClicks}
+                        onChange={(e) => updateFormData("promotionTargetClicks", e.target.value)}
+                        placeholder="500"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Expected customer engagement</p>
+                    </div>
+                  </CardContent>
+                </Card>
                 
                 {/* Geographic Targeting */}
-                <div className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">Geographic Targeting</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Target specific cities or regions for your promotions
-                  </p>
-                  
-                  <div className="flex gap-2">
-                    <div className="flex-1">
-                      <CityAutocomplete
-                        value={formData.serviceAreaInput}
-                        onChange={(value) => updateFormData("serviceAreaInput", value)}
-                        placeholder="Add target location"
-                      />
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Geographic Targeting</CardTitle>
+                    <CardDescription>Focus your marketing budget on specific locations</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <CityAutocomplete
+                          value={formData.targetCityInput || ""}
+                          onChange={(value) => updateFormData("targetCityInput", value)}
+                          placeholder="Add target city or region"
+                        />
+                      </div>
+                      <Button 
+                        type="button" 
+                        onClick={() => {
+                          const trimmed = (formData.targetCityInput || "").trim();
+                          if (trimmed && !formData.promotionGeographicTargets.includes(trimmed)) {
+                            updateFormData("promotionGeographicTargets", [...formData.promotionGeographicTargets, trimmed]);
+                            updateFormData("targetCityInput", "");
+                          }
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add
+                      </Button>
                     </div>
-                    <Button 
-                      type="button" 
-                      onClick={() => {
-                        const trimmed = formData.serviceAreaInput.trim();
-                        if (trimmed && !formData.promotionGeographicTargets.includes(trimmed)) {
-                          updateFormData("promotionGeographicTargets", [...formData.promotionGeographicTargets, trimmed]);
-                          updateFormData("serviceAreaInput", "");
-                        }
-                      }}
-                    >
-                      Add
-                    </Button>
-                  </div>
-                  
-                  {formData.promotionGeographicTargets.length > 0 && (
-                    <div className="flex flex-wrap gap-2">
-                      {formData.promotionGeographicTargets.map((target, index) => (
-                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                          {target}
-                          <X 
-                            className="h-3 w-3 cursor-pointer" 
-                            onClick={() => updateFormData("promotionGeographicTargets", 
-                              formData.promotionGeographicTargets.filter((_, i) => i !== index)
-                            )}
-                          />
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                
-                {/* Special Offers & Packages */}
-                <div className="border rounded-lg p-4 space-y-4">
-                  <h4 className="font-semibold">Special Promotional Packages</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Create exclusive packages and discounts for promoted customers
-                  </p>
-                  
-                  <div>
-                    <Label htmlFor="promotionDiscountOffered">Promotional Discount (%)</Label>
-                    <Input
-                      id="promotionDiscountOffered"
-                      type="number"
-                      value={formData.promotionDiscountOffered}
-                      onChange={(e) => updateFormData("promotionDiscountOffered", e.target.value)}
-                      placeholder="10"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Offer a discount to customers who find you through promotions
-                    </p>
-                  </div>
-                  
-                  {/* Add Package Builder */}
-                  <div className="space-y-3 border-t pt-4">
-                    <Label>Create Special Package</Label>
-                    <Input
-                      placeholder="Package Name (e.g., Airport VIP Transfer)"
-                      value={formData.currentSpecialPackage.name}
-                      onChange={(e) => updateFormData("currentSpecialPackage", {
-                        ...formData.currentSpecialPackage,
-                        name: e.target.value
-                      })}
-                    />
-                    <Textarea
-                      placeholder="Package Description"
-                      value={formData.currentSpecialPackage.description}
-                      onChange={(e) => updateFormData("currentSpecialPackage", {
-                        ...formData.currentSpecialPackage,
-                        description: e.target.value
-                      })}
-                      rows={2}
-                    />
-                    <Input
-                      type="number"
-                      placeholder="Package Price ($)"
-                      value={formData.currentSpecialPackage.price}
-                      onChange={(e) => updateFormData("currentSpecialPackage", {
-                        ...formData.currentSpecialPackage,
-                        price: e.target.value
-                      })}
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => {
-                        const pkg = formData.currentSpecialPackage;
-                        if (pkg.name && pkg.description && pkg.price) {
-                          updateFormData("promotionSpecialPackages", [
-                            ...formData.promotionSpecialPackages,
-                            { ...pkg }
-                          ]);
-                          updateFormData("currentSpecialPackage", { name: "", description: "", price: "" });
-                        }
-                      }}
-                    >
-                      Add Package
-                    </Button>
-                  </div>
-                  
-                  {/* Display added packages */}
-                  {formData.promotionSpecialPackages.length > 0 && (
-                    <div className="space-y-2">
-                      <Label>Created Packages:</Label>
-                      {formData.promotionSpecialPackages.map((pkg, index) => (
-                        <div key={index} className="flex items-start justify-between bg-secondary p-3 rounded-lg">
-                          <div className="flex-1">
-                            <p className="font-medium">{pkg.name}</p>
-                            <p className="text-sm text-muted-foreground">{pkg.description}</p>
-                            <p className="text-sm font-semibold mt-1">${pkg.price}</p>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => updateFormData("promotionSpecialPackages",
-                              formData.promotionSpecialPackages.filter((_, i) => i !== index)
-                            )}
-                          >
-                            Remove
-                          </Button>
+                    
+                    {formData.promotionGeographicTargets.length > 0 && (
+                      <div>
+                        <Label className="mb-2 block">Targeted Locations ({formData.promotionGeographicTargets.length})</Label>
+                        <div className="flex flex-wrap gap-2">
+                          {formData.promotionGeographicTargets.map((target, index) => (
+                            <Badge key={index} variant="secondary" className="flex items-center gap-2 py-1.5 px-3">
+                              <MapPin className="h-3 w-3" />
+                              {target}
+                              <X 
+                                className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                                onClick={() => updateFormData("promotionGeographicTargets", 
+                                  formData.promotionGeographicTargets.filter((_, i) => i !== index)
+                                )}
+                              />
+                            </Badge>
+                          ))}
                         </div>
-                      ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+                
+                {/* Special Promotional Packages Builder */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Create Special Promotional Packages</CardTitle>
+                    <CardDescription>
+                      Build exclusive deals for customers who find you through promotions - increase conversion rates!
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    {/* Promotional Discount */}
+                    <div>
+                      <Label htmlFor="promotionDiscountOffered" className="flex items-center gap-2">
+                        <Percent className="h-4 w-4" />
+                        Promotional Discount (%)
+                      </Label>
+                      <Input
+                        id="promotionDiscountOffered"
+                        type="number"
+                        value={formData.promotionDiscountOffered}
+                        onChange={(e) => updateFormData("promotionDiscountOffered", e.target.value)}
+                        placeholder="10"
+                        min="0"
+                        max="50"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1.5">
+                        💡 Offer a discount to customers who find you through promotions
+                      </p>
                     </div>
-                  )}
-                </div>
+                    
+                    <Separator />
+                    
+                    {/* Package Builder */}
+                    <div className="space-y-4 border rounded-lg p-4 bg-secondary/20">
+                      <h4 className="font-semibold text-lg">Build a Package</h4>
+                      
+                      <div>
+                        <Label>Package Photos (up to 10)</Label>
+                        <Input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []).slice(0, 10);
+                            const urls = files.map(f => URL.createObjectURL(f));
+                            updateFormData("currentPackagePhotos", urls);
+                          }}
+                        />
+                        {formData.currentPackagePhotos && formData.currentPackagePhotos.length > 0 && (
+                          <div className="flex gap-2 mt-2 flex-wrap">
+                            {formData.currentPackagePhotos.map((url: string, idx: number) => (
+                              <div key={idx} className="relative">
+                                <img src={url} className="w-20 h-20 object-cover rounded-lg" alt="Package" />
+                                <Button
+                                  size="icon"
+                                  variant="destructive"
+                                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
+                                  onClick={() => {
+                                    updateFormData("currentPackagePhotos", 
+                                      formData.currentPackagePhotos.filter((_: string, i: number) => i !== idx)
+                                    );
+                                  }}
+                                >
+                                  <X className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="packageName">Package Name</Label>
+                        <Input
+                          id="packageName"
+                          value={formData.currentSpecialPackage.name}
+                          onChange={(e) => updateFormData("currentSpecialPackage", {
+                            ...formData.currentSpecialPackage,
+                            name: e.target.value
+                          })}
+                          placeholder="e.g., VIP Airport Transfer Package"
+                        />
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor="packageDescription">Package Description</Label>
+                        <Textarea
+                          id="packageDescription"
+                          value={formData.currentSpecialPackage.description}
+                          onChange={(e) => updateFormData("currentSpecialPackage", {
+                            ...formData.currentSpecialPackage,
+                            description: e.target.value
+                          })}
+                          placeholder="Describe what's included in this package..."
+                          rows={3}
+                        />
+                      </div>
+                      
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="packageRegularPrice">Regular Price ($)</Label>
+                          <Input
+                            id="packageRegularPrice"
+                            type="number"
+                            value={formData.currentSpecialPackage.price}
+                            onChange={(e) => updateFormData("currentSpecialPackage", {
+                              ...formData.currentSpecialPackage,
+                              price: e.target.value
+                            })}
+                            placeholder="150"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="packagePromoPrice">Promotional Price ($)</Label>
+                          <Input
+                            id="packagePromoPrice"
+                            type="number"
+                            value={formData.currentSpecialPackage.promoPrice}
+                            onChange={(e) => updateFormData("currentSpecialPackage", {
+                              ...formData.currentSpecialPackage,
+                              promoPrice: e.target.value
+                            })}
+                            placeholder="120"
+                          />
+                        </div>
+                      </div>
+                      
+                      <Button
+                        type="button"
+                        className="w-full"
+                        onClick={() => {
+                          const pkg = formData.currentSpecialPackage;
+                          if (pkg.name && pkg.description && pkg.price && pkg.promoPrice) {
+                            updateFormData("promotionSpecialPackages", [
+                              ...formData.promotionSpecialPackages,
+                              { ...pkg, photos: formData.currentPackagePhotos || [] }
+                            ]);
+                            updateFormData("currentSpecialPackage", { name: "", description: "", price: "", promoPrice: "" });
+                            updateFormData("currentPackagePhotos", []);
+                            toast({
+                              title: "Package added!",
+                              description: "Your promotional package has been created"
+                            });
+                          } else {
+                            toast({
+                              title: "Missing fields",
+                              description: "Please fill in all package fields",
+                              variant: "destructive"
+                            });
+                          }
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Package
+                      </Button>
+                    </div>
+                    
+                    {/* Display Created Packages */}
+                    {formData.promotionSpecialPackages.length > 0 && (
+                      <div className="space-y-3">
+                        <Label className="text-lg">Your Promotional Packages ({formData.promotionSpecialPackages.length})</Label>
+                        {formData.promotionSpecialPackages.map((pkg: any, index: number) => {
+                          const discount = pkg.price && pkg.promoPrice 
+                            ? Math.round(((parseFloat(pkg.price) - parseFloat(pkg.promoPrice)) / parseFloat(pkg.price)) * 100)
+                            : 0;
+                          
+                          return (
+                            <Card key={index} className="overflow-hidden">
+                              <CardContent className="p-4">
+                                <div className="flex gap-4">
+                                  {pkg.photos && pkg.photos[0] && (
+                                    <img 
+                                      src={pkg.photos[0]} 
+                                      className="w-32 h-32 object-cover rounded-lg flex-shrink-0"
+                                      alt={pkg.name}
+                                    />
+                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <h4 className="font-semibold text-lg">{pkg.name}</h4>
+                                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{pkg.description}</p>
+                                    <div className="flex items-center gap-4 mt-3">
+                                      <span className="line-through text-muted-foreground text-sm">
+                                        ${pkg.price}
+                                      </span>
+                                      <span className="text-2xl font-bold text-primary">
+                                        ${pkg.promoPrice}
+                                      </span>
+                                      <Badge variant="secondary" className="bg-green-500/10 text-green-700">
+                                        {discount}% OFF
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                  <Button 
+                                    variant="ghost" 
+                                    size="icon"
+                                    onClick={() => updateFormData("promotionSpecialPackages",
+                                      formData.promotionSpecialPackages.filter((_: any, i: number) => i !== index)
+                                    )}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
                 
                 {/* Marketing Description */}
-                <div>
-                  <Label htmlFor="marketingDescription">Marketing Description</Label>
-                  <Textarea
-                    id="marketingDescription"
-                    value={formData.marketingDescription}
-                    onChange={(e) => updateFormData("marketingDescription", e.target.value)}
-                    placeholder="Describe your unique selling points, service quality, fleet features, and what makes you stand out..."
-                    rows={5}
-                  />
-                </div>
-              </>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Marketing Copy</CardTitle>
+                    <CardDescription>Write compelling copy for your promoted listings</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      value={formData.marketingDescription}
+                      onChange={(e) => updateFormData("marketingDescription", e.target.value)}
+                      placeholder="Describe your unique selling points, fleet quality, service excellence, and what makes you the best choice for luxury transportation..."
+                      rows={6}
+                      maxLength={500}
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {formData.marketingDescription?.length || 0} / 500 characters
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+            
+            {/* Summary Box */}
+            {formData.selectedPromotionTier && (
+              <Card className="bg-primary/5 border-primary">
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-muted-foreground">Selected Plan</p>
+                      <p className="text-2xl font-bold">
+                        {PROMOTION_TIERS.find(t => t.id === formData.selectedPromotionTier)?.name}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-muted-foreground">Monthly Cost</p>
+                      <p className="text-3xl font-bold">
+                        {PROMOTION_TIERS.find(t => t.id === formData.selectedPromotionTier)?.monthlyPrice === 0
+                          ? 'Free'
+                          : `$${PROMOTION_TIERS.find(t => t.id === formData.selectedPromotionTier)?.monthlyPrice}`
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             )}
           </div>
         );
 
-      case 8:
+      case 9:
         return (
           <div className="space-y-4">
             <div className="flex items-start space-x-2">

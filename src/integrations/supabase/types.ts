@@ -7523,6 +7523,242 @@ export type Database = {
           },
         ]
       }
+      vendor_promotion_analytics: {
+        Row: {
+          ad_spend: number | null
+          booking_inquiries: number | null
+          clicks: number | null
+          conversion_rate: number | null
+          conversions: number | null
+          created_at: string | null
+          ctr: number | null
+          date: string
+          id: string
+          impressions: number | null
+          profile_views: number | null
+          revenue_generated: number | null
+          roi: number | null
+          vendor_id: string
+        }
+        Insert: {
+          ad_spend?: number | null
+          booking_inquiries?: number | null
+          clicks?: number | null
+          conversion_rate?: number | null
+          conversions?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          date: string
+          id?: string
+          impressions?: number | null
+          profile_views?: number | null
+          revenue_generated?: number | null
+          roi?: number | null
+          vendor_id: string
+        }
+        Update: {
+          ad_spend?: number | null
+          booking_inquiries?: number | null
+          clicks?: number | null
+          conversion_rate?: number | null
+          conversions?: number | null
+          created_at?: string | null
+          ctr?: number | null
+          date?: string
+          id?: string
+          impressions?: number | null
+          profile_views?: number | null
+          revenue_generated?: number | null
+          roi?: number | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_promotion_analytics_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_promotion_subscriptions: {
+        Row: {
+          auto_renew: boolean | null
+          commission_rate: number
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          monthly_price: number
+          payment_method_id: string | null
+          started_at: string
+          status: string
+          stripe_subscription_id: string | null
+          tier: string
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          auto_renew?: boolean | null
+          commission_rate?: number
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          monthly_price: number
+          payment_method_id?: string | null
+          started_at?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          tier: string
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          auto_renew?: boolean | null
+          commission_rate?: number
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          monthly_price?: number
+          payment_method_id?: string | null
+          started_at?: string
+          status?: string
+          stripe_subscription_id?: string | null
+          tier?: string
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_promotion_subscriptions_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_promotional_media: {
+        Row: {
+          analytics: Json | null
+          caption: string | null
+          created_at: string | null
+          display_order: number | null
+          file_url: string
+          hashtags: string[] | null
+          id: string
+          is_cover: boolean | null
+          media_type: string
+          thumbnail_url: string | null
+          updated_at: string | null
+          vendor_id: string
+        }
+        Insert: {
+          analytics?: Json | null
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          file_url: string
+          hashtags?: string[] | null
+          id?: string
+          is_cover?: boolean | null
+          media_type: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          vendor_id: string
+        }
+        Update: {
+          analytics?: Json | null
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          file_url?: string
+          hashtags?: string[] | null
+          id?: string
+          is_cover?: boolean | null
+          media_type?: string
+          thumbnail_url?: string | null
+          updated_at?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_promotional_media_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendor_promotional_packages: {
+        Row: {
+          created_at: string | null
+          current_bookings: number | null
+          description: string | null
+          discount_percentage: number | null
+          exclusions: string[] | null
+          id: string
+          inclusions: string[] | null
+          is_active: boolean | null
+          max_bookings: number | null
+          package_name: string
+          package_photos: Json | null
+          promotional_price: number
+          regular_price: number
+          updated_at: string | null
+          valid_from: string | null
+          valid_until: string | null
+          vendor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          current_bookings?: number | null
+          description?: string | null
+          discount_percentage?: number | null
+          exclusions?: string[] | null
+          id?: string
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          max_bookings?: number | null
+          package_name: string
+          package_photos?: Json | null
+          promotional_price: number
+          regular_price: number
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+          vendor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          current_bookings?: number | null
+          description?: string | null
+          discount_percentage?: number | null
+          exclusions?: string[] | null
+          id?: string
+          inclusions?: string[] | null
+          is_active?: boolean | null
+          max_bookings?: number | null
+          package_name?: string
+          package_photos?: Json | null
+          promotional_price?: number
+          regular_price?: number
+          updated_at?: string | null
+          valid_from?: string | null
+          valid_until?: string | null
+          vendor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vendor_promotional_packages_vendor_id_fkey"
+            columns: ["vendor_id"]
+            isOneToOne: false
+            referencedRelation: "transportation_vendors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vendor_promotions: {
         Row: {
           amount_spent: number | null

@@ -32,29 +32,35 @@ export default function VendorDocumentUpload({
   const [uploading, setUploading] = useState(false);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(event.target.files || []);
+    if (files.length === 0) return;
 
-    // Validate file type
+    // Validate file types
     const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload PDF, JPG, or PNG files only",
-        variant: "destructive",
-      });
-      return;
-    }
+    const validFiles = files.filter(file => {
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: `${file.name} - Please upload PDF, JPG, or PNG files only`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      // Validate file size (10MB max)
+      if (file.size > 10485760) {
+        toast({
+          title: "File too large",
+          description: `${file.name} - File size must be less than 10MB`,
+          variant: "destructive",
+        });
+        return false;
+      }
+      
+      return true;
+    });
 
-    // Validate file size (10MB max)
-    if (file.size > 10485760) {
-      toast({
-        title: "File too large",
-        description: "File size must be less than 10MB",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (validFiles.length === 0) return;
 
     setUploading(true);
 
@@ -62,50 +68,53 @@ export default function VendorDocumentUpload({
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Upload to storage
-      const fileName = `${Date.now()}-${file.name}`;
-      const filePath = `${user.id}/${documentType}/${fileName}`;
+      // Upload all files simultaneously
+      const uploadPromises = validFiles.map(async (file) => {
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${file.name}`;
+        const filePath = `${user.id}/${documentType}/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
-        .from('vendor-documents')
-        .upload(filePath, file);
+        const { error: uploadError } = await supabase.storage
+          .from('vendor-documents')
+          .upload(filePath, file);
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('vendor-documents')
-        .getPublicUrl(filePath);
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('vendor-documents')
+          .getPublicUrl(filePath);
 
-      // Save metadata to database
-      const { data: docData, error: dbError } = await supabase
-        .from('vendor_document_uploads')
-        .insert({
-          user_id: user.id,
-          document_type: documentType,
-          file_name: file.name,
-          file_url: publicUrl,
-          file_size: file.size,
-          mime_type: file.type
-        })
-        .select()
-        .single();
+        // Save metadata to database
+        const { data: docData, error: dbError } = await supabase
+          .from('vendor_document_uploads')
+          .insert({
+            user_id: user.id,
+            document_type: documentType,
+            file_name: file.name,
+            file_url: publicUrl,
+            file_size: file.size,
+            mime_type: file.type
+          })
+          .select()
+          .single();
 
-      if (dbError) throw dbError;
+        if (dbError) throw dbError;
 
-      // Update parent component
-      onDocumentsChange([
-        ...documents,
-        {
+        return {
           id: docData.id,
           fileName: file.name,
           fileUrl: publicUrl
-        }
-      ]);
+        };
+      });
+
+      const results = await Promise.all(uploadPromises);
+
+      // Update parent component with all new documents
+      onDocumentsChange([...documents, ...results]);
 
       toast({
         title: "Upload successful",
-        description: `${file.name} has been uploaded`,
+        description: `Successfully uploaded ${results.length} document${results.length > 1 ? 's' : ''}`,
       });
 
       // Reset input
@@ -170,12 +179,13 @@ export default function VendorDocumentUpload({
             id={`upload-${documentType}`}
             type="file"
             accept=".pdf,.jpg,.jpeg,.png"
+            multiple
             onChange={handleFileUpload}
             disabled={uploading}
             className="cursor-pointer"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Accepted formats: PDF, JPG, PNG (Max 10MB)
+            Accepted formats: PDF, JPG, PNG (Max 10MB per file) • Multiple files allowed
           </p>
         </div>
       </div>
@@ -184,7 +194,7 @@ export default function VendorDocumentUpload({
         <Card className="p-4">
           <div className="flex items-center gap-3">
             <Loader2 className="h-5 w-5 animate-spin" />
-            <p className="text-sm">Uploading document...</p>
+            <p className="text-sm">Uploading documents...</p>
           </div>
         </Card>
       )}
