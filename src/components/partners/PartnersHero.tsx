@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, Mic, MapPin, Users2 } from "lucide-react";
+import { ArrowRight, Mic, MapPin, Plane } from "lucide-react";
 import heroImage from "@/assets/partners/hero-luxury-car.jpg";
 
 export const PartnersHero = () => {
@@ -64,16 +64,16 @@ export const PartnersHero = () => {
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <MapPin className="h-6 w-6 text-primary" />
-                <div className="text-2xl font-bold text-white">50+</div>
+                <div className="text-2xl font-bold text-white">500+</div>
               </div>
-              <div className="text-sm text-gray-300">Cities Worldwide</div>
+              <div className="text-sm text-gray-300">Cities in 60+ Countries</div>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Users2 className="h-6 w-6 text-primary" />
-                <div className="text-2xl font-bold text-white">Creator</div>
+                <Plane className="h-6 w-6 text-primary" />
+                <div className="text-2xl font-bold text-white">400+</div>
               </div>
-              <div className="text-sm text-gray-300">Network Integrated</div>
+              <div className="text-sm text-gray-300">Airports Worldwide</div>
             </div>
           </div>
         </div>
