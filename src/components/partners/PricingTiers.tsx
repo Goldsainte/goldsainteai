@@ -59,8 +59,8 @@ export const PricingTiers = () => {
     <section className="py-20 bg-background">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Promotion Packages</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Promotion Packages</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Choose the package that fits your business goals
           </p>
         </div>
@@ -84,9 +84,9 @@ export const PricingTiers = () => {
               )}
 
               <div className="mb-6">
-                <h3 className="text-2xl font-bold mb-2">{tier.name}</h3>
+                <h3 className="text-xl font-bold mb-2">{tier.name}</h3>
                 <div className="mb-3">
-                  <span className="text-4xl font-bold">{tier.price}</span>
+                  <span className="text-3xl font-bold">{tier.price}</span>
                   {tier.period && (
                     <span className="text-muted-foreground">{tier.period}</span>
                   )}

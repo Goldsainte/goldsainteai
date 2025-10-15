@@ -26,8 +26,8 @@ export const ValueProposition = () => {
     <section className="py-20 bg-background">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Why Partner with Goldsainte?</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Partner with Goldsainte?</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Join the leading platform connecting premium transportation providers with discerning travelers
           </p>
         </div>
@@ -43,11 +43,11 @@ export const ValueProposition = () => {
                   <benefit.icon className="h-8 w-8 text-primary" />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold mb-3">{benefit.title}</h3>
+              <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
               <p className="text-muted-foreground mb-4 leading-relaxed">
                 {benefit.description}
               </p>
-              <div className="text-primary font-semibold text-lg">
+              <div className="text-primary font-semibold">
                 {benefit.stat}
               </div>
             </div>

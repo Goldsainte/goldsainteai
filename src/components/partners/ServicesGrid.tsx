@@ -43,8 +43,8 @@ export const ServicesGrid = () => {
     <section className="py-20 bg-background">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">Services We Support</h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Services We Support</h2>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Diverse service offerings to maximize your earning potential
           </p>
         </div>
@@ -67,8 +67,8 @@ export const ServicesGrid = () => {
                   <div className="w-12 h-12 rounded-full bg-primary/20 backdrop-blur-sm flex items-center justify-center mb-3">
                     <service.icon className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
-                  <p className="text-sm text-gray-200">{service.description}</p>
+                  <h3 className="text-lg font-bold text-white mb-2">{service.title}</h3>
+                  <p className="text-sm text-gray-200 leading-relaxed">{service.description}</p>
                 </div>
               </div>
             </div>
@@ -77,7 +77,7 @@ export const ServicesGrid = () => {
 
         {/* Vehicle Types */}
         <div className="max-w-4xl mx-auto">
-          <h3 className="text-3xl font-bold text-center mb-8">Fleet Categories</h3>
+          <h3 className="text-2xl font-bold text-center mb-8">Fleet Categories</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {vehicleTypes.map((type, index) => (
               <div 

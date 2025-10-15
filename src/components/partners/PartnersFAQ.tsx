@@ -46,8 +46,8 @@ export const PartnersFAQ = () => {
       <div className="container px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-xl text-muted-foreground">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-lg text-muted-foreground">
               Everything you need to know about partnering with Goldsainte
             </p>
           </div>
@@ -59,7 +59,7 @@ export const PartnersFAQ = () => {
                 value={`item-${index}`}
                 className="bg-card border border-border rounded-lg px-6"
               >
-                <AccordionTrigger className="text-left text-lg font-semibold hover:no-underline py-6">
+                <AccordionTrigger className="text-left font-semibold hover:no-underline py-6">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed pb-6">
