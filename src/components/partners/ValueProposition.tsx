@@ -1,23 +1,35 @@
-import { Crown, Smartphone, TrendingUp } from "lucide-react";
+import { Users, Network, Megaphone, CreditCard, Mic } from "lucide-react";
 
 const benefits = [
   {
-    icon: Crown,
-    title: "Premium Clientele",
-    description: "Access to luxury travelers and corporate clients seeking high-end transportation services.",
-    stat: "85% repeat customers"
+    icon: Users,
+    title: "Connect with Luxury Travelers",
+    description: "Be part of high-end, personalized itineraries booked by discerning travelers seeking seamless door-to-door experiences.",
+    stat: "Premium clientele"
   },
   {
-    icon: Smartphone,
-    title: "Technology Platform",
-    description: "Advanced booking management tools, real-time notifications, and seamless payment processing.",
-    stat: "99.9% uptime guarantee"
+    icon: Network,
+    title: "Power Creator & Agent Packages",
+    description: "Get pulled into custom trips crafted by travel creators and certified agents—combining your services with hotels, experiences, and dining.",
+    stat: "Ecosystem integration"
   },
   {
-    icon: TrendingUp,
-    title: "Revenue Growth",
-    description: "Our partners see an average 40% increase in bookings within the first 6 months.",
-    stat: "40% avg. growth"
+    icon: Megaphone,
+    title: "Promote Your Brand, Not Just a Service",
+    description: "Run Sponsored Posts, get featured as a Promoted Vendor, and showcase your fleet and reputation directly to target audiences.",
+    stat: "Marketing tools"
+  },
+  {
+    icon: CreditCard,
+    title: "Streamlined, Secure Payments",
+    description: "Enjoy milestone-based payouts, group payment handling, and transparent billing through Goldsainte's smart payment system.",
+    stat: "Secure transactions"
+  },
+  {
+    icon: Mic,
+    title: "Hands-Free Booking via AI Concierge",
+    description: "Your services are voice-accessible through our 'Hey Goldsainte' AI concierge, making you bookable in seconds—anytime, anywhere.",
+    stat: "Voice discovery"
   }
 ];
 
@@ -32,7 +44,7 @@ export const ValueProposition = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {benefits.map((benefit, index) => (
             <div 
               key={index}

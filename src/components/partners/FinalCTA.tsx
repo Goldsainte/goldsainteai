@@ -10,11 +10,10 @@ export const FinalCTA = () => {
       <div className="container px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-5xl font-bold mb-6">
-            Ready to Accelerate Your Business?
+            Ready to Elevate Your Business?
           </h2>
           <p className="text-lg md:text-xl mb-10 text-white/90 leading-relaxed">
-            Join hundreds of premium transportation providers who trust Goldsainte 
-            to grow their business and connect with luxury travelers worldwide.
+            Join a growing network of premium transportation vendors powering the future of luxury travel.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -24,7 +23,7 @@ export const FinalCTA = () => {
               className="px-8 py-6 bg-white text-primary hover:bg-white/90"
               onClick={() => navigate('/transportation-vendor-application')}
             >
-              Apply Now
+              Apply Now to Become a Goldsainte Vendor
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
@@ -39,8 +38,8 @@ export const FinalCTA = () => {
 
           <div className="mt-12 pt-8 border-t border-white/20">
             <p className="text-white/80">
-              <strong className="text-white">Questions?</strong> Our partner success team is here to help.
-              <span className="block mt-2">Email us at partners@goldsainte.com or call 1-800-PARTNER</span>
+              <strong className="text-white">Review process takes 3–5 business days.</strong>
+              <span className="block mt-2">Questions? Contact our partner team at partners@goldsainte.com</span>
             </p>
           </div>
         </div>

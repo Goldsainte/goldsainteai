@@ -35,7 +35,7 @@ export const RequirementsChecklist = () => {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Partnership Requirements</h2>
             <p className="text-lg text-muted-foreground">
-              We maintain high standards to ensure the best experience for our clients
+              To maintain our luxury standard and protect all ecosystem participants (travelers, agents, creators), we require:
             </p>
           </div>
 

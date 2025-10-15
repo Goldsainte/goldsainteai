@@ -43,9 +43,9 @@ export const ServicesGrid = () => {
     <section className="py-20 bg-background">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Services We Support</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Transportation Services We Support</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Diverse service offerings to maximize your earning potential
+            Your services power complete travel experiences—not just rides, but seamless journeys integrated into curated itineraries
           </p>
         </div>
 

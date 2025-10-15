@@ -1,40 +1,40 @@
-import { Calendar, CreditCard, Megaphone, HeadphonesIcon } from "lucide-react";
-import driverImage from "@/assets/partners/professional-driver.jpg";
-import techImage from "@/assets/partners/technology-platform.jpg";
-import successImage from "@/assets/partners/success-growth.jpg";
-import cityImage from "@/assets/partners/city-services.jpg";
+import { Users2, Globe, Star, Megaphone } from "lucide-react";
+import creatorImage from "@/assets/partners/city-services.jpg";
+import technologyImage from "@/assets/partners/technology-platform.jpg";
+import growthImage from "@/assets/partners/success-growth.jpg";
+import marketingImage from "@/assets/partners/corporate-services.jpg";
 
 const benefits = [
   {
-    icon: Calendar,
-    title: "Flexible Schedule",
-    subtitle: "Work on Your Terms",
-    description: "Control your availability and schedule. Accept bookings when it suits your business. No minimum hours required.",
-    image: driverImage,
+    icon: Users2,
+    title: "Creator Collaborations",
+    subtitle: "Become Part of Influencer Travel Stories",
+    description: "Partner with travel influencers who feature your rides in their content. Your service gets linked to creator-led travel packages (e.g., 'Ride to the Amalfi Coast with @TravelLuxe'). Track engagement, conversions, and ROI from every collaboration.",
+    image: creatorImage,
     imagePosition: "left" as const
   },
   {
-    icon: CreditCard,
-    title: "Guaranteed Payments",
-    subtitle: "Get Paid On Time, Every Time",
-    description: "Secure payment processing with weekly direct deposits. Track all earnings in real-time through your dashboard.",
-    image: techImage,
+    icon: Globe,
+    title: "Agent & Traveler Ecosystem",
+    subtitle: "Power Professional Trip Planning",
+    description: "Certified travel agents pull your services into custom itineraries. Travelers discover you through AI-powered search and curated recommendations. Your brand appears in full trip contexts—not just isolated ride searches.",
+    image: technologyImage,
     imagePosition: "right" as const
   },
   {
-    icon: Megaphone,
-    title: "Marketing Support",
-    subtitle: "We Bring You Customers",
-    description: "Benefit from our promotional features, premium placement options, and extensive marketing campaigns to luxury travelers.",
-    image: successImage,
+    icon: Star,
+    title: "Promoted Vendor Status",
+    subtitle: "Stand Out From the Crowd",
+    description: "Upgrade to Promoted Vendor for featured placement in agent and creator trip planners, priority listing in AI voice search results, and a promoted badge on your profile. Access exclusive creator collabs and sponsorship opportunities.",
+    image: growthImage,
     imagePosition: "left" as const
   },
   {
-    icon: HeadphonesIcon,
-    title: "24/7 Support",
-    subtitle: "Never Alone on the Road",
-    description: "Dedicated partner support team available round the clock. Technical assistance, customer service backup, and business guidance.",
-    image: cityImage,
+    icon: Megaphone,
+    title: "Sponsored Posts & Marketing",
+    subtitle: "Launch Campaigns Inside the Platform",
+    description: "Promote your service directly inside Goldsainte. Launch targeted campaigns, partner with influencers, and track engagement. Your brand reaches travelers at the moment they're planning luxury trips.",
+    image: marketingImage,
     imagePosition: "right" as const
   }
 ];

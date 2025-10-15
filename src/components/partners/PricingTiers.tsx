@@ -6,48 +6,50 @@ const tiers = [
   {
     name: "Basic",
     price: "Free",
-    description: "Get started with basic listing",
+    description: "Perfect for getting started",
     features: [
-      "Standard listing in vendor directory",
-      "Basic profile page",
-      "Customer reviews",
-      "Booking management",
-      "Payment processing"
+      "Profile listing on platform",
+      "Discoverable by agents, creators, and AI concierge",
+      "Access to all booking requests",
+      "Basic analytics dashboard",
+      "Email support",
+      "Standard payment processing"
     ],
-    cta: "Start Free",
+    cta: "Get Started Free",
     highlighted: false
   },
   {
-    name: "Featured",
+    name: "Promoted Vendor",
     price: "$49",
     period: "/month",
-    description: "Stand out with priority placement",
+    description: "Premium visibility across the ecosystem",
     features: [
       "Everything in Basic",
-      "Priority placement in search results",
-      "Featured badge on profile",
+      "Featured placement in agent and creator trip planners",
+      "Priority listing in AI voice search results",
+      "Promoted badge on your vendor profile",
+      "Access to exclusive creator collabs",
       "Enhanced analytics",
-      "Priority customer support",
-      "Social media promotion"
+      "Priority customer support"
     ],
-    cta: "Get Featured",
+    cta: "Start Free Trial",
     highlighted: true
   },
   {
-    name: "Premium",
+    name: "Sponsored Posts + Promoted",
     price: "$99",
     period: "/month",
-    description: "Maximum visibility and growth",
+    description: "Maximum visibility with sponsored campaigns",
     features: [
-      "Everything in Featured",
-      "Homepage carousel presence",
-      "Advanced analytics dashboard",
+      "Everything in Promoted Vendor",
+      "Sponsored Posts in social feed",
+      "Creator collaboration campaigns",
+      "Advanced campaign analytics & ROI tracking",
       "Dedicated account manager",
       "Custom marketing campaigns",
-      "API access",
-      "White-label options"
+      "API access (optional)"
     ],
-    cta: "Go Premium",
+    cta: "Contact Sales",
     highlighted: false
   }
 ];

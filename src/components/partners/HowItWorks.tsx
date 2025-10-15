@@ -1,29 +1,29 @@
-import { FileText, ShieldCheck, DollarSign, Bell } from "lucide-react";
+import { FileText, ShieldCheck, Rocket, Star } from "lucide-react";
 
 const steps = [
   {
     number: "01",
     icon: FileText,
-    title: "Apply Online",
-    description: "Complete our simple 5-minute application with your business details and fleet information."
+    title: "Apply",
+    description: "Submit your vendor application with business credentials, insurance, licenses, and fleet details."
   },
   {
     number: "02",
     icon: ShieldCheck,
     title: "Get Verified",
-    description: "Our team conducts quality and safety checks to ensure premium standards are met."
+    description: "Our team reviews your documentation to approve you as a Standard or Preferred Vendor, depending on service quality and compliance."
   },
   {
     number: "03",
-    icon: DollarSign,
-    title: "Set Your Rates",
-    description: "You have full control over your pricing structure and service offerings."
+    icon: Rocket,
+    title: "Go Live",
+    description: "Your profile becomes discoverable by creators, agents, and travelers. Set your availability, update your fleet, and start accepting bookings."
   },
   {
     number: "04",
-    icon: Bell,
-    title: "Start Earning",
-    description: "Receive instant booking notifications and start serving premium clients immediately."
+    icon: Star,
+    title: "Get Promoted",
+    description: "Choose to run Sponsored Posts or upgrade to Promoted Vendor status for top placement in trip-building tools and the social feed."
   }
 ];
 

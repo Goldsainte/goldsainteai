@@ -7,6 +7,22 @@ import {
 
 const faqs = [
   {
+    question: "What is a Promoted Vendor?",
+    answer: "Promoted Vendors receive priority placement in agent and creator trip-planning tools, featured status in AI voice search results, and a promoted badge on their profile. This tier is designed to maximize your visibility to travelers, agents, and content creators actively building luxury travel experiences."
+  },
+  {
+    question: "How do Sponsored Posts work?",
+    answer: "Sponsored Posts allow you to promote your service directly in the Goldsainte social feed and trip-planning interface. You can partner with travel influencers, track engagement metrics, and measure ROI. Sponsored Posts are available as part of the Premium tier."
+  },
+  {
+    question: "How does the AI Concierge feature vendors?",
+    answer: "Our 'Hey Goldsainte' AI concierge uses voice recognition to help travelers book services. Promoted Vendors receive priority in AI search results, making your business more discoverable when travelers ask for transportation recommendations."
+  },
+  {
+    question: "Can I collaborate with travel creators?",
+    answer: "Yes! Promoted Vendors and Premium tier members can partner with travel influencers and content creators on the platform. Your service can be featured in their content and linked to creator-led travel packages."
+  },
+  {
     question: "How do I get paid?",
     answer: "We process payments weekly via direct deposit to your bank account. All completed bookings are paid out within 7 business days. You can track all earnings and upcoming payments in your vendor dashboard."
   },
