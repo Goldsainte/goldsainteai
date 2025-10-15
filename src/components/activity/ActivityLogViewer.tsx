@@ -33,16 +33,14 @@ export const ActivityLogViewer = () => {
 
   const fetchLogs = async () => {
     try {
-      let query = supabase
+      const { data, error } = await supabase
         .from('activity_logs')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(100);
 
-      const { data, error } = await query;
-
       if (error) throw error;
-      setLogs(data || []);
+      setLogs((data as any[]) || []);
     } catch (error) {
       console.error('Error fetching activity logs:', error);
     } finally {

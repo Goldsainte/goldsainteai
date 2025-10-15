@@ -27,7 +27,7 @@ export const UserActivityHistory = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase
+      const { data, error} = await supabase
         .from('activity_logs')
         .select('id, action, entity_type, entity_id, details, created_at')
         .eq('user_id', user.id)
@@ -35,7 +35,7 @@ export const UserActivityHistory = () => {
         .limit(50);
 
       if (error) throw error;
-      setLogs(data || []);
+      setLogs((data as any[]) || []);
     } catch (error) {
       console.error('Error fetching user activity:', error);
     } finally {
