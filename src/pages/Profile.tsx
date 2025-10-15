@@ -242,6 +242,14 @@ export default function Profile() {
                 <Briefcase className="h-4 w-4" />
                 Post Complex Booking Job
               </Button>
+              <Button onClick={() => navigate('/customer-verification')} variant="outline" className="w-full justify-start gap-2">
+                <Settings className="h-4 w-4" />
+                Identity Verification
+              </Button>
+              <Button onClick={() => navigate('/emergency-contacts')} variant="outline" className="w-full justify-start gap-2">
+                <Phone className="h-4 w-4" />
+                Emergency Contacts
+              </Button>
               {!isAgent && !roleLoading && (
                 <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
                   <Briefcase className="h-4 w-4" />

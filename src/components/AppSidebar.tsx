@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign, Users, Package } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign, Users, Package, TrendingUp } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -140,21 +140,38 @@ export function AppSidebar() {
                 </SidebarMenuItem>
               ))}
               {isAgent && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to="/agent-dashboard"
-                      className={({ isActive }) =>
-                        isActive
-                          ? "bg-accent/10 text-accent font-medium"
-                          : "hover:bg-muted/50"
-                      }
-                    >
-                      <Briefcase className="h-5 w-5" />
-                      {open && <span>Agent Dashboard</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to="/agent-dashboard"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-accent/10 text-accent font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <Briefcase className="h-5 w-5" />
+                        {open && <span>Agent Dashboard</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to="/agent-performance"
+                        className={({ isActive }) =>
+                          isActive
+                            ? "bg-accent/10 text-accent font-medium"
+                            : "hover:bg-muted/50"
+                        }
+                      >
+                        <TrendingUp className="h-5 w-5" />
+                        {open && <span>Performance</span>}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
               )}
               {isAdmin && (
                 <>

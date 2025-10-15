@@ -82,6 +82,9 @@ import VendorBookingCalendar from "./components/VendorBookingCalendar";
 import EscrowTimelineDashboard from "./components/EscrowTimelineDashboard";
 import PlatformAnalyticsDashboard from "./components/PlatformAnalyticsDashboard";
 import ActivityLogs from "./pages/ActivityLogs";
+import CustomerVerification from "./pages/CustomerVerification";
+import EmergencyContacts from "./pages/EmergencyContacts";
+import AgentPerformanceDashboard from "./pages/AgentPerformanceDashboard";
 
 const queryClient = new QueryClient();
 
@@ -202,6 +205,10 @@ function AppContent() {
           <Route path="/escrow-timeline" element={<EscrowTimelineDashboard />} />
           <Route path="/admin/platform-analytics" element={<PlatformAnalyticsDashboard />} />
           <Route path="/activity-logs" element={<ActivityLogs />} />
+          {/* Phase 8: Trust & Safety Pages */}
+          <Route path="/customer-verification" element={<CustomerVerification />} />
+          <Route path="/emergency-contacts" element={<EmergencyContacts />} />
+          <Route path="/agent-performance" element={<AgentPerformanceDashboard />} />
           <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
           <Route path="/cocurated-create" element={<CoCuratedCreate />} />
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
