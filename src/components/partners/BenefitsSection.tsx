@@ -44,7 +44,7 @@ export const BenefitsSection = () => {
     <section className="py-20 bg-muted/30">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Partner Benefits</h2>
+          <h2 className="font-secondary text-3xl md:text-4xl font-bold mb-4">Partner Benefits</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Everything you need to succeed and grow your transportation business
           </p>
@@ -76,7 +76,7 @@ export const BenefitsSection = () => {
                   <benefit.icon className="h-8 w-8 text-primary" />
                 </div>
                 <div className="text-primary font-semibold mb-2">{benefit.subtitle}</div>
-                <h3 className="text-2xl md:text-3xl font-bold mb-4">{benefit.title}</h3>
+                <h3 className="font-secondary text-2xl md:text-3xl font-bold mb-4">{benefit.title}</h3>
                 <p className="text-base text-muted-foreground leading-relaxed">
                   {benefit.description}
                 </p>

@@ -21,7 +21,7 @@ export const PartnersHero = () => {
       {/* Content */}
       <div className="container relative z-10 px-4 py-20">
         <div className="max-w-3xl">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+          <h1 className="font-secondary text-3xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
             Partner with <span className="text-primary">Goldsainte</span>
           </h1>
           <p className="text-lg md:text-xl text-gray-200 mb-4 leading-relaxed">

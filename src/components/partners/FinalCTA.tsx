@@ -9,7 +9,7 @@ export const FinalCTA = () => {
     <section className="py-20 bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-white">
       <div className="container px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">
+          <h2 className="font-secondary text-3xl md:text-5xl font-bold mb-6">
             Ready to Elevate Your Business?
           </h2>
           <p className="text-lg md:text-xl mb-10 text-white/90 leading-relaxed">

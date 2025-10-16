@@ -67,7 +67,7 @@ export const ValueProposition = () => {
     <section className="py-20 bg-background">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Why Partner with Goldsainte?</h2>
+          <h2 className="font-secondary text-3xl md:text-4xl font-bold mb-4">Why Partner with Goldsainte?</h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto mb-6">
             Goldsainte offers more than just a place to list your transportation services. We've built an intelligent travel commerce ecosystem where your business becomes part of fully curated, bookable experiences — powered by AI, elevated by creators, and trusted by travel professionals.
           </p>
@@ -87,7 +87,7 @@ export const ValueProposition = () => {
                   <benefit.icon className="h-8 w-8 text-primary" />
                 </div>
               </div>
-              <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
+              <h3 className="font-secondary text-xl font-bold mb-3">{benefit.title}</h3>
               <ul className="list-disc ml-5 space-y-2 text-muted-foreground leading-relaxed">
                 {benefit.bullets.map((bullet, i) => (
                   <li key={i}>{bullet}</li>

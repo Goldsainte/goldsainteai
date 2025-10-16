@@ -32,7 +32,7 @@ export const HowItWorks = () => {
     <section className="py-20 bg-muted/30">
       <div className="container px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+          <h2 className="font-secondary text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Four simple steps to start growing your transportation business
           </p>
@@ -56,7 +56,7 @@ export const HowItWorks = () => {
                       <step.icon className="h-8 w-8 text-primary" />
                     </div>
                   </div>
-                  <h3 className="text-lg font-bold mb-3">{step.title}</h3>
+                  <h3 className="font-secondary text-lg font-bold mb-3">{step.title}</h3>
                   <p className="text-muted-foreground leading-relaxed">
                     {step.description}
                   </p>

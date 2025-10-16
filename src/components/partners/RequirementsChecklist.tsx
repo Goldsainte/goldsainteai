@@ -33,7 +33,7 @@ export const RequirementsChecklist = () => {
       <div className="container px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Partnership Requirements</h2>
+            <h2 className="font-secondary text-3xl md:text-4xl font-bold mb-4">Partnership Requirements</h2>
             <p className="text-lg text-muted-foreground">
               To maintain our luxury standard and protect all ecosystem participants (travelers, agents, creators), we require:
             </p>
@@ -47,7 +47,7 @@ export const RequirementsChecklist = () => {
                     <CheckCircle2 className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-bold mb-1">{req.title}</h3>
+                    <h3 className="font-secondary text-lg font-bold mb-1">{req.title}</h3>
                     <p className="text-muted-foreground">{req.description}</p>
                   </div>
                 </div>
