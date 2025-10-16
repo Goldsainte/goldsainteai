@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User } from "lucide-react";
-import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
+import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -514,7 +514,10 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               </Avatar>
             )}
           </div>
-          <h1 className="text-base font-semibold">{profile?.username || 'Profile'}</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-base font-semibold">{profile?.username || 'Profile'}</h1>
+            {profile?.is_verified && <InstagramVerifiedBadge />}
+          </div>
           <Button
             variant="ghost"
             size="icon"
@@ -552,9 +555,12 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
           {/* Info Section */}
           <div className="flex-1 space-y-5">
-            {/* Username and Buttons Row */}
-            <div className="flex items-center gap-4">
-              <h2 className="text-xl font-light">{profile?.username || 'User'}</h2>
+              {/* Username and Buttons Row */}
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-light">{profile?.username || 'User'}</h2>
+                  {profile?.is_verified && <InstagramVerifiedBadge />}
+                </div>
               
               {isOwnProfile ? (
                 <>
@@ -622,16 +628,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
             {/* Bio Section */}
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <p className="font-semibold text-sm">
-                  {profile?.first_name && profile?.last_name
-                    ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
-                    : (profile?.username || '').toUpperCase()}
-                </p>
-                {profile?.is_verified && (
-                  <CustomerVerifiedBadge size="xs" />
-                )}
-              </div>
+              <p className="font-semibold text-sm">
+                {profile?.first_name && profile?.last_name
+                  ? `${profile.first_name} ${profile.last_name}`.toUpperCase()
+                  : (profile?.username || '').toUpperCase()}
+              </p>
               {profile?.bio && (
                 <p className="text-sm whitespace-pre-wrap">{profile.bio}</p>
               )}
@@ -695,16 +696,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
           {/* Name and Bio Section */}
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <p className="font-semibold text-sm uppercase">
-                {profile?.first_name && profile?.last_name
-                  ? `${profile.first_name} ${profile.last_name}`
-                  : profile?.username || 'User'}
-              </p>
-              {profile?.is_verified && (
-                <CustomerVerifiedBadge size="xs" />
-              )}
-            </div>
+            <p className="font-semibold text-sm uppercase">
+              {profile?.first_name && profile?.last_name
+                ? `${profile.first_name} ${profile.last_name}`
+                : profile?.username || 'User'}
+            </p>
 
             {profile?.bio && (
               <p className="text-sm whitespace-pre-wrap leading-tight">{profile.bio}</p>
