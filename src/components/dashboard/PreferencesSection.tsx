@@ -14,7 +14,12 @@ type Message = { role: "user" | "assistant"; content: string };
 
 export function PreferencesSection() {
   const { user } = useAuth();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "assistant",
+      content: "Hi! 👋 I'm your travel preferences assistant. I'll help you set up your booking preferences so we can find the perfect options for you.\n\nWould you like to start with:\n- 🏨 Hotel preferences\n- ✈️ Flight preferences\n- 🍽️ Restaurant preferences\n- 🚗 Car rental preferences\n- 🎭 Event preferences\n\nJust let me know which one interests you, and I'll guide you through it!",
+    },
+  ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [preferences, setPreferences] = useState<any>(null);
@@ -68,9 +73,10 @@ export function PreferencesSection() {
     setIsLoading(true);
 
     let assistantContent = "";
+    let preferenceSaved = false;
 
     try {
-      const { error } = await invokeStreamingEdgeFunction('ai-booking-assistant', {
+      const { error } = await invokeStreamingEdgeFunction('ai-preferences-assistant', {
         body: { messages: [...messages, userMsg] },
         timeout: 65000,
         showToastOnError: true,
@@ -96,6 +102,11 @@ export function PreferencesSection() {
                   return [...prev, { role: "assistant", content: assistantContent }];
                 });
               }
+
+              // Check for tool calls (preferences being saved)
+              if (parsed.choices?.[0]?.delta?.tool_calls) {
+                preferenceSaved = true;
+              }
             } catch (e) {
               // Ignore parsing errors
             }
@@ -103,6 +114,10 @@ export function PreferencesSection() {
         },
         onComplete: () => {
           setIsLoading(false);
+          if (preferenceSaved) {
+            fetchPreferences();
+            toast.success("Preferences saved! ✓");
+          }
         }
       });
 
@@ -130,7 +145,7 @@ export function PreferencesSection() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
-              AI Booking Assistant
+              AI Preferences Assistant
             </CardTitle>
             <CardDescription>
               Chat with our AI to set up your preferences naturally
@@ -139,11 +154,6 @@ export function PreferencesSection() {
           <CardContent>
             <ScrollArea className="h-96 pr-4 mb-4">
               <div className="space-y-4">
-                {messages.length === 0 && (
-                  <div className="text-center text-muted-foreground py-8">
-                    Start chatting to set up your booking preferences
-                  </div>
-                )}
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[80%] rounded-lg p-3 ${msg.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"}`}>

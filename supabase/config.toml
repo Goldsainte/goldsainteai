@@ -72,6 +72,9 @@ verify_jwt = false
 [functions.ai-booking-concierge]
 verify_jwt = false
 
+[functions.ai-preferences-assistant]
+verify_jwt = true
+
 [functions.realtime-voice-session]
 verify_jwt = false
 
