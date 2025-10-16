@@ -14,26 +14,21 @@ serve(async (req) => {
 
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
   );
 
   try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header");
-
+    const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw userError;
-    
-    const user = userData.user;
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Find Stripe customer
+    // Check for existing customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
@@ -45,51 +40,32 @@ serve(async (req) => {
 
     const customerId = customers.data[0].id;
 
-    // Check for active subscriptions
+    // Check for active subscription
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
       status: "active",
-      limit: 10,
+      limit: 1,
     });
 
-    const hasActiveVerification = subscriptions.data.some(
-      (sub: any) => sub.metadata?.subscription_type === 'verification'
-    );
+    const hasActiveSubscription = subscriptions.data.length > 0;
 
-    // Update profile verification status
-    if (hasActiveVerification) {
+    // If subscription is active but profile doesn't reflect it, update it
+    if (hasActiveSubscription) {
       await supabaseClient
         .from('profiles')
         .update({ is_verified: true })
         .eq('id', user.id);
-
-      // Store/update verification subscription record
-      await supabaseClient
-        .from('verification_subscriptions')
-        .upsert({
-          user_id: user.id,
-          stripe_customer_id: customerId,
-          stripe_subscription_id: subscriptions.data[0].id,
-          status: 'active',
-          current_period_end: new Date(subscriptions.data[0].current_period_end * 1000).toISOString(),
-        }, {
-          onConflict: 'user_id'
-        });
-    } else {
-      // Remove verification if no active subscription
-      await supabaseClient
-        .from('profiles')
-        .update({ is_verified: false })
-        .eq('id', user.id);
     }
 
-    return new Response(JSON.stringify({ is_verified: hasActiveVerification }), {
+    return new Response(JSON.stringify({ 
+      is_verified: hasActiveSubscription 
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error: any) {
-    console.error("Error checking verification:", error);
-    return new Response(JSON.stringify({ error: error.message, is_verified: false }), {
+    console.error("Error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

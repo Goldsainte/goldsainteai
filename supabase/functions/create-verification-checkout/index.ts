@@ -43,17 +43,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Verified Badge',
-              description: 'Get a blue verified badge on your profile',
-            },
-            unit_amount: 800, // $8.00
-            recurring: {
-              interval: 'month',
-            },
-          },
+          price: 'price_1SIgMGF9Y0dnmu4YWTKXIuIP',
           quantity: 1,
         },
       ],

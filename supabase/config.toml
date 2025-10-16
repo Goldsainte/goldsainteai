@@ -213,13 +213,14 @@ verify_jwt = false
 [functions.stripe-webhook]
 verify_jwt = false
 
+[functions.send-verification-email]
+verify_jwt = false
+
 [functions.create-verification-checkout]
 verify_jwt = true
 
 [functions.check-verification]
 verify_jwt = true
 
-[functions.send-verification-email]
-verify_jwt = false
 
 
