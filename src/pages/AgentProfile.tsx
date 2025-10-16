@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Star, MapPin, Briefcase, Award, Clock, ArrowLeft, Globe, Mail, Phone, Flag } from "lucide-react";
-import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
+import { SimpleVerifiedBadge } from "@/components/badges/SimpleVerifiedBadge";
 import { toast } from "sonner";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
@@ -170,11 +170,7 @@ export default function AgentProfile() {
                     />
                   </div>
 
-                  {agent.is_verified && (
-                    <Badge className="mb-4">
-                      <CustomerVerifiedBadge size="xs" showText />
-                    </Badge>
-                  )}
+                  {agent.is_verified && <SimpleVerifiedBadge size="sm" />}
 
                   <p className="text-sm text-muted-foreground mb-4">
                     {agent.bio || 'No bio available'}
