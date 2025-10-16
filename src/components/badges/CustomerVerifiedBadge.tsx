@@ -1,5 +1,5 @@
-import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import verifiedBadgeIcon from "@/assets/verified-badge.png";
 import {
   Tooltip,
   TooltipContent,
@@ -40,7 +40,7 @@ export const CustomerVerifiedBadge = ({
             variant="outline" 
             className={`${sizeClasses[size]} bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 flex items-center gap-1 ${className}`}
           >
-            <CheckCircle2 className={`${iconSizeClasses[size]} fill-blue-700`} />
+            <img src={verifiedBadgeIcon} alt="Verified" className={iconSizeClasses[size]} />
             {showText && <span>Verified</span>}
           </Badge>
         </TooltipTrigger>
