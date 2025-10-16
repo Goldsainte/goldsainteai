@@ -6,13 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus, AlertTriangle } from "lucide-react";
+import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus, AlertTriangle, RefreshCw, Store, Unplug } from "lucide-react";
 import { CreateProductModal } from "@/components/CreateProductModal";
 import { PackageDisputeModal } from "@/components/PackageDisputeModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
+import { useEcommerceConnections } from "@/hooks/useEcommerceConnections";
+import { formatDistanceToNow } from "date-fns";
 
 export default function Shop() {
   const { user } = useAuth();
@@ -23,6 +25,8 @@ export default function Shop() {
   const [disputeModalOpen, setDisputeModalOpen] = useState(false);
   const [disputePackageId, setDisputePackageId] = useState<string>("");
   const [disputeCreatorId, setDisputeCreatorId] = useState<string>("");
+
+  const { connections, syncProducts, disconnect } = useEcommerceConnections();
 
   const handleBack = () => {
     if (window.history.length > 1) navigate(-1);
@@ -155,6 +159,69 @@ export default function Shop() {
             />
           </div>
         </div>
+
+        {/* Connected Stores */}
+        {user && connections.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Store className="h-5 w-5" />
+                Connected Stores
+              </CardTitle>
+              <CardDescription>
+                Manage your connected ecommerce platforms
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {connections.map((connection: any) => (
+                <div key={connection.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-medium capitalize">{connection.platform}</span>
+                      <Badge variant={connection.is_active ? "default" : "secondary"}>
+                        {connection.is_active ? "Active" : "Inactive"}
+                      </Badge>
+                      {connection.sync_status === 'syncing' && (
+                        <Badge variant="outline" className="animate-pulse">
+                          <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                          Syncing...
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {connection.store_name || connection.store_url}
+                    </p>
+                    {connection.last_synced_at && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Last synced {formatDistanceToNow(new Date(connection.last_synced_at), { addSuffix: true })}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => syncProducts.mutate(connection.platform as 'shopify' | 'etsy')}
+                      disabled={syncProducts.isPending || connection.sync_status === 'syncing'}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${syncProducts.isPending ? 'animate-spin' : ''}`} />
+                      Sync
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => disconnect.mutate(connection.id)}
+                      disabled={disconnect.isPending}
+                    >
+                      <Unplug className="h-4 w-4 mr-2" />
+                      Disconnect
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
 
         <Tabs defaultValue="products" className="space-y-4 md:space-y-6">
           <TabsList className="grid w-full grid-cols-2 max-w-md">
