@@ -179,31 +179,46 @@ serve(async (req) => {
         const lastName = randomElement(LAST_NAMES);
         const username = generateUsername(firstName, lastName);
         const location = randomElement(LOCATIONS);
+        const email = `${username}@seed.local`;
+        const password = crypto.randomUUID();
         
-        // Create profile
-        const profileId = crypto.randomUUID();
-        const profile = {
-          id: profileId,
-          username,
-          full_name: `${firstName} ${lastName}`,
-          bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
-          location,
-          avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
-          website: `https://${username}.com`,
-          instagram_username: `@${username}`,
-          tiktok_username: `@${username}`,
-          account_type: 'creator',
-          is_verified: randomBoolean(0.4),
-        };
+        // Create auth user first
+        const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            username,
+            first_name: firstName,
+            last_name: lastName,
+            avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
+          }
+        });
 
+        if (authError || !authUser.user) {
+          console.error(`Error creating auth user ${username}:`, authError);
+          continue;
+        }
+
+        // Update the profile with rich seeded data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .insert(profile)
+          .update({
+            bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
+            location,
+            website: `https://${username}.com`,
+            instagram_username: `@${username}`,
+            tiktok_username: `@${username}`,
+            account_type: 'creator',
+            is_verified: randomBoolean(0.4),
+            seed_metadata: { seeded_by: 'seed-content-creators', created_at: new Date().toISOString() }
+          })
+          .eq('id', authUser.user.id)
           .select()
           .single();
 
         if (profileError) {
-          console.error(`Error creating profile ${username}:`, profileError);
+          console.error(`Error updating profile ${username}:`, profileError);
           continue;
         }
 
@@ -277,31 +292,46 @@ serve(async (req) => {
         const lastName = randomElement(LAST_NAMES);
         const username = generateUsername(firstName, lastName);
         const location = randomElement(LOCATIONS);
+        const email = `${username}@seed.local`;
+        const password = crypto.randomUUID();
         
-        // Create profile
-        const profileId = crypto.randomUUID();
-        const profile = {
-          id: profileId,
-          username,
-          full_name: `${firstName} ${lastName}`,
-          bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
-          location,
-          avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
-          website: `https://${username}.com`,
-          instagram_username: `@${username}`,
-          tiktok_username: `@${username}`,
-          account_type: 'creator',
-          is_verified: randomBoolean(0.4),
-        };
+        // Create auth user first
+        const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true,
+          user_metadata: {
+            username,
+            first_name: firstName,
+            last_name: lastName,
+            avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
+          }
+        });
 
+        if (authError || !authUser.user) {
+          console.error(`Error creating auth user ${username}:`, authError);
+          continue;
+        }
+
+        // Update the profile with rich seeded data
         const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .insert(profile)
+          .update({
+            bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
+            location,
+            website: `https://${username}.com`,
+            instagram_username: `@${username}`,
+            tiktok_username: `@${username}`,
+            account_type: 'creator',
+            is_verified: randomBoolean(0.4),
+            seed_metadata: { seeded_by: 'seed-content-creators', created_at: new Date().toISOString() }
+          })
+          .eq('id', authUser.user.id)
           .select()
           .single();
 
         if (profileError) {
-          console.error(`Error creating profile ${username}:`, profileError);
+          console.error(`Error updating profile ${username}:`, profileError);
           continue;
         }
 

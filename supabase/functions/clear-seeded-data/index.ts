@@ -79,12 +79,21 @@ serve(async (req) => {
       .in('user_id', creatorIds)
       .select('*', { count: 'exact', head: true });
     
-    // 5. Delete creator profiles
+    // 5. Delete creator profiles (this cascades to auth.users via trigger)
     const { count: profilesDeleted } = await supabase
       .from('profiles')
       .delete()
       .eq('account_type', 'creator')
       .select('*', { count: 'exact', head: true });
+    
+    // 6. Delete auth users for seeded creators
+    for (const id of creatorIds) {
+      try {
+        await supabase.auth.admin.deleteUser(id);
+      } catch (err) {
+        console.error(`Error deleting auth user ${id}:`, err);
+      }
+    }
 
     console.log('Cleanup completed successfully!');
 
