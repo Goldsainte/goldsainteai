@@ -21,8 +21,7 @@ const navItems = [
   { title: "Explore", url: "/trending", icon: Compass },
   { title: "Journeys", url: "/travel-feed", icon: Film },
   { title: "Messages", url: "/messages", icon: MessageCircle },
-  { title: "Notifications", url: "/notifications", icon: Bell },
-  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/creator-dashboard", icon: LayoutDashboard },
 ];
 
 export function TravelSidebar() {
