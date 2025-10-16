@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import FollowButton from "./FollowButton";
 import { SuggestedUsers } from "./SuggestedUsers";
 import { DraftPostsManager } from "./DraftPostsManager";
-import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
+import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
 
 interface SuggestedUser {
   id: string;
@@ -135,14 +135,12 @@ export function FeedSuggestions() {
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">
-                    {suggestion.username || 'User'}
-                  </p>
-                  {suggestion.is_verified && (
-                    <div className="mt-0.5">
-                      <CustomerVerifiedBadge size="xs" />
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <p className="text-sm font-semibold truncate">
+                      {suggestion.username || 'User'}
+                    </p>
+                    {suggestion.is_verified && <InstagramVerifiedBadge />}
+                  </div>
                   <p className="text-xs text-muted-foreground truncate">
                     Suggested for you
                   </p>

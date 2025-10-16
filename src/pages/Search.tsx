@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Search as SearchIcon, ChevronLeft, MapPin, Loader2, X } from "lucide-react";
-import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
+import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
 import { toast } from "sonner";
 
 interface SearchUser {
@@ -265,9 +265,7 @@ export default function Search() {
                           <p className="font-semibold text-sm truncate">
                             {user.username || "Anonymous"}
                           </p>
-                          {user.is_verified && (
-                            <CustomerVerifiedBadge size="xs" />
-                          )}
+                          {user.is_verified && <InstagramVerifiedBadge />}
                         </div>
                         <p className="text-sm text-muted-foreground truncate">
                           {user.full_name}

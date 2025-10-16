@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Heart, MessageCircle, Share2, MoreVertical, MapPin, CheckCircle2, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2, Gift } from "lucide-react";
+import { Heart, MessageCircle, Share2, MoreVertical, MapPin, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2, Gift } from "lucide-react";
+import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -642,9 +643,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
                 <p className="font-semibold text-sm truncate">{post.profiles?.username || 'Anonymous'}</p>
-                {post.profiles?.is_verified && (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500 flex-shrink-0" />
-                )}
+                {post.profiles?.is_verified && <InstagramVerifiedBadge />}
               </div>
               {post.location && (
                 <button
@@ -1504,9 +1503,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </Button>
                 )}
                 
-                {post.profiles?.is_verified && (
-                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-500 fill-blue-500" />
-                )}
+                {post.profiles?.is_verified && <InstagramVerifiedBadge />}
               </div>
               
               {/* Music info - relocated from top */}
