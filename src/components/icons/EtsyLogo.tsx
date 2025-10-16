@@ -1,11 +1,11 @@
-import etsyLogo from "@/assets/etsy-logo.jpg";
+import etsyLogo from "@/assets/etsy-logo.png";
 
 export function EtsyLogo({ className = "h-5 w-5" }: { className?: string }) {
   return (
     <img 
       src={etsyLogo} 
       alt="Etsy" 
-      className={className}
+      className={`${className} object-contain`}
     />
   );
 }

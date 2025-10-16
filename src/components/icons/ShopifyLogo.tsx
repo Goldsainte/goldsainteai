@@ -5,7 +5,7 @@ export function ShopifyLogo({ className = "h-5 w-5" }: { className?: string }) {
     <img 
       src={shopifyLogo} 
       alt="Shopify" 
-      className={className}
+      className={`${className} object-contain`}
     />
   );
 }
