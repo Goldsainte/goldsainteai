@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { X, Heart, Send, Loader2, ChevronLeft, ChevronRight, MessageCircle, Share2, Instagram, MessageSquare } from "lucide-react";
+import { X, Heart, Send, Loader2, ChevronLeft, ChevronRight, MessageCircle, Share2, Instagram, MessageSquare, Volume2, VolumeX, Music2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -77,6 +77,8 @@ const PhotoCarouselModal = ({
   const [loading, setLoading] = useState(false);
   const [carouselApi, setCarouselApi] = useState<CarouselApi | null>(null);
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -110,6 +112,30 @@ const PhotoCarouselModal = ({
       carouselApi.off('select', onSelect as any);
     };
   }, [carouselApi]);
+
+  // Audio playback management
+  useEffect(() => {
+    if (open && musicPreviewUrl) {
+      const audio = new Audio(musicPreviewUrl);
+      audio.volume = 0.7;
+      audio.loop = true;
+      audioRef.current = audio;
+      
+      audio.play().then(() => {
+        setIsAudioPlaying(true);
+      }).catch(() => {
+        setIsAudioPlaying(false);
+      });
+    }
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+        setIsAudioPlaying(false);
+      }
+    };
+  }, [open, musicPreviewUrl]);
 
   const checkIfLiked = async () => {
     if (!postId || !user) return;
@@ -473,6 +499,47 @@ const PhotoCarouselModal = ({
               </div>
             )}
 
+            {/* Music Track Info - Mobile */}
+            {musicTrackId && (
+              <div className="px-4 pb-3">
+                <div className="flex items-center gap-2 bg-secondary/50 rounded-lg px-3 py-2">
+                  {musicAlbumArt && (
+                    <img 
+                      src={musicAlbumArt} 
+                      alt="Album art"
+                      className="w-10 h-10 rounded object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">
+                      {musicTrackName || 'Unknown Track'}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {musicTrackArtist || 'Unknown Artist'}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (audioRef.current) {
+                        if (isAudioPlaying) {
+                          audioRef.current.pause();
+                          setIsAudioPlaying(false);
+                        } else {
+                          audioRef.current.play();
+                          setIsAudioPlaying(true);
+                        }
+                      }
+                    }}
+                    className="flex-shrink-0"
+                  >
+                    {isAudioPlaying ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                  </Button>
+                </div>
+              </div>
+            )}
+
             {/* Caption */}
             {caption && (
               <div className="px-4 pb-2">
@@ -589,6 +656,47 @@ const PhotoCarouselModal = ({
                       {caption}
                     </p>
                   </div>
+                </div>
+              </div>
+            )}
+
+            {/* Music Track Info - Desktop */}
+            {musicTrackId && (
+              <div className="p-4 border-b border-border">
+                <div className="flex items-center gap-3 bg-secondary/50 rounded-lg px-3 py-2">
+                  {musicAlbumArt && (
+                    <img 
+                      src={musicAlbumArt} 
+                      alt="Album art"
+                      className="w-12 h-12 rounded object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">
+                      {musicTrackName || 'Unknown Track'}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {musicTrackArtist || 'Unknown Artist'}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (audioRef.current) {
+                        if (isAudioPlaying) {
+                          audioRef.current.pause();
+                          setIsAudioPlaying(false);
+                        } else {
+                          audioRef.current.play();
+                          setIsAudioPlaying(true);
+                        }
+                      }
+                    }}
+                    className="flex-shrink-0"
+                  >
+                    {isAudioPlaying ? <Volume2 className="h-5 w-5" /> : <VolumeX className="h-5 w-5" />}
+                  </Button>
                 </div>
               </div>
             )}

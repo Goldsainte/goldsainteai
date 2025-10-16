@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, Music2 } from "lucide-react";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -1010,6 +1010,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                         ) : (
                           <Grid3X3 className="h-8 w-8 text-white" />
                         )}
+                      </div>
+                    )}
+                    
+                    {/* Music Icon Overlay */}
+                    {post.music_track_id && (
+                      <div className="absolute top-2 right-2 z-10 bg-black/60 backdrop-blur-sm rounded-full p-1.5">
+                        <Music2 className="h-4 w-4 text-white" />
                       </div>
                     )}
                   </div>

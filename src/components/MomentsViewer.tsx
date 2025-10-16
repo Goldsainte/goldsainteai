@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { ChevronLeft, ChevronRight, X, Eye, Archive, Volume2, VolumeX, Trash } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Eye, Archive, Volume2, VolumeX, Trash, Music2 } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import {
@@ -522,6 +522,28 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               <span className="ml-2 text-sm">Save</span>
             </Button>
           </div>
+
+          {/* Music Track Info Display - Bottom */}
+          {currentMoment.music_track_id && (
+            <div className="absolute bottom-24 left-4 right-4 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-3 py-2 max-w-xs">
+              {currentMoment.music_album_art && (
+                <img 
+                  src={currentMoment.music_album_art} 
+                  alt="Album art"
+                  className="w-8 h-8 rounded object-cover flex-shrink-0"
+                />
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="text-white text-xs font-semibold truncate leading-tight">
+                  {currentMoment.music_track_name || 'Unknown Track'}
+                </p>
+                <p className="text-white/70 text-xs truncate leading-tight">
+                  {currentMoment.music_track_artist || 'Unknown Artist'}
+                </p>
+              </div>
+              <Music2 className="w-4 h-4 text-white flex-shrink-0" />
+            </div>
+          )}
 
           {/* Global tap-to-play overlay */}
           {!isSoundOn && (currentMoment.music_preview_url || currentMoment.media_type === 'video') && (
