@@ -62,6 +62,14 @@ interface Post {
   view_count: number;
   like_count: number;
   comment_count?: number;
+  music_track_id?: string;
+  music_track_name?: string;
+  music_track_artist?: string;
+  music_preview_url?: string;
+  music_album_art?: string;
+  music_service?: string;
+  music_volume?: number;
+  native_video_volume?: number;
 }
 
 const TravelProfile = () => {
@@ -225,7 +233,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       // Fetch only photo posts for the Posts tab - limit for faster initial load
       let query: any = supabase
         .from('travel_posts')
-        .select('id, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count')
+        .select('id, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, music_volume')
         .eq('user_id', profileUserId)
         .eq('media_type', 'photo')
         .order('created_at', { ascending: false })
@@ -257,7 +265,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
       // Fetch only video posts for the Journeys tab
       let query: any = supabase
         .from('travel_posts')
-        .select('id, video_url, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count')
+        .select('id, video_url, media_type, thumbnail_url, caption, location, view_count, like_count, comment_count, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, native_video_volume, music_volume')
         .eq('user_id', profileUserId)
         .eq('media_type', 'video')
         .order('created_at', { ascending: false });
@@ -301,7 +309,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
 
       const { data: posts, error: postsError } = await supabase
         .from('travel_posts')
-        .select('id, video_url, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count')
+        .select('id, video_url, image_urls, media_type, thumbnail_url, caption, location, view_count, like_count, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, music_volume')
         .in('id', postIds)
         .eq('status', 'active')
         .order('created_at', { ascending: false });
@@ -1081,6 +1089,12 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
         likeCount={selectedPost?.like_count}
         username={profile?.username || undefined}
         userAvatar={profile?.avatar_url || undefined}
+        musicTrackId={selectedPost?.music_track_id}
+        musicTrackName={selectedPost?.music_track_name}
+        musicTrackArtist={selectedPost?.music_track_artist}
+        musicPreviewUrl={selectedPost?.music_preview_url}
+        musicAlbumArt={selectedPost?.music_album_art}
+        musicService={selectedPost?.music_service}
       />
 
       {/* Upload Modal */}

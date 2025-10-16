@@ -41,6 +41,12 @@ interface PhotoCarouselModalProps {
   likeCount?: number;
   username?: string;
   userAvatar?: string;
+  musicTrackId?: string;
+  musicTrackName?: string;
+  musicTrackArtist?: string;
+  musicPreviewUrl?: string;
+  musicAlbumArt?: string;
+  musicService?: string;
 }
 
 const PhotoCarouselModal = ({ 
@@ -52,7 +58,13 @@ const PhotoCarouselModal = ({
   caption,
   likeCount: initialLikeCount = 0,
   username,
-  userAvatar
+  userAvatar,
+  musicTrackId,
+  musicTrackName,
+  musicTrackArtist,
+  musicPreviewUrl,
+  musicAlbumArt,
+  musicService,
 }: PhotoCarouselModalProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -249,6 +261,14 @@ const PhotoCarouselModal = ({
         media_type: isVideo ? 'video' : 'image',
         caption: caption || null,
         expires_at: expiresAt,
+        ...(musicTrackId && {
+          music_track_id: musicTrackId,
+          music_track_name: musicTrackName,
+          music_track_artist: musicTrackArtist,
+          music_preview_url: musicPreviewUrl,
+          music_album_art: musicAlbumArt,
+          music_service: musicService,
+        }),
       });
       if (error) throw error;
       toast.success("Shared as a Moment! Your ring is live.");

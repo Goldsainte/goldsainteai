@@ -527,9 +527,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
           user_id: user.id,
           media_url: mediaUrl,
           media_type: mediaType,
-          caption: post.caption?.substring(0, 200) || null, // Limit caption length
+          caption: post.caption?.substring(0, 200) || null,
           expires_at: expiresAt.toISOString(),
           duration_seconds: mediaType === 'video' ? null : 5,
+          ...(post.music_track_id && {
+            music_track_id: post.music_track_id,
+            music_track_name: post.music_track_name,
+            music_track_artist: post.music_track_artist,
+            music_preview_url: post.music_preview_url,
+            music_album_art: post.music_album_art,
+            music_service: post.music_service,
+          }),
         });
 
       if (insertError) throw insertError;
