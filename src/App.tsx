@@ -85,6 +85,7 @@ import ActivityLogs from "./pages/ActivityLogs";
 import CustomerVerification from "./pages/CustomerVerification";
 import EmergencyContacts from "./pages/EmergencyContacts";
 import AgentPerformanceDashboard from "./pages/AgentPerformanceDashboard";
+import AdminCustomerVerifications from "./pages/AdminCustomerVerifications";
 
 const queryClient = new QueryClient();
 
@@ -154,6 +155,7 @@ function AppContent() {
           <Route path="/agent-onboarding" element={<AgentOnboarding />} />
           <Route path="/agent-dashboard" element={<AgentDashboard />} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
+          <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
           <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
           <Route path="/admin/upload-apple-music-key" element={<UploadAppleMusicKey />} />
