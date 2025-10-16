@@ -100,37 +100,37 @@ export const StoryHighlights = ({ userId, isOwnProfile }: StoryHighlightsProps) 
   }
 
   return (
-    <div className="flex items-center gap-2.5 overflow-x-auto py-[1.2px] md:px-4 md:border-b scrollbar-hide">
+    <div className="flex items-center gap-4 md:gap-5 overflow-x-auto px-4 scrollbar-hide">
       {highlights.map((highlight) => (
-        <div key={highlight.id} className="flex flex-col items-center gap-0.5 min-w-[56px] md:min-w-[80px] group">
+        <div key={highlight.id} className="flex flex-col items-center gap-1 min-w-[64px] md:min-w-[90px] group">
           <div className="relative">
-            <Avatar className="w-12 h-12 md:w-16 md:h-16 ring-2 ring-primary cursor-pointer">
+            <Avatar className="w-16 h-16 md:w-[77px] md:h-[77px] ring-2 ring-border cursor-pointer">
               <AvatarImage src={highlight.cover_image_url || undefined} />
-              <AvatarFallback className="text-xs">{highlight.title[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarFallback className="text-sm">{highlight.title[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             {isOwnProfile && (
               <Button
                 size="icon"
                 variant="destructive"
-                className="absolute -top-1 -right-1 w-4 h-4 md:w-6 md:h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                className="absolute -top-1 -right-1 w-5 h-5 md:w-6 md:h-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                 onClick={() => deleteHighlight(highlight.id)}
               >
-                <Trash2 className="w-2 h-2 md:w-3 md:h-3" />
+                <Trash2 className="w-3 h-3" />
               </Button>
             )}
           </div>
-          <span className="text-[10px] text-center truncate w-full max-w-[56px] md:max-w-[80px]">{highlight.title}</span>
+          <span className="text-xs text-center truncate w-full max-w-[64px] md:max-w-[90px]">{highlight.title}</span>
         </div>
       ))}
 
       {isOwnProfile && (
         <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
           <DialogTrigger asChild>
-            <div className="flex flex-col items-center gap-0.5 min-w-[56px] md:min-w-[80px] cursor-pointer">
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center hover:bg-accent transition-colors">
-                <Plus className="w-4 h-4 md:w-6 md:h-6 text-muted-foreground" />
+            <div className="flex flex-col items-center gap-1 min-w-[64px] md:min-w-[90px] cursor-pointer">
+              <div className="w-16 h-16 md:w-[77px] md:h-[77px] rounded-full border-2 border-dashed border-muted-foreground/50 flex items-center justify-center hover:bg-accent transition-colors">
+                <Plus className="w-5 h-5 md:w-6 md:h-6 text-muted-foreground" />
               </div>
-              <span className="text-[10px] text-center">New</span>
+              <span className="text-xs text-center">New</span>
             </div>
           </DialogTrigger>
           <DialogContent>

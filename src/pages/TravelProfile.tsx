@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, LayoutDashboard } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User } from "lucide-react";
 import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -484,15 +484,14 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     <>
       <TravelSidebar />
       <div className="min-h-screen bg-background pb-28 pb-safe md:pb-0 md:ml-64">
-        {/* Header - Instagram style */}
-        <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
-        <div className="max-w-5xl mx-auto flex items-center justify-between px-4 md:px-6 h-14">
+      {/* Header - Mobile Only */}
+        <div className="md:hidden sticky top-0 z-20 bg-background/80 backdrop-blur-lg border-b">
+        <div className="max-w-5xl mx-auto flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => navigate(-1)}
-              className="md:invisible"
               aria-label="Back"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -562,7 +561,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 px-4 bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold"
+                    className="h-8 px-4 bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold text-sm"
                     onClick={() => setEditProfileOpen(true)}
                   >
                     Edit profile
@@ -570,13 +569,13 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   <Button
                     variant="outline"
                     size="sm"
-                    className="h-8 px-4 bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold"
+                    className="h-8 px-4 bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold text-sm"
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
                       toast.success("Profile link copied!");
                     }}
                   >
-                    Share profile
+                    View archive
                   </Button>
                   <Button
                     variant="ghost"
@@ -591,20 +590,15 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                 <>
                   {user && <FollowButton targetUserId={profileUserId!} />}
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="sm"
                     className="h-8 px-4 text-sm font-semibold"
-                    onClick={() => setPartnershipProposalOpen(true)}
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      toast.success("Profile link copied!");
+                    }}
                   >
-                    Partner
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="h-8 px-4 text-sm font-semibold"
-                    onClick={() => setPartnershipRequestOpen(true)}
-                  >
-                    Request
+                    Message
                   </Button>
                 </>
               )}
@@ -656,50 +650,6 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               )}
             </div>
 
-            {/* Your Dashboard Section - Desktop Only */}
-            {isOwnProfile && (
-              <div className="rounded-lg p-2 space-y-1" style={{ backgroundColor: '#E5DFC6' }}>
-                <div className="flex items-center gap-2 mb-0.5">
-                  <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-semibold">Your Dashboard</h3>
-                </div>
-                <div className="grid grid-cols-5 gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className="text-base font-bold">{formatNumber(stats.viewsCount)}</div>
-                    <div className="text-xs text-muted-foreground">views</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="text-base font-bold">{formatNumber(stats.likesCount)}</div>
-                    <div className="text-xs text-muted-foreground">likes</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="text-base font-bold">{formatNumber(stats.commentsCount)}</div>
-                    <div className="text-xs text-muted-foreground">comments</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="text-base font-bold">{formatNumber(stats.sharesCount)}</div>
-                    <div className="text-xs text-muted-foreground">shares</div>
-                  </div>
-                  <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-1">
-                      <div className="text-base font-bold flex items-center gap-1">
-                        <Coins className="h-4 w-4 text-accent" />
-                        {balance}
-                      </div>
-                      <Button
-                        variant="link"
-                        size="sm"
-                        className="h-auto p-0 text-[10px] text-primary leading-tight"
-                        onClick={() => setBuyCoinsOpen(true)}
-                      >
-                        Buy
-                      </Button>
-                    </div>
-                    <div className="text-xs text-muted-foreground">coins</div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -802,39 +752,22 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               <>
                 {user && <FollowButton targetUserId={profileUserId!} />}
                 <Button
-                  variant="secondary"
-                  className="flex-1 h-6 text-[11px] font-semibold rounded-md"
-                  onClick={() => setPartnershipProposalOpen(true)}
+                  variant="outline"
+                  className="flex-1 h-[30px] bg-[#EFEFEF] hover:bg-[#DBDBDB] border-0 font-semibold text-sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Profile link copied!");
+                  }}
                 >
-                  Partner
-                </Button>
-                <Button
-                  variant="secondary"
-                  className="flex-1 h-6 text-[11px] font-semibold rounded-md"
-                  onClick={() => setPartnershipRequestOpen(true)}
-                >
-                  Request
+                  Message
                 </Button>
               </>
             )}
           </div>
         </div>
 
-        {/* Moments Vault - Smaller circles for better spacing */}
-        <div className="border-t border-border pt-2 pb-1.5 md:hidden">
-          <div className="px-4">
-            <h3 className="text-[10px] font-semibold mb-1.5 text-muted-foreground uppercase tracking-wide">Moments Vault</h3>
-            <div className="overflow-x-auto -mx-2 px-2">
-              <StoryHighlights
-                userId={profileUserId!}
-                isOwnProfile={isOwnProfile}
-              />
-            </div>
-          </div>
-        </div>
-        
-        {/* Desktop Story Highlights */}
-        <div className="hidden md:block border-t border-border pt-3 pb-2">
+        {/* Story Highlights */}
+        <div className="border-t border-border pt-3 pb-3">
           <StoryHighlights
             userId={profileUserId!}
             isOwnProfile={isOwnProfile}
@@ -863,9 +796,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
             <TabsTrigger 
               value="liked"
               className="hidden md:flex data-[state=active]:border-t-2 data-[state=active]:border-foreground rounded-none h-full items-center justify-center gap-0"
-              title="Liked"
+              title="Saved"
             >
-              <Heart className="h-5 w-5" />
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+              </svg>
             </TabsTrigger>
           )}
         </TabsList>
