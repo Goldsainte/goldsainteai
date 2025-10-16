@@ -18,9 +18,15 @@ interface ShareToStoryButtonProps {
   postId: string;
   postImage?: string;
   postCaption?: string;
+  musicTrackId?: string;
+  musicTrackName?: string;
+  musicTrackArtist?: string;
+  musicPreviewUrl?: string;
+  musicAlbumArt?: string;
+  musicService?: string;
 }
 
-export const ShareToStoryButton = ({ postId, postImage, postCaption }: ShareToStoryButtonProps) => {
+export const ShareToStoryButton = ({ postId, postImage, postCaption, musicTrackId, musicTrackName, musicTrackArtist, musicPreviewUrl, musicAlbumArt, musicService }: ShareToStoryButtonProps) => {
   const [showDialog, setShowDialog] = useState(false);
   const [sharing, setSharing] = useState(false);
 
@@ -35,7 +41,7 @@ export const ShareToStoryButton = ({ postId, postImage, postCaption }: ShareToSt
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Create a moment with the reposted content
+      // Create a moment with the reposted content and music
       const { error } = await supabase
         .from('moments' as any)
         .insert({
@@ -46,6 +52,12 @@ export const ShareToStoryButton = ({ postId, postImage, postCaption }: ShareToSt
           duration_seconds: 10,
           visibility: 'public',
           reposted_from_post_id: postId,
+          music_track_id: musicTrackId || null,
+          music_track_name: musicTrackName || null,
+          music_track_artist: musicTrackArtist || null,
+          music_preview_url: musicPreviewUrl || null,
+          music_album_art: musicAlbumArt || null,
+          music_service: musicService || null,
         } as any);
 
       if (error) throw error;

@@ -82,6 +82,8 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [hasViewed, setHasViewed] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [videoLoading, setVideoLoading] = useState(true);
+  const [videoReady, setVideoReady] = useState(false);
+  const [localMuted, setLocalMuted] = useState(isMuted);
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [localCommentCount, setLocalCommentCount] = useState(post.comment_count);
   const [editOpen, setEditOpen] = useState(false);
@@ -161,7 +163,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   }, [post.id]);
 
   useEffect(() => {
-    if (isActive && videoRef.current && post.video_url) {
+    if (isActive && videoRef.current && post.video_url && videoReady) {
       videoRef.current.play().catch(e => console.log('Autoplay prevented:', e));
       
       if (!hasViewed) {
@@ -175,13 +177,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
     }
-  }, [isActive]);
+  }, [isActive, videoReady]);
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.volume = isMuted ? 0 : nativeVolume / 100;
+      videoRef.current.volume = localMuted ? 0 : nativeVolume / 100;
     }
-  }, [nativeVolume, isMuted]);
+  }, [nativeVolume, localMuted]);
 
   // Reset photo index when post changes
   useEffect(() => {
@@ -228,11 +230,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
     // Active-first autoplay logic
     audio.volume = musicVolume / 100;
     
-    if (!isActive || isMuted) {
+    if (!isActive || localMuted) {
       // Always pause when not active or muted
       audio.pause();
       setAudioPlaying(false);
-    } else if (isActive && !isMuted && hasInteracted) {
+    } else if (isActive && !localMuted && hasInteracted) {
       // Auto-play when active, unmuted, and user has interacted
       audio.play()
         .then(() => setAudioPlaying(true))
@@ -245,7 +247,7 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
       audio.removeEventListener('suspend', handleSuspended);
       audio.removeEventListener('play', handlePlay);
     };
-  }, [isActive, isMuted, post.music_preview_url, hasInteracted, musicVolume]);
+  }, [isActive, localMuted, post.music_preview_url, hasInteracted, musicVolume]);
 
   const checkIfLiked = async () => {
     if (!user) return;
@@ -787,14 +789,16 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                 <video
                   ref={videoRef}
                   src={post.video_url}
-                  poster={post.thumbnail_url || undefined}
                   className="w-full h-full object-cover"
                   loop
                   playsInline
                   preload="metadata"
                   crossOrigin="anonymous"
                   onLoadedData={() => setVideoLoading(false)}
-                  onCanPlay={() => setVideoLoading(false)}
+                  onCanPlay={() => {
+                    setVideoLoading(false);
+                    setVideoReady(true);
+                  }}
                   onError={() => {
                     setVideoError(true);
                     setVideoLoading(false);
@@ -805,11 +809,17 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               {/* Mute Button */}
               {!videoError && (
                 <button
-                  onClick={onToggleMute}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setLocalMuted(!localMuted);
+                    if (audioRef.current && !audioRef.current.paused) {
+                      audioRef.current.pause();
+                    }
+                  }}
                   className="absolute top-4 right-4 rounded-full bg-black/40 backdrop-blur-md p-2 shadow-xl transition-all duration-200 hover:bg-black/60 hover:scale-110 z-20"
-                  aria-label={isMuted ? "Unmute" : "Mute"}
+                  aria-label={localMuted ? "Unmute" : "Mute"}
                 >
-                  {isMuted ? (
+                  {localMuted ? (
                     <VolumeX className="h-5 w-5 text-white" />
                   ) : (
                     <Volume2 className="h-5 w-5 text-white" />
