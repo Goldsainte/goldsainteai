@@ -38,17 +38,26 @@ export const useUserPreferences = (): UserPreferences => {
           setNativeVideoVolume(data.native_video_volume);
           setMusicVolume(data.music_volume);
         } else {
-          // Create default preferences if none exist
-          const { error: insertError } = await supabase
+          // Create default preferences if none exist using upsert to handle race conditions
+          const { data: upsertData, error: upsertError } = await supabase
             .from('user_preferences')
-            .insert({
+            .upsert({
               user_id: user.id,
               native_video_volume: 100,
               music_volume: 80
-            });
+            }, {
+              onConflict: 'user_id',
+              ignoreDuplicates: false
+            })
+            .select()
+            .single();
 
-          if (insertError) {
-            console.error('Error creating default preferences:', insertError);
+          if (upsertError) {
+            console.error('Error creating default preferences:', upsertError);
+            setError(upsertError as Error);
+          } else if (upsertData) {
+            setNativeVideoVolume(upsertData.native_video_volume);
+            setMusicVolume(upsertData.music_volume);
           }
         }
       } catch (err) {
