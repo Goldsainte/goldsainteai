@@ -875,6 +875,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
               >
                 <Bookmark className={`h-6 w-6 transition-all ${isSaved ? 'fill-current' : ''}`} />
               </button>
+              <button
+                onClick={() => setGiftModalOpen(true)}
+                className="transition-transform active:scale-90 hover:opacity-70"
+                data-tour="send-gift-post"
+              >
+                <Gift className="h-6 w-6" />
+              </button>
             </div>
           </div>
 
