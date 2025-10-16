@@ -1,4 +1,25 @@
+import { useMemo } from 'react';
+
 export const InstagramVerifiedBadge = () => {
+  const spikedPath = useMemo(() => {
+    const centerX = 12;
+    const centerY = 12;
+    const outerRadius = 11;
+    const innerRadius = 9.5;
+    const numPoints = 12;
+    
+    let path = '';
+    for (let i = 0; i < numPoints * 2; i++) {
+      const angle = (i * Math.PI) / numPoints;
+      const r = i % 2 === 0 ? outerRadius : innerRadius;
+      const x = centerX + r * Math.cos(angle);
+      const y = centerY + r * Math.sin(angle);
+      path += `${i === 0 ? 'M' : 'L'} ${x} ${y} `;
+    }
+    path += 'Z';
+    return path;
+  }, []);
+
   return (
     <span 
       className="inline-flex items-center ml-1.5 align-middle" 
@@ -15,7 +36,7 @@ export const InstagramVerifiedBadge = () => {
         aria-hidden="true"
         className="block"
       >
-        <circle cx="12" cy="12" r="11" fill="#0095F6"/>
+        <path d={spikedPath} fill="#0095F6"/>
         <path 
           d="M9.2 12.8l1.7 1.7 4.2-4.8" 
           stroke="#fff" 
