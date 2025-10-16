@@ -187,18 +187,11 @@ export const Header = () => {
                       align="end" 
                       className="w-80 max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
                     >
-                      {/* Create Section */}
+                      {/* Discover Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Create</p>
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Discover</p>
                       </div>
                       <div className="py-2">
-                        <DropdownMenuItem 
-                          onClick={handleCreateClick} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
-                        >
-                          <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Create</span>
-                        </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/travel-feed')} 
                           className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
@@ -210,18 +203,9 @@ export const Header = () => {
                           onClick={() => navigate('/browse-creators')} 
                           className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
                         >
-                          <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Browse Creators</span>
                         </DropdownMenuItem>
-                      </div>
-                      
-                      <DropdownMenuSeparator className="bg-border/50" />
-                      
-                      {/* Travel Agent Marketplace Section */}
-                      <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Agent Marketplace</p>
-                      </div>
-                      <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/browse-agents')} 
                           className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
@@ -233,9 +217,18 @@ export const Header = () => {
                           onClick={() => navigate('/marketplace')} 
                           className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
                         >
-                          <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Marketplace</span>
                         </DropdownMenuItem>
+                      </div>
+                      
+                      <DropdownMenuSeparator className="bg-border/50" />
+                      
+                      {/* Professional Section */}
+                      <div className="px-4 py-3 border-b border-border/50">
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Professional</p>
+                      </div>
+                      <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/agent-onboarding')} 
                           className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
@@ -322,6 +315,13 @@ export const Header = () => {
                           >
                             <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={handleCreateClick} 
+                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          >
+                            <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Create Content</span>
                           </DropdownMenuItem>
                           
                           <DropdownMenuSeparator className="bg-border/50" />
@@ -454,18 +454,11 @@ export const Header = () => {
                     
                     <DropdownMenuSeparator className="bg-border/50" />
                     
-                    {/* Create Section */}
+                    {/* Discover Section */}
                     <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Create</p>
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Discover</p>
                     </div>
                     <div className="py-2">
-                      <DropdownMenuItem 
-                        onClick={handleCreateClick} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
-                      >
-                        <Plus className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Create</span>
-                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/travel-feed')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
@@ -477,18 +470,9 @@ export const Header = () => {
                         onClick={() => navigate('/browse-creators')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >
-                        <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Browse Creators</span>
                       </DropdownMenuItem>
-                    </div>
-                    
-                    <DropdownMenuSeparator className="bg-border/50" />
-                    
-                    {/* Travel Agent Marketplace Section */}
-                    <div className="px-4 py-3 border-b border-border/50">
-                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Agent Marketplace</p>
-                    </div>
-                    <div className="py-2 pb-3">
                       <DropdownMenuItem 
                         onClick={() => navigate('/browse-agents')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
@@ -500,9 +484,18 @@ export const Header = () => {
                         onClick={() => navigate('/marketplace')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
                       >
-                        <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Marketplace</span>
                       </DropdownMenuItem>
+                    </div>
+                    
+                    <DropdownMenuSeparator className="bg-border/50" />
+                    
+                    {/* Professional Section */}
+                    <div className="px-4 py-3 border-b border-border/50">
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Professional</p>
+                    </div>
+                    <div className="py-2 pb-3">
                       <DropdownMenuItem 
                         onClick={() => navigate('/agent-onboarding')} 
                         className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
@@ -588,6 +581,13 @@ export const Header = () => {
                           >
                             <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={handleCreateClick} 
+                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                          >
+                            <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Create Content</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/creator-dashboard')} 

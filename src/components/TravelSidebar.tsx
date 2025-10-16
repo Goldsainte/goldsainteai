@@ -1,14 +1,18 @@
-import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu, Settings, Activity, Bookmark, Sun, Moon, AlertCircle, LogOut, LayoutDashboard } from "lucide-react";
+import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu, Settings, Activity, Bookmark, Sun, Moon, AlertCircle, LogOut, LayoutDashboard, ChevronDown } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { toast } from "sonner";
+import CreateContentSheet from "@/components/CreateContentSheet";
+import ContentUploadModal from "@/components/ContentUploadModal";
+import { CreateMomentModal } from "@/components/CreateMomentModal";
 import logoHorizontal from "@/assets/primary-horizontal-logo-gold-2.png";
 
 const navItems = [
@@ -19,8 +23,6 @@ const navItems = [
   { title: "Messages", url: "/messages", icon: MessageCircle },
   { title: "Notifications", url: "/notifications", icon: Bell },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Create", url: "/travel-profile", icon: PlusSquare },
-  { title: "Profile", url: "/travel-profile", icon: User },
 ];
 
 export function TravelSidebar() {
@@ -30,6 +32,11 @@ export function TravelSidebar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [open, setOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [createSheetOpen, setCreateSheetOpen] = useState(false);
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
+  const [createMomentOpen, setCreateMomentOpen] = useState(false);
 
   useEffect(() => {
     if (user?.id) {
@@ -70,6 +77,37 @@ export function TravelSidebar() {
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
+  const handleCreateClick = () => {
+    if (!user) {
+      navigate('/auth');
+      toast.error('Please sign in to create content');
+      return;
+    }
+    setCreateSheetOpen(true);
+  };
+
+  const handleCreateContent = (type: string) => {
+    if (type === "reel") {
+      setCreateSheetOpen(false);
+      setUploadInitialTab("video");
+      setUploadModalOpen(true);
+    } else if (type === "post") {
+      setCreateSheetOpen(false);
+      setUploadInitialTab("photo");
+      setUploadModalOpen(true);
+    } else if (type === "moment") {
+      setCreateSheetOpen(false);
+      setCreateMomentOpen(true);
+    } else if (type === "moments-vault") {
+      toast.info("Go to your profile to create moments vaults");
+      setCreateSheetOpen(false);
+    }
+  };
+
+  const handleUploadSuccess = () => {
+    setUploadModalOpen(false);
+  };
+
   return (
     <div className="hidden md:flex md:flex-col fixed left-0 top-0 h-screen w-64 border-r border-border bg-background z-10">
       {/* Logo */}
@@ -90,20 +128,54 @@ export function TravelSidebar() {
                   }`
                 }
               >
-                {item.title === "Profile" ? (
-                  <Avatar className="h-7 w-7">
-                    <AvatarImage src={avatarUrl || undefined} />
-                    <AvatarFallback className="text-xs bg-primary text-primary-foreground">
-                      {username?.[0]?.toUpperCase() || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <item.icon className="h-6 w-6" strokeWidth={2} />
-                )}
+                <item.icon className="h-6 w-6" strokeWidth={2} />
                 <span className="text-base">{item.title}</span>
               </NavLink>
             </li>
           ))}
+          
+          {/* Profile with Create submenu */}
+          <li>
+            <Collapsible open={profileOpen} onOpenChange={setProfileOpen}>
+              <CollapsibleTrigger asChild>
+                <button className="flex items-center justify-between gap-4 px-3 py-3 rounded-lg transition-colors hover:bg-muted/50 w-full">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={avatarUrl || undefined} />
+                      <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                        {username?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-base">Profile</span>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="ml-11 mt-1 space-y-1">
+                  <Button
+                    variant="ghost"
+                    onClick={handleCreateClick}
+                    className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-muted/50 rounded-lg"
+                  >
+                    <PlusSquare className="h-5 w-5" />
+                    <span className="text-sm">Create Content</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      navigate('/travel-profile');
+                      setProfileOpen(false);
+                    }}
+                    className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-muted/50 rounded-lg"
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="text-sm">View Profile</span>
+                  </Button>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </li>
         </ul>
       </nav>
 
@@ -173,6 +245,23 @@ export function TravelSidebar() {
           </PopoverContent>
         </Popover>
       </div>
+
+      {/* Create Content Modals */}
+      <CreateContentSheet 
+        open={createSheetOpen} 
+        onOpenChange={setCreateSheetOpen}
+        onSelectType={handleCreateContent}
+      />
+      <ContentUploadModal
+        open={uploadModalOpen}
+        onOpenChange={setUploadModalOpen}
+        initialTab={uploadInitialTab}
+        onSuccess={handleUploadSuccess}
+      />
+      <CreateMomentModal
+        open={createMomentOpen}
+        onOpenChange={setCreateMomentOpen}
+      />
     </div>
   );
 }
