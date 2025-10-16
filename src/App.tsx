@@ -50,6 +50,7 @@ import TravelFeed from "./pages/TravelFeed";
 import TravelProfile from "./pages/TravelProfile";
 import TravelSettings from "./pages/TravelSettings";
 import TravelSettings2 from "./pages/TravelSettings2";
+import MusicVolumeSettings from "./pages/MusicVolumeSettings";
 import CrosspostingSettings from "./pages/CrosspostingSettings";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Search from "./pages/Search";
@@ -177,6 +178,7 @@ function AppContent() {
           <Route path="/travel-settings" element={<TravelSettings2 />} />
           <Route path="/travel-settings-2" element={<TravelSettings2 />} />
           <Route path="/travel-settings/edit" element={<TravelSettings />} />
+          <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
           <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
           <Route path="/instagram-callback" element={<InstagramCallback />} />
           <Route path="/creator-dashboard" element={<CreatorDashboard />} />

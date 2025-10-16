@@ -7336,6 +7336,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          music_volume: number
+          native_video_volume: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          music_volume?: number
+          native_video_volume?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          music_volume?: number
+          native_video_volume?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_presence: {
         Row: {
           id: string

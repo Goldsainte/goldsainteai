@@ -17,7 +17,8 @@ import {
   Grid2X2,
   Ban,
   MapPin,
-  Loader2
+  Loader2,
+  Music2
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -140,6 +141,12 @@ const TravelSettings2 = () => {
             icon={Bell}
             title="Notifications"
             onClick={() => {}}
+          />
+          <SettingsItem
+            icon={Music2}
+            title="Music & Audio"
+            description="Control volume levels for videos and music"
+            onClick={() => navigate('/travel-settings/music-volume')}
           />
           <SettingsItem
             icon={Clock}

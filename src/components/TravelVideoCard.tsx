@@ -21,6 +21,7 @@ import {
 import { renderTextWithHashtags } from "@/lib/hashtagHelpers";
 import { renderTextWithMentionsAndHashtags } from "@/lib/mentionHelpers";
 import { useCollections } from "@/hooks/useCollections";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { SendGiftModal } from "@/components/SendGiftModal";
 import { Coins } from "lucide-react";
 import { BrandPartnershipProposal } from "./BrandPartnershipProposal";
@@ -110,6 +111,13 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
   const [dragStart, setDragStart] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [wasSwipe, setWasSwipe] = useState(false);
+  const { nativeVideoVolume: userNativeVolume, musicVolume: userMusicVolume } = useUserPreferences();
+
+  // Apply user preferences to volume when they change
+  useEffect(() => {
+    setNativeVolume(userNativeVolume);
+    setMusicVolume(userMusicVolume);
+  }, [userNativeVolume, userMusicVolume]);
 
   // Reset touch state on mount/unmount
   useEffect(() => {

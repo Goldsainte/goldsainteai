@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { MomentDrawingDisplay } from "./MomentDrawingDisplay";
 import { MomentInteractionDisplay } from "./MomentInteractionDisplay";
 import { MomentReactions } from "./MomentReactions";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 interface Moment {
   id: string;
@@ -85,6 +86,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
   const [isSoundOn, setIsSoundOn] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const { musicVolume } = useUserPreferences();
 
   useEffect(() => {
     const init = async () => {
@@ -170,7 +172,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
       const newAudio = new Audio(currentMoment.music_preview_url);
       newAudio.preload = 'auto';
       newAudio.crossOrigin = 'anonymous';
-      newAudio.volume = 0.7;
+      newAudio.volume = (musicVolume / 100) * 0.7;
 
       let stopTimeout: NodeJS.Timeout;
 

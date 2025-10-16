@@ -10,6 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import { useUserPreferences } from "@/hooks/useUserPreferences";
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from "@/components/ui/carousel";
 import { CommentsSheet } from "@/components/CommentsSheet";
 import {
@@ -79,6 +80,7 @@ const PhotoCarouselModal = ({
   const [commentsSheetOpen, setCommentsSheetOpen] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
+  const { musicVolume } = useUserPreferences();
 
   useEffect(() => {
     if (!open) return;
