@@ -200,26 +200,50 @@ serve(async (req) => {
           continue;
         }
 
-        // Update the profile with rich seeded data
-        const { data: profileData, error: profileError } = await supabase
+        // Update or upsert the profile with rich seeded data (handles missing trigger timing)
+        const updatePayload = {
+          bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
+          location,
+          website: `https://${username}.com`,
+          instagram_username: `@${username}`,
+          tiktok_username: `@${username}`,
+          account_type: 'creator',
+          is_verified: randomBoolean(0.4),
+          seed_metadata: { seeded_by: 'seed-content-creators', created_at: new Date().toISOString() }
+        } as const;
+
+        const { data: profileMaybe, error: profileUpdateError } = await supabase
           .from('profiles')
-          .update({
-            bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
-            location,
-            website: `https://${username}.com`,
-            instagram_username: `@${username}`,
-            tiktok_username: `@${username}`,
-            account_type: 'creator',
-            is_verified: randomBoolean(0.4),
-            seed_metadata: { seeded_by: 'seed-content-creators', created_at: new Date().toISOString() }
-          })
+          .update(updatePayload)
           .eq('id', authUser.user.id)
           .select()
-          .single();
+          .maybeSingle();
 
-        if (profileError) {
-          console.error(`Error updating profile ${username}:`, profileError);
-          continue;
+        let profileData = profileMaybe;
+
+        if (!profileData) {
+          // If the profile row does not exist yet (trigger lag or missing), upsert it
+          const upsertPayload = {
+            id: authUser.user.id,
+            username,
+            first_name: firstName,
+            last_name: lastName,
+            avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
+            ...updatePayload,
+          };
+
+          const { data: upserted, error: upsertError } = await supabase
+            .from('profiles')
+            .upsert(upsertPayload)
+            .select()
+            .single();
+
+          if (upsertError) {
+            console.error(`Error upserting profile ${username}:`, upsertError, profileUpdateError);
+            continue;
+          }
+
+          profileData = upserted;
         }
 
         createdProfiles.push(profileData);
@@ -313,26 +337,50 @@ serve(async (req) => {
           continue;
         }
 
-        // Update the profile with rich seeded data
-        const { data: profileData, error: profileError } = await supabase
+        // Update or upsert the profile with rich seeded data (handles missing trigger timing)
+        const updatePayload = {
+          bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
+          location,
+          website: `https://${username}.com`,
+          instagram_username: `@${username}`,
+          tiktok_username: `@${username}`,
+          account_type: 'creator',
+          is_verified: randomBoolean(0.4),
+          seed_metadata: { seeded_by: 'seed-content-creators', created_at: new Date().toISOString() }
+        } as const;
+
+        const { data: profileMaybe, error: profileUpdateError } = await supabase
           .from('profiles')
-          .update({
-            bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
-            location,
-            website: `https://${username}.com`,
-            instagram_username: `@${username}`,
-            tiktok_username: `@${username}`,
-            account_type: 'creator',
-            is_verified: randomBoolean(0.4),
-            seed_metadata: { seeded_by: 'seed-content-creators', created_at: new Date().toISOString() }
-          })
+          .update(updatePayload)
           .eq('id', authUser.user.id)
           .select()
-          .single();
+          .maybeSingle();
 
-        if (profileError) {
-          console.error(`Error updating profile ${username}:`, profileError);
-          continue;
+        let profileData = profileMaybe;
+
+        if (!profileData) {
+          // If the profile row does not exist yet (trigger lag or missing), upsert it
+          const upsertPayload = {
+            id: authUser.user.id,
+            username,
+            first_name: firstName,
+            last_name: lastName,
+            avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
+            ...updatePayload,
+          };
+
+          const { data: upserted, error: upsertError } = await supabase
+            .from('profiles')
+            .upsert(upsertPayload)
+            .select()
+            .single();
+
+          if (upsertError) {
+            console.error(`Error upserting profile ${username}:`, upsertError, profileUpdateError);
+            continue;
+          }
+
+          profileData = upserted;
         }
 
         createdProfiles.push(profileData);

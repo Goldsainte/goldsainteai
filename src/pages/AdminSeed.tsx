@@ -215,19 +215,21 @@ const AdminSeed = () => {
               <AlertTriangle className="h-5 w-5 text-warning" />
               Seeded Data Already Exists
             </AlertDialogTitle>
-            <AlertDialogDescription className="space-y-3">
-              <p>Your database already contains seeded content:</p>
-              {existingData && (
-                <div className="bg-muted p-3 rounded-md space-y-1 text-sm">
-                  <p>• {existingData.profiles} creator profiles</p>
-                  <p>• {existingData.posts} travel posts</p>
-                  <p>• {existingData.collections} collections</p>
-                </div>
-              )}
-              <p className="text-sm">
-                You can either switch to <strong>Hybrid Mode</strong> to add content to existing creators,
-                or <strong>Clear All Data</strong> and start fresh.
-              </p>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>Your database already contains seeded content:</p>
+                {existingData && (
+                  <div className="bg-muted p-3 rounded-md space-y-1 text-sm">
+                    <p>• {existingData.profiles} creator profiles</p>
+                    <p>• {existingData.posts} travel posts</p>
+                    <p>• {existingData.collections} collections</p>
+                  </div>
+                )}
+                <p className="text-sm">
+                  You can either switch to <strong>Hybrid Mode</strong> to add content to existing creators,
+                  or <strong>Clear All Data</strong> and start fresh.
+                </p>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

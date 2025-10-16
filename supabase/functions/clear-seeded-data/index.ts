@@ -50,13 +50,20 @@ serve(async (req) => {
 
     // Delete in correct order (respect foreign keys)
     
-    // 1. Delete collection_posts links
-    await supabase
-      .from('collection_posts')
-      .delete()
-      .in('collection_id', 
-        supabase.from('post_collections').select('id').in('user_id', creatorIds)
-      );
+    // 1. Delete collection_posts links (fetch collection ids first)
+    const { data: collections } = await supabase
+      .from('post_collections')
+      .select('id')
+      .in('user_id', creatorIds);
+
+    const collectionIds = collections?.map((c: { id: string }) => c.id) || [];
+
+    if (collectionIds.length > 0) {
+      await supabase
+        .from('collection_posts')
+        .delete()
+        .in('collection_id', collectionIds);
+    }
     
     // 2. Delete post_collections
     const { count: collectionsDeleted } = await supabase
@@ -65,11 +72,12 @@ serve(async (req) => {
       .in('user_id', creatorIds)
       .select('*', { count: 'exact', head: true });
     
-    // 3. Delete user_follows where both users are creators
+    // 3. Delete user_follows where either follower or following is a creator
+    const idsCSV = creatorIds.join(',');
     const { count: followsDeleted } = await supabase
       .from('user_follows')
       .delete()
-      .in('follower_id', creatorIds)
+      .or(`follower_id.in.(${idsCSV}),following_id.in.(${idsCSV})`)
       .select('*', { count: 'exact', head: true });
     
     // 4. Delete travel_posts from creators
