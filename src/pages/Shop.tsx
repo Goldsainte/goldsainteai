@@ -6,9 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus, AlertTriangle, RefreshCw, Store, Unplug } from "lucide-react";
+import { ShoppingCart, Search, Package, MapPin, ArrowLeft, Plus, AlertTriangle, RefreshCw, Store, Unplug, Link } from "lucide-react";
 import { CreateProductModal } from "@/components/CreateProductModal";
 import { PackageDisputeModal } from "@/components/PackageDisputeModal";
+import { StoreConnectionBanner } from "@/components/StoreConnectionBanner";
+import { ShopifyLogo } from "@/components/icons/ShopifyLogo";
+import { EtsyLogo } from "@/components/icons/EtsyLogo";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -22,6 +25,7 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState("product");
   const [disputeModalOpen, setDisputeModalOpen] = useState(false);
   const [disputePackageId, setDisputePackageId] = useState<string>("");
   const [disputeCreatorId, setDisputeCreatorId] = useState<string>("");
@@ -132,15 +136,34 @@ export default function Shop() {
               Back
             </Button>
             {user && (
-              <Button 
-                onClick={() => setCreateModalOpen(true)}
-                className="gap-2 w-full sm:w-auto"
-                size="sm"
-              >
-                <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Sell Your Products</span>
-                <span className="sm:hidden">Sell</span>
-              </Button>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button 
+                  onClick={() => {
+                    setCreateModalOpen(true);
+                    setActiveTab("store");
+                  }}
+                  variant="default"
+                  className="gap-2 flex-1 sm:flex-initial"
+                  size="sm"
+                >
+                  <Link className="h-4 w-4" />
+                  <span className="hidden sm:inline">Connect Store</span>
+                  <span className="sm:hidden">Connect</span>
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setCreateModalOpen(true);
+                    setActiveTab("product");
+                  }}
+                  variant="outline"
+                  className="gap-2 flex-1 sm:flex-initial"
+                  size="sm"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span className="hidden sm:inline">Manual Upload</span>
+                  <span className="sm:hidden">Upload</span>
+                </Button>
+              </div>
             )}
           </div>
 
@@ -160,6 +183,16 @@ export default function Shop() {
           </div>
         </div>
 
+        {/* Store Connection Banner for users without connections */}
+        {user && connections.length === 0 && (
+          <StoreConnectionBanner 
+            onConnect={() => {
+              setCreateModalOpen(true);
+              setActiveTab("store");
+            }} 
+          />
+        )}
+
         {/* Connected Stores */}
         {user && connections.length > 0 && (
           <Card className="mb-6">
@@ -175,27 +208,36 @@ export default function Shop() {
             <CardContent className="space-y-4">
               {connections.map((connection: any) => (
                 <div key={connection.id} className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium capitalize">{connection.platform}</span>
-                      <Badge variant={connection.is_active ? "default" : "secondary"}>
-                        {connection.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                      {connection.sync_status === 'syncing' && (
-                        <Badge variant="outline" className="animate-pulse">
-                          <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
-                          Syncing...
-                        </Badge>
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="p-2 bg-background rounded">
+                      {connection.platform === 'shopify' ? (
+                        <ShopifyLogo className="h-8 w-8 text-[#95BF47]" />
+                      ) : (
+                        <EtsyLogo className="h-8 w-8 text-[#F16521]" />
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {connection.store_name || connection.store_url}
-                    </p>
-                    {connection.last_synced_at && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Last synced {formatDistanceToNow(new Date(connection.last_synced_at), { addSuffix: true })}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium capitalize">{connection.platform}</span>
+                        <Badge variant={connection.is_active ? "default" : "secondary"}>
+                          {connection.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                        {connection.sync_status === 'syncing' && (
+                          <Badge variant="outline" className="animate-pulse">
+                            <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                            Syncing...
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {connection.store_name || connection.store_url}
                       </p>
-                    )}
+                      {connection.last_synced_at && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Last synced {formatDistanceToNow(new Date(connection.last_synced_at), { addSuffix: true })}
+                        </p>
+                      )}
+                    </div>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -250,22 +292,38 @@ export default function Shop() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {products.map((product: any) => (
                   <Card key={product.id} className="overflow-hidden">
-                    {product.images && product.images.length > 0 && (
+                     {product.images && product.images.length > 0 && (
                       <div className="aspect-video bg-muted relative overflow-hidden">
                         <img
                           src={product.images[0]}
                           alt={product.title}
                           className="object-cover w-full h-full"
                         />
+                        {product.source_platform && (
+                          <div className="absolute top-2 right-2 p-2 bg-background/90 backdrop-blur-sm rounded-lg shadow-md">
+                            {product.source_platform === 'shopify' ? (
+                              <ShopifyLogo className="h-5 w-5 text-[#95BF47]" />
+                            ) : product.source_platform === 'etsy' ? (
+                              <EtsyLogo className="h-5 w-5 text-[#F16521]" />
+                            ) : null}
+                          </div>
+                        )}
                       </div>
                     )}
                     <CardHeader>
-                      <div className="flex items-start justify-between">
+                      <div className="flex items-start justify-between gap-2">
                         <div className="flex-1">
                           <CardTitle className="text-lg">{product.title}</CardTitle>
                           {/* Creator attribution intentionally omitted until relation is added */}
                         </div>
-                        <Badge variant="secondary">{product.product_type}</Badge>
+                        <div className="flex flex-col gap-1 items-end">
+                          <Badge variant="secondary">{product.product_type}</Badge>
+                          {product.source_platform && (
+                            <Badge variant="outline" className="text-xs">
+                              {product.source_platform === 'shopify' ? 'Shopify' : 'Etsy'}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent>
@@ -391,7 +449,8 @@ export default function Shop() {
             refetchProducts();
             refetchPackages();
           }
-        }} 
+        }}
+        defaultTab={activeTab}
       />
 
       {/* Package Dispute Modal */}

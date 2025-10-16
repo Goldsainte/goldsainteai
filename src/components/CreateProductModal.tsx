@@ -16,15 +16,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useEcommerceConnections } from "@/hooks/useEcommerceConnections";
 import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ShopifyLogo } from "@/components/icons/ShopifyLogo";
+import { EtsyLogo } from "@/components/icons/EtsyLogo";
 
 interface CreateProductModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultTab?: string;
 }
 
-export function CreateProductModal({ open, onOpenChange }: CreateProductModalProps) {
+export function CreateProductModal({ open, onOpenChange, defaultTab = "store" }: CreateProductModalProps) {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("product");
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [loading, setLoading] = useState(false);
   
   // E-commerce connections
@@ -345,17 +348,20 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="store" className="gap-2">
+              <div className="flex items-center gap-1">
+                <ShopifyLogo className="h-4 w-4 text-[#95BF47]" />
+                <EtsyLogo className="h-4 w-4 text-[#F16521]" />
+              </div>
+              <span className="hidden sm:inline">Link Store</span>
+            </TabsTrigger>
             <TabsTrigger value="product">
               <Package className="h-4 w-4 mr-2" />
-              Product
+              <span className="hidden sm:inline">Product</span>
             </TabsTrigger>
             <TabsTrigger value="package">
               <MapPin className="h-4 w-4 mr-2" />
-              Package
-            </TabsTrigger>
-            <TabsTrigger value="store">
-              <Store className="h-4 w-4 mr-2" />
-              Link Store
+              <span className="hidden sm:inline">Package</span>
             </TabsTrigger>
           </TabsList>
 
