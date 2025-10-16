@@ -33,8 +33,7 @@ export default function Shop() {
   const { connections, syncProducts, disconnect } = useEcommerceConnections();
 
   const handleBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate('/');
+    navigate(-1);
   };
   // Fetch products
   const { data: products = [], isLoading: productsLoading, refetch: refetchProducts } = useQuery({
