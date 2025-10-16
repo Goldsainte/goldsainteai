@@ -57,10 +57,37 @@ export default function TransportationVendorDashboard() {
   const [availableBalance, setAvailableBalance] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [onboarding, setOnboarding] = useState(false);
 
   useEffect(() => {
     loadVendorData();
   }, [user]);
+
+  const handleQuickStart = async () => {
+    setOnboarding(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('start-transport-vendor-onboarding');
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Success",
+        description: "Vendor account created! Loading your dashboard...",
+      });
+      
+      // Reload vendor data
+      await loadVendorData();
+    } catch (err: any) {
+      console.error("Error starting onboarding:", err);
+      toast({
+        title: "Error",
+        description: err.message || "Failed to create vendor account",
+        variant: "destructive",
+      });
+    } finally {
+      setOnboarding(false);
+    }
+  };
 
   const loadVendorData = async () => {
     try {
@@ -187,15 +214,67 @@ export default function TransportationVendorDashboard() {
 
   if (error || !vendor) {
     return (
-      <div className="container mx-auto py-12 px-4">
+      <div className="container mx-auto py-12 px-4 max-w-3xl">
         <Card>
-          <CardContent className="text-center py-12">
-            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-destructive" />
-            <h2 className="text-2xl font-bold mb-4">Failed to Load Dashboard</h2>
-            <p className="text-muted-foreground mb-6">{error || "No vendor profile found"}</p>
-            <Button onClick={() => window.location.href = "/transportation-vendor-application"}>
-              Apply as Vendor
-            </Button>
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl">Welcome to Transportation Portal</CardTitle>
+            <CardDescription>
+              Get started as a transportation vendor in seconds
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="flex flex-col gap-4">
+              <Card className="border-2 border-primary/20 hover:border-primary transition-colors">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Car className="h-5 w-5" />
+                    Quick Start (Recommended)
+                  </CardTitle>
+                  <CardDescription>
+                    Create your vendor account now and start managing your fleet immediately. You can add details later.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={handleQuickStart} 
+                    disabled={onboarding}
+                    className="w-full"
+                    size="lg"
+                  >
+                    {onboarding ? "Setting up your account..." : "Start Now - Free"}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Complete Application
+                  </CardTitle>
+                  <CardDescription>
+                    Submit a full application with all details for verification and featured placement.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={() => window.location.href = "/transportation-vendor-application"}
+                    variant="outline"
+                    className="w-full"
+                    size="lg"
+                  >
+                    Apply for Verification
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
           </CardContent>
         </Card>
       </div>
