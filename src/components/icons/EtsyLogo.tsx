@@ -1,4 +1,4 @@
-import etsyLogo from "@/assets/etsy-logo.png";
+import etsyLogo from "@/assets/etsy-logo.svg";
 
 export function EtsyLogo({ className = "h-5 w-5" }: { className?: string }) {
   return (

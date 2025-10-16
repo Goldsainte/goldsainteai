@@ -1,4 +1,4 @@
-import shopifyLogo from "@/assets/shopify-logo.png";
+import shopifyLogo from "@/assets/shopify-logo.svg";
 
 export function ShopifyLogo({ className = "h-5 w-5" }: { className?: string }) {
   return (
