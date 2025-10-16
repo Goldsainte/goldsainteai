@@ -67,6 +67,7 @@ import CoCuratedPackage from "./pages/CoCuratedPackage";
 import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
+import AdminSeed from "./pages/AdminSeed";
 import InstagramAPI from "./pages/InstagramAPI";
 import InstagramCallback from "./pages/InstagramCallback";
 import YourActivity from "./pages/YourActivity";
@@ -160,6 +161,7 @@ function AppContent() {
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
+          <Route path="/admin/seed" element={<AdminSeed />} />
           <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
           <Route path="/admin/upload-apple-music-key" element={<UploadAppleMusicKey />} />
           <Route path="/booking-preferences" element={<BookingPreferencesRedirect />} />
