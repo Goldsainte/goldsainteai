@@ -3554,6 +3554,39 @@ export type Database = {
         }
         Relationships: []
       }
+      oauth_states: {
+        Row: {
+          code_verifier: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          platform: string
+          state: string
+          store_url: string | null
+          user_id: string
+        }
+        Insert: {
+          code_verifier?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          platform: string
+          state: string
+          store_url?: string | null
+          user_id: string
+        }
+        Update: {
+          code_verifier?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          platform?: string
+          state?: string
+          store_url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       package_bookings: {
         Row: {
           booking_reference: string
@@ -8291,6 +8324,10 @@ export type Database = {
       check_creator_eligibility: {
         Args: { p_user_id: string }
         Returns: boolean
+      }
+      cleanup_expired_oauth_states: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       cleanup_old_rate_limits: {
         Args: Record<PropertyKey, never>

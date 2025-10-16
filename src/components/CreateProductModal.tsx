@@ -8,10 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Package, MapPin, Upload, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Package, MapPin, Upload, X, Store, ShoppingBag, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEcommerceConnections } from "@/hooks/useEcommerceConnections";
+import { Switch } from "@/components/ui/switch";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface CreateProductModalProps {
   open: boolean;
@@ -22,6 +26,14 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("product");
   const [loading, setLoading] = useState(false);
+  
+  // E-commerce connections
+  const { connections, connectShopify, connectEtsy, syncProducts, disconnect, toggleAutoSync } = useEcommerceConnections();
+  const [shopifyUrl, setShopifyUrl] = useState("");
+  const [etsyShopName, setEtsyShopName] = useState("");
+  
+  const shopifyConnection = connections.find(c => c.platform === 'shopify' && c.is_active);
+  const etsyConnection = connections.find(c => c.platform === 'etsy' && c.is_active);
   
   // Product form state
   const [productForm, setProductForm] = useState({
@@ -332,14 +344,18 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="product">
               <Package className="h-4 w-4 mr-2" />
               Product
             </TabsTrigger>
             <TabsTrigger value="package">
               <MapPin className="h-4 w-4 mr-2" />
-              Travel Package
+              Package
+            </TabsTrigger>
+            <TabsTrigger value="store">
+              <Store className="h-4 w-4 mr-2" />
+              Link Store
             </TabsTrigger>
           </TabsList>
 
@@ -957,6 +973,187 @@ export function CreateProductModal({ open, onOpenChange }: CreateProductModalPro
             <Button onClick={handleCreatePackage} disabled={loading} className="w-full mt-6">
               {loading ? "Creating..." : "Create Travel Package"}
             </Button>
+          </TabsContent>
+
+          <TabsContent value="store" className="space-y-6">
+            <Tabs defaultValue="shopify">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="shopify" className="gap-2">
+                  <Store className="h-4 w-4" />
+                  Shopify
+                </TabsTrigger>
+                <TabsTrigger value="etsy" className="gap-2">
+                  <ShoppingBag className="h-4 w-4" />
+                  Etsy
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Shopify Tab */}
+              <TabsContent value="shopify" className="space-y-4">
+                {!shopifyConnection ? (
+                  <div className="space-y-4">
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        Connect your Shopify store to automatically sync products. Products will remain linked to your store.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="shopify-url">Shopify Store URL *</Label>
+                      <Input
+                        id="shopify-url"
+                        value={shopifyUrl}
+                        onChange={(e) => setShopifyUrl(e.target.value)}
+                        placeholder="yourstore.myshopify.com"
+                      />
+                    </div>
+                    
+                    <Button 
+                      onClick={() => connectShopify.mutate(shopifyUrl)}
+                      disabled={!shopifyUrl || connectShopify.isPending}
+                      className="w-full"
+                    >
+                      {connectShopify.isPending ? 'Connecting...' : 'Connect Shopify Store'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="font-medium">{shopifyConnection.store_name}</p>
+                          <p className="text-sm text-muted-foreground">{shopifyConnection.store_url}</p>
+                          {shopifyConnection.last_synced_at && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Last synced: {new Date(shopifyConnection.last_synced_at).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                        <Badge variant={shopifyConnection.sync_status === 'success' ? 'default' : 'destructive'}>
+                          {shopifyConnection.sync_status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={shopifyConnection.auto_sync_enabled}
+                            onCheckedChange={(checked) => 
+                              toggleAutoSync.mutate({ 
+                                connectionId: shopifyConnection.id, 
+                                enabled: checked 
+                              })
+                            }
+                          />
+                          <Label className="text-sm">Auto-sync daily</Label>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => syncProducts.mutate('shopify')}
+                          disabled={syncProducts.isPending || shopifyConnection.sync_status === 'syncing'}
+                          className="flex-1"
+                        >
+                          {syncProducts.isPending ? 'Syncing...' : 'Sync Now'}
+                        </Button>
+                        <Button 
+                          variant="destructive"
+                          onClick={() => disconnect.mutate(shopifyConnection.id)}
+                          disabled={disconnect.isPending}
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+
+              {/* Etsy Tab */}
+              <TabsContent value="etsy" className="space-y-4">
+                {!etsyConnection ? (
+                  <div className="space-y-4">
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        Connect your Etsy shop to automatically sync listings. You'll need to approve access to your shop.
+                      </AlertDescription>
+                    </Alert>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="etsy-shop">Etsy Shop Name *</Label>
+                      <Input
+                        id="etsy-shop"
+                        value={etsyShopName}
+                        onChange={(e) => setEtsyShopName(e.target.value)}
+                        placeholder="YourShopName"
+                      />
+                    </div>
+                    
+                    <Button 
+                      onClick={() => connectEtsy.mutate(etsyShopName)}
+                      disabled={!etsyShopName || connectEtsy.isPending}
+                      className="w-full"
+                    >
+                      {connectEtsy.isPending ? 'Connecting...' : 'Connect Etsy Shop'}
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="border rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <p className="font-medium">{etsyConnection.store_name}</p>
+                          <p className="text-sm text-muted-foreground">{etsyConnection.store_url}</p>
+                          {etsyConnection.last_synced_at && (
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Last synced: {new Date(etsyConnection.last_synced_at).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                        <Badge variant={etsyConnection.sync_status === 'success' ? 'default' : 'destructive'}>
+                          {etsyConnection.sync_status}
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Switch 
+                            checked={etsyConnection.auto_sync_enabled}
+                            onCheckedChange={(checked) => 
+                              toggleAutoSync.mutate({ 
+                                connectionId: etsyConnection.id, 
+                                enabled: checked 
+                              })
+                            }
+                          />
+                          <Label className="text-sm">Auto-sync daily</Label>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => syncProducts.mutate('etsy')}
+                          disabled={syncProducts.isPending || etsyConnection.sync_status === 'syncing'}
+                          className="flex-1"
+                        >
+                          {syncProducts.isPending ? 'Syncing...' : 'Sync Now'}
+                        </Button>
+                        <Button 
+                          variant="destructive"
+                          onClick={() => disconnect.mutate(etsyConnection.id)}
+                          disabled={disconnect.isPending}
+                        >
+                          Disconnect
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </TabsContent>
         </Tabs>
       </DialogContent>
