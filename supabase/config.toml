@@ -3,6 +3,9 @@ project_id = "iwdevxltjuedijrcdejs"
 [functions.seed-content-creators]
 verify_jwt = false
 
+[functions.clear-seeded-data]
+verify_jwt = false
+
 [functions.apple-music-search]
 verify_jwt = false
 

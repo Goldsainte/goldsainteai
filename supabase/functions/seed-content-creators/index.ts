@@ -56,6 +56,30 @@ function generateCaption(theme: string, location: string): string {
   return randomElement(captions) + ` #travel #${theme} #wanderlust #explore`;
 }
 
+async function checkExistingData(supabase: any) {
+  const { count: profileCount } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+    .eq('account_type', 'creator');
+  
+  const { count: postCount } = await supabase
+    .from('travel_posts')
+    .select('*', { count: 'exact', head: true });
+  
+  const { count: collectionCount } = await supabase
+    .from('post_collections')
+    .select('*', { count: 'exact', head: true });
+
+  return {
+    hasData: (profileCount || 0) > 0 || (postCount || 0) > 0 || (collectionCount || 0) > 0,
+    counts: {
+      profiles: profileCount || 0,
+      posts: postCount || 0,
+      collections: collectionCount || 0
+    }
+  };
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -66,106 +90,277 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const { numCreators = 15 } = await req.json().catch(() => ({}));
+    const { numCreators = 15, mode = 'new', skipCheck = false } = await req.json().catch(() => ({}));
 
-    console.log(`Starting seed process for ${numCreators} creators...`);
+    // Check existing data unless skipCheck is true
+    if (!skipCheck) {
+      const existingData = await checkExistingData(supabase);
+      
+      if (existingData.hasData && mode === 'new') {
+        return new Response(
+          JSON.stringify({
+            warning: true,
+            message: 'Database already contains seeded data',
+            existing: existingData.counts,
+            suggestion: 'Use mode="hybrid" to add to existing creators or clear data first'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    console.log(`Starting seed process: mode=${mode}, numCreators=${numCreators}...`);
     
     const createdProfiles = [];
     const createdPosts = [];
     const createdFollows = [];
     const createdCollections = [];
 
-    for (let i = 0; i < numCreators; i++) {
-      const theme = randomElement(THEMES);
-      const firstName = randomElement(FIRST_NAMES);
-      const lastName = randomElement(LAST_NAMES);
-      const username = generateUsername(firstName, lastName);
-      const location = randomElement(LOCATIONS);
-      
-      // Create profile
-      const profile = {
-        username,
-        full_name: `${firstName} ${lastName}`,
-        bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
-        location,
-        avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
-        website: `https://${username}.com`,
-        instagram_username: `@${username}`,
-        tiktok_username: `@${username}`,
-        account_type: 'creator',
-        is_verified: randomBoolean(0.4),
-      };
-
-      const { data: profileData, error: profileError } = await supabase
+    // Hybrid mode: add content to existing + create new
+    if (mode === 'hybrid') {
+      const { data: existingCreators } = await supabase
         .from('profiles')
-        .insert(profile)
-        .select()
-        .single();
+        .select('id, username')
+        .eq('account_type', 'creator')
+        .limit(50);
 
-      if (profileError) {
-        console.error(`Error creating profile ${username}:`, profileError);
-        continue;
-      }
+      const numExistingToEnhance = Math.min(
+        existingCreators?.length || 0,
+        Math.floor(numCreators * 0.7)
+      );
 
-      createdProfiles.push(profileData);
-      console.log(`Created profile: ${username}`);
-
-      // Create 6-10 travel posts for this creator
-      const numPosts = randomInt(6, 10);
-      for (let j = 0; j < numPosts; j++) {
-        const postTag = randomElement(CONTENT_TAGS);
-        const postLocation = randomElement(LOCATIONS);
+      console.log(`Enhancing ${numExistingToEnhance} existing creators with new posts...`);
+      
+      // Add 3-5 new posts to existing creators
+      for (let i = 0; i < numExistingToEnhance && existingCreators; i++) {
+        const creator = existingCreators[i];
+        const theme = randomElement(THEMES);
+        const numNewPosts = randomInt(3, 5);
         
-        const post = {
-          user_id: profileData.id,
-          media_type: 'image',
-          image_urls: [generateUnsplashUrl([postTag, theme, 'travel'])],
-          caption: generateCaption(theme, postLocation),
-          location: postLocation,
-          like_count: randomInt(500, 75000),
-          view_count: randomInt(2000, 500000),
-          comment_count: randomInt(20, 3000),
-          share_count: randomInt(10, 1500),
-          is_original_content: true,
-          visibility: 'public',
-          status: 'active',
-          created_at: generateRecentDate(180),
-        };
+        for (let j = 0; j < numNewPosts; j++) {
+          const postTag = randomElement(CONTENT_TAGS);
+          const postLocation = randomElement(LOCATIONS);
+          
+          const post = {
+            user_id: creator.id,
+            media_type: 'image',
+            image_urls: [generateUnsplashUrl([postTag, theme, 'travel'])],
+            caption: generateCaption(theme, postLocation),
+            location: postLocation,
+            like_count: randomInt(500, 75000),
+            view_count: randomInt(2000, 500000),
+            comment_count: randomInt(20, 3000),
+            share_count: randomInt(10, 1500),
+            is_original_content: true,
+            visibility: 'public',
+            status: 'active',
+            created_at: generateRecentDate(180),
+          };
 
-        const { data: postData, error: postError } = await supabase
-          .from('travel_posts')
-          .insert(post)
-          .select()
-          .single();
+          const { data: postData, error: postError } = await supabase
+            .from('travel_posts')
+            .insert(post)
+            .select()
+            .single();
 
-        if (!postError && postData) {
-          createdPosts.push(postData);
+          if (!postError && postData) {
+            createdPosts.push(postData);
+          }
         }
       }
 
-      // Create 2-3 collections for this creator
-      const numCollections = randomInt(2, 3);
-      const collectionThemes = ["Hidden Gems", "Luxury Stays", "Food Adventures", "City Guides", "Beach Escapes"];
+      // Adjust numCreators to create fewer new ones (30%)
+      const adjustedNumCreators = Math.ceil(numCreators * 0.3);
+      console.log(`Creating ${adjustedNumCreators} new creators in hybrid mode...`);
       
-      for (let k = 0; k < numCollections; k++) {
-        const collectionName = randomElement(collectionThemes);
+      for (let i = 0; i < adjustedNumCreators; i++) {
+        const theme = randomElement(THEMES);
+        const firstName = randomElement(FIRST_NAMES);
+        const lastName = randomElement(LAST_NAMES);
+        const username = generateUsername(firstName, lastName);
+        const location = randomElement(LOCATIONS);
         
-        const collection = {
-          user_id: profileData.id,
-          name: `${collectionName} ${randomInt(2023, 2024)}`,
-          description: `My favorite ${collectionName.toLowerCase()} from around the world`,
-          cover_image_url: generateUnsplashUrl([theme, 'travel', 'collection']),
-          is_private: false,
+        // Create profile
+        const profile = {
+          username,
+          full_name: `${firstName} ${lastName}`,
+          bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
+          location,
+          avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
+          website: `https://${username}.com`,
+          instagram_username: `@${username}`,
+          tiktok_username: `@${username}`,
+          account_type: 'creator',
+          is_verified: randomBoolean(0.4),
         };
 
-        const { data: collectionData, error: collectionError } = await supabase
-          .from('post_collections')
-          .insert(collection)
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .insert(profile)
           .select()
           .single();
 
-        if (!collectionError && collectionData) {
-          createdCollections.push(collectionData);
+        if (profileError) {
+          console.error(`Error creating profile ${username}:`, profileError);
+          continue;
+        }
+
+        createdProfiles.push(profileData);
+        console.log(`Created profile: ${username}`);
+
+        // Create 6-10 travel posts for this creator
+        const numPosts = randomInt(6, 10);
+        for (let j = 0; j < numPosts; j++) {
+          const postTag = randomElement(CONTENT_TAGS);
+          const postLocation = randomElement(LOCATIONS);
+          
+          const post = {
+            user_id: profileData.id,
+            media_type: 'image',
+            image_urls: [generateUnsplashUrl([postTag, theme, 'travel'])],
+            caption: generateCaption(theme, postLocation),
+            location: postLocation,
+            like_count: randomInt(500, 75000),
+            view_count: randomInt(2000, 500000),
+            comment_count: randomInt(20, 3000),
+            share_count: randomInt(10, 1500),
+            is_original_content: true,
+            visibility: 'public',
+            status: 'active',
+            created_at: generateRecentDate(180),
+          };
+
+          const { data: postData, error: postError } = await supabase
+            .from('travel_posts')
+            .insert(post)
+            .select()
+            .single();
+
+          if (!postError && postData) {
+            createdPosts.push(postData);
+          }
+        }
+
+        // Create 2-3 collections for this creator
+        const numCollections = randomInt(2, 3);
+        const collectionThemes = ["Hidden Gems", "Luxury Stays", "Food Adventures", "City Guides", "Beach Escapes"];
+        
+        for (let k = 0; k < numCollections; k++) {
+          const collectionName = randomElement(collectionThemes);
+          
+          const collection = {
+            user_id: profileData.id,
+            name: `${collectionName} ${randomInt(2023, 2024)}`,
+            description: `My favorite ${collectionName.toLowerCase()} from around the world`,
+            cover_image_url: generateUnsplashUrl([theme, 'travel', 'collection']),
+            is_private: false,
+          };
+
+          const { data: collectionData, error: collectionError } = await supabase
+            .from('post_collections')
+            .insert(collection)
+            .select()
+            .single();
+
+          if (!collectionError && collectionData) {
+            createdCollections.push(collectionData);
+          }
+        }
+      }
+    } else {
+      // Original "new" mode: create all new creators
+      for (let i = 0; i < numCreators; i++) {
+        const theme = randomElement(THEMES);
+        const firstName = randomElement(FIRST_NAMES);
+        const lastName = randomElement(LAST_NAMES);
+        const username = generateUsername(firstName, lastName);
+        const location = randomElement(LOCATIONS);
+        
+        // Create profile
+        const profile = {
+          username,
+          full_name: `${firstName} ${lastName}`,
+          bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
+          location,
+          avatar_url: generateUnsplashUrl([theme, 'portrait', 'person']),
+          website: `https://${username}.com`,
+          instagram_username: `@${username}`,
+          tiktok_username: `@${username}`,
+          account_type: 'creator',
+          is_verified: randomBoolean(0.4),
+        };
+
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .insert(profile)
+          .select()
+          .single();
+
+        if (profileError) {
+          console.error(`Error creating profile ${username}:`, profileError);
+          continue;
+        }
+
+        createdProfiles.push(profileData);
+        console.log(`Created profile: ${username}`);
+
+        // Create 6-10 travel posts for this creator
+        const numPosts = randomInt(6, 10);
+        for (let j = 0; j < numPosts; j++) {
+          const postTag = randomElement(CONTENT_TAGS);
+          const postLocation = randomElement(LOCATIONS);
+          
+          const post = {
+            user_id: profileData.id,
+            media_type: 'image',
+            image_urls: [generateUnsplashUrl([postTag, theme, 'travel'])],
+            caption: generateCaption(theme, postLocation),
+            location: postLocation,
+            like_count: randomInt(500, 75000),
+            view_count: randomInt(2000, 500000),
+            comment_count: randomInt(20, 3000),
+            share_count: randomInt(10, 1500),
+            is_original_content: true,
+            visibility: 'public',
+            status: 'active',
+            created_at: generateRecentDate(180),
+          };
+
+          const { data: postData, error: postError } = await supabase
+            .from('travel_posts')
+            .insert(post)
+            .select()
+            .single();
+
+          if (!postError && postData) {
+            createdPosts.push(postData);
+          }
+        }
+
+        // Create 2-3 collections for this creator
+        const numCollections = randomInt(2, 3);
+        const collectionThemes = ["Hidden Gems", "Luxury Stays", "Food Adventures", "City Guides", "Beach Escapes"];
+        
+        for (let k = 0; k < numCollections; k++) {
+          const collectionName = randomElement(collectionThemes);
+          
+          const collection = {
+            user_id: profileData.id,
+            name: `${collectionName} ${randomInt(2023, 2024)}`,
+            description: `My favorite ${collectionName.toLowerCase()} from around the world`,
+            cover_image_url: generateUnsplashUrl([theme, 'travel', 'collection']),
+            is_private: false,
+          };
+
+          const { data: collectionData, error: collectionError } = await supabase
+            .from('post_collections')
+            .insert(collection)
+            .select()
+            .single();
+
+          if (!collectionError && collectionData) {
+            createdCollections.push(collectionData);
+          }
         }
       }
     }

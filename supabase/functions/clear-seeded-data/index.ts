@@ -1,0 +1,111 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    const { confirmToken } = await req.json();
+    
+    // Safety check: require confirmation token
+    if (confirmToken !== 'DELETE_ALL_SEEDED_DATA') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid confirmation token' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Starting data cleanup...');
+    
+    // Get all creator profile IDs first
+    const { data: creatorProfiles } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('account_type', 'creator');
+    
+    const creatorIds = creatorProfiles?.map(p => p.id) || [];
+    
+    if (creatorIds.length === 0) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: 'No seeded data found',
+          deleted: { profiles: 0, posts: 0, follows: 0, collections: 0 }
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Delete in correct order (respect foreign keys)
+    
+    // 1. Delete collection_posts links
+    await supabase
+      .from('collection_posts')
+      .delete()
+      .in('collection_id', 
+        supabase.from('post_collections').select('id').in('user_id', creatorIds)
+      );
+    
+    // 2. Delete post_collections
+    const { count: collectionsDeleted } = await supabase
+      .from('post_collections')
+      .delete()
+      .in('user_id', creatorIds)
+      .select('*', { count: 'exact', head: true });
+    
+    // 3. Delete user_follows where both users are creators
+    const { count: followsDeleted } = await supabase
+      .from('user_follows')
+      .delete()
+      .in('follower_id', creatorIds)
+      .select('*', { count: 'exact', head: true });
+    
+    // 4. Delete travel_posts from creators
+    const { count: postsDeleted } = await supabase
+      .from('travel_posts')
+      .delete()
+      .in('user_id', creatorIds)
+      .select('*', { count: 'exact', head: true });
+    
+    // 5. Delete creator profiles
+    const { count: profilesDeleted } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('account_type', 'creator')
+      .select('*', { count: 'exact', head: true });
+
+    console.log('Cleanup completed successfully!');
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        message: 'All seeded data cleared',
+        deleted: {
+          profiles: profilesDeleted || 0,
+          posts: postsDeleted || 0,
+          follows: followsDeleted || 0,
+          collections: collectionsDeleted || 0,
+        }
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error clearing data:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
