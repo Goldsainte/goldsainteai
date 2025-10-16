@@ -134,33 +134,7 @@ export function TravelSidebar() {
             </li>
           ))}
           
-          {/* Create Content - Always visible */}
-          <li>
-            <button
-              onClick={handleCreateClick}
-              className="flex items-center gap-4 px-3 py-3 rounded-lg transition-colors hover:bg-muted/50 w-full"
-            >
-              <PlusSquare className="h-6 w-6" strokeWidth={2} />
-              <span className="text-base">Create</span>
-            </button>
-          </li>
-          
-          {/* Profile - Always visible */}
-          <li>
-            <NavLink
-              to="/travel-profile"
-              className={({ isActive }) =>
-                `flex items-center gap-4 px-3 py-3 rounded-lg transition-colors hover:bg-muted/50 ${
-                  isActive ? "font-bold" : "font-normal"
-                }`
-              }
-            >
-              <User className="h-6 w-6" strokeWidth={2} />
-              <span className="text-base">Profile</span>
-            </NavLink>
-          </li>
-          
-          {/* Profile with Create submenu (kept for backward compatibility) */}
+          {/* Profile with Create submenu */}
           <li>
             <Collapsible open={profileOpen} onOpenChange={setProfileOpen}>
               <CollapsibleTrigger asChild>

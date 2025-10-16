@@ -164,9 +164,9 @@ export const Header = () => {
             <div className="flex flex-col gap-2 py-2">
               {/* Top row: Logo + Navigation + User Menu */}
               <div className="flex items-center justify-between">
-              <button onClick={() => navigate('/')} className="flex items-center hover:opacity-90 transition-opacity">
-                <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
-              </button>
+                <a href="/home" className="flex items-center hover:opacity-90 transition-opacity">
+                  <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
+                </a>
                 
                 <div className="flex items-center gap-2">
                   {user && <NotificationCenter showLabel={false} />}

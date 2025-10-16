@@ -286,17 +286,6 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   const handleNext = () => {
     setProgress(0); // Reset progress immediately
-    
-    // Pause and clean up media before advancing
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-    
     if (currentIndex < moments.length - 1) {
       setCurrentIndex(prev => prev + 1);
     } else {
@@ -307,17 +296,6 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   const handlePrevious = () => {
     setProgress(0); // Reset progress immediately
-    
-    // Pause and clean up media before going back
-    if (audio) {
-      audio.pause();
-      audio.currentTime = 0;
-    }
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-    
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
     }
