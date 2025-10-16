@@ -21,6 +21,7 @@ import { SuggestedUsers } from "@/components/SuggestedUsers";
 import { DraftPostsManager } from "@/components/DraftPostsManager";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
+import { FloatingSidePanels } from "@/components/FloatingSidePanels";
 
 interface TravelPost {
   id: string;
@@ -326,6 +327,9 @@ const TravelFeed = () => {
 
   return (
     <>
+      {/* Floating Side Panels - Booking.com style */}
+      {!isMobile && <FloatingSidePanels />}
+
       {/* Desktop Layout - Cleaner Instagram-style */}
       {!isMobile ? (
         <div className="flex w-full min-h-screen bg-background">
