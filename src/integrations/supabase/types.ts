@@ -2023,6 +2023,63 @@ export type Database = {
         }
         Relationships: []
       }
+      ecommerce_connections: {
+        Row: {
+          access_token: string
+          auto_sync_enabled: boolean | null
+          created_at: string
+          creator_id: string
+          id: string
+          is_active: boolean | null
+          last_synced_at: string | null
+          metadata: Json | null
+          platform: string
+          refresh_token: string | null
+          store_name: string | null
+          store_url: string
+          sync_error_message: string | null
+          sync_status: string | null
+          token_expires_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_token: string
+          auto_sync_enabled?: boolean | null
+          created_at?: string
+          creator_id: string
+          id?: string
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          metadata?: Json | null
+          platform: string
+          refresh_token?: string | null
+          store_name?: string | null
+          store_url: string
+          sync_error_message?: string | null
+          sync_status?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_token?: string
+          auto_sync_enabled?: boolean | null
+          created_at?: string
+          creator_id?: string
+          id?: string
+          is_active?: boolean | null
+          last_synced_at?: string | null
+          metadata?: Json | null
+          platform?: string
+          refresh_token?: string | null
+          store_name?: string | null
+          store_url?: string
+          sync_error_message?: string | null
+          sync_status?: string | null
+          token_expires_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       emergency_contacts: {
         Row: {
           contact_name: string
@@ -4670,14 +4727,19 @@ export type Database = {
           creator_id: string
           currency: string
           description: string | null
+          external_product_id: string | null
+          external_store_id: string | null
+          external_url: string | null
           id: string
           images: Json | null
           inventory_count: number | null
           is_active: boolean | null
+          last_synced_at: string | null
           price: number
           product_type: string
           stripe_price_id: string | null
           stripe_product_id: string | null
+          sync_source: string | null
           title: string
           updated_at: string
         }
@@ -4687,14 +4749,19 @@ export type Database = {
           creator_id: string
           currency?: string
           description?: string | null
+          external_product_id?: string | null
+          external_store_id?: string | null
+          external_url?: string | null
           id?: string
           images?: Json | null
           inventory_count?: number | null
           is_active?: boolean | null
+          last_synced_at?: string | null
           price: number
           product_type: string
           stripe_price_id?: string | null
           stripe_product_id?: string | null
+          sync_source?: string | null
           title: string
           updated_at?: string
         }
@@ -4704,18 +4771,31 @@ export type Database = {
           creator_id?: string
           currency?: string
           description?: string | null
+          external_product_id?: string | null
+          external_store_id?: string | null
+          external_url?: string | null
           id?: string
           images?: Json | null
           inventory_count?: number | null
           is_active?: boolean | null
+          last_synced_at?: string | null
           price?: number
           product_type?: string
           stripe_price_id?: string | null
           stripe_product_id?: string | null
+          sync_source?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_external_store_id_fkey"
+            columns: ["external_store_id"]
+            isOneToOne: false
+            referencedRelation: "ecommerce_connections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -5682,6 +5762,56 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      sync_history: {
+        Row: {
+          completed_at: string | null
+          connection_id: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          products_created: number | null
+          products_fetched: number | null
+          products_skipped: number | null
+          products_updated: number | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          completed_at?: string | null
+          connection_id: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          products_created?: number | null
+          products_fetched?: number | null
+          products_skipped?: number | null
+          products_updated?: number | null
+          started_at?: string
+          status: string
+        }
+        Update: {
+          completed_at?: string | null
+          connection_id?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          products_created?: number | null
+          products_fetched?: number | null
+          products_skipped?: number | null
+          products_updated?: number | null
+          started_at?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sync_history_connection_id_fkey"
+            columns: ["connection_id"]
+            isOneToOne: false
+            referencedRelation: "ecommerce_connections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       template_day_items: {
         Row: {
