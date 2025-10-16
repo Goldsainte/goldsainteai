@@ -846,12 +846,7 @@ const Index = () => {
   const showChat = messages.length > 0;
 
   return (
-    <>
-      {/* Simple Side Borders - Empty gutters for framed layout */}
-      <div className="hidden xl:block fixed left-0 top-0 h-screen w-12 bg-background border-r border-border/50 z-10" />
-      <div className="hidden xl:block fixed right-0 top-0 h-screen w-12 bg-background border-l border-border/50 z-10" />
-      
-      <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20">
+    <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40">
       <div className="w-full h-full flex flex-col">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
@@ -1805,7 +1800,6 @@ const Index = () => {
         />
       </div>
     </main>
-    </>
   );
 };
 
