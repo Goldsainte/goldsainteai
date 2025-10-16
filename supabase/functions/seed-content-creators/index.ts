@@ -181,7 +181,9 @@ serve(async (req) => {
         const location = randomElement(LOCATIONS);
         
         // Create profile
+        const profileId = crypto.randomUUID();
         const profile = {
+          id: profileId,
           username,
           full_name: `${firstName} ${lastName}`,
           bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
@@ -277,7 +279,9 @@ serve(async (req) => {
         const location = randomElement(LOCATIONS);
         
         // Create profile
+        const profileId = crypto.randomUUID();
         const profile = {
+          id: profileId,
           username,
           full_name: `${firstName} ${lastName}`,
           bio: `${randomElement(CATCHPHRASES)} | ${theme.charAt(0).toUpperCase() + theme.slice(1)} content | ${location}`,
