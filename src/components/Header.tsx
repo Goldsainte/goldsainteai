@@ -320,15 +320,8 @@ export const Header = () => {
                             onClick={() => navigate('/dashboard')} 
                             className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
                           >
-                            <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/favorites')} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
-                          >
-                            <Heart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm font-medium">Favorites</span>
                           </DropdownMenuItem>
                           
                           <DropdownMenuSeparator className="bg-border/50" />
@@ -595,27 +588,6 @@ export const Header = () => {
                           >
                             <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/my-bookings')} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
-                          >
-                            <Calendar className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">My Bookings</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/favorites')} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
-                          >
-                            <Heart className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Favorites</span>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => navigate('/booking-preferences')} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
-                          >
-                            <Settings className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                            <span className="text-sm font-medium">Booking Preferences</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/creator-dashboard')} 

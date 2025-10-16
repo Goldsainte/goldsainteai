@@ -33,6 +33,9 @@ import BrowseAgents from "./pages/BrowseAgents";
 import MyJobs from "./pages/MyJobs";
 import MyTrips from "./pages/MyTrips";
 import BookingPreferences from "./pages/BookingPreferences";
+import MyBookingsRedirect from "./pages/redirects/MyBookingsRedirect";
+import FavoritesRedirect from "./pages/redirects/FavoritesRedirect";
+import BookingPreferencesRedirect from "./pages/redirects/BookingPreferencesRedirect";
 import CommissionDashboard from "./pages/CommissionDashboard";
 import EmailPreview from "./pages/EmailPreview";
 import MyBookings from "./pages/MyBookings";
@@ -159,13 +162,13 @@ function AppContent() {
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
           <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
           <Route path="/admin/upload-apple-music-key" element={<UploadAppleMusicKey />} />
-          <Route path="/booking-preferences" element={<BookingPreferences />} />
+          <Route path="/booking-preferences" element={<BookingPreferencesRedirect />} />
           <Route path="/commission-dashboard" element={<CommissionDashboard />} />
           <Route path="/email-preview" element={<EmailPreview />} />
-          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/favorites" element={<FavoritesRedirect />} />
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/:collectionId" element={<CollectionDetail />} />
-          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/my-bookings" element={<MyBookingsRedirect />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/travel-profile" element={<TravelProfile />} />
           <Route path="/travel-profile/:userId" element={<TravelProfile />} />

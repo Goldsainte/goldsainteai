@@ -217,7 +217,7 @@ export default function Profile() {
               <Button
                 variant="outline"
                 className="w-full justify-start gap-2"
-                onClick={() => navigate('/booking-preferences')}
+                onClick={() => navigate('/dashboard?tab=preferences')}
               >
                 <Settings className="h-4 w-4" />
                 Booking Preferences & AI Assistant

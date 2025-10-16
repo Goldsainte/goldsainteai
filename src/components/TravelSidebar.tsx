@@ -1,4 +1,4 @@
-import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu, Settings, Activity, Bookmark, Sun, Moon, AlertCircle, LogOut } from "lucide-react";
+import { Home, Search, Compass, Film, MessageCircle, Bell, PlusSquare, User, Menu, Settings, Activity, Bookmark, Sun, Moon, AlertCircle, LogOut, LayoutDashboard } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ const navItems = [
   { title: "Journeys", url: "/travel-feed", icon: Film },
   { title: "Messages", url: "/messages", icon: MessageCircle },
   { title: "Notifications", url: "/notifications", icon: Bell },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Create", url: "/travel-profile", icon: PlusSquare },
   { title: "Profile", url: "/travel-profile", icon: User },
 ];
@@ -140,14 +141,6 @@ export function TravelSidebar() {
               >
                 <Activity className="h-5 w-5" />
                 <span>Your activity</span>
-              </Button>
-              <Button
-                variant="ghost"
-                className="w-full justify-start gap-3 px-4 py-3 h-auto hover:bg-accent rounded-none"
-                onClick={() => handleNavigation('/favorites')}
-              >
-                <Bookmark className="h-5 w-5" />
-                <span>Saved</span>
               </Button>
               <Button
                 variant="ghost"
