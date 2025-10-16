@@ -46,7 +46,7 @@ export default function AdminCustomerVerifications() {
         .from('customer_verifications')
         .select(`
           *,
-          user:profiles!user_id (
+          profiles (
             id,
             username,
             first_name,
@@ -232,9 +232,9 @@ export default function AdminCustomerVerifications() {
                 <div key={verification.id} className="bg-card border rounded-lg p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
-                      {(verification as any).user?.avatar_url ? (
+                      {(verification as any).profiles?.avatar_url ? (
                         <img 
-                          src={(verification as any).user.avatar_url} 
+                          src={(verification as any).profiles.avatar_url} 
                           alt="User" 
                           className="w-12 h-12 rounded-full object-cover"
                         />
@@ -245,9 +245,9 @@ export default function AdminCustomerVerifications() {
                       )}
                       <div>
                         <h3 className="font-semibold">
-                          {(verification as any).user?.first_name} {(verification as any).user?.last_name}
+                          {(verification as any).profiles?.first_name} {(verification as any).profiles?.last_name}
                         </h3>
-                        <p className="text-sm text-muted-foreground">@{(verification as any).user?.username}</p>
+                        <p className="text-sm text-muted-foreground">@{(verification as any).profiles?.username}</p>
                         <p className="text-xs text-muted-foreground mt-1">
                           Submitted: {new Date(verification.created_at).toLocaleDateString()}
                         </p>
