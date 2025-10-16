@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import FollowButton from "./FollowButton";
 import { SuggestedUsers } from "./SuggestedUsers";
 import { DraftPostsManager } from "./DraftPostsManager";
+import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
 
 interface SuggestedUser {
   id: string;
@@ -137,6 +138,11 @@ export function FeedSuggestions() {
                   <p className="text-sm font-semibold truncate">
                     {suggestion.username || 'User'}
                   </p>
+                  {suggestion.is_verified && (
+                    <div className="mt-0.5">
+                      <CustomerVerifiedBadge size="xs" />
+                    </div>
+                  )}
                   <p className="text-xs text-muted-foreground truncate">
                     Suggested for you
                   </p>

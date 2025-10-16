@@ -6,7 +6,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, Settings, Heart, Video, MessageCircle, CheckCircle2, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, LayoutDashboard } from "lucide-react";
+import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, LayoutDashboard } from "lucide-react";
+import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -634,7 +635,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     : (profile?.username || '').toUpperCase()}
                 </p>
                 {profile?.is_verified && (
-                  <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                  <CustomerVerifiedBadge size="xs" />
                 )}
               </div>
               {profile?.bio && (
@@ -751,7 +752,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   : profile?.username || 'User'}
               </p>
               {profile?.is_verified && (
-                <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500" />
+                <CustomerVerifiedBadge size="xs" />
               )}
             </div>
 

@@ -7,7 +7,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Search as SearchIcon, ChevronLeft, MapPin, CheckCircle2, Loader2, X } from "lucide-react";
+import { Search as SearchIcon, ChevronLeft, MapPin, Loader2, X } from "lucide-react";
+import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
 import { toast } from "sonner";
 
 interface SearchUser {
@@ -265,7 +266,7 @@ export default function Search() {
                             {user.username || "Anonymous"}
                           </p>
                           {user.is_verified && (
-                            <CheckCircle2 className="h-4 w-4 text-blue-500 fill-blue-500 flex-shrink-0" />
+                            <CustomerVerifiedBadge size="xs" />
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground truncate">

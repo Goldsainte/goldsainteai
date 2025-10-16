@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
-import { Star, MapPin, Briefcase, Award, Clock, CheckCircle, ArrowLeft, Globe, Mail, Phone, Flag } from "lucide-react";
+import { Star, MapPin, Briefcase, Award, Clock, ArrowLeft, Globe, Mail, Phone, Flag } from "lucide-react";
+import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
 import { toast } from "sonner";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
@@ -171,8 +172,7 @@ export default function AgentProfile() {
 
                   {agent.is_verified && (
                     <Badge className="mb-4">
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Verified Agent
+                      <CustomerVerifiedBadge size="xs" showText />
                     </Badge>
                   )}
 

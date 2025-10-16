@@ -94,11 +94,25 @@ export default function AdminCustomerVerifications() {
         details: { admin_notes: adminNotes, checklist }
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Verification Approved",
-        description: "Customer verification has been approved successfully."
+        description: "Customer has been notified of their approved verification."
       });
+      
+      // Send email notification
+      try {
+        await supabase.functions.invoke('send-verification-email', {
+          body: {
+            user_id: selectedVerification.user_id,
+            status: 'approved',
+            rejection_reason: null
+          }
+        });
+      } catch (error) {
+        console.error('Failed to send email:', error);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['admin-customer-verifications'] });
       resetForm();
     },
@@ -140,11 +154,25 @@ export default function AdminCustomerVerifications() {
         details: { admin_notes: adminNotes, rejection_reason: rejectionReason }
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast({
         title: "Verification Rejected",
-        description: "Customer verification has been rejected."
+        description: "Customer has been notified of the rejection."
       });
+      
+      // Send email notification
+      try {
+        await supabase.functions.invoke('send-verification-email', {
+          body: {
+            user_id: selectedVerification.user_id,
+            status: 'rejected',
+            rejection_reason: rejectionReason
+          }
+        });
+      } catch (error) {
+        console.error('Failed to send email:', error);
+      }
+      
       queryClient.invalidateQueries({ queryKey: ['admin-customer-verifications'] });
       resetForm();
     },
