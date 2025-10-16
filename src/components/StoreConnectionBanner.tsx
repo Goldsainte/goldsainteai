@@ -15,7 +15,7 @@ export function StoreConnectionBanner({ onConnect }: StoreConnectionBannerProps)
         <div className="flex flex-col md:flex-row items-center gap-6">
           <div className="flex items-center gap-4 md:gap-6">
             <div className="p-4 bg-background rounded-lg">
-              <ShopifyLogo className="h-12 w-12 text-[#95BF47]" />
+              <ShopifyLogo className="h-14 w-20 text-[#95BF47]" />
             </div>
             <div className="hidden md:block text-4xl text-muted-foreground">+</div>
             <div className="p-4 bg-background rounded-lg">
