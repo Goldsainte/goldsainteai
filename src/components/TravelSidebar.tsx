@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
@@ -30,7 +31,7 @@ export function TravelSidebar() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const [open, setOpen] = useState(false);
-  
+  const [profileOpen, setProfileOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
@@ -158,6 +159,48 @@ export function TravelSidebar() {
             </NavLink>
           </li>
           
+          {/* Profile with Create submenu (kept for backward compatibility) */}
+          <li>
+            <Collapsible open={profileOpen} onOpenChange={setProfileOpen}>
+              <CollapsibleTrigger asChild>
+                <button className="flex items-center justify-between gap-4 px-3 py-3 rounded-lg transition-colors hover:bg-muted/50 w-full">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={avatarUrl || undefined} />
+                      <AvatarFallback className="text-xs bg-primary text-primary-foreground">
+                        {username?.[0]?.toUpperCase() || 'U'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-base">Profile</span>
+                  </div>
+                  <ChevronDown className={`h-4 w-4 transition-transform ${profileOpen ? 'rotate-180' : ''}`} />
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="ml-11 mt-1 space-y-1">
+                  <Button
+                    variant="ghost"
+                    onClick={handleCreateClick}
+                    className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-muted/50 rounded-lg"
+                  >
+                    <PlusSquare className="h-5 w-5" />
+                    <span className="text-sm">Create Content</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      navigate('/travel-profile');
+                      setProfileOpen(false);
+                    }}
+                    className="w-full justify-start gap-3 px-3 py-2 h-auto hover:bg-muted/50 rounded-lg"
+                  >
+                    <User className="h-5 w-5" />
+                    <span className="text-sm">View Profile</span>
+                  </Button>
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          </li>
         </ul>
       </nav>
 
