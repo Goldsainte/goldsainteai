@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChevronLeft, Camera, CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { SimpleVerifiedBadge } from "@/components/badges/SimpleVerifiedBadge";
 
 interface Profile {
   username: string | null;
@@ -240,12 +239,7 @@ const TravelSettings = () => {
               {profile.username?.[0]?.toUpperCase() || 'U'}
             </AvatarFallback>
           </Avatar>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold">Settings</h1>
-            {profile.is_verified && (
-              <SimpleVerifiedBadge size="sm" />
-            )}
-          </div>
+          <h1 className="text-xl font-bold">Settings</h1>
         </div>
       </div>
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, LayoutDashboard } from "lucide-react";
-import { SimpleVerifiedBadge } from "@/components/badges/SimpleVerifiedBadge";
+import { CustomerVerifiedBadge } from "@/components/badges/CustomerVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -555,12 +555,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           <div className="flex-1 space-y-5">
             {/* Username and Buttons Row */}
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <h2 className="text-xl font-light">{profile?.username || 'User'}</h2>
-                {profile?.is_verified && (
-                  <SimpleVerifiedBadge size="sm" />
-                )}
-              </div>
+              <h2 className="text-xl font-light">{profile?.username || 'User'}</h2>
               
               {isOwnProfile ? (
                 <>
@@ -640,7 +635,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                     : (profile?.username || '').toUpperCase()}
                 </p>
                 {profile?.is_verified && (
-                  <SimpleVerifiedBadge size="xs" />
+                  <CustomerVerifiedBadge size="xs" />
                 )}
               </div>
               {profile?.bio && (
@@ -757,7 +752,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
                   : profile?.username || 'User'}
               </p>
               {profile?.is_verified && (
-                <SimpleVerifiedBadge size="xs" />
+                <CustomerVerifiedBadge size="xs" />
               )}
             </div>
 
