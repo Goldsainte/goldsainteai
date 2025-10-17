@@ -11,7 +11,7 @@ const WhatWeDo = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">What We Do - Goldsainte Travel Services</h1>
+        <h1 className="text-4xl font-bold mb-4">What We Do</h1>
         <p className="text-muted-foreground">
           Learn how Goldsainte provides AI-powered travel services across accommodations, attractions, car rentals, flights, and transportation.
         </p>
