@@ -88,7 +88,7 @@ const PrivacyCookies = () => {
 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="data-collection">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       Information We Collect
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4">
@@ -114,7 +114,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="how-we-use">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       How We Use Your Information
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -129,7 +129,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="sharing">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       Sharing Your Information
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -143,7 +143,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="your-rights">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       Your Rights
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -176,7 +176,7 @@ const PrivacyCookies = () => {
 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="cookie-types">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       Types of Cookies We Use
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4">
@@ -205,7 +205,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="managing-cookies">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       Managing Cookies
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -219,7 +219,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="third-party">
-                    <AccordionTrigger className="text-2xl font-semibold">
+                    <AccordionTrigger className="text-base font-medium">
                       Third-Party Cookies
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
