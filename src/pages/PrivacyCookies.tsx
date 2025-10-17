@@ -30,7 +30,7 @@ const PrivacyCookies = () => {
             Privacy and Cookies Policy
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Your privacy matters to us. Learn how Goldsainte collects, uses, and protects your personal information.
+            Your Privacy, Our Priority — How Goldsainte Collects, Uses, and Safeguards Your Personal Information
           </p>
         </div>
       </section>
