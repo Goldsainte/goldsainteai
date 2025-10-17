@@ -41,7 +41,7 @@ export const PackageSearchHero = ({
       
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 font-secondary">
+        <h1 className="text-[36px] sm:text-[45px] md:text-[54px] font-bold text-white mb-4 font-secondary">
           CoCurated Journeys + Live Deals
         </h1>
         <p className="text-xl text-white/90 mb-6">
@@ -58,13 +58,13 @@ export const PackageSearchHero = ({
           >
             <ToggleGroupItem 
               value="amadeus" 
-              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6"
+              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6 hover:bg-[#bfad72] hover:text-white transition-colors"
             >
               Amadeus Tours
             </ToggleGroupItem>
             <ToggleGroupItem 
               value="agent" 
-              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6"
+              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6 hover:bg-[#bfad72] hover:text-white transition-colors"
             >
               CoCurated by Agents
             </ToggleGroupItem>
@@ -75,7 +75,7 @@ export const PackageSearchHero = ({
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Where to */}
-            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border">
+            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border hover:bg-[#bfad72]/10 transition-colors cursor-pointer">
               <div className="flex-shrink-0">
                 <MapPin className="h-5 w-5 text-muted-foreground" />
               </div>
@@ -96,7 +96,7 @@ export const PackageSearchHero = ({
             <div className="flex-1">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-muted/50 transition-colors">
+                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-[#bfad72]/10 transition-colors">
                     <div className="flex-shrink-0">
                       <CalendarIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
