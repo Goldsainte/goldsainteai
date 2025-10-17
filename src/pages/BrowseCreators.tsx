@@ -6,7 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Users, TrendingUp, Star } from "lucide-react";
+import { Search, Users, TrendingUp, Star, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +26,7 @@ interface Creator {
 export default function BrowseCreators() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [creators, setCreators] = useState<Creator[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -123,11 +125,22 @@ export default function BrowseCreators() {
     <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">Discover Travel Creators</h1>
-          <p className="text-sm md:text-base text-muted-foreground">
-            Partner with influential travel creators to promote your brand
-          </p>
+        <div className="flex items-center gap-4 mb-6">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate(-1)}
+            className="shrink-0"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">Discover Travel Creators</h1>
+            <p className="text-sm md:text-base text-muted-foreground">
+              Partner with influential travel creators to promote your brand
+            </p>
+          </div>
         </div>
 
         {/* Search */}

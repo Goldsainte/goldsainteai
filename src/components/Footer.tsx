@@ -102,9 +102,9 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">Partners</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">Become a Travel Agent</Link></li>
-              <li><Link to="/browse-influencers" className="hover:text-primary transition-colors">Influencer Program</Link></li>
-              <li><Link to="/affiliate-manager" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
-              <li><Link to="/supplier-management" className="hover:text-primary transition-colors">List Your Property</Link></li>
+              <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Influencer Program</Link></li>
+              <li><Link to="/shop" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
+              <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">List Your Company</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">Partner Help Center</a></li>
             </ul>
           </div>
