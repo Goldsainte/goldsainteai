@@ -1,56 +1,45 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import TourFilters, { FilterState } from "@/components/TourFilters";
-import PackageFilters, { PackageFilterState, DURATION_FILTERS } from "@/components/PackageFilters";
-import { Sparkles, MapPin, Calendar, Users, DollarSign, TrendingUp, Search, ArrowLeft, Star, Clock, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
-
-interface TourActivity {
-  id: string;
-  name: string;
-  shortDescription?: string;
-  rating?: string;
-  pictures?: string[];
-  price: {
-    currencyCode: string;
-    amount: string;
-    baseAmount?: string;
-  };
-  geoCode?: {
-    latitude: number;
-    longitude: number;
-  };
-  minimumDuration?: string;
-}
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { PackageSearchHero } from "@/components/PackageSearchHero";
+import { DestinationCard } from "@/components/DestinationCard";
+import { CategoryPackageSection } from "@/components/CategoryPackageSection";
+import { PackageStatsBar } from "@/components/PackageStatsBar";
+import { EnhancedPackageCard } from "@/components/EnhancedPackageCard";
+import { PackageFilters, PackageFilterState } from "@/components/PackageFilters";
+import { Card } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AgentPackage {
   id: string;
+  agent_id: string;
   package_name: string;
-  description: string;
+  description?: string;
   destination: string;
   duration_days: number;
   retail_price: number;
-  wholesale_cost: number;
+  wholesale_cost?: number;
   currency: string;
-  agent_commission_percentage: number;
-  influencer_commission_percentage: number;
-  available_from: string;
-  available_until: string;
-  max_participants: number;
-  inclusions: any;
-  exclusions: any;
-  travel_agents: {
+  agent_commission_percentage?: number;
+  influencer_commission_percentage?: number;
+  available_from?: string;
+  available_until?: string;
+  max_participants?: number;
+  inclusions?: any;
+  exclusions?: any;
+  highlights?: any;
+  cover_image_url?: string;
+  trip_type?: string;
+  status: string;
+  is_active: boolean;
+  travel_agents?: {
     agency_name: string;
-    rating: number;
+    rating?: number;
+    total_reviews?: number;
+    user_id: string;
   };
 }
 
@@ -58,96 +47,41 @@ interface Promotion {
   id: string;
   package_id: string;
   status: string;
-  promo_code: string;
-  clicks: number;
-  conversions: number;
-  total_commission_earned: number;
+  promo_code?: string;
 }
 
 export default function CoCuratedJourneys() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<'tours' | 'cocurated'>('tours');
-  const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState("");
-  const [tours, setTours] = useState<TourActivity[]>([]);
+  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("destination") || "");
   const [packages, setPackages] = useState<AgentPackage[]>([]);
+  const [topDestinations, setTopDestinations] = useState<any[]>([]);
   const [myPromotions, setMyPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<FilterState>({
-    priceRange: [0, 1000],
-    categories: [],
+  const [stats, setStats] = useState({
+    totalPackages: 0,
+    totalDestinations: 0,
+    averageRating: 0,
   });
   
   const [packageFilters, setPackageFilters] = useState<PackageFilterState>({
     priceRange: [0, 10000],
     durationRanges: [],
     destinations: [],
+    tripTypes: [],
+    minRating: 0,
+    dateRange: {},
   });
 
   useEffect(() => {
     fetchPackages();
-    if (user) {
-      fetchMyPromotions();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    if (activeTab === 'tours' && location) {
-      fetchTours();
-    }
-  }, [activeTab, location, filters]);
-
-  const fetchTours = async () => {
-    if (!location) {
-      toast.error('Please enter a location to search for tours');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // For demo purposes, using Paris coordinates. In production, you'd geocode the location input
-      const defaultCoords = { lat: 48.8566, lng: 2.3522 }; // Paris
-
-      const { data, error } = await supabase.functions.invoke('amadeus-search-tours', {
-        body: {
-          latitude: defaultCoords.lat,
-          longitude: defaultCoords.lng,
-          radius: 10,
-          categories: filters.categories.length > 0 ? filters.categories : undefined,
-        }
-      });
-
-      if (error) throw error;
-
-      let filteredTours = data.data || [];
-
-      // Apply client-side filters
-      if (filters.priceRange) {
-        filteredTours = filteredTours.filter((tour: TourActivity) => {
-          const price = parseFloat(tour.price.amount);
-          return price >= filters.priceRange[0] && price <= filters.priceRange[1];
-        });
-      }
-
-      if (filters.minRating) {
-        filteredTours = filteredTours.filter((tour: TourActivity) => {
-          const rating = parseFloat(tour.rating || '0');
-          return rating >= filters.minRating!;
-        });
-      }
-
-      setTours(filteredTours);
-    } catch (error: any) {
-      console.error('Error fetching tours:', error);
-      toast.error('Failed to load tours');
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchTopDestinations();
+    fetchMyPromotions();
+    fetchStats();
+  }, []);
 
   const fetchPackages = async () => {
-    setLoading(true);
     try {
       const { data, error } = await supabase
         .from('agent_packages')
@@ -155,19 +89,86 @@ export default function CoCuratedJourneys() {
           *,
           travel_agents (
             agency_name,
-            rating
+            rating,
+            total_reviews,
+            user_id
           )
         `)
         .eq('is_active', true)
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       setPackages(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching packages:', error);
-      toast.error('Failed to load packages');
-    } finally {
-      setLoading(false);
+      toast.error("Failed to load packages");
+    }
+  };
+
+  const fetchTopDestinations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('agent_packages')
+        .select('destination, cover_image_url, retail_price')
+        .eq('is_active', true)
+        .eq('status', 'active');
+
+      if (error) throw error;
+
+      const destinationMap = new Map();
+      data?.forEach(pkg => {
+        const dest = pkg.destination;
+        if (!destinationMap.has(dest)) {
+          destinationMap.set(dest, {
+            destination: dest,
+            packageCount: 0,
+            startingPrice: pkg.retail_price,
+            imageUrl: pkg.cover_image_url,
+          });
+        }
+        const destData = destinationMap.get(dest);
+        destData.packageCount++;
+        destData.startingPrice = Math.min(destData.startingPrice, pkg.retail_price);
+      });
+
+      const destinations = Array.from(destinationMap.values())
+        .sort((a, b) => b.packageCount - a.packageCount)
+        .slice(0, 8);
+
+      setTopDestinations(destinations);
+    } catch (error) {
+      console.error('Error fetching destinations:', error);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const { data: packagesData, error: packagesError } = await supabase
+        .from('agent_packages')
+        .select('id, destination')
+        .eq('is_active', true)
+        .eq('status', 'active');
+
+      const { data: agentsData, error: agentsError } = await supabase
+        .from('travel_agents')
+        .select('rating')
+        .eq('is_active', true);
+
+      if (packagesError || agentsError) throw packagesError || agentsError;
+
+      const uniqueDestinations = new Set(packagesData?.map(p => p.destination) || []);
+      const avgRating = agentsData?.length 
+        ? agentsData.reduce((sum, a) => sum + (a.rating || 0), 0) / agentsData.length 
+        : 0;
+
+      setStats({
+        totalPackages: packagesData?.length || 0,
+        totalDestinations: uniqueDestinations.size,
+        averageRating: avgRating,
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
     }
   };
 
@@ -182,12 +183,12 @@ export default function CoCuratedJourneys() {
 
       if (error) throw error;
       setMyPromotions(data || []);
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error fetching promotions:', error);
     }
   };
 
-  const requestPromotion = async (packageId: string, packageName: string) => {
+  const requestPromotion = async (packageId: string) => {
     if (!user) {
       toast.error('Please sign in to request promotions');
       navigate('/auth');
@@ -217,344 +218,151 @@ export default function CoCuratedJourneys() {
   };
 
   const getPromotionStatus = (packageId: string) => {
-    return myPromotions.find(p => p.package_id === packageId);
+    return myPromotions.some(p => p.package_id === packageId && p.status === 'active');
   };
 
-  const calculatePotentialEarnings = (pkg: AgentPackage) => {
-    return (pkg.retail_price * (pkg.influencer_commission_percentage / 100)).toFixed(2);
-  };
-
-  // Get unique destinations for filter
   const uniqueDestinations = Array.from(new Set(packages.map(pkg => pkg.destination))).sort();
 
-  // Apply all filters to packages
   const filteredPackages = packages.filter(pkg => {
-    // Text search filter
-    const matchesSearch = 
+    const matchesSearch = searchQuery === "" || 
       pkg.package_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       pkg.destination.toLowerCase().includes(searchQuery.toLowerCase());
     
-    if (!matchesSearch) return false;
-
-    // Price filter
-    const matchesPrice = 
-      pkg.retail_price >= packageFilters.priceRange[0] && 
+    const matchesPrice = pkg.retail_price >= packageFilters.priceRange[0] && 
       pkg.retail_price <= packageFilters.priceRange[1];
     
-    if (!matchesPrice) return false;
-
-    // Duration filter
-    if (packageFilters.durationRanges.length > 0) {
-      const matchesDuration = packageFilters.durationRanges.some(rangeId => {
-        const range = DURATION_FILTERS.find(d => d.id === rangeId);
-        if (!range) return false;
-        return pkg.duration_days >= range.min && pkg.duration_days <= range.max;
+    const matchesDuration = packageFilters.durationRanges.length === 0 ||
+      packageFilters.durationRanges.some(rangeId => {
+        if (rangeId === '1-3') return pkg.duration_days >= 1 && pkg.duration_days <= 3;
+        if (rangeId === '4-7') return pkg.duration_days >= 4 && pkg.duration_days <= 7;
+        if (rangeId === '8-14') return pkg.duration_days >= 8 && pkg.duration_days <= 14;
+        if (rangeId === '15+') return pkg.duration_days >= 15;
+        return false;
       });
-      if (!matchesDuration) return false;
-    }
+    
+    const matchesDestination = packageFilters.destinations.length === 0 ||
+      packageFilters.destinations.includes(pkg.destination);
 
-    // Destination filter
-    if (packageFilters.destinations.length > 0) {
-      const matchesDestination = packageFilters.destinations.includes(pkg.destination);
-      if (!matchesDestination) return false;
-    }
+    const matchesTripType = packageFilters.tripTypes.length === 0 ||
+      (pkg.trip_type && packageFilters.tripTypes.includes(pkg.trip_type.toLowerCase()));
 
-    return true;
+    const matchesRating = packageFilters.minRating === 0 ||
+      (pkg.travel_agents?.rating && pkg.travel_agents.rating >= packageFilters.minRating);
+
+    return matchesSearch && matchesPrice && matchesDuration && matchesDestination && matchesTripType && matchesRating;
   });
 
+  const adventurePackages = packages.filter(p => p.trip_type?.toLowerCase().includes('adventure'));
+  const luxuryPackages = packages.filter(p => p.trip_type?.toLowerCase().includes('luxury'));
+  const familyPackages = packages.filter(p => p.trip_type?.toLowerCase().includes('family'));
+
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col">
       <Header />
-      
-      <main className="flex-1 container mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          
-          <div className="flex items-center gap-3 mb-3">
-            <Sparkles className="h-8 w-8 text-primary" />
-            <h1 className="text-4xl font-bold">CoCurated Journeys + Live Deals</h1>
-          </div>
-          <p className="text-lg text-muted-foreground">
-            Exclusive creator packages & real-time tour deals from around the world
-          </p>
-        </div>
+      <main className="flex-1">
+        <PackageSearchHero
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onSearch={() => {}}
+        />
 
-        {/* Tabs */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="space-y-6">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="tours" className="relative">
-              Tours & Activities
-              <Badge variant="secondary" className="ml-2 text-xs">
-                Live
-              </Badge>
-            </TabsTrigger>
-            <TabsTrigger value="cocurated" className="relative">
-              CoCurated Packages
-              <Badge variant="outline" className="ml-2 text-xs">
-                Exclusive
-              </Badge>
-            </TabsTrigger>
-          </TabsList>
+        <PackageStatsBar
+          totalPackages={stats.totalPackages}
+          totalDestinations={stats.totalDestinations}
+          averageRating={stats.averageRating}
+        />
 
-          {/* Tours Tab */}
-          <TabsContent value="tours" className="space-y-6">
-            {/* Search and Filters */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <div className="lg:col-span-1">
-                <TourFilters onFilterChange={setFilters} />
-              </div>
-
-              <div className="lg:col-span-3 space-y-6">
-                {/* Location Search */}
-                <div className="flex gap-2">
-                  <div className="relative flex-1">
-                    <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                    <Input
-                      placeholder="Enter destination (e.g., Paris, Tokyo, New York)"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="pl-10"
-                      onKeyDown={(e) => e.key === 'Enter' && fetchTours()}
-                    />
-                  </div>
-                  <Button onClick={fetchTours} disabled={loading}>
-                    {loading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Search className="h-4 w-4" />
-                    )}
-                  </Button>
-                </div>
-
-                {/* Tours Grid */}
-                {loading && tours.length === 0 ? (
-                  <div className="flex justify-center items-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
-                ) : tours.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {tours.map((tour) => (
-                      <Card key={tour.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                        {tour.pictures && tour.pictures[0] && (
-                          <div className="aspect-video overflow-hidden">
-                            <img 
-                              src={tour.pictures[0]} 
-                              alt={tour.name}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        <CardHeader>
-                          <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="text-lg line-clamp-2">{tour.name}</CardTitle>
-                            {tour.rating && (
-                              <Badge variant="secondary" className="shrink-0">
-                                <Star className="h-3 w-3 mr-1 fill-current" />
-                                {tour.rating}
-                              </Badge>
-                            )}
-                          </div>
-                          {tour.shortDescription && (
-                            <CardDescription className="line-clamp-2">
-                              {tour.shortDescription}
-                            </CardDescription>
-                          )}
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
-                            {tour.minimumDuration && (
-                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Clock className="h-4 w-4" />
-                                <span>{tour.minimumDuration.replace('PT', '').toLowerCase()}</span>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <div className="text-2xl font-bold">
-                                  {tour.price.currencyCode} {tour.price.amount}
-                                </div>
-                                {tour.price.baseAmount && (
-                                  <div className="text-xs text-muted-foreground line-through">
-                                    Was {tour.price.currencyCode} {tour.price.baseAmount}
-                                  </div>
-                                )}
-                              </div>
-                              <Badge className="bg-green-500">
-                                <TrendingUp className="h-3 w-3 mr-1" />
-                                Live Deal
-                              </Badge>
-                            </div>
-                            <Button 
-                              className="w-full"
-                              onClick={() => navigate(`/tour/${tour.id}`)}
-                            >
-                              View Details
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="p-12 text-center">
-                    <p className="text-muted-foreground mb-4">
-                      {location 
-                        ? "No tours found matching your criteria. Try adjusting filters or searching a different location."
-                        : "Enter a destination above to discover amazing tours and activities"
-                      }
-                    </p>
-                  </Card>
-                )}
+        <div className="container mx-auto px-4 py-12">
+          {topDestinations.length > 0 && (
+            <div className="mb-16">
+              <h2 className="text-3xl font-bold mb-6">Popular Destinations</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {topDestinations.map((dest, idx) => (
+                  <DestinationCard key={idx} {...dest} />
+                ))}
               </div>
             </div>
-          </TabsContent>
+          )}
 
-          {/* CoCurated Packages Tab */}
-          <TabsContent value="cocurated" className="space-y-6">
-            {/* Search and Filters Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-              <div className="lg:col-span-1">
-                <PackageFilters 
+          {adventurePackages.length > 0 && (
+            <CategoryPackageSection
+              title="Top Adventure Packages"
+              description="Thrilling experiences for the adventurous soul"
+              packages={adventurePackages}
+              myPromotions={myPromotions}
+              onRequestPromotion={requestPromotion}
+            />
+          )}
+
+          {luxuryPackages.length > 0 && (
+            <CategoryPackageSection
+              title="Luxury Escapes"
+              description="Premium experiences for discerning travelers"
+              packages={luxuryPackages}
+              myPromotions={myPromotions}
+              onRequestPromotion={requestPromotion}
+            />
+          )}
+
+          {familyPackages.length > 0 && (
+            <CategoryPackageSection
+              title="Family Vacations"
+              description="Perfect getaways for the whole family"
+              packages={familyPackages}
+              myPromotions={myPromotions}
+              onRequestPromotion={requestPromotion}
+            />
+          )}
+
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold mb-6">All Travel Packages</h2>
+            <div className="flex gap-6">
+              <div className="w-80 flex-shrink-0">
+                <PackageFilters
                   onFilterChange={setPackageFilters}
                   availableDestinations={uniqueDestinations}
                 />
               </div>
 
-              <div className="lg:col-span-3 space-y-6">
-                {/* Search */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                  <Input
-                    placeholder="Search packages by name or destination..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-
-                {/* Packages Grid */}
+              <div className="flex-1">
                 {loading ? (
-                  <div className="flex justify-center items-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                  </div>
+                  <div className="text-center py-12">Loading packages...</div>
                 ) : filteredPackages.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {filteredPackages.map((pkg) => {
-                      const promotion = getPromotionStatus(pkg.id);
-                      const potentialEarnings = calculatePotentialEarnings(pkg);
-
-                      return (
-                        <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                            <div className="flex items-start justify-between">
-                              <CardTitle className="text-xl line-clamp-2">{pkg.package_name}</CardTitle>
-                              <Badge variant="outline">
-                                <Sparkles className="h-3 w-3 mr-1" />
-                                Exclusive
-                              </Badge>
-                            </div>
-                            <CardDescription className="line-clamp-2">
-                              {pkg.description}
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="space-y-4">
-                            <div className="space-y-2 text-sm">
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <MapPin className="h-4 w-4" />
-                                <span>{pkg.destination}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <Calendar className="h-4 w-4" />
-                                <span>{pkg.duration_days} days</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-muted-foreground">
-                                <Users className="h-4 w-4" />
-                                <span>Max {pkg.max_participants} participants</span>
-                              </div>
-                            </div>
-
-                            <div className="pt-4 border-t">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-muted-foreground">Price</span>
-                                <span className="text-2xl font-bold">
-                                  {pkg.currency} {pkg.retail_price}
-                                </span>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm text-green-600">
-                                <DollarSign className="h-4 w-4" />
-                                <span>Earn {pkg.currency} {potentialEarnings} per booking</span>
-                              </div>
-                            </div>
-
-                            {promotion ? (
-                              promotion.status === 'active' ? (
-                                <div className="space-y-2">
-                                  <Badge className="w-full justify-center py-2" variant="secondary">
-                                    ✓ Promoting
-                                  </Badge>
-                                  <p className="text-xs text-center text-muted-foreground">
-                                    Code: {promotion.promo_code}
-                                  </p>
-                                </div>
-                              ) : (
-                                <Badge className="w-full justify-center py-2" variant="outline">
-                                  {promotion.status}
-                                </Badge>
-                              )
-                            ) : (
-                              <Button
-                                className="w-full"
-                                onClick={() => requestPromotion(pkg.id, pkg.package_name)}
-                              >
-                                Request to Promote
-                              </Button>
-                            )}
-
-                            <Button
-                              variant="outline"
-                              className="w-full"
-                              onClick={() => navigate(`/cocurated-package/${pkg.id}`)}
-                            >
-                              View Details
-                            </Button>
-                          </CardContent>
-                        </Card>
-                      );
-                    })}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredPackages.map((pkg) => (
+                      <EnhancedPackageCard
+                        key={pkg.id}
+                        id={pkg.id}
+                        packageName={pkg.package_name}
+                        destination={pkg.destination}
+                        coverImage={pkg.cover_image_url}
+                        durationDays={pkg.duration_days}
+                        retailPrice={pkg.retail_price}
+                        currency={pkg.currency}
+                        agencyName={pkg.travel_agents?.agency_name}
+                        rating={pkg.travel_agents?.rating}
+                        totalReviews={pkg.travel_agents?.total_reviews}
+                        maxParticipants={pkg.max_participants}
+                        highlights={Array.isArray(pkg.highlights) ? pkg.highlights : []}
+                        influencerCommission={pkg.influencer_commission_percentage}
+                        onViewDetails={() => navigate(`/cocurated-package/${pkg.id}`)}
+                        onRequestPromotion={() => requestPromotion(pkg.id)}
+                        isPromoting={getPromotionStatus(pkg.id)}
+                      />
+                    ))}
                   </div>
                 ) : (
                   <Card className="p-12 text-center">
-                    <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-xl font-semibold mb-2">
-                      {packages.length > 0 ? "No packages match your filters" : "No CoCurated packages available yet"}
-                    </h3>
-                    <p className="text-muted-foreground mb-6">
-                      {packages.length > 0 
-                        ? "Try adjusting your filters to see more packages"
-                        : "Be the first to create a curated travel experience!"
-                      }
+                    <p className="text-muted-foreground">
+                      No packages match your criteria. Try adjusting your filters.
                     </p>
-                    {packages.length === 0 && (
-                      <Button onClick={() => navigate('/agent-onboarding')}>
-                        Become an Agent
-                      </Button>
-                    )}
                   </Card>
                 )}
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       </main>
-
       <Footer />
     </div>
   );
