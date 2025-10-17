@@ -74,6 +74,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">Discover</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
+              <li><Link to="/what-we-do" className="hover:text-primary transition-colors">Our Services</Link></li>
               <li><Link to="/loyalty-rewards" className="hover:text-primary transition-colors">Loyalty Program</Link></li>
               <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
               <li><Link to="/travel-feed" className="hover:text-primary transition-colors">Travel Articles & Videos</Link></li>
@@ -114,6 +115,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">About</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
+              <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Sustainability</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>

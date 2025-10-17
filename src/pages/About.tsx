@@ -459,6 +459,71 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
+    {/* What We Do */}
+    <AccordionItem value="what-we-do" className="border-0 rounded-lg px-6 bg-card shadow-sm">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+        What We Do
+      </AccordionTrigger>
+      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+          <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            View the full, detailed information about all Goldsainte services including accommodations, attractions, flights, car rentals, and transportation.
+          </p>
+          <Link 
+            to="/what-we-do" 
+            className="inline-flex items-center text-primary hover:underline font-medium"
+          >
+            View Full Service Details →
+          </Link>
+        </div>
+        
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold">Our Services Overview</h3>
+          
+          <div>
+            <h4 className="font-semibold mb-2">How Our Platform Works</h4>
+            <p>Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">1. Accommodations</h4>
+            <p>Search, compare, and book hotels and properties worldwide. Our platform displays real-time availability, pricing, and reviews from verified guests. Service Providers set their own rates and policies.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">2. Attractions</h4>
+            <p>Discover and book tours, activities, and attractions at your destination. We work with Service Providers and Third-Party Aggregators to offer a wide selection of experiences with transparent pricing.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">3. Car Rentals</h4>
+            <p>Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">4. Flights</h4>
+            <p>Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">5. Private and Public Transportation</h4>
+            <p>Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">How We Make Money</h4>
+            <p>Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
+          </div>
+
+          <div>
+            <h4 className="font-semibold mb-2">AI-Powered Recommendations</h4>
+            <p>Our recommendation systems use your search criteria, past interactions, and property performance metrics to suggest travel options you'll love. You can adjust sorting preferences and disable personalization in your account settings.</p>
+          </div>
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+
     </Accordion>
     </div>
   );
