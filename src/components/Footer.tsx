@@ -129,7 +129,7 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">Privacy & Cookies</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">Dispute Resolution</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Modern Slavery Statement</a></li>
             </ul>
