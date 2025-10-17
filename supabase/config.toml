@@ -234,4 +234,7 @@ verify_jwt = true
 [functions.start-transport-vendor-onboarding]
 verify_jwt = true
 
+[functions.amadeus-search-tours]
+verify_jwt = false
+
 

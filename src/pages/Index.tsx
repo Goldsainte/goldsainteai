@@ -1015,7 +1015,7 @@ const Index = () => {
                           <Button 
                             variant="outline" 
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
-                            onClick={() => navigate('/cocurated-marketplace')}
+                            onClick={() => navigate('/cocurated-journeys')}
                           >
                             Browse Packages
                           </Button>

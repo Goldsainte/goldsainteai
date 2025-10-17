@@ -66,6 +66,8 @@ import CoCuratedCreate from "./pages/CoCuratedCreate";
 import CoCuratedMarketplace from "./pages/CoCuratedMarketplace";
 import CoCuratedPackage from "./pages/CoCuratedPackage";
 import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
+import CoCuratedJourneys from "./pages/CoCuratedJourneys";
+import TourActivityDetail from "./pages/TourActivityDetail";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import AdminSeed from "./pages/AdminSeed";
@@ -221,8 +223,10 @@ function AppContent() {
           <Route path="/cocurated-dashboard" element={<CoCuratedDashboard />} />
           <Route path="/cocurated-create" element={<CoCuratedCreate />} />
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
-            <Route path="/cocurated-package/:packageId" element={<CoCuratedPackage />} />
-            <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
+          <Route path="/cocurated-journeys" element={<CoCuratedJourneys />} />
+          <Route path="/tour/:tourId" element={<TourActivityDetail />} />
+          <Route path="/cocurated-package/:packageId" element={<CoCuratedPackage />} />
+          <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
             <Route path="/browse-influencers" element={<BrowseInfluencers />} />
             <Route path="/instagram-api" element={<InstagramAPI />} />
             <Route path="/your-activity" element={<YourActivity />} />
