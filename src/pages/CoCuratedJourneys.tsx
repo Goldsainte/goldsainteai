@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TourFilters, { FilterState } from "@/components/TourFilters";
+import PackageFilters, { PackageFilterState, DURATION_FILTERS } from "@/components/PackageFilters";
 import { Sparkles, MapPin, Calendar, Users, DollarSign, TrendingUp, Search, ArrowLeft, Star, Clock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -76,6 +77,12 @@ export default function CoCuratedJourneys() {
   const [filters, setFilters] = useState<FilterState>({
     priceRange: [0, 1000],
     categories: [],
+  });
+  
+  const [packageFilters, setPackageFilters] = useState<PackageFilterState>({
+    priceRange: [0, 10000],
+    durationRanges: [],
+    destinations: [],
   });
 
   useEffect(() => {
@@ -217,10 +224,43 @@ export default function CoCuratedJourneys() {
     return (pkg.retail_price * (pkg.influencer_commission_percentage / 100)).toFixed(2);
   };
 
-  const filteredPackages = packages.filter(pkg =>
-    pkg.package_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    pkg.destination.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Get unique destinations for filter
+  const uniqueDestinations = Array.from(new Set(packages.map(pkg => pkg.destination))).sort();
+
+  // Apply all filters to packages
+  const filteredPackages = packages.filter(pkg => {
+    // Text search filter
+    const matchesSearch = 
+      pkg.package_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pkg.destination.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (!matchesSearch) return false;
+
+    // Price filter
+    const matchesPrice = 
+      pkg.retail_price >= packageFilters.priceRange[0] && 
+      pkg.retail_price <= packageFilters.priceRange[1];
+    
+    if (!matchesPrice) return false;
+
+    // Duration filter
+    if (packageFilters.durationRanges.length > 0) {
+      const matchesDuration = packageFilters.durationRanges.some(rangeId => {
+        const range = DURATION_FILTERS.find(d => d.id === rangeId);
+        if (!range) return false;
+        return pkg.duration_days >= range.min && pkg.duration_days <= range.max;
+      });
+      if (!matchesDuration) return false;
+    }
+
+    // Destination filter
+    if (packageFilters.destinations.length > 0) {
+      const matchesDestination = packageFilters.destinations.includes(pkg.destination);
+      if (!matchesDestination) return false;
+    }
+
+    return true;
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -379,119 +419,138 @@ export default function CoCuratedJourneys() {
 
           {/* CoCurated Packages Tab */}
           <TabsContent value="cocurated" className="space-y-6">
-            {/* Search */}
-            <div className="relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input
-                placeholder="Search packages by name or destination..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Packages Grid */}
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            {/* Search and Filters Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div className="lg:col-span-1">
+                <PackageFilters 
+                  onFilterChange={setPackageFilters}
+                  availableDestinations={uniqueDestinations}
+                />
               </div>
-            ) : filteredPackages.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredPackages.map((pkg) => {
-                  const promotion = getPromotionStatus(pkg.id);
-                  const potentialEarnings = calculatePotentialEarnings(pkg);
 
-                  return (
-                    <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
-                          <CardTitle className="text-xl line-clamp-2">{pkg.package_name}</CardTitle>
-                          <Badge variant="outline">
-                            <Sparkles className="h-3 w-3 mr-1" />
-                            Exclusive
-                          </Badge>
-                        </div>
-                        <CardDescription className="line-clamp-2">
-                          {pkg.description}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin className="h-4 w-4" />
-                            <span>{pkg.destination}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Calendar className="h-4 w-4" />
-                            <span>{pkg.duration_days} days</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-muted-foreground">
-                            <Users className="h-4 w-4" />
-                            <span>Max {pkg.max_participants} participants</span>
-                          </div>
-                        </div>
+              <div className="lg:col-span-3 space-y-6">
+                {/* Search */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                  <Input
+                    placeholder="Search packages by name or destination..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
 
-                        <div className="pt-4 border-t">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm text-muted-foreground">Price</span>
-                            <span className="text-2xl font-bold">
-                              {pkg.currency} {pkg.retail_price}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-green-600">
-                            <DollarSign className="h-4 w-4" />
-                            <span>Earn {pkg.currency} {potentialEarnings} per booking</span>
-                          </div>
-                        </div>
+                {/* Packages Grid */}
+                {loading ? (
+                  <div className="flex justify-center items-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : filteredPackages.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {filteredPackages.map((pkg) => {
+                      const promotion = getPromotionStatus(pkg.id);
+                      const potentialEarnings = calculatePotentialEarnings(pkg);
 
-                        {promotion ? (
-                          promotion.status === 'active' ? (
-                            <div className="space-y-2">
-                              <Badge className="w-full justify-center py-2" variant="secondary">
-                                ✓ Promoting
+                      return (
+                        <Card key={pkg.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                            <div className="flex items-start justify-between">
+                              <CardTitle className="text-xl line-clamp-2">{pkg.package_name}</CardTitle>
+                              <Badge variant="outline">
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                Exclusive
                               </Badge>
-                              <p className="text-xs text-center text-muted-foreground">
-                                Code: {promotion.promo_code}
-                              </p>
                             </div>
-                          ) : (
-                            <Badge className="w-full justify-center py-2" variant="outline">
-                              {promotion.status}
-                            </Badge>
-                          )
-                        ) : (
-                          <Button
-                            className="w-full"
-                            onClick={() => requestPromotion(pkg.id, pkg.package_name)}
-                          >
-                            Request to Promote
-                          </Button>
-                        )}
+                            <CardDescription className="line-clamp-2">
+                              {pkg.description}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div className="space-y-2 text-sm">
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <MapPin className="h-4 w-4" />
+                                <span>{pkg.destination}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Calendar className="h-4 w-4" />
+                                <span>{pkg.duration_days} days</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Users className="h-4 w-4" />
+                                <span>Max {pkg.max_participants} participants</span>
+                              </div>
+                            </div>
 
-                        <Button
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => navigate(`/cocurated-package/${pkg.id}`)}
-                        >
-                          View Details
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+                            <div className="pt-4 border-t">
+                              <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm text-muted-foreground">Price</span>
+                                <span className="text-2xl font-bold">
+                                  {pkg.currency} {pkg.retail_price}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-green-600">
+                                <DollarSign className="h-4 w-4" />
+                                <span>Earn {pkg.currency} {potentialEarnings} per booking</span>
+                              </div>
+                            </div>
+
+                            {promotion ? (
+                              promotion.status === 'active' ? (
+                                <div className="space-y-2">
+                                  <Badge className="w-full justify-center py-2" variant="secondary">
+                                    ✓ Promoting
+                                  </Badge>
+                                  <p className="text-xs text-center text-muted-foreground">
+                                    Code: {promotion.promo_code}
+                                  </p>
+                                </div>
+                              ) : (
+                                <Badge className="w-full justify-center py-2" variant="outline">
+                                  {promotion.status}
+                                </Badge>
+                              )
+                            ) : (
+                              <Button
+                                className="w-full"
+                                onClick={() => requestPromotion(pkg.id, pkg.package_name)}
+                              >
+                                Request to Promote
+                              </Button>
+                            )}
+
+                            <Button
+                              variant="outline"
+                              className="w-full"
+                              onClick={() => navigate(`/cocurated-package/${pkg.id}`)}
+                            >
+                              View Details
+                            </Button>
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <Card className="p-12 text-center">
+                    <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                    <h3 className="text-xl font-semibold mb-2">
+                      {packages.length > 0 ? "No packages match your filters" : "No CoCurated packages available yet"}
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      {packages.length > 0 
+                        ? "Try adjusting your filters to see more packages"
+                        : "Be the first to create a curated travel experience!"
+                      }
+                    </p>
+                    {packages.length === 0 && (
+                      <Button onClick={() => navigate('/agent-onboarding')}>
+                        Become an Agent
+                      </Button>
+                    )}
+                  </Card>
+                )}
               </div>
-            ) : (
-              <Card className="p-12 text-center">
-                <Sparkles className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-xl font-semibold mb-2">No CoCurated packages available yet</h3>
-                <p className="text-muted-foreground mb-6">
-                  Be the first to create a curated travel experience!
-                </p>
-                <Button onClick={() => navigate('/agent-onboarding')}>
-                  Become an Agent
-                </Button>
-              </Card>
-            )}
+            </div>
           </TabsContent>
         </Tabs>
       </main>
