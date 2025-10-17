@@ -187,7 +187,7 @@ const About = () => {
           <AccordionContent className="pt-6 space-y-8">
             {featureCategories.map((category, idx) => (
               <div key={category.category}>
-                <h3 className="text-lg font-semibold mb-4 text-foreground">{category.category}</h3>
+                <h3 className="text-base font-semibold mb-4 text-foreground">{category.category}</h3>
                 <div className="grid gap-4">
                   {category.features.map((feature) => (
                     <div 
@@ -199,7 +199,7 @@ const About = () => {
                       </div>
                       <div>
                         <h4 className="font-semibold text-base mb-1 text-foreground">{feature.title}</h4>
-                        <p className="text-sm text-muted-foreground">{feature.description}</p>
+                        <p className="text-base text-muted-foreground">{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -256,7 +256,7 @@ const About = () => {
                 </div>
               ))}
             </div>
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-base text-muted-foreground text-center">
               Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences and seamless marketplace integrations.
             </p>
           </AccordionContent>
@@ -287,7 +287,7 @@ const About = () => {
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
             <div>
-              <h3 className="font-semibold text-lg mb-3 text-foreground">Accessibility Statement for Goldsainte</h3>
+              <h3 className="font-semibold text-base mb-3 text-foreground">Accessibility Statement for Goldsainte</h3>
               <p className="text-foreground">
                 At Goldsainte, our mission is to make it easier for everyone to experience the world. We are committed to delivering barrier-free, inclusive experiences for all our users, and this involves making our digital services accessible to everyone, including persons with disabilities.
               </p>
@@ -298,7 +298,7 @@ const About = () => {
             </p>
 
             <div>
-              <h3 className="font-semibold text-lg mb-3 text-foreground">Description of the services and measures to support accessibility</h3>
+              <h3 className="font-semibold text-base mb-3 text-foreground">Description of the services and measures to support accessibility</h3>
               <p className="text-foreground mb-4">
                 Goldsainte provides users with the capabilities to discover, search, book, and manage travel-related products or services ("Travel Experiences") across accommodations, car rental, flights, taxis, and attractions. Our services are intended to be accessible across desktop and mobile websites, as well as applications ("Platforms"), allowing users to book Travel Experiences, and which support a broad range of user needs.
               </p>
@@ -407,7 +407,7 @@ const About = () => {
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Terms Available</p>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-base text-muted-foreground mb-3">
             View the full, detailed Terms of Service document including all sections, subsections, and the Goldsainte Dictionary.
           </p>
           <Link 
@@ -418,10 +418,10 @@ const About = () => {
           </Link>
         </div>
         
-        <p className="text-sm text-muted-foreground">Updated October 17, 2025</p>
+        <p className="text-base text-muted-foreground">Updated October 17, 2025</p>
         
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">A: General Terms</h3>
+          <h3 className="text-base font-semibold">A: General Terms</h3>
           
           <div>
             <h4 className="font-semibold mb-2">A1-A3: Introduction</h4>
@@ -447,7 +447,7 @@ const About = () => {
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">B-E: Service-Specific Terms</h3>
+          <h3 className="text-base font-semibold">B-E: Service-Specific Terms</h3>
           
           <div>
             <h4 className="font-semibold mb-2">B: Accommodations</h4>
@@ -593,7 +593,7 @@ const About = () => {
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-base text-muted-foreground mb-3">
             View the full, detailed information about all Goldsainte services including accommodations, attractions, flights, car rentals, and transportation.
           </p>
           <Link 
@@ -605,7 +605,7 @@ const About = () => {
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Our Services Overview</h3>
+          <h3 className="text-base font-semibold">Our Services Overview</h3>
           
           <div>
             <h4 className="font-semibold mb-2">How Our Platform Works</h4>
@@ -656,12 +656,12 @@ const About = () => {
         Modern Slavery Statement
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-base text-muted-foreground">
           Fiscal Year Ending December 31, 2025
         </p>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">1. Introduction</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">1. Introduction</h3>
           <p className="text-foreground">
             Goldsainte recognizes that modern slavery in all its forms—including slavery, human trafficking, forced labor, debt bondage, descent-based slavery, servitude, child slavery, and forced or early marriage—is a serious global issue. We are committed to respecting the human rights of all our stakeholders and to taking proactive measures to prevent our business and supply chains from contributing to such practices.
           </p>
@@ -671,14 +671,14 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">2. About Goldsainte</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">2. About Goldsainte</h3>
           <p className="text-foreground">
             Goldsainte is a travel and experiences platform that connects users with accommodations, attractions, flights, car rentals, and other travel services worldwide. While our operations are primarily digital, we engage with a wide range of suppliers, service providers, and contractors. We recognize that certain areas of our supply chain may be at higher risk of modern slavery and remain committed to mitigating these risks wherever they exist.
           </p>
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">3. Our Policies and Commitments</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">3. Our Policies and Commitments</h3>
           <p className="text-foreground mb-3">
             Goldsainte has implemented policies and procedures to address modern slavery risks, including:
           </p>
@@ -696,7 +696,7 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">4. Risk Assessment and Due Diligence</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">4. Risk Assessment and Due Diligence</h3>
           <p className="text-foreground mb-3">
             Goldsainte regularly evaluates potential modern slavery risks in our operations and supply chain. We prioritize:
           </p>
@@ -711,21 +711,21 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">5. Training and Awareness</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">5. Training and Awareness</h3>
           <p className="text-foreground">
             We provide training and awareness programs for our employees, procurement teams, and key suppliers. These programs focus on recognizing modern slavery risks, understanding reporting mechanisms, and ensuring compliance with Goldsainte's policies.
           </p>
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">6. Reporting and Accountability</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">6. Reporting and Accountability</h3>
           <p className="text-foreground">
             Goldsainte maintains a transparent reporting framework. Any suspected incidents of modern slavery are investigated promptly. We are committed to continuous improvement and regularly review our policies and procedures to strengthen our efforts to prevent modern slavery.
           </p>
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">7. Future Commitments</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">7. Future Commitments</h3>
           <p className="text-foreground mb-3">
             Goldsainte will continue to:
           </p>
@@ -737,7 +737,7 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="font-semibold text-lg mb-3 text-foreground">8. Approval</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">8. Approval</h3>
           <p className="text-foreground mb-3">
             This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
           </p>
@@ -755,7 +755,7 @@ const About = () => {
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
         <div>
-          <h3 className="text-lg font-semibold mb-3">1. Introduction</h3>
+          <h3 className="text-base font-semibold mb-3">1. Introduction</h3>
           <p className="text-foreground">
             Goldsainte is committed to respecting and promoting human rights wherever we operate. We believe that travel can bring out the best in humanity, and our mission is to ensure that our business activities and partnerships support this principle.
           </p>
@@ -765,7 +765,7 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">2. Our Commitment</h3>
+          <h3 className="text-base font-semibold mb-3">2. Our Commitment</h3>
           <p className="text-foreground mb-3">Goldsainte is committed to:</p>
           <ul className="list-disc pl-6 space-y-2 text-foreground">
             <li>Respecting the rights and dignity of all individuals, including employees, contractors, suppliers, and travelers.</li>
@@ -775,14 +775,14 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">3. Scope</h3>
+          <h3 className="text-base font-semibold mb-3">3. Scope</h3>
           <p className="text-foreground">
             This statement applies to all Goldsainte employees, contractors, suppliers, partners, and service providers. We also expect our business partners and supply chain participants to uphold the same human rights principles and standards.
           </p>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">4. Human Rights Principles</h3>
+          <h3 className="text-base font-semibold mb-3">4. Human Rights Principles</h3>
           <p className="text-foreground mb-3">Goldsainte recognizes the following key principles as fundamental to our human rights approach:</p>
           <ul className="list-disc pl-6 space-y-2 text-foreground">
             <li><strong>Non-discrimination:</strong> We do not tolerate discrimination based on race, ethnicity, gender, sexual orientation, religion, disability, or any other characteristic.</li>
@@ -795,7 +795,7 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">5. Due Diligence and Risk Management</h3>
+          <h3 className="text-base font-semibold mb-3">5. Due Diligence and Risk Management</h3>
           <p className="text-foreground mb-3">Goldsainte actively assesses human rights risks in our operations and supply chains. Key measures include:</p>
           <ul className="list-disc pl-6 space-y-2 text-foreground">
             <li>Conducting supplier due diligence and audits.</li>
@@ -805,28 +805,28 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">6. Training and Awareness</h3>
+          <h3 className="text-base font-semibold mb-3">6. Training and Awareness</h3>
           <p className="text-foreground">
             We provide training and resources for employees, contractors, and partners to ensure awareness of human rights risks and responsibilities. This includes guidance on how to identify and respond to potential human rights violations.
           </p>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">7. Reporting and Accountability</h3>
+          <h3 className="text-base font-semibold mb-3">7. Reporting and Accountability</h3>
           <p className="text-foreground">
             Goldsainte encourages employees, partners, and stakeholders to raise concerns or report potential human rights issues through our whistleblower channels or direct contact with our compliance team. All reports are investigated promptly and confidentially.
           </p>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">8. Continuous Improvement</h3>
+          <h3 className="text-base font-semibold mb-3">8. Continuous Improvement</h3>
           <p className="text-foreground">
             We are committed to continually improving our human rights practices. We regularly review policies, procedures, and business operations to strengthen our human rights performance and align with evolving international standards.
           </p>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold mb-3">9. Approval</h3>
+          <h3 className="text-base font-semibold mb-3">9. Approval</h3>
           <p className="text-foreground mb-4">
             This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
           </p>
