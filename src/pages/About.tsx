@@ -8,6 +8,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import founderImage from "@/assets/founder.jpg";
+import amadeusLogo from "@/assets/Amadeus_CRS_Logo.svg";
+import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
+import openaiLogo from "@/assets/OpenAI_Logo.svg";
+import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
+import shopifyLogo from "@/assets/shopify-logo.svg";
+import etsyLogo from "@/assets/etsy-logo.svg";
 import { 
   Mic, Sparkles, Share2, Briefcase, Package, BarChart3, 
   DollarSign, Users, FileCheck, MessageCircle, 
@@ -15,10 +21,12 @@ import {
 
 const About = () => {
   const partners = [
-    { name: "Amadeus", color: "from-blue-600 to-blue-400" },
-    { name: "Ticketmaster", color: "from-blue-500 to-cyan-400" },
-    { name: "OpenAI", color: "from-emerald-600 to-teal-400" },
-    { name: "Google Gemini", color: "from-purple-600 to-pink-400" }
+    { name: "Amadeus", logo: amadeusLogo },
+    { name: "Ticketmaster", logo: ticketmasterLogo },
+    { name: "OpenAI", logo: openaiLogo },
+    { name: "Google Gemini", logo: geminiLogo },
+    { name: "Shopify", logo: shopifyLogo },
+    { name: "Etsy", logo: etsyLogo }
   ];
 
   const featureCategories = [
@@ -227,20 +235,22 @@ const About = () => {
             Our Partners & Technology
           </AccordionTrigger>
           <AccordionContent className="pt-6">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-6">
               {partners.map((partner) => (
                 <div 
                   key={partner.name}
                   className="flex items-center justify-center p-6 rounded-lg border border-border/50 bg-card/50 hover:border-primary/30 hover:shadow-lg transition-all"
                 >
-                  <span className={`text-lg font-bold bg-gradient-to-r ${partner.color} bg-clip-text text-transparent`}>
-                    {partner.name}
-                  </span>
+                  <img 
+                    src={partner.logo} 
+                    alt={`${partner.name} logo`}
+                    className="w-full h-auto max-h-12 object-contain filter dark:invert"
+                  />
                 </div>
               ))}
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, and Google Gemini to bring you curated and real-time travel experiences.
+              Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences.
             </p>
           </AccordionContent>
         </AccordionItem>
