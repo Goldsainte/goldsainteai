@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -267,6 +267,22 @@ export const Header = () => {
                           <span className="text-sm font-medium">Affiliate Links</span>
                         </DropdownMenuItem>
                       </div>
+                      
+                      <DropdownMenuSeparator className="bg-border/50" />
+                      
+                      {/* Company Section */}
+                      <div className="px-4 py-3 border-b border-border/50">
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Company</p>
+                      </div>
+                      <div className="py-2">
+                        <DropdownMenuItem 
+                          onClick={() => navigate('/about')} 
+                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                        >
+                          <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">About</span>
+                        </DropdownMenuItem>
+                      </div>
                     </DropdownMenuContent>
                   </DropdownMenu>
                   
@@ -532,6 +548,22 @@ export const Header = () => {
                       >
                         <Link2 className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Affiliate Links</span>
+                      </DropdownMenuItem>
+                    </div>
+                    
+                    <DropdownMenuSeparator className="bg-border/50" />
+                    
+                    {/* Company Section */}
+                    <div className="px-4 py-3 border-b border-border/50">
+                      <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Company</p>
+                    </div>
+                    <div className="py-2 pb-3">
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/about')} 
+                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                      >
+                        <Info className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">About</span>
                       </DropdownMenuItem>
                     </div>
                   </DropdownMenuContent>
