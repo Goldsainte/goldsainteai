@@ -131,7 +131,6 @@ const WhatWeDo = () => {
           <ul className="list-disc pl-6 space-y-2">
             <li>Homes & apartments first</li>
             <li>Price (lowest first)</li>
-            <li>Genius discount first</li>
             <li>Property rating (high to low or low to high)</li>
             <li>Top-reviewed or closest distance</li>
           </ul>
@@ -534,7 +533,7 @@ const WhatWeDo = () => {
               <p className="leading-relaxed font-semibold mt-4">Sorting options:</p>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Recommended: Default, based on multiple weighted factors</li>
-                <li>Price, distance, rating, or Genius program</li>
+                <li>Price, distance, or rating</li>
               </ul>
               
               <p className="leading-relaxed mt-2">Filters allow further refinement</p>
