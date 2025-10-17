@@ -31,7 +31,7 @@ export const PackageSearchHero = ({
   return (
     <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
       {/* Background with gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary-foreground/90 z-0" />
+      <div className="absolute inset-0 bg-black/60 z-0" />
       <div 
         className="absolute inset-0 bg-cover bg-center z-0 opacity-30"
         style={{
@@ -161,7 +161,7 @@ export const PackageSearchHero = ({
           {["Adventure", "Luxury", "Family-Friendly", "Budget", "Romantic"].map((tag) => (
             <button
               key={tag}
-              className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-full text-sm font-medium transition-colors backdrop-blur-sm"
+              className="px-4 py-2 bg-white/20 hover:bg-[#bfad72] hover:text-white text-white rounded-full text-sm font-medium transition-colors backdrop-blur-sm"
             >
               {tag}
             </button>
