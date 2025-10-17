@@ -26,7 +26,7 @@ const PrivacyCookies = () => {
       {/* Hero Section */}
       <section className="relative py-20 px-4 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-6">
             Privacy and Cookies Policy
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -62,7 +62,7 @@ const PrivacyCookies = () => {
           <div id="introduction" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-3xl">1. Introduction</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl">1. Introduction</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base">
@@ -79,7 +79,7 @@ const PrivacyCookies = () => {
           <div id="privacy-policy" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-3xl">2. Our Privacy Policy</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl">2. Our Privacy Policy</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <p className="text-base">
@@ -167,7 +167,7 @@ const PrivacyCookies = () => {
           <div id="cookies" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-3xl">3. Cookies and Similar Technologies</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl">3. Cookies and Similar Technologies</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <p className="text-base">
@@ -237,7 +237,7 @@ const PrivacyCookies = () => {
           <div id="updates" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-3xl">4. Updates to This Statement</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl">4. Updates to This Statement</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base">
@@ -254,7 +254,7 @@ const PrivacyCookies = () => {
           <div id="contact" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-3xl">5. Contact Us</CardTitle>
+                <CardTitle className="text-2xl sm:text-3xl">5. Contact Us</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base">
