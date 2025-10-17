@@ -15,6 +15,7 @@ import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
 import shopifyLogo from "@/assets/shopify-logo.svg";
 import etsyLogo from "@/assets/etsy-logo.svg";
 import goldsainteLogo from "@/assets/wordmark-green.svg";
+import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 import { 
   Mic, Sparkles, Share2, Briefcase, Package, BarChart3, 
   DollarSign, Users, FileCheck, MessageCircle, 
@@ -173,6 +174,13 @@ const About = () => {
             What is Goldsainte?
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
+            <div className="flex justify-center mb-6">
+              <img 
+                src={primaryLogoGreen} 
+                alt="Goldsainte" 
+                className="h-5 sm:h-7 w-auto"
+              />
+            </div>
             <p className="text-foreground">
               Goldsainte AI is a voice-activated, AI-powered travel marketplace that merges automation with verified human expertise to deliver fully personalized, end-to-end trip planning and booking. With the wake word "Hey, Goldsainte," users can engage a conversational concierge to search, plan, and book flights, hotels, dining, events, and transportation—completely hands-free and in real-time.
             </p>
@@ -191,6 +199,13 @@ const About = () => {
             What We Offer
           </AccordionTrigger>
           <AccordionContent className="pt-6 space-y-8">
+            <div className="flex justify-center mb-6">
+              <img 
+                src={primaryLogoGreen} 
+                alt="Goldsainte" 
+                className="h-5 sm:h-7 w-auto"
+              />
+            </div>
             {featureCategories.map((category, idx) => (
               <div key={category.category}>
                 <h3 className="text-base font-semibold mb-4 text-foreground">{category.category}</h3>
@@ -224,6 +239,13 @@ const About = () => {
             Our Mission
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
+            <div className="flex justify-center mb-6">
+              <img 
+                src={primaryLogoGreen} 
+                alt="Goldsainte" 
+                className="h-5 sm:h-7 w-auto"
+              />
+            </div>
             <p className="text-foreground">
               At Goldsainte, we believe that travel is more than just booking a flight or reserving a hotel—it's about creating unforgettable experiences, building meaningful connections, and empowering people to share their journeys in ways that inspire others.
             </p>
@@ -248,6 +270,13 @@ const About = () => {
             Our Partners & Technology
           </AccordionTrigger>
           <AccordionContent className="pt-6">
+            <div className="flex justify-center mb-6">
+              <img 
+                src={primaryLogoGreen} 
+                alt="Goldsainte" 
+                className="h-5 sm:h-7 w-auto"
+              />
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-6">
               {partners.map((partner) => (
                 <div 
@@ -274,6 +303,13 @@ const About = () => {
             Legal
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
+            <div className="flex justify-center mb-6">
+              <img 
+                src={primaryLogoGreen} 
+                alt="Goldsainte" 
+                className="h-5 sm:h-7 w-auto"
+              />
+            </div>
             <p className="text-foreground">
               Goldsainte Inc. (the company behind Goldsainte™) is registered and based in Delaware, USA ("Goldsainte," "we," "us," or "our"), from where it provides its AI-powered luxury travel and booking platform (the "Service") on its website (the "Website"), and is supported internationally by its affiliated group companies (the "Support Companies"). The Support Companies provide internal and operational support only. They do not render the Service and do not own, operate, or manage the Website or any other website.
             </p>
@@ -292,6 +328,13 @@ const About = () => {
             Accessibility Statement
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+            <div className="flex justify-center mb-6">
+              <img 
+                src={primaryLogoGreen} 
+                alt="Goldsainte" 
+                className="h-5 sm:h-7 w-auto"
+              />
+            </div>
             <div>
               <h3 className="font-semibold text-base mb-3 text-foreground">Accessibility Statement for Goldsainte</h3>
               <p className="text-foreground">
@@ -411,6 +454,13 @@ const About = () => {
         Customer Terms of Service
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="flex justify-center mb-6">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-5 sm:h-7 w-auto"
+          />
+        </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Terms Available</p>
           <p className="text-base text-muted-foreground mb-3">
@@ -489,6 +539,13 @@ const About = () => {
         Dispute Resolution
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="flex justify-center mb-6">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-5 sm:h-7 w-auto"
+          />
+        </div>
         <p>
           Goldsainte Ai / Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
         </p>
@@ -597,6 +654,13 @@ const About = () => {
         What We Do
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="flex justify-center mb-6">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-5 sm:h-7 w-auto"
+          />
+        </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
           <p className="text-base text-muted-foreground mb-3">
@@ -662,6 +726,13 @@ const About = () => {
         Modern Slavery Statement
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="flex justify-center mb-6">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-5 sm:h-7 w-auto"
+          />
+        </div>
         <p className="text-base text-muted-foreground">
           Fiscal Year Ending December 31, 2025
         </p>
@@ -760,6 +831,13 @@ const About = () => {
         Human Rights Statement
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="flex justify-center mb-6">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-5 sm:h-7 w-auto"
+          />
+        </div>
         <div>
           <h3 className="text-base font-semibold mb-3">1. Introduction</h3>
           <p className="text-foreground">
