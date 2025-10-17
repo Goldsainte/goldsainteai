@@ -650,7 +650,7 @@ const About = () => {
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
         <p className="text-sm text-muted-foreground">
-          Fiscal Year Ending [Insert Date]
+          Fiscal Year Ending December 31, 2025
         </p>
 
         <div>
