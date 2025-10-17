@@ -1,11 +1,8 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Get Amadeus access token
 async function getAmadeusToken() {
   const apiKey = Deno.env.get('AMADEUS_API_KEY');
   const apiSecret = Deno.env.get('AMADEUS_API_SECRET');
@@ -31,7 +28,7 @@ async function getAmadeusToken() {
   return data.access_token;
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
