@@ -22,7 +22,7 @@ export const DestinationCard = ({
       className="rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
       onClick={() => navigate(`/cocurated-journeys?destination=${destination}`)}
     >
-      <div className="relative h-64">
+      <div className="relative h-40">
         <img
           src={imageUrl || `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80`}
           alt={destination}

@@ -1,18 +1,28 @@
-import { Search, MapPin } from "lucide-react";
+import { useState } from "react";
+import { Search, MapPin, Calendar as CalendarIcon, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 interface PackageSearchHeroProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
   onSearch: () => void;
+  onOpenFilters: () => void;
 }
 
 export const PackageSearchHero = ({
   searchQuery,
   onSearchChange,
   onSearch,
+  onOpenFilters,
 }: PackageSearchHeroProps) => {
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   return (
     <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
       {/* Background with gradient overlay */}
@@ -33,22 +43,88 @@ export const PackageSearchHero = ({
           Expert-crafted packages by verified travel agents
         </p>
         
-        {/* Search Bar */}
-        <div className="flex gap-2 bg-white rounded-lg p-2 shadow-lg max-w-2xl mx-auto">
-          <div className="flex-1 flex items-center gap-2 px-3">
-            <MapPin className="h-5 w-5 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Where do you want to go?"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-              className="border-0 focus-visible:ring-0 text-lg"
-            />
+        {/* Search Bar - Viator Style */}
+        <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
+          <div className="flex flex-col md:flex-row">
+            {/* Where to */}
+            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border">
+              <div className="flex-shrink-0">
+                <MapPin className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div className="flex-1 text-left">
+                <label className="text-xs font-semibold text-foreground block mb-1">Where to?</label>
+                <Input
+                  type="text"
+                  placeholder="Search for a place or activity"
+                  value={searchQuery}
+                  onChange={(e) => onSearchChange(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && onSearch()}
+                  className="border-0 focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground"
+                />
+              </div>
+            </div>
+
+            {/* When */}
+            <div className="flex-1">
+              <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                <PopoverTrigger asChild>
+                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-muted/50 transition-colors">
+                    <div className="flex-shrink-0">
+                      <CalendarIcon className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-xs font-semibold text-foreground block mb-1">When</label>
+                      <span className="text-base text-muted-foreground">
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`
+                          ) : (
+                            format(dateRange.from, "MMM dd, yyyy")
+                          )
+                        ) : (
+                          "Select Dates"
+                        )}
+                      </span>
+                    </div>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={(range) => {
+                      setDateRange(range);
+                      if (range?.from && range?.to) {
+                        setCalendarOpen(false);
+                      }
+                    }}
+                    numberOfMonths={2}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Search Button */}
+            <div className="flex items-center p-2">
+              <Button onClick={onSearch} size="lg" className="rounded-xl px-8 h-full">
+                <Search className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
-          <Button onClick={onSearch} size="lg" className="px-8">
-            <Search className="h-5 w-5 mr-2" />
-            Search
+        </div>
+
+        {/* Filters Button Below */}
+        <div className="mt-4">
+          <Button
+            variant="outline"
+            onClick={onOpenFilters}
+            className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+          >
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            Filters
           </Button>
         </div>
 

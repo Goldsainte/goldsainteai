@@ -34,10 +34,10 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
           {tours.map((tour) => (
             <Card
               key={tour.id}
-              className="w-[320px] inline-block overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
+              className="w-[280px] inline-block overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
               onClick={() => navigate(`/cocurated-package/${tour.id}`)}
             >
-              <div className="relative h-48 overflow-hidden">
+              <div className="relative h-36 overflow-hidden">
                 <img
                   src={tour.coverImage || `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80`}
                   alt={tour.packageName}

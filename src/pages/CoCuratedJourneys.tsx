@@ -12,6 +12,7 @@ import { TopToursCarousel } from "@/components/TopToursCarousel";
 import { EnhancedPackageCard } from "@/components/EnhancedPackageCard";
 import { PackageFilters, PackageFilterState } from "@/components/PackageFilters";
 import { Card } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AgentPackage {
@@ -181,6 +182,7 @@ export default function CoCuratedJourneys() {
   const [topTours, setTopTours] = useState<any[]>([]);
   const [myPromotions, setMyPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   
   const [packageFilters, setPackageFilters] = useState<PackageFilterState>({
     priceRange: [0, 10000],
@@ -432,6 +434,7 @@ export default function CoCuratedJourneys() {
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onSearch={() => {}}
+          onOpenFilters={() => setFiltersOpen(true)}
         />
 
         <div className="container mx-auto px-4 py-12">
@@ -483,54 +486,58 @@ export default function CoCuratedJourneys() {
 
           <div className="mb-12">
             <h2 className="text-3xl font-bold mb-6">All Travel Packages</h2>
-            <div className="flex gap-6">
-              <div className="w-80 flex-shrink-0">
-                <PackageFilters
-                  onFilterChange={setPackageFilters}
-                  availableDestinations={uniqueDestinations}
-                />
-              </div>
-
-              <div className="flex-1">
-                {loading ? (
-                  <div className="text-center py-12">Loading packages...</div>
-                ) : filteredPackages.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredPackages.map((pkg) => (
-                      <EnhancedPackageCard
-                        key={pkg.id}
-                        id={pkg.id}
-                        packageName={pkg.package_name}
-                        destination={pkg.destination}
-                        coverImage={pkg.cover_image_url}
-                        durationDays={pkg.duration_days}
-                        retailPrice={pkg.retail_price}
-                        currency={pkg.currency}
-                        agencyName={pkg.travel_agents?.agency_name}
-                        rating={pkg.travel_agents?.rating}
-                        totalReviews={pkg.travel_agents?.total_reviews}
-                        maxParticipants={pkg.max_participants}
-                        highlights={Array.isArray(pkg.highlights) ? pkg.highlights : []}
-                        influencerCommission={pkg.influencer_commission_percentage}
-                        onViewDetails={() => navigate(`/cocurated-package/${pkg.id}`)}
-                        onRequestPromotion={() => requestPromotion(pkg.id)}
-                        isPromoting={getPromotionStatus(pkg.id)}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <Card className="p-12 text-center">
-                    <p className="text-muted-foreground">
-                      No packages match your criteria. Try adjusting your filters.
-                    </p>
-                  </Card>
-                )}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {loading ? (
+                <div className="text-center py-12 col-span-full">Loading packages...</div>
+              ) : filteredPackages.length > 0 ? (
+                filteredPackages.map((pkg) => (
+                  <EnhancedPackageCard
+                    key={pkg.id}
+                    id={pkg.id}
+                    packageName={pkg.package_name}
+                    destination={pkg.destination}
+                    coverImage={pkg.cover_image_url}
+                    durationDays={pkg.duration_days}
+                    retailPrice={pkg.retail_price}
+                    currency={pkg.currency}
+                    agencyName={pkg.travel_agents?.agency_name}
+                    rating={pkg.travel_agents?.rating}
+                    totalReviews={pkg.travel_agents?.total_reviews}
+                    maxParticipants={pkg.max_participants}
+                    highlights={Array.isArray(pkg.highlights) ? pkg.highlights : []}
+                    influencerCommission={pkg.influencer_commission_percentage}
+                    onViewDetails={() => navigate(`/cocurated-package/${pkg.id}`)}
+                    onRequestPromotion={() => requestPromotion(pkg.id)}
+                    isPromoting={getPromotionStatus(pkg.id)}
+                  />
+                ))
+              ) : (
+                <Card className="p-12 text-center col-span-full">
+                  <p className="text-muted-foreground">
+                    No packages match your criteria. Try adjusting your filters.
+                  </p>
+                </Card>
+              )}
             </div>
           </div>
         </div>
       </main>
       <Footer />
+
+      {/* Filters Sheet - Left Sidebar */}
+      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+        <SheetContent side="left" className="w-[400px] sm:w-[540px] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Filters</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            <PackageFilters
+              onFilterChange={setPackageFilters}
+              availableDestinations={uniqueDestinations}
+            />
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
