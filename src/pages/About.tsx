@@ -109,7 +109,7 @@ const About = () => {
             className="h-16 sm:h-20 w-auto"
           />
         </div>
-        <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+        <p className="text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed">
           Discover. Book. Create. Earn. — Travel Reinvented with AI, Agent Bidding & Creator Collaborations. Plan faster with AI, let agents bid to save more, or book CoCurated trips built by pros, amplified by creators, and designed to deliver real value.
         </p>
       </div>
