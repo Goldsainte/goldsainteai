@@ -12,9 +12,6 @@ const WhatWeDo = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold mb-4">What We Do - Goldsainte Travel Services</h1>
-        <p className="text-muted-foreground text-lg mb-2">
-          Registered Address: 850 New Burton Road, Suite 201, Dover, DE, 19904, County of Kent, USA
-        </p>
         <p className="text-muted-foreground">
           Learn how Goldsainte provides AI-powered travel services across accommodations, attractions, car rentals, flights, and transportation.
         </p>
