@@ -155,7 +155,7 @@ const About = () => {
       <Accordion type="single" collapsible className="space-y-4">
         
         {/* What Is Goldsainte */}
-        <AccordionItem value="what-is" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+        <AccordionItem value="what-is" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
             What is Goldsainte?
           </AccordionTrigger>
@@ -173,7 +173,7 @@ const About = () => {
         </AccordionItem>
 
         {/* What We Offer */}
-        <AccordionItem value="features" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+        <AccordionItem value="features" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
             What We Offer
           </AccordionTrigger>
@@ -206,7 +206,7 @@ const About = () => {
         </AccordionItem>
 
         {/* Our Mission */}
-        <AccordionItem value="mission" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+        <AccordionItem value="mission" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
             Our Mission
           </AccordionTrigger>
@@ -230,7 +230,7 @@ const About = () => {
         </AccordionItem>
 
         {/* Partners & Technology */}
-        <AccordionItem value="partners" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+        <AccordionItem value="partners" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
             Our Partners & Technology
           </AccordionTrigger>
@@ -256,7 +256,7 @@ const About = () => {
         </AccordionItem>
 
         {/* Legal */}
-        <AccordionItem value="legal" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+        <AccordionItem value="legal" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
             Legal
           </AccordionTrigger>
@@ -274,7 +274,7 @@ const About = () => {
         </AccordionItem>
 
         {/* Accessibility Statement */}
-        <AccordionItem value="accessibility" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+        <AccordionItem value="accessibility" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
             Accessibility Statement
           </AccordionTrigger>
@@ -393,7 +393,7 @@ const About = () => {
     </AccordionItem>
 
     {/* Customer Terms of Service */}
-    <AccordionItem value="terms" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+    <AccordionItem value="terms" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
       <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
         Customer Terms of Service
       </AccordionTrigger>
@@ -471,7 +471,7 @@ const About = () => {
     </AccordionItem>
 
     {/* Dispute Resolution */}
-    <AccordionItem value="dispute-resolution" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+    <AccordionItem value="dispute-resolution" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
       <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
         Dispute Resolution
       </AccordionTrigger>
@@ -579,7 +579,7 @@ const About = () => {
     </AccordionItem>
 
     {/* What We Do */}
-    <AccordionItem value="what-we-do" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+    <AccordionItem value="what-we-do" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
       <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
         What We Do
       </AccordionTrigger>
@@ -644,7 +644,7 @@ const About = () => {
     </AccordionItem>
 
     {/* Modern Slavery Statement */}
-    <AccordionItem value="modern-slavery" id="modern-slavery" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+    <AccordionItem value="modern-slavery" id="modern-slavery" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
       <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
         Modern Slavery Statement
       </AccordionTrigger>
@@ -742,7 +742,7 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
-    <AccordionItem value="human-rights" id="human-rights" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] has-[&_[data-state=open]]:hover:!bg-card transition-colors">
+    <AccordionItem value="human-rights" id="human-rights" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
       <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47]">
         Human Rights Statement
       </AccordionTrigger>
