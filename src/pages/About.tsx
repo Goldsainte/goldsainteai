@@ -13,56 +13,71 @@ const About = () => {
     { name: "Google Gemini", color: "from-purple-600 to-pink-400" }
   ];
 
-  const features = [
+  const featureCategories = [
     {
-      icon: Mic,
-      title: "Voice AI Concierge",
-      description: "Just say 'Hey Goldsainte' anywhere on our site to start a natural conversation about flights, hotels, dining, and more—hands-free."
+      category: "AI-Powered Intelligence",
+      features: [
+        {
+          icon: Mic,
+          title: "Voice AI Concierge",
+          description: "Just say 'Hey Goldsainte' anywhere on our site to start a natural conversation about flights, hotels, dining, and more—hands-free."
+        },
+        {
+          icon: Sparkles,
+          title: "Personal AI Agent",
+          description: "Your AI learns your style, budget, and preferences to deliver smarter, personalized recommendations every time you travel."
+        }
+      ]
     },
     {
-      icon: Sparkles,
-      title: "Personal AI Agent",
-      description: "Your AI learns your style, budget, and preferences to deliver smarter, personalized recommendations every time you travel."
+      category: "Creator Economy",
+      features: [
+        {
+          icon: Share2,
+          title: "Create. Share. Make Money.",
+          description: "A social platform where content creators can showcase their journeys, build interactive trip plans, and generate income."
+        },
+        {
+          icon: Package,
+          title: "CoCurated™ Packages",
+          description: "Exclusive travel experiences designed by top creators and travel experts, blending inspiration with transparent booking."
+        },
+        {
+          icon: BarChart3,
+          title: "Creator Dashboard",
+          description: "Comprehensive tools, analytics, package management, partnerships, and Shop products—all built to empower creators."
+        },
+        {
+          icon: DollarSign,
+          title: "Creator Payouts",
+          description: "Multiple revenue streams with tiered commissions (5-15%) based on performance and engagement—rewarding quality content."
+        }
+      ]
     },
     {
-      icon: Share2,
-      title: "Create. Share. Make Money.",
-      description: "A social platform where content creators can showcase their journeys, build interactive trip plans, and generate income."
-    },
-    {
-      icon: Briefcase,
-      title: "Expert Agent Marketplace",
-      description: "Post complex trips, get AI-matched with certified agents, and pay securely in milestones while tracking progress in real time."
-    },
-    {
-      icon: Package,
-      title: "CoCurated™ Packages",
-      description: "Exclusive travel experiences designed by top creators and travel experts, blending inspiration with transparent booking."
-    },
-    {
-      icon: BarChart3,
-      title: "Creator Dashboard",
-      description: "Comprehensive tools, analytics, package management, partnerships, and Shop products—all built to empower creators."
-    },
-    {
-      icon: DollarSign,
-      title: "Creator Payouts",
-      description: "Multiple revenue streams with tiered commissions (5-15%) based on performance and engagement—rewarding quality content."
-    },
-    {
-      icon: Users,
-      title: "Group Bookings & Split Payments",
-      description: "Make planning with friends seamless with secure payment links, split payment tracking, and transparent cost sharing."
-    },
-    {
-      icon: FileCheck,
-      title: "Itinerary Management",
-      description: "Keep everything in one place—day-by-day plans, document uploads, calendar sync, and organized travel information."
-    },
-    {
-      icon: MessageCircle,
-      title: "Real-Time Communication Hub",
-      description: "Instant chat with agents, push notifications for booking updates, and seamless communication throughout your journey."
+      category: "Seamless Experience",
+      features: [
+        {
+          icon: Briefcase,
+          title: "Expert Agent Marketplace",
+          description: "Post complex trips, get AI-matched with certified agents, and pay securely in milestones while tracking progress in real time."
+        },
+        {
+          icon: Users,
+          title: "Group Bookings & Split Payments",
+          description: "Make planning with friends seamless with secure payment links, split payment tracking, and transparent cost sharing."
+        },
+        {
+          icon: FileCheck,
+          title: "Itinerary Management",
+          description: "Keep everything in one place—day-by-day plans, document uploads, calendar sync, and organized travel information."
+        },
+        {
+          icon: MessageCircle,
+          title: "Real-Time Communication Hub",
+          description: "Instant chat with agents, push notifications for booking updates, and seamless communication throughout your journey."
+        }
+      ]
     }
   ];
 
@@ -161,58 +176,79 @@ const About = () => {
         </CardContent>
       </Card>
 
-      {/* What We Offer Section - Expanded */}
-      <Card className="mb-8">
+      {/* What We Offer Section - Luxury Redesign */}
+      <Card className="mb-12">
         <CardHeader>
-          <CardTitle className="text-xl">What We Offer</CardTitle>
+          <CardTitle className="text-2xl tracking-tight">What We Offer</CardTitle>
+          <p className="text-sm text-muted-foreground mt-2">A Complete Ecosystem for Modern Travel</p>
         </CardHeader>
-        <CardContent>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {features.map((feature) => (
-              <div 
-                key={feature.title}
-                className="border border-border rounded-lg p-4 hover:shadow-md transition-shadow bg-card"
-              >
-                <div className="flex gap-3 items-start">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <feature.icon className="h-5 w-5 text-primary" />
+        <CardContent className="space-y-8">
+          {featureCategories.map((category, idx) => (
+            <div key={category.category}>
+              <h3 className="text-lg font-semibold mb-6 text-foreground">{category.category}</h3>
+              <div className="space-y-6">
+                {category.features.map((feature) => (
+                  <div 
+                    key={feature.title}
+                    className="group flex gap-4 items-start p-4 rounded-lg hover:bg-accent/50 transition-all duration-300"
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                      <feature.icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-semibold mb-2 text-foreground">{feature.title}</h4>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-semibold mb-1 text-foreground">{feature.title}</h4>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+              {idx < featureCategories.length - 1 && (
+                <div className="mt-8 border-t border-border/50" />
+              )}
+            </div>
+          ))}
         </CardContent>
       </Card>
 
       {/* Our Mission Section */}
-      <Card className="mb-8">
+      <Card className="mb-12">
         <CardHeader>
-          <CardTitle className="text-xl">Our Mission</CardTitle>
+          <CardTitle className="text-2xl tracking-tight">Our Mission</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-base leading-relaxed text-foreground">
-            Our mission is to transform the way people experience travel by making it accessible, social, and rewarding. Whether you're a content creator, influencer, or traveler seeking unique adventures, Goldsainte provides the tools and connections to create unforgettable journeys.
-          </p>
+          <div className="space-y-4 text-base leading-loose text-foreground">
+            <p>
+              At Goldsainte, we believe that travel is more than just booking a flight or reserving a hotel—it's about creating unforgettable experiences, building meaningful connections, and empowering people to share their journeys in ways that inspire others. Our mission is to redefine the travel industry by combining cutting-edge AI technology with the creativity and passion of travelers, creators, and experts worldwide.
+            </p>
+            <p>
+              We are dedicated to making travel more accessible, personalized, and rewarding. Whether you're a solo explorer seeking hidden gems, a content creator building your brand, or a travel expert sharing your knowledge, Goldsainte provides the tools, platform, and community to help you thrive. We envision a world where every traveler can discover, plan, and experience trips that are uniquely tailored to their preferences—and where creators and experts are fairly compensated for the value they bring.
+            </p>
+            <p>
+              Our AI-powered ecosystem is designed to simplify the complexities of travel planning while preserving the magic of discovery. From voice-activated concierge services to personalized AI agents that learn your travel style, we're leveraging technology to make every journey smarter, smoother, and more enjoyable. At the same time, our social and creator-focused features ensure that travel remains a deeply human, shareable, and community-driven experience.
+            </p>
+            <p>
+              Goldsainte is more than a travel platform—it's a movement. We're building a global community of travelers, creators, and innovators who are passionate about exploration, storytelling, and connection. By bridging the gap between inspiration and action, we empower our users to not only dream about their next adventure but to make it a reality—and to inspire others along the way.
+            </p>
+            <p>
+              Ultimately, our mission is to transform how the world travels. We aim to create an ecosystem where technology enhances human experience, where creators are valued and rewarded, and where every journey—no matter how big or small—becomes a story worth sharing. At Goldsainte, the future of travel is collaborative, intelligent, and boundless.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
       {/* Partners & Technology Section */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Our Partners & Technology</CardTitle>
+          <CardTitle className="text-2xl tracking-tight">Our Partners & Technology</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             {partners.map((partner) => (
               <div 
                 key={partner.name}
-                className="flex items-center justify-center p-6 rounded-lg border border-border bg-card hover:shadow-md transition-all duration-300"
+                className="group flex items-center justify-center p-8 rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-lg transition-all duration-500"
               >
-                <span className={`text-xl font-bold bg-gradient-to-r ${partner.color} bg-clip-text text-transparent`}>
+                <span className={`text-2xl font-bold bg-gradient-to-r ${partner.color} bg-clip-text text-transparent grayscale group-hover:grayscale-0 transition-all duration-500`}>
                   {partner.name}
                 </span>
               </div>
