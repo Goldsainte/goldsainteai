@@ -94,7 +94,7 @@ export const Footer = () => {
               <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">Community Guidelines</Link></li>
               <li><Link to="/dispute-resolution" className="hover:text-primary transition-colors">Dispute resolution</Link></li>
               <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Human Rights Statement</a></li>
+              <li><Link to="/about#human-rights" className="hover:text-primary transition-colors">Human Rights Statement</Link></li>
             </ul>
           </div>
 

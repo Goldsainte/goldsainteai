@@ -742,6 +742,95 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
+    <AccordionItem value="human-rights" id="human-rights">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+        Human Rights Statement
+      </AccordionTrigger>
+      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div>
+          <h3 className="text-lg font-semibold mb-3">1. Introduction</h3>
+          <p className="text-foreground">
+            Goldsainte is committed to respecting and promoting human rights wherever we operate. We believe that travel can bring out the best in humanity, and our mission is to ensure that our business activities and partnerships support this principle.
+          </p>
+          <p className="text-foreground mt-4">
+            This statement articulates our approach to respecting and promoting human rights, in alignment with internationally recognized standards such as the United Nations Guiding Principles on Business and Human Rights and the International Bill of Human Rights.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">2. Our Commitment</h3>
+          <p className="text-foreground mb-3">Goldsainte is committed to:</p>
+          <ul className="list-disc pl-6 space-y-2 text-foreground">
+            <li>Respecting the rights and dignity of all individuals, including employees, contractors, suppliers, and travelers.</li>
+            <li>Preventing, mitigating, and addressing adverse human rights impacts connected to our operations, products, and services.</li>
+            <li>Promoting ethical business practices and positive social outcomes across all regions in which we operate.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">3. Scope</h3>
+          <p className="text-foreground">
+            This statement applies to all Goldsainte employees, contractors, suppliers, partners, and service providers. We also expect our business partners and supply chain participants to uphold the same human rights principles and standards.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">4. Human Rights Principles</h3>
+          <p className="text-foreground mb-3">Goldsainte recognizes the following key principles as fundamental to our human rights approach:</p>
+          <ul className="list-disc pl-6 space-y-2 text-foreground">
+            <li><strong>Non-discrimination:</strong> We do not tolerate discrimination based on race, ethnicity, gender, sexual orientation, religion, disability, or any other characteristic.</li>
+            <li><strong>Freedom from forced labor:</strong> We prohibit forced, bonded, or compulsory labor in our operations and supply chain.</li>
+            <li><strong>Child protection:</strong> We do not tolerate child labor in any form.</li>
+            <li><strong>Health, safety, and well-being:</strong> We are committed to safe and healthy workplaces and promote well-being for all employees and travelers.</li>
+            <li><strong>Freedom of association and collective bargaining:</strong> We respect the rights of workers to organize and engage in collective bargaining where legally permitted.</li>
+            <li><strong>Privacy and data protection:</strong> We protect the personal data of our employees, travelers, and partners in accordance with applicable privacy laws.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">5. Due Diligence and Risk Management</h3>
+          <p className="text-foreground mb-3">Goldsainte actively assesses human rights risks in our operations and supply chains. Key measures include:</p>
+          <ul className="list-disc pl-6 space-y-2 text-foreground">
+            <li>Conducting supplier due diligence and audits.</li>
+            <li>Integrating human rights considerations into procurement and partnership decisions.</li>
+            <li>Monitoring, reporting, and addressing human rights concerns through established policies and procedures.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">6. Training and Awareness</h3>
+          <p className="text-foreground">
+            We provide training and resources for employees, contractors, and partners to ensure awareness of human rights risks and responsibilities. This includes guidance on how to identify and respond to potential human rights violations.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">7. Reporting and Accountability</h3>
+          <p className="text-foreground">
+            Goldsainte encourages employees, partners, and stakeholders to raise concerns or report potential human rights issues through our whistleblower channels or direct contact with our compliance team. All reports are investigated promptly and confidentially.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">8. Continuous Improvement</h3>
+          <p className="text-foreground">
+            We are committed to continually improving our human rights practices. We regularly review policies, procedures, and business operations to strengthen our human rights performance and align with evolving international standards.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-3">9. Approval</h3>
+          <p className="text-foreground mb-4">
+            This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
+          </p>
+          <div className="bg-muted p-4 rounded-lg">
+            <p className="font-semibold text-foreground">Andre C. Powell</p>
+            <p className="text-muted-foreground">CEO & Founder, Goldsainte</p>
+          </div>
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+
     </Accordion>
     </div>
   );
