@@ -56,6 +56,8 @@ export default function CoCuratedJourneys() {
     minRating: 0,
     dateRange: {},
   });
+  
+  const [selectedDestinationFilter, setSelectedDestinationFilter] = useState<string>('all');
 
   useEffect(() => {
     const initializeData = async () => {
@@ -257,6 +259,12 @@ export default function CoCuratedJourneys() {
 
   const uniqueDestinations = [currentLocation.name];
 
+  // Get unique destinations from top destinations for filtering
+  const topDestinationCities = topDestinations.map(dest => 
+    dest.destination || dest.name
+  ).filter((dest, index, self) => self.indexOf(dest) === index);
+
+  // Filter packages based on all criteria
   const filteredPackages = packages.filter(pkg => {
     const matchesSearch = searchQuery === "" || 
       pkg.packageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -267,9 +275,44 @@ export default function CoCuratedJourneys() {
 
     const matchesRating = packageFilters.minRating === 0 ||
       pkg.rating >= packageFilters.minRating;
+      
+    // Filter by selected destination
+    const matchesDestination = selectedDestinationFilter === 'all' || 
+      pkg.destination.toLowerCase().includes(selectedDestinationFilter.toLowerCase());
 
-    return matchesSearch && matchesPrice && matchesRating;
+    return matchesSearch && matchesPrice && matchesRating && matchesDestination;
   });
+
+  // Get top 5 packages from top destination cities for default display
+  const getDefaultPackages = () => {
+    if (selectedDestinationFilter !== 'all') {
+      return filteredPackages; // Show all matching when filter is applied
+    }
+    
+    // Group packages by destination
+    const packagesByDestination: { [key: string]: typeof packages } = {};
+    packages.forEach(pkg => {
+      const dest = pkg.destination;
+      if (!packagesByDestination[dest]) {
+        packagesByDestination[dest] = [];
+      }
+      packagesByDestination[dest].push(pkg);
+    });
+    
+    // Get top 5 from each top destination city
+    const defaultPackages: typeof packages = [];
+    topDestinationCities.forEach(city => {
+      const cityPackages = Object.entries(packagesByDestination)
+        .filter(([dest]) => dest.toLowerCase().includes(city.toLowerCase()))
+        .flatMap(([_, pkgs]) => pkgs)
+        .slice(0, 5);
+      defaultPackages.push(...cityPackages);
+    });
+    
+    return defaultPackages.length > 0 ? defaultPackages : packages.slice(0, 20);
+  };
+
+  const displayedPackages = getDefaultPackages();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -317,13 +360,33 @@ export default function CoCuratedJourneys() {
 
               {/* All Travel Packages */}
               <section className="py-12">
-                <div className="flex items-center justify-between mb-8">
-                  <h2 className="text-3xl font-bold">All Travel Packages</h2>
-                  <p className="text-muted-foreground">{filteredPackages.length} packages available</p>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+                  <div>
+                    <h2 className="text-3xl font-bold">All Travel Packages</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {selectedDestinationFilter === 'all' 
+                        ? `Showing top 5 from each destination (${displayedPackages.length} packages)`
+                        : `${displayedPackages.length} packages in ${selectedDestinationFilter}`
+                      }
+                    </p>
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
+                    <select
+                      value={selectedDestinationFilter}
+                      onChange={(e) => setSelectedDestinationFilter(e.target.value)}
+                      className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    >
+                      <option value="all">All Top Destinations</option>
+                      {topDestinationCities.map(city => (
+                        <option key={city} value={city}>{city}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredPackages.map((pkg) => (
+                  {displayedPackages.map((pkg) => (
                     <EnhancedPackageCard
                       key={pkg.id}
                       id={pkg.id}
@@ -344,9 +407,9 @@ export default function CoCuratedJourneys() {
                   ))}
                 </div>
 
-                {filteredPackages.length === 0 && (
+                {displayedPackages.length === 0 && (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No packages match your filters. Try adjusting your search.</p>
+                    <p className="text-muted-foreground">No packages available for this destination. Try selecting a different destination.</p>
                   </div>
                 )}
               </section>
