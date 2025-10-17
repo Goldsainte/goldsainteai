@@ -1,263 +1,208 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ItineraryBuilder } from "@/components/ItineraryBuilder";
-import { ItineraryTimeline } from "@/components/ItineraryTimeline";
-import { TravelDocumentUpload } from "@/components/TravelDocumentUpload";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { Plus, MapPin, Calendar, FileText, Share2, Trash2, Eye } from "lucide-react";
-import { format } from "date-fns";
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { toast } from '@/components/ui/use-toast';
+import { Loader2, Users, DollarSign } from 'lucide-react';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+
+interface TripRequest {
+  id: string;
+  status: string;
+  trip_items: any[];
+  total_travelers: number;
+  budget_range_min: number | null;
+  budget_range_max: number | null;
+  preferred_dates: any;
+  special_requests: string | null;
+  quoted_price: number | null;
+  quoted_details: string | null;
+  created_at: string;
+  assigned_agent_id: string | null;
+}
 
 export default function MyTrips() {
+  const { user } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [user, setUser] = useState<any>(null);
-  const [itineraries, setItineraries] = useState<any[]>([]);
-  const [selectedItinerary, setSelectedItinerary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [trips, setTrips] = useState<TripRequest[]>([]);
 
   useEffect(() => {
-    checkUser();
-  }, []);
-
-  const checkUser = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      navigate("/auth");
+      navigate('/auth');
       return;
     }
-    setUser(user);
-    fetchItineraries(user.id);
-  };
+    fetchTrips();
+  }, [user, navigate]);
 
-  const fetchItineraries = async (userId: string) => {
-    setLoading(true);
+  const fetchTrips = async () => {
     try {
       const { data, error } = await supabase
-        .from("trip_itineraries")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false });
+        .from('cocurated_trip_requests')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setItineraries(data || []);
-    } catch (error) {
-      console.error("Error fetching itineraries:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load your trips",
-        variant: "destructive",
-      });
+      setTrips((data as any) || []);
+    } catch (error: any) {
+      console.error('Error fetching trips:', error);
+      toast({ title: 'Error loading trips', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteItinerary = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from("trip_itineraries")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-
-      toast({
-        title: "Trip deleted",
-        description: "Your trip has been deleted successfully",
-      });
-
-      fetchItineraries(user.id);
-    } catch (error) {
-      console.error("Error deleting itinerary:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete trip",
-        variant: "destructive",
-      });
-    }
-  };
-
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case "draft": return "secondary";
-      case "active": return "default";
-      case "completed": return "outline";
-      default: return "secondary";
-    }
+    const colors: Record<string, string> = {
+      pending: 'bg-yellow-500',
+      assigned: 'bg-blue-500',
+      quoted: 'bg-purple-500',
+      booked: 'bg-green-500',
+      cancelled: 'bg-red-500'
+    };
+    return colors[status] || 'bg-gray-500';
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen">
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <p className="text-muted-foreground">Loading your trips...</p>
-          </div>
+        <div className="container mx-auto py-8 flex justify-center">
+          <Loader2 className="h-8 w-8 animate-spin" />
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen">
       <Header />
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-4xl font-bold mb-2">My Trips</h1>
-            <p className="text-muted-foreground">
-              Manage your travel itineraries, documents, and plans
-            </p>
-          </div>
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button size="lg">
-                <Plus className="mr-2 h-5 w-5" />
-                Create Trip
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Trip</DialogTitle>
-              </DialogHeader>
-              <ItineraryBuilder
-                jobId=""
-                userId={user?.id || ""}
-                onComplete={() => {
-                  setShowCreateDialog(false);
-                  fetchItineraries(user.id);
-                }}
-              />
-            </DialogContent>
-          </Dialog>
+      <div className="container mx-auto py-8 px-4">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">My Custom Trip Requests</h1>
+          <p className="text-muted-foreground">
+            View and manage your custom trip requests with Goldsainte agents
+          </p>
         </div>
 
-        {itineraries.length === 0 ? (
-          <Card className="p-12 text-center">
-            <MapPin className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-xl font-semibold mb-2">No trips yet</h3>
-            <p className="text-muted-foreground mb-6">
-              Start planning your next adventure by creating your first trip itinerary
-            </p>
-            <Button onClick={() => setShowCreateDialog(true)}>
-              <Plus className="mr-2 h-5 w-5" />
-              Create Your First Trip
-            </Button>
-          </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            {itineraries.map((itinerary) => (
-              <Card key={itinerary.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <CardTitle className="line-clamp-1">{itinerary.title}</CardTitle>
-                      <CardDescription className="flex items-center gap-1 mt-1">
-                        <MapPin className="h-3 w-3" />
-                        {itinerary.destination}
-                      </CardDescription>
-                    </div>
-                    <Badge variant={getStatusColor(itinerary.status)}>
-                      {itinerary.status}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      {format(new Date(itinerary.start_date), "MMM d")} - {format(new Date(itinerary.end_date), "MMM d, yyyy")}
-                    </div>
-                    {itinerary.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {itinerary.description}
-                      </p>
-                    )}
-                    <div className="flex gap-2 pt-2">
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => setSelectedItinerary(itinerary)}
-                        className="flex-1"
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleDeleteItinerary(itinerary.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {selectedItinerary && (
-          <Card className="mt-8">
-            <CardHeader>
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-2xl">{selectedItinerary.title}</CardTitle>
-                  <CardDescription className="flex items-center gap-2 mt-2">
-                    <MapPin className="h-4 w-4" />
-                    {selectedItinerary.destination}
-                    <span className="mx-2">•</span>
-                    <Calendar className="h-4 w-4" />
-                    {format(new Date(selectedItinerary.start_date), "MMM d")} - {format(new Date(selectedItinerary.end_date), "MMM d, yyyy")}
-                  </CardDescription>
-                </div>
-                <Button variant="outline" onClick={() => setSelectedItinerary(null)}>
-                  Close
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="timeline" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="timeline">
-                    <Calendar className="mr-2 h-4 w-4" />
-                    Timeline
-                  </TabsTrigger>
-                  <TabsTrigger value="documents">
-                    <FileText className="mr-2 h-4 w-4" />
-                    Documents
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="timeline" className="mt-6">
-                  <ItineraryTimeline itineraryId={selectedItinerary.id} />
-                </TabsContent>
-                <TabsContent value="documents" className="mt-6">
-                  <TravelDocumentUpload
-                    itineraryId={selectedItinerary.id}
-                    userId={user?.id || ""}
-                    onUploadComplete={() => {
-                      toast({
-                        title: "Document uploaded",
-                        description: "Your travel document has been saved",
-                      });
-                    }}
-                  />
-                </TabsContent>
-              </Tabs>
+        {trips.length === 0 ? (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <p className="text-muted-foreground mb-4">
+                You haven't created any custom trip requests yet
+              </p>
+              <Button onClick={() => navigate('/cocurated-marketplace')}>
+                Browse Tours
+              </Button>
             </CardContent>
           </Card>
+        ) : (
+          <div className="grid gap-6">
+            {trips.map((trip) => {
+              const tripItems = Array.isArray(trip.trip_items) ? trip.trip_items : [];
+              
+              return (
+                <Card key={trip.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle className="flex items-center gap-2">
+                          Trip Request
+                          <Badge className={getStatusColor(trip.status)}>
+                            {trip.status}
+                          </Badge>
+                        </CardTitle>
+                        <CardDescription>
+                          Created {new Date(trip.created_at).toLocaleDateString()}
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        <span>{trip.total_travelers} travelers</span>
+                      </div>
+                      {trip.budget_range_min && trip.budget_range_max && (
+                        <div className="flex items-center gap-1">
+                          <DollarSign className="h-4 w-4" />
+                          <span>
+                            ${trip.budget_range_min} - ${trip.budget_range_max}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold mb-2">Trip Items:</h4>
+                      <div className="space-y-2">
+                        {tripItems.map((item: any, idx: number) => (
+                          <div key={idx} className="flex items-start gap-3 p-3 bg-secondary rounded-lg">
+                            {item.image && (
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-16 h-16 object-cover rounded"
+                              />
+                            )}
+                            <div className="flex-1">
+                              <p className="font-medium">{item.name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {item.currency} {item.price} • {item.travelers} travelers
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {trip.special_requests && (
+                      <div>
+                        <h4 className="font-semibold mb-1">Special Requests:</h4>
+                        <p className="text-sm text-muted-foreground">{trip.special_requests}</p>
+                      </div>
+                    )}
+
+                    {trip.quoted_price && (
+                      <div className="border-t pt-4">
+                        <h4 className="font-semibold mb-2">Agent Quote:</h4>
+                        <div className="bg-primary/10 p-4 rounded-lg">
+                          <p className="text-2xl font-bold mb-2">
+                            ${trip.quoted_price.toFixed(2)}
+                          </p>
+                          {trip.quoted_details && (
+                            <p className="text-sm">{trip.quoted_details}</p>
+                          )}
+                          {trip.status === 'quoted' && (
+                            <div className="flex gap-2 mt-4">
+                              <Button>Accept Quote</Button>
+                              <Button variant="outline">Request Changes</Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {trip.status === 'pending' && !trip.assigned_agent_id && (
+                      <p className="text-sm text-muted-foreground italic">
+                        Waiting for an agent to review your request...
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }

@@ -32,6 +32,7 @@ import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
 import MyJobs from "./pages/MyJobs";
 import MyTrips from "./pages/MyTrips";
+import AgentTripRequests from './pages/AgentTripRequests';
 import BookingPreferences from "./pages/BookingPreferences";
 import MyBookingsRedirect from "./pages/redirects/MyBookingsRedirect";
 import FavoritesRedirect from "./pages/redirects/FavoritesRedirect";
@@ -194,6 +195,7 @@ function AppContent() {
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
           <Route path="/my-jobs" element={<MyJobs />} />
           <Route path="/my-trips" element={<MyTrips />} />
+          <Route path="/agent-trip-requests" element={<AgentTripRequests />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />

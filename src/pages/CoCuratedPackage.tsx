@@ -25,6 +25,7 @@ export default function CoCuratedPackage() {
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [bookingLoading, setBookingLoading] = useState(false);
+  const [addingToTrip, setAddingToTrip] = useState(false);
 
   useEffect(() => {
     fetchPackage();
@@ -62,42 +63,112 @@ export default function CoCuratedPackage() {
       return;
     }
 
-    if (!packageData?.bookingLink) {
-      toast.error('Booking link not available');
+    setBookingLoading(true);
+    try {
+      // Create booking record in database
+      const { data: booking, error: bookingError } = await supabase
+        .from('bookings')
+        .insert({
+          user_id: user.id,
+          booking_type: 'tour',
+          booking_data: {
+            packageId,
+            packageName: packageData.name,
+            travelers,
+            promoCode: promoCode || null
+          },
+          total_price: finalPrice,
+          currency: packageData.price.currencyCode,
+          status: 'pending',
+          payment_status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (bookingError) throw bookingError;
+
+      toast.success('Redirecting to Amadeus booking...');
+      
+      // Redirect to Amadeus booking link
+      if (packageData.bookingLink) {
+        window.open(packageData.bookingLink, '_blank');
+      }
+      
+      navigate('/bookings');
+    } catch (error: any) {
+      console.error('Booking error:', error);
+      toast.error('Failed to create booking');
+    } finally {
+      setBookingLoading(false);
+    }
+  };
+
+  const handleAddToCoCuratedTrip = async () => {
+    if (!user) {
+      toast.error('Please sign in to create a custom trip');
+      navigate('/auth');
       return;
     }
 
-    setBookingLoading(true);
+    setAddingToTrip(true);
     try {
-      if (user) {
-        // Create booking record
+      // Check for existing pending trip request
+      const { data: existingRequest, error: fetchError } = await supabase
+        .from('cocurated_trip_requests')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'pending')
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') throw fetchError;
+
+      const tripItem = {
+        id: packageId,
+        name: packageData.name,
+        type: 'amadeus_tour',
+        price: packageData.price.amount,
+        currency: packageData.price.currencyCode,
+        travelers: travelers,
+        description: packageData.shortDescription,
+        image: packageData.pictures?.[0] || null
+      };
+
+      if (existingRequest) {
+        // Add to existing trip request
+        const existingItems = Array.isArray(existingRequest.trip_items) ? existingRequest.trip_items : [];
+        const updatedItems = [...existingItems, tripItem];
         const { error } = await supabase
-          .from('bookings')
+          .from('cocurated_trip_requests')
+          .update({ 
+            trip_items: updatedItems,
+            total_travelers: travelers,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', existingRequest.id);
+
+        if (error) throw error;
+        toast.success('Added to your custom trip! An agent will contact you soon.');
+      } else {
+        // Create new trip request
+        const { error } = await supabase
+          .from('cocurated_trip_requests')
           .insert({
-            booking_type: 'event',
-            booking_reference: packageId,
-            status: 'pending',
-            total_price: finalPrice,
-            currency: packageData.price.currencyCode,
             user_id: user.id,
-            booking_data: {
-              activity_id: packageId,
-              activity_name: packageData.name,
-              travelers_count: travelers
-            }
+            trip_items: [tripItem],
+            total_travelers: travelers,
+            status: 'pending'
           });
 
         if (error) throw error;
+        toast.success('Trip request created! An agent will reach out to build your custom itinerary.');
       }
 
-      // Open Amadeus booking link
-      window.open(packageData.bookingLink, '_blank');
-      toast.success('Redirecting to booking page...');
+      navigate('/my-trips');
     } catch (error: any) {
-      console.error('Error:', error);
-      toast.error('Failed to initiate booking');
+      console.error('Error adding to trip:', error);
+      toast.error('Failed to add to custom trip');
     } finally {
-      setBookingLoading(false);
+      setAddingToTrip(false);
     }
   };
 
@@ -240,19 +311,39 @@ export default function CoCuratedPackage() {
                   <span>${finalPrice.toFixed(0)}</span>
                 </div>
 
-                {/* Book Button */}
-                <Button
-                  className="w-full"
-                  size="lg"
-                  onClick={handleBooking}
-                  disabled={bookingLoading || !packageData.bookingLink}
-                >
-                  {bookingLoading ? 'Processing...' : 'Book Now'}
-                </Button>
+                {/* Book Buttons */}
+                <div className="space-y-2">
+                  <Button
+                    className="w-full"
+                    size="lg"
+                    onClick={handleBooking}
+                    disabled={bookingLoading || !packageData.bookingLink}
+                  >
+                    {bookingLoading ? 'Processing...' : 'Book Now via Amadeus'}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    You'll be redirected to complete booking via Amadeus
+                  </p>
+                </div>
 
-                <p className="text-xs text-center text-muted-foreground">
-                  You'll be redirected to complete booking via Amadeus.
-                </p>
+                <div className="w-full text-center text-sm text-muted-foreground my-2">
+                  — OR —
+                </div>
+
+                <div className="space-y-2">
+                  <Button
+                    className="w-full"
+                    variant="outline"
+                    size="lg"
+                    onClick={handleAddToCoCuratedTrip}
+                    disabled={addingToTrip}
+                  >
+                    {addingToTrip ? 'Adding...' : 'Add to CoCurated Trip'}
+                  </Button>
+                  <p className="text-xs text-center text-muted-foreground">
+                    Work with a Goldsainte agent to build a custom package
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>

@@ -1360,6 +1360,65 @@ export type Database = {
         }
         Relationships: []
       }
+      cocurated_trip_requests: {
+        Row: {
+          assigned_agent_id: string | null
+          budget_range_max: number | null
+          budget_range_min: number | null
+          created_at: string
+          id: string
+          preferred_dates: Json | null
+          quoted_details: string | null
+          quoted_price: number | null
+          special_requests: string | null
+          status: string
+          total_travelers: number | null
+          trip_items: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assigned_agent_id?: string | null
+          budget_range_max?: number | null
+          budget_range_min?: number | null
+          created_at?: string
+          id?: string
+          preferred_dates?: Json | null
+          quoted_details?: string | null
+          quoted_price?: number | null
+          special_requests?: string | null
+          status?: string
+          total_travelers?: number | null
+          trip_items?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assigned_agent_id?: string | null
+          budget_range_max?: number | null
+          budget_range_min?: number | null
+          created_at?: string
+          id?: string
+          preferred_dates?: Json | null
+          quoted_details?: string | null
+          quoted_price?: number | null
+          special_requests?: string | null
+          status?: string
+          total_travelers?: number | null
+          trip_items?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cocurated_trip_requests_assigned_agent_id_fkey"
+            columns: ["assigned_agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coin_purchases: {
         Row: {
           coin_amount: number
