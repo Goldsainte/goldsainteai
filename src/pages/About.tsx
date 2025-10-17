@@ -89,9 +89,17 @@ const About = () => {
       {/* Introduction Section */}
       <Card className="mb-8">
         <CardContent className="pt-6">
-          <p className="text-base leading-relaxed text-foreground">
-            Goldsainte is the ultimate travel platform for creators, explorers, and travel enthusiasts who want more than just a trip. We combine curated, co-created travel experiences with real-time, bookable packages, empowering our users to discover, share, and monetize their adventures.
-          </p>
+          <div className="space-y-4">
+            <p className="text-base leading-relaxed text-foreground">
+              Goldsainte AI is a voice-activated, AI-powered travel marketplace that merges automation with verified human expertise to deliver fully personalized, end-to-end trip planning and booking. With the wake word "Hey Goldsainte," users can engage a conversational concierge to search, plan, and book flights, hotels, dining, events, and transportation—completely hands-free and in real time.
+            </p>
+            <p className="text-base leading-relaxed text-foreground">
+              At the core of the platform is a travel agent marketplace where users can post complex itineraries, receive competitive bids from certified agents, and pay securely through milestone-based transactions. The system supports group bookings, split payments, full itinerary management, and real-time messaging, making it easy to coordinate even the most intricate trips.
+            </p>
+            <p className="text-base leading-relaxed text-foreground">
+              Goldsainte also powers a unique creator economy: content creators collaborate with agents to co-build and promote curated travel experiences, while transportation vendors can onboard, promote their services, and be included in creator or agent-led packages. This three-sided ecosystem—AI + Agents + Creators—makes Goldsainte the first platform to unify inspiration, planning, and booking within one intelligent, social commerce environment.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -104,11 +112,11 @@ const About = () => {
           <div className="grid md:grid-cols-[300px_1fr] gap-6 lg:gap-8">
             {/* Founder Image */}
             <div className="flex justify-center md:justify-start">
-              <img 
-                src={founderImage}
-                alt="Goldsainte Founder"
-                className="rounded-xl shadow-lg w-full max-w-[280px] md:max-w-none object-cover"
-              />
+          <img 
+            src={founderImage}
+            alt="Goldsainte Founder"
+            className="rounded-xl shadow-lg w-full max-w-[280px] aspect-[3/4] object-cover"
+          />
             </div>
             
             {/* Letter Content */}
