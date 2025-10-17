@@ -301,7 +301,7 @@ const DisputeResolution = () => {
           <CardContent>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="overview">
-                <AccordionTrigger>A. Overview</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">A. Overview</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>
                     Goldsainte Ai / Inc. strives to provide seamless booking experiences. However, in the event of a disagreement, dispute, or claim arising out of or relating to your use of our Platform, services, or the Travel Experience itself ("Dispute"), this section explains how such matters will be resolved.
@@ -313,7 +313,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="informal">
-                <AccordionTrigger>B. Informal Resolution</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">B. Informal Resolution</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>Before initiating formal legal action, you agree to:</p>
                   <ul>
@@ -334,7 +334,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="mediation">
-                <AccordionTrigger>C. Mediation</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">C. Mediation</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>If a dispute cannot be resolved informally, you and Goldsainte Ai / Inc. agree to attempt mediation before pursuing arbitration or litigation:</p>
                   <ul>
@@ -349,7 +349,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="arbitration">
-                <AccordionTrigger>D. Arbitration</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">D. Arbitration</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>All disputes that cannot be resolved through informal resolution or mediation will be resolved through binding arbitration:</p>
                   <ul>
@@ -363,7 +363,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="exceptions">
-                <AccordionTrigger>E. Exceptions</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">E. Exceptions</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>Arbitration does not prevent either party from:</p>
                   <ul>
@@ -374,7 +374,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="waiver">
-                <AccordionTrigger>F. Class Action Waiver</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">F. Class Action Waiver</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>
                     You and Goldsainte Ai / Inc. agree that all disputes must be resolved individually, and not as a class or consolidated action.
@@ -386,7 +386,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="jurisdiction">
-                <AccordionTrigger>G. Governing Law and Jurisdiction</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">G. Governing Law and Jurisdiction</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>
                     This Dispute Resolution section is governed by the laws of the State of Delaware, USA, without regard to its conflict of law rules.
@@ -398,7 +398,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="severability">
-                <AccordionTrigger>H. Severability</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">H. Severability</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>
                     If any provision of this Dispute Resolution section is found invalid or unenforceable, the remaining provisions remain fully in effect.
@@ -407,7 +407,7 @@ const DisputeResolution = () => {
               </AccordionItem>
 
               <AccordionItem value="contact">
-                <AccordionTrigger>I. Contact for Disputes</AccordionTrigger>
+                <AccordionTrigger className="text-xl font-semibold hover:no-underline">I. Contact for Disputes</AccordionTrigger>
                 <AccordionContent className="prose prose-sm max-w-none">
                   <p>For any dispute or claim, contact:</p>
                   <div className="bg-muted p-4 rounded-lg">
