@@ -153,6 +153,12 @@ const About = () => {
               <p className="text-foreground italic mt-4">
                 Thank you for being part of this journey. The best adventures are still ahead.
               </p>
+              
+              <div className="mt-6 text-foreground">
+                <p className="font-semibold">Andre C. Powell Jr.</p>
+                <p>CEO & Founder</p>
+                <p>Goldsainte, Inc.</p>
+              </div>
             </div>
           </div>
         </CardContent>
