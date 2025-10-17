@@ -939,7 +939,7 @@ const Index = () => {
                 <section className="px-4 sm:px-6 py-10 sm:py-14 md:py-18 bg-gradient-to-b from-background via-muted/10 to-background" aria-labelledby="how-it-works-heading">
                   <div className="w-full max-w-7xl mx-auto space-y-6 sm:space-y-8 md:space-y-10">
                     <div className="text-left space-y-3 sm:space-y-4 px-2">
-                      <h2 id="how-it-works-heading" className="text-2xl md:text-[32px] lg:text-[36px] font-secondary font-semibold leading-tight text-primary mb-6 md:mb-8">
+                      <h2 id="how-it-works-heading" className="text-5xl sm:text-6xl md:text-7xl font-secondary font-bold leading-tight text-primary">
                         How it Works
                       </h2>
                       <div className="text-base sm:text-lg md:text-xl text-muted-foreground font-secondary leading-relaxed space-y-4">
@@ -1127,16 +1127,16 @@ const Index = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
                   {/* Left: Text Content */}
                   <div className="space-y-6">
-                    <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">
-                      <h3 id="creator-section-heading" className="text-[22px] md:text-2xl lg:text-[28px] font-bold text-primary leading-tight">
+                    <div className="space-y-2">
+                      <h2 id="creator-section-heading" className="text-5xl sm:text-6xl md:text-7xl font-bold text-primary leading-tight">
                         Create.
-                      </h3>
-                      <h3 className="text-[22px] md:text-2xl lg:text-[28px] font-bold text-secondary leading-tight" aria-label="Share">
+                      </h2>
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-secondary leading-tight" aria-label="Share">
                         Share.
-                      </h3>
-                      <h3 className="text-[22px] md:text-2xl lg:text-[28px] font-bold text-foreground leading-tight" aria-label="Make Money">
+                      </h2>
+                      <h2 className="text-5xl sm:text-6xl md:text-7xl font-bold text-foreground leading-tight" aria-label="Make Money">
                         Make Money.
-                      </h3>
+                      </h2>
                     </div>
                      <div className="text-base sm:text-lg md:text-xl text-muted-foreground font-secondary leading-relaxed space-y-4">
                       <p>
