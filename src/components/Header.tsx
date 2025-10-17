@@ -164,7 +164,7 @@ export const Header = () => {
             <div className="flex flex-col gap-2 py-2">
               {/* Top row: Logo + Navigation + User Menu */}
               <div className="flex items-center justify-between">
-                <a href="/home" className="flex items-center hover:opacity-90 transition-opacity">
+                <a href="/" className="flex items-center hover:opacity-90 transition-opacity">
                   <img src={logomark} alt="Goldsainte Logo" className="h-8 w-8" />
                 </a>
                 
@@ -380,7 +380,7 @@ export const Header = () => {
             /* Desktop Layout */
             <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
               {/* Logo - Left */}
-              <a href="/home" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
+              <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
                 <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
               </a>
 
