@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
 import logomark from "@/assets/logomark-seal-gold.png";
 import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
 import { WakeWordDetector } from "@/utils/WakeWordDetector";
@@ -40,6 +41,8 @@ export const AIBookingConcierge = () => {
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
 
@@ -145,6 +148,39 @@ export const AIBookingConcierge = () => {
       }
     }
   }, [voiceMode]);
+
+  // Handle URL parameters for opening AI chat with destination context
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const shouldOpenAI = params.get('aiChat') === 'true';
+    const destination = params.get('destination');
+    
+    if (shouldOpenAI && destination) {
+      console.log('[AIBookingConcierge] Opening chat with destination:', destination);
+      
+      // Clear the URL parameters to avoid re-triggering
+      const newParams = new URLSearchParams(location.search);
+      newParams.delete('aiChat');
+      newParams.delete('destination');
+      navigate({ search: newParams.toString() }, { replace: true });
+      
+      // Open the chat
+      setIsOpen(true);
+      
+      // Check if we should inject the destination message
+      // Only inject if conversation is empty or just has the greeting
+      const isNewConversation = messages.length <= 1;
+      
+      if (isNewConversation) {
+        const destinationPrompt = `I'm interested in planning a trip to ${destination}. Can you help me explore options and suggest activities, accommodations, and experiences?`;
+        
+        // Wait a bit for the component to fully open before sending
+        setTimeout(() => {
+          sendProgrammaticMessage(destinationPrompt);
+        }, 500);
+      }
+    }
+  }, [location.search]);
 
   // Save conversation data to localStorage for seamless handoff
   const saveConversationData = () => {
@@ -272,6 +308,98 @@ export const AIBookingConcierge = () => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const sendProgrammaticMessage = async (messageContent: string) => {
+    console.log('[AIBookingConcierge] Sending programmatic message:', messageContent);
+    
+    const userMessage: Message = { role: 'user', content: messageContent };
+    setMessages(prev => [...prev, userMessage]);
+    setIsLoading(true);
+    saveConversationData();
+
+    try {
+      // Add placeholder for assistant message
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+      const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-booking-concierge`;
+      console.log('[AIBookingConcierge] Calling edge function:', CHAT_URL);
+      
+      const resp = await fetch(CHAT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify({ 
+          messages: [...messages, userMessage],
+          stream: false,
+          agentProfile: agentProfile
+        }),
+      });
+
+      console.log('[AIBookingConcierge] Response status:', resp.status);
+
+      if (!resp.ok) {
+        const errorText = await resp.text();
+        console.error('[AIBookingConcierge] Error response:', errorText);
+        
+        if (resp.status === 429) {
+          toast({
+            title: "Rate limit exceeded",
+            description: "Too many requests. Please try again in a moment.",
+            variant: "destructive",
+          });
+          throw new Error("Rate limit exceeded");
+        }
+        if (resp.status === 402) {
+          toast({
+            title: "AI usage limit reached",
+            description: "Please add credits to continue using AI features.",
+            variant: "destructive",
+          });
+          throw new Error("Payment required");
+        }
+        
+        throw new Error("Failed to get response");
+      }
+
+      const data = await resp.json();
+      console.log('[AIBookingConcierge] Response data:', data);
+      
+      // Update assistant message with response
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = {
+          ...newMessages[newMessages.length - 1],
+          content: data.content || data.message || "I apologize, I encountered an issue. Please try again."
+        };
+        return newMessages;
+      });
+
+      saveConversationData();
+    } catch (error) {
+      console.error('[AIBookingConcierge] Error:', error);
+      
+      setMessages(prev => {
+        const newMessages = [...prev];
+        if (newMessages[newMessages.length - 1]?.role === 'assistant' && !newMessages[newMessages.length - 1].content) {
+          newMessages[newMessages.length - 1] = {
+            role: 'assistant',
+            content: "I apologize, but I encountered an error. Please try again."
+          };
+        }
+        return newMessages;
+      });
+      
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 

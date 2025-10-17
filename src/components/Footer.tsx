@@ -37,7 +37,7 @@ export const Footer = () => {
           {popularDestinations.slice(0, showAllDestinations ? undefined : 10).map((dest, idx) => (
             <Link 
               key={idx}
-              to={`/search?destination=${dest.name}`}
+              to={`/?aiChat=true&destination=${encodeURIComponent(dest.name)}`}
               className="text-sm hover:text-primary transition-colors group"
             >
               <div className="font-medium group-hover:underline">{dest.name}</div>
