@@ -42,10 +42,10 @@ export const PackageSearchHero = ({
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
         <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 font-secondary">
-          Discover Curated Travel Experiences
+          CoCurated Journeys + Live Deals
         </h1>
         <p className="text-xl text-white/90 mb-6">
-          Expert-crafted packages by verified travel agents
+          Discover exclusive travel experiences co-created with top creators and agents, alongside real-time packages you can book instantly. Curated inspiration meets live deals, all in one place.
         </p>
 
         {/* Data Source Toggle */}
