@@ -277,6 +277,7 @@ function AppContent() {
             <Route path="/instagram-api" element={<InstagramAPI />} />
             <Route path="/your-activity" element={<YourActivity />} />
           <Route path="/about" element={<About />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

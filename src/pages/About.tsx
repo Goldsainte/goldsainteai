@@ -386,6 +386,19 @@ const About = () => {
         Customer Terms of Service
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+          <p className="text-foreground font-semibold mb-2">Complete Terms Available</p>
+          <p className="text-sm text-muted-foreground mb-3">
+            View the full, detailed Terms of Service document including all sections, subsections, and the Goldsainte Dictionary.
+          </p>
+          <Link 
+            to="/terms" 
+            className="inline-flex items-center text-primary hover:underline font-medium"
+          >
+            View Full Terms of Service Document →
+          </Link>
+        </div>
+        
         <p className="text-sm text-muted-foreground">Updated October 17, 2025</p>
         
         <div className="space-y-4">
