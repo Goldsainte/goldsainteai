@@ -88,7 +88,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">Terms and settings</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">Privacy & cookies</a></li>
+              <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
               <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
               <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">Community Guidelines</Link></li>
@@ -130,7 +130,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">Legal</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Privacy & Cookies</a></li>
+              <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & Cookies</Link></li>
               <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link to="/dispute-resolution" className="hover:text-primary transition-colors">Dispute Resolution</Link></li>
               <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
