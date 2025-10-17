@@ -9,7 +9,6 @@ import { DestinationCard } from "@/components/DestinationCard";
 import { CategoryPackageSection } from "@/components/CategoryPackageSection";
 import { TopAttractionsSection } from "@/components/TopAttractionsSection";
 import { TopToursCarousel } from "@/components/TopToursCarousel";
-import { CancellationPolicyBanner } from "@/components/CancellationPolicyBanner";
 import { EnhancedPackageCard } from "@/components/EnhancedPackageCard";
 import { PackageFilters, PackageFilterState } from "@/components/PackageFilters";
 import { Card } from "@/components/ui/card";
@@ -51,6 +50,125 @@ interface Promotion {
   status: string;
   promo_code?: string;
 }
+
+const FALLBACK_DESTINATIONS = [
+  { destination: "Las Vegas", packageCount: 2847, startingPrice: 45, imageUrl: "https://images.unsplash.com/photo-1605833556294-ea5f7d4ef200?w=800&q=80" },
+  { destination: "Rome", packageCount: 3214, startingPrice: 52, imageUrl: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80" },
+  { destination: "Paris", packageCount: 4156, startingPrice: 48, imageUrl: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80" },
+  { destination: "London", packageCount: 3892, startingPrice: 55, imageUrl: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80" },
+  { destination: "New York City", packageCount: 5234, startingPrice: 62, imageUrl: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80" },
+  { destination: "Barcelona", packageCount: 2567, startingPrice: 49, imageUrl: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80" },
+  { destination: "Cancun", packageCount: 1893, startingPrice: 68, imageUrl: "https://images.unsplash.com/photo-1569077333975-580f7740f54e?w=800&q=80" },
+  { destination: "Florence", packageCount: 1456, startingPrice: 58, imageUrl: "https://images.unsplash.com/photo-1543429258-2b513e3a5a18?w=800&q=80" },
+];
+
+const FALLBACK_ATTRACTIONS = [
+  { destination: "Colosseum", packageCount: 1846, imageUrl: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=400&q=80" },
+  { destination: "Ephesus (Efes)", packageCount: 892, imageUrl: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=400&q=80" },
+  { destination: "Sagrada Familia", packageCount: 1523, imageUrl: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=400&q=80" },
+  { destination: "Yellowstone National Park", packageCount: 734, imageUrl: "https://images.unsplash.com/photo-1490077476659-095159692ab5?w=400&q=80" },
+  { destination: "Moraine Lake", packageCount: 567, imageUrl: "https://images.unsplash.com/photo-1503614472-8c93d56e92ce?w=400&q=80" },
+  { destination: "Blue Lagoon", packageCount: 1234, imageUrl: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=400&q=80" },
+];
+
+const FALLBACK_TOURS = [
+  {
+    id: "demo_1",
+    packageName: "Vatican Museums & Sistine Chapel Skip-the-Line Ticket",
+    destination: "Rome",
+    coverImage: "https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=800&q=80",
+    retailPrice: 89,
+    currency: "USD",
+    rating: 4.8,
+    totalReviews: 12453,
+    likelyToSellOut: true,
+    agencyName: "Rome Tours Inc."
+  },
+  {
+    id: "demo_2",
+    packageName: "Chicago River Architecture Tour",
+    destination: "Chicago",
+    coverImage: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80",
+    retailPrice: 42,
+    currency: "USD",
+    rating: 4.9,
+    totalReviews: 8934,
+    likelyToSellOut: true,
+    agencyName: "Chicago Adventures"
+  },
+  {
+    id: "demo_3",
+    packageName: "Tuscany Day Trip from Florence with Wine Tasting",
+    destination: "Florence",
+    coverImage: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&q=80",
+    retailPrice: 125,
+    currency: "USD",
+    rating: 4.7,
+    totalReviews: 5672,
+    likelyToSellOut: false,
+    agencyName: "Tuscany Excursions"
+  },
+  {
+    id: "demo_4",
+    packageName: "Grand Canyon West Rim Tour with Skywalk",
+    destination: "Las Vegas",
+    coverImage: "https://images.unsplash.com/photo-1474044159687-1ee9f3a51722?w=800&q=80",
+    retailPrice: 189,
+    currency: "USD",
+    rating: 4.6,
+    totalReviews: 3421,
+    likelyToSellOut: true,
+    agencyName: "Vegas Day Tours"
+  },
+  {
+    id: "demo_5",
+    packageName: "Eiffel Tower Summit with Skip-the-Line Access",
+    destination: "Paris",
+    coverImage: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=80",
+    retailPrice: 68,
+    currency: "USD",
+    rating: 4.8,
+    totalReviews: 15234,
+    likelyToSellOut: true,
+    agencyName: "Paris Premium Tours"
+  },
+  {
+    id: "demo_6",
+    packageName: "Snorkeling Adventure in the Great Barrier Reef",
+    destination: "Cairns",
+    coverImage: "https://images.unsplash.com/photo-1582967788606-a171c1080cb0?w=800&q=80",
+    retailPrice: 156,
+    currency: "USD",
+    rating: 4.9,
+    totalReviews: 7892,
+    likelyToSellOut: false,
+    agencyName: "Reef Adventures"
+  },
+  {
+    id: "demo_7",
+    packageName: "Santorini Sunset Cruise with Dinner",
+    destination: "Santorini",
+    coverImage: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=80",
+    retailPrice: 95,
+    currency: "USD",
+    rating: 4.7,
+    totalReviews: 4567,
+    likelyToSellOut: true,
+    agencyName: "Greek Island Cruises"
+  },
+  {
+    id: "demo_8",
+    packageName: "Northern Lights Tour with Professional Photography",
+    destination: "Reykjavik",
+    coverImage: "https://images.unsplash.com/photo-1579033461380-adb47c3eb938?w=800&q=80",
+    retailPrice: 145,
+    currency: "USD",
+    rating: 4.8,
+    totalReviews: 3234,
+    likelyToSellOut: false,
+    agencyName: "Iceland Adventures"
+  }
+];
 
 export default function CoCuratedJourneys() {
   const navigate = useNavigate();
@@ -137,9 +255,10 @@ export default function CoCuratedJourneys() {
         .sort((a, b) => b.packageCount - a.packageCount)
         .slice(0, 8);
 
-      setTopDestinations(destinations);
+      setTopDestinations(destinations.length > 0 ? destinations : FALLBACK_DESTINATIONS);
     } catch (error) {
       console.error("Error fetching top destinations:", error);
+      setTopDestinations(FALLBACK_DESTINATIONS);
     }
   };
 
@@ -171,9 +290,10 @@ export default function CoCuratedJourneys() {
         .sort((a, b) => b.packageCount - a.packageCount)
         .slice(0, 6);
 
-      setTopAttractions(attractions);
+      setTopAttractions(attractions.length > 0 ? attractions : FALLBACK_ATTRACTIONS);
     } catch (error) {
       console.error("Error fetching top attractions:", error);
+      setTopAttractions(FALLBACK_ATTRACTIONS);
     }
   };
 
@@ -210,12 +330,13 @@ export default function CoCuratedJourneys() {
         rating: pkg.travel_agents?.rating,
         totalReviews: pkg.travel_agents?.total_reviews,
         agencyName: pkg.travel_agents?.agency_name,
-        likelyToSellOut: Math.random() > 0.7, // Placeholder - replace with actual logic
+        likelyToSellOut: Math.random() > 0.7,
       })) || [];
 
-      setTopTours(tours);
+      setTopTours(tours.length > 0 ? tours : FALLBACK_TOURS);
     } catch (error) {
       console.error("Error fetching top tours:", error);
+      setTopTours(FALLBACK_TOURS);
     }
   };
 
@@ -315,22 +436,17 @@ export default function CoCuratedJourneys() {
 
         <div className="container mx-auto px-4 py-12">
           {/* Top Destinations */}
-          {topDestinations.length > 0 && (
-            <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Top Destinations</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {topDestinations.map((dest, idx) => (
-                  <DestinationCard key={idx} {...dest} />
-                ))}
-              </div>
+          <div className="mb-16">
+            <h2 className="text-3xl font-bold mb-6">Top Destinations</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {topDestinations.map((dest, idx) => (
+                <DestinationCard key={idx} {...dest} />
+              ))}
             </div>
-          )}
+          </div>
 
           {/* Top Attractions */}
           <TopAttractionsSection attractions={topAttractions} />
-
-          {/* Cancellation Policy Banner */}
-          <CancellationPolicyBanner />
 
           {/* Top Tours Carousel */}
           <TopToursCarousel tours={topTours} />

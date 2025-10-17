@@ -19,7 +19,7 @@ export const DestinationCard = ({
 
   return (
     <Card 
-      className="overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
+      className="rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
       onClick={() => navigate(`/cocurated-journeys?destination=${destination}`)}
     >
       <div className="relative h-64">
