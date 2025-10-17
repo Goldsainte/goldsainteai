@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, MapPin, Clock, Star, Calendar, Users, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 
 export default function TourActivityDetail() {
   const { tourId } = useParams();
@@ -15,35 +16,39 @@ export default function TourActivityDetail() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real implementation, you would fetch the tour details from Amadeus API
-    // For now, showing a placeholder
     const loadTourDetails = async () => {
       try {
         setLoading(true);
-        // Placeholder data - in production, fetch from Amadeus API
-        await new Promise(resolve => setTimeout(resolve, 1000));
         
-        setTour({
-          id: tourId,
-          name: "Sample Tour Activity",
-          description: "This is a placeholder for the tour details page. In production, this would fetch complete tour information from the Amadeus Tours & Activities API including full description, included/excluded items, meeting point, cancellation policy, and booking options.",
-          rating: "4.8",
-          pictures: [],
-          price: {
-            currencyCode: "USD",
-            amount: "99.00"
-          },
-          minimumDuration: "PT4H"
+        const { data, error } = await invokeEdgeFunction('amadeus-get-tour-details', {
+          body: { activityId: tourId }
         });
+
+        if (error) {
+          if (error.message?.includes('Rate limit')) {
+            toast.error('Too many requests. Please try again in a moment.');
+          } else if (error.message?.includes('not found')) {
+            toast.error('Tour not found');
+          } else {
+            toast.error('Failed to load tour details');
+          }
+          setTour(null);
+          return;
+        }
+
+        setTour(data);
       } catch (error) {
         console.error('Error loading tour:', error);
         toast.error('Failed to load tour details');
+        setTour(null);
       } finally {
         setLoading(false);
       }
     };
 
-    loadTourDetails();
+    if (tourId) {
+      loadTourDetails();
+    }
   }, [tourId]);
 
   if (loading) {
@@ -133,16 +138,43 @@ export default function TourActivityDetail() {
 
               <div className="prose max-w-none">
                 <h2>About this activity</h2>
-                <p>{tour.description}</p>
+                <p>{tour.description || tour.shortDescription || 'No description available.'}</p>
                 
-                <h2>What's included</h2>
-                <p>Detailed information about inclusions would be shown here from the Amadeus API response.</p>
+                {tour.included && tour.included.length > 0 && (
+                  <>
+                    <h2>What's included</h2>
+                    <ul>
+                      {tour.included.map((item: string, index: number) => (
+                        <li key={index}>{item}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
 
-                <h2>Meeting point</h2>
-                <p>Detailed meeting point information would be shown here from the Amadeus API response.</p>
+                {tour.excluded && tour.excluded.length > 0 && (
+                  <>
+                    <h2>What's not included</h2>
+                    <ul>
+                      {tour.excluded.map((item: string, index: number) => (
+                        <li key={index}>{item}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
 
-                <h2>Cancellation policy</h2>
-                <p>Cancellation policy details would be shown here from the Amadeus API response.</p>
+                {tour.meetingPoint && (
+                  <>
+                    <h2>Meeting point</h2>
+                    <p>{tour.meetingPoint.address || 'Meeting point details available upon booking.'}</p>
+                  </>
+                )}
+
+                {tour.cancellationPolicy && (
+                  <>
+                    <h2>Cancellation policy</h2>
+                    <p>{tour.cancellationPolicy.description || 'Cancellation policy available upon booking.'}</p>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -45,6 +45,9 @@ verify_jwt = true
 [functions.amadeus-search-cars]
 verify_jwt = false
 
+[functions.amadeus-get-tour-details]
+verify_jwt = false
+
 [functions.create-booking]
 verify_jwt = false
 
