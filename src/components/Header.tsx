@@ -157,7 +157,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className="bg-[#0c4d47] border-b border-border sticky top-0 z-50 touch-manipulation">
+      <header className="bg-[#0c4d47] border-b border-border sticky top-0 z-50 touch-manipulation font-secondary">
         <div className="container mx-auto px-3 sm:px-4 md:px-6">
           {/* Mobile Layout */}
           {isMobile ? (

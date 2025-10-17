@@ -14,6 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ['Playfair Display', 'serif'],
         covik: ['Covik Sans', 'sans-serif'],
         primary: ['Cormorant Garamond', 'serif'],
         secondary: ['Playfair Display', 'serif'],

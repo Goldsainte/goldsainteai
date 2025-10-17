@@ -41,7 +41,7 @@ export const PackageSearchHero = ({
       
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
+        <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 font-secondary">
           Discover Curated Travel Experiences
         </h1>
         <p className="text-xl text-white/90 mb-6">

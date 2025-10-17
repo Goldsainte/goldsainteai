@@ -8,7 +8,7 @@ export const SimpleHeader = () => {
   const { user, signOut } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 font-secondary">
       <div className="flex h-16 md:h-14 items-center px-3 md:px-4">
         <div className="flex-1" />
         <div className="flex items-center gap-1.5 md:gap-2">
