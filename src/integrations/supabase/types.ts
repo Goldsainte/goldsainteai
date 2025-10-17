@@ -2082,6 +2082,51 @@ export type Database = {
         }
         Relationships: []
       }
+      dispute_submissions: {
+        Row: {
+          booking_reference: string | null
+          created_at: string | null
+          description: string
+          dispute_type: string
+          email: string
+          id: string
+          name: string
+          phone: string | null
+          preferred_contact_method: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          booking_reference?: string | null
+          created_at?: string | null
+          description: string
+          dispute_type: string
+          email: string
+          id?: string
+          name: string
+          phone?: string | null
+          preferred_contact_method?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          booking_reference?: string | null
+          created_at?: string | null
+          description?: string
+          dispute_type?: string
+          email?: string
+          id?: string
+          name?: string
+          phone?: string | null
+          preferred_contact_method?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       ecommerce_connections: {
         Row: {
           access_token: string

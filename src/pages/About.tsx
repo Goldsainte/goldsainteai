@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { 
   Accordion,
   AccordionContent,
@@ -456,6 +457,114 @@ const About = () => {
           <h4 className="font-semibold mb-2">Governing Law</h4>
           <p className="text-muted-foreground">Disputes not subject to arbitration will be resolved in state or federal courts in Delaware (or your county for small claims), and these Terms are governed by Delaware law.</p>
         </div>
+      </AccordionContent>
+    </AccordionItem>
+
+    {/* Dispute Resolution */}
+    <AccordionItem value="dispute-resolution" className="border-0 rounded-lg px-6 bg-card shadow-sm">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+        Dispute Resolution
+      </AccordionTrigger>
+      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <p>
+          Goldsainte Ai / Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
+        </p>
+        
+        <div>
+          <h4 className="font-semibold mb-2">A. Overview</h4>
+          <p>
+            In the event of a disagreement, dispute, or claim arising from your use of our Platform or services, 
+            we provide multiple resolution pathways including informal resolution, mediation, and arbitration.
+          </p>
+          <p className="mt-2">
+            By using Goldsainte Ai / Inc., you agree to resolve disputes according to the terms outlined below.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">B. Informal Resolution</h4>
+          <p>Before initiating formal legal action, you agree to:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1">
+            <li>Contact Goldsainte Ai / Inc. Customer Support promptly via your account, app, or Help Center.</li>
+            <li>Provide relevant details including booking reference, contact information, issue summary, and supporting documentation.</li>
+            <li>Allow us 30 days to review and attempt to resolve the issue informally.</li>
+          </ul>
+          <p className="mt-2">Most disputes are resolved at this stage without further escalation.</p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">C. Mediation</h4>
+          <p>If a dispute cannot be resolved informally, mediation is the next step:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1">
+            <li>Either party may initiate mediation by providing written notice.</li>
+            <li>A mutually agreed-upon, neutral third-party mediator will facilitate the process.</li>
+            <li>Mediation sessions take place virtually or in-person in Dover, Delaware, USA.</li>
+            <li>Both parties must participate in good faith.</li>
+            <li>Costs are shared equally unless otherwise agreed.</li>
+            <li>If unresolved within 60 days, either party may proceed to arbitration.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">D. Arbitration</h4>
+          <p>All disputes that cannot be resolved through informal resolution or mediation will be resolved through binding arbitration:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1">
+            <li><strong>Arbitration Rules:</strong> Conducted under American Arbitration Association (AAA) rules.</li>
+            <li><strong>Location:</strong> Dover, Delaware, USA, unless both parties agree otherwise.</li>
+            <li><strong>Arbitrator:</strong> A single neutral arbitrator with relevant travel industry experience.</li>
+            <li><strong>Decision:</strong> Final, binding, and enforceable in any court of competent jurisdiction.</li>
+            <li><strong>Costs:</strong> Each party bears its own costs, including attorney's fees, unless determined otherwise.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">E. Exceptions</h4>
+          <p>Arbitration does not prevent either party from:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1">
+            <li>Seeking urgent injunctive or equitable relief in a court of competent jurisdiction.</li>
+            <li>Filing claims in small claims court for amounts within the applicable jurisdictional limit.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">F. Class Action Waiver</h4>
+          <p>
+            You and Goldsainte Ai / Inc. agree that all disputes must be resolved individually, and not as a class or consolidated action. 
+            Any arbitration or legal proceeding will apply only to you and us, and not to any other user or third party.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">G. Governing Law and Jurisdiction</h4>
+          <p>
+            This Dispute Resolution section is governed by the laws of the State of Delaware, USA, without regard to its conflict of law rules. 
+            Any court with jurisdiction in Kent County, Delaware may enforce arbitration awards or hear matters excluded from arbitration.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">H. Severability</h4>
+          <p>
+            If any provision of this Dispute Resolution section is found invalid or unenforceable, the remaining provisions remain fully in effect.
+          </p>
+        </div>
+
+        <div>
+          <h4 className="font-semibold mb-2">I. Contact for Disputes</h4>
+          <div className="bg-muted p-4 rounded-lg mt-2">
+            <p className="font-semibold">Goldsainte Ai / Goldsainte Inc.</p>
+            <p>850 New Burton Road, Suite 201</p>
+            <p>Dover, DE, 19904, County of Kent, USA</p>
+            <p>Email: support@goldsainte.ai</p>
+          </div>
+        </div>
+
+        <Button
+          onClick={() => window.location.href = '/dispute-resolution'}
+          className="mt-4 w-full"
+        >
+          Submit Dispute Resolution Form
+        </Button>
       </AccordionContent>
     </AccordionItem>
 

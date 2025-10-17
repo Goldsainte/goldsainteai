@@ -98,6 +98,7 @@ import AdminCustomerVerifications from "./pages/AdminCustomerVerifications";
 import About from "./pages/About";
 import TermsPage from "./pages/Terms";
 import WhatWeDo from "./pages/WhatWeDo";
+import DisputeResolution from "./pages/DisputeResolution";
 
 const queryClient = new QueryClient();
 
@@ -281,6 +282,7 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/what-we-do" element={<WhatWeDo />} />
+          <Route path="/dispute-resolution" element={<DisputeResolution />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
