@@ -75,7 +75,7 @@ export const PackageSearchHero = ({
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Where to */}
-            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border hover:bg-[#bfad72]/10 transition-colors cursor-pointer">
+            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border hover:bg-[#bfad72]/20 transition-colors cursor-pointer">
               <div className="flex-shrink-0">
                 <MapPin className="h-5 w-5 text-muted-foreground" />
               </div>
@@ -96,7 +96,7 @@ export const PackageSearchHero = ({
             <div className="flex-1">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-[#bfad72]/10 transition-colors">
+                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-[#bfad72]/20 transition-colors">
                     <div className="flex-shrink-0">
                       <CalendarIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
