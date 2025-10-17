@@ -742,7 +742,7 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
-    <AccordionItem value="human-rights" id="human-rights">
+    <AccordionItem value="human-rights" id="human-rights" className="border-0 rounded-lg px-6 bg-card shadow-sm">
       <AccordionTrigger className="text-xl font-semibold hover:no-underline">
         Human Rights Statement
       </AccordionTrigger>
