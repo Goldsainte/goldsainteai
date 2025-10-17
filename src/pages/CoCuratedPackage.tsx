@@ -3,142 +3,96 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, MapPin, Users, DollarSign, Check, Clock, Tag, Sparkles, AlertTriangle } from "lucide-react";
+import { MapPin, Users, DollarSign, Tag, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
-import { PackageDisputeModal } from "@/components/PackageDisputeModal";
+import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
+import { fetchAmadeusTourDetails, AmadeusActivity } from "@/lib/amadeusHelpers";
 
 export default function CoCuratedPackage() {
   const { packageId } = useParams();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [packageData, setPackageData] = useState<any>(null);
+  const [packageData, setPackageData] = useState<AmadeusActivity | null>(null);
   const [loading, setLoading] = useState(true);
   const [travelers, setTravelers] = useState(1);
   const [promoCode, setPromoCode] = useState("");
   const [discount, setDiscount] = useState(0);
   const [bookingLoading, setBookingLoading] = useState(false);
-  const [disputeModalOpen, setDisputeModalOpen] = useState(false);
-  const [hasActiveBooking, setHasActiveBooking] = useState(false);
 
   useEffect(() => {
     fetchPackage();
-    if (user) {
-      checkExistingBooking();
-    }
     // Check for promo code in URL
     const urlPromo = searchParams.get('promo');
     if (urlPromo) {
       setPromoCode(urlPromo.toUpperCase());
-      // Auto-apply if valid
-      setTimeout(() => {
-        applyPromoCode(urlPromo.toUpperCase());
-      }, 500);
     }
   }, [packageId]);
 
-  const checkExistingBooking = async () => {
-    if (!user) return;
+  const fetchPackage = async () => {
+    if (!packageId) return;
+    
     try {
-      const { data } = await supabase
-        .from('package_bookings')
-        .select('id')
-        .eq('package_id', packageId)
-        .eq('customer_id', user.id)
-        .or('status.eq.confirmed,status.eq.pending')
-        .limit(1);
-      
-      if (data && data.length > 0) {
-        setHasActiveBooking(true);
+      const activity = await fetchAmadeusTourDetails(packageId);
+      if (activity) {
+        setPackageData(activity);
+      } else {
+        toast.error("Package not found");
+        navigate('/cocurated-journeys');
       }
     } catch (error) {
-      console.error('Error checking booking:', error);
-    }
-  };
-
-  const fetchPackage = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('agent_packages')
-        .select(`
-          *,
-          travel_agents!inner(
-            agency_name,
-            rating,
-            profile_image_url
-          )
-        `)
-        .eq('id', packageId)
-        .eq('is_active', true)
-        .single();
-
-      if (error) throw error;
-      setPackageData(data);
-    } catch (error: any) {
-      console.error('Error:', error);
-      toast.error('Package not found');
-      navigate('/cocurated-marketplace');
+      console.error('Error fetching package:', error);
+      toast.error("Failed to load package details");
+      navigate('/cocurated-journeys');
     } finally {
       setLoading(false);
     }
   };
 
-  const applyPromoCode = async (codeOverride?: string) => {
-    const code = codeOverride || promoCode;
-    if (!code.trim()) return;
-
-    try {
-      const { data, error } = await supabase
-        .from('influencer_promotions')
-        .select('*')
-        .eq('promo_code', code.toUpperCase())
-        .eq('package_id', packageId)
-        .eq('status', 'active')
-        .single();
-
-      if (error || !data) {
-        toast.error('Invalid promo code');
-        return;
-      }
-
-      setDiscount(packageData.retail_price * 0.05); // 5% discount
-      toast.success('Promo code applied! 5% discount');
-
-      // Track the click via edge function
-      await supabase.functions.invoke('track-promo-click', {
-        body: {
-          promoCode: code.toUpperCase(),
-          packageId: packageId,
-          sessionId: crypto.randomUUID()
-        }
-      });
-    } catch (error: any) {
-      console.error('Error applying promo:', error);
-      toast.error('Failed to apply promo code');
-    }
-  };
-
   const handleBooking = async () => {
+    if (!user) {
+      toast.error('Please sign in to book');
+      navigate('/auth');
+      return;
+    }
+
+    if (!packageData?.bookingLink) {
+      toast.error('Booking link not available');
+      return;
+    }
+
     setBookingLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-cocurated-checkout', {
-        body: {
-          packageId,
-          promoCode: discount > 0 ? promoCode.toUpperCase() : null,
-          travelers
-        }
-      });
+      if (user) {
+        // Create booking record
+        const { error } = await supabase
+          .from('bookings')
+          .insert({
+            booking_type: 'event',
+            booking_reference: packageId,
+            status: 'pending',
+            total_price: finalPrice,
+            currency: packageData.price.currencyCode,
+            user_id: user.id,
+            booking_data: {
+              activity_id: packageId,
+              activity_name: packageData.name,
+              travelers_count: travelers
+            }
+          });
 
-      if (error) throw error;
-
-      if (data.url) {
-        window.open(data.url, '_blank');
+        if (error) throw error;
       }
+
+      // Open Amadeus booking link
+      window.open(packageData.bookingLink, '_blank');
+      toast.success('Redirecting to booking page...');
     } catch (error: any) {
       console.error('Error:', error);
       toast.error('Failed to initiate booking');
@@ -148,26 +102,39 @@ export default function CoCuratedPackage() {
   };
 
   if (loading) {
-    return <div className="container mx-auto py-8">Loading...</div>;
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <div className="container mx-auto py-8">Loading...</div>
+        <Footer />
+      </div>
+    );
   }
 
   if (!packageData) {
-    return <div className="container mx-auto py-8">Package not found</div>;
+    return (
+      <div className="min-h-screen">
+        <Header />
+        <div className="container mx-auto py-8">Package not found</div>
+        <Footer />
+      </div>
+    );
   }
 
-  const finalPrice = (packageData.retail_price - discount) * travelers;
-  const margin = packageData.retail_price - packageData.wholesale_cost;
+  const basePrice = parseFloat(packageData.price.amount);
+  const finalPrice = (basePrice - discount) * travelers;
 
   return (
     <div className="min-h-screen">
+      <Header />
       <div className="container mx-auto py-8 px-4">
         {/* Hero Section */}
         <div className="mb-8">
-          {packageData.cover_image_url && (
+          {packageData.pictures && packageData.pictures.length > 0 && (
             <div className="w-full h-96 rounded-lg overflow-hidden mb-6">
               <img 
-                src={packageData.cover_image_url} 
-                alt={packageData.package_name}
+                src={packageData.pictures[0]} 
+                alt={packageData.name}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -177,14 +144,19 @@ export default function CoCuratedPackage() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Sparkles className="h-6 w-6 text-primary" />
-                <h1 className="text-4xl font-bold">{packageData.package_name}</h1>
+                <h1 className="text-4xl font-bold">{packageData.name}</h1>
               </div>
-              <p className="text-muted-foreground">
-                by {packageData.travel_agents?.agency_name}
-              </p>
+              <div className="flex items-center gap-4 text-muted-foreground mt-2">
+                {packageData.rating && (
+                  <div className="flex items-center gap-1">
+                    <Star className="h-4 w-4 fill-current text-yellow-500" />
+                    <span>{packageData.rating} ({packageData.numberOfRatings || 0} reviews)</span>
+                  </div>
+                )}
+              </div>
             </div>
             <Badge className="text-lg px-4 py-2">
-              CoCurated<span className="text-xs align-super">™</span>
+              ${packageData.price.amount} {packageData.price.currencyCode}
             </Badge>
           </div>
         </div>
@@ -192,86 +164,30 @@ export default function CoCuratedPackage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Key Details */}
+            {/* Description */}
             <Card>
               <CardHeader>
-                <CardTitle>Trip Overview</CardTitle>
+                <CardTitle>About This Experience</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-4">
-                  <MapPin className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Destination</p>
-                    <p className="text-sm text-muted-foreground">{packageData.destination}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <Calendar className="h-5 w-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">Duration</p>
-                    <p className="text-sm text-muted-foreground">{packageData.duration_days} days</p>
-                  </div>
-                </div>
-                {packageData.max_participants && (
-                  <div className="flex items-center gap-4">
-                    <Users className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Group Size</p>
-                      <p className="text-sm text-muted-foreground">
-                        Up to {packageData.max_participants} travelers
-                      </p>
-                    </div>
-                  </div>
-                )}
+              <CardContent>
+                <p className="whitespace-pre-wrap">
+                  {packageData.description || packageData.shortDescription || "Explore this amazing tour and create unforgettable memories."}
+                </p>
               </CardContent>
             </Card>
 
-            {/* Description */}
-            {packageData.description && (
+            {/* Categories */}
+            {packageData.categories && packageData.categories.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>About This Trip</CardTitle>
+                  <CardTitle>Categories</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="whitespace-pre-wrap">{packageData.description}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Inclusions */}
-            {packageData.inclusions && packageData.inclusions.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>What's Included</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {packageData.inclusions.map((item: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <Check className="h-5 w-5 text-primary mt-0.5" />
-                        <span>{item}</span>
-                      </li>
+                  <div className="flex flex-wrap gap-2">
+                    {packageData.categories.map((category: string, index: number) => (
+                      <Badge key={index} variant="outline">{category}</Badge>
                     ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Exclusions */}
-            {packageData.exclusions && packageData.exclusions.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>What's Not Included</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {packageData.exclusions.map((item: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2 text-muted-foreground">
-                        <span>•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  </div>
                 </CardContent>
               </Card>
             )}
@@ -294,11 +210,11 @@ export default function CoCuratedPackage() {
                     <div className="text-right">
                       {discount > 0 && (
                         <p className="text-sm line-through text-muted-foreground">
-                          ${packageData.retail_price.toFixed(0)}
+                          ${basePrice.toFixed(0)}
                         </p>
                       )}
                       <p className="text-2xl font-bold">
-                        ${(packageData.retail_price - discount).toFixed(0)}
+                        ${(basePrice - discount).toFixed(0)}
                       </p>
                     </div>
                   </div>
@@ -313,33 +229,10 @@ export default function CoCuratedPackage() {
                   <Input
                     type="number"
                     min="1"
-                    max={packageData.max_participants || 20}
+                    max="20"
                     value={travelers}
                     onChange={(e) => setTravelers(parseInt(e.target.value) || 1)}
                   />
-                </div>
-
-                {/* Promo Code */}
-                <div>
-                  <Label className="flex items-center gap-2">
-                    <Tag className="h-4 w-4" />
-                    Promo Code
-                  </Label>
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter code"
-                      value={promoCode}
-                      onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                      disabled={discount > 0}
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => applyPromoCode()}
-                      disabled={discount > 0 || !promoCode.trim()}
-                    >
-                      Apply
-                    </Button>
-                  </div>
                 </div>
 
                 <Separator />
@@ -355,46 +248,20 @@ export default function CoCuratedPackage() {
                   className="w-full"
                   size="lg"
                   onClick={handleBooking}
-                  disabled={bookingLoading}
+                  disabled={bookingLoading || !packageData.bookingLink}
                 >
                   {bookingLoading ? 'Processing...' : 'Book Now'}
                 </Button>
 
                 <p className="text-xs text-center text-muted-foreground">
-                  Secure payment via Stripe. You'll be redirected to complete booking.
+                  You'll be redirected to complete booking via Amadeus.
                 </p>
-
-                {/* Dispute Button - Only show if user has an active booking */}
-                {hasActiveBooking && (
-                  <>
-                    <Separator />
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      onClick={() => setDisputeModalOpen(true)}
-                    >
-                      <AlertTriangle className="h-4 w-4 mr-2" />
-                      File a Dispute
-                    </Button>
-                  </>
-                )}
               </CardContent>
             </Card>
           </div>
         </div>
       </div>
-
-      {/* Dispute Modal */}
-      <PackageDisputeModal
-        open={disputeModalOpen}
-        onOpenChange={setDisputeModalOpen}
-        packageId={packageId || ''}
-        packageType="cocurated"
-        creatorId={packageData?.travel_agents?.user_id}
-        onSuccess={() => {
-          toast.success('Dispute submitted successfully');
-        }}
-      />
+      <Footer />
     </div>
   );
 }
