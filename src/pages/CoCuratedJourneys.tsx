@@ -7,7 +7,9 @@ import { toast } from "sonner";
 import { PackageSearchHero } from "@/components/PackageSearchHero";
 import { DestinationCard } from "@/components/DestinationCard";
 import { CategoryPackageSection } from "@/components/CategoryPackageSection";
-import { PackageStatsBar } from "@/components/PackageStatsBar";
+import { TopAttractionsSection } from "@/components/TopAttractionsSection";
+import { TopToursCarousel } from "@/components/TopToursCarousel";
+import { CancellationPolicyBanner } from "@/components/CancellationPolicyBanner";
 import { EnhancedPackageCard } from "@/components/EnhancedPackageCard";
 import { PackageFilters, PackageFilterState } from "@/components/PackageFilters";
 import { Card } from "@/components/ui/card";
@@ -57,13 +59,10 @@ export default function CoCuratedJourneys() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("destination") || "");
   const [packages, setPackages] = useState<AgentPackage[]>([]);
   const [topDestinations, setTopDestinations] = useState<any[]>([]);
+  const [topAttractions, setTopAttractions] = useState<any[]>([]);
+  const [topTours, setTopTours] = useState<any[]>([]);
   const [myPromotions, setMyPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState({
-    totalPackages: 0,
-    totalDestinations: 0,
-    averageRating: 0,
-  });
   
   const [packageFilters, setPackageFilters] = useState<PackageFilterState>({
     priceRange: [0, 10000],
@@ -77,8 +76,9 @@ export default function CoCuratedJourneys() {
   useEffect(() => {
     fetchPackages();
     fetchTopDestinations();
+    fetchTopAttractions();
+    fetchTopTours();
     fetchMyPromotions();
-    fetchStats();
   }, []);
 
   const fetchPackages = async () => {
@@ -109,27 +109,28 @@ export default function CoCuratedJourneys() {
   const fetchTopDestinations = async () => {
     try {
       const { data, error } = await supabase
-        .from('agent_packages')
-        .select('destination, cover_image_url, retail_price')
-        .eq('is_active', true)
-        .eq('status', 'active');
+        .from("agent_packages")
+        .select("destination, cover_image_url, retail_price")
+        .eq("is_active", true)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
 
+      // Group by destination and get the first 8
       const destinationMap = new Map();
-      data?.forEach(pkg => {
-        const dest = pkg.destination;
-        if (!destinationMap.has(dest)) {
-          destinationMap.set(dest, {
-            destination: dest,
-            packageCount: 0,
+      data?.forEach((pkg) => {
+        if (!destinationMap.has(pkg.destination)) {
+          destinationMap.set(pkg.destination, {
+            destination: pkg.destination,
+            packageCount: 1,
             startingPrice: pkg.retail_price,
             imageUrl: pkg.cover_image_url,
           });
+        } else {
+          const dest = destinationMap.get(pkg.destination);
+          dest.packageCount += 1;
+          dest.startingPrice = Math.min(dest.startingPrice, pkg.retail_price);
         }
-        const destData = destinationMap.get(dest);
-        destData.packageCount++;
-        destData.startingPrice = Math.min(destData.startingPrice, pkg.retail_price);
       });
 
       const destinations = Array.from(destinationMap.values())
@@ -138,37 +139,83 @@ export default function CoCuratedJourneys() {
 
       setTopDestinations(destinations);
     } catch (error) {
-      console.error('Error fetching destinations:', error);
+      console.error("Error fetching top destinations:", error);
     }
   };
 
-  const fetchStats = async () => {
+  const fetchTopAttractions = async () => {
     try {
-      const { data: packagesData, error: packagesError } = await supabase
-        .from('agent_packages')
-        .select('id, destination')
-        .eq('is_active', true)
-        .eq('status', 'active');
+      const { data, error } = await supabase
+        .from("agent_packages")
+        .select("destination, cover_image_url")
+        .eq("is_active", true);
 
-      const { data: agentsData, error: agentsError } = await supabase
-        .from('travel_agents')
-        .select('rating')
-        .eq('is_active', true);
+      if (error) throw error;
 
-      if (packagesError || agentsError) throw packagesError || agentsError;
-
-      const uniqueDestinations = new Set(packagesData?.map(p => p.destination) || []);
-      const avgRating = agentsData?.length 
-        ? agentsData.reduce((sum, a) => sum + (a.rating || 0), 0) / agentsData.length 
-        : 0;
-
-      setStats({
-        totalPackages: packagesData?.length || 0,
-        totalDestinations: uniqueDestinations.size,
-        averageRating: avgRating,
+      // Group by destination for attractions
+      const attractionMap = new Map();
+      data?.forEach((pkg) => {
+        if (!attractionMap.has(pkg.destination)) {
+          attractionMap.set(pkg.destination, {
+            destination: pkg.destination,
+            packageCount: 1,
+            imageUrl: pkg.cover_image_url,
+          });
+        } else {
+          const attr = attractionMap.get(pkg.destination);
+          attr.packageCount += 1;
+        }
       });
+
+      const attractions = Array.from(attractionMap.values())
+        .sort((a, b) => b.packageCount - a.packageCount)
+        .slice(0, 6);
+
+      setTopAttractions(attractions);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching top attractions:", error);
+    }
+  };
+
+  const fetchTopTours = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("agent_packages")
+        .select(`
+          id,
+          package_name,
+          destination,
+          cover_image_url,
+          retail_price,
+          currency,
+          travel_agents (
+            agency_name,
+            rating,
+            total_reviews
+          )
+        `)
+        .eq("is_active", true)
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      const tours = data?.map((pkg) => ({
+        id: pkg.id,
+        packageName: pkg.package_name,
+        destination: pkg.destination,
+        coverImage: pkg.cover_image_url,
+        retailPrice: pkg.retail_price,
+        currency: pkg.currency || "USD",
+        rating: pkg.travel_agents?.rating,
+        totalReviews: pkg.travel_agents?.total_reviews,
+        agencyName: pkg.travel_agents?.agency_name,
+        likelyToSellOut: Math.random() > 0.7, // Placeholder - replace with actual logic
+      })) || [];
+
+      setTopTours(tours);
+    } catch (error) {
+      console.error("Error fetching top tours:", error);
     }
   };
 
@@ -266,16 +313,11 @@ export default function CoCuratedJourneys() {
           onSearch={() => {}}
         />
 
-        <PackageStatsBar
-          totalPackages={stats.totalPackages}
-          totalDestinations={stats.totalDestinations}
-          averageRating={stats.averageRating}
-        />
-
         <div className="container mx-auto px-4 py-12">
+          {/* Top Destinations */}
           {topDestinations.length > 0 && (
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Popular Destinations</h2>
+              <h2 className="text-3xl font-bold mb-6">Top Destinations</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {topDestinations.map((dest, idx) => (
                   <DestinationCard key={idx} {...dest} />
@@ -283,6 +325,15 @@ export default function CoCuratedJourneys() {
               </div>
             </div>
           )}
+
+          {/* Top Attractions */}
+          <TopAttractionsSection attractions={topAttractions} />
+
+          {/* Cancellation Policy Banner */}
+          <CancellationPolicyBanner />
+
+          {/* Top Tours Carousel */}
+          <TopToursCarousel tours={topTours} />
 
           {adventurePackages.length > 0 && (
             <CategoryPackageSection
