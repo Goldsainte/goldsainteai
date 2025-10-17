@@ -965,21 +965,21 @@ const Index = () => {
                 <div className="relative -mx-4 sm:-mx-6 touch-manipulation">
                   <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
                     <div className="flex gap-3 sm:gap-5 md:gap-6 px-4 sm:px-6 pb-4 min-w-min">
-                      {/* Card 1 - AI Search */}
+                      {/* Card 1 - Voice AI Concierge */}
                       <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
                         <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
                             src={cardAiSearch} 
-                            alt="AI-Powered Search" 
+                            alt="Voice AI Concierge with Hey Goldsainte wake word activation" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
                         <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
                           <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
-                            AI-Powered Search
+                            Voice AI Concierge
                           </h3>
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
-                            Search across flights, hotels, restaurants, events, and curated packages in one conversation
+                            Just say "Hey Goldsainte" from anywhere on the site to instantly activate our advanced voice AI. Have natural conversations about flights, hotels, dining, and more—hands-free.
                           </p>
                           <Button 
                             variant="outline" 
@@ -992,26 +992,84 @@ const Index = () => {
                               }, 500);
                             }}
                           >
-                            Try it Now
+                            Try Voice AI
                           </Button>
                         </CardContent>
                       </Card>
 
-                      {/* Card 2 - Expert Agents */}
+                      {/* Card 2 - CoCurated™ Packages */}
                       <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
                         <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
-                            src={cardExpertAgents} 
-                            alt="Expert Travel Agents" 
+                            src={cardItinerary} 
+                            alt="CoCurated collaborative travel packages by top creators and agents" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
                         <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
                           <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
-                            Expert Travel Agents
+                            CoCurated™ - Collaborative Travel
                           </h3>
                           <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
-                            Post complex trips to our marketplace and get matched with certified luxury travel agents
+                            Browse exclusive packages created by top creators and agents. Fixed or flexible dates, secure booking, transparent pricing—all curated by travel experts who know the destinations best.
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
+                            onClick={() => {
+                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              setTimeout(() => {
+                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
+                                input?.focus();
+                              }, 500);
+                            }}
+                          >
+                            Browse Packages
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 3 - Creator Social Network */}
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
+                          <img 
+                            src={cardMessaging} 
+                            alt="Creator social network for sharing luxury travel experiences" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
+                            Create. Share. Make Money.
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
+                            A social networking platform for content creators to share their luxury travel experiences and create interactive trip plans. Earn income from your content and build your travel brand.
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
+                            onClick={() => navigate('/creator-dashboard')}
+                          >
+                            Join Creators
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 4 - Expert Agent Marketplace */}
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
+                          <img 
+                            src={cardExpertAgents} 
+                            alt="Expert agent marketplace with AI-matching and milestone payments" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
+                            Expert Agent Marketplace
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
+                            Post complex trips to our marketplace and get AI-matched with certified agents. Pay in milestones, track progress, and chat in real-time with full transparency.
                           </p>
                           <Button 
                             variant="outline" 
@@ -1023,83 +1081,25 @@ const Index = () => {
                         </CardContent>
                       </Card>
 
-                      {/* Card 3 - Real-Time Messaging */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardMessaging} 
-                            alt="Real-Time Messaging" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
-                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
-                            Real-Time Messaging
-                          </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
-                            Chat instantly with agents and manage all your travel conversations in one secure place
-                          </p>
-                          <Button 
-                            variant="outline" 
-                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
-                            onClick={() => {
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              setTimeout(() => {
-                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
-                                input?.focus();
-                              }, 500);
-                            }}
-                          >
-                            Start Chatting
-                          </Button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 4 - Itinerary Builder */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardItinerary} 
-                            alt="Itinerary Management" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
-                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
-                            Itinerary Management
-                          </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
-                            Build day-by-day itineraries, upload travel docs, and sync with your calendar
-                          </p>
-                          <Button 
-                            variant="outline" 
-                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
-                            onClick={() => navigate('/dashboard')}
-                          >
-                            Build Itinerary
-                          </Button>
-                        </CardContent>
-                      </Card>
-
                       {/* Card 5 - Instant Booking */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[307px] md:w-[346px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20">
-                        <div className="relative h-48 sm:h-52 overflow-hidden">
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
                           <img 
                             src={cardInstantBooking} 
-                            alt="Instant Booking" 
+                            alt="Instant booking for flights, hotels, restaurants, and events" 
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
-                        <CardContent className="p-5 sm:p-6 space-y-3">
-                          <h3 className="text-lg sm:text-xl font-semibold font-secondary text-foreground">
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
                             Instant Booking
                           </h3>
-                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[60px]">
-                            Book instantly with transparent pricing, flexible cancellations, and smart price insights
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
+                            Book flights, hotels, restaurants, and events directly on Goldsainte.ai. Transparent pricing, real-time availability, and seamless checkout—all in one platform.
                           </p>
                           <Button 
                             variant="outline" 
-                            className="w-full mt-4 h-10 sm:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation"
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => {
                               window.scrollTo({ top: 0, behavior: 'smooth' });
                               setTimeout(() => {
@@ -1109,6 +1109,28 @@ const Index = () => {
                             }}
                           >
                             Start Booking
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 6 - Creator Stores */}
+                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group hover:shadow-2xl transition-all duration-300 border-secondary/20 touch-manipulation">
+                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden bg-gradient-to-br from-muted/40 to-muted/20 flex items-center justify-center">
+                          <div className="text-muted-foreground/30 text-sm">Image coming soon</div>
+                        </div>
+                        <CardContent className="p-4 sm:p-5 md:p-6 space-y-2.5 sm:space-y-3">
+                          <h3 className="text-base sm:text-lg md:text-xl font-semibold font-secondary text-foreground leading-tight">
+                            Creator Stores
+                          </h3>
+                          <p className="text-sm text-muted-foreground leading-relaxed whitespace-normal min-h-[56px] sm:min-h-[60px]">
+                            Link your Shopify and Etsy stores to sell travel merchandise, guides, and exclusive products. Monetize your brand beyond travel packages.
+                          </p>
+                          <Button 
+                            variant="outline" 
+                            className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
+                            onClick={() => navigate('/creator-dashboard')}
+                          >
+                            Connect Store
                           </Button>
                         </CardContent>
                       </Card>
