@@ -250,7 +250,7 @@ const About = () => {
               ))}
             </div>
             <p className="text-sm text-muted-foreground text-center">
-              Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences.
+              Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences and seamless marketplace integrations.
             </p>
           </AccordionContent>
         </AccordionItem>
