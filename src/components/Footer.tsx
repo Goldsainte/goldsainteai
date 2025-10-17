@@ -63,7 +63,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">Support</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/my-trips" className="hover:text-primary transition-colors">Manage your trips</Link></li>
+              <li><Link to="/dashboard" className="hover:text-primary transition-colors">Manage your trips</Link></li>
               <li><Link to="/messages" className="hover:text-primary transition-colors">Contact Customer Service</Link></li>
               <li><Link to="/trust-safety" className="hover:text-primary transition-colors">Safety Resource Center</Link></li>
               <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">Cancellation & Refunds</Link></li>
@@ -89,10 +89,10 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">Terms and settings</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
               <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">Community Guidelines</Link></li>
-              <li><Link to="/dispute-resolution" className="hover:text-primary transition-colors">Dispute resolution</Link></li>
+              <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">Dispute resolution</Link></li>
               <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
               <li><Link to="/about#human-rights" className="hover:text-primary transition-colors">Human Rights Statement</Link></li>
             </ul>
@@ -131,8 +131,8 @@ export const Footer = () => {
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
               <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & Cookies</Link></li>
-              <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link to="/dispute-resolution" className="hover:text-primary transition-colors">Dispute Resolution</Link></li>
+              <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+              <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">Dispute Resolution</Link></li>
               <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
             </ul>
           </div>
