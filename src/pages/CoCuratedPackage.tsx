@@ -104,7 +104,6 @@ export default function CoCuratedPackage() {
   if (loading) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container mx-auto py-8">Loading...</div>
         <Footer />
       </div>
@@ -114,7 +113,6 @@ export default function CoCuratedPackage() {
   if (!packageData) {
     return (
       <div className="min-h-screen">
-        <Header />
         <div className="container mx-auto py-8">Package not found</div>
         <Footer />
       </div>
@@ -126,7 +124,6 @@ export default function CoCuratedPackage() {
 
   return (
     <div className="min-h-screen">
-      <Header />
       <div className="container mx-auto pt-4 pb-8 px-4">
         {/* Hero Section */}
         <div className="mb-8">
@@ -170,9 +167,12 @@ export default function CoCuratedPackage() {
                 <CardTitle>About This Experience</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="whitespace-pre-wrap">
-                  {packageData.description || packageData.shortDescription || "Explore this amazing tour and create unforgettable memories."}
-                </p>
+                <div 
+                  className="prose prose-sm max-w-none text-foreground"
+                  dangerouslySetInnerHTML={{ 
+                    __html: packageData.description || packageData.shortDescription || "Explore this amazing tour and create unforgettable memories."
+                  }}
+                />
               </CardContent>
             </Card>
 
