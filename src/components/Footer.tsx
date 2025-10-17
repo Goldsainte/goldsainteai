@@ -58,7 +58,7 @@ export const Footer = () => {
 
       {/* Navigation Links Section */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
           {/* Support Column */}
           <div>
             <h4 className="font-semibold mb-4 text-base">Support</h4>
@@ -120,6 +120,18 @@ export const Footer = () => {
               <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Investor Relations</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Corporate Contact</a></li>
+            </ul>
+          </div>
+
+          {/* Legal Column */}
+          <div>
+            <h4 className="font-semibold mb-4 text-base">Legal</h4>
+            <ul className="space-y-3 text-sm text-muted-foreground">
+              <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Privacy & Cookies</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Dispute Resolution</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">Modern Slavery Statement</a></li>
             </ul>
           </div>
         </div>

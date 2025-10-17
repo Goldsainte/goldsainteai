@@ -243,6 +243,24 @@ const About = () => {
           </AccordionContent>
         </AccordionItem>
 
+        {/* Legal */}
+        <AccordionItem value="legal" className="border-0 rounded-lg px-6 bg-card shadow-sm">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+            Legal
+          </AccordionTrigger>
+          <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
+            <p className="text-foreground">
+              Goldsainte Inc. (the company behind Goldsainte™) is registered and based in Delaware, USA ("Goldsainte," "we," "us," or "our"), from where it provides its AI-powered luxury travel and booking platform (the "Service") on its website (the "Website"), and is supported internationally by its affiliated group companies (the "Support Companies"). The Support Companies provide internal and operational support only. They do not render the Service and do not own, operate, or manage the Website or any other website.
+            </p>
+            <p className="text-foreground">
+              For any questions regarding Goldsainte, the Service, or the Website, or to send or serve any documents, notices, correspondence, or other communications—including press inquiries—please contact Goldsainte Inc. directly at its registered office in Delaware.
+            </p>
+            <p className="text-foreground">
+              Goldsainte Inc. does not maintain a legal domicile at any other location or office, including the offices of its Support Companies. The Support Companies are not authorized to act as a process agent or service agent for Goldsainte Inc., and no bookings or reservations can be made through the Support Companies.
+            </p>
+          </AccordionContent>
+        </AccordionItem>
+
       </Accordion>
     </div>
   );
