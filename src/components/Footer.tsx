@@ -169,7 +169,7 @@ export const Footer = () => {
             <img src={verticalLogo} alt="Goldsainte" className="h-20 w-auto" />
             <div className="text-center max-w-3xl">
               <p className="text-sm text-muted-foreground mb-2">
-                Goldsainte is part of Goldsainte.Ai Inc., the world leader in AI-powered luxury travel and curated experiences.
+                Goldsainte AI is part of Goldsainte Inc., the world leader in AI-powered luxury travel and curated experiences. Discover. Create. Share. Travel with Goldsainte.
               </p>
               <p className="text-xs text-muted-foreground">
                 Copyright © 2025 Goldsainte.Ai™. All rights reserved.
