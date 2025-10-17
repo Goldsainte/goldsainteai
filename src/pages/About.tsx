@@ -643,6 +643,105 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
+    {/* Modern Slavery Statement */}
+    <AccordionItem value="modern-slavery" id="modern-slavery" className="border-0 rounded-lg px-6 bg-card shadow-sm">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+        Modern Slavery Statement
+      </AccordionTrigger>
+      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+        <p className="text-sm text-muted-foreground">
+          Fiscal Year Ending [Insert Date]
+        </p>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">1. Introduction</h3>
+          <p className="text-foreground">
+            Goldsainte recognizes that modern slavery in all its forms—including slavery, human trafficking, forced labor, debt bondage, descent-based slavery, servitude, child slavery, and forced or early marriage—is a serious global issue. We are committed to respecting the human rights of all our stakeholders and to taking proactive measures to prevent our business and supply chains from contributing to such practices.
+          </p>
+          <p className="text-foreground mt-3">
+            Our commitment is guided by internationally recognized standards and principles, including the United Nations Guiding Principles on Business and Human Rights. We strive to avoid infringing on the rights of others and actively work to address adverse human rights impacts with which we may be involved, including modern slavery risks.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">2. About Goldsainte</h3>
+          <p className="text-foreground">
+            Goldsainte is a travel and experiences platform that connects users with accommodations, attractions, flights, car rentals, and other travel services worldwide. While our operations are primarily digital, we engage with a wide range of suppliers, service providers, and contractors. We recognize that certain areas of our supply chain may be at higher risk of modern slavery and remain committed to mitigating these risks wherever they exist.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">3. Our Policies and Commitments</h3>
+          <p className="text-foreground mb-3">
+            Goldsainte has implemented policies and procedures to address modern slavery risks, including:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-foreground">
+            <li>
+              <strong>Code of Conduct:</strong> All employees, contractors, and business partners are required to uphold ethical standards and respect human rights.
+            </li>
+            <li>
+              <strong>Supplier Standards:</strong> Our suppliers must comply with local labor laws and international human rights standards. Suppliers are expected to take steps to ensure that modern slavery does not exist within their own operations or supply chains.
+            </li>
+            <li>
+              <strong>Whistleblower Policy:</strong> Employees, partners, and other stakeholders can report concerns anonymously and without fear of retaliation.
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">4. Risk Assessment and Due Diligence</h3>
+          <p className="text-foreground mb-3">
+            Goldsainte regularly evaluates potential modern slavery risks in our operations and supply chain. We prioritize:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-foreground">
+            <li>Suppliers located in regions with higher risk of labor exploitation.</li>
+            <li>Industries where forced labor and human trafficking are more prevalent.</li>
+            <li>Contractors providing labor-intensive services or temporary staffing.</li>
+          </ul>
+          <p className="text-foreground mt-3">
+            Where risks are identified, we implement mitigation measures, including contractual obligations, audits, and monitoring practices.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">5. Training and Awareness</h3>
+          <p className="text-foreground">
+            We provide training and awareness programs for our employees, procurement teams, and key suppliers. These programs focus on recognizing modern slavery risks, understanding reporting mechanisms, and ensuring compliance with Goldsainte's policies.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">6. Reporting and Accountability</h3>
+          <p className="text-foreground">
+            Goldsainte maintains a transparent reporting framework. Any suspected incidents of modern slavery are investigated promptly. We are committed to continuous improvement and regularly review our policies and procedures to strengthen our efforts to prevent modern slavery.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">7. Future Commitments</h3>
+          <p className="text-foreground mb-3">
+            Goldsainte will continue to:
+          </p>
+          <ul className="list-disc pl-6 space-y-2 text-foreground">
+            <li>Enhance supplier engagement to ensure compliance with human rights standards.</li>
+            <li>Monitor, assess, and mitigate risks across our supply chain.</li>
+            <li>Collaborate with industry partners and stakeholders to promote responsible and ethical business practices.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-lg mb-3 text-foreground">8. Approval</h3>
+          <p className="text-foreground mb-3">
+            This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
+          </p>
+          <div className="bg-muted p-4 rounded-lg">
+            <p className="font-semibold">Andre C. Powell Jr.</p>
+            <p className="text-muted-foreground">CEO & Founder, Goldsainte Inc.</p>
+          </div>
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+
     </Accordion>
     </div>
   );

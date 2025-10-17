@@ -93,7 +93,7 @@ export const Footer = () => {
               <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
               <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">Community Guidelines</Link></li>
               <li><Link to="/dispute-resolution" className="hover:text-primary transition-colors">Dispute resolution</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Modern Slavery Statement</a></li>
+              <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">Human Rights Statement</a></li>
             </ul>
           </div>
@@ -133,7 +133,7 @@ export const Footer = () => {
               <li><a href="#" className="hover:text-primary transition-colors">Privacy & Cookies</a></li>
               <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link to="/dispute-resolution" className="hover:text-primary transition-colors">Dispute Resolution</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Modern Slavery Statement</a></li>
+              <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
             </ul>
           </div>
         </div>
