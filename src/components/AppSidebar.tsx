@@ -29,10 +29,10 @@ const items = [
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
   { title: "Creator Earnings", url: "/creator-dashboard", icon: DollarSign, authRequired: true },
   { title: "Favorites", url: "/favorites", icon: Heart },
+  { title: "About", url: "/about", icon: Info },
 ];
 
 const bottomItems = [
-  { title: "About", url: "/about", icon: Info },
   { title: "Profile", url: "/profile", icon: User },
 ];
 
