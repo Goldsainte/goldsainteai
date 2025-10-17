@@ -151,10 +151,19 @@ export const groupByCategory = (activities: AmadeusActivity[]) => {
     }
   });
 
-  return Object.values(categoryMap).map(({ name, activities: acts }) => ({
-    name,
-    imageUrl: acts[0]?.pictures?.[0] || '/placeholder.svg',
-    packageCount: acts.length,
-    startingPrice: Math.min(...acts.map(a => parseFloat(a.price.amount))),
-  }));
+  return Object.values(categoryMap).map(({ name, activities: acts }) => {
+    // Find first activity with valid images
+    const activityWithImage = acts.find(activity => 
+      activity.pictures && 
+      activity.pictures.length > 0 && 
+      activity.pictures[0] !== '/placeholder.svg'
+    );
+    
+    return {
+      name,
+      imageUrl: activityWithImage?.pictures?.[0] || '/placeholder.svg',
+      packageCount: acts.length,
+      startingPrice: Math.min(...acts.map(a => parseFloat(a.price.amount))),
+    };
+  });
 };
