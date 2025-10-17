@@ -237,7 +237,7 @@ const PrivacyCookies = () => {
           <div id="updates" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl sm:text-3xl">4. Updates to This Statement</CardTitle>
+                <CardTitle className="text-2xl">4. Updates to This Statement</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base">
