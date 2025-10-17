@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PackageSearchHero } from "@/components/PackageSearchHero";
 import { DestinationCard } from "@/components/DestinationCard";
+import { TopDestinationsSection } from "@/components/TopDestinationsSection";
 import { TopAttractionsSection } from "@/components/TopAttractionsSection";
 import { TopToursCarousel } from "@/components/TopToursCarousel";
 import { EnhancedPackageCard } from "@/components/EnhancedPackageCard";
@@ -20,6 +21,12 @@ import {
   AmadeusActivity,
   TransformedPackage
 } from "@/lib/amadeusHelpers";
+import { 
+  fetchAgentPackages, 
+  groupAgentPackagesByDestination, 
+  groupAgentPackagesByType,
+  TransformedAgentPackage
+} from "@/lib/agentPackageHelpers";
 import { findLocationCoordinates, getUserLocation } from "@/lib/locationMapping";
 
 export default function CoCuratedJourneys() {
@@ -27,12 +34,13 @@ export default function CoCuratedJourneys() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("destination") || "");
-  const [packages, setPackages] = useState<TransformedPackage[]>([]);
+  const [packages, setPackages] = useState<(TransformedPackage | TransformedAgentPackage)[]>([]);
   const [topDestinations, setTopDestinations] = useState<any[]>([]);
   const [topAttractions, setTopAttractions] = useState<any[]>([]);
-  const [topTours, setTopTours] = useState<AmadeusActivity[]>([]);
+  const [topTours, setTopTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [dataSource, setDataSource] = useState<'amadeus' | 'agent'>('amadeus');
   const [currentLocation, setCurrentLocation] = useState({ latitude: 48.8566, longitude: 2.3522, name: 'Paris' });
   
   const [packageFilters, setPackageFilters] = useState<PackageFilterState>({
@@ -46,14 +54,48 @@ export default function CoCuratedJourneys() {
 
   useEffect(() => {
     const initializeData = async () => {
-      const location = await getUserLocation();
-      setCurrentLocation(location);
-      await fetchToursForLocation(location.latitude, location.longitude, location.name);
+      if (dataSource === 'amadeus') {
+        const location = await getUserLocation();
+        setCurrentLocation(location);
+        await fetchToursForLocation(location.latitude, location.longitude, location.name);
+      } else {
+        await fetchAgentPackagesData();
+      }
       setLoading(false);
     };
 
     initializeData();
-  }, []);
+  }, [dataSource]);
+
+  const fetchAgentPackagesData = async () => {
+    setLoading(true);
+    try {
+      const agentPkgs = await fetchAgentPackages();
+      
+      if (agentPkgs.length === 0) {
+        toast.info("No agent packages available yet");
+      }
+      
+      setPackages(agentPkgs);
+      
+      const destGroups = groupAgentPackagesByDestination(agentPkgs);
+      setTopDestinations(destGroups);
+      
+      const typeGroups = groupAgentPackagesByType(agentPkgs);
+      setTopAttractions(typeGroups);
+      
+      setTopTours(agentPkgs.slice(0, 10));
+    } catch (error) {
+      console.error("Error fetching agent packages:", error);
+      toast.error("Failed to load agent packages");
+      setPackages([]);
+      setTopDestinations([]);
+      setTopAttractions([]);
+      setTopTours([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchToursForLocation = async (latitude: number, longitude: number, destinationName: string) => {
     setLoading(true);
@@ -84,7 +126,19 @@ export default function CoCuratedJourneys() {
       setTopAttractions(attractions);
 
       // Set top tours (first 10 activities)
-      setTopTours(activities.slice(0, 10));
+      const toursForCarousel = activities.slice(0, 10).map(tour => ({
+        id: tour.id,
+        packageName: tour.name,
+        destination: destinationName,
+        coverImage: tour.pictures?.[0] || '/placeholder.svg',
+        retailPrice: parseFloat(tour.price.amount),
+        currency: tour.price.currencyCode,
+        rating: tour.rating ? parseFloat(tour.rating) : undefined,
+        totalReviews: tour.numberOfRatings,
+        agencyName: 'Via Amadeus',
+        likelyToSellOut: !!tour.bookingLink
+      }));
+      setTopTours(toursForCarousel);
 
       console.log(`Loaded ${activities.length} tours for ${destinationName}`);
     } catch (error) {
@@ -98,6 +152,16 @@ export default function CoCuratedJourneys() {
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       toast.error("Please enter a destination");
+      return;
+    }
+
+    if (dataSource === 'agent') {
+      // For agent packages, just filter locally
+      const filtered = packages.filter(pkg => 
+        pkg.packageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        pkg.destination.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setPackages(filtered);
       return;
     }
 
@@ -148,6 +212,8 @@ export default function CoCuratedJourneys() {
           onSearchChange={setSearchQuery}
           onSearch={handleSearch}
           onOpenFilters={() => setFiltersOpen(true)}
+          dataSource={dataSource}
+          onDataSourceChange={setDataSource}
         />
 
         <div className="container mx-auto px-4 py-12">
@@ -159,20 +225,7 @@ export default function CoCuratedJourneys() {
             <>
               {/* Top Destinations */}
               {topDestinations.length > 0 && (
-                <div className="mb-16">
-                  <h2 className="text-3xl font-bold mb-6">Top Destinations</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {topDestinations.map((dest, idx) => (
-                      <DestinationCard 
-                        key={idx} 
-                        destination={dest.destination}
-                        imageUrl={dest.image}
-                        packageCount={dest.packageCount}
-                        startingPrice={dest.startingPrice}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <TopDestinationsSection destinations={topDestinations} />
               )}
 
               {/* Top Attractions */}
@@ -187,19 +240,10 @@ export default function CoCuratedJourneys() {
               {/* Top Tours Carousel */}
               {topTours.length > 0 && (
                 <section className="mb-16">
-                  <h2 className="text-3xl font-bold mb-8">Top Tours in {currentLocation.name}</h2>
-                  <TopToursCarousel tours={topTours.map(tour => ({
-                    id: tour.id,
-                    packageName: tour.name,
-                    destination: currentLocation.name,
-                    coverImage: tour.pictures?.[0] || '/placeholder.svg',
-                    retailPrice: parseFloat(tour.price.amount),
-                    currency: tour.price.currencyCode,
-                    rating: tour.rating ? parseFloat(tour.rating) : undefined,
-                    totalReviews: tour.numberOfRatings,
-                    agencyName: 'Via Amadeus',
-                    likelyToSellOut: !!tour.bookingLink
-                  }))} />
+                  <h2 className="text-3xl font-bold mb-8">
+                    {dataSource === 'amadeus' ? `Top Tours in ${currentLocation.name}` : 'Featured CoCurated Packages'}
+                  </h2>
+                  <TopToursCarousel tours={topTours} />
                 </section>
               )}
 
@@ -225,6 +269,7 @@ export default function CoCuratedJourneys() {
                       agencyName={pkg.agencyName}
                       durationDays={1}
                       isPromoting={false}
+                      source={dataSource}
                       onViewDetails={() => navigate(`/cocurated-package/${pkg.id}`)}
                       onRequestPromotion={() => requestPromotion(pkg.id)}
                     />

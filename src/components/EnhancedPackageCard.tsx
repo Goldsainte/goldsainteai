@@ -20,6 +20,7 @@ interface EnhancedPackageCardProps {
   onViewDetails: () => void;
   onRequestPromotion: () => void;
   isPromoting?: boolean;
+  source?: 'amadeus' | 'agent';
 }
 
 export const EnhancedPackageCard = ({
@@ -38,6 +39,7 @@ export const EnhancedPackageCard = ({
   onViewDetails,
   onRequestPromotion,
   isPromoting,
+  source = 'amadeus',
 }: EnhancedPackageCardProps) => {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
@@ -57,14 +59,19 @@ export const EnhancedPackageCard = ({
       </div>
 
       <CardContent className="p-4">
-        {/* Agency Badge */}
-        {agencyName && (
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="outline" className="text-xs">
-              {agencyName}
+        {/* Source and Agency Badges */}
+        <div className="flex items-center gap-2 mb-2">
+          {source === 'agent' && (
+            <Badge variant="default" className="text-xs bg-primary">
+              CoCurated by {agencyName || 'Agent'}
             </Badge>
-          </div>
-        )}
+          )}
+          {source === 'amadeus' && agencyName && (
+            <Badge variant="outline" className="text-xs">
+              Via Amadeus
+            </Badge>
+          )}
+        </div>
 
         {/* Title */}
         <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">

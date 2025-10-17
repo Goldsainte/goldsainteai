@@ -26,7 +26,7 @@ export const TopAttractionsSection = ({ attractions }: TopAttractionsSectionProp
             className="p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-all duration-300"
             onClick={() => navigate(`/cocurated-journeys?destination=${attraction.destination}`)}
           >
-            <div className="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+            <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
               <img
                 src={attraction.imageUrl || `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80`}
                 alt={attraction.destination}
@@ -34,7 +34,7 @@ export const TopAttractionsSection = ({ attractions }: TopAttractionsSectionProp
               />
             </div>
             <div>
-              <h3 className="text-lg font-bold mb-1">{attraction.destination}</h3>
+              <h3 className="text-xl font-bold mb-1">{attraction.destination}</h3>
               <p className="text-sm text-muted-foreground">
                 {attraction.packageCount.toLocaleString()} Tours and Activities
               </p>

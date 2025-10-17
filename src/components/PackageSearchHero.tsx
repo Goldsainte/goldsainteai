@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
 
@@ -12,6 +13,8 @@ interface PackageSearchHeroProps {
   onSearchChange: (value: string) => void;
   onSearch: () => void;
   onOpenFilters: () => void;
+  dataSource: 'amadeus' | 'agent';
+  onDataSourceChange: (source: 'amadeus' | 'agent') => void;
 }
 
 export const PackageSearchHero = ({
@@ -19,6 +22,8 @@ export const PackageSearchHero = ({
   onSearchChange,
   onSearch,
   onOpenFilters,
+  dataSource,
+  onDataSourceChange,
 }: PackageSearchHeroProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -39,9 +44,32 @@ export const PackageSearchHero = ({
         <h1 className="text-5xl md:text-6xl font-bold text-white mb-4">
           Discover Curated Travel Experiences
         </h1>
-        <p className="text-xl text-white/90 mb-8">
+        <p className="text-xl text-white/90 mb-6">
           Expert-crafted packages by verified travel agents
         </p>
+
+        {/* Data Source Toggle */}
+        <div className="flex justify-center mb-6">
+          <ToggleGroup 
+            type="single" 
+            value={dataSource} 
+            onValueChange={(value) => value && onDataSourceChange(value as 'amadeus' | 'agent')}
+            className="bg-white/10 backdrop-blur-sm rounded-lg p-1"
+          >
+            <ToggleGroupItem 
+              value="amadeus" 
+              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6"
+            >
+              Amadeus Tours
+            </ToggleGroupItem>
+            <ToggleGroupItem 
+              value="agent" 
+              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6"
+            >
+              CoCurated by Agents
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </div>
         
         {/* Search Bar - Viator Style */}
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
