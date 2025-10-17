@@ -555,7 +555,7 @@ const About = () => {
             <p className="font-semibold">Goldsainte Ai / Goldsainte Inc.</p>
             <p>850 New Burton Road, Suite 201</p>
             <p>Dover, DE, 19904, County of Kent, USA</p>
-            <p>Email: support@goldsainte.ai</p>
+            <p>Email: support@goldsainte.com</p>
           </div>
         </div>
 

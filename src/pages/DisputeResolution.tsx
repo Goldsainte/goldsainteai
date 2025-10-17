@@ -282,7 +282,7 @@ const DisputeResolution = () => {
                 County of Kent, USA
               </p>
               <p className="text-muted-foreground">
-                Email: support@goldsainte.ai
+                Email: support@goldsainte.com
               </p>
             </CardContent>
           </Card>
@@ -414,7 +414,7 @@ const DisputeResolution = () => {
                     <p className="font-semibold">Goldsainte Ai / Goldsainte Inc.</p>
                     <p>850 New Burton Road, Suite 201</p>
                     <p>Dover, DE, 19904, County of Kent, USA</p>
-                    <p>Email: support@goldsainte.ai</p>
+                    <p>Email: support@goldsainte.com</p>
                   </div>
                 </AccordionContent>
               </AccordionItem>

@@ -34,12 +34,28 @@ interface Profile {
   created_at: string;
 }
 
+interface DisputeSubmission {
+  id: string;
+  user_id: string | null;
+  name: string;
+  email: string;
+  phone: string | null;
+  booking_reference: string | null;
+  dispute_type: string;
+  description: string;
+  preferred_contact_method: string | null;
+  status: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function AdminInquiries() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [users, setUsers] = useState<Profile[]>([]);
+  const [disputes, setDisputes] = useState<DisputeSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -94,6 +110,15 @@ export default function AdminInquiries() {
       const profilesWithEmails = profilesData || [];
       setUsers(profilesWithEmails as any);
 
+      // Fetch dispute submissions
+      const { data: disputesData, error: disputesError } = await supabase
+        .from('dispute_submissions')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (disputesError) throw disputesError;
+      setDisputes(disputesData || []);
+
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({
@@ -127,6 +152,31 @@ export default function AdminInquiries() {
     toast({
       title: "Success",
       description: "Inquiry status updated.",
+    });
+    fetchData();
+  };
+
+  const updateDisputeStatus = async (disputeId: string, newStatus: string) => {
+    const { error } = await supabase
+      .from('dispute_submissions')
+      .update({ 
+        status: newStatus,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', disputeId);
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update dispute status.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Success",
+      description: "Dispute status updated.",
     });
     fetchData();
   };
@@ -172,6 +222,9 @@ export default function AdminInquiries() {
           <TabsList>
             <TabsTrigger value="inquiries">
               Agent Inquiries ({inquiries.length})
+            </TabsTrigger>
+            <TabsTrigger value="disputes">
+              Dispute Submissions ({disputes.length})
             </TabsTrigger>
             <TabsTrigger value="users">
               All Users ({users.length})
@@ -294,6 +347,118 @@ export default function AdminInquiries() {
                     {users.length === 0 && (
                       <p className="text-center text-muted-foreground py-8">
                         No users found.
+                      </p>
+                    )}
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="disputes" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Dispute Resolution Submissions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="h-[600px]">
+                  <div className="space-y-4">
+                    {disputes.map((dispute) => (
+                      <Card key={dispute.id} className="border-2">
+                        <CardContent className="pt-6">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <User className="h-4 w-4" />
+                                <span className="font-semibold">{dispute.name}</span>
+                                <Badge className={getStatusColor(dispute.status)}>
+                                  {dispute.status}
+                                </Badge>
+                                <Badge variant="outline">{dispute.dispute_type}</Badge>
+                              </div>
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-1">
+                                  <Mail className="h-3 w-3" />
+                                  {dispute.email}
+                                </div>
+                                {dispute.phone && (
+                                  <div className="flex items-center gap-1">
+                                    <Phone className="h-3 w-3" />
+                                    {dispute.phone}
+                                  </div>
+                                )}
+                                <div className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {format(new Date(dispute.created_at), 'MMM d, yyyy h:mm a')}
+                                </div>
+                              </div>
+                              {dispute.booking_reference && (
+                                <p className="text-xs text-muted-foreground">
+                                  Booking Ref: {dispute.booking_reference}
+                                </p>
+                              )}
+                              {dispute.preferred_contact_method && (
+                                <p className="text-xs text-muted-foreground">
+                                  Preferred Contact: {dispute.preferred_contact_method}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              {dispute.status === 'pending' && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    onClick={() => updateDisputeStatus(dispute.id, 'under_review')}
+                                  >
+                                    Start Review
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => updateDisputeStatus(dispute.id, 'closed')}
+                                  >
+                                    Close
+                                  </Button>
+                                </>
+                              )}
+                              {dispute.status === 'under_review' && (
+                                <>
+                                  <Button
+                                    size="sm"
+                                    variant="default"
+                                    onClick={() => updateDisputeStatus(dispute.id, 'resolved')}
+                                  >
+                                    Mark Resolved
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => updateDisputeStatus(dispute.id, 'escalated')}
+                                  >
+                                    Escalate
+                                  </Button>
+                                </>
+                              )}
+                              {dispute.status === 'escalated' && (
+                                <Button
+                                  size="sm"
+                                  onClick={() => updateDisputeStatus(dispute.id, 'resolved')}
+                                >
+                                  Mark Resolved
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                          <div className="mt-3 p-3 bg-muted rounded-lg">
+                            <p className="text-sm font-semibold mb-2">Description:</p>
+                            <p className="text-sm whitespace-pre-wrap">{dispute.description}</p>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                    {disputes.length === 0 && (
+                      <p className="text-center text-muted-foreground py-8">
+                        No dispute submissions yet.
                       </p>
                     )}
                   </div>
