@@ -38,11 +38,12 @@ export interface TransformedPackage {
 export const fetchAmadeusToursForLocation = async (
   latitude: number,
   longitude: number,
-  radius: number = 10,
+  radius: number = 20,
   categories?: string[]
 ): Promise<AmadeusActivity[]> => {
   try {
-    const { data, error } = await supabase.functions.invoke('amadeus-search-tours', {
+    // Try with initial radius
+    let { data, error } = await supabase.functions.invoke('amadeus-search-tours', {
       body: {
         latitude,
         longitude,
@@ -53,10 +54,29 @@ export const fetchAmadeusToursForLocation = async (
 
     if (error) {
       console.error('Error fetching Amadeus tours:', error);
-      return [];
     }
 
-    return data?.data || [];
+    let activities = data?.data || [];
+
+    // If no results, try expanding radius to 50km
+    if (activities.length === 0 && radius < 50) {
+      console.log(`No results with ${radius}km radius, trying 50km...`);
+      const result = await supabase.functions.invoke('amadeus-search-tours', {
+        body: { latitude, longitude, radius: 50, categories },
+      });
+      activities = result.data?.data || [];
+    }
+
+    // If still no results, try 100km
+    if (activities.length === 0 && radius < 100) {
+      console.log(`No results with 50km radius, trying 100km...`);
+      const result = await supabase.functions.invoke('amadeus-search-tours', {
+        body: { latitude, longitude, radius: 100, categories },
+      });
+      activities = result.data?.data || [];
+    }
+
+    return activities;
   } catch (error) {
     console.error('Failed to fetch Amadeus tours:', error);
     return [];
@@ -112,7 +132,7 @@ export const groupByDestination = (activities: AmadeusActivity[], defaultDestina
 
   return Object.entries(grouped).map(([destination, tours]) => ({
     destination,
-    image: tours[0]?.pictures?.[0] || '/placeholder.svg',
+    imageUrl: tours[0]?.pictures?.[0] || '/placeholder.svg',
     packageCount: tours.length,
     startingPrice: Math.min(...tours.map(t => parseFloat(t.price.amount))),
   }));
@@ -133,7 +153,7 @@ export const groupByCategory = (activities: AmadeusActivity[]) => {
 
   return Object.values(categoryMap).map(({ name, activities: acts }) => ({
     name,
-    image: acts[0]?.pictures?.[0] || '/placeholder.svg',
+    imageUrl: acts[0]?.pictures?.[0] || '/placeholder.svg',
     packageCount: acts.length,
     startingPrice: Math.min(...acts.map(a => parseFloat(a.price.amount))),
   }));

@@ -24,7 +24,11 @@ export const TopAttractionsSection = ({ attractions }: TopAttractionsSectionProp
           <Card
             key={attraction.destination}
             className="p-4 flex items-center gap-4 cursor-pointer hover:shadow-lg transition-all duration-300"
-            onClick={() => navigate(`/cocurated-journeys?destination=${attraction.destination}`)}
+            onClick={() => {
+              const searchParams = new URLSearchParams(window.location.search);
+              const currentDest = searchParams.get('destination') || '';
+              navigate(`/cocurated-journeys?destination=${currentDest || 'Paris'}&category=${encodeURIComponent(attraction.destination)}`);
+            }}
           >
             <div className="w-24 h-24 flex-shrink-0 rounded-lg overflow-hidden">
               <img

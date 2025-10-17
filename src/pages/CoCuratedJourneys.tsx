@@ -28,6 +28,11 @@ import {
   TransformedAgentPackage
 } from "@/lib/agentPackageHelpers";
 import { findLocationCoordinates, getUserLocation } from "@/lib/locationMapping";
+import { 
+  curatedTopDestinations, 
+  curatedTopAttractions, 
+  curatedDefaultCity 
+} from "@/lib/curatedContent";
 
 export default function CoCuratedJourneys() {
   const navigate = useNavigate();
@@ -54,10 +59,33 @@ export default function CoCuratedJourneys() {
 
   useEffect(() => {
     const initializeData = async () => {
+      const destParam = searchParams.get('destination');
+      const categoryParam = searchParams.get('category');
+      
       if (dataSource === 'amadeus') {
-        const location = await getUserLocation();
-        setCurrentLocation(location);
-        await fetchToursForLocation(location.latitude, location.longitude, location.name);
+        if (destParam) {
+          // URL has destination, fetch that
+          const location = findLocationCoordinates(destParam);
+          if (location) {
+            setCurrentLocation(location);
+            await fetchToursForLocation(
+              location.latitude, 
+              location.longitude, 
+              location.name,
+              categoryParam ? [categoryParam] : undefined
+            );
+          } else {
+            toast.error("Destination not found");
+            const userLoc = await getUserLocation();
+            setCurrentLocation(userLoc);
+            await fetchToursForLocation(userLoc.latitude, userLoc.longitude, userLoc.name);
+          }
+        } else {
+          // No destination in URL, use user location
+          const location = await getUserLocation();
+          setCurrentLocation(location);
+          await fetchToursForLocation(location.latitude, location.longitude, location.name);
+        }
       } else {
         await fetchAgentPackagesData();
       }
@@ -65,7 +93,7 @@ export default function CoCuratedJourneys() {
     };
 
     initializeData();
-  }, [dataSource]);
+  }, [dataSource, searchParams]);
 
   const fetchAgentPackagesData = async () => {
     setLoading(true);
@@ -79,35 +107,72 @@ export default function CoCuratedJourneys() {
       setPackages(agentPkgs);
       
       const destGroups = groupAgentPackagesByDestination(agentPkgs);
-      setTopDestinations(destGroups);
+      setTopDestinations(destGroups.length > 0 ? destGroups : curatedTopDestinations);
       
       const typeGroups = groupAgentPackagesByType(agentPkgs);
-      setTopAttractions(typeGroups);
+      setTopAttractions(typeGroups.length > 0 ? typeGroups : curatedTopAttractions);
       
       setTopTours(agentPkgs.slice(0, 10));
     } catch (error) {
       console.error("Error fetching agent packages:", error);
       toast.error("Failed to load agent packages");
       setPackages([]);
-      setTopDestinations([]);
-      setTopAttractions([]);
+      setTopDestinations(curatedTopDestinations);
+      setTopAttractions(curatedTopAttractions);
       setTopTours([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchToursForLocation = async (latitude: number, longitude: number, destinationName: string) => {
+  const fetchToursForLocation = async (
+    latitude: number, 
+    longitude: number, 
+    destinationName: string, 
+    categories?: string[]
+  ) => {
     setLoading(true);
     try {
-      const activities = await fetchAmadeusToursForLocation(latitude, longitude, 20);
+      const activities = await fetchAmadeusToursForLocation(latitude, longitude, 20, categories);
       
       if (activities.length === 0) {
-        toast.error("No tours found for this location");
-        setPackages([]);
-        setTopDestinations([]);
-        setTopAttractions([]);
-        setTopTours([]);
+        // No results even after retry - fallback to Paris and show curated lists
+        console.log('No tours found, fetching from default city (Paris)...');
+        const parisActivities = await fetchAmadeusToursForLocation(
+          curatedDefaultCity.latitude,
+          curatedDefaultCity.longitude,
+          20
+        );
+        
+        if (parisActivities.length > 0) {
+          const parisPackages = parisActivities.map(activity => 
+            transformAmadeusToPackage(activity, curatedDefaultCity.name)
+          );
+          setPackages(parisPackages);
+          
+          const parisToursCarousel = parisActivities.slice(0, 10).map(tour => ({
+            id: tour.id,
+            packageName: tour.name,
+            destination: curatedDefaultCity.name,
+            coverImage: tour.pictures?.[0] || '/placeholder.svg',
+            retailPrice: parseFloat(tour.price.amount),
+            currency: tour.price.currencyCode,
+            rating: tour.rating ? parseFloat(tour.rating) : undefined,
+            totalReviews: tour.numberOfRatings,
+            agencyName: 'Via Amadeus',
+            likelyToSellOut: !!tour.bookingLink
+          }));
+          setTopTours(parisToursCarousel);
+        } else {
+          setPackages([]);
+          setTopTours([]);
+        }
+        
+        // Always show curated destinations and attractions for visual richness
+        setTopDestinations(curatedTopDestinations);
+        setTopAttractions(curatedTopAttractions);
+        
+        toast.info(`Showing popular options. Click a destination above to explore!`);
         return;
       }
 
@@ -119,11 +184,11 @@ export default function CoCuratedJourneys() {
 
       // Generate top destinations
       const destinations = groupByDestination(activities, destinationName);
-      setTopDestinations(destinations);
+      setTopDestinations(destinations.length > 0 ? destinations : curatedTopDestinations);
 
       // Generate top attractions by category
       const attractions = groupByCategory(activities);
-      setTopAttractions(attractions);
+      setTopAttractions(attractions.length > 0 ? attractions : curatedTopAttractions);
 
       // Set top tours (first 10 activities)
       const toursForCarousel = activities.slice(0, 10).map(tour => ({
@@ -144,6 +209,9 @@ export default function CoCuratedJourneys() {
     } catch (error) {
       console.error('Error fetching tours:', error);
       toast.error("Failed to load tours");
+      // Fallback to curated on error
+      setTopDestinations(curatedTopDestinations);
+      setTopAttractions(curatedTopAttractions);
     } finally {
       setLoading(false);
     }
@@ -231,8 +299,8 @@ export default function CoCuratedJourneys() {
               {/* Top Attractions */}
               {topAttractions.length > 0 && (
                 <TopAttractionsSection attractions={topAttractions.map(attr => ({
-                  destination: attr.name,
-                  imageUrl: attr.image,
+                  destination: attr.name || attr.destination,
+                  imageUrl: attr.image || attr.imageUrl,
                   packageCount: attr.packageCount
                 }))} />
               )}
