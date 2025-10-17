@@ -985,11 +985,10 @@ const Index = () => {
                             variant="outline" 
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => {
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              setTimeout(() => {
-                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
-                                input?.focus();
-                              }, 500);
+                              const aiWidget = document.querySelector('[data-tour="ai-widget"]') as HTMLButtonElement;
+                              if (aiWidget) {
+                                aiWidget.click();
+                              }
                             }}
                           >
                             Try Voice AI
@@ -1016,13 +1015,7 @@ const Index = () => {
                           <Button 
                             variant="outline" 
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
-                            onClick={() => {
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              setTimeout(() => {
-                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
-                                input?.focus();
-                              }, 500);
-                            }}
+                            onClick={() => navigate('/cocurated-marketplace')}
                           >
                             Browse Packages
                           </Button>
@@ -1048,7 +1041,7 @@ const Index = () => {
                           <Button 
                             variant="outline" 
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
-                            onClick={() => navigate('/creator-dashboard')}
+                            onClick={() => navigate('/journeys')}
                           >
                             Join Creators
                           </Button>
@@ -1128,7 +1121,7 @@ const Index = () => {
                           <Button 
                             variant="outline" 
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
-                            onClick={() => navigate('/creator-dashboard')}
+                            onClick={() => navigate('/shop')}
                           >
                             Connect Store
                           </Button>
