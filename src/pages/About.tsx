@@ -106,7 +106,7 @@ const About = () => {
           <img 
             src={goldsainteLogo} 
             alt="Goldsainte" 
-            className="h-7 sm:h-9 w-auto"
+            className="h-5 sm:h-7 w-auto"
           />
         </div>
         <p className="text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed">
