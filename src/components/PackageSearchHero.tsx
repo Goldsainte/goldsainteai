@@ -15,6 +15,7 @@ interface PackageSearchHeroProps {
   onOpenFilters: () => void;
   dataSource: 'amadeus' | 'agent';
   onDataSourceChange: (source: 'amadeus' | 'agent') => void;
+  onQuickFilterClick?: (filterType: string) => void;
 }
 
 export const PackageSearchHero = ({
@@ -24,6 +25,7 @@ export const PackageSearchHero = ({
   onOpenFilters,
   dataSource,
   onDataSourceChange,
+  onQuickFilterClick,
 }: PackageSearchHeroProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -149,7 +151,7 @@ export const PackageSearchHero = ({
           <Button
             variant="outline"
             onClick={onOpenFilters}
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30 backdrop-blur-sm"
+            className="bg-white/20 hover:bg-[#bfad72] text-white border-white/30 backdrop-blur-sm"
           >
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             Filters
@@ -161,7 +163,8 @@ export const PackageSearchHero = ({
           {["Adventure", "Luxury", "Family-Friendly", "Budget", "Romantic"].map((tag) => (
             <button
               key={tag}
-              className="px-4 py-2 bg-white/20 hover:bg-[#bfad72] hover:text-white text-white rounded-full text-sm font-medium transition-colors backdrop-blur-sm"
+              onClick={() => onQuickFilterClick?.(tag)}
+              className="px-4 py-2 bg-white/20 hover:bg-[#bfad72] hover:text-white text-white rounded-full text-sm font-medium transition-colors backdrop-blur-sm cursor-pointer"
             >
               {tag}
             </button>

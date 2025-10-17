@@ -244,6 +244,51 @@ export default function CoCuratedJourneys() {
     }
   };
 
+  const handleQuickFilter = (filterType: string) => {
+    const filterMap: Record<string, Partial<PackageFilterState>> = {
+      'Adventure': { 
+        tripTypes: ['adventure'],
+        priceRange: [0, 10000],
+      },
+      'Luxury': { 
+        tripTypes: [],
+        priceRange: [3000, 10000],
+      },
+      'Family-Friendly': { 
+        tripTypes: ['family'],
+        priceRange: [0, 10000],
+      },
+      'Budget': { 
+        tripTypes: [],
+        priceRange: [0, 1500],
+      },
+      'Romantic': { 
+        tripTypes: ['romantic'],
+        priceRange: [0, 10000],
+      },
+    };
+    
+    const newFilter = filterMap[filterType];
+    if (newFilter) {
+      setPackageFilters(prev => ({ 
+        ...prev, 
+        ...newFilter,
+        durationRanges: prev.durationRanges,
+        destinations: prev.destinations,
+        minRating: prev.minRating,
+        dateRange: prev.dateRange,
+      }));
+      toast.success(`Filtering by ${filterType}`);
+      
+      setTimeout(() => {
+        const element = document.querySelector('.all-packages-section');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  };
+
   const requestPromotion = async (packageId: string) => {
     if (!user) {
       toast.error('Please sign in to request promotions');
@@ -274,13 +319,16 @@ export default function CoCuratedJourneys() {
       pkg.retailPrice <= packageFilters.priceRange[1];
 
     const matchesRating = packageFilters.minRating === 0 ||
-      pkg.rating >= packageFilters.minRating;
+      (pkg.rating || 0) >= packageFilters.minRating;
+    
+    const matchesTripType = packageFilters.tripTypes.length === 0 ||
+      (pkg.tripType && packageFilters.tripTypes.includes(pkg.tripType));
       
     // Filter by selected destination
     const matchesDestination = selectedDestinationFilter === 'all' || 
       pkg.destination.toLowerCase().includes(selectedDestinationFilter.toLowerCase());
 
-    return matchesSearch && matchesPrice && matchesRating && matchesDestination;
+    return matchesSearch && matchesPrice && matchesRating && matchesTripType && matchesDestination;
   });
 
   // Get top 5 packages from top destination cities for default display
@@ -325,6 +373,7 @@ export default function CoCuratedJourneys() {
           onOpenFilters={() => setFiltersOpen(true)}
           dataSource={dataSource}
           onDataSourceChange={setDataSource}
+          onQuickFilterClick={handleQuickFilter}
         />
 
         <div className="container mx-auto px-4 py-12">
@@ -359,7 +408,7 @@ export default function CoCuratedJourneys() {
               )}
 
               {/* All Travel Packages */}
-              <section className="py-12">
+              <section className="py-12 all-packages-section">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                   <div>
                     <h2 className="text-3xl font-bold">All Travel Packages</h2>

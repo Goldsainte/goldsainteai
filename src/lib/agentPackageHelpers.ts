@@ -30,6 +30,7 @@ export interface TransformedAgentPackage {
   retailPrice: number;
   currency: string;
   durationDays: number;
+  tripType?: string;
   rating?: number;
   totalReviews?: number;
   agencyName: string;
@@ -61,6 +62,7 @@ export const transformAgentPackageToDisplay = (pkg: AgentPackage): TransformedAg
     retailPrice: pkg.retail_price,
     currency: pkg.currency,
     durationDays: pkg.duration_days,
+    tripType: pkg.trip_type,
     rating: pkg.travel_agents?.rating,
     totalReviews: pkg.travel_agents?.total_reviews,
     agencyName: pkg.travel_agents?.agency_name || 'Travel Agent',

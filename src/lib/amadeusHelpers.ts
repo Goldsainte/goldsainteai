@@ -31,6 +31,7 @@ export interface TransformedPackage {
   totalReviews: number;
   agencyName: string;
   likelyToSellOut: boolean;
+  tripType?: string;
   description?: string;
   duration?: string;
 }
@@ -101,6 +102,25 @@ export const fetchAmadeusTourDetails = async (activityId: string): Promise<Amade
   }
 };
 
+const inferTripType = (categories?: string[]): string | undefined => {
+  if (!categories || categories.length === 0) return undefined;
+  
+  const categoryMap: Record<string, string> = {
+    'ADVENTURE': 'adventure',
+    'SPORTS': 'adventure',
+    'NATURE': 'adventure',
+    'LUXURY': 'luxury',
+    'FAMILY': 'family',
+    'ROMANTIC': 'romantic',
+    'CULTURAL': 'cultural',
+    'TOURS': 'cultural',
+    'MUSEUMS': 'cultural',
+  };
+  
+  const category = categories[0]?.toUpperCase();
+  return categoryMap[category] || 'cultural';
+};
+
 export const transformAmadeusToPackage = (
   activity: AmadeusActivity,
   destinationName: string
@@ -116,6 +136,7 @@ export const transformAmadeusToPackage = (
     totalReviews: activity.numberOfRatings || 0,
     agencyName: 'Via Amadeus',
     likelyToSellOut: !!activity.bookingLink,
+    tripType: inferTripType(activity.categories),
     description: activity.shortDescription || activity.description,
   };
 };
