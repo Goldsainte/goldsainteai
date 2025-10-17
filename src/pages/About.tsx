@@ -14,7 +14,7 @@ import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
 import shopifyLogo from "@/assets/shopify-logo.svg";
 import etsyLogo from "@/assets/etsy-logo.svg";
-import goldsainteLogo from "@/assets/primary-horizontal-logo-green.svg";
+import goldsainteLogo from "@/assets/wordmark-green.svg";
 import { 
   Mic, Sparkles, Share2, Briefcase, Package, BarChart3, 
   DollarSign, Users, FileCheck, MessageCircle, 
