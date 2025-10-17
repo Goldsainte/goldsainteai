@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Clipboard, DollarSign, Users, Package, TrendingUp } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Package, TrendingUp, Info, DollarSign, Users } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -23,8 +23,8 @@ const items = [
   { title: "Home", url: "/", icon: Home },
   { title: "Search", url: "/search", icon: Search },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard, authRequired: true },
-  { title: "Marketplace", url: "/marketplace", icon: Clipboard, authRequired: true },
-  { title: "CoCurated™", url: "/cocurated-marketplace", icon: Package, tourId: "cocurated" },
+  { title: "Marketplace", url: "/marketplace", icon: Briefcase, authRequired: true },
+  { title: "CoCurate™", url: "/cocurated-marketplace", icon: Package, tourId: "cocurated" },
   { title: "My Jobs", url: "/my-jobs", icon: Briefcase, authRequired: true },
   { title: "Browse Agents", url: "/browse-agents", icon: Users },
   { title: "Creator Earnings", url: "/creator-dashboard", icon: DollarSign, authRequired: true },
@@ -32,6 +32,7 @@ const items = [
 ];
 
 const bottomItems = [
+  { title: "About", url: "/about", icon: Info },
   { title: "Profile", url: "/profile", icon: User },
 ];
 
