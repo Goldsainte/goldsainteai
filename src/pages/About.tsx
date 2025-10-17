@@ -156,7 +156,7 @@ const About = () => {
         
         {/* What Is Goldsainte */}
         <AccordionItem value="what-is" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
             What is Goldsainte?
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
@@ -174,7 +174,7 @@ const About = () => {
 
         {/* What We Offer */}
         <AccordionItem value="features" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
             What We Offer
           </AccordionTrigger>
           <AccordionContent className="pt-6 space-y-8">
@@ -207,7 +207,7 @@ const About = () => {
 
         {/* Our Mission */}
         <AccordionItem value="mission" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
             Our Mission
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
@@ -231,7 +231,7 @@ const About = () => {
 
         {/* Partners & Technology */}
         <AccordionItem value="partners" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
             Our Partners & Technology
           </AccordionTrigger>
           <AccordionContent className="pt-6">
@@ -257,7 +257,7 @@ const About = () => {
 
         {/* Legal */}
         <AccordionItem value="legal" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
             Legal
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
@@ -275,7 +275,7 @@ const About = () => {
 
         {/* Accessibility Statement */}
         <AccordionItem value="accessibility" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-          <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+          <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
             Accessibility Statement
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
@@ -394,7 +394,7 @@ const About = () => {
 
     {/* Customer Terms of Service */}
     <AccordionItem value="terms" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
         Customer Terms of Service
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
@@ -472,7 +472,7 @@ const About = () => {
 
     {/* Dispute Resolution */}
     <AccordionItem value="dispute-resolution" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
         Dispute Resolution
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
@@ -580,7 +580,7 @@ const About = () => {
 
     {/* What We Do */}
     <AccordionItem value="what-we-do" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
         What We Do
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
@@ -645,7 +645,7 @@ const About = () => {
 
     {/* Modern Slavery Statement */}
     <AccordionItem value="modern-slavery" id="modern-slavery" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
         Modern Slavery Statement
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
@@ -743,7 +743,7 @@ const About = () => {
     </AccordionItem>
 
     <AccordionItem value="human-rights" id="human-rights" className="border-0 rounded-lg px-6 bg-card shadow-sm">
-      <AccordionTrigger className="text-xl font-semibold hover:no-underline">
+      <AccordionTrigger className="text-xl font-semibold hover:no-underline text-[#0c4d47] hover:text-[#bfad72]">
         Human Rights Statement
       </AccordionTrigger>
       <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
