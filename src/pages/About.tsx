@@ -120,9 +120,9 @@ const About = () => {
           <CardTitle className="text-2xl sm:text-3xl">Letter from the Founder</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-[200px_1fr] gap-8">
+          <div className="flex flex-col items-center gap-8">
             {/* Founder Image */}
-            <div className="flex justify-center md:justify-start">
+            <div className="flex justify-center">
               <div className="w-[200px] h-[250px] rounded-lg overflow-hidden shadow-md">
                 <img 
                   src={founderImage}
@@ -133,7 +133,7 @@ const About = () => {
             </div>
             
             {/* Letter Content */}
-            <div className="space-y-4 text-base leading-relaxed">
+            <div className="space-y-4 text-base leading-relaxed max-w-3xl text-center">
               <p className="text-foreground">
                 When Goldsainte first launched, people asked how we were different from other services. The answer was clear: we brought innovation, safety, and elevated experiences to transportation. Today, we've grown far beyond those roots.
               </p>
