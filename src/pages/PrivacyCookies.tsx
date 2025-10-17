@@ -62,7 +62,7 @@ const PrivacyCookies = () => {
           <div id="introduction" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl sm:text-3xl">1. Introduction</CardTitle>
+                <CardTitle className="text-2xl">1. Introduction</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base">
@@ -79,7 +79,7 @@ const PrivacyCookies = () => {
           <div id="privacy-policy" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl sm:text-3xl">2. Our Privacy Policy</CardTitle>
+                <CardTitle className="text-2xl">2. Our Policy</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <p className="text-base">
@@ -88,7 +88,7 @@ const PrivacyCookies = () => {
 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="data-collection">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       Information We Collect
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4">
@@ -114,7 +114,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="how-we-use">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       How We Use Your Information
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -129,7 +129,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="sharing">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       Sharing Your Information
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -143,7 +143,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="your-rights">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       Your Rights
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -167,7 +167,7 @@ const PrivacyCookies = () => {
           <div id="cookies" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl sm:text-3xl">3. Cookies and Similar Technologies</CardTitle>
+                <CardTitle className="text-2xl">3. Cookies and Similar Technologies</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
                 <p className="text-base">
@@ -176,7 +176,7 @@ const PrivacyCookies = () => {
 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="cookie-types">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       Types of Cookies We Use
                     </AccordionTrigger>
                     <AccordionContent className="space-y-4">
@@ -205,7 +205,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="managing-cookies">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       Managing Cookies
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -219,7 +219,7 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="third-party">
-                    <AccordionTrigger className="text-xl font-semibold">
+                    <AccordionTrigger className="text-2xl font-semibold">
                       Third-Party Cookies
                     </AccordionTrigger>
                     <AccordionContent className="space-y-3">
@@ -254,7 +254,7 @@ const PrivacyCookies = () => {
           <div id="contact" className="scroll-mt-20">
             <Card>
               <CardHeader>
-                <CardTitle className="text-2xl sm:text-3xl">5. Contact Us</CardTitle>
+                <CardTitle className="text-2xl">5. Contact Us</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <p className="text-base">
@@ -262,7 +262,7 @@ const PrivacyCookies = () => {
                 </p>
                 
                 <div className="bg-primary/5 p-6 rounded-lg space-y-4">
-                  <h3 className="text-xl font-semibold">Goldsainte</h3>
+                  <h3 className="text-2xl font-semibold">Goldsainte</h3>
                   
                   <div className="flex items-start gap-3">
                     <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
@@ -288,7 +288,7 @@ const PrivacyCookies = () => {
           <div className="pt-8">
             <Card className="bg-muted/30">
               <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold mb-4">Related Information</h3>
+                <h3 className="text-2xl font-semibold mb-4">Related Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <Link to="/terms" className="text-primary hover:underline">
                     Terms of Service
