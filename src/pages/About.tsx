@@ -14,6 +14,7 @@ import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
 import shopifyLogo from "@/assets/shopify-logo.svg";
 import etsyLogo from "@/assets/etsy-logo.svg";
+import goldsainteLogo from "@/assets/primary-horizontal-logo-green.svg";
 import { 
   Mic, Sparkles, Share2, Briefcase, Package, BarChart3, 
   DollarSign, Users, FileCheck, MessageCircle, 
@@ -101,9 +102,15 @@ const About = () => {
     <div className="container mx-auto px-4 py-8 sm:py-12 max-w-5xl">
       {/* Page Header */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl sm:text-5xl font-bold mb-4">About Goldsainte</h1>
-        <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-          AI-Powered Travel Intelligence Meets Human Expertise
+        <div className="flex justify-center mb-6">
+          <img 
+            src={goldsainteLogo} 
+            alt="Goldsainte" 
+            className="h-16 sm:h-20 w-auto"
+          />
+        </div>
+        <p className="text-lg text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+          Discover. Book. Create. Earn. — Travel Reinvented with AI, Agent Bidding & Creator Collaborations. Plan faster with AI, let agents bid to save more, or book CoCurated trips built by pros, amplified by creators, and designed to deliver real value.
         </p>
       </div>
 
