@@ -96,6 +96,7 @@ import EmergencyContacts from "./pages/EmergencyContacts";
 import AgentPerformanceDashboard from "./pages/AgentPerformanceDashboard";
 import AdminCustomerVerifications from "./pages/AdminCustomerVerifications";
 import About from "./pages/About";
+import Terms from "./pages/Terms";
 
 const queryClient = new QueryClient();
 
