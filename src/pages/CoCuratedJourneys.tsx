@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { PackageSearchHero } from "@/components/PackageSearchHero";
@@ -466,7 +465,6 @@ export default function CoCuratedJourneys() {
           )}
         </div>
       </main>
-      <Footer />
 
       {/* Filters Sheet */}
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>

@@ -11,7 +11,6 @@ import { Separator } from "@/components/ui/separator";
 import { MapPin, Users, DollarSign, Tag, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { fetchAmadeusTourDetails, AmadeusActivity } from "@/lib/amadeusHelpers";
 
 export default function CoCuratedPackage() {
@@ -176,7 +175,6 @@ export default function CoCuratedPackage() {
     return (
       <div className="min-h-screen">
         <div className="container mx-auto py-8">Loading...</div>
-        <Footer />
       </div>
     );
   }
@@ -185,7 +183,6 @@ export default function CoCuratedPackage() {
     return (
       <div className="min-h-screen">
         <div className="container mx-auto py-8">Package not found</div>
-        <Footer />
       </div>
     );
   }
@@ -349,7 +346,6 @@ export default function CoCuratedPackage() {
           </div>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

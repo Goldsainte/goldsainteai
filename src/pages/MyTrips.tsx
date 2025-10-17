@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2, Users, DollarSign } from 'lucide-react';
 import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
 
 interface TripRequest {
   id: string;
@@ -75,7 +74,6 @@ export default function MyTrips() {
         <div className="container mx-auto py-8 flex justify-center">
           <Loader2 className="h-8 w-8 animate-spin" />
         </div>
-        <Footer />
       </div>
     );
   }
@@ -202,7 +200,6 @@ export default function MyTrips() {
           </div>
         )}
       </div>
-      <Footer />
     </div>
   );
 }

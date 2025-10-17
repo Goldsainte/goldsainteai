@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
@@ -131,6 +132,48 @@ function AppContent() {
   const hideAIBookingPages = ['/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/search', '/trending'];
   const showAIBooking = !hideAIBookingPages.some(page => location.pathname === page || location.pathname.startsWith(page));
 
+  // Don't show footer on these pages
+  const hideFooterPages = [
+    // Auth & Onboarding
+    '/auth',
+    '/reset-password',
+    '/onboarding',
+    '/ai-agent-setup',
+    
+    // Travel Feed / Social Pages
+    '/travel-feed',
+    '/journeys',
+    '/travel-profile',
+    '/travel-settings',
+    '/crossposting-settings',
+    '/creator-dashboard',
+    '/search',
+    '/trending',
+    '/your-activity',
+    
+    // Other Utility Pages
+    '/browse-influencers',
+    '/browse-creators',
+    '/activity-logs',
+    '/customer-verification',
+    '/emergency-contacts',
+    '/agent-performance',
+    '/commission-dashboard',
+    '/email-preview',
+    '/test-group-payment',
+    '/instagram-api',
+    '/instagram-callback',
+    
+    // Admin Utility Pages
+    '/admin/upload-email-assets',
+    '/admin/upload-apple-music-key',
+    '/not-found',
+  ];
+
+  const showFooter = !hideFooterPages.some(page => 
+    location.pathname === page || location.pathname.startsWith(page)
+  );
+
   // Hide Lovable badge on Journeys feed
   useEffect(() => {
     const isJourneysPage = location.pathname === '/travel-feed' || location.pathname === '/journeys';
@@ -237,6 +280,7 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      {showFooter && <Footer />}
       {showAIBooking && <AIBookingConcierge />}
     </div>
   );

@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { ShieldCheck, Clock, AlertCircle, CheckCircle, XCircle, Info } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -236,7 +235,6 @@ export default function CancellationRefundPolicy() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

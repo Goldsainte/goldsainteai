@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +57,6 @@ export default function TourActivityDetail() {
         <main className="flex-1 flex items-center justify-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </main>
-        <Footer />
       </div>
     );
   }
@@ -78,7 +76,6 @@ export default function TourActivityDetail() {
             </Button>
           </Card>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -221,7 +218,6 @@ export default function TourActivityDetail() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

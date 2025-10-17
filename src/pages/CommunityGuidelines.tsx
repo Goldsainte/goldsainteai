@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Footer } from "@/components/Footer";
 
 interface Guideline {
   id: string;
@@ -115,7 +114,6 @@ export default function CommunityGuidelines() {
           </CardContent>
         </Card>
       </div>
-      <Footer />
     </>
   );
 }
