@@ -137,16 +137,22 @@ export const EnhancedPackageCard = ({
       </CardContent>
 
       <CardFooter className="p-4 pt-0 flex gap-2">
-        <Button onClick={onViewDetails} variant="outline" className="flex-1">
+        <Button 
+          onClick={onViewDetails} 
+          variant="outline" 
+          className={source === 'agent' ? 'flex-1' : 'w-full'}
+        >
           View Details
         </Button>
-        <Button 
-          onClick={onRequestPromotion} 
-          className="flex-1"
-          disabled={isPromoting}
-        >
-          {isPromoting ? "Promoting" : "Request to Promote"}
-        </Button>
+        {source === 'agent' && (
+          <Button 
+            onClick={onRequestPromotion} 
+            className="flex-1"
+            disabled={isPromoting}
+          >
+            {isPromoting ? "Promoting" : "Request to Promote"}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

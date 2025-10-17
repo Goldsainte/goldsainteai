@@ -127,7 +127,7 @@ export default function CoCuratedPackage() {
   return (
     <div className="min-h-screen">
       <Header />
-      <div className="container mx-auto py-8 px-4">
+      <div className="container mx-auto pt-4 pb-8 px-4">
         {/* Hero Section */}
         <div className="mb-8">
           {packageData.pictures && packageData.pictures.length > 0 && (
@@ -197,10 +197,7 @@ export default function CoCuratedPackage() {
           <div className="lg:col-span-1">
             <Card className="sticky top-8">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <DollarSign className="h-5 w-5" />
-                  Book This Trip
-                </CardTitle>
+                <CardTitle>Book This Trip</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Price Display */}
