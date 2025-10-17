@@ -95,6 +95,7 @@ import CustomerVerification from "./pages/CustomerVerification";
 import EmergencyContacts from "./pages/EmergencyContacts";
 import AgentPerformanceDashboard from "./pages/AgentPerformanceDashboard";
 import AdminCustomerVerifications from "./pages/AdminCustomerVerifications";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -275,6 +276,7 @@ function AppContent() {
             <Route path="/browse-influencers" element={<BrowseInfluencers />} />
             <Route path="/instagram-api" element={<InstagramAPI />} />
             <Route path="/your-activity" element={<YourActivity />} />
+          <Route path="/about" element={<About />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

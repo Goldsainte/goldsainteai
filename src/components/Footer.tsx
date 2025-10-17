@@ -113,7 +113,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">About</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-primary transition-colors">About Goldsainte</a></li>
+              <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Sustainability</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
