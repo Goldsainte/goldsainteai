@@ -29,7 +29,7 @@ const PrivacyCookies = () => {
           <h1 className="text-2xl sm:text-3xl font-bold mb-6">
             Privacy and Cookies Policy
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Your Privacy, Our Priority — How Goldsainte Collects, Uses, and Safeguards Your Personal Information
           </p>
         </div>
@@ -65,10 +65,10 @@ const PrivacyCookies = () => {
                 <CardTitle className="text-2xl">1. Introduction</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-base">
+                <p className="text-sm sm:text-base">
                   Goldsainte ("we," "us," or "our") is committed to protecting your privacy and providing a safe and secure online experience. This Policy and Cookies Statement explains how we collect, use, and store your information when you access or use our website, mobile applications, and other digital services (collectively, the "Platform"), and how we use cookies and similar technologies.
                 </p>
-                <p className="text-base">
+                <p className="text-sm sm:text-base">
                   By using our Platform, you agree to the terms described in this Policy and Cookies Statement.
                 </p>
               </CardContent>
@@ -82,44 +82,44 @@ const PrivacyCookies = () => {
                 <CardTitle className="text-2xl">2. Our Policy</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <p className="text-base">
+                <p className="text-sm sm:text-base">
                   Goldsainte respects your privacy and processes your personal data in accordance with applicable data protection laws, including GDPR, CCPA, and other relevant legislation.
                 </p>
 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="data-collection">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       Information We Collect
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-4">
-                      <p className="text-base">We may collect the following types of information:</p>
+                    <AccordionContent className="space-y-4 text-sm sm:text-base">
+                      <p className="text-sm sm:text-base">We may collect the following types of information:</p>
                       
                       <div className="space-y-3">
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Personal Information</h4>
-                          <p className="text-base">Name, email, phone number, address, and payment details when you make a booking or register on our Platform.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Personal Information</h4>
+                          <p className="text-sm sm:text-base">Name, email, phone number, address, and payment details when you make a booking or register on our Platform.</p>
                         </div>
 
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Travel and Booking Data</h4>
-                          <p className="text-base">Reservation details, preferences, past bookings, and interactions with our Platform.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Travel and Booking Data</h4>
+                          <p className="text-sm sm:text-base">Reservation details, preferences, past bookings, and interactions with our Platform.</p>
                         </div>
 
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Usage Data</h4>
-                          <p className="text-base">Information about your visits to our Platform, including IP address, browser type, pages visited, and time spent.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Usage Data</h4>
+                          <p className="text-sm sm:text-base">Information about your visits to our Platform, including IP address, browser type, pages visited, and time spent.</p>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="how-we-use">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       How We Use Your Information
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-3">
-                      <p className="text-base">We use your information to:</p>
-                      <ul className="list-disc list-inside space-y-2 text-base">
+                    <AccordionContent className="space-y-3 text-sm sm:text-base">
+                      <p className="text-sm sm:text-base">We use your information to:</p>
+                      <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
                         <li>Provide and manage our services, including bookings, payments, and customer support</li>
                         <li>Personalize your experience on our Platform, including recommendations and offers</li>
                         <li>Communicate important updates, marketing, and promotions (with your consent where required)</li>
@@ -129,12 +129,12 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="sharing">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       Sharing Your Information
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-3">
-                      <p className="text-base">We may share your data with:</p>
-                      <ul className="list-disc list-inside space-y-2 text-base">
+                    <AccordionContent className="space-y-3 text-sm sm:text-base">
+                      <p className="text-sm sm:text-base">We may share your data with:</p>
+                      <ul className="list-disc list-inside space-y-2 text-sm sm:text-base">
                         <li><strong>Service Providers and partners</strong> to facilitate bookings and travel experiences</li>
                         <li><strong>Legal authorities</strong> if required by law or to protect our rights</li>
                         <li><strong>Other entities within the Goldsainte group</strong> for operational purposes</li>
@@ -143,18 +143,18 @@ const PrivacyCookies = () => {
                   </AccordionItem>
 
                   <AccordionItem value="your-rights">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       Your Rights
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-3">
-                      <p className="text-base">
+                    <AccordionContent className="space-y-3 text-sm sm:text-base">
+                      <p className="text-sm sm:text-base">
                         You have rights over your personal data, including access, correction, deletion, and objection to processing. To exercise your rights, please contact our Data Protection Officer at:
                       </p>
                       <div className="bg-muted/50 p-4 rounded-lg space-y-2">
-                        <p className="text-base font-semibold">Goldsainte Data Protection Officer</p>
-                        <p className="text-base">850 New Burton Road, Suite 201</p>
-                        <p className="text-base">Dover, DE 19904, County of Kent</p>
-                        <p className="text-base">Email: support@goldsainte.com</p>
+                        <p className="text-sm sm:text-base font-semibold">Goldsainte Data Protection Officer</p>
+                        <p className="text-sm sm:text-base">850 New Burton Road, Suite 201</p>
+                        <p className="text-sm sm:text-base">Dover, DE 19904, County of Kent</p>
+                        <p className="text-sm sm:text-base">Email: support@goldsainte.com</p>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
@@ -170,60 +170,60 @@ const PrivacyCookies = () => {
                 <CardTitle className="text-2xl">3. Cookies and Similar Technologies</CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <p className="text-base">
+                <p className="text-sm sm:text-base">
                   Goldsainte uses cookies and similar technologies to enhance your experience on our Platform, analyze usage, and provide personalized content and advertising.
                 </p>
 
                 <Accordion type="single" collapsible className="w-full">
                   <AccordionItem value="cookie-types">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       Types of Cookies We Use
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-4">
+                    <AccordionContent className="space-y-4 text-sm sm:text-base">
                       <div className="space-y-3">
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Strictly Necessary Cookies</h4>
-                          <p className="text-base">Essential for Platform functionality, such as logging in, managing bookings, and ensuring security.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Strictly Necessary Cookies</h4>
+                          <p className="text-sm sm:text-base">Essential for Platform functionality, such as logging in, managing bookings, and ensuring security.</p>
                         </div>
 
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Performance and Analytics Cookies</h4>
-                          <p className="text-base">Help us understand how visitors interact with our Platform to improve features and usability.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Performance and Analytics Cookies</h4>
+                          <p className="text-sm sm:text-base">Help us understand how visitors interact with our Platform to improve features and usability.</p>
                         </div>
 
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Functional Cookies</h4>
-                          <p className="text-base">Remember preferences, language settings, and login information.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Functional Cookies</h4>
+                          <p className="text-sm sm:text-base">Remember preferences, language settings, and login information.</p>
                         </div>
 
                         <div>
-                          <h4 className="text-base font-semibold mb-2">Advertising and Targeting Cookies</h4>
-                          <p className="text-base">Deliver relevant promotions, measure ad effectiveness, and provide personalized offers.</p>
+                          <h4 className="text-sm sm:text-base font-semibold mb-2">Advertising and Targeting Cookies</h4>
+                          <p className="text-sm sm:text-base">Deliver relevant promotions, measure ad effectiveness, and provide personalized offers.</p>
                         </div>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="managing-cookies">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       Managing Cookies
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-3">
-                      <p className="text-base">
+                    <AccordionContent className="space-y-3 text-sm sm:text-base">
+                      <p className="text-sm sm:text-base">
                         You can manage your cookie preferences through your browser settings. Note that disabling certain cookies may affect the functionality and user experience of our Platform.
                       </p>
-                      <p className="text-base text-muted-foreground">
+                      <p className="text-sm sm:text-base text-muted-foreground">
                         Most web browsers allow you to control cookies through their settings preferences. However, if you limit the ability of websites to set cookies, you may worsen your overall user experience.
                       </p>
                     </AccordionContent>
                   </AccordionItem>
 
                   <AccordionItem value="third-party">
-                    <AccordionTrigger className="text-base font-medium">
+                    <AccordionTrigger className="text-sm sm:text-base font-medium">
                       Third-Party Cookies
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-3">
-                      <p className="text-base">
+                    <AccordionContent className="space-y-3 text-sm sm:text-base">
+                      <p className="text-sm sm:text-base">
                         Some cookies are set by third-party partners for analytics, advertising, or social media integration. We do not control these cookies, and their use is governed by the third party's privacy policy.
                       </p>
                     </AccordionContent>
@@ -240,10 +240,10 @@ const PrivacyCookies = () => {
                 <CardTitle className="text-2xl">4. Updates to This Statement</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-base">
+                <p className="text-sm sm:text-base">
                   Goldsainte may update this Policy and Cookies Statement periodically to reflect changes in our practices, technology, or legal requirements. The latest version will always be available on our Platform, and we encourage you to review it regularly.
                 </p>
-                <p className="text-base text-muted-foreground">
+                <p className="text-sm sm:text-base text-muted-foreground">
                   We will notify you of any material changes by posting a notice on our Platform or by sending you an email notification.
                 </p>
               </CardContent>
@@ -257,25 +257,25 @@ const PrivacyCookies = () => {
                 <CardTitle className="text-2xl">5. Contact Us</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-base">
+                <p className="text-sm sm:text-base">
                   If you have questions or concerns about this Policy and Cookies Statement, or if you would like to exercise your privacy rights, please contact us at:
                 </p>
                 
                 <div className="bg-primary/5 p-6 rounded-lg space-y-4">
-                  <h3 className="text-2xl font-semibold">Goldsainte</h3>
+                  <h3 className="text-xl sm:text-2xl font-semibold">Goldsainte</h3>
                   
                   <div className="flex items-start gap-3">
                     <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-base">850 New Burton Road, Suite 201</p>
-                      <p className="text-base">Dover, DE 19904</p>
-                      <p className="text-base">County of Kent</p>
+                      <p className="text-sm sm:text-base">850 New Burton Road, Suite 201</p>
+                      <p className="text-sm sm:text-base">Dover, DE 19904</p>
+                      <p className="text-sm sm:text-base">County of Kent</p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <Mail className="h-5 w-5 text-primary flex-shrink-0" />
-                    <a href="mailto:support@goldsainte.com" className="text-base text-primary hover:underline">
+                    <a href="mailto:support@goldsainte.com" className="text-sm sm:text-base text-primary hover:underline">
                       support@goldsainte.com
                     </a>
                   </div>
