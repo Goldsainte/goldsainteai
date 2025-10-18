@@ -962,7 +962,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">AI-Powered Travel Marketplace</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>End-to-End Booking:</strong> Users can plan, customize, and book trips in real-time using AI voice assistants.</p>
               <p><strong>Personalized Recommendations:</strong> Proprietary algorithms analyze traveler behavior, preferences, and past bookings to deliver highly targeted suggestions.</p>
               <p><strong>Dynamic Pricing:</strong> AI-driven insights help optimize trip margins while providing competitive pricing.</p>
@@ -971,7 +971,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Agent Bidding Model</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Competitive Agent Marketplace:</strong> Travel agents bid for bookings, creating value for travelers and ensuring high-quality service.</p>
               <p><strong>Revenue Optimization:</strong> Success fees and service commissions drive predictable revenue for the platform.</p>
               <p><strong>Data-Driven Matching:</strong> AI matches agents to travelers based on expertise, location, and previous performance.</p>
@@ -980,7 +980,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Creator-Led Experiences</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Monetized Content:</strong> Influencers and travel creators earn revenue by designing and promoting trips.</p>
               <p><strong>CoCurated Packages:</strong> High-quality, authentic itineraries attract users and increase engagement.</p>
               <p><strong>Social Commerce Integration:</strong> Creator-driven promotions amplify reach and drive bookings.</p>
@@ -989,7 +989,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Luxury Positioning</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Curated Packages:</strong> Premium experiences with detailed itineraries, exclusive access, and personalized amenities.</p>
               <p><strong>Industry Partnerships:</strong> Collaborations with Amadeus, Ticketmaster, and other global partners enhance offerings.</p>
               <p><strong>Brand Differentiation:</strong> Combining AI technology, creator influence, and travel expertise positions Goldsainte uniquely in the luxury segment.</p>
@@ -998,7 +998,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Scalable Growth</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Global Market Reach:</strong> Multi-currency, multi-language support enables international expansion.</p>
               <p><strong>Modular Ecosystem:</strong> Flights, hotels, cars, restaurants, and events can scale independently.</p>
               <p><strong>Network Effects:</strong> Travelers attract agents; agents attract creators; creators attract travelers — creating a self-reinforcing growth loop.</p>
@@ -1007,7 +1007,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Data & AI Advantage</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Voice AI Concierge:</strong> Personalized, conversational trip planning and booking.</p>
               <p><strong>Predictive Analytics:</strong> Insights from search, bookings, and user engagement enable demand forecasting, seasonal offers, and upsell opportunities.</p>
               <p><strong>Rich Data Moat:</strong> User behavior, booking history, agent performance, and creator engagement provide unique competitive intelligence.</p>
@@ -1016,7 +1016,7 @@ const About = () => {
 
           <div className="mb-4">
             <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Diverse Revenue Streams</h4>
-            <div className="space-y-1 text-sm sm:text-base text-foreground">
+            <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
               <p><strong>Agent Commissions:</strong> Service + success fees from agent bookings.</p>
               <p><strong>Creator Partnerships:</strong> Content monetization, affiliate deals, and brand collaborations.</p>
               <p><strong>Vendor Subscriptions:</strong> Multi-tiered plans (Bronze–Platinum) with marketing, analytics, and exposure benefits.</p>
@@ -1028,7 +1028,7 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Competitive Advantage / Moat</h3>
-          <div className="space-y-1 text-sm sm:text-base text-foreground">
+          <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
             <p><strong>Proprietary Technology:</strong> Voice AI concierge, AI-driven matching, and recommendation systems.</p>
             <p><strong>Triple-Sided Network:</strong> Integrated ecosystem connecting travelers, agents, and creators.</p>
             <p><strong>Trust & Safety Infrastructure:</strong> Verified agents, content moderation, escrow payouts, and transparent reviews.</p>
@@ -1038,7 +1038,7 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Vision & Roadmap</h3>
-          <div className="space-y-1 text-sm sm:text-base text-foreground">
+          <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
             <p><strong>Near-Term (0–6 months):</strong> Full AI concierge rollout, expanded vendor tiers, creator monetization, and dynamic pricing.</p>
             <p><strong>Mid-Term (6–12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</p>
             <p><strong>Long-Term (12–24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</p>
@@ -1047,7 +1047,7 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">Key Information</h3>
-          <div className="space-y-1 text-sm sm:text-base text-foreground">
+          <div className="pl-4 space-y-1 text-sm sm:text-base text-foreground">
             <p><strong>Corporate Headquarters:</strong> 850 New Burton Road, Suite 201, Dover, DE, 19904, County of Kent</p>
             <p><strong>Incorporation:</strong> Delaware, USA</p>
             <p><strong>Stock Information:</strong> Goldsainte is currently a privately held company exploring strategic funding opportunities.</p>
