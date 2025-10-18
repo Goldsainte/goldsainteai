@@ -79,10 +79,8 @@ export const Footer = () => {
             <AccordionTrigger className="text-sm font-semibold">Discover</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/what-we-do" className="hover:text-primary transition-colors">Our Services</Link></li>
-                <li><Link to="/loyalty-rewards" className="hover:text-primary transition-colors">Loyalty Program</Link></li>
+                <li><Link to="/journeys" className="hover:text-primary transition-colors">Journeys</Link></li>
                 <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
-                <li><Link to="/travel-feed" className="hover:text-primary transition-colors">Travel Articles & Videos</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">Travel Agent Services</Link></li>
                 <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">Co-Curated Packages</Link></li>
                 <li><Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link></li>
@@ -95,6 +93,7 @@ export const Footer = () => {
             <AccordionTrigger className="text-sm font-semibold">Terms and settings</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
                 <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
                 <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
                 <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
@@ -115,45 +114,28 @@ export const Footer = () => {
                 <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Influencer Program</Link></li>
                 <li><Link to="/shop" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
                 <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">List Your Company</Link></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Partner Help Center</a></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
 
           {/* About */}
-          <AccordionItem value="about">
+          <AccordionItem value="about" className="border-b-0">
             <AccordionTrigger className="text-sm font-semibold">About</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
                 <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Sustainability</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Investor Relations</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Corporate Contact</a></li>
-              </ul>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* Legal */}
-          <AccordionItem value="legal" className="border-b-0">
-            <AccordionTrigger className="text-sm font-semibold">Legal</AccordionTrigger>
-            <AccordionContent>
-              <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
-                <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & Cookies</Link></li>
-                <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-                <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">Dispute Resolution</Link></li>
-                <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
 
         {/* DESKTOP: Grid Layout */}
-        <div className="hidden md:grid grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
+        <div className="hidden md:grid grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Support Column */}
           <div>
             <h4 className="font-semibold mb-4 text-base">Support</h4>
@@ -169,10 +151,8 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">Discover</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/what-we-do" className="hover:text-primary transition-colors">Our Services</Link></li>
-              <li><Link to="/loyalty-rewards" className="hover:text-primary transition-colors">Loyalty Program</Link></li>
+              <li><Link to="/journeys" className="hover:text-primary transition-colors">Journeys</Link></li>
               <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
-              <li><Link to="/travel-feed" className="hover:text-primary transition-colors">Travel Articles & Videos</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">Travel Agent Services</Link></li>
               <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">Co-Curated Packages</Link></li>
               <li><Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link></li>
@@ -183,6 +163,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">Terms and settings</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
+              <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
               <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
               <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
@@ -201,7 +182,6 @@ export const Footer = () => {
               <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Influencer Program</Link></li>
               <li><Link to="/shop" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
               <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">List Your Company</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Partner Help Center</a></li>
             </ul>
           </div>
 
@@ -212,23 +192,9 @@ export const Footer = () => {
               <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
               <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Sustainability</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Careers</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Investor Relations</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Corporate Contact</a></li>
-            </ul>
-          </div>
-
-          {/* Legal Column */}
-          <div>
-            <h4 className="font-semibold mb-4 text-base">Legal</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
-              <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & Cookies</Link></li>
-              <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">Dispute Resolution</Link></li>
-              <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
             </ul>
           </div>
         </div>
