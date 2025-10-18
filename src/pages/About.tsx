@@ -302,7 +302,7 @@ const About = () => {
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
             Legal
           </AccordionTrigger>
-          <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
+          <AccordionContent className="pt-4 space-y-4 text-sm sm:text-base leading-relaxed">
             <div className="flex justify-center mb-6">
               <img 
                 src={primaryLogoGreen} 
@@ -327,7 +327,7 @@ const About = () => {
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
             Accessibility Statement
           </AccordionTrigger>
-          <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+          <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
             <div className="flex justify-center mb-6">
               <img 
                 src={primaryLogoGreen} 
@@ -453,7 +453,7 @@ const About = () => {
       <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
         Customer Terms of Service
       </AccordionTrigger>
-      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
         <div className="flex justify-center mb-6">
           <img 
             src={primaryLogoGreen} 
@@ -463,7 +463,7 @@ const About = () => {
         </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Terms Available</p>
-          <p className="text-base text-muted-foreground mb-3">
+          <p className="text-sm sm:text-base text-muted-foreground mb-3">
             View the full, detailed Terms of Service document including all sections, subsections, and the Goldsainte Dictionary.
           </p>
           <Link 
@@ -474,7 +474,7 @@ const About = () => {
           </Link>
         </div>
         
-        <p className="text-base text-muted-foreground">Updated October 17, 2025</p>
+        <p className="text-sm sm:text-base text-muted-foreground">Updated October 17, 2025</p>
         
         <div className="space-y-4">
           <h3 className="font-semibold text-base mb-3 text-foreground">A: General Terms</h3>
@@ -538,7 +538,7 @@ const About = () => {
       <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
         Dispute Resolution
       </AccordionTrigger>
-      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
         <div className="flex justify-center mb-6">
           <img 
             src={primaryLogoGreen} 
@@ -653,7 +653,7 @@ const About = () => {
       <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
         What We Do
       </AccordionTrigger>
-      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
         <div className="flex justify-center mb-6">
           <img 
             src={primaryLogoGreen} 
@@ -663,7 +663,7 @@ const About = () => {
         </div>
         <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
           <p className="text-foreground font-semibold mb-2">Complete Service Details Available</p>
-          <p className="text-base text-muted-foreground mb-3">
+          <p className="text-sm sm:text-base text-muted-foreground mb-3">
             View the full, detailed information about all Goldsainte services including accommodations, attractions, flights, car rentals, and transportation.
           </p>
           <Link 
@@ -725,7 +725,7 @@ const About = () => {
       <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
         Modern Slavery Statement
       </AccordionTrigger>
-      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
         <div className="flex justify-center mb-6">
           <img 
             src={primaryLogoGreen} 
@@ -733,7 +733,7 @@ const About = () => {
             className="h-5 sm:h-7 w-auto"
           />
         </div>
-        <p className="text-base text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Fiscal Year Ending December 31, 2025
         </p>
 
@@ -830,7 +830,7 @@ const About = () => {
       <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
         Human Rights Statement
       </AccordionTrigger>
-      <AccordionContent className="pt-4 space-y-6 text-base leading-relaxed">
+      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
         <div className="flex justify-center mb-6">
           <img 
             src={primaryLogoGreen} 
