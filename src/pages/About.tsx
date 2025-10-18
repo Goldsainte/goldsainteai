@@ -922,7 +922,7 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
-    <AccordionItem value="investor-relations">
+    <AccordionItem value="investor-relations" id="investor-relations" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
       <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
         Investor Relations
       </AccordionTrigger>
