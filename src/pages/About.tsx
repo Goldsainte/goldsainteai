@@ -546,35 +546,35 @@ const About = () => {
             className="h-5 sm:h-7 w-auto"
           />
         </div>
-        <p>
+        <p className="text-foreground">
           Goldsainte Ai / Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
         </p>
         
         <div>
-          <h4 className="font-semibold mb-2">A. Overview</h4>
-          <p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">A. Overview</h3>
+          <p className="text-foreground">
             In the event of a disagreement, dispute, or claim arising from your use of our Platform or services, 
             we provide multiple resolution pathways including informal resolution, mediation, and arbitration.
           </p>
-          <p className="mt-2">
+          <p className="mt-2 text-foreground">
             By using Goldsainte Ai / Inc., you agree to resolve disputes according to the terms outlined below.
           </p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">B. Informal Resolution</h4>
-          <p>Before initiating formal legal action, you agree to:</p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">B. Informal Resolution</h3>
+          <p className="text-foreground">Before initiating formal legal action, you agree to:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li>Contact Goldsainte Ai / Inc. Customer Support promptly via your account, app, or Help Center.</li>
             <li>Provide relevant details including booking reference, contact information, issue summary, and supporting documentation.</li>
             <li>Allow us 30 days to review and attempt to resolve the issue informally.</li>
           </ul>
-          <p className="mt-2">Most disputes are resolved at this stage without further escalation.</p>
+          <p className="mt-2 text-foreground">Most disputes are resolved at this stage without further escalation.</p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">C. Mediation</h4>
-          <p>If a dispute cannot be resolved informally, mediation is the next step:</p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">C. Mediation</h3>
+          <p className="text-foreground">If a dispute cannot be resolved informally, mediation is the next step:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li>Either party may initiate mediation by providing written notice.</li>
             <li>A mutually agreed-upon, neutral third-party mediator will facilitate the process.</li>
@@ -586,8 +586,8 @@ const About = () => {
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">D. Arbitration</h4>
-          <p>All disputes that cannot be resolved through informal resolution or mediation will be resolved through binding arbitration:</p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">D. Arbitration</h3>
+          <p className="text-foreground">All disputes that cannot be resolved through informal resolution or mediation will be resolved through binding arbitration:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li><strong>Arbitration Rules:</strong> Conducted under American Arbitration Association (AAA) rules.</li>
             <li><strong>Location:</strong> Dover, Delaware, USA, unless both parties agree otherwise.</li>
@@ -598,8 +598,8 @@ const About = () => {
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">E. Exceptions</h4>
-          <p>Arbitration does not prevent either party from:</p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">E. Exceptions</h3>
+          <p className="text-foreground">Arbitration does not prevent either party from:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1">
             <li>Seeking urgent injunctive or equitable relief in a court of competent jurisdiction.</li>
             <li>Filing claims in small claims court for amounts within the applicable jurisdictional limit.</li>
@@ -607,30 +607,30 @@ const About = () => {
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">F. Class Action Waiver</h4>
-          <p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">F. Class Action Waiver</h3>
+          <p className="text-foreground">
             You and Goldsainte Ai / Inc. agree that all disputes must be resolved individually, and not as a class or consolidated action. 
             Any arbitration or legal proceeding will apply only to you and us, and not to any other user or third party.
           </p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">G. Governing Law and Jurisdiction</h4>
-          <p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">G. Governing Law and Jurisdiction</h3>
+          <p className="text-foreground">
             This Dispute Resolution section is governed by the laws of the State of Delaware, USA, without regard to its conflict of law rules. 
             Any court with jurisdiction in Kent County, Delaware may enforce arbitration awards or hear matters excluded from arbitration.
           </p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">H. Severability</h4>
-          <p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">H. Severability</h3>
+          <p className="text-foreground">
             If any provision of this Dispute Resolution section is found invalid or unenforceable, the remaining provisions remain fully in effect.
           </p>
         </div>
 
         <div>
-          <h4 className="font-semibold mb-2">I. Contact for Disputes</h4>
+          <h3 className="font-semibold text-base mb-3 text-foreground">I. Contact for Disputes</h3>
           <div className="bg-muted p-4 rounded-lg mt-2">
             <p className="font-semibold">Goldsainte Ai / Goldsainte Inc.</p>
             <p>850 New Burton Road, Suite 201</p>
@@ -675,46 +675,46 @@ const About = () => {
         </div>
         
         <div className="space-y-4">
-          <h3 className="text-base font-semibold">Our Services Overview</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Our Services Overview</h3>
           
           <div>
-            <h4 className="font-semibold mb-2">How Our Platform Works</h4>
-            <p>Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">How Our Platform Works</h3>
+            <p className="text-foreground">Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">1. Accommodations</h4>
-            <p>Search, compare, and book hotels and properties worldwide. Our platform displays real-time availability, pricing, and reviews from verified guests. Service Providers set their own rates and policies.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">1. Accommodations</h3>
+            <p className="text-foreground">Search, compare, and book hotels and properties worldwide. Our platform displays real-time availability, pricing, and reviews from verified guests. Service Providers set their own rates and policies.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">2. Attractions</h4>
-            <p>Discover and book tours, activities, and attractions at your destination. We work with Service Providers and Third-Party Aggregators to offer a wide selection of experiences with transparent pricing.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">2. Attractions</h3>
+            <p className="text-foreground">Discover and book tours, activities, and attractions at your destination. We work with Service Providers and Third-Party Aggregators to offer a wide selection of experiences with transparent pricing.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">3. Car Rentals</h4>
-            <p>Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">3. Car Rentals</h3>
+            <p className="text-foreground">Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">4. Flights</h4>
-            <p>Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">4. Flights</h3>
+            <p className="text-foreground">Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">5. Private and Public Transportation</h4>
-            <p>Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">5. Private and Public Transportation</h3>
+            <p className="text-foreground">Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">How We Make Money</h4>
-            <p>Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">How We Make Money</h3>
+            <p className="text-foreground">Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">AI-Powered Recommendations</h4>
-            <p>Our recommendation systems use your search criteria, past interactions, and property performance metrics to suggest travel options you'll love. You can adjust sorting preferences and disable personalization in your account settings.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">AI-Powered Recommendations</h3>
+            <p className="text-foreground">Our recommendation systems use your search criteria, past interactions, and property performance metrics to suggest travel options you'll love. You can adjust sorting preferences and disable personalization in your account settings.</p>
           </div>
         </div>
       </AccordionContent>
