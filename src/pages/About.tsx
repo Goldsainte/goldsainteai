@@ -107,7 +107,7 @@ const About = () => {
           <img 
             src={goldsainteLogo} 
             alt="Goldsainte" 
-            className="h-5 sm:h-6 md:h-7 w-auto"
+            className="h-4 sm:h-6 md:h-7 w-auto"
           />
         </div>
         <p className="text-xs sm:text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed px-2">
@@ -118,7 +118,7 @@ const About = () => {
       {/* Letter from the Founder - Main, Visible Section */}
       <Card className="mb-6 sm:mb-8 border-primary/20 shadow-lg">
         <CardHeader className="pb-4 sm:pb-6">
-          <CardTitle className="text-xl sm:text-2xl md:text-3xl">Letter from the Founder</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl text-center">Letter from the Founder</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6">
           <div className="grid md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] gap-6 sm:gap-8">
@@ -265,11 +265,11 @@ const About = () => {
         </AccordionItem>
 
         {/* Partners & Technology */}
-        <AccordionItem value="partners" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
-          <AccordionTrigger className="text-base font-medium hover:no-underline text-[#0c4d47]">
+        <AccordionItem value="partners" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
+          <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
             Our Partners & Technology
           </AccordionTrigger>
-          <AccordionContent className="pt-6">
+          <AccordionContent className="pt-4 sm:pt-6">
             <div className="flex justify-center mb-6">
               <img 
                 src={primaryLogoGreen} 
@@ -291,7 +291,7 @@ const About = () => {
                 </div>
               ))}
             </div>
-            <p className="text-base text-muted-foreground text-center">
+            <p className="text-sm sm:text-base text-muted-foreground text-center">
               Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences and seamless marketplace integrations.
             </p>
           </AccordionContent>
@@ -839,7 +839,7 @@ const About = () => {
           />
         </div>
         <div>
-          <h3 className="text-base font-semibold mb-3">1. Introduction</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">1. Introduction</h3>
           <p className="text-foreground">
             Goldsainte is committed to respecting and promoting human rights wherever we operate. We believe that travel can bring out the best in humanity, and our mission is to ensure that our business activities and partnerships support this principle.
           </p>
@@ -849,7 +849,7 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">2. Our Commitment</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">2. Our Commitment</h3>
           <p className="text-foreground mb-3">Goldsainte is committed to:</p>
           <ul className="list-disc pl-6 space-y-2 text-foreground">
             <li>Respecting the rights and dignity of all individuals, including employees, contractors, suppliers, and travelers.</li>
@@ -859,14 +859,14 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">3. Scope</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">3. Scope</h3>
           <p className="text-foreground">
             This statement applies to all Goldsainte employees, contractors, suppliers, partners, and service providers. We also expect our business partners and supply chain participants to uphold the same human rights principles and standards.
           </p>
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">4. Human Rights Principles</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">4. Human Rights Principles</h3>
           <p className="text-foreground mb-3">Goldsainte recognizes the following key principles as fundamental to our human rights approach:</p>
           <ul className="list-disc pl-6 space-y-2 text-foreground">
             <li><strong>Non-discrimination:</strong> We do not tolerate discrimination based on race, ethnicity, gender, sexual orientation, religion, disability, or any other characteristic.</li>
@@ -879,7 +879,7 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">5. Due Diligence and Risk Management</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">5. Due Diligence and Risk Management</h3>
           <p className="text-foreground mb-3">Goldsainte actively assesses human rights risks in our operations and supply chains. Key measures include:</p>
           <ul className="list-disc pl-6 space-y-2 text-foreground">
             <li>Conducting supplier due diligence and audits.</li>
@@ -889,28 +889,28 @@ const About = () => {
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">6. Training and Awareness</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">6. Training and Awareness</h3>
           <p className="text-foreground">
             We provide training and resources for employees, contractors, and partners to ensure awareness of human rights risks and responsibilities. This includes guidance on how to identify and respond to potential human rights violations.
           </p>
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">7. Reporting and Accountability</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">7. Reporting and Accountability</h3>
           <p className="text-foreground">
             Goldsainte encourages employees, partners, and stakeholders to raise concerns or report potential human rights issues through our whistleblower channels or direct contact with our compliance team. All reports are investigated promptly and confidentially.
           </p>
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">8. Continuous Improvement</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">8. Continuous Improvement</h3>
           <p className="text-foreground">
             We are committed to continually improving our human rights practices. We regularly review policies, procedures, and business operations to strengthen our human rights performance and align with evolving international standards.
           </p>
         </div>
 
         <div>
-          <h3 className="text-base font-semibold mb-3">9. Approval</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">9. Approval</h3>
           <p className="text-foreground mb-4">
             This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
           </p>

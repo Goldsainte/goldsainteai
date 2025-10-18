@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import { usePresence } from "@/hooks/usePresence";
 import { useState, useEffect } from "react";
 import Index from "./pages/Index";
@@ -303,6 +304,7 @@ function App() {
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <AuthProvider>
             <AppContent />
           </AuthProvider>
