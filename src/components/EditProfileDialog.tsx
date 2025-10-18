@@ -20,6 +20,9 @@ interface Profile {
   website: string | null;
   location: string | null;
   instagram_username: string | null;
+  account_type?: string;
+  show_account_type?: boolean;
+  is_business_verified?: boolean;
 }
 
 interface EditProfileDialogProps {

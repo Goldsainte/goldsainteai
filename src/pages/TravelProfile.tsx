@@ -49,6 +49,8 @@ interface Profile {
   instagram_username: string | null;
   is_verified?: boolean;
   is_business_verified?: boolean;
+  account_type?: string;
+  show_account_type?: boolean;
   followers_count?: number;
   following_count?: number;
 }
@@ -185,7 +187,7 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select('*, account_type, show_account_type, is_business_verified')
         .eq('id', profileUserId)
         .maybeSingle();
 
@@ -204,6 +206,9 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           location: data.location,
           instagram_username: data.instagram_username,
           is_verified: data.is_verified,
+          is_business_verified: data.is_business_verified,
+          account_type: data.account_type,
+          show_account_type: data.show_account_type,
           followers_count: data.followers_count,
           following_count: data.following_count,
         });
