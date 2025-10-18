@@ -8,12 +8,14 @@ import FollowButton from "./FollowButton";
 import { SuggestedUsers } from "./SuggestedUsers";
 import { DraftPostsManager } from "./DraftPostsManager";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
+import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 
 interface SuggestedUser {
   id: string;
   username: string | null;
   avatar_url: string | null;
   is_verified?: boolean;
+  is_business_verified?: boolean;
 }
 
 export function FeedSuggestions() {
@@ -54,7 +56,7 @@ export function FeedSuggestions() {
 
     let query = supabase
       .from('profiles')
-      .select('id, username, avatar_url, is_verified')
+      .select('id, username, avatar_url, is_verified, is_business_verified')
       .neq('id', user.id);
 
     // Only apply the filter if there are users being followed
@@ -139,7 +141,11 @@ export function FeedSuggestions() {
                     <p className="text-sm font-semibold truncate">
                       {suggestion.username || 'User'}
                     </p>
-                    {suggestion.is_verified && <InstagramVerifiedBadge />}
+                    {suggestion.is_business_verified ? (
+                      <BusinessVerifiedBadge />
+                    ) : suggestion.is_verified ? (
+                      <InstagramVerifiedBadge />
+                    ) : null}
                   </div>
                   <p className="text-xs text-muted-foreground truncate">
                     Suggested for you

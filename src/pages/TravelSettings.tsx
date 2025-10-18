@@ -7,9 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Camera, CheckCircle2, Loader2 } from "lucide-react";
+import { ChevronLeft, Camera, CheckCircle2, Loader2, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { AccountTypeSelector } from "@/components/AccountTypeSelector";
+import { BusinessVerificationUpload } from "@/components/BusinessVerificationUpload";
+import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 
 interface Profile {
   username: string | null;
@@ -18,6 +21,9 @@ interface Profile {
   last_name: string | null;
   bio: string | null;
   is_verified: boolean;
+  account_type?: 'personal' | 'creator' | 'business';
+  show_account_type?: boolean;
+  is_business_verified?: boolean;
 }
 
 const TravelSettings = () => {
@@ -30,6 +36,9 @@ const TravelSettings = () => {
     last_name: '',
     bio: '',
     is_verified: false,
+    account_type: 'personal',
+    show_account_type: false,
+    is_business_verified: false,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -70,6 +79,7 @@ const TravelSettings = () => {
 
       if (error) throw error;
       if (data) {
+        const accountType = (data.account_type as 'personal' | 'creator' | 'business') || 'personal';
         setProfile({
           username: data.username,
           avatar_url: data.avatar_url,
@@ -77,6 +87,9 @@ const TravelSettings = () => {
           last_name: data.last_name,
           bio: data.bio,
           is_verified: data.is_verified || false,
+          account_type: accountType,
+          show_account_type: data.show_account_type || false,
+          is_business_verified: data.is_business_verified || false,
         });
       }
     } catch (error) {
@@ -115,6 +128,8 @@ const TravelSettings = () => {
           first_name: profile.first_name,
           last_name: profile.last_name,
           bio: profile.bio,
+          account_type: profile.account_type,
+          show_account_type: profile.show_account_type,
         })
         .eq('id', user?.id);
 
@@ -287,17 +302,57 @@ const TravelSettings = () => {
           </CardContent>
         </Card>
 
-        {/* Verification Status */}
+        {/* Account Type */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              Verification
+              <Shield className="h-5 w-5" />
+              Account Type
+            </CardTitle>
+            <CardDescription>
+              Choose the account type that best fits your needs
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <AccountTypeSelector
+              currentType={profile.account_type || 'personal'}
+              onTypeChange={(type) => setProfile({ ...profile, account_type: type })}
+              showBadgeToggle={profile.show_account_type || false}
+              onShowBadgeChange={(show) => setProfile({ ...profile, show_account_type: show })}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Business Verification */}
+        {profile.account_type === 'business' && !profile.is_business_verified && (
+          <BusinessVerificationUpload onSuccess={fetchProfile} />
+        )}
+
+        {profile.account_type === 'business' && profile.is_business_verified && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                Business Verification
+                <BusinessVerifiedBadge />
+              </CardTitle>
+              <CardDescription>
+                Your business has been verified! You now have the gold verification badge.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
+
+        {/* Individual Verification Status */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              Individual Verification
               {profile.is_verified && (
                 <CheckCircle2 className="h-5 w-5 text-blue-500 fill-blue-500" />
               )}
             </CardTitle>
             <CardDescription>
-              Get a verified badge on your profile for $8/month
+              Get a blue verified badge on your profile for $8/month
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
