@@ -40,6 +40,7 @@ export const Header = () => {
   const [uploadInitialTab, setUploadInitialTab] = useState<"photo" | "video">("photo");
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
+  const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
   const { balance } = useCoinBalance();
 
   // Fetch user's preference setting
@@ -59,6 +60,50 @@ export const Header = () => {
     };
 
     fetchPreferences();
+  }, [user]);
+
+  // Fetch and subscribe to profile avatar changes
+  useEffect(() => {
+    if (!user) {
+      setProfileAvatarUrl(null);
+      return;
+    }
+
+    const fetchProfileAvatar = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .maybeSingle();
+      
+      if (data) {
+        setProfileAvatarUrl(data.avatar_url);
+      }
+    };
+
+    fetchProfileAvatar();
+
+    const channel = supabase
+      .channel(`profile-avatar-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.new && 'avatar_url' in payload.new) {
+            setProfileAvatarUrl(payload.new.avatar_url as string);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const handleCreateContent = (type: string) => {
@@ -748,7 +793,7 @@ export const Header = () => {
             >
               {user ? (
                 <Avatar className="h-6 w-6 ring-2 ring-primary/20">
-                  <AvatarImage src={user.user_metadata?.avatar_url} />
+                  <AvatarImage src={profileAvatarUrl || user.user_metadata?.avatar_url} />
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs">
                     {user.user_metadata?.username?.[0]?.toUpperCase() || 'U'}
                   </AvatarFallback>
