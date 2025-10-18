@@ -922,6 +922,166 @@ const About = () => {
       </AccordionContent>
     </AccordionItem>
 
+    <AccordionItem value="investor-relations">
+      <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
+        Investor Relations
+      </AccordionTrigger>
+      <AccordionContent className="pt-4 space-y-6 text-sm sm:text-base leading-relaxed">
+        <div className="flex justify-center mb-6">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-5 sm:h-7 w-auto"
+          />
+        </div>
+
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-2">
+            Investor Relations — Goldsainte, Inc.
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground">
+            Redefining Luxury Travel with AI, Agents & Creators
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Our Vision</h3>
+          <p className="text-sm sm:text-base text-foreground">
+            Goldsainte, Inc. is building the world's first AI-powered travel marketplace that combines real-time booking, voice AI, travel agent bidding, and creator-led experiences — all in one platform. By integrating technology, social media, and curated travel, we aim to transform how people discover, book, and experience travel.
+          </p>
+          <p className="text-sm sm:text-base text-foreground mt-4">
+            Our vision is to empower travelers with personalized experiences, enable creators to monetize content meaningfully, and provide agents with dynamic opportunities — all while generating value for our shareholders.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Why Invest in Goldsainte</h3>
+          <p className="text-sm sm:text-base text-foreground mb-4">
+            Goldsainte sits at the convergence of luxury travel, AI, and social commerce, offering investors access to a scalable, data-driven ecosystem with diverse revenue streams.
+          </p>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">AI-Powered Travel Marketplace</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>End-to-End Booking:</strong> Users can plan, customize, and book trips in real-time using AI voice assistants.</li>
+              <li><strong>Personalized Recommendations:</strong> Proprietary algorithms analyze traveler behavior, preferences, and past bookings to deliver highly targeted suggestions.</li>
+              <li><strong>Dynamic Pricing:</strong> AI-driven insights help optimize trip margins while providing competitive pricing.</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Agent Bidding Model</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>Competitive Agent Marketplace:</strong> Travel agents bid for bookings, creating value for travelers and ensuring high-quality service.</li>
+              <li><strong>Revenue Optimization:</strong> Success fees and service commissions drive predictable revenue for the platform.</li>
+              <li><strong>Data-Driven Matching:</strong> AI matches agents to travelers based on expertise, location, and previous performance.</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Creator-Led Experiences</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>Monetized Content:</strong> Influencers and travel creators earn revenue by designing and promoting trips.</li>
+              <li><strong>CoCurated Packages:</strong> High-quality, authentic itineraries attract users and increase engagement.</li>
+              <li><strong>Social Commerce Integration:</strong> Creator-driven promotions amplify reach and drive bookings.</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Luxury Positioning</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>Curated Packages:</strong> Premium experiences with detailed itineraries, exclusive access, and personalized amenities.</li>
+              <li><strong>Industry Partnerships:</strong> Collaborations with Amadeus, Ticketmaster, and other global partners enhance offerings.</li>
+              <li><strong>Brand Differentiation:</strong> Combining AI technology, creator influence, and travel expertise positions Goldsainte uniquely in the luxury segment.</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Scalable Growth</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>Global Market Reach:</strong> Multi-currency, multi-language support enables international expansion.</li>
+              <li><strong>Modular Ecosystem:</strong> Flights, hotels, cars, restaurants, and events can scale independently.</li>
+              <li><strong>Network Effects:</strong> Travelers attract agents; agents attract creators; creators attract travelers — creating a self-reinforcing growth loop.</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Data & AI Advantage</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>Voice AI Concierge:</strong> Personalized, conversational trip planning and booking.</li>
+              <li><strong>Predictive Analytics:</strong> Insights from search, bookings, and user engagement enable demand forecasting, seasonal offers, and upsell opportunities.</li>
+              <li><strong>Rich Data Moat:</strong> User behavior, booking history, agent performance, and creator engagement provide unique competitive intelligence.</li>
+            </ul>
+          </div>
+
+          <div className="mb-4">
+            <h4 className="font-semibold text-sm sm:text-base mb-2 text-foreground">Diverse Revenue Streams</h4>
+            <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+              <li><strong>Agent Commissions:</strong> Service + success fees from agent bookings.</li>
+              <li><strong>Creator Partnerships:</strong> Content monetization, affiliate deals, and brand collaborations.</li>
+              <li><strong>Vendor Subscriptions:</strong> Multi-tiered plans (Bronze–Platinum) with marketing, analytics, and exposure benefits.</li>
+              <li><strong>Platform Fees:</strong> Co-curated trip commissions and premium package fees.</li>
+              <li><strong>Future Revenue Opportunities:</strong> Traveler subscriptions, premium listings, API/B2B offerings, and loyalty programs.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Competitive Advantage / Moat</h3>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+            <li><strong>Proprietary Technology:</strong> Voice AI concierge, AI-driven matching, and recommendation systems.</li>
+            <li><strong>Triple-Sided Network:</strong> Integrated ecosystem connecting travelers, agents, and creators.</li>
+            <li><strong>Trust & Safety Infrastructure:</strong> Verified agents, content moderation, escrow payouts, and transparent reviews.</li>
+            <li><strong>Brand Loyalty:</strong> Curated trips and high-quality creator content increase repeat bookings and engagement.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Vision & Roadmap</h3>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+            <li><strong>Near-Term (0–6 months):</strong> Full AI concierge rollout, expanded vendor tiers, creator monetization, and dynamic pricing.</li>
+            <li><strong>Mid-Term (6–12 months):</strong> International expansion, traveler subscription tiers, B2B API launch, and predictive AI for personalized packages.</li>
+            <li><strong>Long-Term (12–24 months):</strong> White-label agency solutions, AR/VR trip previews, blockchain loyalty program, and crypto payment integration.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Key Information</h3>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
+            <li><strong>Corporate Headquarters:</strong> 850 New Burton Road, Suite 201, Dover, DE, 19904, County of Kent</li>
+            <li><strong>Incorporation:</strong> Delaware, USA</li>
+            <li><strong>Stock Information:</strong> Goldsainte is currently a privately held company exploring strategic funding opportunities.</li>
+            <li><strong>Financial Reports:</strong> [Links or placeholders for quarterly/annual reports]</li>
+            <li><strong>Press Releases & News:</strong> [Links to PR or media updates]</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Governance</h3>
+          <p className="text-sm sm:text-base text-foreground">
+            We are committed to transparency, ethical business practices, and strong governance. Our leadership team brings deep experience in entrepreneurship, travel, technology, and scaling companies in dynamic markets.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Modern Slavery & Human Rights Statements</h3>
+          <p className="text-sm sm:text-base text-foreground">
+            For detailed information, please refer to our Modern Slavery Statement and Human Rights Statement above.
+          </p>
+        </div>
+
+        <div>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Contact Investor Relations</h3>
+          <p className="text-sm sm:text-base text-foreground mb-2">
+            For investor inquiries, please contact:
+          </p>
+          <p className="text-sm sm:text-base">
+            📧 <a href="mailto:investors@goldsainte.com" className="text-[#0c4d47] hover:underline font-medium">investors@goldsainte.com</a>
+          </p>
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+
     </Accordion>
     </div>
   );

@@ -127,7 +127,7 @@ export const Footer = () => {
                 <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Investor Relations</a></li>
+                <li><a href="/about#investor-relations" className="hover:text-primary transition-colors">Investor Relations</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Corporate Contact</a></li>
               </ul>
             </AccordionContent>
@@ -193,7 +193,7 @@ export const Footer = () => {
               <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Investor Relations</a></li>
+              <li><a href="/about#investor-relations" className="hover:text-primary transition-colors">Investor Relations</a></li>
               <li><a href="#" className="hover:text-primary transition-colors">Corporate Contact</a></li>
             </ul>
           </div>
