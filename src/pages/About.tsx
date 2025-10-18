@@ -57,7 +57,7 @@ const About = () => {
         },
         {
           icon: Package,
-          title: "CoCutures™ Packages",
+          title: "CoCurated™ Packages",
           description: "Exclusive travel experiences designed by top creators and experts, blending inspiration with seamless booking."
         },
         {
