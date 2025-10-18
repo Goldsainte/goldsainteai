@@ -343,7 +343,7 @@ const About = () => {
             </div>
             
             <p className="text-foreground">
-              We are continuously working to improve the accessibility of our digital services. This statement has been prepared to inform users about how we make our services more accessible, including aligning with the currently applicable EU standards on accessibility requirements for ICT products and services ("Accessibility Standards"). This accessibility statement applies to the portions of our services covered by the European Accessibility Act.
+              We are continuously working to improve the accessibility of our digital services. This statement has been prepared to inform users about how we make our services more accessible, including aligning with the currently applicable US standards on accessibility requirements for ICT products and services ("Accessibility Standards"). This accessibility statement applies to the portions of our services covered by US accessibility legislation.
             </p>
 
             <div>
@@ -522,7 +522,7 @@ const About = () => {
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">E: Flights</h3>
-            <p className="text-sm sm:text-base text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. EU regulations for passengers with reduced mobility may apply.</p>
+            <p className="text-sm sm:text-base text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. US regulations for passengers with reduced mobility may apply.</p>
           </div>
         </div>
 
@@ -547,7 +547,7 @@ const About = () => {
           />
         </div>
         <p className="text-sm sm:text-base text-foreground">
-          Goldsainte Ai / Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
+          Goldsainte AI/Goldsainte Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
         </p>
         
         <div>
@@ -557,7 +557,7 @@ const About = () => {
             we provide multiple resolution pathways including informal resolution, mediation, and arbitration.
           </p>
           <p className="mt-2 text-sm sm:text-base text-foreground">
-            By using Goldsainte Ai / Inc., you agree to resolve disputes according to the terms outlined below.
+            By using Goldsainte AI/Goldsainte Inc., you agree to resolve disputes according to the terms outlined below.
           </p>
         </div>
 
@@ -565,7 +565,7 @@ const About = () => {
           <h3 className="font-semibold text-base mb-3 text-foreground">B. Informal Resolution</h3>
           <p className="text-sm sm:text-base text-foreground">Before initiating formal legal action, you agree to:</p>
           <ul className="list-disc pl-6 mt-2 space-y-1 text-sm sm:text-base text-foreground">
-            <li>Contact Goldsainte Ai / Inc. Customer Support promptly via your account, app, or Help Center.</li>
+            <li>Contact Goldsainte AI/Goldsainte Inc. Customer Support promptly via your account, app, or Help Center.</li>
             <li>Provide relevant details including booking reference, contact information, issue summary, and supporting documentation.</li>
             <li>Allow us 30 days to review and attempt to resolve the issue informally.</li>
           </ul>
@@ -609,7 +609,7 @@ const About = () => {
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">F. Class Action Waiver</h3>
           <p className="text-sm sm:text-base text-foreground">
-            You and Goldsainte Ai / Inc. agree that all disputes must be resolved individually, and not as a class or consolidated action. 
+            You and Goldsainte AI/Goldsainte Inc. agree that all disputes must be resolved individually, and not as a class or consolidated action. 
             Any arbitration or legal proceeding will apply only to you and us, and not to any other user or third party.
           </p>
         </div>
@@ -1051,8 +1051,6 @@ const About = () => {
             <p><strong>Corporate Headquarters:</strong> 850 New Burton Road, Suite 201, Dover, DE, 19904, County of Kent</p>
             <p><strong>Incorporation:</strong> Delaware, USA</p>
             <p><strong>Stock Information:</strong> Goldsainte is currently a privately held company exploring strategic funding opportunities.</p>
-            <p><strong>Financial Reports:</strong> [Links or placeholders for quarterly/annual reports]</p>
-            <p><strong>Press Releases & News:</strong> [Links to PR or media updates]</p>
           </div>
         </div>
 
