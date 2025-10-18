@@ -32,22 +32,23 @@ export default function EmergencyContacts() {
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="mb-6"
+          className="mb-6 h-12 text-base"
+          size="lg"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-5 w-5 mr-2" />
           Back
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-secondary text-primary mb-2">Emergency Contacts</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-4xl font-secondary text-primary mb-2">Emergency Contacts</h1>
+          <p className="text-base sm:text-lg text-muted-foreground">
             Manage emergency contacts for your travel safety
           </p>
         </div>
 
         <Alert className="mb-6">
-          <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
+          <AlertTriangle className="h-5 w-5" />
+          <AlertDescription className="text-sm sm:text-base">
             Emergency contacts are required for high-value bookings (over $5,000) and will be shared with your travel agent in case of emergencies during your trip.
           </AlertDescription>
         </Alert>

@@ -53,7 +53,7 @@ export const AIBookingConcierge = () => {
         // Set default greeting even without user
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm your Goldsainte AI Concierge.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+          content: `Hello! I'm your Goldsainte AI Concierge.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
         }]);
         return;
       }
@@ -99,7 +99,7 @@ export const AIBookingConcierge = () => {
         console.log('Setting initial greeting with agent:', agentName);
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+          content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
         }]);
       }
     };
@@ -199,7 +199,7 @@ export const AIBookingConcierge = () => {
     const agentName = agentProfile?.agent_name || "your Goldsainte AI Concierge";
     setMessages([{
       role: 'assistant',
-      content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Unmute your microphone\n2. Say "Hey Goldsainte" to activate voice mode\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+      content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
     }]);
 
     toast({
@@ -648,9 +648,9 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-24 md:bottom-28 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+      className={`fixed bottom-20 md:bottom-28 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
         isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
-      } ${isMinimized ? 'h-16' : 'h-[80vh] md:h-[600px] max-h-[80vh] md:max-h-[600px]'}`}
+      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[70vh] md:max-h-[600px]'}`}
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
@@ -698,7 +698,7 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(80vh-180px)] md:h-[calc(600px-180px)] p-3" ref={scrollRef}>
+          <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3" ref={scrollRef}>
             <div className="space-y-3">
               {messages.map((msg, idx) => (
                 <div key={idx}>
@@ -837,8 +837,8 @@ export const AIBookingConcierge = () => {
             {/* Helper text */}
             <p className="text-[11px] leading-tight text-muted-foreground text-center px-2">
               {voiceMode 
-                ? "Voice mode active — speak naturally"
-                : "Tap the microphone to talk, or type your request"}
+                ? "Voice mode active — speak naturally or tap to end"
+                : "Tap the microphone to start voice mode, or type below"}
             </p>
           </div>
         </>

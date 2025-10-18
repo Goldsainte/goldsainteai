@@ -36,11 +36,11 @@ export const BottomActionBar = ({ actions, className, showLabels = false }: Bott
                     variant={action.active ? "default" : "ghost"}
                     onClick={action.onClick}
                     className={cn(
-                      "relative h-14 w-14 min-h-[56px] min-w-[56px] sm:h-16 sm:w-16 sm:min-h-[64px] sm:min-w-[64px] touch-manipulation rounded-md",
+                      "relative !h-14 !w-14 !min-h-[56px] !min-w-[56px] sm:!h-16 sm:!w-16 sm:!min-h-[64px] sm:!min-w-[64px] p-0 touch-manipulation rounded-md",
                       action.active && "bg-primary text-primary-foreground"
                     )}
                   >
-                    <div className="[&_svg]:!size-6 sm:[&_svg]:!size-7">{action.icon}</div>
+                    <div className="[&_svg]:!size-6 [&_svg]:!shrink-0 sm:[&_svg]:!size-7">{action.icon}</div>
                     {action.badge !== undefined && action.badge > 0 && (
                       <Badge 
                         variant="destructive" 
