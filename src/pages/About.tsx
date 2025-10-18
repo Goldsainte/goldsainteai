@@ -220,7 +220,7 @@ const About = () => {
                       </div>
                       <div>
                         <h3 className="font-semibold text-sm sm:text-base mb-2 sm:mb-3 text-foreground">{feature.title}</h3>
-                        <p className="text-xs sm:text-sm text-foreground">{feature.description}</p>
+                        <p className="text-sm sm:text-base text-foreground">{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -310,13 +310,13 @@ const About = () => {
                 className="h-5 sm:h-7 w-auto"
               />
             </div>
-            <p className="text-foreground">
+            <p className="text-sm sm:text-base text-foreground">
               Goldsainte Inc. (the company behind Goldsainte™) is registered and based in Delaware, USA ("Goldsainte," "we," "us," or "our"), from where it provides its AI-powered luxury travel and booking platform (the "Service") on its website (the "Website"), and is supported internationally by its affiliated group companies (the "Support Companies"). The Support Companies provide internal and operational support only. They do not render the Service and do not own, operate, or manage the Website or any other website.
             </p>
-            <p className="text-foreground">
+            <p className="text-sm sm:text-base text-foreground">
               For any questions regarding Goldsainte, the Service, or the Website, or to send or serve any documents, notices, correspondence, or other communications—including press inquiries—please contact Goldsainte Inc. directly at its registered office in Delaware.
             </p>
-            <p className="text-foreground">
+            <p className="text-sm sm:text-base text-foreground">
               Goldsainte Inc. does not maintain a legal domicile at any other location or office, including the offices of its Support Companies. The Support Companies are not authorized to act as a process agent or service agent for Goldsainte Inc., and no bookings or reservations can be made through the Support Companies.
             </p>
           </AccordionContent>
@@ -352,16 +352,16 @@ const About = () => {
                 Goldsainte provides users with the capabilities to discover, search, book, and manage travel-related products or services ("Travel Experiences") across accommodations, car rental, flights, taxis, and attractions. Our services are intended to be accessible across desktop and mobile websites, as well as applications ("Platforms"), allowing users to book Travel Experiences, and which support a broad range of user needs.
               </p>
               
-              <p className="text-foreground mb-3">Specifically, we aim to deliver:</p>
-              <ul className="list-disc pl-6 space-y-2 text-foreground mb-4">
+              <p className="text-sm sm:text-base text-foreground mb-3">Specifically, we aim to deliver:</p>
+              <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground mb-4">
                 <li><strong>Perceivable content:</strong> All visual and auditory information is presented in ways that are adaptable to users' needs.</li>
                 <li><strong>Operable interface:</strong> The service is fully navigable by keyboard and works seamlessly with assistive technologies.</li>
                 <li><strong>Understandable design:</strong> Our interface uses clear and simple language; it avoids unnecessary complexity.</li>
                 <li><strong>Robust content:</strong> We ensure compatibility with current and future user agents, including assistive technologies.</li>
               </ul>
 
-              <p className="text-foreground mb-3">In order to deliver these points, we have taken the following measures to provide more accessible services:</p>
-              <ul className="list-disc pl-6 space-y-2 text-foreground mb-4">
+              <p className="text-sm sm:text-base text-foreground mb-3">In order to deliver these points, we have taken the following measures to provide more accessible services:</p>
+              <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground mb-4">
                 <li><strong>Text-based descriptions:</strong> Detailed written information available in clear and simple language</li>
                 <li><strong>Screen reader compatibility:</strong> Fully functional with popular screen readers (e.g., VoiceOver, TalkBack, NVDA, JAWS)</li>
                 <li><strong>Accessible Rich Internet Applications ("ARIA") use:</strong> Implementation of ARIA roles and attributes</li>
@@ -383,7 +383,7 @@ const About = () => {
               <p className="text-foreground mb-2">
                 We are supporting our employees in developing the skills required to keep our services inclusive and conformant with Accessibility Standards by delivering the following:
               </p>
-              <ul className="list-disc pl-6 space-y-1 text-foreground">
+              <ul className="list-disc pl-6 space-y-1 text-sm sm:text-base text-foreground">
                 <li><strong>Role-specific, personalized training:</strong> Available for all employees on accessibility best practices.</li>
                 <li><strong>Internal guidelines and documentation:</strong> Provides up-to-date knowledge for product teams and supplements the training.</li>
               </ul>
@@ -394,7 +394,7 @@ const About = () => {
               <p className="text-foreground mb-2">
                 We strive to ensure accessibility is considered as early as possible in the product life cycle, with support of the following:
               </p>
-              <ul className="list-disc pl-6 space-y-1 text-foreground">
+              <ul className="list-disc pl-6 space-y-1 text-sm sm:text-base text-foreground">
                 <li><strong>Accessible Design System:</strong> Our component library is built with accessibility requirements baked in, ensuring consistency on our Platform.</li>
                 <li><strong>Annotation Kit:</strong> Implementation of a bespoke accessibility annotation kit and quality checklist, allowing UX designers and writers to clearly communicate requirements for assistive technology users during the development of features or flows.</li>
                 <li><strong>Inclusive User Research:</strong> We conduct research and test our products with people with disabilities.</li>
@@ -407,7 +407,7 @@ const About = () => {
               <p className="text-foreground mb-2">
                 We aim to embed accessibility testing practices within our development and QA processes, continually testing our services against the latest Accessibility Standards and detecting accessibility issues in our code.
               </p>
-              <ul className="list-disc pl-6 space-y-1 text-foreground">
+              <ul className="list-disc pl-6 space-y-1 text-sm sm:text-base text-foreground">
                 <li><strong>Automated testing:</strong> Utilizing third-party tooling to embed accessibility tests into pipeline testing and release processes. Additionally, we perform monthly automated scans of our web platforms to detect accessibility issues proactively.</li>
                 <li><strong>Manual testing:</strong> Ad hoc manual testing performed as part of development and QA processes in pre- and post-production.</li>
                 <li><strong>Assistive Technology Lab:</strong> Product teams have access to a range of devices set up with assistive technologies to easily test their products.</li>
@@ -417,7 +417,7 @@ const About = () => {
             <div>
               <h4 className="font-semibold text-base mb-2 text-foreground">Auditing and Evaluation</h4>
               <p className="text-foreground mb-2">We conduct regular auditing with external experts to understand our performance:</p>
-              <ul className="list-disc pl-6 space-y-1 text-foreground">
+              <ul className="list-disc pl-6 space-y-1 text-sm sm:text-base text-foreground">
                 <li><strong>Third-party audits:</strong> Periodic assessments by external accessibility experts, across all our Platforms.</li>
                 <li><strong>Bug and defect management process:</strong> Robust company-wide bug tracking system, with set service level objectives for all accessibility-related bugs and defects identified from external audits.</li>
                 <li><strong>Record keeping:</strong> Internal reporting on accessibility conformance maintained.</li>
@@ -427,7 +427,7 @@ const About = () => {
 
             <div>
               <h4 className="font-semibold text-base mb-2 text-foreground">Centralized Accessibility Support</h4>
-              <ul className="list-disc pl-6 space-y-1 text-foreground">
+              <ul className="list-disc pl-6 space-y-1 text-sm sm:text-base text-foreground">
                 <li>Centralized accessibility team established to provide guidance and support to all product teams.</li>
                 <li>A cross-functional group established to support accessibility efforts across the company and spread awareness.</li>
               </ul>
@@ -481,24 +481,24 @@ const About = () => {
           
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">A1-A3: Introduction</h3>
-            <p className="text-foreground"><strong>A1:</strong> Certain terms in these Terms have specific meanings. Please refer to the Goldsainte Dictionary at the end of these Terms for clarity.</p>
-            <p className="mt-2 text-foreground"><strong>A2:</strong> By using Goldsainte's platform or completing a booking, you agree to these Terms and their conditions, including mandatory arbitration for most disputes (see A20 for opt-out procedures) and waiver of class-action rights.</p>
-            <p className="mt-2 text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurate™ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
+            <p className="text-sm sm:text-base text-foreground"><strong>A1:</strong> Certain terms in these Terms have specific meanings. Please refer to the Goldsainte Dictionary at the end of these Terms for clarity.</p>
+            <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A2:</strong> By using Goldsainte's platform or completing a booking, you agree to these Terms and their conditions, including mandatory arbitration for most disputes (see A20 for opt-out procedures) and waiver of class-action rights.</p>
+            <p className="mt-2 text-sm sm:text-base text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurate™ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">A4-A10: Using the Platform</h3>
-            <p className="text-foreground"><strong>A4-A10:</strong> The Platform provides AI-driven tools and marketplace for travel experiences. You must be 18+ to use it. You agree to pay all costs, follow provider policies, and comply with our terms and applicable laws. For accessibility requests on the Platform, contact Goldsainte Customer Support.</p>
+            <p className="text-sm sm:text-base text-foreground"><strong>A4-A10:</strong> The Platform provides AI-driven tools and marketplace for travel experiences. You must be 18+ to use it. You agree to pay all costs, follow provider policies, and comply with our terms and applicable laws. For accessibility requests on the Platform, contact Goldsainte Customer Support.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">A12-A14: Rewards, Insurance & Credits</h3>
-            <p className="text-foreground"><strong>A12-A14:</strong> We offer Rewards, Credits, and Wallet for bookings and creator earnings. Insurance is governed by the provider's policy. Rewards are non-transferable and can be used for eligible purchases on the Platform.</p>
+            <p className="text-sm sm:text-base text-foreground"><strong>A12-A14:</strong> We offer Rewards, Credits, and Wallet for bookings and creator earnings. Insurance is governed by the provider's policy. Rewards are non-transferable and can be used for eligible purchases on the Platform.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">A15-A20: Legal Responsibilities</h3>
-            <p className="text-foreground"><strong>A15-A20:</strong> We own all intellectual property rights in the Platform. Automated access or scraping is prohibited. Contact Customer Support for issues. We may suspend accounts for violations. Liability is limited to amounts paid. Disputes are resolved through binding arbitration (opt-out available within 30 days via Dispute Resolution page).</p>
+            <p className="text-sm sm:text-base text-foreground"><strong>A15-A20:</strong> We own all intellectual property rights in the Platform. Automated access or scraping is prohibited. Contact Customer Support for issues. We may suspend accounts for violations. Liability is limited to amounts paid. Disputes are resolved through binding arbitration (opt-out available within 30 days via Dispute Resolution page).</p>
           </div>
         </div>
 
@@ -507,28 +507,28 @@ const About = () => {
           
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">B: Accommodations</h3>
-            <p className="text-foreground">Booking is directly with the Service Provider; Goldsainte is not a contractual party. Service Providers are responsible for accuracy of information (facilities, policies, availability). Goldsainte provides the platform to search, compare, and book. Features include Price-Match (subject to criteria), Partner Offers (non-modifiable except for free cancellations), and Damage Policy (for property damage claims).</p>
+            <p className="text-sm sm:text-base text-foreground">Booking is directly with the Service Provider; Goldsainte is not a contractual party. Service Providers are responsible for accuracy of information (facilities, policies, availability). Goldsainte provides the platform to search, compare, and book. Features include Price-Match (subject to criteria), Partner Offers (non-modifiable except for free cancellations), and Damage Policy (for property damage claims).</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">C: Attractions</h3>
-            <p className="text-foreground">Booking is with the Service Provider or Third-Party Aggregator; Goldsainte is not a contractual party. Goldsainte provides the platform for search, booking, and confirmation. Payment is organized through Goldsainte.</p>
+            <p className="text-sm sm:text-base text-foreground">Booking is with the Service Provider or Third-Party Aggregator; Goldsainte is not a contractual party. Goldsainte provides the platform for search, booking, and confirmation. Payment is organized through Goldsainte.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">D: Car Rentals</h3>
-            <p className="text-foreground">Booking may be with Goldsainte Transport Limited or the Service Provider. The Rental Agreement signed at pickup governs the rental and supersedes these Terms if there are discrepancies. Only the Main Driver can manage the booking unless authorized otherwise. Full refund if canceled more than 48 hours before rental; partial refund if canceled less than 48 hours before rental (deduct 3 days cost); no refund after rental start or for no-show. Driver age limits and additional fees (young/elderly driver, one-way, cross-border) may apply.</p>
+            <p className="text-sm sm:text-base text-foreground">Booking may be with Goldsainte Transport Limited or the Service Provider. The Rental Agreement signed at pickup governs the rental and supersedes these Terms if there are discrepancies. Only the Main Driver can manage the booking unless authorized otherwise. Full refund if canceled more than 48 hours before rental; partial refund if canceled less than 48 hours before rental (deduct 3 days cost); no refund after rental start or for no-show. Driver age limits and additional fees (young/elderly driver, one-way, cross-border) may apply.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">E: Flights</h3>
-            <p className="text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. EU regulations for passengers with reduced mobility may apply.</p>
+            <p className="text-sm sm:text-base text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. EU regulations for passengers with reduced mobility may apply.</p>
           </div>
         </div>
 
         <div className="pt-4 border-t border-border">
           <h3 className="font-semibold text-base mb-3 text-foreground">Governing Law</h3>
-          <p className="text-foreground">Disputes not subject to arbitration will be resolved in state or federal courts in Delaware (or your county for small claims), and these Terms are governed by Delaware law.</p>
+          <p className="text-sm sm:text-base text-foreground">Disputes not subject to arbitration will be resolved in state or federal courts in Delaware (or your county for small claims), and these Terms are governed by Delaware law.</p>
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -546,36 +546,36 @@ const About = () => {
             className="h-5 sm:h-7 w-auto"
           />
         </div>
-        <p className="text-foreground">
+        <p className="text-sm sm:text-base text-foreground">
           Goldsainte Ai / Inc. is committed to resolving any disputes fairly and efficiently through a structured process.
         </p>
         
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">A. Overview</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             In the event of a disagreement, dispute, or claim arising from your use of our Platform or services, 
             we provide multiple resolution pathways including informal resolution, mediation, and arbitration.
           </p>
-          <p className="mt-2 text-foreground">
+          <p className="mt-2 text-sm sm:text-base text-foreground">
             By using Goldsainte Ai / Inc., you agree to resolve disputes according to the terms outlined below.
           </p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">B. Informal Resolution</h3>
-          <p className="text-foreground">Before initiating formal legal action, you agree to:</p>
-          <ul className="list-disc pl-6 mt-2 space-y-1">
+          <p className="text-sm sm:text-base text-foreground">Before initiating formal legal action, you agree to:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1 text-sm sm:text-base text-foreground">
             <li>Contact Goldsainte Ai / Inc. Customer Support promptly via your account, app, or Help Center.</li>
             <li>Provide relevant details including booking reference, contact information, issue summary, and supporting documentation.</li>
             <li>Allow us 30 days to review and attempt to resolve the issue informally.</li>
           </ul>
-          <p className="mt-2 text-foreground">Most disputes are resolved at this stage without further escalation.</p>
+          <p className="mt-2 text-sm sm:text-base text-foreground">Most disputes are resolved at this stage without further escalation.</p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">C. Mediation</h3>
-          <p className="text-foreground">If a dispute cannot be resolved informally, mediation is the next step:</p>
-          <ul className="list-disc pl-6 mt-2 space-y-1">
+          <p className="text-sm sm:text-base text-foreground">If a dispute cannot be resolved informally, mediation is the next step:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1 text-sm sm:text-base text-foreground">
             <li>Either party may initiate mediation by providing written notice.</li>
             <li>A mutually agreed-upon, neutral third-party mediator will facilitate the process.</li>
             <li>Mediation sessions take place virtually or in-person in Dover, Delaware, USA.</li>
@@ -587,8 +587,8 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">D. Arbitration</h3>
-          <p className="text-foreground">All disputes that cannot be resolved through informal resolution or mediation will be resolved through binding arbitration:</p>
-          <ul className="list-disc pl-6 mt-2 space-y-1">
+          <p className="text-sm sm:text-base text-foreground">All disputes that cannot be resolved through informal resolution or mediation will be resolved through binding arbitration:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1 text-sm sm:text-base text-foreground">
             <li><strong>Arbitration Rules:</strong> Conducted under American Arbitration Association (AAA) rules.</li>
             <li><strong>Location:</strong> Dover, Delaware, USA, unless both parties agree otherwise.</li>
             <li><strong>Arbitrator:</strong> A single neutral arbitrator with relevant travel industry experience.</li>
@@ -599,8 +599,8 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">E. Exceptions</h3>
-          <p className="text-foreground">Arbitration does not prevent either party from:</p>
-          <ul className="list-disc pl-6 mt-2 space-y-1">
+          <p className="text-sm sm:text-base text-foreground">Arbitration does not prevent either party from:</p>
+          <ul className="list-disc pl-6 mt-2 space-y-1 text-sm sm:text-base text-foreground">
             <li>Seeking urgent injunctive or equitable relief in a court of competent jurisdiction.</li>
             <li>Filing claims in small claims court for amounts within the applicable jurisdictional limit.</li>
           </ul>
@@ -608,7 +608,7 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">F. Class Action Waiver</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             You and Goldsainte Ai / Inc. agree that all disputes must be resolved individually, and not as a class or consolidated action. 
             Any arbitration or legal proceeding will apply only to you and us, and not to any other user or third party.
           </p>
@@ -616,7 +616,7 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">G. Governing Law and Jurisdiction</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             This Dispute Resolution section is governed by the laws of the State of Delaware, USA, without regard to its conflict of law rules. 
             Any court with jurisdiction in Kent County, Delaware may enforce arbitration awards or hear matters excluded from arbitration.
           </p>
@@ -624,7 +624,7 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">H. Severability</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             If any provision of this Dispute Resolution section is found invalid or unenforceable, the remaining provisions remain fully in effect.
           </p>
         </div>
@@ -679,42 +679,42 @@ const About = () => {
           
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">How Our Platform Works</h3>
-            <p className="text-foreground">Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
+            <p className="text-sm sm:text-base text-foreground">Goldsainte provides an AI-powered platform that makes it easy to compare and book travel experiences from hotels, attractions, car rentals, flights, and transportation providers worldwide. When you make a booking, you enter into a direct contract with the Service Provider.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">1. Accommodations</h3>
-            <p className="text-foreground">Search, compare, and book hotels and properties worldwide. Our platform displays real-time availability, pricing, and reviews from verified guests. Service Providers set their own rates and policies.</p>
+            <p className="text-sm sm:text-base text-foreground">Search, compare, and book hotels and properties worldwide. Our platform displays real-time availability, pricing, and reviews from verified guests. Service Providers set their own rates and policies.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">2. Attractions</h3>
-            <p className="text-foreground">Discover and book tours, activities, and attractions at your destination. We work with Service Providers and Third-Party Aggregators to offer a wide selection of experiences with transparent pricing.</p>
+            <p className="text-sm sm:text-base text-foreground">Discover and book tours, activities, and attractions at your destination. We work with Service Providers and Third-Party Aggregators to offer a wide selection of experiences with transparent pricing.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">3. Car Rentals</h3>
-            <p className="text-foreground">Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
+            <p className="text-sm sm:text-base text-foreground">Compare rental cars from multiple companies with clear pricing and flexible booking options. Our platform helps you find the right vehicle for your needs with detailed specifications and customer reviews.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">4. Flights</h3>
-            <p className="text-foreground">Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
+            <p className="text-sm sm:text-base text-foreground">Search and book flights through our Third-Party Aggregator partners. Our recommendation system helps you find the best options based on price, travel time, and your preferences.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">5. Private and Public Transportation</h3>
-            <p className="text-foreground">Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
+            <p className="text-sm sm:text-base text-foreground">Book ground transportation including private transfers, taxis, and public transit options. Pre-book with confidence knowing all fees are included upfront.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">How We Make Money</h3>
-            <p className="text-foreground">Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
+            <p className="text-sm sm:text-base text-foreground">Goldsainte earns commission from Service Providers after bookings are completed. We don't charge booking fees to customers. Properties with "Preferred Partner" or "Ad" badges pay higher commissions for enhanced visibility.</p>
           </div>
 
           <div>
             <h3 className="font-semibold text-base mb-3 text-foreground">AI-Powered Recommendations</h3>
-            <p className="text-foreground">Our recommendation systems use your search criteria, past interactions, and property performance metrics to suggest travel options you'll love. You can adjust sorting preferences and disable personalization in your account settings.</p>
+            <p className="text-sm sm:text-base text-foreground">Our recommendation systems use your search criteria, past interactions, and property performance metrics to suggest travel options you'll love. You can adjust sorting preferences and disable personalization in your account settings.</p>
           </div>
         </div>
       </AccordionContent>
@@ -840,18 +840,18 @@ const About = () => {
         </div>
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">1. Introduction</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             Goldsainte is committed to respecting and promoting human rights wherever we operate. We believe that travel can bring out the best in humanity, and our mission is to ensure that our business activities and partnerships support this principle.
           </p>
-          <p className="text-foreground mt-4">
+          <p className="text-sm sm:text-base text-foreground mt-4">
             This statement articulates our approach to respecting and promoting human rights, in alignment with internationally recognized standards such as the United Nations Guiding Principles on Business and Human Rights and the International Bill of Human Rights.
           </p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">2. Our Commitment</h3>
-          <p className="text-foreground mb-3">Goldsainte is committed to:</p>
-          <ul className="list-disc pl-6 space-y-2 text-foreground">
+          <p className="text-sm sm:text-base text-foreground mb-3">Goldsainte is committed to:</p>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
             <li>Respecting the rights and dignity of all individuals, including employees, contractors, suppliers, and travelers.</li>
             <li>Preventing, mitigating, and addressing adverse human rights impacts connected to our operations, products, and services.</li>
             <li>Promoting ethical business practices and positive social outcomes across all regions in which we operate.</li>
@@ -860,15 +860,15 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">3. Scope</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             This statement applies to all Goldsainte employees, contractors, suppliers, partners, and service providers. We also expect our business partners and supply chain participants to uphold the same human rights principles and standards.
           </p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">4. Human Rights Principles</h3>
-          <p className="text-foreground mb-3">Goldsainte recognizes the following key principles as fundamental to our human rights approach:</p>
-          <ul className="list-disc pl-6 space-y-2 text-foreground">
+          <p className="text-sm sm:text-base text-foreground mb-3">Goldsainte recognizes the following key principles as fundamental to our human rights approach:</p>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
             <li><strong>Non-discrimination:</strong> We do not tolerate discrimination based on race, ethnicity, gender, sexual orientation, religion, disability, or any other characteristic.</li>
             <li><strong>Freedom from forced labor:</strong> We prohibit forced, bonded, or compulsory labor in our operations and supply chain.</li>
             <li><strong>Child protection:</strong> We do not tolerate child labor in any form.</li>
@@ -880,8 +880,8 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">5. Due Diligence and Risk Management</h3>
-          <p className="text-foreground mb-3">Goldsainte actively assesses human rights risks in our operations and supply chains. Key measures include:</p>
-          <ul className="list-disc pl-6 space-y-2 text-foreground">
+          <p className="text-sm sm:text-base text-foreground mb-3">Goldsainte actively assesses human rights risks in our operations and supply chains. Key measures include:</p>
+          <ul className="list-disc pl-6 space-y-2 text-sm sm:text-base text-foreground">
             <li>Conducting supplier due diligence and audits.</li>
             <li>Integrating human rights considerations into procurement and partnership decisions.</li>
             <li>Monitoring, reporting, and addressing human rights concerns through established policies and procedures.</li>
@@ -890,28 +890,28 @@ const About = () => {
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">6. Training and Awareness</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             We provide training and resources for employees, contractors, and partners to ensure awareness of human rights risks and responsibilities. This includes guidance on how to identify and respond to potential human rights violations.
           </p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">7. Reporting and Accountability</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             Goldsainte encourages employees, partners, and stakeholders to raise concerns or report potential human rights issues through our whistleblower channels or direct contact with our compliance team. All reports are investigated promptly and confidentially.
           </p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">8. Continuous Improvement</h3>
-          <p className="text-foreground">
+          <p className="text-sm sm:text-base text-foreground">
             We are committed to continually improving our human rights practices. We regularly review policies, procedures, and business operations to strengthen our human rights performance and align with evolving international standards.
           </p>
         </div>
 
         <div>
           <h3 className="font-semibold text-base mb-3 text-foreground">9. Approval</h3>
-          <p className="text-foreground mb-4">
+          <p className="text-sm sm:text-base text-foreground mb-4">
             This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
           </p>
           <div className="bg-muted p-4 rounded-lg">
