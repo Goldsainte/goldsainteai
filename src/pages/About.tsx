@@ -155,7 +155,7 @@ const About = () => {
                 Thank you for being part of this journey. The best adventures are still ahead.
               </p>
               
-              <div className="mt-6 text-foreground">
+              <div className="mt-6 text-foreground leading-tight space-y-0">
                 <p className="font-semibold">Andre C. Powell Jr.</p>
                 <p>CEO & Founder</p>
                 <p>Goldsainte, Inc.</p>
@@ -818,10 +818,10 @@ const About = () => {
           <p className="text-foreground mb-3">
             This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
           </p>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="font-semibold">Andre C. Powell Jr.</p>
-            <p className="text-muted-foreground">CEO & Founder, Goldsainte Inc.</p>
-          </div>
+              <div className="bg-muted p-4 rounded-lg leading-tight space-y-0">
+                <p className="font-semibold">Andre C. Powell Jr.</p>
+                <p className="text-muted-foreground">CEO & Founder, Goldsainte Inc.</p>
+              </div>
         </div>
       </AccordionContent>
     </AccordionItem>
@@ -914,10 +914,10 @@ const About = () => {
           <p className="text-sm sm:text-base text-foreground mb-4">
             This statement has been approved by the Board of Directors of Goldsainte and is signed on behalf of the company by:
           </p>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="font-semibold text-foreground">Andre C. Powell</p>
-            <p className="text-muted-foreground">CEO & Founder, Goldsainte</p>
-          </div>
+              <div className="bg-muted p-4 rounded-lg leading-tight space-y-0">
+                <p className="font-semibold text-foreground">Andre C. Powell</p>
+                <p className="text-muted-foreground">CEO & Founder, Goldsainte</p>
+              </div>
         </div>
       </AccordionContent>
     </AccordionItem>
