@@ -34,10 +34,9 @@ export const BottomActionBar = ({ actions, className, showLabels = false }: Bott
                 <div className="flex flex-col items-center gap-1">
                   <Button
                     variant={action.active ? "default" : "ghost"}
-                    size="icon"
                     onClick={action.onClick}
                     className={cn(
-                      "relative h-14 w-14 sm:h-16 sm:w-16 touch-manipulation",
+                      "relative h-14 w-14 min-h-[56px] min-w-[56px] sm:h-16 sm:w-16 sm:min-h-[64px] sm:min-w-[64px] touch-manipulation rounded-md",
                       action.active && "bg-primary text-primary-foreground"
                     )}
                   >
