@@ -208,7 +208,7 @@ const About = () => {
             </div>
             {featureCategories.map((category, idx) => (
               <div key={category.category}>
-                <h3 className="text-base font-semibold mb-4 text-foreground">{category.category}</h3>
+                <h3 className="font-semibold text-base mb-3 text-foreground">{category.category}</h3>
                 <div className="grid gap-4">
                   {category.features.map((feature) => (
                     <div 
@@ -219,8 +219,8 @@ const About = () => {
                         <feature.icon className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <h4 className="font-semibold text-base mb-1 text-foreground">{feature.title}</h4>
-                        <p className="text-base text-muted-foreground">{feature.description}</p>
+                        <h3 className="font-semibold text-base mb-3 text-foreground">{feature.title}</h3>
+                        <p className="text-foreground">{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -477,58 +477,58 @@ const About = () => {
         <p className="text-base text-muted-foreground">Updated October 17, 2025</p>
         
         <div className="space-y-4">
-          <h3 className="text-base font-semibold">A: General Terms</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">A: General Terms</h3>
           
           <div>
-            <h4 className="font-semibold mb-2">A1-A3: Introduction</h4>
-            <p><strong>A1:</strong> Certain terms in these Terms have specific meanings. Please refer to the Goldsainte Dictionary at the end of these Terms for clarity.</p>
-            <p className="mt-2"><strong>A2:</strong> By using Goldsainte's platform or completing a booking, you agree to these Terms and their conditions, including mandatory arbitration for most disputes (see A20 for opt-out procedures) and waiver of class-action rights.</p>
-            <p className="mt-2"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurate™ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">A1-A3: Introduction</h3>
+            <p className="text-foreground"><strong>A1:</strong> Certain terms in these Terms have specific meanings. Please refer to the Goldsainte Dictionary at the end of these Terms for clarity.</p>
+            <p className="mt-2 text-foreground"><strong>A2:</strong> By using Goldsainte's platform or completing a booking, you agree to these Terms and their conditions, including mandatory arbitration for most disputes (see A20 for opt-out procedures) and waiver of class-action rights.</p>
+            <p className="mt-2 text-foreground"><strong>A3:</strong> Goldsainte Inc., registered in Delaware, USA, provides and manages the Platform, including AI-powered services, CoCurate™ packages, Travel Agent Marketplace, and creator tools. We do not provide the travel experiences themselves—service providers are solely responsible for their services.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">A4-A10: Using the Platform</h4>
-            <p><strong>A4-A10:</strong> The Platform provides AI-driven tools and marketplace for travel experiences. You must be 18+ to use it. You agree to pay all costs, follow provider policies, and comply with our terms and applicable laws. For accessibility requests on the Platform, contact Goldsainte Customer Support.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">A4-A10: Using the Platform</h3>
+            <p className="text-foreground"><strong>A4-A10:</strong> The Platform provides AI-driven tools and marketplace for travel experiences. You must be 18+ to use it. You agree to pay all costs, follow provider policies, and comply with our terms and applicable laws. For accessibility requests on the Platform, contact Goldsainte Customer Support.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">A12-A14: Rewards, Insurance & Credits</h4>
-            <p><strong>A12-A14:</strong> We offer Rewards, Credits, and Wallet for bookings and creator earnings. Insurance is governed by the provider's policy. Rewards are non-transferable and can be used for eligible purchases on the Platform.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">A12-A14: Rewards, Insurance & Credits</h3>
+            <p className="text-foreground"><strong>A12-A14:</strong> We offer Rewards, Credits, and Wallet for bookings and creator earnings. Insurance is governed by the provider's policy. Rewards are non-transferable and can be used for eligible purchases on the Platform.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">A15-A20: Legal Responsibilities</h4>
-            <p><strong>A15-A20:</strong> We own all intellectual property rights in the Platform. Automated access or scraping is prohibited. Contact Customer Support for issues. We may suspend accounts for violations. Liability is limited to amounts paid. Disputes are resolved through binding arbitration (opt-out available within 30 days via Dispute Resolution page).</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">A15-A20: Legal Responsibilities</h3>
+            <p className="text-foreground"><strong>A15-A20:</strong> We own all intellectual property rights in the Platform. Automated access or scraping is prohibited. Contact Customer Support for issues. We may suspend accounts for violations. Liability is limited to amounts paid. Disputes are resolved through binding arbitration (opt-out available within 30 days via Dispute Resolution page).</p>
           </div>
         </div>
 
         <div className="space-y-4">
-          <h3 className="text-base font-semibold">B-E: Service-Specific Terms</h3>
+          <h3 className="font-semibold text-base mb-3 text-foreground">B-E: Service-Specific Terms</h3>
           
           <div>
-            <h4 className="font-semibold mb-2">B: Accommodations</h4>
-            <p>Booking is directly with the Service Provider; Goldsainte is not a contractual party. Service Providers are responsible for accuracy of information (facilities, policies, availability). Goldsainte provides the platform to search, compare, and book. Features include Price-Match (subject to criteria), Partner Offers (non-modifiable except for free cancellations), and Damage Policy (for property damage claims).</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">B: Accommodations</h3>
+            <p className="text-foreground">Booking is directly with the Service Provider; Goldsainte is not a contractual party. Service Providers are responsible for accuracy of information (facilities, policies, availability). Goldsainte provides the platform to search, compare, and book. Features include Price-Match (subject to criteria), Partner Offers (non-modifiable except for free cancellations), and Damage Policy (for property damage claims).</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">C: Attractions</h4>
-            <p>Booking is with the Service Provider or Third-Party Aggregator; Goldsainte is not a contractual party. Goldsainte provides the platform for search, booking, and confirmation. Payment is organized through Goldsainte.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">C: Attractions</h3>
+            <p className="text-foreground">Booking is with the Service Provider or Third-Party Aggregator; Goldsainte is not a contractual party. Goldsainte provides the platform for search, booking, and confirmation. Payment is organized through Goldsainte.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">D: Car Rentals</h4>
-            <p>Booking may be with Goldsainte Transport Limited or the Service Provider. The Rental Agreement signed at pickup governs the rental and supersedes these Terms if there are discrepancies. Only the Main Driver can manage the booking unless authorized otherwise. Full refund if canceled more than 48 hours before rental; partial refund if canceled less than 48 hours before rental (deduct 3 days cost); no refund after rental start or for no-show. Driver age limits and additional fees (young/elderly driver, one-way, cross-border) may apply.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">D: Car Rentals</h3>
+            <p className="text-foreground">Booking may be with Goldsainte Transport Limited or the Service Provider. The Rental Agreement signed at pickup governs the rental and supersedes these Terms if there are discrepancies. Only the Main Driver can manage the booking unless authorized otherwise. Full refund if canceled more than 48 hours before rental; partial refund if canceled less than 48 hours before rental (deduct 3 days cost); no refund after rental start or for no-show. Driver age limits and additional fees (young/elderly driver, one-way, cross-border) may apply.</p>
           </div>
 
           <div>
-            <h4 className="font-semibold mb-2">E: Flights</h4>
-            <p>Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. EU regulations for passengers with reduced mobility may apply.</p>
+            <h3 className="font-semibold text-base mb-3 text-foreground">E: Flights</h3>
+            <p className="text-foreground">Booking is with the airline (via Third-Party Aggregator); Goldsainte is not a contractual party. You enter into an Intermediation Contract with the Aggregator and a Contract of Carriage with the airline. Your Contract of Carriage governs cancellations, changes, and refunds. You are responsible for all travel documentation (passport, visas) and for compliance with check-in and boarding requirements. Charges may include taxes, service fees, baggage, and seat selection. Prohibited practices (e.g., buying flights you don't intend to use) are not allowed. Code-share flights may be operated by a different airline. EU regulations for passengers with reduced mobility may apply.</p>
           </div>
         </div>
 
         <div className="pt-4 border-t border-border">
-          <h4 className="font-semibold mb-2">Governing Law</h4>
-          <p className="text-muted-foreground">Disputes not subject to arbitration will be resolved in state or federal courts in Delaware (or your county for small claims), and these Terms are governed by Delaware law.</p>
+          <h3 className="font-semibold text-base mb-3 text-foreground">Governing Law</h3>
+          <p className="text-foreground">Disputes not subject to arbitration will be resolved in state or federal courts in Delaware (or your county for small claims), and these Terms are governed by Delaware law.</p>
         </div>
       </AccordionContent>
     </AccordionItem>
