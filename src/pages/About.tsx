@@ -100,31 +100,31 @@ const About = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 sm:py-12 max-w-5xl">
+    <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 md:py-12 max-w-5xl">
       {/* Page Header */}
-      <div className="text-center mb-12">
-        <div className="flex justify-center mb-6">
+      <div className="text-center mb-8 sm:mb-12">
+        <div className="flex justify-center mb-4 sm:mb-6">
           <img 
             src={goldsainteLogo} 
             alt="Goldsainte" 
-            className="h-5 sm:h-7 w-auto"
+            className="h-5 sm:h-6 md:h-7 w-auto"
           />
         </div>
-        <p className="text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed">
+        <p className="text-xs sm:text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed px-2">
           Discover. Book. Create. Earn. — Travel Reinvented with AI, Agent Bidding & Creator Collaborations. Plan faster with AI, let agents bid to save more, or book CoCurated trips built by pros, amplified by creators, and designed to deliver real value.
         </p>
       </div>
 
       {/* Letter from the Founder - Main, Visible Section */}
-      <Card className="mb-8 border-primary/20 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl sm:text-3xl">Letter from the Founder</CardTitle>
+      <Card className="mb-6 sm:mb-8 border-primary/20 shadow-lg">
+        <CardHeader className="pb-4 sm:pb-6">
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl">Letter from the Founder</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid md:grid-cols-[200px_1fr] gap-8">
+        <CardContent className="space-y-4 sm:space-y-6">
+          <div className="grid md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] gap-6 sm:gap-8">
             {/* Founder Image */}
             <div className="flex justify-center md:justify-start">
-              <div className="w-[200px] h-[250px] rounded-lg overflow-hidden shadow-md">
+              <div className="w-[160px] h-[200px] sm:w-[180px] sm:h-[225px] md:w-[180px] md:h-[225px] lg:w-[200px] lg:h-[250px] rounded-lg overflow-hidden shadow-md">
                 <img 
                   src={founderImage}
                   alt="Goldsainte Founder"
@@ -134,7 +134,7 @@ const About = () => {
             </div>
             
             {/* Letter Content */}
-            <div className="space-y-4 text-base leading-relaxed">
+            <div className="space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
               <p className="text-foreground">
                 When Goldsainte first launched, people asked how we were different from other services. The answer was clear: we brought innovation, safety, and elevated experiences to transportation. Today, we've grown far beyond those roots.
               </p>
@@ -166,19 +166,19 @@ const About = () => {
       </Card>
 
       {/* Expandable Sections */}
-      <Accordion type="single" collapsible className="space-y-4">
+      <Accordion type="single" collapsible className="space-y-3 sm:space-y-4">
         
         {/* What Is Goldsainte */}
-        <AccordionItem value="what-is" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
-          <AccordionTrigger className="text-base font-medium hover:no-underline text-[#0c4d47]">
+        <AccordionItem value="what-is" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
+          <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
             What is Goldsainte?
           </AccordionTrigger>
-          <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
-            <div className="flex justify-center mb-6">
+          <AccordionContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <img 
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
-                className="h-5 sm:h-7 w-auto"
+                className="h-4 sm:h-5 md:h-7 w-auto"
               />
             </div>
             <p className="text-foreground">
@@ -194,33 +194,33 @@ const About = () => {
         </AccordionItem>
 
         {/* What We Offer */}
-        <AccordionItem value="features" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
-          <AccordionTrigger className="text-base font-medium hover:no-underline text-[#0c4d47]">
+        <AccordionItem value="features" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
+          <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
             What We Offer
           </AccordionTrigger>
-          <AccordionContent className="pt-6 space-y-8">
-            <div className="flex justify-center mb-6">
+          <AccordionContent className="pt-4 sm:pt-6 space-y-6 sm:space-y-8">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <img 
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
-                className="h-5 sm:h-7 w-auto"
+                className="h-4 sm:h-5 md:h-7 w-auto"
               />
             </div>
             {featureCategories.map((category, idx) => (
               <div key={category.category}>
-                <h3 className="font-semibold text-base mb-3 text-foreground">{category.category}</h3>
-                <div className="grid gap-4">
+                <h3 className="font-semibold text-sm sm:text-base mb-3 text-foreground">{category.category}</h3>
+                <div className="grid gap-3 sm:gap-4">
                   {category.features.map((feature) => (
                     <div 
                       key={feature.title}
-                      className="flex gap-4 items-start p-4 rounded-lg hover:bg-accent/50 transition-all"
+                      className="flex gap-3 sm:gap-4 items-start p-3 sm:p-4 rounded-lg hover:bg-accent/50 transition-all"
                     >
-                      <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <feature.icon className="h-5 w-5 text-primary" />
+                      <div className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <feature.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-base mb-3 text-foreground">{feature.title}</h3>
-                        <p className="text-foreground">{feature.description}</p>
+                        <h3 className="font-semibold text-sm sm:text-base mb-2 sm:mb-3 text-foreground">{feature.title}</h3>
+                        <p className="text-xs sm:text-sm text-foreground">{feature.description}</p>
                       </div>
                     </div>
                   ))}
@@ -234,16 +234,16 @@ const About = () => {
         </AccordionItem>
 
         {/* Our Mission */}
-        <AccordionItem value="mission" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
-          <AccordionTrigger className="text-base font-medium hover:no-underline text-[#0c4d47]">
+        <AccordionItem value="mission" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
+          <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
             Our Mission
           </AccordionTrigger>
-          <AccordionContent className="pt-4 space-y-4 text-base leading-relaxed">
-            <div className="flex justify-center mb-6">
+          <AccordionContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
+            <div className="flex justify-center mb-4 sm:mb-6">
               <img 
                 src={primaryLogoGreen} 
                 alt="Goldsainte" 
-                className="h-5 sm:h-7 w-auto"
+                className="h-4 sm:h-5 md:h-7 w-auto"
               />
             </div>
             <p className="text-foreground">

@@ -32,8 +32,8 @@ export const Footer = () => {
   return (
     <footer className="bg-background border-t border-border mt-16">
       {/* Popular Destinations Section */}
-      <div className="container mx-auto px-4 py-8 border-b border-border">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 border-b border-border">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
           {popularDestinations.slice(0, showAllDestinations ? undefined : 10).map((dest, idx) => (
             <Link 
               key={idx}
@@ -57,12 +57,12 @@ export const Footer = () => {
       </div>
 
       {/* Navigation Links Section */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
+      <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8 mb-8 sm:mb-12">
           {/* Support Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Support</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Support</h4>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li><Link to="/dashboard" className="hover:text-primary transition-colors">Manage your trips</Link></li>
               <li><Link to="/messages" className="hover:text-primary transition-colors">Contact Customer Service</Link></li>
               <li><Link to="/trust-safety" className="hover:text-primary transition-colors">Safety Resource Center</Link></li>
@@ -72,8 +72,8 @@ export const Footer = () => {
 
           {/* Discover Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Discover</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Discover</h4>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li><Link to="/what-we-do" className="hover:text-primary transition-colors">Our Services</Link></li>
               <li><Link to="/loyalty-rewards" className="hover:text-primary transition-colors">Loyalty Program</Link></li>
               <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
@@ -86,8 +86,8 @@ export const Footer = () => {
 
           {/* Terms & Settings Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Terms and settings</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Terms and settings</h4>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
               <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
               <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
@@ -100,8 +100,8 @@ export const Footer = () => {
 
           {/* Partners Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Partners</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Partners</h4>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">Become a Travel Agent</Link></li>
               <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Influencer Program</Link></li>
               <li><Link to="/shop" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
@@ -112,8 +112,8 @@ export const Footer = () => {
 
           {/* About Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">About</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">About</h4>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
               <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
               <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
@@ -127,8 +127,8 @@ export const Footer = () => {
 
           {/* Legal Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Legal</h4>
-            <ul className="space-y-3 text-sm text-muted-foreground">
+            <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Legal</h4>
+            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-muted-foreground">
               <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
               <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & Cookies</Link></li>
               <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
@@ -139,9 +139,9 @@ export const Footer = () => {
         </div>
 
         {/* Currency Selector & Social Media */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pb-8 border-b border-border">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-border">
           {/* Currency Selector */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
             <Globe className="h-4 w-4 text-muted-foreground" />
             <select 
               value={selectedCurrency}
@@ -157,8 +157,8 @@ export const Footer = () => {
           </div>
 
           {/* Social Media Links */}
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Follow us:</span>
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
+            <span className="text-xs sm:text-sm font-medium w-full sm:w-auto text-center sm:text-left">Follow us:</span>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Facebook">
               <Facebook className="h-5 w-5" />
             </a>
@@ -178,11 +178,11 @@ export const Footer = () => {
         </div>
 
         {/* Logo & Copyright */}
-        <div className="pt-8">
-          <div className="flex flex-col items-center gap-6">
-            <img src={verticalLogo} alt="Goldsainte" className="h-20 w-auto" />
-            <div className="text-center max-w-3xl">
-              <p className="text-sm text-muted-foreground mb-2">
+        <div className="pt-6 sm:pt-8">
+          <div className="flex flex-col items-center gap-4 sm:gap-6">
+            <img src={verticalLogo} alt="Goldsainte" className="h-16 sm:h-20 w-auto" />
+            <div className="text-center max-w-3xl px-4">
+              <p className="text-xs sm:text-sm text-muted-foreground mb-2">
                 Goldsainte AI is part of Goldsainte Inc., the world leader in AI-powered luxury travel and curated experiences. Discover. Create. Share. Travel with Goldsainte.
               </p>
               <p className="text-xs text-muted-foreground">
