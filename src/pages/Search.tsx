@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Search as SearchIcon, ChevronLeft, MapPin, Loader2, X } from "lucide-react";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
+import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 
 interface SearchUser {
@@ -18,6 +19,7 @@ interface SearchUser {
   avatar_url: string | null;
   bio: string | null;
   is_verified: boolean;
+  is_business_verified?: boolean;
 }
 
 interface SearchPost {
@@ -68,7 +70,7 @@ export default function Search() {
       // Search users
       const { data: usersData, error: usersError } = await supabase
         .from("profiles")
-        .select("id, username, full_name, avatar_url, bio, is_verified")
+        .select("id, username, full_name, avatar_url, bio, is_verified, is_business_verified")
         .or(`username.ilike.%${searchQuery}%,full_name.ilike.%${searchQuery}%,bio.ilike.%${searchQuery}%`)
         .limit(20);
 
@@ -265,7 +267,11 @@ export default function Search() {
                           <p className="font-semibold text-sm truncate">
                             {user.username || "Anonymous"}
                           </p>
-                          {user.is_verified && <InstagramVerifiedBadge />}
+                          {user.is_business_verified ? (
+                            <BusinessVerifiedBadge />
+                          ) : user.is_verified ? (
+                            <InstagramVerifiedBadge />
+                          ) : null}
                         </div>
                         <p className="text-sm text-muted-foreground truncate">
                           {user.full_name}

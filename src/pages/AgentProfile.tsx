@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Star, MapPin, Briefcase, Award, Clock, ArrowLeft, Globe, Mail, Phone, Flag } from "lucide-react";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
+import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { ReviewsSection } from "@/components/ReviewsSection";
 import { AgentAvailabilityCalendar } from "@/components/AgentAvailabilityCalendar";
@@ -168,11 +169,15 @@ export default function AgentProfile() {
                     />
                   </div>
 
-                  {agent.is_verified && (
+                  {agent.is_business_verified ? (
+                    <div className="mb-4">
+                      <BusinessVerifiedBadge />
+                    </div>
+                  ) : agent.is_verified ? (
                     <div className="mb-4">
                       <InstagramVerifiedBadge />
                     </div>
-                  )}
+                  ) : null}
 
                   <p className="text-sm text-muted-foreground mb-4">
                     {agent.bio || 'No bio available'}

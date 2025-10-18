@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronLeft, Settings, Heart, Video, MessageCircle, Share2, Grid3X3, TrendingUp, ChevronDown, PlusCircle, Edit, Star, Coins, Briefcase, Sparkles, X, Home, Search as SearchIcon, PlusSquare, User, Music2 } from "lucide-react";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
+import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import CreateContentSheet from "@/components/CreateContentSheet";
@@ -47,6 +48,7 @@ interface Profile {
   location: string | null;
   instagram_username: string | null;
   is_verified?: boolean;
+  is_business_verified?: boolean;
   followers_count?: number;
   following_count?: number;
 }
@@ -524,7 +526,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
           </div>
           <div className="flex items-center gap-2">
             <h1 className="text-base font-semibold">{profile?.username || 'Profile'}</h1>
-            {profile?.is_verified && <InstagramVerifiedBadge />}
+            {profile?.is_business_verified ? (
+              <BusinessVerifiedBadge />
+            ) : profile?.is_verified ? (
+              <InstagramVerifiedBadge />
+            ) : null}
           </div>
           <Button
             variant="ghost"
@@ -567,7 +573,11 @@ const { balance, refetch: refetchCoins } = useCoinBalance();
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-light">{profile?.username || 'User'}</h2>
-                  {profile?.is_verified && <InstagramVerifiedBadge />}
+                  {profile?.is_business_verified ? (
+                    <BusinessVerifiedBadge />
+                  ) : profile?.is_verified ? (
+                    <InstagramVerifiedBadge />
+                  ) : null}
                 </div>
               
               {isOwnProfile ? (

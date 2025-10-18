@@ -1263,6 +1263,54 @@ export type Database = {
           },
         ]
       }
+      business_verifications: {
+        Row: {
+          business_address: Json | null
+          business_license_url: string | null
+          business_name: string
+          created_at: string | null
+          id: string
+          registration_document_url: string | null
+          registration_number: string | null
+          rejection_reason: string | null
+          status: string | null
+          tax_id: string | null
+          updated_at: string | null
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          business_address?: Json | null
+          business_license_url?: string | null
+          business_name: string
+          created_at?: string | null
+          id?: string
+          registration_document_url?: string | null
+          registration_number?: string | null
+          rejection_reason?: string | null
+          status?: string | null
+          tax_id?: string | null
+          updated_at?: string | null
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          business_address?: Json | null
+          business_license_url?: string | null
+          business_name?: string
+          created_at?: string | null
+          id?: string
+          registration_document_url?: string | null
+          registration_number?: string | null
+          rejection_reason?: string | null
+          status?: string | null
+          tax_id?: string | null
+          updated_at?: string | null
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       calendar_events: {
         Row: {
           agent_id: string
@@ -4952,6 +5000,7 @@ export type Database = {
           full_name: string | null
           id: string
           instagram_username: string | null
+          is_business_verified: boolean | null
           is_shadowbanned: boolean | null
           is_verified: boolean | null
           last_name: string | null
@@ -4962,6 +5011,7 @@ export type Database = {
           preferences: Json | null
           preferred_currency: string | null
           restriction_expires_at: string | null
+          show_account_type: boolean | null
           sms_notifications: boolean | null
           stripe_account_id: string | null
           stripe_account_status: string | null
@@ -4992,6 +5042,7 @@ export type Database = {
           full_name?: string | null
           id: string
           instagram_username?: string | null
+          is_business_verified?: boolean | null
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
@@ -5002,6 +5053,7 @@ export type Database = {
           preferences?: Json | null
           preferred_currency?: string | null
           restriction_expires_at?: string | null
+          show_account_type?: boolean | null
           sms_notifications?: boolean | null
           stripe_account_id?: string | null
           stripe_account_status?: string | null
@@ -5032,6 +5084,7 @@ export type Database = {
           full_name?: string | null
           id?: string
           instagram_username?: string | null
+          is_business_verified?: boolean | null
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
@@ -5042,6 +5095,7 @@ export type Database = {
           preferences?: Json | null
           preferred_currency?: string | null
           restriction_expires_at?: string | null
+          show_account_type?: boolean | null
           sms_notifications?: boolean | null
           stripe_account_id?: string | null
           stripe_account_status?: string | null

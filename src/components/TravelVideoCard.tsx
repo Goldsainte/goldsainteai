@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Heart, MessageCircle, Share2, MoreVertical, MapPin, ExternalLink, Edit, Volume2, VolumeX, Repeat2, Send, Bookmark, Users, Music2, TrendingUp, Play, Pause, Trash2, Gift } from "lucide-react";
 import { InstagramVerifiedBadge } from "@/components/badges/InstagramVerifiedBadge";
+import { BusinessVerifiedBadge } from "@/components/badges/BusinessVerifiedBadge";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { CommentsSheet } from "./CommentsSheet";
@@ -63,6 +64,7 @@ interface TravelVideoCardProps {
       username: string | null;
       avatar_url: string | null;
       is_verified?: boolean;
+      is_business_verified?: boolean;
       instagram_username?: string | null;
     };
   };
@@ -659,7 +661,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1">
                 <p className="font-semibold text-sm truncate">{post.profiles?.username || 'Anonymous'}</p>
-                {post.profiles?.is_verified && <InstagramVerifiedBadge />}
+                {post.profiles?.is_business_verified ? (
+                  <BusinessVerifiedBadge />
+                ) : post.profiles?.is_verified ? (
+                  <InstagramVerifiedBadge />
+                ) : null}
               </div>
               {post.location && (
                 <button
@@ -1526,7 +1532,11 @@ const TravelVideoCard = ({ post, isActive, onUpdate, layout = 'mobile', isMuted,
                   </Button>
                 )}
                 
-                {post.profiles?.is_verified && <InstagramVerifiedBadge />}
+                {post.profiles?.is_business_verified ? (
+                  <BusinessVerifiedBadge />
+                ) : post.profiles?.is_verified ? (
+                  <InstagramVerifiedBadge />
+                ) : null}
               </div>
               
               {/* Music info - relocated from top */}
