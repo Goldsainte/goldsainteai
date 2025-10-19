@@ -115,11 +115,17 @@ export default function CorporateContact() {
           Back
         </Button>
 
+        {/* Logo Section */}
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-4 sm:h-6 md:h-7 w-auto"
+          />
+        </div>
+
         {/* Hero Section */}
         <div className="mb-8 sm:mb-12 text-center max-w-3xl mx-auto">
-          <div className="flex justify-center mb-4 sm:mb-6">
-            <Building2 className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
-          </div>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-secondary text-primary mb-4">
             Contact Us
           </h1>
