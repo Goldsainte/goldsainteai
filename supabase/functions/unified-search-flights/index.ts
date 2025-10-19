@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 
 const corsHeaders = {
@@ -160,6 +161,15 @@ serve(async (req) => {
       const basePrice = parseFloat(flight.price?.total || 0);
       const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
       
+      // Calculate duration in minutes for ranking
+      const segments = flight.itineraries?.[0]?.segments || [];
+      const duration = segments.reduce((total: number, seg: any) => {
+        const dur = seg.duration || '';
+        const hours = parseInt(dur.match(/(\d+)H/)?.[1] || '0');
+        const minutes = parseInt(dur.match(/(\d+)M/)?.[1] || '0');
+        return total + (hours * 60) + minutes;
+      }, 0);
+      
       return {
         ...flight,
         price: {
@@ -167,13 +177,44 @@ serve(async (req) => {
           total: markedUpPrice.toFixed(2),
           base: basePrice.toFixed(2), // Store original price
           grandTotal: markedUpPrice.toFixed(2)
-        }
+        },
+        duration,
+        stops: segments.length - 1 || 0
       };
     });
 
+    // Rank flights using Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    let rankedResults = markedUpResults;
+    try {
+      const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
+        body: {
+          results: markedUpResults.map(f => ({
+            ...f,
+            price: parseFloat(f.price.total),
+            rating: 4.0 // Default for flights
+          })),
+          sortBy: 'best_value'
+        }
+      });
+
+      if (!rankError && rankedData?.rankedResults) {
+        rankedResults = rankedData.rankedResults;
+        console.log('Flights ranked successfully');
+      } else if (rankError) {
+        console.warn('Ranking error (non-blocking):', rankError);
+      }
+    } catch (rankErr) {
+      console.warn('Failed to rank flights (non-blocking):', rankErr);
+    }
+
     const responseData = {
       ...flightData,
-      results: markedUpResults
+      results: rankedResults
     };
 
     // Cache the result with markup
