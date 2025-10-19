@@ -270,6 +270,19 @@ export default function CorporateContact() {
           </Card>
         </div>
 
+        {/* Help Center CTA */}
+        <Card className="max-w-3xl mx-auto mb-8">
+          <CardContent className="p-6 sm:p-8 text-center">
+            <h3 className="text-lg sm:text-xl font-semibold mb-3">Need Quick Answers?</h3>
+            <p className="text-muted-foreground mb-6 text-sm sm:text-base">
+              Visit our AI-powered Help Center for instant answers to common questions about navigation, bookings, and more.
+            </p>
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/help">Visit Help Center</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Business Hours Notice */}
         <Card className="max-w-3xl mx-auto">
           <CardContent className="p-4 sm:p-6 text-center">

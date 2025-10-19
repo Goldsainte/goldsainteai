@@ -104,6 +104,7 @@ import TermsPage from "./pages/Terms";
 import WhatWeDo from "./pages/WhatWeDo";
 import DisputeResolution from "./pages/DisputeResolution";
 import PrivacyCookies from "./pages/PrivacyCookies";
+import HelpCenter from "./pages/HelpCenter";
 
 const queryClient = new QueryClient();
 
@@ -293,6 +294,7 @@ function AppContent() {
           <Route path="/what-we-do" element={<WhatWeDo />} />
           <Route path="/dispute-resolution" element={<DisputeResolution />} />
           <Route path="/privacy-cookies" element={<PrivacyCookies />} />
+          <Route path="/help" element={<HelpCenter />} />
           <Route path="/r" element={<Redirect />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

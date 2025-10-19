@@ -240,4 +240,7 @@ verify_jwt = true
 [functions.amadeus-search-tours]
 verify_jwt = false
 
+[functions.help-center-ai]
+verify_jwt = false
+
 

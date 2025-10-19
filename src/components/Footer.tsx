@@ -66,6 +66,7 @@ export const Footer = () => {
             <AccordionTrigger className="text-sm font-semibold">Support</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
+                <li><Link to="/help" className="hover:text-primary transition-colors">Help Center</Link></li>
                 <li><Link to="/dashboard" className="hover:text-primary transition-colors">Manage your trips</Link></li>
                 <li><Link to="/messages" className="hover:text-primary transition-colors">Contact Customer Service</Link></li>
                 <li><Link to="/trust-safety" className="hover:text-primary transition-colors">Safety Resource Center</Link></li>
@@ -140,6 +141,7 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">Support</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
+              <li><Link to="/help" className="hover:text-primary transition-colors">Help Center</Link></li>
               <li><Link to="/dashboard" className="hover:text-primary transition-colors">Manage your trips</Link></li>
               <li><Link to="/messages" className="hover:text-primary transition-colors">Contact Customer Service</Link></li>
               <li><Link to="/trust-safety" className="hover:text-primary transition-colors">Safety Resource Center</Link></li>
