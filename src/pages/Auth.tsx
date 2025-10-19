@@ -145,37 +145,21 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setIsLoading(true);
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
-          skipBrowserRedirect: true
         },
       });
       
       if (error) throw error;
-      
-      // Open in new tab to escape sandbox
-      if (data?.url) {
-        const popup = window.open(data.url, '_blank', 'noopener,noreferrer');
-        if (popup) {
-          popup.focus();
-        } else {
-          // Popup blocked - fallback to current window
-          toast({
-            title: "Popup blocked",
-            description: "Please allow popups or click the link below to continue",
-            action: <button onClick={() => window.location.href = data.url} className="underline">Open Sign-In</button>
-          });
-        }
-      }
+      // Supabase will automatically redirect the current window
     } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
@@ -186,7 +170,10 @@ const Auth = () => {
       
       // Call edge function to initiate Apple Sign-In
       const { data, error } = await supabase.functions.invoke('apple-signin-init', {
-        body: {}
+        body: {},
+        headers: {
+          'x-app-origin': window.location.origin
+        }
       });
 
       if (error) throw error;
@@ -195,25 +182,14 @@ const Auth = () => {
       // Store state in session storage for callback
       sessionStorage.setItem('apple_state', data.state);
 
-      // Open in new tab to escape sandbox
-      const popup = window.open(data.authUrl, '_blank', 'noopener,noreferrer');
-      if (popup) {
-        popup.focus();
-      } else {
-        // Popup blocked - fallback to current window
-        toast({
-          title: "Popup blocked",
-          description: "Please allow popups or click the link below to continue",
-          action: <button onClick={() => window.location.href = data.authUrl} className="underline">Open Sign-In</button>
-        });
-      }
+      // Redirect current window to Apple Sign-In
+      window.location.href = data.authUrl;
     } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error.message,
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
