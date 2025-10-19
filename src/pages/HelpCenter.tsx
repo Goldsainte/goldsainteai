@@ -185,7 +185,7 @@ export default function HelpCenter() {
             <Accordion type="single" collapsible className="w-full">
               {filteredFAQs.map((faq) => (
                 <AccordionItem key={faq.id} value={faq.id}>
-                  <AccordionTrigger className="text-left hover:text-primary">
+                  <AccordionTrigger className="text-left hover:text-primary text-sm sm:text-base">
                     {faq.question}
                   </AccordionTrigger>
                   <AccordionContent className="text-muted-foreground">
