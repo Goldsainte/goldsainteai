@@ -143,22 +143,30 @@ const Auth = () => {
   };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    
-    if (error) {
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          skipBrowserRedirect: true
+        },
+      });
+      
+      if (error) throw error;
+      
+      // Break out of iframe by redirecting top window
+      if (data?.url) {
+        window.top!.location.href = data.url;
+      }
+    } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error.message,
         variant: "destructive",
       });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleAppleSignIn = async () => {
@@ -175,16 +183,18 @@ const Auth = () => {
       // Store state in session storage for callback
       sessionStorage.setItem('apple_state', data.state);
 
-      // Redirect to Apple
-      window.location.href = data.authUrl;
+      // Break out of iframe by redirecting top window
+      if (data?.authUrl) {
+        window.top!.location.href = data.authUrl;
+      }
     } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error.message,
         variant: "destructive",
       });
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
 

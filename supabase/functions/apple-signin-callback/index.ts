@@ -84,6 +84,9 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+    
+    // Get app origin for redirect
+    const appOrigin = stateData.app_origin || Deno.env.get('SUPABASE_URL') || '';
 
     // Delete used state
     await supabaseClient
@@ -182,12 +185,8 @@ Deno.serve(async (req) => {
     const token = magicLinkUrl.searchParams.get('token');
     const type = magicLinkUrl.searchParams.get('type');
 
-    // Get the origin from referer header (where user came from)
-    const referer = req.headers.get('referer') || '';
-    const origin = referer.split('/').slice(0, 3).join('/') || 'https://a7969815-170e-4304-bb8c-07f694c52257.lovableproject.com';
-    
-    // Redirect back to app with token
-    const redirectUrl = `${origin}/auth/callback/apple?token=${token}&type=${type}`;
+    // Use the app origin stored during init for reliable redirect
+    const redirectUrl = `${appOrigin}/auth/callback/apple?token=${token}&type=${type}`;
     
     console.log('Redirecting to:', redirectUrl);
     

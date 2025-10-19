@@ -37,6 +37,9 @@ Deno.serve(async (req) => {
 
     // Generate state for CSRF protection
     const state = crypto.randomUUID();
+    
+    // Capture app origin for callback redirect
+    const appOrigin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || '';
 
     // Store state in a temporary table
     const { error: stateError } = await supabaseClient
@@ -44,7 +47,8 @@ Deno.serve(async (req) => {
       .insert({
         state,
         provider: 'apple',
-        expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+        expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        app_origin: appOrigin
       });
 
     if (stateError) {
