@@ -391,12 +391,14 @@ export type Database = {
       }
       agent_inquiries: {
         Row: {
+          additional_emails: Json | null
           ai_match_score: number | null
           assigned_agent_id: string | null
           contacted_at: string | null
           conversation_data: Json
           converted_to_job_id: string | null
           created_at: string
+          generated_itinerary: Json | null
           guest_email: string | null
           guest_name: string | null
           guest_phone: string | null
@@ -409,12 +411,14 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          additional_emails?: Json | null
           ai_match_score?: number | null
           assigned_agent_id?: string | null
           contacted_at?: string | null
           conversation_data?: Json
           converted_to_job_id?: string | null
           created_at?: string
+          generated_itinerary?: Json | null
           guest_email?: string | null
           guest_name?: string | null
           guest_phone?: string | null
@@ -427,12 +431,14 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          additional_emails?: Json | null
           ai_match_score?: number | null
           assigned_agent_id?: string | null
           contacted_at?: string | null
           conversation_data?: Json
           converted_to_job_id?: string | null
           created_at?: string
+          generated_itinerary?: Json | null
           guest_email?: string | null
           guest_name?: string | null
           guest_phone?: string | null
@@ -786,6 +792,47 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agent_terms_acceptance: {
+        Row: {
+          accepted_at: string | null
+          agent_id: string
+          id: string
+          ip_address: string | null
+          privacy_version: string
+          terms_version: string
+          user_agent: string | null
+          vendor_version: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          agent_id: string
+          id?: string
+          ip_address?: string | null
+          privacy_version: string
+          terms_version: string
+          user_agent?: string | null
+          vendor_version: string
+        }
+        Update: {
+          accepted_at?: string | null
+          agent_id?: string
+          id?: string
+          ip_address?: string | null
+          privacy_version?: string
+          terms_version?: string
+          user_agent?: string | null
+          vendor_version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_terms_acceptance_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
             referencedColumns: ["id"]
           },
         ]
@@ -1410,14 +1457,18 @@ export type Database = {
       }
       cocurated_trip_requests: {
         Row: {
+          additional_emails: Json | null
           assigned_agent_id: string | null
           budget_range_max: number | null
           budget_range_min: number | null
           created_at: string
+          generated_itinerary: Json | null
           id: string
+          notify_all_emails: boolean | null
           preferred_dates: Json | null
           quoted_details: string | null
           quoted_price: number | null
+          requester_email: string | null
           special_requests: string | null
           status: string
           total_travelers: number | null
@@ -1426,14 +1477,18 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          additional_emails?: Json | null
           assigned_agent_id?: string | null
           budget_range_max?: number | null
           budget_range_min?: number | null
           created_at?: string
+          generated_itinerary?: Json | null
           id?: string
+          notify_all_emails?: boolean | null
           preferred_dates?: Json | null
           quoted_details?: string | null
           quoted_price?: number | null
+          requester_email?: string | null
           special_requests?: string | null
           status?: string
           total_travelers?: number | null
@@ -1442,14 +1497,18 @@ export type Database = {
           user_id: string
         }
         Update: {
+          additional_emails?: Json | null
           assigned_agent_id?: string | null
           budget_range_max?: number | null
           budget_range_min?: number | null
           created_at?: string
+          generated_itinerary?: Json | null
           id?: string
+          notify_all_emails?: boolean | null
           preferred_dates?: Json | null
           quoted_details?: string | null
           quoted_price?: number | null
+          requester_email?: string | null
           special_requests?: string | null
           status?: string
           total_travelers?: number | null
@@ -3158,6 +3217,7 @@ export type Database = {
       }
       marketplace_jobs: {
         Row: {
+          additional_emails: Json | null
           agent_payout_amount: number | null
           agent_payout_status: string | null
           assigned_agent_id: string | null
@@ -3183,6 +3243,7 @@ export type Database = {
           id: string
           installment_plan_id: string | null
           is_group_booking: boolean | null
+          notify_all_emails: boolean | null
           number_of_travelers: number | null
           paid_at: string | null
           payment_captured_at: string | null
@@ -3209,6 +3270,7 @@ export type Database = {
           winning_bid_id: string | null
         }
         Insert: {
+          additional_emails?: Json | null
           agent_payout_amount?: number | null
           agent_payout_status?: string | null
           assigned_agent_id?: string | null
@@ -3234,6 +3296,7 @@ export type Database = {
           id?: string
           installment_plan_id?: string | null
           is_group_booking?: boolean | null
+          notify_all_emails?: boolean | null
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_captured_at?: string | null
@@ -3260,6 +3323,7 @@ export type Database = {
           winning_bid_id?: string | null
         }
         Update: {
+          additional_emails?: Json | null
           agent_payout_amount?: number | null
           agent_payout_status?: string | null
           assigned_agent_id?: string | null
@@ -3285,6 +3349,7 @@ export type Database = {
           id?: string
           installment_plan_id?: string | null
           is_group_booking?: boolean | null
+          notify_all_emails?: boolean | null
           number_of_travelers?: number | null
           paid_at?: string | null
           payment_captured_at?: string | null
@@ -6374,6 +6439,9 @@ export type Database = {
           stripe_onboarding_completed: boolean | null
           stripe_payouts_enabled: boolean | null
           tax_id: string | null
+          terms_accepted: boolean | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           time_zone: string | null
           total_reviews: number | null
           trust_score: number | null
@@ -6445,6 +6513,9 @@ export type Database = {
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
+          terms_accepted?: boolean | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           time_zone?: string | null
           total_reviews?: number | null
           trust_score?: number | null
@@ -6516,6 +6587,9 @@ export type Database = {
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
+          terms_accepted?: boolean | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           time_zone?: string | null
           total_reviews?: number | null
           trust_score?: number | null
@@ -6986,6 +7060,44 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trip_request_modifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          modification_reason: string | null
+          modified_by: string | null
+          new_data: Json
+          previous_data: Json
+          trip_request_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          modification_reason?: string | null
+          modified_by?: string | null
+          new_data: Json
+          previous_data: Json
+          trip_request_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          modification_reason?: string | null
+          modified_by?: string | null
+          new_data?: Json
+          previous_data?: Json
+          trip_request_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_request_modifications_trip_request_id_fkey"
+            columns: ["trip_request_id"]
+            isOneToOne: false
+            referencedRelation: "cocurated_trip_requests"
             referencedColumns: ["id"]
           },
         ]
