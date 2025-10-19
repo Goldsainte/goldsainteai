@@ -11,15 +11,15 @@ const WhatWeDo = () => {
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">What We Do</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4">What We Do</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Learn how Goldsainte provides AI-powered travel services across accommodations, attractions, car rentals, flights, and transportation.
         </p>
       </div>
 
       {/* Table of Contents */}
       <nav className="bg-card border rounded-lg p-6 mb-8">
-        <h2 className="text-2xl font-semibold mb-4">Contents</h2>
+        <h2 className="text-lg sm:text-xl font-semibold mb-4">Contents</h2>
         <div className="grid gap-2 text-sm">
           <a href="#section-1" className="text-primary hover:underline">1. Definitions and Who We Are</a>
           <a href="#section-2" className="text-primary hover:underline">2. How Our Service Works</a>
@@ -48,7 +48,7 @@ const WhatWeDo = () => {
         
         {/* Section 1 */}
         <section id="section-1" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">1. Definitions and Who We Are</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">1. Definitions and Who We Are</h2>
           <p className="leading-relaxed">
             Some words used in these Terms have specific meanings. Refer to the Goldsainte Ai / Inc. dictionary for definitions.
           </p>
@@ -62,7 +62,7 @@ const WhatWeDo = () => {
 
         {/* Section 2 */}
         <section id="section-2" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">2. How Our Service Works</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">2. How Our Service Works</h2>
           <p className="leading-relaxed">
             Goldsainte Ai / Inc. makes it easy for you to compare bookings from many hotels, hosts, and other Service Providers.
           </p>
@@ -76,7 +76,7 @@ const WhatWeDo = () => {
 
         {/* Section 3 */}
         <section id="section-3" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">3. Who We Work With</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">3. Who We Work With</h2>
           <p className="leading-relaxed">
             Only Service Providers with a contractual relationship with Goldsainte Ai / Inc. appear on our Platform. Service Providers may also offer Travel Experiences outside our Platform.
           </p>
@@ -90,7 +90,7 @@ const WhatWeDo = () => {
 
         {/* Section 4 */}
         <section id="section-4" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">4. How We Make Money</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">4. How We Make Money</h2>
           <p className="leading-relaxed">
             Goldsainte Ai / Inc. does not buy or resell Travel Experiences. Service Providers pay a commission after a guest completes a booking.
           </p>
@@ -104,7 +104,7 @@ const WhatWeDo = () => {
 
         {/* Section 5 */}
         <section id="section-5" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">5. Recommendation Systems</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">5. Recommendation Systems</h2>
           <p className="leading-relaxed">
             Goldsainte Ai / Inc. uses recommendation systems to help you discover properties you may like. These include:
           </p>
@@ -139,7 +139,7 @@ const WhatWeDo = () => {
 
         {/* Section 6 */}
         <section id="section-6" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">6. Reviews</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">6. Reviews</h2>
           <p className="leading-relaxed">
             Reviews are scored 1–10 using a weighted system. Guests may also provide subscores for: location, cleanliness, staff, comfort, facilities, value, and free Wifi.
           </p>
@@ -159,7 +159,7 @@ const WhatWeDo = () => {
 
         {/* Section 7 */}
         <section id="section-7" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">7. Prices</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">7. Prices</h2>
           <p className="leading-relaxed">
             Service Providers set rates displayed on the Platform. Prices may vary due to location, room type, number of guests, and applicable taxes or fees.
           </p>
@@ -170,7 +170,7 @@ const WhatWeDo = () => {
 
         {/* Section 8 */}
         <section id="section-8" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">8. Payments</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">8. Payments</h2>
           <p className="leading-relaxed">Payment options include:</p>
           <ul className="list-disc pl-6 space-y-2">
             <li>Direct payment to the Service Provider at the Accommodation.</li>
@@ -184,7 +184,7 @@ const WhatWeDo = () => {
 
         {/* Section 9 */}
         <section id="section-9" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">9. Host Type</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">9. Host Type</h2>
           <p className="leading-relaxed">
             Service Providers declare if they are a "private host" or "professional host" (EU law).
           </p>
@@ -198,7 +198,7 @@ const WhatWeDo = () => {
 
         {/* Section 10 */}
         <section id="section-10" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">10. Star Ratings, Review Scores, and Quality Ratings</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">10. Star Ratings, Review Scores, and Quality Ratings</h2>
           <div className="space-y-3">
             <div>
               <h3 className="text-xl font-semibold">Star Ratings</h3>
@@ -217,7 +217,7 @@ const WhatWeDo = () => {
 
         {/* Section 11 */}
         <section id="section-11" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">11. Help and Advice – If the Unexpected Happens</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">11. Help and Advice – If the Unexpected Happens</h2>
           <p className="leading-relaxed">
             Contact Customer Service through your booking, app, or Help Center. Provide:
           </p>
@@ -240,7 +240,7 @@ const WhatWeDo = () => {
 
         {/* Section 12 */}
         <section id="section-12" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">12. Overbooking</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">12. Overbooking</h2>
           <p className="leading-relaxed">
             Service Providers must honor confirmed bookings.
           </p>
@@ -262,7 +262,7 @@ const WhatWeDo = () => {
 
         {/* Section 13 */}
         <section id="section-13" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">13. Private and Public Transportation</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">13. Private and Public Transportation</h2>
           
           <div className="space-y-6">
             <div>
@@ -329,7 +329,7 @@ const WhatWeDo = () => {
 
         {/* Section 14 */}
         <section id="section-14" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">14. Cruises</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">14. Cruises</h2>
           <p className="leading-relaxed">
             Goldsainte Ai / Inc. does not resell or provide cruises. Bookings are made directly with the cruise provider, who sets their own terms.
           </p>
@@ -337,7 +337,7 @@ const WhatWeDo = () => {
 
         {/* Section 15 - Dictionary */}
         <section id="section-15" className="space-y-4">
-          <h2 className="text-3xl font-bold border-b pb-2">15. Goldsainte Dictionary (Key Terms)</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2">15. Goldsainte Dictionary (Key Terms)</h2>
           <p className="leading-relaxed">
             Account, Accommodation, Attraction, Booking, Platform, Service Provider, Travel Experience, Payment Method, Rewards, Wallet, etc., are defined per context throughout these Terms.
           </p>
@@ -345,7 +345,7 @@ const WhatWeDo = () => {
 
         {/* Service-Specific: Attractions */}
         <section id="attractions" className="space-y-4 mt-16">
-          <h2 className="text-3xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">2. Attractions</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">2. Attractions</h2>
           
           <div className="space-y-8">
             <div>
@@ -472,7 +472,7 @@ const WhatWeDo = () => {
 
         {/* Service-Specific: Car Rentals */}
         <section id="car-rentals" className="space-y-4 mt-16">
-          <h2 className="text-3xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">3. Car Rentals</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">3. Car Rentals</h2>
           
           <div className="space-y-8">
             <div>
@@ -583,7 +583,7 @@ const WhatWeDo = () => {
 
         {/* Service-Specific: Flights */}
         <section id="flights" className="space-y-4 mt-16">
-          <h2 className="text-3xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">4. Flights</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">4. Flights</h2>
           
           <div className="space-y-8">
             <div>
@@ -668,7 +668,7 @@ const WhatWeDo = () => {
 
         {/* Service-Specific: Transportation */}
         <section id="transportation" className="space-y-4 mt-16">
-          <h2 className="text-3xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">5. Private and Public Transportation</h2>
+          <h2 className="text-lg sm:text-xl md:text-2xl font-bold border-b pb-2 bg-accent/30 p-4 rounded-lg">5. Private and Public Transportation</h2>
           
           <div className="space-y-8">
             <div>

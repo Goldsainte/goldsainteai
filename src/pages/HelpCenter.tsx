@@ -7,6 +7,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { HelpCenterChat } from '@/components/HelpCenterChat';
 import { helpCenterFAQs, searchFAQs, getFAQsByCategory } from '@/data/helpCenterFAQs';
 import { siteRoutes, searchRoutes } from '@/data/siteRoutes';
+import primaryLogoGreen from "@/assets/primary-horizontal-logo-green.svg";
 
 const categories = [
   { id: 'bookings', label: 'Bookings', icon: BookOpen },
@@ -56,12 +57,21 @@ export default function HelpCenter() {
           </Link>
         </Button>
 
+        {/* Logo */}
+        <div className="flex justify-center mb-6 sm:mb-8">
+          <img 
+            src={primaryLogoGreen} 
+            alt="Goldsainte" 
+            className="h-4 sm:h-6 md:h-7 w-auto"
+          />
+        </div>
+
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-secondary text-primary mb-4">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-secondary text-primary mb-4">
             Help Center
           </h1>
-          <p className="text-lg text-muted-foreground mb-8">
+          <p className="text-sm sm:text-base text-muted-foreground mb-8">
             Get instant answers with our AI assistant or browse FAQs below
           </p>
 
@@ -73,7 +83,7 @@ export default function HelpCenter() {
               placeholder="Search for help articles, pages, or ask a question..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 h-14 text-base"
+              className="pl-12 h-10 sm:h-12 text-base"
             />
           </div>
         </div>
@@ -111,7 +121,7 @@ export default function HelpCenter() {
         {/* Popular Routes */}
         {!searchQuery && (
           <div className="mb-12">
-            <h2 className="text-xl font-semibold mb-6 text-center">Popular Pages</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-6 text-center">Popular Pages</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {popularRoutes.map((route) => (
                 <Link
@@ -132,7 +142,7 @@ export default function HelpCenter() {
         {/* Category Filters */}
         {!searchQuery && (
           <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-4 text-center">Browse by Category</h2>
+            <h2 className="text-lg sm:text-xl font-semibold mb-4 text-center">Browse by Category</h2>
             <div className="flex flex-wrap justify-center gap-2">
               <Button
                 variant={selectedCategory === null ? 'default' : 'outline'}
@@ -159,7 +169,7 @@ export default function HelpCenter() {
 
         {/* FAQs */}
         <div className="mb-12">
-          <h2 className="text-xl font-semibold mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-6">
             {searchQuery
               ? `Search Results (${filteredFAQs.length})`
               : selectedCategory
