@@ -98,6 +98,7 @@ import CustomerVerification from "./pages/CustomerVerification";
 import EmergencyContacts from "./pages/EmergencyContacts";
 import AgentPerformanceDashboard from "./pages/AgentPerformanceDashboard";
 import AdminCustomerVerifications from "./pages/AdminCustomerVerifications";
+import CorporateContact from "./pages/CorporateContact";
 import About from "./pages/About";
 import TermsPage from "./pages/Terms";
 import WhatWeDo from "./pages/WhatWeDo";
@@ -255,6 +256,7 @@ function AppContent() {
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
+          <Route path="/corporate-contact" element={<CorporateContact />} />
           <Route path="/shop" element={<Shop />} />
           <Route path="/affiliate-manager" element={<AffiliateManager />} />
           <Route path="/supplier-management" element={<SupplierManagement />} />
