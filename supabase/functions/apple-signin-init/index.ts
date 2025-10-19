@@ -46,13 +46,17 @@ Deno.serve(async (req) => {
       .from('oauth_states')
       .insert({
         state,
-        provider: 'apple',
+        platform: 'apple',
         expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
         app_origin: appOrigin
       });
 
     if (stateError) {
       console.error('Error storing state:', stateError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to store state' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
     // Build authorization URL - Apple will POST directly to edge function

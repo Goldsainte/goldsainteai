@@ -28,6 +28,26 @@ const AppleCallback = () => {
 
         if (verifyError) throw verifyError;
 
+        // Get the session and ensure profile exists
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('id', session.user.id)
+            .maybeSingle();
+
+          if (!profile) {
+            await supabase.from('profiles').insert({
+              id: session.user.id,
+              username: session.user.user_metadata?.username || session.user.email?.split('@')[0],
+              avatar_url: session.user.user_metadata?.avatar_url,
+              account_type: 'personal'
+            });
+          }
+        }
+
         // Clean up session storage
         sessionStorage.removeItem('apple_state');
 

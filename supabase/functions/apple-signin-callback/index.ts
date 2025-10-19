@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       .from('oauth_states')
       .select('*')
       .eq('state', state)
-      .eq('provider', 'apple')
+      .eq('platform', 'apple')
       .maybeSingle();
 
     if (stateError || !stateData) {
