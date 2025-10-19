@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 
 const corsHeaders = {
@@ -179,14 +179,14 @@ serve(async (req) => {
           grandTotal: markedUpPrice.toFixed(2)
         },
         duration,
-        stops: segments.length - 1 || 0
+        stops: Math.max(segments.length - 1, 0)
       };
     });
 
     // Rank flights using Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
     let rankedResults = markedUpResults;
@@ -202,8 +202,8 @@ serve(async (req) => {
         }
       });
 
-      if (!rankError && rankedData?.rankedResults) {
-        rankedResults = rankedData.rankedResults;
+      if (!rankError && rankedData?.results) {
+        rankedResults = rankedData.results;
         console.log('Flights ranked successfully');
       } else if (rankError) {
         console.warn('Ranking error (non-blocking):', rankError);
