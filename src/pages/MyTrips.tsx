@@ -23,6 +23,8 @@ interface TripRequest {
   quoted_details: string | null;
   created_at: string;
   assigned_agent_id: string | null;
+  additional_emails?: any;
+  notify_all_emails?: boolean;
 }
 
 export default function MyTrips() {
@@ -217,11 +219,14 @@ export default function MyTrips() {
             open={!!editingTrip}
             onClose={() => setEditingTrip(null)}
             tripRequest={{
-              ...editingTrip,
+              id: editingTrip.id,
               destination: editingTrip.trip_items?.[0]?.name || '',
-              travelers_count: editingTrip.total_travelers,
+              total_travelers: editingTrip.total_travelers,
               budget_min: editingTrip.budget_range_min || 0,
-              budget_max: editingTrip.budget_range_max || 0
+              budget_max: editingTrip.budget_range_max || 0,
+              special_requests: editingTrip.special_requests,
+              additional_emails: editingTrip.additional_emails as any || [],
+              notify_all_emails: editingTrip.notify_all_emails ?? true
             }}
             onSuccess={() => {
               setEditingTrip(null);

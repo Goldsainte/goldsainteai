@@ -12,7 +12,7 @@ import { EmailListManager, EmailEntry } from './EmailListManager';
 interface TripRequest {
   id: string;
   destination: string;
-  travelers_count: number;
+  total_travelers: number;
   budget_min?: number;
   budget_max?: number;
   special_requests?: string;
@@ -31,7 +31,7 @@ export const EditTripRequestModal = ({ open, onClose, tripRequest, onSuccess }: 
   const { toast } = useToast();
   const [saving, setSaving] = useState(false);
   const [destination, setDestination] = useState(tripRequest.destination);
-  const [travelersCount, setTravelersCount] = useState(tripRequest.travelers_count);
+  const [travelersCount, setTravelersCount] = useState(tripRequest.total_travelers);
   const [budgetMin, setBudgetMin] = useState(tripRequest.budget_min || 0);
   const [budgetMax, setBudgetMax] = useState(tripRequest.budget_max || 0);
   const [specialRequests, setSpecialRequests] = useState(tripRequest.special_requests || '');
@@ -40,7 +40,7 @@ export const EditTripRequestModal = ({ open, onClose, tripRequest, onSuccess }: 
 
   const hasChanges = 
     destination !== tripRequest.destination ||
-    travelersCount !== tripRequest.travelers_count ||
+    travelersCount !== tripRequest.total_travelers ||
     budgetMin !== (tripRequest.budget_min || 0) ||
     budgetMax !== (tripRequest.budget_max || 0) ||
     specialRequests !== (tripRequest.special_requests || '') ||
@@ -60,7 +60,7 @@ export const EditTripRequestModal = ({ open, onClose, tripRequest, onSuccess }: 
 
       const previousData = {
         destination: tripRequest.destination,
-        travelers_count: tripRequest.travelers_count,
+        total_travelers: tripRequest.total_travelers,
         budget_min: tripRequest.budget_min,
         budget_max: tripRequest.budget_max,
         special_requests: tripRequest.special_requests,
@@ -70,7 +70,7 @@ export const EditTripRequestModal = ({ open, onClose, tripRequest, onSuccess }: 
 
       const newData = {
         destination,
-        travelers_count: travelersCount,
+        total_travelers: travelersCount,
         budget_min: budgetMin || null,
         budget_max: budgetMax || null,
         special_requests: specialRequests || null,
@@ -96,7 +96,7 @@ export const EditTripRequestModal = ({ open, onClose, tripRequest, onSuccess }: 
         .from('cocurated_trip_requests')
         .update({
           destination,
-          travelers_count: travelersCount,
+          total_travelers: travelersCount,
           budget_range_min: budgetMin || null,
           budget_range_max: budgetMax || null,
           special_requests: specialRequests || null,
