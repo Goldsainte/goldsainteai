@@ -3814,7 +3814,7 @@ export type Database = {
           platform: string
           state: string
           store_url: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           app_origin?: string | null
@@ -3825,7 +3825,7 @@ export type Database = {
           platform: string
           state: string
           store_url?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           app_origin?: string | null
@@ -3836,7 +3836,7 @@ export type Database = {
           platform?: string
           state?: string
           store_url?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: []
       }

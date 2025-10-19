@@ -70,13 +70,12 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify state
+    // Verify state (state is unique, no need to filter by platform)
     console.log('Verifying state:', state);
     const { data: stateData, error: stateError } = await supabaseClient
       .from('oauth_states')
       .select('*')
       .eq('state', state)
-      .eq('platform', 'apple')
       .maybeSingle();
 
     if (stateError || !stateData) {
