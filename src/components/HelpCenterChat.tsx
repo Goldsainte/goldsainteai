@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import { Link } from 'react-router-dom';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -24,6 +23,16 @@ export const HelpCenterChat = () => {
     }
   }, [messages]);
 
+  // Sanitize assistant content to remove any route references
+  const sanitizeAssistantContent = (content: string): string => {
+    return content
+      .replace(/\s*\(\/[^\)]+\)/g, '')
+      .replace(/\s+(?:at|visit|go to|or visit|or go to)\s+\/[^\s\.,)]+/gi, '')
+      .replace(/\/[a-z0-9\-\/\?=]+/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -42,7 +51,7 @@ export const HelpCenterChat = () => {
       if (data?.response) {
         const assistantMessage: Message = {
           role: 'assistant',
-          content: data.response
+          content: sanitizeAssistantContent(data.response)
         };
         setMessages(prev => [...prev, assistantMessage]);
       }
@@ -59,24 +68,7 @@ export const HelpCenterChat = () => {
   };
 
   const renderMessageContent = (content: string) => {
-    // Convert route paths like /dashboard to clickable links
-    const routePattern = /(\/[a-z0-9\-\/\?=]+)/g;
-    const parts = content.split(routePattern);
-
-    return parts.map((part, i) => {
-      if (part.match(routePattern)) {
-        return (
-          <Link 
-            key={i}
-            to={part}
-            className="text-primary underline hover:text-primary/80 font-medium"
-          >
-            {part}
-          </Link>
-        );
-      }
-      return <span key={i}>{part}</span>;
-    });
+    return <span>{content}</span>;
   };
 
   if (!isOpen) {

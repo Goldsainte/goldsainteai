@@ -7,6 +7,20 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Strip technical routes from AI responses
+const stripRoutes = (text: string): string => {
+  return text
+    // Remove parenthetical route references e.g. "(/travel-profile)"
+    .replace(/\s*\(\/[^\)]+\)/g, '')
+    // Remove "at /path", "visit /path", etc.
+    .replace(/\s+(?:at|visit|go to|or visit|or go to)\s+\/[^\s\.,)]+/gi, '')
+    // Remove any remaining naked "/path" strings
+    .replace(/\/[a-z0-9\-\/\?=]+/gi, '')
+    // Clean up extra spaces
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+};
+
 const systemPrompt = `You are Goldsainte's AI Help Center Assistant. You have complete knowledge of our platform, services, policies, AND navigation structure.
 
 ## NAVIGATION INTELLIGENCE
@@ -131,7 +145,7 @@ When users ask how to access a page:
 ## RESPONSE GUIDELINES:
 - Be friendly, clear, and conversational
 - Use NATURAL page names like "Dashboard", "Travel Profile", "Creator Dashboard"
-- NEVER mention technical routes like /dashboard or /travel-profile in responses
+- **HARD RULE**: NEVER include strings that begin with "/" (e.g., /dashboard, /travel-profile) in your responses
 - Explain navigation using user-friendly directions:
   * "Click on your profile icon in the top right and select Dashboard"
   * "Look for the Messages link in the main navigation menu"
@@ -196,11 +210,14 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const assistantMessage = data.choices?.[0]?.message?.content;
+    const assistantMessageRaw = data.choices?.[0]?.message?.content;
 
-    if (!assistantMessage) {
+    if (!assistantMessageRaw) {
       throw new Error("No response from AI");
     }
+
+    // Strip any technical routes from the response
+    const assistantMessage = stripRoutes(assistantMessageRaw);
 
     return new Response(
       JSON.stringify({ response: assistantMessage }),
