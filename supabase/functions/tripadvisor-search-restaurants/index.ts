@@ -265,10 +265,38 @@ serve(async (req) => {
       return hasPhoto && hasQuality;
     });
 
+    // Rank restaurants
+    let rankedRestaurants = validRestaurants;
+    try {
+      const rankingResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/rank-search-results`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          results: validRestaurants.map(r => ({
+            ...r,
+            price: r.price_level ? r.price_level.length * 15 : 30,
+            reviewCount: r.num_reviews || 0,
+            distance: 0
+          })),
+          sortBy: 'best_value'
+        }),
+      });
+      
+      if (rankingResponse.ok) {
+        const rankedData = await rankingResponse.json();
+        rankedRestaurants = rankedData.results;
+      }
+    } catch (err) {
+      console.warn('Restaurant ranking failed:', err);
+    }
+
     clearTimeout(timeoutId);
 
     return new Response(JSON.stringify({ 
-      results: validRestaurants
+      results: rankedRestaurants
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,

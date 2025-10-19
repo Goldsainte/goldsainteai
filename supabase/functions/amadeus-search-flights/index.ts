@@ -107,19 +107,53 @@ serve(async (req) => {
       const basePrice = parseFloat(flight.price?.total || 0);
       const markedUpPrice = basePrice * (1 + MARKUP_PERCENTAGE / 100);
       
+      // Calculate flight duration in minutes
+      const duration = flight.itineraries?.[0]?.duration ? 
+        parseInt(flight.itineraries[0].duration.replace('PT', '').replace('H', '').replace('M', '')) : 0;
+      
       return {
         ...flight,
         price: {
           ...flight.price,
           total: markedUpPrice.toFixed(2),
-          base: basePrice.toFixed(2), // Store original price
+          base: basePrice.toFixed(2),
           grandTotal: markedUpPrice.toFixed(2)
-        }
+        },
+        // Add fields for ranking
+        duration,
+        stops: flight.itineraries?.[0]?.segments?.length - 1 || 0
       };
     });
 
+    // Rank flights
+    let rankedFlights = markedUpFlights;
+    try {
+      const rankingResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/rank-search-results`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          results: markedUpFlights.map(f => ({
+            ...f,
+            price: parseFloat(f.price.total),
+            rating: 4.0 // Default for flights
+          })),
+          sortBy: 'best_value'
+        }),
+      });
+      
+      if (rankingResponse.ok) {
+        const rankedData = await rankingResponse.json();
+        rankedFlights = rankedData.results;
+      }
+    } catch (err) {
+      console.warn('Flight ranking failed:', err);
+    }
+
     return new Response(JSON.stringify({ 
-      results: markedUpFlights,
+      results: rankedFlights,
       dictionaries: data.dictionaries,
       meta: data.meta
     }), {

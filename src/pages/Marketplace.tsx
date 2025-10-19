@@ -251,6 +251,8 @@ export default function Marketplace() {
             start: jobData.departureDate || jobData.checkInDate || jobData.tripDate,
             end: jobData.returnDate || jobData.checkOutDate,
           } : null,
+          additional_emails: jobData.additionalEmails as any || [],
+          notify_all_emails: jobData.notifyAllEmails ?? true
         } as any);
 
       if (error) throw error;

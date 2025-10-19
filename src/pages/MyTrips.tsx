@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
-import { Loader2, Users, DollarSign } from 'lucide-react';
+import { Loader2, Users, DollarSign, Edit } from 'lucide-react';
 import { Header } from '@/components/Header';
+import { EditTripRequestModal } from '@/components/EditTripRequestModal';
 
 interface TripRequest {
   id: string;
@@ -29,6 +30,7 @@ export default function MyTrips() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [trips, setTrips] = useState<TripRequest[]>([]);
+  const [editingTrip, setEditingTrip] = useState<TripRequest | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -120,6 +122,16 @@ export default function MyTrips() {
                           Created {new Date(trip.created_at).toLocaleDateString()}
                         </CardDescription>
                       </div>
+                      {(trip.status === 'pending' || trip.status === 'quoted' || trip.status === 'assigned') && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingTrip(trip)}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Details
+                        </Button>
+                      )}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -198,6 +210,24 @@ export default function MyTrips() {
               );
             })}
           </div>
+        )}
+
+        {editingTrip && (
+          <EditTripRequestModal
+            open={!!editingTrip}
+            onClose={() => setEditingTrip(null)}
+            tripRequest={{
+              ...editingTrip,
+              destination: editingTrip.trip_items?.[0]?.name || '',
+              travelers_count: editingTrip.total_travelers,
+              budget_min: editingTrip.budget_range_min || 0,
+              budget_max: editingTrip.budget_range_max || 0
+            }}
+            onSuccess={() => {
+              setEditingTrip(null);
+              fetchTrips();
+            }}
+          />
         )}
       </div>
     </div>

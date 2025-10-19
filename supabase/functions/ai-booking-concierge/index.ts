@@ -68,7 +68,18 @@ serve(async (req) => {
                 properties: {
                   name: { type: "string" },
                   email: { type: "string" },
-                  phone: { type: "string" }
+                  phone: { type: "string" },
+                  additionalEmails: {
+                    type: "array",
+                    description: "Additional email addresses to notify",
+                    items: {
+                      type: "object",
+                      properties: {
+                        email: { type: "string" },
+                        name: { type: "string" }
+                      }
+                    }
+                  }
                 },
                 required: ["name", "email"]
               },
@@ -78,6 +89,61 @@ serve(async (req) => {
               }
             },
             required: ["travelerInfo"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "generate_itinerary",
+          description: "Generate a detailed day-by-day itinerary for the entire trip when user wants complete trip planning.",
+          parameters: {
+            type: "object",
+            properties: {
+              destination: { type: "string", description: "Destination city/country" },
+              startDate: { type: "string", description: "Trip start date YYYY-MM-DD" },
+              endDate: { type: "string", description: "Trip end date YYYY-MM-DD" },
+              travelers: { type: "number", description: "Number of travelers", default: 2 },
+              interests: {
+                type: "array",
+                items: { type: "string" },
+                description: "User interests: culture, food, adventure, relaxation, etc."
+              },
+              pace: {
+                type: "string",
+                enum: ["relaxed", "moderate", "packed"],
+                description: "Trip pace preference"
+              },
+              budget: {
+                type: "object",
+                properties: {
+                  perDay: { type: "number" },
+                  currency: { type: "string" }
+                }
+              }
+            },
+            required: ["destination", "startDate", "endDate"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "update_trip_context",
+          description: "Update trip details when user changes their mind about destination, dates, travelers, or preferences mid-conversation.",
+          parameters: {
+            type: "object",
+            properties: {
+              updates: {
+                type: "object",
+                description: "Fields to update in trip context (destination, dates, travelers, budget, etc.)"
+              },
+              reason: {
+                type: "string",
+                description: "Why the change was made"
+              }
+            },
+            required: ["updates"]
           }
         }
       },
@@ -198,6 +264,20 @@ CRITICAL RULES:
 1. I CAN SEARCH AND RECOMMEND travel options - I help you find the perfect flights, hotels, restaurants, events, and check visa requirements
    - In voice mode, SAY THIS: "I can help you search for flights, hotels, rental cars, restaurants, and events - plus check visa requirements."
 2. ALWAYS collect complete details before searching: dates, location, number of guests, preferences
+3. WHEN USERS CHANGE THEIR MIND: Use the update_trip_context tool immediately
+   - Examples: "Actually, make it July instead" → update_trip_context
+   - "Change to 5 people" → update_trip_context
+   - "Let's go to Tokyo instead" → update_trip_context
+   - ACKNOWLEDGE: "Got it! Updated to [new details]. Let me search again..."
+4. WHEN USERS WANT FULL ITINERARY: Use generate_itinerary tool
+   - After showing search results, offer: "Would you like me to create a complete day-by-day itinerary?"
+   - Present itinerary conversationally with day themes, activities, meals, and costs
+   - Ask if they want to adjust specific days
+5. SEARCH RESULTS RANKING:
+   - Results are pre-ranked by "Best Value" (price + quality + location)
+   - ALWAYS highlight the 🏆 Best Value option first
+   - Mention 💰 Cheapest and ⭐ Highest Rated alternatives
+   - Ask user preference after showing options
 3. BEFORE calling any search tool, ALWAYS tell the user: "Great! Let me search for [flights/hotels/restaurants/events] for you. This will take about 30 seconds - I'll be right back with your options!"
    - This is CRITICAL in voice mode so users know you're still working
 4. When showing search results, describe TOP 2-3 options in detail: name, location, price, rating, amenities
@@ -338,11 +418,21 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_events': 'search-events',
             'check_visa_requirements': 'check-visa-requirements',
-            'request_agent_contact': 'create-agent-inquiry'
+            'request_agent_contact': 'create-agent-inquiry',
+            'generate_itinerary': 'generate-trip-itinerary',
+            'update_trip_context': null // Handled inline
           };
           
           const edgeFunctionName = functionMap[functionName];
-          if (!edgeFunctionName) {
+          
+          // Handle update_trip_context inline
+          if (functionName === 'update_trip_context') {
+            result = { 
+              success: true, 
+              message: "Trip details updated successfully",
+              updated_fields: Object.keys(args.updates || {})
+            };
+          } else if (!edgeFunctionName) {
             result = { error: `Unknown function: ${functionName}` };
           } else {
             const toolResponse = await fetch(`${supabaseUrl}/functions/v1/${edgeFunctionName}`, {

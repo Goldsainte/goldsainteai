@@ -377,6 +377,33 @@ serve(async (req) => {
 
     const responseData = { results };
     
+    // Rank results by best value
+    try {
+      const rankingResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/rank-search-results`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          results: results.map(r => ({
+            ...r,
+            distance: 0, // TODO: Calculate from city center
+            reviewCount: r.num_reviews
+          })),
+          sortBy: 'best_value'
+        }),
+      });
+      
+      if (rankingResponse.ok) {
+        const rankedData = await rankingResponse.json();
+        responseData.results = rankedData.results;
+        responseData.meta = rankedData.meta;
+      }
+    } catch (err) {
+      console.warn('Ranking failed, returning unranked results:', err);
+    }
+    
     // Cache the result
     setCache(cacheKey, responseData);
     clearTimeout(timeoutId);

@@ -11,6 +11,7 @@ import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { RequireAgentTerms } from "@/components/RequireAgentTerms";
 import { usePresence } from "@/hooks/usePresence";
 import { useState, useEffect } from "react";
 import Index from "./pages/Index";
@@ -212,7 +213,9 @@ function AppContent() {
           <Route path="/browse-creators" element={<BrowseCreators />} />
           <Route path="/agent/:agentId" element={<AgentProfile />} />
           <Route path="/agent-onboarding" element={<AgentOnboarding />} />
-          <Route path="/agent-dashboard" element={<AgentDashboard />} />
+          <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />
+          <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
+          <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />

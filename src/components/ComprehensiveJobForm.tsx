@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { EmailListManager, EmailEntry } from "./EmailListManager";
 
 interface JobFormData {
   // Basic Overview
@@ -70,6 +71,10 @@ interface JobFormData {
   
   // Deliverables
   expectedDeliverables?: string[];
+  
+  // Additional emails
+  additionalEmails?: EmailEntry[];
+  notifyAllEmails?: boolean;
 }
 
 interface ComprehensiveJobFormProps {
@@ -87,6 +92,8 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
     budgetMin: 0,
     budgetMax: 0,
     currency: "USD",
+    additionalEmails: [],
+    notifyAllEmails: true
   });
 
   const totalSteps = 6;
@@ -222,6 +229,21 @@ export const ComprehensiveJobForm = ({ onSubmit, onCancel }: ComprehensiveJobFor
                   placeholder="9 AM - 5 PM"
                 />
               </div>
+            </div>
+            
+            <Separator />
+            
+            <div>
+              <EmailListManager
+                emails={formData.additionalEmails || []}
+                onChange={(emails) => updateField("additionalEmails", emails)}
+                notifyAll={formData.notifyAllEmails ?? true}
+                onNotifyAllChange={(notifyAll) => updateField("notifyAllEmails", notifyAll)}
+                maxEmails={10}
+              />
+              <p className="text-xs text-muted-foreground mt-2">
+                Add additional email addresses to receive booking updates and notifications
+              </p>
             </div>
           </div>
         )}

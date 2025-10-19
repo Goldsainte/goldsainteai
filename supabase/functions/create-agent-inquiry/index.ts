@@ -37,6 +37,9 @@ serve(async (req) => {
       userId = user?.id;
     }
 
+    // Extract additional emails from travelerInfo
+    const additionalEmails = travelerInfo.additionalEmails || [];
+
     // Create the inquiry
     const { data: inquiry, error: inquiryError } = await supabase
       .from('agent_inquiries')
@@ -45,6 +48,7 @@ serve(async (req) => {
         guest_name: travelerInfo.name,
         guest_email: travelerInfo.email,
         guest_phone: travelerInfo.phone,
+        additional_emails: additionalEmails,
         inquiry_source: inquirySource,
         conversation_data: conversationData || {},
         status: 'pending',
