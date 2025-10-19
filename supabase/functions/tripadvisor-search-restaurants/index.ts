@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -43,7 +44,13 @@ serve(async (req) => {
   try {
     const { location, cuisine, priceRange } = await req.json();
     
-    console.log('TripAdvisor restaurant search request:', { 
+    // Initialize Supabase client for ranking
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
+    console.log('TripAdvisor restaurant search request:', {
       location, 
       cuisine,
       priceRange
@@ -265,16 +272,11 @@ serve(async (req) => {
       return hasPhoto && hasQuality;
     });
 
-    // Rank restaurants
+    // Rank restaurants using Supabase client
     let rankedRestaurants = validRestaurants;
     try {
-      const rankingResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/rank-search-results`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
+        body: {
           results: validRestaurants.map(r => ({
             ...r,
             price: r.price_level ? r.price_level.length * 15 : 30,
@@ -282,15 +284,14 @@ serve(async (req) => {
             distance: 0
           })),
           sortBy: 'best_value'
-        }),
+        }
       });
       
-      if (rankingResponse.ok) {
-        const rankedData = await rankingResponse.json();
+      if (!rankError && rankedData?.results) {
         rankedRestaurants = rankedData.results;
       }
-    } catch (err) {
-      console.warn('Restaurant ranking failed:', err);
+    } catch (error) {
+      console.error('Restaurant ranking failed:', error);
     }
 
     clearTimeout(timeoutId);

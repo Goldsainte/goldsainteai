@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -270,6 +271,12 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
     }
 
+    // Initialize Supabase client for ranking
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
     console.log("Unified hotel search:", { location, checkIn, checkOut, guests });
 
     // Check cache first
@@ -377,31 +384,24 @@ serve(async (req) => {
 
     const responseData = { results };
     
-    // Rank results by best value
+    // Rank results by best value using Supabase client
     try {
-      const rankingResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/rank-search-results`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
+        body: {
           results: results.map(r => ({
             ...r,
             distance: 0, // TODO: Calculate from city center
             reviewCount: r.num_reviews
           })),
           sortBy: 'best_value'
-        }),
+        }
       });
       
-      if (rankingResponse.ok) {
-        const rankedData = await rankingResponse.json();
+      if (!rankError && rankedData?.results) {
         responseData.results = rankedData.results;
-        responseData.meta = rankedData.meta;
       }
-    } catch (err) {
-      console.warn('Ranking failed, returning unranked results:', err);
+    } catch (error) {
+      console.error('Ranking failed, returning unranked results:', error);
     }
     
     // Cache the result

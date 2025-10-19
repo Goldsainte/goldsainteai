@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 
 const corsHeaders = {
@@ -40,6 +41,12 @@ serve(async (req) => {
 
   try {
     const { origin, destination, departureDate, returnDate, adults, travelClass = 'ECONOMY', cabinClass, nonStop = 'false', max = 250, includedAirlineCodes, destinationCity } = await req.json();
+    
+    // Initialize Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
     
     // Support both parameter naming conventions
     const originLocationCode = origin;
@@ -125,34 +132,28 @@ serve(async (req) => {
       };
     });
 
-    // Rank flights
+    // Rank flights using Supabase client
     let rankedFlights = markedUpFlights;
     try {
-      const rankingResponse = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/rank-search-results`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
+        body: {
           results: markedUpFlights.map(f => ({
             ...f,
             price: parseFloat(f.price.total),
             rating: 4.0 // Default for flights
           })),
           sortBy: 'best_value'
-        }),
+        }
       });
       
-      if (rankingResponse.ok) {
-        const rankedData = await rankingResponse.json();
+      if (!rankError && rankedData?.results) {
         rankedFlights = rankedData.results;
       }
-    } catch (err) {
-      console.warn('Flight ranking failed:', err);
+    } catch (error) {
+      console.error('Flight ranking failed:', error);
     }
 
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       results: rankedFlights,
       dictionaries: data.dictionaries,
       meta: data.meta
