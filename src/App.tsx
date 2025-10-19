@@ -81,6 +81,7 @@ import InstagramCallback from "./pages/InstagramCallback";
 import YourActivity from "./pages/YourActivity";
 import UploadEmailAssets from "./pages/UploadEmailAssets";
 import UploadAppleMusicKey from "./pages/UploadAppleMusicKey";
+import UploadAppleSignInKey from "./pages/UploadAppleSignInKey";
 import TransportationVendorApplication from "./pages/TransportationVendorApplication";
 import TransportationVendorDashboard from "./pages/TransportationVendorDashboard";
 import AdminTransportVendorVetting from "./pages/AdminTransportVendorVetting";
@@ -224,6 +225,7 @@ function AppContent() {
           <Route path="/admin/seed" element={<AdminSeed />} />
           <Route path="/admin/upload-email-assets" element={<UploadEmailAssets />} />
           <Route path="/admin/upload-apple-music-key" element={<UploadAppleMusicKey />} />
+          <Route path="/admin/upload-apple-signin-key" element={<UploadAppleSignInKey />} />
           <Route path="/booking-preferences" element={<BookingPreferencesRedirect />} />
           <Route path="/commission-dashboard" element={<CommissionDashboard />} />
           <Route path="/email-preview" element={<EmailPreview />} />
