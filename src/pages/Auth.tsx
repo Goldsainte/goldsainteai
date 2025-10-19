@@ -170,10 +170,7 @@ const Auth = () => {
       
       // Call edge function to initiate Apple Sign-In
       const { data, error } = await supabase.functions.invoke('apple-signin-init', {
-        body: {},
-        headers: {
-          'x-app-origin': window.location.origin
-        }
+        body: {}
       });
 
       if (error) throw error;
