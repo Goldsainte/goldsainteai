@@ -243,4 +243,10 @@ verify_jwt = false
 [functions.help-center-ai]
 verify_jwt = false
 
+[functions.apple-signin-init]
+verify_jwt = false
+
+[functions.apple-signin-callback]
+verify_jwt = false
+
 

@@ -162,15 +162,23 @@ const Auth = () => {
   };
 
   const handleAppleSignIn = async () => {
-    setIsLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'apple',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    
-    if (error) {
+    try {
+      setIsLoading(true);
+      
+      // Call edge function to initiate Apple Sign-In
+      const { data, error } = await supabase.functions.invoke('apple-signin-init', {
+        body: {}
+      });
+
+      if (error) throw error;
+
+      // Store client secret in session storage for callback
+      sessionStorage.setItem('apple_client_secret', data.clientSecret);
+      sessionStorage.setItem('apple_state', data.state);
+
+      // Redirect to Apple
+      window.location.href = data.authUrl;
+    } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error.message,
