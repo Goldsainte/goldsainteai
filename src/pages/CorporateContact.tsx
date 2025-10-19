@@ -91,7 +91,7 @@ export default function CorporateContact() {
         {/* Back Button */}
         <Button
           variant="ghost"
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="mb-6 h-12 text-base"
           size="lg"
         >
