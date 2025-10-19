@@ -51,9 +51,9 @@ Deno.serve(async (req) => {
       console.error('Error storing state:', stateError);
     }
 
-    // Build authorization URL
-    const origin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || '';
-    const redirectUri = `${origin}/auth/callback/apple`;
+    // Build authorization URL - Apple will POST directly to edge function
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+    const redirectUri = `${supabaseUrl}/functions/v1/apple-signin-callback`;
     
     const authUrl = new URL('https://appleid.apple.com/auth/authorize');
     authUrl.searchParams.set('client_id', credentials.services_id);

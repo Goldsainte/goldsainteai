@@ -34,7 +34,33 @@ Deno.serve(async (req) => {
   try {
     console.log('Processing Apple callback...');
     
-    const { code, state, id_token, user } = await req.json();
+    // Handle form POST from Apple or JSON from our app
+    let code, state, id_token, user;
+    
+    if (req.method === 'POST') {
+      const contentType = req.headers.get('content-type') || '';
+      
+      if (contentType.includes('application/x-www-form-urlencoded')) {
+        // Form POST from Apple
+        console.log('Handling form POST from Apple');
+        const formData = await req.formData();
+        code = formData.get('code') as string;
+        state = formData.get('state') as string;
+        id_token = formData.get('id_token') as string;
+        const userJson = formData.get('user');
+        user = userJson ? JSON.parse(userJson as string) : null;
+      } else {
+        // JSON from our app
+        console.log('Handling JSON request');
+        const body = await req.json();
+        code = body.code;
+        state = body.state;
+        id_token = body.id_token;
+        user = body.user;
+      }
+    } else {
+      throw new Error('Invalid request method');
+    }
 
     console.log('Received data:', { hasCode: !!code, hasState: !!state, hasIdToken: !!id_token });
 
@@ -151,14 +177,27 @@ Deno.serve(async (req) => {
 
     console.log('Magic link generated successfully');
 
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        magicLink: linkData.properties.action_link,
-        user: authUser
-      }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    // Extract token from magic link
+    const magicLinkUrl = new URL(linkData.properties.action_link);
+    const token = magicLinkUrl.searchParams.get('token');
+    const type = magicLinkUrl.searchParams.get('type');
+
+    // Get the origin from referer header (where user came from)
+    const referer = req.headers.get('referer') || '';
+    const origin = referer.split('/').slice(0, 3).join('/') || 'https://a7969815-170e-4304-bb8c-07f694c52257.lovableproject.com';
+    
+    // Redirect back to app with token
+    const redirectUrl = `${origin}/auth/callback/apple?token=${token}&type=${type}`;
+    
+    console.log('Redirecting to:', redirectUrl);
+    
+    return new Response(null, {
+      status: 302,
+      headers: {
+        'Location': redirectUrl,
+        ...corsHeaders
+      }
+    });
   } catch (error) {
     console.error('Error in apple-signin-callback:', error);
     return new Response(

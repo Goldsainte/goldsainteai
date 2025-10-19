@@ -12,50 +12,24 @@ const AppleCallback = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Get parameters from URL or form post
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-        const idToken = searchParams.get('id_token');
-        const userParam = searchParams.get('user');
+        // Get token from URL (redirected from edge function)
+        const token = searchParams.get('token');
+        const type = searchParams.get('type');
 
-        const storedState = sessionStorage.getItem('apple_state');
-
-        // Verify state
-        if (state !== storedState) {
-          throw new Error('Invalid state parameter');
+        if (!token || !type) {
+          throw new Error('Missing authentication token');
         }
+
+        // Use the token to establish the session
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: type as any
+        });
+
+        if (verifyError) throw verifyError;
 
         // Clean up session storage
         sessionStorage.removeItem('apple_state');
-
-        // Call callback edge function
-        const { data, error } = await supabase.functions.invoke('apple-signin-callback', {
-          body: {
-            code,
-            state,
-            id_token: idToken,
-            user: userParam
-          }
-        });
-
-        if (error) throw error;
-        if (!data.success) throw new Error(data.error || 'Authentication failed');
-
-        // Use the magic link to establish the session
-        if (data.magicLink) {
-          const url = new URL(data.magicLink);
-          const token = url.searchParams.get('token');
-          const type = url.searchParams.get('type');
-
-          if (token && type) {
-            const { error: verifyError } = await supabase.auth.verifyOtp({
-              token_hash: token,
-              type: type as any
-            });
-
-            if (verifyError) throw verifyError;
-          }
-        }
 
         // Redirect to home
         navigate('/');
