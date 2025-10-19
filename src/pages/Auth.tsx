@@ -165,62 +165,28 @@ const Auth = () => {
   };
 
   const handleAppleSignIn = async () => {
-    // Open popup immediately to satisfy Safari's user-gesture requirement
-    const popup = window.open('about:blank', 'apple-signin', 'width=600,height=700');
-    if (!popup) {
-      toast({
-        title: "Popup blocked",
-        description: "Please allow popups for this site to continue with Apple.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
       setIsLoading(true);
-
-      // Show a simple loading UI in the popup while we fetch the Apple auth URL
-      try {
-        popup.document.open();
-        popup.document.write(`<!doctype html><html><head><title>Apple Sign-In</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#666;">
-          <div>Loading Apple Sign-In…</div>
-        </body></html>`);
-        popup.document.close();
-      } catch (_) {
-        // Ignore if we can't write (some browsers restrict document.write)
-      }
       
-      // Call backend to initiate Apple Sign-In and get the authorization URL
+      // Call edge function to get Apple auth URL
       const { data, error } = await supabase.functions.invoke('apple-signin-init', {
         body: {}
       });
 
-      if (error) {
-        popup.close();
-        throw error;
-      }
-      if (!data?.authUrl) {
-        popup.close();
-        throw new Error('No auth URL received');
-      }
+      if (error) throw error;
+      if (!data?.authUrl) throw new Error('No auth URL received');
 
-      // Store state in session storage for callback validation
+      // Store state for callback validation
       sessionStorage.setItem('apple_state', data.state);
 
-      // Navigate the already-opened popup to Apple's authorization page
-      try {
-        popup.location.href = data.authUrl;
-      } catch (_) {
-        // If navigation fails (popup closed), fallback to navigating current window
-        window.location.href = data.authUrl;
-      }
+      // Full-page redirect to Apple (standard OAuth flow)
+      window.location.href = data.authUrl;
     } catch (error: any) {
       toast({
         title: "Sign in failed",
         description: error?.message || 'Failed to initiate Apple Sign-In',
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
   };
