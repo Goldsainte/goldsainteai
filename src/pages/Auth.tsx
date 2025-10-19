@@ -155,9 +155,19 @@ const Auth = () => {
       
       if (error) throw error;
       
-      // Break out of iframe by redirecting top window
+      // Open in new tab to escape sandbox
       if (data?.url) {
-        window.top!.location.href = data.url;
+        const popup = window.open(data.url, '_blank', 'noopener,noreferrer');
+        if (popup) {
+          popup.focus();
+        } else {
+          // Popup blocked - fallback to current window
+          toast({
+            title: "Popup blocked",
+            description: "Please allow popups or click the link below to continue",
+            action: <button onClick={() => window.location.href = data.url} className="underline">Open Sign-In</button>
+          });
+        }
       }
     } catch (error: any) {
       toast({
@@ -165,6 +175,7 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -179,13 +190,22 @@ const Auth = () => {
       });
 
       if (error) throw error;
+      if (!data?.authUrl) throw new Error('No auth URL received');
 
       // Store state in session storage for callback
       sessionStorage.setItem('apple_state', data.state);
 
-      // Break out of iframe by redirecting top window
-      if (data?.authUrl) {
-        window.top!.location.href = data.authUrl;
+      // Open in new tab to escape sandbox
+      const popup = window.open(data.authUrl, '_blank', 'noopener,noreferrer');
+      if (popup) {
+        popup.focus();
+      } else {
+        // Popup blocked - fallback to current window
+        toast({
+          title: "Popup blocked",
+          description: "Please allow popups or click the link below to continue",
+          action: <button onClick={() => window.location.href = data.authUrl} className="underline">Open Sign-In</button>
+        });
       }
     } catch (error: any) {
       toast({
@@ -193,6 +213,7 @@ const Auth = () => {
         description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
