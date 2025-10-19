@@ -38,6 +38,7 @@ Deno.serve(async (req) => {
 
     // Generate state for CSRF protection
     const state = crypto.randomUUID();
+    console.log('Generated state:', state);
     
     // Capture app origin for callback redirect
     const appOrigin = req.headers.get('origin') || req.headers.get('referer')?.split('/').slice(0, 3).join('/') || '';

@@ -71,6 +71,7 @@ Deno.serve(async (req) => {
     );
 
     // Verify state
+    console.log('Verifying state:', state);
     const { data: stateData, error: stateError } = await supabaseClient
       .from('oauth_states')
       .select('*')
