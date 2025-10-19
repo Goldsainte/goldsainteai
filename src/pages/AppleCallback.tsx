@@ -19,7 +19,6 @@ const AppleCallback = () => {
         const userParam = searchParams.get('user');
 
         const storedState = sessionStorage.getItem('apple_state');
-        const clientSecret = sessionStorage.getItem('apple_client_secret');
 
         // Verify state
         if (state !== storedState) {
@@ -28,7 +27,6 @@ const AppleCallback = () => {
 
         // Clean up session storage
         sessionStorage.removeItem('apple_state');
-        sessionStorage.removeItem('apple_client_secret');
 
         // Call callback edge function
         const { data, error } = await supabase.functions.invoke('apple-signin-callback', {
@@ -41,11 +39,11 @@ const AppleCallback = () => {
         });
 
         if (error) throw error;
+        if (!data.success) throw new Error(data.error || 'Authentication failed');
 
-        // Set the session
-        if (data.session) {
-          // Use the magic link to establish the session
-          const url = new URL(data.session.properties.action_link);
+        // Use the magic link to establish the session
+        if (data.magicLink) {
+          const url = new URL(data.magicLink);
           const token = url.searchParams.get('token');
           const type = url.searchParams.get('type');
 

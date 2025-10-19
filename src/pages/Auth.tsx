@@ -172,8 +172,7 @@ const Auth = () => {
 
       if (error) throw error;
 
-      // Store client secret in session storage for callback
-      sessionStorage.setItem('apple_client_secret', data.clientSecret);
+      // Store state in session storage for callback
       sessionStorage.setItem('apple_state', data.state);
 
       // Redirect to Apple

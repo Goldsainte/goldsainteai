@@ -6,13 +6,24 @@ const corsHeaders = {
 };
 
 function decodeJwt(token: string) {
-  const parts = token.split('.');
-  if (parts.length !== 3) {
-    throw new Error('Invalid JWT');
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Invalid JWT format');
+    }
+    
+    const payload = parts[1];
+    // Replace URL-safe characters
+    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+    // Add padding if needed
+    const padded = base64.padEnd(base64.length + (4 - base64.length % 4) % 4, '=');
+    
+    const decoded = atob(padded);
+    return JSON.parse(decoded);
+  } catch (error) {
+    console.error('Error decoding JWT:', error);
+    throw new Error('Failed to decode ID token');
   }
-  const payload = parts[1];
-  const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
-  return JSON.parse(decoded);
 }
 
 Deno.serve(async (req) => {
@@ -21,7 +32,11 @@ Deno.serve(async (req) => {
   }
 
   try {
+    console.log('Processing Apple callback...');
+    
     const { code, state, id_token, user } = await req.json();
+
+    console.log('Received data:', { hasCode: !!code, hasState: !!state, hasIdToken: !!id_token });
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -34,9 +49,10 @@ Deno.serve(async (req) => {
       .select('*')
       .eq('state', state)
       .eq('provider', 'apple')
-      .single();
+      .maybeSingle();
 
     if (stateError || !stateData) {
+      console.error('Invalid state:', stateError);
       return new Response(
         JSON.stringify({ error: 'Invalid state parameter' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -51,22 +67,47 @@ Deno.serve(async (req) => {
 
     // Decode ID token to get user info
     const idTokenPayload = decodeJwt(id_token);
+    console.log('ID token decoded:', { sub: idTokenPayload.sub, email: idTokenPayload.email });
+    
     const appleUserId = idTokenPayload.sub;
     const email = idTokenPayload.email;
+
+    if (!email) {
+      return new Response(
+        JSON.stringify({ error: 'Email not provided by Apple' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Parse user data if provided (only on first sign-in)
     let firstName, lastName;
     if (user) {
-      const userData = typeof user === 'string' ? JSON.parse(user) : user;
-      firstName = userData.name?.firstName;
-      lastName = userData.name?.lastName;
+      try {
+        const userData = typeof user === 'string' ? JSON.parse(user) : user;
+        firstName = userData.name?.firstName;
+        lastName = userData.name?.lastName;
+        console.log('User data parsed:', { firstName, lastName });
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
     }
 
-    // Check if user exists in auth.users by email
-    const { data: existingUsers } = await supabaseClient.auth.admin.listUsers();
-    let authUser = existingUsers?.users.find(u => u.email === email);
+    // Check if user exists
+    const { data: { users }, error: listError } = await supabaseClient.auth.admin.listUsers();
+    
+    if (listError) {
+      console.error('Error listing users:', listError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to check existing users' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    let authUser = users.find(u => u.email === email);
 
     if (!authUser) {
+      console.log('Creating new user...');
+      
       // Create new user
       const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
         email,
@@ -89,26 +130,31 @@ Deno.serve(async (req) => {
       }
 
       authUser = newUser.user;
+      console.log('User created successfully');
+    } else {
+      console.log('Existing user found');
     }
 
-    // Generate session token
-    const { data: sessionData, error: sessionError } = await supabaseClient.auth.admin.generateLink({
+    // Generate magic link for session
+    const { data: linkData, error: linkError } = await supabaseClient.auth.admin.generateLink({
       type: 'magiclink',
-      email: authUser!.email!
+      email: authUser.email!
     });
 
-    if (sessionError || !sessionData) {
-      console.error('Error generating session:', sessionError);
+    if (linkError || !linkData) {
+      console.error('Error generating link:', linkError);
       return new Response(
         JSON.stringify({ error: 'Failed to create session' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log('Magic link generated successfully');
+
     return new Response(
       JSON.stringify({ 
         success: true,
-        session: sessionData,
+        magicLink: linkData.properties.action_link,
         user: authUser
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -116,7 +162,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error in apple-signin-callback:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: String(error) }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
