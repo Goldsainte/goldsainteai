@@ -1,3 +1,5 @@
+// DEPLOYMENT VERSION: 2025-01-20-v2 - Force fresh deployment
+// Fixed: Using auth.admin.listUsers() instead of non-existent getUserByEmail()
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const corsHeaders = {
