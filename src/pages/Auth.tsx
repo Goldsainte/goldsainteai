@@ -168,19 +168,9 @@ const Auth = () => {
     try {
       setIsLoading(true);
       
-      // Call edge function to get Apple auth URL
-      const { data, error } = await supabase.functions.invoke('apple-signin-init', {
-        body: {}
-      });
-
-      if (error) throw error;
-      if (!data?.authUrl) throw new Error('No auth URL received');
-
-      // Store state for callback validation
-      sessionStorage.setItem('apple_state', data.state);
-
-      // Full-page redirect to Apple (standard OAuth flow)
-      window.location.href = data.authUrl;
+      // Direct navigation to init function - it will set cookie and redirect to Apple
+      const origin = encodeURIComponent(window.location.origin);
+      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-init?origin=${origin}`;
     } catch (error: any) {
       toast({
         title: "Sign in failed",

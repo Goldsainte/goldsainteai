@@ -65,13 +65,34 @@ Deno.serve(async (req) => {
 
     console.log('Received data:', { hasCode: !!code, hasState: !!state, hasIdToken: !!id_token });
 
+    // Extract cookie state
+    const cookieHeader = req.headers.get('cookie') || '';
+    const cookieState = cookieHeader.split(';')
+      .map(c => c.trim())
+      .find(c => c.startsWith('apple_state='))
+      ?.split('=')[1];
+
+    console.log('Cookie state:', cookieState ? 'present' : 'missing');
+    console.log('Posted state:', state ? 'present' : 'missing');
+
+    // Validate: cookie state must match posted state
+    if (!cookieState || !state || cookieState !== state) {
+      console.error('State mismatch:', { cookieState, postedState: state });
+      return new Response(
+        JSON.stringify({ error: 'Invalid state parameter - cookie mismatch' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Cookie and posted state match');
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify state (state is unique, no need to filter by platform)
-    console.log('Verifying state:', state);
+    // Verify state exists in database
+    console.log('Verifying state in database:', state);
     const { data: stateData, error: stateError } = await supabaseClient
       .from('oauth_states')
       .select('*')
@@ -79,12 +100,14 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (stateError || !stateData) {
-      console.error('Invalid state:', stateError);
+      console.error('State not found in DB:', stateError);
       return new Response(
-        JSON.stringify({ error: 'Invalid state parameter' }),
+        JSON.stringify({ error: 'Invalid state parameter - not found in database' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    console.log('State validated successfully');
     
     // Get app origin for redirect
     const appOrigin = stateData.app_origin || Deno.env.get('SUPABASE_URL') || '';
@@ -191,10 +214,12 @@ Deno.serve(async (req) => {
     
     console.log('Redirecting to:', redirectUrl);
     
+    // Clear the cookie by setting it expired
     return new Response(null, {
       status: 302,
       headers: {
         'Location': redirectUrl,
+        'Set-Cookie': `apple_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0`,
         ...corsHeaders
       }
     });
