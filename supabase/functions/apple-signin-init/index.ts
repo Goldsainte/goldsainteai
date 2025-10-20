@@ -72,9 +72,23 @@ Deno.serve(async (req) => {
 
     console.log('State stored successfully in DB');
 
-    // Build authorization URL - Apple will POST directly to edge function
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const redirectUri = `${supabaseUrl}/functions/v1/apple-signin-callback`;
+    // Determine redirect URI based on app origin (environment-aware)
+    let redirectUri: string;
+    
+    if (appOrigin.includes('goldsainte.ai')) {
+      // Production domain
+      redirectUri = 'https://goldsainte.ai/auth/apple/callback';
+      console.log('Using production redirect URI');
+    } else if (appOrigin.includes('lovable.app')) {
+      // Staging/preview domain
+      redirectUri = `${appOrigin}/auth/apple/callback`;
+      console.log('Using staging redirect URI');
+    } else {
+      // Development fallback - direct to Supabase edge function
+      const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+      redirectUri = `${supabaseUrl}/functions/v1/apple-signin-callback`;
+      console.log('Using development redirect URI (direct to edge function)');
+    }
     
     const authUrl = new URL('https://appleid.apple.com/auth/authorize');
     authUrl.searchParams.set('client_id', credentials.services_id);

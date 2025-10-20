@@ -111,6 +111,7 @@ Deno.serve(async (req) => {
     
     // Get app origin for redirect
     const appOrigin = stateData.app_origin || Deno.env.get('SUPABASE_URL') || '';
+    console.log('App origin for redirect:', appOrigin);
 
     // Delete used state
     await supabaseClient
@@ -210,16 +211,24 @@ Deno.serve(async (req) => {
     const type = magicLinkUrl.searchParams.get('type');
 
     // Use the app origin stored during init for reliable redirect
-    const redirectUrl = `${appOrigin}/auth/callback/apple?token=${token}&type=${type}`;
+    // Determine if we need to use /auth/apple/callback (production) or /auth/callback/apple (fallback)
+    let callbackPath = '/auth/callback/apple';
+    if (appOrigin.includes('goldsainte.ai') || appOrigin.includes('lovable.app')) {
+      callbackPath = '/auth/apple/callback';
+    }
+    
+    const redirectUrl = `${appOrigin}${callbackPath}?token=${token}&type=${type}`;
     
     console.log('Redirecting to:', redirectUrl);
     
-    // Clear the cookie by setting it expired
+    // Clear the cookie by setting it expired, with proper domain for production
+    const cookieDomain = appOrigin.includes('goldsainte.ai') ? '; Domain=goldsainte.ai' : '';
+    
     return new Response(null, {
       status: 302,
       headers: {
         'Location': redirectUrl,
-        'Set-Cookie': `apple_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0`,
+        'Set-Cookie': `apple_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0${cookieDomain}`,
         ...corsHeaders
       }
     });
