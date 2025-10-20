@@ -46,43 +46,8 @@ const AppleCallback = () => {
           return;
         }
 
-        // If no token, we might be receiving POST data from Apple
-        // This shouldn't happen in the new flow, but handle it just in case
-        toast({
-          title: "Processing...",
-          description: "Completing Apple sign-in.",
-        });
-
-        // Forward to edge function for processing
-        const formData = new FormData();
-        const code = searchParams.get('code');
-        const state = searchParams.get('state');
-        const id_token = searchParams.get('id_token');
-        const user = searchParams.get('user');
-
-        if (code) formData.append('code', code);
-        if (state) formData.append('state', state);
-        if (id_token) formData.append('id_token', id_token);
-        if (user) formData.append('user', user);
-
-        // Call edge function to complete OAuth
-        const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-callback`,
-          {
-            method: 'POST',
-            body: formData,
-            credentials: 'include',
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error('Failed to complete Apple sign-in');
-        }
-
-        // Edge function will redirect us back with token
-        // If we get here without redirect, something went wrong
-        const result = await response.json();
-        console.log('Callback result:', result);
+        // If no token/type, something went wrong with the flow
+        throw new Error('No authentication token received from Apple');
 
       } catch (error: any) {
         console.error('Apple callback error:', error);
