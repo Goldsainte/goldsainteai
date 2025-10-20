@@ -46,7 +46,53 @@ const AppleCallback = () => {
           return;
         }
 
-        // If no token/type, something went wrong with the flow
+        // If no token, check if we received POST data from Apple (old flow)
+        const code = searchParams.get('code');
+        const state = searchParams.get('state');
+        const id_token = searchParams.get('id_token');
+
+        if (code || state || id_token) {
+          // Apple POSTed to React app - forward to edge function
+          toast({
+            title: "Processing...",
+            description: "Completing Apple sign-in.",
+          });
+
+          const formData = new FormData();
+          if (code) formData.append('code', code);
+          if (state) formData.append('state', state);
+          if (id_token) formData.append('id_token', id_token);
+          const user = searchParams.get('user');
+          if (user) formData.append('user', user);
+
+          // Forward to edge function
+          const response = await fetch(
+            `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-callback`,
+            {
+              method: 'POST',
+              body: formData,
+              credentials: 'include',
+            }
+          );
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Edge function error:', errorText);
+            throw new Error('Failed to complete Apple sign-in');
+          }
+
+          // Edge function should redirect us back with token
+          // If we're still here, check response
+          const responseUrl = response.url;
+          if (responseUrl && responseUrl.includes('token=')) {
+            window.location.href = responseUrl;
+            return;
+          }
+
+          throw new Error('Failed to get redirect from edge function');
+        }
+
+        // No token, code, or state - something went wrong
         throw new Error('No authentication token received from Apple');
 
       } catch (error: any) {
