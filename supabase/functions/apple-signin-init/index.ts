@@ -21,7 +21,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('🍎 APPLE SIGNIN INIT v2 - redirect + nocache');
+    console.log('🍎 APPLE SIGNIN INIT v3 - redirect + nocache');
 
     // Get Apple credentials from database
     const { data: credentials, error: credError } = await supabaseClient
