@@ -170,7 +170,7 @@ const Auth = () => {
       
       // Direct navigation to init function - it will set cookie and redirect to Apple
       const origin = encodeURIComponent(window.location.origin);
-      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-init?origin=${origin}`;
+      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/apple-signin-init?origin=${origin}&cb=${Date.now()}`;
     } catch (error: any) {
       toast({
         title: "Sign in failed",

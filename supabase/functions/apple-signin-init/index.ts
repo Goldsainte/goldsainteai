@@ -4,6 +4,10 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+  'Vary': 'Origin',
 };
 
 Deno.serve(async (req) => {
@@ -17,7 +21,7 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    console.log('Fetching Apple Sign-In credentials...');
+    console.log('🍎 APPLE SIGNIN INIT v2 - redirect + nocache');
 
     // Get Apple credentials from database
     const { data: credentials, error: credError } = await supabaseClient
