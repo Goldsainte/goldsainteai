@@ -31,18 +31,8 @@ const AppleCallback = () => {
             description: "Successfully signed in with Apple.",
           });
 
-          // Check if user has AI agent profile
-          const { data: profileData } = await supabase
-            .from('ai_agent_profiles')
-            .select('id')
-            .eq('user_id', data.user?.id)
-            .maybeSingle();
-
-          if (profileData) {
-            navigate('/dashboard', { replace: true });
-          } else {
-            navigate('/create-agent-profile', { replace: true });
-          }
+          // Redirect to home page after successful sign-in
+          navigate('/', { replace: true });
           return;
         }
 
