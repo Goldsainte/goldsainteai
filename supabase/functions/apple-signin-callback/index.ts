@@ -1,5 +1,4 @@
-// DEPLOYMENT VERSION: 2025-01-20-v2 - Force fresh deployment
-// Fixed: Using auth.admin.listUsers() instead of non-existent getUserByEmail()
+// Apple Sign-In Callback Handler v4 - Complete rewrite to force deployment
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.58.0';
 
 const corsHeaders = {
@@ -35,7 +34,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    console.log('Processing Apple callback...');
+    console.log('Processing Apple callback v4...');
     
     // Handle form POST from Apple or JSON from our app
     let code, state, id_token, user;
@@ -79,43 +78,44 @@ Deno.serve(async (req) => {
 
     // Validate: cookie state must match posted state
     if (!cookieState || !state || cookieState !== state) {
-      console.error('State mismatch:', { cookieState, postedState: state });
+      console.error('State mismatch or missing state');
       return new Response(
-        JSON.stringify({ error: 'Invalid state parameter - cookie mismatch' }),
+        JSON.stringify({ error: 'Invalid state parameter' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.log('Cookie and posted state match');
 
+    // Create Supabase client
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Verify state exists in database
+    // Verify state in database
     console.log('Verifying state in database:', state);
     const { data: stateData, error: stateError } = await supabaseClient
       .from('oauth_states')
       .select('*')
       .eq('state', state)
-      .maybeSingle();
+      .single();
 
     if (stateError || !stateData) {
-      console.error('State not found in DB:', stateError);
+      console.error('Invalid or expired state:', stateError);
       return new Response(
-        JSON.stringify({ error: 'Invalid state parameter - not found in database' }),
+        JSON.stringify({ error: 'Invalid or expired state' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.log('State validated successfully');
-    
-    // Get app origin for redirect
-    const appOrigin = stateData.app_origin || Deno.env.get('SUPABASE_URL') || '';
+
+    // Extract app origin for redirect
+    const appOrigin = stateData.app_origin || 'https://goldsainte.ai';
     console.log('App origin for redirect:', appOrigin);
 
-    // Delete used state
+    // Clean up state
     await supabaseClient
       .from('oauth_states')
       .delete()
@@ -148,8 +148,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Check if user exists by email using listUsers
-    const { data: { users }, error: getUserError } = await supabaseClient.auth.admin.listUsers();
+    // Check if user exists by email - CORRECTED METHOD
+    console.log('Checking for existing user with email:', email);
+    const { data: usersList, error: getUserError } = await supabaseClient.auth.admin.listUsers();
     
     if (getUserError) {
       console.error('Error fetching users:', getUserError);
@@ -159,8 +160,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    const userByEmail = users?.find(u => u.email === email);
-    let authUser = userByEmail || null;
+    const existingUser = usersList.users?.find(u => u.email === email);
+    console.log('Existing user found:', !!existingUser);
+
+    let authUser = existingUser || null;
 
     if (!authUser) {
       console.log('Creating new user...');
@@ -189,7 +192,7 @@ Deno.serve(async (req) => {
       authUser = newUser.user;
       console.log('User created successfully');
     } else {
-      console.log('Existing user found');
+      console.log('Existing user found, proceeding with login');
     }
 
     // Generate magic link for session
@@ -198,47 +201,48 @@ Deno.serve(async (req) => {
       email: authUser.email!
     });
 
-    if (linkError || !linkData) {
-      console.error('Error generating link:', linkError);
+    if (linkError) {
+      console.error('Error generating magic link:', linkError);
       return new Response(
-        JSON.stringify({ error: 'Failed to create session' }),
+        JSON.stringify({ error: 'Failed to generate session' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     console.log('Magic link generated successfully');
 
-    // Extract token from magic link
-    const magicLinkUrl = new URL(linkData.properties.action_link);
-    const token = magicLinkUrl.searchParams.get('token');
-    const type = magicLinkUrl.searchParams.get('type');
+    // Extract tokens from magic link
+    const url = new URL(linkData.properties.action_link);
+    const token = url.searchParams.get('token');
+    const type = url.searchParams.get('type');
 
-    // Use the app origin stored during init for reliable redirect
-    // Determine if we need to use /auth/apple/callback (production) or /auth/callback/apple (fallback)
-    let callbackPath = '/auth/callback/apple';
-    if (appOrigin.includes('goldsainte.ai') || appOrigin.includes('lovable.app')) {
-      callbackPath = '/auth/apple/callback';
+    if (!token || !type) {
+      console.error('Failed to extract token from magic link');
+      return new Response(
+        JSON.stringify({ error: 'Failed to extract session token' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    // Construct callback URL with token
+    const callbackUrl = `${appOrigin}/apple-callback?token=${encodeURIComponent(token)}&type=${encodeURIComponent(type)}`;
     
-    const redirectUrl = `${appOrigin}${callbackPath}?token=${token}&type=${type}`;
-    
-    console.log('Redirecting to:', redirectUrl);
-    
-    // Clear the cookie by setting it expired, with proper domain for production
-    const cookieDomain = appOrigin.includes('goldsainte.ai') ? '; Domain=goldsainte.ai' : '';
-    
+    console.log('Redirecting to app with session token');
+
+    // Clear the apple_state cookie and redirect
     return new Response(null, {
       status: 302,
       headers: {
-        'Location': redirectUrl,
-        'Set-Cookie': `apple_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0${cookieDomain}`,
-        ...corsHeaders
+        ...corsHeaders,
+        'Location': callbackUrl,
+        'Set-Cookie': 'apple_state=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=None'
       }
     });
-  } catch (error) {
+
+  } catch (error: any) {
     console.error('Error in apple-signin-callback:', error);
     return new Response(
-      JSON.stringify({ error: String(error) }),
+      JSON.stringify({ error: error.message || 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
