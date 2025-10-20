@@ -3807,36 +3807,27 @@ export type Database = {
       oauth_states: {
         Row: {
           app_origin: string | null
-          code_verifier: string | null
-          created_at: string
+          created_at: string | null
           expires_at: string
           id: string
           platform: string
           state: string
-          store_url: string | null
-          user_id: string | null
         }
         Insert: {
           app_origin?: string | null
-          code_verifier?: string | null
-          created_at?: string
+          created_at?: string | null
           expires_at: string
           id?: string
           platform: string
           state: string
-          store_url?: string | null
-          user_id?: string | null
         }
         Update: {
           app_origin?: string | null
-          code_verifier?: string | null
-          created_at?: string
+          created_at?: string | null
           expires_at?: string
           id?: string
           platform?: string
           state?: string
-          store_url?: string | null
-          user_id?: string | null
         }
         Relationships: []
       }
