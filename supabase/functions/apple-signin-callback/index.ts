@@ -146,18 +146,19 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Check if user exists by email
-    const { data: userByEmail, error: getUserError } = await supabaseClient.auth.admin.getUserByEmail(email);
-
+    // Check if user exists by email using listUsers
+    const { data: { users }, error: getUserError } = await supabaseClient.auth.admin.listUsers();
+    
     if (getUserError) {
-      console.error('Error fetching user by email:', getUserError);
+      console.error('Error fetching users:', getUserError);
       return new Response(
         JSON.stringify({ error: 'Failed to check existing users' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    let authUser = userByEmail?.user || null;
+    const userByEmail = users?.find(u => u.email === email);
+    let authUser = userByEmail || null;
 
     if (!authUser) {
       console.log('Creating new user...');
