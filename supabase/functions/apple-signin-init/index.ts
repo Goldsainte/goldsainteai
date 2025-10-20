@@ -7,8 +7,6 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req) => {
-  console.log('🍎 APPLE SIGNIN INIT - NEW VERSION WITH COOKIE');
-  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
