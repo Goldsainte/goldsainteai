@@ -71,7 +71,7 @@ serve(async (req) => {
 
     // Store package in database
     const { data: packageData, error: packageError } = await supabaseClient
-      .from('travel_packages')
+      .from('ai_bundled_packages')
       .insert({
         user_id: user.id,
         destination,

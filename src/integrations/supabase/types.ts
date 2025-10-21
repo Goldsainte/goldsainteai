@@ -935,6 +935,63 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_bundled_packages: {
+        Row: {
+          bundled_price: number
+          car_details: Json | null
+          created_at: string | null
+          currency: string | null
+          departure_date: string
+          destination: string
+          flight_details: Json | null
+          hotel_details: Json | null
+          id: string
+          return_date: string
+          savings_amount: number
+          status: string | null
+          total_price: number
+          travelers_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bundled_price: number
+          car_details?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          departure_date: string
+          destination: string
+          flight_details?: Json | null
+          hotel_details?: Json | null
+          id?: string
+          return_date: string
+          savings_amount: number
+          status?: string | null
+          total_price: number
+          travelers_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bundled_price?: number
+          car_details?: Json | null
+          created_at?: string | null
+          currency?: string | null
+          departure_date?: string
+          destination?: string
+          flight_details?: Json | null
+          hotel_details?: Json | null
+          id?: string
+          return_date?: string
+          savings_amount?: number
+          status?: string | null
+          total_price?: number
+          travelers_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_matching_scores: {
         Row: {
           agent_id: string
@@ -4985,13 +5042,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "product_orders_package_id_fkey"
-            columns: ["package_id"]
-            isOneToOne: false
-            referencedRelation: "travel_packages"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "product_orders_product_id_fkey"
             columns: ["product_id"]
             isOneToOne: false
@@ -6692,117 +6742,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      travel_packages: {
-        Row: {
-          booking_cta: string | null
-          booking_deadline: string | null
-          brochure_url: string | null
-          created_at: string
-          creator_id: string
-          creator_story: string | null
-          currency: string
-          daily_itinerary: Json | null
-          dates_info: Json | null
-          description: string
-          destination: string
-          duration_days: number
-          faqs: Json | null
-          id: string
-          images: Json | null
-          included_services: Json | null
-          is_active: boolean | null
-          itinerary: Json
-          location_details: Json | null
-          max_travelers: number | null
-          package_summary: string | null
-          price: number
-          pricing_details: Json | null
-          spots_remaining: number | null
-          spots_total: number | null
-          stripe_price_id: string | null
-          stripe_product_id: string | null
-          testimonials: Json | null
-          title: string
-          travel_requirements: Json | null
-          updated_at: string
-          video_url: string | null
-          whats_included: Json | null
-          whats_not_included: string[] | null
-        }
-        Insert: {
-          booking_cta?: string | null
-          booking_deadline?: string | null
-          brochure_url?: string | null
-          created_at?: string
-          creator_id: string
-          creator_story?: string | null
-          currency?: string
-          daily_itinerary?: Json | null
-          dates_info?: Json | null
-          description: string
-          destination: string
-          duration_days: number
-          faqs?: Json | null
-          id?: string
-          images?: Json | null
-          included_services?: Json | null
-          is_active?: boolean | null
-          itinerary?: Json
-          location_details?: Json | null
-          max_travelers?: number | null
-          package_summary?: string | null
-          price: number
-          pricing_details?: Json | null
-          spots_remaining?: number | null
-          spots_total?: number | null
-          stripe_price_id?: string | null
-          stripe_product_id?: string | null
-          testimonials?: Json | null
-          title: string
-          travel_requirements?: Json | null
-          updated_at?: string
-          video_url?: string | null
-          whats_included?: Json | null
-          whats_not_included?: string[] | null
-        }
-        Update: {
-          booking_cta?: string | null
-          booking_deadline?: string | null
-          brochure_url?: string | null
-          created_at?: string
-          creator_id?: string
-          creator_story?: string | null
-          currency?: string
-          daily_itinerary?: Json | null
-          dates_info?: Json | null
-          description?: string
-          destination?: string
-          duration_days?: number
-          faqs?: Json | null
-          id?: string
-          images?: Json | null
-          included_services?: Json | null
-          is_active?: boolean | null
-          itinerary?: Json
-          location_details?: Json | null
-          max_travelers?: number | null
-          package_summary?: string | null
-          price?: number
-          pricing_details?: Json | null
-          spots_remaining?: number | null
-          spots_total?: number | null
-          stripe_price_id?: string | null
-          stripe_product_id?: string | null
-          testimonials?: Json | null
-          title?: string
-          travel_requirements?: Json | null
-          updated_at?: string
-          video_url?: string | null
-          whats_included?: Json | null
-          whats_not_included?: string[] | null
-        }
-        Relationships: []
       }
       travel_posts: {
         Row: {

@@ -788,6 +788,24 @@ export const AIBookingConcierge = () => {
                       );
                     }
                     
+                    // Display travel package results
+                    if (result.success && result.package) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8">
+                          <p className="text-xs text-muted-foreground mb-2">Travel Package Created:</p>
+                          <TravelPackageCard 
+                            packageData={result.package}
+                            onBook={() => {
+                              toast({
+                                title: "Package Booking",
+                                description: "Package booking will be available soon!",
+                              });
+                            }}
+                          />
+                        </div>
+                      );
+                    }
+                    
                     return null;
                   })}
                 </div>
