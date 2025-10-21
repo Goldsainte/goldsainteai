@@ -105,7 +105,7 @@ export const AIBookingConcierge = () => {
         console.log('Setting initial greeting with agent:', agentName);
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+          content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, restaurants, events, book Uber rides, and check visa requirements. Ready to plan your trip?`
         }]);
       }
     };
@@ -483,27 +483,65 @@ export const AIBookingConcierge = () => {
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
               saveConversationData();
               
-              // Bridge voice Uber requests to text mode backend
+              // Detect Uber intent and bridge to text mode
               const transcript = message.transcript.toLowerCase();
-              if ((transcript.includes('uber') || transcript.includes('ride') || transcript.includes('transport')) &&
-                  (transcript.includes('from') || transcript.includes('to'))) {
+              const hasUberIntent = 
+                transcript.includes('uber') || 
+                transcript.includes('ride') || 
+                transcript.includes('lyft') ||
+                transcript.includes('transport') ||
+                transcript.includes('get me to') ||
+                transcript.includes('take me to') ||
+                transcript.includes('airport transfer');
                 
-                const fromMatch = transcript.match(/from\s+([^to]+?)(?:\s+to|$)/i);
-                const toMatch = transcript.match(/to\s+(.+?)(?:\.|$|from)/i);
+              const hasLocationInfo = 
+                (transcript.includes('from') && transcript.includes('to')) ||
+                (transcript.match(/\b(lax|jfk|sfo|ord|atl|dfw|den|las|sea|mia|airport)\b/i));
+              
+              if (hasUberIntent && hasLocationInfo) {
+                // Try to parse locations more reliably
+                let fromLocation = '';
+                let toLocation = '';
                 
-                if (fromMatch && toMatch) {
-                  const from = fromMatch[1].trim();
-                  const to = toMatch[1].trim();
-                  
+                // Pattern 1: "from X to Y"
+                const fromToMatch = transcript.match(/from\s+([^,.]+?)\s+to\s+([^,.]+?)(?:\.|$|,)/i);
+                if (fromToMatch) {
+                  fromLocation = fromToMatch[1].trim();
+                  toLocation = fromToMatch[2].trim();
+                }
+                
+                // Pattern 2: "to X from Y"
+                if (!fromLocation) {
+                  const toFromMatch = transcript.match(/to\s+([^,.]+?)\s+from\s+([^,.]+?)(?:\.|$|,)/i);
+                  if (toFromMatch) {
+                    toLocation = toFromMatch[1].trim();
+                    fromLocation = toFromMatch[2].trim();
+                  }
+                }
+                
+                // Pattern 3: "get me to X" (assume current location as pickup)
+                if (!fromLocation && !toLocation) {
+                  const getMatch = transcript.match(/(?:get|take)\s+me\s+to\s+([^,.]+?)(?:\.|$|,)/i);
+                  if (getMatch) {
+                    toLocation = getMatch[1].trim();
+                    fromLocation = "my current location";
+                  }
+                }
+                
+                if (fromLocation || toLocation) {
                   toast({
-                    title: "Fetching Uber Options",
+                    title: "Getting Uber Options",
                     description: "Check the chat below for live pricing!",
+                    duration: 3000
                   });
                   
+                  // Send to TEXT backend which has Uber tools
                   setTimeout(() => {
-                    sendProgrammaticMessage(
-                      `Get Uber price estimates from ${from} to ${to} and show me the options with pricing.`
-                    );
+                    const uberRequest = fromLocation && toLocation 
+                      ? `Get Uber price estimates from ${fromLocation} to ${toLocation} and show me the options.`
+                      : `Get Uber options for: ${transcript}`;
+                      
+                    sendProgrammaticMessage(uberRequest);
                   }, 1000);
                 }
               }
