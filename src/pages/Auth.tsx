@@ -270,7 +270,7 @@ const Auth = () => {
 
         {/* Heading */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold mb-2">
+          <h1 className="text-2xl sm:text-3xl font-semibold mb-2">
             {isMobile ? 'Log in or sign up' : 'Welcome back'}
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground">
