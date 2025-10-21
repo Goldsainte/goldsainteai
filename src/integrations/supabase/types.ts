@@ -7209,6 +7209,63 @@ export type Database = {
           },
         ]
       }
+      uber_ride_requests: {
+        Row: {
+          created_at: string | null
+          currency: string | null
+          dropoff_address: string | null
+          dropoff_latitude: number
+          dropoff_longitude: number
+          estimated_price: number | null
+          fare_id: string | null
+          id: string
+          pickup_address: string | null
+          pickup_latitude: number
+          pickup_longitude: number
+          product_id: string
+          ride_id: string | null
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          currency?: string | null
+          dropoff_address?: string | null
+          dropoff_latitude: number
+          dropoff_longitude: number
+          estimated_price?: number | null
+          fare_id?: string | null
+          id?: string
+          pickup_address?: string | null
+          pickup_latitude: number
+          pickup_longitude: number
+          product_id: string
+          ride_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          currency?: string | null
+          dropoff_address?: string | null
+          dropoff_latitude?: number
+          dropoff_longitude?: number
+          estimated_price?: number | null
+          fare_id?: string | null
+          id?: string
+          pickup_address?: string | null
+          pickup_latitude?: number
+          pickup_longitude?: number
+          product_id?: string
+          ride_id?: string | null
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_booking_preferences: {
         Row: {
           accessibility_needs: string[] | null

@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.uber-request-ride]
+verify_jwt = true
+
 [functions.seed-content-creators]
 verify_jwt = false
 
