@@ -151,11 +151,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       setError(null);
       setResults([]); // Clear previous results immediately
       setSearchPerformed(true); // Mark that a search was performed
-      
-      // Auto-hide search bar on mobile when search starts
-      if (window.innerWidth < 768) {
-        setShowSearchBar(false);
-      }
+      setUberProducts([]); // Clear previous Uber products
 
       try {
         if (searchType === "hotels") {
@@ -316,36 +312,57 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "cars") {
-          try {
-            const { data, error } = await invokeEdgeFunction('amadeus-search-cars', {
-              body: {
-                pickupLocation: pickup,
-                pickupDate: pickupDateCar,
-                dropoffDate: returnDateCar,
-                dropoffLocation: dropoff || pickup,
-                currencyCode: 'USD'
-              },
-              timeout: 25000,
-              showToastOnError: false,
-            });
-            if (error) {
-              console.warn('Car rental search error:', error);
+          // Check if we have full rental params or just location
+          if (pickup && pickupDateCar && returnDateCar) {
+            // Full car rental search
+            try {
+              const { data, error } = await invokeEdgeFunction('amadeus-search-cars', {
+                body: {
+                  pickupLocation: pickup,
+                  pickupDate: pickupDateCar,
+                  dropoffDate: returnDateCar,
+                  dropoffLocation: dropoff || pickup,
+                  currencyCode: 'USD'
+                },
+                timeout: 25000,
+                showToastOnError: false,
+              });
+              if (error) {
+                console.warn('Car rental search error:', error);
+                setResults([]);
+                setFilteredResults([]);
+                setError('No car rentals available for this location. Try a major airport like JFK, LAX, or LHR.');
+                return;
+              }
+              const carResults = data.results || [];
+              if (carResults.length === 0) {
+                setError('No car rentals found for this location and date. Try a different airport or dates.');
+              }
+              setResults(carResults);
+              setFilteredResults(carResults);
+            } catch (err) {
+              console.error('Car search failed:', err);
               setResults([]);
               setFilteredResults([]);
-              setError('No car rentals available for this location. Try a major airport like JFK, LAX, or LHR.');
-              return;
+              setError('Unable to search for car rentals. The test API may not have data for this airport.');
             }
-            const carResults = data.results || [];
-            if (carResults.length === 0) {
-              setError('No car rentals found for this location and date. Try a different airport or dates.');
-            }
-            setResults(carResults);
-            setFilteredResults(carResults);
-          } catch (err) {
-            console.error('Car search failed:', err);
+          } else if (location && !pickup) {
+            // Location-only search: show Uber instant rides
+            console.log('[Car Search] Location-only, fetching Uber');
             setResults([]);
             setFilteredResults([]);
-            setError('Unable to search for car rentals. The test API may not have data for this airport.');
+            setError(null);
+            
+            const { products, error: uberError } = await fetchUberFallback(location);
+            if (uberError) {
+              setError(uberError);
+            } else {
+              setUberProducts(products);
+            }
+          } else {
+            setError('Enter pickup location and dates for rentals, or just a location for instant rides');
+            setResults([]);
+            setFilteredResults([]);
           }
         } else if (searchType === "packages") {
           // Fetch hotels via unified function, plus flights and restaurants in parallel
@@ -410,7 +427,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       }
     };
 
-    if (searchType === "cars" ? !!pickup : !!(location || origin)) {
+    if (searchType === "cars" ? (!!pickup || !!location) : !!(location || origin)) {
       performSearch();
     } else {
       setLoading(false);
@@ -419,6 +436,23 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       setSearchPerformed(false); // No search was performed
     }
   }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass, pickup, dropoff, pickupDateCar, returnDateCar, carTripType, rankingSort]);
+
+  // Uber live polling
+  useEffect(() => {
+    const shouldPoll = searchType === "transportation" || (searchType === "cars" && location && !pickup);
+    if (!shouldPoll || uberProducts.length === 0) return;
+    
+    const interval = setInterval(async () => {
+      if (location && searchType === "cars" && !pickup) {
+        const { products } = await fetchUberFallback(location);
+        if (products && products.length > 0) {
+          setUberProducts(products);
+        }
+      }
+    }, 15000); // Every 15 seconds
+    
+    return () => clearInterval(interval);
+  }, [searchType, location, pickup, uberProducts.length]);
 
   // Apply filters and sorting
   useEffect(() => {

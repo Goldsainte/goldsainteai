@@ -19,26 +19,38 @@ serve(async (req) => {
   }
 
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    );
-
-    const { data: { user } } = await supabaseClient.auth.getUser();
-    if (!user) {
-      throw new Error('Not authenticated');
-    }
-
     const requestData: ProductRequest = await req.json();
     const { pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude } = requestData;
+    
+    // Validate coordinates
+    if (!pickupLatitude || !pickupLongitude || !dropoffLatitude || !dropoffLongitude) {
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Missing required coordinates'
+        }),
+        { 
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
 
     // Get Uber credentials from secrets
     const UBER_CLIENT_ID = Deno.env.get('UBER_CLIENT_ID');
     const UBER_CLIENT_SECRET = Deno.env.get('UBER_CLIENT_SECRET');
 
     if (!UBER_CLIENT_ID || !UBER_CLIENT_SECRET) {
-      throw new Error('Uber credentials not configured');
+      return new Response(
+        JSON.stringify({ 
+          success: false,
+          error: 'Uber service temporarily unavailable. Please try again later.'
+        }),
+        { 
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Get OAuth2 access token

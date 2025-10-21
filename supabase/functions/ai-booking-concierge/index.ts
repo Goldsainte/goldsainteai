@@ -5,7 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Persistent trip context across tool calls (stores ranking preferences)
+// Persistent trip context across tool calls
 const tripContext: {
   rankingPreferences: {
     flights?: string;
@@ -13,8 +13,15 @@ const tripContext: {
     cars?: string;
     restaurants?: string;
   };
+  carRental?: {
+    pickupLocation?: string;
+    dropoffLocation?: string;
+    pickupDate?: string;
+    returnDate?: string;
+  };
 } = {
-  rankingPreferences: {}
+  rankingPreferences: {},
+  carRental: {}
 };
 
 serve(async (req) => {
@@ -619,6 +626,14 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             } else if (functionName === 'search_hotels') {
               requestBody.sortBy = tripContext.rankingPreferences.hotels || 'best_value';
             } else if (functionName === 'search_cars') {
+              // Store car rental context
+              if (!tripContext.carRental) tripContext.carRental = {};
+              Object.assign(tripContext.carRental, {
+                pickupLocation: args.pickupLocation || tripContext.carRental.pickupLocation,
+                dropoffLocation: args.dropoffLocation || tripContext.carRental.dropoffLocation,
+                pickupDate: args.pickupDate || tripContext.carRental.pickupDate,
+                returnDate: args.dropoffDate || tripContext.carRental.returnDate
+              });
               requestBody.sortBy = tripContext.rankingPreferences.cars || 'best_value';
             } else if (functionName === 'search_restaurants') {
               requestBody.sortBy = tripContext.rankingPreferences.restaurants || 'best_value';

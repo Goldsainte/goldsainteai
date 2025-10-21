@@ -2,12 +2,36 @@
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { getUserLocation } from "@/lib/locationMapping";
 
+const geocodeLocation = async (location: string): Promise<{ latitude: number; longitude: number } | null> => {
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(location)}&format=json&limit=1`);
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return {
+        latitude: parseFloat(data[0].lat),
+        longitude: parseFloat(data[0].lon)
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('[Geocode] Error geocoding location:', error);
+    return null;
+  }
+};
+
 export const fetchUberFallback = async (location: string) => {
   console.log('[Uber Fallback] Fetching Uber products for location:', location);
   
   try {
-    // Get coordinates for the location
-    const coords = await getUserLocation();
+    // Try to geocode the location first
+    let coords = await geocodeLocation(location);
+    
+    // Fallback to user location if geocoding fails
+    if (!coords) {
+      console.log('[Uber Fallback] Geocoding failed, using device location');
+      const userLoc = await getUserLocation();
+      coords = { latitude: userLoc.latitude, longitude: userLoc.longitude };
+    }
     
     // Fetch Uber products (pickup = dropoff for local area)
     const { data: uberData, error: uberError } = await invokeEdgeFunction('uber-get-products', {

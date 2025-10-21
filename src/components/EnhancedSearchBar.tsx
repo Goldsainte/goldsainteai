@@ -142,7 +142,14 @@ export const EnhancedSearchBar = () => {
       const puDate = params.get("pickupDate");
       const rtDate = params.get("returnDate");
       const tt = (params.get("carTripType") as any) || "round-trip";
-      if (pu) setPickupLocation(pu);
+      
+      // Pre-fill pickup from location param if it looks like an airport code
+      if (!pu && loc && /^[A-Z]{3}$/i.test(loc.trim())) {
+        setPickupLocation(loc.toUpperCase());
+      } else if (pu) {
+        setPickupLocation(pu);
+      }
+      
       if (doLoc) setDropoffLocation(doLoc);
       if (puDate) setPickupDateCar(parseLocalDate(puDate));
       if (rtDate) setReturnDateCar(parseLocalDate(rtDate));
