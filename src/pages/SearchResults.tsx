@@ -354,13 +354,19 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           // Check if we have full rental params or just location
           if (pickup && pickupDateCar && returnDateCar) {
             // Full car rental search
+            console.log('[Car Search] Calling amadeus with:', { 
+              pickupCode, 
+              dropoffCode, 
+              pickupDateCar, 
+              returnDateCar 
+            });
             try {
               const { data, error } = await invokeEdgeFunction('amadeus-search-cars', {
                 body: {
-                  pickupLocation: pickup,
+                  pickupLocation: pickupCode,
                   pickupDate: pickupDateCar,
                   dropoffDate: returnDateCar,
-                  dropoffLocation: dropoff || pickup,
+                  dropoffLocation: dropoffCode || pickupCode,
                   currencyCode: 'USD'
                 },
                 timeout: 25000,
