@@ -12,7 +12,8 @@ import { RestaurantFilters } from "@/components/RestaurantFilters";
 import { AdvancedEventFilters } from "@/components/AdvancedEventFilters";
 import { AdvancedFlightFilters } from "@/components/AdvancedFlightFilters";
 import { Button } from "@/components/ui/button";
-import { Loader2, SlidersHorizontal, Map, List, ArrowLeft } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, SlidersHorizontal, Map, List, ArrowLeft, Trophy, DollarSign, Star, MapPin, Zap } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -36,6 +37,7 @@ const SearchResults = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("popularity");
+  const [rankingSort, setRankingSort] = useState<string>("best_value");
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [minRating, setMinRating] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
@@ -145,7 +147,13 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           let hotelResults: any[] = [];
           try {
             const { data, error } = await invokeEdgeFunction('unified-search-hotels', {
-              body: { location, checkIn, checkOut, guests: parseInt(guests) },
+              body: { 
+                location, 
+                checkIn, 
+                checkOut, 
+                guests: parseInt(guests),
+                sortBy: rankingSort 
+              },
               timeout: 30000,
               showToastOnError: false, // Handle errors with fallback
             });
@@ -228,7 +236,8 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
               adults: parseInt(adults),
               children: parseInt(children),
               infants: parseInt(infants),
-              cabinClass
+              cabinClass,
+              sortBy: rankingSort
             },
             timeout: 30000,
             showToastOnError: true,
@@ -273,7 +282,10 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           
           console.log('Searching restaurants in:', location);
           const { data, error } = await invokeEdgeFunction('tripadvisor-search-restaurants', {
-            body: { location: location.trim() },
+            body: { 
+              location: location.trim(),
+              sortBy: rankingSort 
+            },
             timeout: 20000,
             showToastOnError: true,
           });
@@ -363,7 +375,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
       setFilteredResults([]);
       setSearchPerformed(false); // No search was performed
     }
-  }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass, pickup, dropoff, pickupDateCar, returnDateCar, carTripType]);
+  }, [searchType, location, origin, destination, departureDate, returnDate, checkIn, checkOut, guests, adults, children, infants, cabinClass, pickup, dropoff, pickupDateCar, returnDateCar, carTripType, rankingSort]);
 
   // Apply filters and sorting
   useEffect(() => {
@@ -527,6 +539,28 @@ if (minRating && searchType !== "restaurants") {
 
   const [showSearchBar, setShowSearchBar] = useState(true);
   const [searchPerformed, setSearchPerformed] = useState(false);
+
+  const getRankingIcon = (type: string) => {
+    switch(type) {
+      case 'best_value': return <Trophy className="h-4 w-4" />;
+      case 'cheapest': return <DollarSign className="h-4 w-4" />;
+      case 'highest_rated': return <Star className="h-4 w-4" />;
+      case 'closest': return <MapPin className="h-4 w-4" />;
+      case 'fastest': return <Zap className="h-4 w-4" />;
+      default: return <Trophy className="h-4 w-4" />;
+    }
+  };
+
+  const getRankingLabel = (type: string) => {
+    switch(type) {
+      case 'best_value': return 'Best Value';
+      case 'cheapest': return 'Cheapest';
+      case 'highest_rated': return 'Highest Rated';
+      case 'closest': return 'Closest';
+      case 'fastest': return 'Fastest';
+      default: return 'Best Value';
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">

@@ -198,6 +198,54 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "create_package",
+          description: "Create a bundled travel package combining flight, hotel, and/or car rental with a 7% discount. Use after user has selected their preferred options.",
+          parameters: {
+            type: "object",
+            properties: {
+              destination: { type: "string", description: "Destination city" },
+              departureDate: { type: "string", description: "Departure date in YYYY-MM-DD format" },
+              returnDate: { type: "string", description: "Return date in YYYY-MM-DD format" },
+              travelers: { type: "number", description: "Number of travelers" },
+              selectedFlight: { 
+                type: "object",
+                description: "Selected flight details with price",
+                properties: {
+                  id: { type: "string" },
+                  price: { type: "number" },
+                  airline: { type: "string" },
+                  departure: { type: "string" },
+                  arrival: { type: "string" }
+                }
+              },
+              selectedHotel: { 
+                type: "object",
+                description: "Selected hotel details with price",
+                properties: {
+                  id: { type: "string" },
+                  price: { type: "number" },
+                  name: { type: "string" },
+                  nights: { type: "number" }
+                }
+              },
+              selectedCar: { 
+                type: "object",
+                description: "Selected car rental details with price",
+                properties: {
+                  id: { type: "string" },
+                  price: { type: "number" },
+                  type: { type: "string" },
+                  days: { type: "number" }
+                }
+              }
+            },
+            required: ["destination", "departureDate", "returnDate"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "set_ranking_preference",
           description: "Update how search results should be ranked based on user preference. Use when user expresses a preference like 'show me the cheapest' or 'what's closest to the city center'.",
           parameters: {
@@ -299,6 +347,13 @@ Goldsainte's Unique Value:
 - Flexible choice: Use AI alone, agent alone, or both together
 - Competitive marketplace ensures best pricing
 - Seamless handoff from AI to agent when needed
+
+PACKAGE BUNDLING:
+- When user shows interest in multiple services (flight + hotel, or flight + hotel + car), suggest creating a bundled package
+- Bundles save 7% compared to booking separately
+- After user selects individual options, ask: "Would you like me to bundle these together into a package? You'll save 7% compared to booking separately."
+- Use create_package tool to generate the bundled offer
+- Present packages clearly showing itemized breakdown and total savings
 
 RANKING AND SORTING:
 - Results are shown as "Best Value" by default (balancing price, rating, and location)
@@ -473,6 +528,8 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_flights': 'unified-search-flights',
             'search_hotels': 'unified-search-hotels',
             'search_restaurants': 'tripadvisor-search-restaurants',
+            'search_cars': 'amadeus-search-cars',
+            'create_package': 'create-travel-package',
             'search_events': 'search-events',
             'search_cars': 'amadeus-search-cars',
             'check_visa_requirements': 'check-visa-requirements',

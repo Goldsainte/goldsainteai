@@ -42,7 +42,7 @@ serve(async (req) => {
   const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
 
   try {
-    const { location, cuisine, priceRange } = await req.json();
+    const { location, cuisine, priceRange, sortBy = 'best_value' } = await req.json();
     
     // Initialize Supabase client for ranking
     const supabaseClient = createClient(
@@ -265,11 +265,52 @@ serve(async (req) => {
       await new Promise((r) => setTimeout(r, 250));
     }
 
+    // City center coordinates map for distance calculation
+    const cityCenterCoords: { [key: string]: { lat: number; lng: number } } = {
+      'paris': { lat: 48.8566, lng: 2.3522 },
+      'london': { lat: 51.5074, lng: -0.1278 },
+      'new york': { lat: 40.7128, lng: -74.0060 },
+      'tokyo': { lat: 35.6762, lng: 139.6503 },
+      'rome': { lat: 41.9028, lng: 12.4964 },
+      'barcelona': { lat: 41.3851, lng: 2.1734 },
+      'amsterdam': { lat: 52.3676, lng: 4.9041 },
+      'dubai': { lat: 25.2048, lng: 55.2708 },
+      'singapore': { lat: 1.3521, lng: 103.8198 },
+      'sydney': { lat: -33.8688, lng: 151.2093 },
+      'los angeles': { lat: 34.0522, lng: -118.2437 },
+      'san francisco': { lat: 37.7749, lng: -122.4194 },
+      'miami': { lat: 25.7617, lng: -80.1918 },
+      'chicago': { lat: 41.8781, lng: -87.6298 },
+      'boston': { lat: 42.3601, lng: -71.0589 }
+    };
+
+    // Calculate distance from city center
+    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+      const R = 6371; // Radius of Earth in km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    };
+
+    const locationKey = location.toLowerCase().split(',')[0].trim();
+    const cityCenter = cityCenterCoords[locationKey] || { lat: 0, lng: 0 };
+
     const validRestaurants = restaurantDetails.filter((restaurant: any) => {
       if (!restaurant) return false;
       const hasPhoto = !!restaurant.photoUrl || (Array.isArray(restaurant.photos) && restaurant.photos.length > 0);
       const hasQuality = (Array.isArray(restaurant.reviews) && restaurant.reviews.length > 0) || (Number(restaurant.rating) > 0);
       return hasPhoto && hasQuality;
+    }).map(r => {
+      // Calculate distance if coordinates available
+      const distance = (r.latitude && r.longitude && cityCenter.lat !== 0)
+        ? calculateDistance(cityCenter.lat, cityCenter.lng, r.latitude, r.longitude)
+        : 999; // Default high distance if coords unavailable
+      
+      return { ...r, distance };
     });
 
     // Rank restaurants using Supabase client
@@ -281,9 +322,9 @@ serve(async (req) => {
             ...r,
             price: r.price_level ? r.price_level.length * 15 : 30,
             reviewCount: r.num_reviews || 0,
-            distance: 0
+            distance: r.distance
           })),
-          sortBy: 'best_value'
+          sortBy: sortBy
         }
       });
       

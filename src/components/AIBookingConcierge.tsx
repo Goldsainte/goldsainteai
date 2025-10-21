@@ -16,6 +16,7 @@ import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 import { CompactFlightCard } from "./CompactFlightCard";
 import { CompactHotelCard } from "./CompactHotelCard";
 import { CompactCarCard } from "./CompactCarCard";
+import { TravelPackageCard } from "./TravelPackageCard";
 
 interface Message {
   role: 'user' | 'assistant';
