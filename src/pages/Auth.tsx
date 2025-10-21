@@ -273,10 +273,8 @@ const Auth = () => {
           <h1 className="text-3xl font-semibold mb-2">
             {isMobile ? 'Log in or sign up' : 'Welcome back'}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {isMobile 
-              ? 'Get smarter responses and unlock all features' 
-              : 'Sign in to access your personalized AI travel agent'}
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            Sign in to plan fast, save big, and travel smarter — powered by AI, agents, and creators.
           </p>
         </div>
 
