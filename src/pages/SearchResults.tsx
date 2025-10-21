@@ -49,6 +49,8 @@ const SearchResults = () => {
   const [selectedEventCategories, setSelectedEventCategories] = useState<string[]>([]);
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [flightDictionaries, setFlightDictionaries] = useState<any>(null);
+  const [showSearchBar, setShowSearchBar] = useState(true);
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -537,9 +539,6 @@ if (minRating && searchType !== "restaurants") {
     setFilteredResults(filtered);
   }, [results, priceRange, minRating, sortBy, selectedAmenities, selectedPropertyTypes, selectedStarRatings, selectedCuisines, selectedDietary, selectedEventCategories]);
 
-  const [showSearchBar, setShowSearchBar] = useState(true);
-  const [searchPerformed, setSearchPerformed] = useState(false);
-
   const getRankingIcon = (type: string) => {
     switch(type) {
       case 'best_value': return <Trophy className="h-4 w-4" />;
@@ -637,6 +636,59 @@ if (minRating && searchType !== "restaurants") {
                       {pickupDateCar} to {returnDateCar} • {pickupCode}{dropoffCode && pickupCode !== dropoffCode ? ` → ${dropoffCode}` : ''}
                     </p>
                   </div>
+                )}
+              </div>
+              
+              {/* Ranking Pills - show for all search types */}
+              <div className="flex flex-wrap gap-2 pb-2">
+                <Button
+                  variant={rankingSort === 'best_value' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setRankingSort('best_value')}
+                  className="flex items-center gap-1"
+                >
+                  <Trophy className="h-3 w-3" />
+                  Best Value
+                </Button>
+                <Button
+                  variant={rankingSort === 'cheapest' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setRankingSort('cheapest')}
+                  className="flex items-center gap-1"
+                >
+                  <DollarSign className="h-3 w-3" />
+                  Cheapest
+                </Button>
+                <Button
+                  variant={rankingSort === 'highest_rated' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setRankingSort('highest_rated')}
+                  className="flex items-center gap-1"
+                >
+                  <Star className="h-3 w-3" />
+                  Highest Rated
+                </Button>
+                {(searchType === 'hotels' || searchType === 'restaurants') && (
+                  <Button
+                    variant={rankingSort === 'closest' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setRankingSort('closest')}
+                    className="flex items-center gap-1"
+                  >
+                    <MapPin className="h-3 w-3" />
+                    Closest
+                  </Button>
+                )}
+                {searchType === 'flights' && (
+                  <Button
+                    variant={rankingSort === 'fastest' ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setRankingSort('fastest')}
+                    className="flex items-center gap-1"
+                  >
+                    <Zap className="h-3 w-3" />
+                    Fastest
+                  </Button>
                 )}
               </div>
               

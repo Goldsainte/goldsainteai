@@ -5,6 +5,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Persistent trip context across tool calls (stores ranking preferences)
+const tripContext: {
+  rankingPreferences: {
+    flights?: string;
+    hotels?: string;
+    cars?: string;
+    restaurants?: string;
+  };
+} = {
+  rankingPreferences: {}
+};
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -548,21 +560,35 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               updated_fields: Object.keys(args.updates || {})
             };
           } else if (functionName === 'set_ranking_preference') {
-            // Handle set_ranking_preference inline
+            // Store ranking preference in tripContext
+            tripContext.rankingPreferences[args.resultType as 'flights' | 'hotels' | 'cars' | 'restaurants'] = args.sortBy;
             result = { 
               success: true, 
-              message: `Results will now be sorted by ${args.sortBy} for ${args.resultType}` 
+              message: `Results will now be sorted by ${args.sortBy} for ${args.resultType}`,
+              currentPreferences: tripContext.rankingPreferences
             };
           } else if (!edgeFunctionName) {
             result = { error: `Unknown function: ${functionName}` };
           } else {
+            // Add sortBy from tripContext to search calls
+            let requestBody = { ...args };
+            if (functionName === 'search_flights') {
+              requestBody.sortBy = tripContext.rankingPreferences.flights || 'best_value';
+            } else if (functionName === 'search_hotels') {
+              requestBody.sortBy = tripContext.rankingPreferences.hotels || 'best_value';
+            } else if (functionName === 'search_cars') {
+              requestBody.sortBy = tripContext.rankingPreferences.cars || 'best_value';
+            } else if (functionName === 'search_restaurants') {
+              requestBody.sortBy = tripContext.rankingPreferences.restaurants || 'best_value';
+            }
+            
             const toolResponse = await fetch(`${supabaseUrl}/functions/v1/${edgeFunctionName}`, {
               method: 'POST',
               headers: {
                 'Authorization': `Bearer ${supabaseKey}`,
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify(args),
+              body: JSON.stringify(requestBody),
             });
             
             result = await toolResponse.json();
