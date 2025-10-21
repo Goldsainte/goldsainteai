@@ -19,7 +19,7 @@ export default function AIAgentOnboarding() {
 
   // Agent configuration state
   const [selectedVoice, setSelectedVoice] = useState("alloy");
-  const [agentName, setAgentName] = useState("My Travel Assistant");
+  const [agentName, setAgentName] = useState("Madison");
   const [travelPreferences, setTravelPreferences] = useState<any>({});
 
   const totalSteps = 3;

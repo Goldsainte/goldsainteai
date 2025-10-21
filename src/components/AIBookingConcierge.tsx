@@ -101,7 +101,7 @@ export const AIBookingConcierge = () => {
 
       // Set initial greeting only if not restoring a conversation
       if (shouldUseInitialGreeting) {
-        const agentName = data?.agent_name || "your Goldsainte AI Concierge";
+        const agentName = data?.agent_name || "Madison";
         console.log('Setting initial greeting with agent:', agentName);
         setMessages([{
           role: 'assistant',
@@ -202,7 +202,7 @@ export const AIBookingConcierge = () => {
     localStorage.removeItem('aiConciergeConversation');
     
     // Reset to initial greeting with detailed instructions
-    const agentName = agentProfile?.agent_name || "your Goldsainte AI Concierge";
+    const agentName = agentProfile?.agent_name || "Madison";
     setMessages([{
       role: 'assistant',
       content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
@@ -480,34 +480,6 @@ export const AIBookingConcierge = () => {
               // User finished speaking - start processing state
               console.log('User finished speaking, starting processing state');
               setIsProcessing(true);
-              
-              const transcript = message.transcript?.toLowerCase() || '';
-              
-              // Detect Uber/ride intent and bridge to chat concierge
-              if ((transcript.includes('uber') || transcript.includes('ride') || transcript.includes('transportation')) && 
-                  (transcript.includes('from') || transcript.includes('to'))) {
-                // Try to parse from...to...
-                const fromMatch = transcript.match(/from\s+([^to]+?)(?:\s+to\s+|\s*$)/i);
-                const toMatch = transcript.match(/to\s+(.+?)(?:\s*$)/i);
-                
-                if (fromMatch && toMatch) {
-                  const fromLocation = fromMatch[1].trim();
-                  const toLocation = toMatch[1].trim();
-                  
-                  toast({
-                    title: "Fetching Uber options...",
-                    description: `From ${fromLocation} to ${toLocation}`,
-                  });
-                  
-                  // Dispatch programmatic message to trigger get_uber_estimate
-                  setTimeout(() => {
-                    sendProgrammaticMessage(
-                      `Please get Uber price estimates from ${fromLocation} to ${toLocation} and show me the options.`
-                    );
-                  }, 500);
-                }
-              }
-              
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
               saveConversationData();
             } else if (message.type === 'input_audio_buffer.speech_stopped') {
