@@ -124,6 +124,8 @@ serve(async (req) => {
     const params = await req.json();
     console.log('Unified flight search request:', params);
     
+    const sortBy = params.sortBy || 'best_value'; // Extract sortBy parameter
+    
     // Determine currency from destination
     const currencyCode = params.destinationCity 
       ? getCurrencyFromLocation(params.destinationCity) 
@@ -198,7 +200,7 @@ serve(async (req) => {
             price: parseFloat(f.price.total),
             rating: 4.0 // Default for flights
           })),
-          sortBy: 'best_value'
+          sortBy: sortBy
         }
       });
 

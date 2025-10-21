@@ -15,6 +15,7 @@ import { WakeWordDetector } from "@/utils/WakeWordDetector";
 import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 import { CompactFlightCard } from "./CompactFlightCard";
 import { CompactHotelCard } from "./CompactHotelCard";
+import { CompactCarCard } from "./CompactCarCard";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -765,6 +766,21 @@ export const AIBookingConcierge = () => {
                             <CompactHotelCard 
                               key={hotelIdx} 
                               property={hotel}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    
+                    // Display car rental search results
+                    if (result.data && Array.isArray(result.data) && result.data.length > 0 && result.data[0].vehicle) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                          <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.data.length)} car rental options:</p>
+                          {result.data.slice(0, 3).map((car: any, carIdx: number) => (
+                            <CompactCarCard 
+                              key={carIdx} 
+                              car={car}
                             />
                           ))}
                         </div>

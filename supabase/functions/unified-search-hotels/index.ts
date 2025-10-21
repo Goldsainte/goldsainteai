@@ -265,7 +265,7 @@ serve(async (req) => {
   const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
   
   try {
-    const { location, checkIn, checkOut, guests = 2 } = await req.json();
+    const { location, checkIn, checkOut, guests = 2, sortBy = 'best_value' } = await req.json();
     if (!location || !checkIn || !checkOut) {
       clearTimeout(timeoutId);
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
@@ -384,7 +384,7 @@ serve(async (req) => {
 
     const responseData = { results };
     
-    // Rank results by best value using Supabase client
+    // Rank results using user's preference or default to best_value
     try {
       const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
         body: {
@@ -393,7 +393,7 @@ serve(async (req) => {
             distance: 0, // TODO: Calculate from city center
             reviewCount: r.num_reviews
           })),
-          sortBy: 'best_value'
+          sortBy: sortBy
         }
       });
       

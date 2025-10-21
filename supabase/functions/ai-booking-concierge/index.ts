@@ -181,6 +181,46 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "search_cars",
+          description: "Search for rental cars at a specific location. Returns car rental options with prices, vehicle types, and rental company details.",
+          parameters: {
+            type: "object",
+            properties: {
+              pickupLocation: { type: "string", description: "Pickup location (city or airport code)" },
+              pickupDate: { type: "string", description: "Pickup date in YYYY-MM-DD format" },
+              dropoffDate: { type: "string", description: "Dropoff date in YYYY-MM-DD format" },
+              dropoffLocation: { type: "string", description: "Dropoff location if different from pickup (optional)" }
+            },
+            required: ["pickupLocation", "pickupDate", "dropoffDate"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "set_ranking_preference",
+          description: "Update how search results should be ranked based on user preference. Use when user expresses a preference like 'show me the cheapest' or 'what's closest to the city center'.",
+          parameters: {
+            type: "object",
+            properties: {
+              resultType: { 
+                type: "string",
+                enum: ["flights", "hotels", "cars", "restaurants"],
+                description: "What type of results to rank"
+              },
+              sortBy: { 
+                type: "string",
+                enum: ["best_value", "cheapest", "closest", "highest_rated", "fastest"],
+                description: "How to rank the results"
+              }
+            },
+            required: ["resultType", "sortBy"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "check_visa_requirements",
           description: "Check visa requirements when traveling from one country to another.",
           parameters: {
@@ -260,8 +300,25 @@ Goldsainte's Unique Value:
 - Competitive marketplace ensures best pricing
 - Seamless handoff from AI to agent when needed
 
+RANKING AND SORTING:
+- Results are shown as "Best Value" by default (balancing price, rating, and location)
+- When user asks to see results differently, use set_ranking_preference tool
+- Common requests:
+  * "Show me the cheapest options" → sortBy: "cheapest"
+  * "What's closest to downtown/city center?" → sortBy: "closest"  
+  * "Show me the best rated hotels" → sortBy: "highest_rated"
+  * "What's the fastest flight?" → sortBy: "fastest"
+- After changing ranking, confirm: "I've re-sorted the results by [preference]. Here are your top options:"
+- Explain badges:
+  * 🏆 Best Overall/Best Value - Best combination of price, quality, and location
+  * 💰 Cheapest Option - Lowest price available
+  * ⭐ Highest Rated - Top customer reviews
+  * 📍 Closest to Center - Nearest to city center/main area
+  * ⚡ Fastest - Shortest travel time
+  * ✈️ Non-Stop - Direct flights only
+
 CRITICAL RULES:
-1. I CAN SEARCH AND RECOMMEND travel options - I help you find the perfect flights, hotels, restaurants, events, and check visa requirements
+1. I CAN SEARCH AND RECOMMEND travel options - I help you find the perfect flights, hotels, rental cars, restaurants, events, and check visa requirements
    - In voice mode, SAY THIS: "I can help you search for flights, hotels, rental cars, restaurants, and events - plus check visa requirements."
 2. ALWAYS collect complete details before searching: dates, location, number of guests, preferences
 3. WHEN USERS CHANGE THEIR MIND: Use the update_trip_context tool immediately
@@ -417,10 +474,12 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_hotels': 'unified-search-hotels',
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_events': 'search-events',
+            'search_cars': 'amadeus-search-cars',
             'check_visa_requirements': 'check-visa-requirements',
             'request_agent_contact': 'create-agent-inquiry',
             'generate_itinerary': 'generate-trip-itinerary',
-            'update_trip_context': null // Handled inline
+            'update_trip_context': null, // Handled inline
+            'set_ranking_preference': null // Handled inline
           };
           
           const edgeFunctionName = functionMap[functionName];
@@ -431,6 +490,12 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               success: true, 
               message: "Trip details updated successfully",
               updated_fields: Object.keys(args.updates || {})
+            };
+          } else if (functionName === 'set_ranking_preference') {
+            // Handle set_ranking_preference inline
+            result = { 
+              success: true, 
+              message: `Results will now be sorted by ${args.sortBy} for ${args.resultType}` 
             };
           } else if (!edgeFunctionName) {
             result = { error: `Unknown function: ${functionName}` };

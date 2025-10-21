@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 export interface Favorite {
   id: string;
   user_id: string;
-  favorite_type: 'flight' | 'hotel' | 'restaurant';
+  favorite_type: 'flight' | 'hotel' | 'restaurant' | 'car';
   favorite_data: any;
   created_at: string;
 }
@@ -47,7 +47,7 @@ export const useFavorites = () => {
     }
   };
 
-  const addFavorite = async (type: 'flight' | 'hotel' | 'restaurant', data: any) => {
+  const addFavorite = async (type: 'flight' | 'hotel' | 'restaurant' | 'car', data: any) => {
     if (!user) {
       toast({
         title: "Sign in required",
@@ -121,7 +121,7 @@ export const useFavorites = () => {
     }
   };
 
-  const isFavorite = (type: 'flight' | 'hotel' | 'restaurant', itemData: any): string | null => {
+  const isFavorite = (type: 'flight' | 'hotel' | 'restaurant' | 'car', itemData: any): string | null => {
     const favorite = favorites.find(
       (fav) => fav.favorite_type === type && JSON.stringify(fav.favorite_data) === JSON.stringify(itemData)
     );
