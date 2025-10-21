@@ -27,6 +27,8 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useAuth } from "@/contexts/AuthContext";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
+import { getUserLocation } from "@/lib/locationMapping";
+import { fetchUberFallback } from "@/lib/simpleCarSearchFallback";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 
 const SearchResults = () => {
@@ -56,6 +58,12 @@ const SearchResults = () => {
   const [uberProducts, setUberProducts] = useState<any[]>([]);
   const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
   const [isUberModalOpen, setIsUberModalOpen] = useState(false);
+  const [selectedPickupLat, setSelectedPickupLat] = useState<string | undefined>();
+  const [selectedPickupLng, setSelectedPickupLng] = useState<string | undefined>();
+  const [selectedDropoffLat, setSelectedDropoffLat] = useState<string | undefined>();
+  const [selectedDropoffLng, setSelectedDropoffLng] = useState<string | undefined>();
+  const [selectedPickupAddress, setSelectedPickupAddress] = useState<string | undefined>();
+  const [selectedDropoffAddress, setSelectedDropoffAddress] = useState<string | undefined>();
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -933,8 +941,17 @@ if (minRating && searchType !== "restaurants") {
                       }
                     })}
                     
-                    {searchType === "transportation" && uberProducts.length > 0 && (
+                    {/* Show Uber products for transportation OR cars (when only location provided) */}
+                    {((searchType === "transportation") || (searchType === "cars" && !pickup && location)) && uberProducts.length > 0 && (
                       <div className="space-y-6">
+                        {searchType === "cars" && !pickup && location && (
+                          <div className="mb-4 p-4 bg-accent/50 rounded-lg border border-border">
+                            <p className="text-sm text-muted-foreground">
+                              Showing instant ride options for <span className="font-semibold text-foreground">{location}</span>. 
+                              For traditional car rentals, use the search bar above to specify pickup/return dates and airport code (e.g., LAX, JFK).
+                            </p>
+                          </div>
+                        )}
                         <div className="space-y-4">
                           <div className="flex items-center justify-between">
                             <h3 className="text-lg font-semibold">Instant Uber Options</h3>
@@ -948,6 +965,12 @@ if (minRating && searchType !== "restaurants") {
                                 onBook={() => {
                                   setSelectedUberProduct(product);
                                   setIsUberModalOpen(true);
+                                  setSelectedPickupLat(searchParams.get('pickupLat') || undefined);
+                                  setSelectedPickupLng(searchParams.get('pickupLng') || undefined);
+                                  setSelectedDropoffLat(searchParams.get('dropoffLat') || undefined);
+                                  setSelectedDropoffLng(searchParams.get('dropoffLng') || undefined);
+                                  setSelectedPickupAddress(searchParams.get('pickupAddress') || undefined);
+                                  setSelectedDropoffAddress(searchParams.get('dropoffAddress') || undefined);
                                 }}
                               />
                             ))}
@@ -976,10 +999,12 @@ if (minRating && searchType !== "restaurants") {
           onClose={() => setIsUberModalOpen(false)}
           productId={selectedUberProduct.product_id}
           productName={selectedUberProduct.display_name}
-          pickupLat={searchParams.get('pickupLat') || undefined}
-          pickupLng={searchParams.get('pickupLng') || undefined}
-          dropoffLat={searchParams.get('dropoffLat') || undefined}
-          dropoffLng={searchParams.get('dropoffLng') || undefined}
+          pickupLat={selectedPickupLat}
+          pickupLng={selectedPickupLng}
+          dropoffLat={selectedDropoffLat}
+          dropoffLng={selectedDropoffLng}
+          pickupAddress={selectedPickupAddress}
+          dropoffAddress={selectedDropoffAddress}
         />
       )}
     </div>

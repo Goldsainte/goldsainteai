@@ -580,6 +580,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_hotels': 'unified-search-hotels',
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_cars': 'amadeus-search-cars',
+            'search_cars': 'amadeus-search-cars',
             'create_package': 'create-travel-package',
             'search_events': 'search-events',
             'check_visa_requirements': 'check-visa-requirements',
