@@ -4,7 +4,7 @@ project_id = "iwdevxltjuedijrcdejs"
 verify_jwt = true
 
 [functions.uber-get-products]
-verify_jwt = true
+verify_jwt = false
 
 [functions.seed-content-creators]
 verify_jwt = false

@@ -64,6 +64,7 @@ const SearchResults = () => {
   const [selectedDropoffLng, setSelectedDropoffLng] = useState<string | undefined>();
   const [selectedPickupAddress, setSelectedPickupAddress] = useState<string | undefined>();
   const [selectedDropoffAddress, setSelectedDropoffAddress] = useState<string | undefined>();
+  const [uberFallbackMode, setUberFallbackMode] = useState(false);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -131,6 +132,44 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
     loadPreferences();
   }, [user]);
+
+  // Polling for Uber updates when in transportation or fallback mode
+  useEffect(() => {
+    if (searchType !== "transportation" && !uberFallbackMode) return;
+    
+    const pollUberUpdates = async () => {
+      const pickupLat = searchParams.get('pickupLat');
+      const pickupLng = searchParams.get('pickupLng');
+      const dropoffLat = searchParams.get('dropoffLat');
+      const dropoffLng = searchParams.get('dropoffLng');
+
+      if (searchType === "transportation" && pickupLat && pickupLng && dropoffLat && dropoffLng) {
+        try {
+          const { data: uberData } = await supabase.functions.invoke('uber-get-products', {
+            body: {
+              pickupLatitude: parseFloat(pickupLat),
+              pickupLongitude: parseFloat(pickupLng),
+              dropoffLatitude: parseFloat(dropoffLat),
+              dropoffLongitude: parseFloat(dropoffLng),
+            }
+          });
+          if (uberData?.products) {
+            setUberProducts(uberData.products);
+          }
+        } catch (err) {
+          console.error('Uber polling error:', err);
+        }
+      } else if (uberFallbackMode && location) {
+        const { products } = await fetchUberFallback(location);
+        if (products) {
+          setUberProducts(products);
+        }
+      }
+    };
+
+    const intervalId = setInterval(pollUberUpdates, 15000); // Poll every 15 seconds
+    return () => clearInterval(intervalId);
+  }, [searchType, uberFallbackMode, location, searchParams]);
 
   useEffect(() => {
     const performSearch = async () => {
@@ -352,6 +391,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             setResults([]);
             setFilteredResults([]);
             setError(null);
+            setUberFallbackMode(true);
             
             const { products, error: uberError } = await fetchUberFallback(location);
             if (uberError) {
@@ -661,8 +701,8 @@ if (minRating && searchType !== "restaurants") {
           </Button>
         </div>
         
-        {/* Search bar - hidden on mobile by default, always visible on desktop */}
-        <div className={`mb-6 ${showSearchBar ? 'block' : 'hidden md:block'}`}>
+        {/* Search bar - always visible */}
+        <div className="mb-6">
           <EnhancedSearchBar />
         </div>
 
@@ -714,8 +754,8 @@ if (minRating && searchType !== "restaurants") {
                 )}
               </div>
               
-              {/* Ranking Pills - show for all search types */}
-              <div className="flex flex-wrap gap-2 pb-2">
+              {/* Ranking Pills - mobile-friendly with horizontal scroll */}
+              <div className="flex gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
                 <Button
                   variant={rankingSort === 'best_value' ? 'default' : 'outline'}
                   size="sm"
