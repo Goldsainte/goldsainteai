@@ -6743,6 +6743,84 @@ export type Database = {
           },
         ]
       }
+      travel_packages: {
+        Row: {
+          booking_cta: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          creator_id: string
+          creator_story: string | null
+          currency: string
+          dates_info: Json | null
+          description: string | null
+          destination: string
+          duration_days: number
+          id: string
+          images: string[] | null
+          is_active: boolean | null
+          location_details: Json | null
+          package_summary: string | null
+          price: number
+          pricing_details: Json | null
+          region: string | null
+          title: string
+          updated_at: string
+          video_url: string | null
+          whats_included: Json | null
+        }
+        Insert: {
+          booking_cta?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          creator_id: string
+          creator_story?: string | null
+          currency?: string
+          dates_info?: Json | null
+          description?: string | null
+          destination: string
+          duration_days: number
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          location_details?: Json | null
+          package_summary?: string | null
+          price: number
+          pricing_details?: Json | null
+          region?: string | null
+          title: string
+          updated_at?: string
+          video_url?: string | null
+          whats_included?: Json | null
+        }
+        Update: {
+          booking_cta?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          creator_id?: string
+          creator_story?: string | null
+          currency?: string
+          dates_info?: Json | null
+          description?: string | null
+          destination?: string
+          duration_days?: number
+          id?: string
+          images?: string[] | null
+          is_active?: boolean | null
+          location_details?: Json | null
+          package_summary?: string | null
+          price?: number
+          pricing_details?: Json | null
+          region?: string | null
+          title?: string
+          updated_at?: string
+          video_url?: string | null
+          whats_included?: Json | null
+        }
+        Relationships: []
+      }
       travel_posts: {
         Row: {
           average_watch_percentage: number | null
