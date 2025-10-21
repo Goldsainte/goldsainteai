@@ -877,7 +877,7 @@ const Index = () => {
                   <Input
                     id="ai-search-input"
                     placeholder={rotatingMessages[currentMessageIndex]}
-                    className="w-full h-16 md:h-16 px-5 pr-16 text-base rounded-3xl border-2 border-[#BFAD72] shadow-sm focus-visible:ring-2 focus-visible:ring-[#BFAD72] focus-visible:ring-offset-2 placeholder:text-sm sm:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 touch-manipulation"
+                    className="w-full h-14 md:h-16 px-4 pr-14 md:px-5 md:pr-16 text-sm md:text-base rounded-3xl border-2 border-[#BFAD72] shadow-sm focus-visible:ring-2 focus-visible:ring-[#BFAD72] focus-visible:ring-offset-2 placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 touch-manipulation"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyPress={handleKeyPress}
@@ -888,14 +888,14 @@ const Index = () => {
                     onClick={() => handleSearch()}
                     size="icon"
                     variant="ghost"
-                    className="absolute right-4 md:right-3 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full hover:bg-muted touch-manipulation min-h-[48px] min-w-[48px]"
+                    className="absolute right-3 md:right-3 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-muted touch-manipulation min-h-[44px] min-w-[44px]"
                     disabled={isLoading}
                     aria-label="Submit search"
                   >
                     {isLoading ? (
-                      <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
+                      <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" aria-hidden="true" />
                     ) : (
-                      <Send className="h-6 w-6" aria-hidden="true" />
+                      <Send className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
                     )}
                   </Button>
                 </div>
@@ -1737,7 +1737,7 @@ const Index = () => {
                     <div className="relative">
                       <Input
                         placeholder={getPlaceholderText()}
-                        className="w-full h-12 px-4 pr-14 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="w-full h-11 md:h-12 px-4 pr-12 md:pr-14 text-sm md:text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={handleKeyPress}
