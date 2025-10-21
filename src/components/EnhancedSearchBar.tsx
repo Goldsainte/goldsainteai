@@ -272,7 +272,7 @@ export const EnhancedSearchBar = () => {
           type="button"
           variant={flightType === "round-trip" ? "default" : "outline"}
           onClick={() => setFlightType("round-trip")}
-          className="flex-1 h-11"
+          className="flex-1 h-11 text-sm md:text-base"
         >
           Round-trip
         </Button>
@@ -280,15 +280,15 @@ export const EnhancedSearchBar = () => {
           type="button"
           variant={flightType === "one-way" ? "default" : "outline"}
           onClick={() => setFlightType("one-way")}
-          className="flex-1 h-11"
+          className="flex-1 h-11 text-sm md:text-base"
         >
           One-way
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
+      <div className="space-y-3">
         {/* Origin */}
-        <div className="md:col-span-5">
+        <div>
           <AirportAutocomplete
             value={origin}
             onChange={setOrigin}
@@ -296,8 +296,8 @@ export const EnhancedSearchBar = () => {
           />
         </div>
 
-        {/* Swap button */}
-        <div className="md:col-span-2 flex items-center justify-center">
+        {/* Swap button - centered on mobile */}
+        <div className="flex justify-center md:hidden">
           <Button
             variant="ghost"
             size="icon"
@@ -309,7 +309,7 @@ export const EnhancedSearchBar = () => {
         </div>
 
         {/* Destination */}
-        <div className="md:col-span-5">
+        <div>
           <AirportAutocomplete
             value={destination}
             onChange={setDestination}
@@ -318,13 +318,14 @@ export const EnhancedSearchBar = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+      {/* Dates - stacked on mobile, side-by-side on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {/* Departure Date */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !departureDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !departureDate && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -349,9 +350,9 @@ export const EnhancedSearchBar = () => {
         {flightType === "round-trip" && (
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !returnDate && "text-muted-foreground")}> 
-                <Calendar className="mr-2 h-4 w-4" />
-                {returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}
+              <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !returnDate && "text-muted-foreground")}> 
+                <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span className="truncate">{returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}</span>
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -366,16 +367,18 @@ export const EnhancedSearchBar = () => {
             </PopoverContent>
           </Popover>
         )}
+      </div>
 
-        {/* Passengers & Class */}
+      {/* Passengers & Cabin - stacked on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Popover open={showPassengerPopover} onOpenChange={setShowPassengerPopover}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 justify-start text-left font-normal">
-              <Users className="mr-2 h-4 w-4" />
-              {totalFlightPassengers} Passenger{totalFlightPassengers !== 1 ? "s" : ""}
+            <Button variant="outline" className="h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base">
+              <Users className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{totalFlightPassengers} Passenger{totalFlightPassengers !== 1 ? "s" : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="start">
+          <PopoverContent className="w-full max-w-sm" align="start">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -430,7 +433,7 @@ export const EnhancedSearchBar = () => {
 
         {/* Cabin Class */}
         <Select value={cabinClass} onValueChange={setCabinClass}>
-          <SelectTrigger className="h-12">
+          <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
             <SelectValue placeholder="Class" />
           </SelectTrigger>
           <SelectContent>
@@ -455,13 +458,14 @@ export const EnhancedSearchBar = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+      {/* Dates & Guests - all stacked on mobile */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Check-in */}
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !checkInDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !checkInDate && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -479,9 +483,9 @@ export const EnhancedSearchBar = () => {
         {/* Check-out */}
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !checkOutDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !checkOutDate && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -499,12 +503,12 @@ export const EnhancedSearchBar = () => {
         {/* Guests & Rooms */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-12 justify-start text-left font-normal md:col-span-2">
-              <Users className="mr-2 h-4 w-4" />
-              {totalHotelGuests} Guest{totalHotelGuests !== 1 ? "s" : ""}, {rooms} Room{rooms !== 1 ? "s" : ""}
+            <Button variant="outline" className="h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base">
+              <Users className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{totalHotelGuests} Guest{totalHotelGuests !== 1 ? "s" : ""}, {rooms} Room{rooms !== 1 ? "s" : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="start">
+          <PopoverContent className="w-full max-w-sm" align="start">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="font-medium">Rooms</p>
@@ -572,9 +576,9 @@ export const EnhancedSearchBar = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !restaurantDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {restaurantDate ? format(restaurantDate, "MMM dd, yyyy") : "Select date"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !restaurantDate && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{restaurantDate ? format(restaurantDate, "MMM dd, yyyy") : "Select date"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -590,7 +594,7 @@ export const EnhancedSearchBar = () => {
         </Popover>
 
         <Select value={restaurantTime} onValueChange={setRestaurantTime}>
-          <SelectTrigger className="h-12">
+          <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
             <SelectValue placeholder="Time" />
           </SelectTrigger>
           <SelectContent>
@@ -605,7 +609,7 @@ export const EnhancedSearchBar = () => {
         </Select>
 
         <Select value={partySize.toString()} onValueChange={(v) => setPartySize(parseInt(v))}>
-          <SelectTrigger className="h-12">
+          <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
             <SelectValue placeholder="Party size" />
           </SelectTrigger>
           <SelectContent>
@@ -634,9 +638,9 @@ export const EnhancedSearchBar = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal", !eventDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {eventDate ? format(eventDate, "MMM dd, yyyy") : "Event date"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !eventDate && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{eventDate ? format(eventDate, "MMM dd, yyyy") : "Event date"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -652,7 +656,7 @@ export const EnhancedSearchBar = () => {
         </Popover>
 
         <Select value={eventCategory} onValueChange={setEventCategory}>
-          <SelectTrigger className="h-12">
+          <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
           <SelectContent>
@@ -706,9 +710,9 @@ export const EnhancedSearchBar = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal w-full", !pickupDateCar && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {pickupDateCar ? format(pickupDateCar, "MMM dd, yyyy") : "Pick-up date"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal w-full text-sm md:text-base", !pickupDateCar && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{pickupDateCar ? format(pickupDateCar, "MMM dd, yyyy") : "Pick-up date"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -725,9 +729,9 @@ export const EnhancedSearchBar = () => {
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-12 justify-start text-left font-normal w-full", !returnDateCar && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4" />
-              {returnDateCar ? format(returnDateCar, "MMM dd, yyyy") : "Return date"}
+            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal w-full text-sm md:text-base", !returnDateCar && "text-muted-foreground")}>
+              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{returnDateCar ? format(returnDateCar, "MMM dd, yyyy") : "Return date"}</span>
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
@@ -808,8 +812,8 @@ export const EnhancedSearchBar = () => {
         {searchType === "events" && renderEventSearch()}
         {searchType === "cars" && renderCarSearch()}
 
-        <Button className="w-full mt-6 h-14 text-lg font-semibold bg-primary hover:bg-primary/90" onClick={handleSearch}>
-          <Search className="h-5 w-5 mr-2" />
+        <Button className="w-full mt-6 h-12 md:h-14 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90" onClick={handleSearch}>
+          <Search className="h-5 w-5 mr-2 flex-shrink-0" />
           Search {searchType}
         </Button>
       </div>
