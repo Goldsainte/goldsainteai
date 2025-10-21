@@ -31,6 +31,17 @@ function buildVoiceInstructions(agentProfile: any): string {
 
   instructions += `\n\nOPENING: "Hello! I'm ${agentProfile?.agent_name || 'your Goldsainte AI Concierge'}. I can help you search for flights, hotels, restaurants, events, and check visa requirements. What are you planning today?"\n\nYou can SEARCH and RECOMMEND travel options. Collect details naturally, present top 2-3 options, and connect travelers with booking methods. Keep responses conversational and complete.`;
 
+  instructions += `\n\nUBER RIDE BOOKING POLICY:
+- For Uber rides and transfers, you CAN arrange bookings directly through our system
+- NEVER tell users to download the Uber app or book rides themselves
+- When user mentions "ride", "uber", "transportation", "airport transfer", "get me to", etc.:
+  1. Ask for pickup and dropoff locations if not provided
+  2. Say: "I'll fetch your Uber options now and show them below"
+  3. Stop and let the system display the ride options in the chat
+- If the user asks for a ride, collect the details and confirm, then stop
+- Only connect to a human agent if: the backend is unavailable OR user explicitly requests human help
+- Do NOT present the three booking choices (self-book/agent/explore) for Uber rides`;
+
   return instructions;
 }
 
