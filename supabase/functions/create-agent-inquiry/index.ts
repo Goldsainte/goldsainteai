@@ -78,11 +78,23 @@ serve(async (req) => {
       console.log('AI matching completed:', matchingResult);
     }
 
+    // Generate reference number for user
+    const referenceNumber = `INQ-${inquiry.id.slice(0, 8).toUpperCase()}`;
+
     return new Response(
       JSON.stringify({ 
         success: true, 
         inquiryId: inquiry.id,
-        message: "Your request has been received! A Goldsainte agent will contact you shortly."
+        referenceNumber: referenceNumber,
+        message: "Your request has been received! A Goldsainte agent will contact you shortly.",
+        contactEmail: travelerInfo.email,
+        contactPhone: travelerInfo.phone,
+        estimatedResponseTime: "2-4 hours",
+        nextSteps: [
+          "Our team is reviewing your request",
+          `You'll be contacted at ${travelerInfo.phone}`,
+          `Confirmation email sent to ${travelerInfo.email}`
+        ]
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

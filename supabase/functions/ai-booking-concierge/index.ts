@@ -77,20 +77,29 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "request_agent_contact",
-          description: "When user requests to be contacted by a Goldsainte travel agent instead of booking directly. Save their information and conversation.",
+          description: "When user requests to be contacted by a Goldsainte travel agent. CRITICAL: You MUST collect ALL required information before calling this tool.",
           parameters: {
             type: "object",
             properties: {
               travelerInfo: {
                 type: "object",
-                description: "Traveler contact information",
+                description: "Traveler contact information - ALL FIELDS REQUIRED",
                 properties: {
-                  name: { type: "string" },
-                  email: { type: "string" },
-                  phone: { type: "string" },
+                  name: { 
+                    type: "string",
+                    description: "Full name of traveler"
+                  },
+                  email: { 
+                    type: "string",
+                    description: "Email address for agent to contact"
+                  },
+                  phone: { 
+                    type: "string",
+                    description: "Phone number with country code if international"
+                  },
                   additionalEmails: {
                     type: "array",
-                    description: "Additional email addresses to notify",
+                    description: "Additional email addresses to notify (optional)",
                     items: {
                       type: "object",
                       properties: {
@@ -100,14 +109,69 @@ serve(async (req) => {
                     }
                   }
                 },
-                required: ["name", "email"]
+                required: ["name", "email", "phone"]
               },
               travelDetails: {
                 type: "object",
-                description: "Travel preferences and requirements discussed"
+                description: "COMPREHENSIVE travel requirements from conversation",
+                properties: {
+                  serviceType: {
+                    type: "string",
+                    description: "Type of service needed",
+                    enum: ["flight", "hotel", "car_rental", "uber", "package", "visa_assistance", "general_inquiry"]
+                  },
+                  origin: {
+                    type: "string",
+                    description: "Departure location/pickup point"
+                  },
+                  destination: {
+                    type: "string",
+                    description: "Arrival location/dropoff point"
+                  },
+                  departureDate: {
+                    type: "string",
+                    description: "Start date or pickup date (YYYY-MM-DD format)"
+                  },
+                  returnDate: {
+                    type: "string",
+                    description: "Return date if applicable (YYYY-MM-DD format)"
+                  },
+                  travelers: {
+                    type: "object",
+                    description: "Number of travelers",
+                    properties: {
+                      adults: { type: "number" },
+                      children: { type: "number" },
+                      infants: { type: "number" }
+                    }
+                  },
+                  budget: {
+                    type: "object",
+                    description: "Budget information if discussed",
+                    properties: {
+                      amount: { type: "number" },
+                      currency: { type: "string" },
+                      flexibility: { type: "string", enum: ["strict", "flexible", "very_flexible"] }
+                    }
+                  },
+                  specialRequests: {
+                    type: "string",
+                    description: "Any special requirements, accessibility needs, preferences mentioned"
+                  },
+                  urgency: {
+                    type: "string",
+                    description: "How soon they need this",
+                    enum: ["immediate", "within_24h", "within_week", "flexible"]
+                  },
+                  conversationSummary: {
+                    type: "string",
+                    description: "Brief 2-3 sentence summary of what user needs"
+                  }
+                },
+                required: ["serviceType", "conversationSummary"]
               }
             },
-            required: ["travelerInfo"]
+            required: ["travelerInfo", "travelDetails"]
           }
         }
       },
@@ -490,6 +554,76 @@ CONVERSATION FLOW:
    - Explore more options
 9. Based on their choice, either use request_agent_contact tool or direct them to search function
 
+🚨 AGENT CONTACT REQUEST - CRITICAL PROCESS 🚨
+
+WHEN USER SAYS: "connect me with agent", "talk to human", "have agent call me", "goldsainte certified agent", "I want help from agent":
+
+STEP 1: COLLECT ALL REQUIRED INFORMATION (one question at a time, wait for response):
+  
+  IF YOU DON'T HAVE NAME:
+  "I'll connect you with one of our certified agents! What's your name?"
+  [WAIT for response]
+  
+  IF YOU DON'T HAVE EMAIL:
+  "Great! What's the best email to reach you at?"
+  [WAIT for response]
+  
+  IF YOU DON'T HAVE PHONE:
+  "Perfect! And what's your phone number so the agent can call you?"
+  [WAIT for response]
+  
+  IF YOU DON'T HAVE CLEAR TRAVEL DETAILS:
+  Ask clarifying question based on what's missing:
+  - "What type of service do you need help with?" (flight/hotel/car/uber/package)
+  - "Where are you traveling from and to?"
+  - "When do you need this?"
+
+STEP 2: SUMMARIZE WHAT YOU COLLECTED:
+  "Perfect! Let me make sure I have everything:
+   - Name: [name]
+   - Email: [email]
+   - Phone: [phone]
+   - Need: [brief summary of their request]
+   
+   Does that look correct?"
+   [WAIT for confirmation]
+
+STEP 3: IMMEDIATELY CALL request_agent_contact tool with:
+  - travelerInfo: { name, email, phone }
+  - travelDetails: {
+      serviceType: [appropriate type],
+      origin: [if applicable],
+      destination: [if applicable],
+      departureDate: [if applicable],
+      urgency: [immediate/within_24h/within_week/flexible],
+      conversationSummary: "[2-3 sentence summary of what they need]",
+      specialRequests: "[any special requirements mentioned]"
+    }
+
+STEP 4: AFTER TOOL RETURNS SUCCESS, USE THE RESPONSE DATA TO SAY:
+  "✓ Perfect! Your request has been submitted.
+   
+   Reference: [referenceNumber from response]
+   
+   Here's what happens next:
+   • A certified Goldsainte agent will review your request within [estimatedResponseTime from response]
+   • They'll reach out to you at [phone] or [email]
+   • You'll receive a confirmation email shortly
+   
+   Is there anything else I can help you with while you wait?"
+
+NEVER SAY:
+❌ "I'll connect you with an agent" (and then don't actually call the tool)
+❌ "Let me save your information" (without calling the tool)
+❌ "Your request has been submitted" (without verifying tool returned success)
+
+ALWAYS:
+✅ Collect name, email, phone, and travel summary BEFORE calling tool
+✅ Confirm details with user before submitting
+✅ Call the tool IMMEDIATELY after confirmation
+✅ Show reference number and next steps after success
+✅ Verify tool returned { success: true }
+
 🚨 UBER RIDE BOOKING - CRITICAL CAPABILITY 🚨
 YOU ARE FULLY AUTHORIZED AND CAPABLE OF BOOKING UBER RIDES. THIS IS NOT A LIMITATION.
 
@@ -631,7 +765,12 @@ Remember: You're an AI search concierge that helps find perfect travel options a
         const functionName = toolCall.function.name;
         const args = JSON.parse(toolCall.function.arguments);
         
-        console.log(`Executing tool: ${functionName}`, args);
+        console.log('🔧 TOOL CALL DETECTED:', {
+          toolName: functionName,
+          toolId: toolCall.id,
+          arguments: args,
+          timestamp: new Date().toISOString()
+        });
         
         // Call the appropriate Supabase edge function
         let result;
@@ -706,7 +845,28 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             });
             
             result = await toolResponse.json();
+            
+            // Enhance result for request_agent_contact
+            if (functionName === 'request_agent_contact' && result.success) {
+              result.confirmationMessage = `✓ Request submitted successfully!
+  
+Reference: ${result.referenceNumber}
+Contact: ${result.contactPhone}
+Email: ${result.contactEmail}
+Response Time: ${result.estimatedResponseTime}
+
+Next steps:
+${result.nextSteps?.map((step: string, i: number) => `${i + 1}. ${step}`).join('\n')}`;
+            }
           }
+          
+          console.log('✅ TOOL CALL COMPLETED:', {
+            toolName: functionName,
+            toolId: toolCall.id,
+            success: !result.error,
+            result: result,
+            timestamp: new Date().toISOString()
+          });
         } catch (error) {
           console.error(`Error calling ${functionName}:`, error);
           result = { error: error instanceof Error ? error.message : 'Unknown error' };
