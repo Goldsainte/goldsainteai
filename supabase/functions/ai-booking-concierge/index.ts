@@ -531,7 +531,6 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_cars': 'amadeus-search-cars',
             'create_package': 'create-travel-package',
             'search_events': 'search-events',
-            'search_cars': 'amadeus-search-cars',
             'check_visa_requirements': 'check-visa-requirements',
             'request_agent_contact': 'create-agent-inquiry',
             'generate_itinerary': 'generate-trip-itinerary',
