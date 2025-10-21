@@ -281,6 +281,45 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "get_uber_estimate",
+          description: "Get real-time Uber pricing and availability for instant transportation. Use when user needs quick rides, airport transfers, or point-to-point transportation in cities. Perfect for short trips within cities.",
+          parameters: {
+            type: "object",
+            properties: {
+              pickupAddress: { type: "string", description: "Pickup location address" },
+              dropoffAddress: { type: "string", description: "Dropoff location address" },
+              pickupLatitude: { type: "number", description: "Pickup latitude coordinate" },
+              pickupLongitude: { type: "number", description: "Pickup longitude coordinate" },
+              dropoffLatitude: { type: "number", description: "Dropoff latitude coordinate" },
+              dropoffLongitude: { type: "number", description: "Dropoff longitude coordinate" }
+            },
+            required: ["pickupLatitude", "pickupLongitude", "dropoffLatitude", "dropoffLongitude"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "request_uber_ride",
+          description: "Book an Uber ride after user confirms product selection. ONLY call this after showing estimates via get_uber_estimate and getting explicit user confirmation with product choice.",
+          parameters: {
+            type: "object",
+            properties: {
+              productId: { type: "string", description: "Uber product ID from estimate results (e.g., 'uberx', 'uberxl')" },
+              pickupAddress: { type: "string", description: "Pickup location address" },
+              dropoffAddress: { type: "string", description: "Dropoff location address" },
+              pickupLatitude: { type: "number", description: "Pickup latitude coordinate" },
+              pickupLongitude: { type: "number", description: "Pickup longitude coordinate" },
+              dropoffLatitude: { type: "number", description: "Dropoff latitude coordinate" },
+              dropoffLongitude: { type: "number", description: "Dropoff longitude coordinate" }
+            },
+            required: ["productId", "pickupLatitude", "pickupLongitude", "dropoffLatitude", "dropoffLongitude"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "check_visa_requirements",
           description: "Check visa requirements when traveling from one country to another.",
           parameters: {
@@ -546,6 +585,8 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'check_visa_requirements': 'check-visa-requirements',
             'request_agent_contact': 'create-agent-inquiry',
             'generate_itinerary': 'generate-trip-itinerary',
+            'get_uber_estimate': 'uber-get-products',
+            'request_uber_ride': 'uber-request-ride',
             'update_trip_context': null, // Handled inline
             'set_ranking_preference': null // Handled inline
           };

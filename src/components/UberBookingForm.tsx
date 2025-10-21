@@ -10,16 +10,31 @@ import { MapPin, Navigation } from "lucide-react";
 interface UberBookingFormProps {
   productId: string;
   onSuccess?: () => void;
+  initialPickupLat?: string;
+  initialPickupLng?: string;
+  initialDropoffLat?: string;
+  initialDropoffLng?: string;
+  initialPickupAddress?: string;
+  initialDropoffAddress?: string;
 }
 
-export default function UberBookingForm({ productId, onSuccess }: UberBookingFormProps) {
+export default function UberBookingForm({ 
+  productId, 
+  onSuccess,
+  initialPickupLat,
+  initialPickupLng,
+  initialDropoffLat,
+  initialDropoffLng,
+  initialPickupAddress,
+  initialDropoffAddress,
+}: UberBookingFormProps) {
   const [loading, setLoading] = useState(false);
-  const [pickupAddress, setPickupAddress] = useState("");
-  const [dropoffAddress, setDropoffAddress] = useState("");
-  const [pickupLat, setPickupLat] = useState("");
-  const [pickupLng, setPickupLng] = useState("");
-  const [dropoffLat, setDropoffLat] = useState("");
-  const [dropoffLng, setDropoffLng] = useState("");
+  const [pickupAddress, setPickupAddress] = useState(initialPickupAddress || "");
+  const [dropoffAddress, setDropoffAddress] = useState(initialDropoffAddress || "");
+  const [pickupLat, setPickupLat] = useState(initialPickupLat || "");
+  const [pickupLng, setPickupLng] = useState(initialPickupLng || "");
+  const [dropoffLat, setDropoffLat] = useState(initialDropoffLat || "");
+  const [dropoffLng, setDropoffLng] = useState(initialDropoffLng || "");
   const { toast } = useToast();
 
   const handleUseCurrentLocation = () => {

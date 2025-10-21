@@ -3,7 +3,7 @@ import { X, Send, Loader2, Mic, MicOff, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,8 @@ import { CompactFlightCard } from "./CompactFlightCard";
 import { CompactHotelCard } from "./CompactHotelCard";
 import { CompactCarCard } from "./CompactCarCard";
 import { TravelPackageCard } from "./TravelPackageCard";
+import { UberProductCard } from "./UberProductCard";
+import { UberBookingModal } from "./UberBookingModal";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -36,6 +38,8 @@ export const AIBookingConcierge = () => {
   const [wakeWordActive, setWakeWordActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
+  const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
+  const [isUberModalOpen, setIsUberModalOpen] = useState(false);
   const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -806,6 +810,44 @@ export const AIBookingConcierge = () => {
                       );
                     }
                     
+                    // Render Uber products
+                    if (result.name === 'get_uber_estimate' && result.data?.products) {
+                      return (
+                        <div key={resultIdx} className="space-y-3">
+                          {result.data.products.map((product: any) => (
+                            <UberProductCard
+                              key={product.product_id}
+                              product={product}
+                              onBook={() => {
+                                setSelectedUberProduct({
+                                  ...product,
+                                  pickupLat: String(result.data.pickupLatitude || ''),
+                                  pickupLng: String(result.data.pickupLongitude || ''),
+                                  dropoffLat: String(result.data.dropoffLatitude || ''),
+                                  dropoffLng: String(result.data.dropoffLongitude || ''),
+                                });
+                                setIsUberModalOpen(true);
+                              }}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+
+                    // Render Uber ride confirmation
+                    if (result.name === 'request_uber_ride' && result.data?.success) {
+                      return (
+                        <Card key={resultIdx} className="bg-green-50 dark:bg-green-900/20">
+                          <CardHeader>
+                            <CardTitle className="text-sm">✓ Ride Confirmed!</CardTitle>
+                          </CardHeader>
+                          <CardContent className="text-xs">
+                            <p>Your Uber is on the way!</p>
+                          </CardContent>
+                        </Card>
+                      );
+                    }
+                    
                     return null;
                   })}
                 </div>
@@ -874,9 +916,22 @@ export const AIBookingConcierge = () => {
               {voiceMode 
                 ? "Voice mode active — speak naturally or tap to end"
                 : "Tap the microphone to start voice mode, or type below"}
-            </p>
+             </p>
           </div>
         </>
+      )}
+      
+      {selectedUberProduct && (
+        <UberBookingModal
+          isOpen={isUberModalOpen}
+          onClose={() => setIsUberModalOpen(false)}
+          productId={selectedUberProduct.product_id}
+          productName={selectedUberProduct.display_name}
+          pickupLat={selectedUberProduct.pickupLat}
+          pickupLng={selectedUberProduct.pickupLng}
+          dropoffLat={selectedUberProduct.dropoffLat}
+          dropoffLng={selectedUberProduct.dropoffLng}
+        />
       )}
     </Card>
   );

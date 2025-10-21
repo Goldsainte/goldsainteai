@@ -6,6 +6,8 @@ import { CompactHotelCard } from "@/components/CompactHotelCard";
 import { CompactFlightCard } from "@/components/CompactFlightCard";
 import { CompactRestaurantCard } from "@/components/CompactRestaurantCard";
 import { CarCard } from "@/components/CarCard";
+import { UberProductCard } from "@/components/UberProductCard";
+import { UberBookingModal } from "@/components/UberBookingModal";
 import { ResultsMapView } from "@/components/ResultsMapView";
 import { HotelFilters } from "@/components/HotelFilters";
 import { RestaurantFilters } from "@/components/RestaurantFilters";
@@ -51,6 +53,9 @@ const SearchResults = () => {
   const [flightDictionaries, setFlightDictionaries] = useState<any>(null);
   const [showSearchBar, setShowSearchBar] = useState(true);
   const [searchPerformed, setSearchPerformed] = useState(false);
+  const [uberProducts, setUberProducts] = useState<any[]>([]);
+  const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
+  const [isUberModalOpen, setIsUberModalOpen] = useState(false);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -357,6 +362,34 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           ];
           setResults(packageResults);
           setFilteredResults(packageResults);
+        } else if (searchType === "transportation") {
+          // Search transportation - both Uber and custom vendors
+          const pickupLat = searchParams.get('pickupLat');
+          const pickupLng = searchParams.get('pickupLng');
+          const dropoffLat = searchParams.get('dropoffLat');
+          const dropoffLng = searchParams.get('dropoffLng');
+
+          if (pickupLat && pickupLng && dropoffLat && dropoffLng) {
+            // Fetch Uber products
+            try {
+              const { data: uberData, error: uberError } = await supabase.functions.invoke('uber-get-products', {
+                body: {
+                  pickupLatitude: parseFloat(pickupLat),
+                  pickupLongitude: parseFloat(pickupLng),
+                  dropoffLatitude: parseFloat(dropoffLat),
+                  dropoffLongitude: parseFloat(dropoffLng),
+                },
+              });
+
+              if (!uberError && uberData?.success) {
+                setUberProducts(uberData.products || []);
+              }
+            } catch (e) {
+              console.error('Failed to fetch Uber products:', e);
+            }
+          }
+          setResults([]);
+          setFilteredResults([]);
         } else {
           setResults([]);
           setFilteredResults([]);
@@ -887,6 +920,9 @@ if (minRating && searchType !== "restaurants") {
                             restaurant={result}
                           />
                         );
+                      } else if (searchType === "transportation") {
+                        // Transportation search shows Uber products instead of filtered results
+                        return null;
                       } else {
                         return (
                           <CompactHotelCard
@@ -896,6 +932,29 @@ if (minRating && searchType !== "restaurants") {
                         );
                       }
                     })}
+                    
+                    {searchType === "transportation" && uberProducts.length > 0 && (
+                      <div className="space-y-6">
+                        <div className="space-y-4">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold">Instant Uber Options</h3>
+                            <Badge variant="secondary">{uberProducts.length} available</Badge>
+                          </div>
+                          <div className="grid gap-4">
+                            {uberProducts.map((product: any) => (
+                              <UberProductCard
+                                key={product.product_id}
+                                product={product}
+                                onBook={() => {
+                                  setSelectedUberProduct(product);
+                                  setIsUberModalOpen(true);
+                                }}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="h-[calc(100vh-300px)] rounded-lg border bg-muted flex items-center justify-center">
@@ -910,6 +969,19 @@ if (minRating && searchType !== "restaurants") {
           </div>
         )}
       </div>
+
+      {selectedUberProduct && (
+        <UberBookingModal
+          isOpen={isUberModalOpen}
+          onClose={() => setIsUberModalOpen(false)}
+          productId={selectedUberProduct.product_id}
+          productName={selectedUberProduct.display_name}
+          pickupLat={searchParams.get('pickupLat') || undefined}
+          pickupLng={searchParams.get('pickupLng') || undefined}
+          dropoffLat={searchParams.get('dropoffLat') || undefined}
+          dropoffLng={searchParams.get('dropoffLng') || undefined}
+        />
+      )}
     </div>
   );
 };
