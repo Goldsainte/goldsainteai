@@ -26,6 +26,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useSearchHistory } from "@/hooks/useSearchHistory";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { getUserLocation } from "@/lib/locationMapping";
 import { fetchUberFallback } from "@/lib/simpleCarSearchFallback";
@@ -36,6 +37,7 @@ const SearchResults = () => {
   const navigate = useNavigate();
   const { addSearch } = useSearchHistory();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [results, setResults] = useState<any[]>([]);
   const [filteredResults, setFilteredResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -372,17 +374,30 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
                 timeout: 25000,
                 showToastOnError: false,
               });
+              console.log('[Car Search] Response:', { data, error });
+              
               if (error) {
                 console.warn('Car rental search error:', error);
                 setResults([]);
                 setFilteredResults([]);
-                setError('No car rentals available for this location. Try a major airport like JFK, LAX, or LHR.');
+                setError(error.message || 'No car rentals available for this location. Try a major airport like JFK, LAX, or LHR.');
                 return;
               }
+              
               const carResults = data.results || [];
+              
+              // Show helpful message if no results
               if (carResults.length === 0) {
-                setError('No car rentals found for this location and date. Try a different airport or dates.');
+                const helpMessage = data.meta?.message || 'No car rentals found. Try different dates or major airports like LAX, JFK, LHR, CDG, or DXB.';
+                console.log('[Car Search] No results:', helpMessage);
+                toast({
+                  title: "No Cars Available",
+                  description: helpMessage,
+                  duration: 6000,
+                });
+                setError(helpMessage);
               }
+              
               setResults(carResults);
               setFilteredResults(carResults);
             } catch (err) {

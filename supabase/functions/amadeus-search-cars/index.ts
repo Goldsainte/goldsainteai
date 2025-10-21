@@ -154,12 +154,18 @@ serve(async (req) => {
       }
     }
 
-    // Nothing found anywhere
+    // Nothing found anywhere - provide helpful message
+    console.log('No car rentals found for pickup:', pickupCode, 'or fallback airports');
     return new Response(JSON.stringify({
-      error: 'Car rental search failed for provided airport and common fallbacks.'
+      results: [],
+      meta: { 
+        message: 'No cars available for these dates and location. This may be due to limited test data in the Amadeus sandbox. Try searching for major airports like LAX, JFK, LHR, CDG, or DXB.',
+        searchedAirports: [pickupCode, ...fallbackAirports],
+        pickupUsed: pickupCode
+      }
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 404,
+      status: 200,
     });
 
   } catch (error) {

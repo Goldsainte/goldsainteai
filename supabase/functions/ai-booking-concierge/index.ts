@@ -289,7 +289,7 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "get_uber_estimate",
-          description: "Get real-time Uber pricing and availability for instant transportation. Use when user needs quick rides, airport transfers, or point-to-point transportation in cities. Perfect for short trips within cities.",
+          description: "Get real-time Uber pricing and availability for instant transportation. FULLY FUNCTIONAL - use whenever user asks about rides, airport transfers, or point-to-point transportation. You CAN book Uber rides for users.",
           parameters: {
             type: "object",
             properties: {
@@ -308,7 +308,7 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "request_uber_ride",
-          description: "Book an Uber ride after user confirms product selection. ONLY call this after showing estimates via get_uber_estimate and getting explicit user confirmation with product choice.",
+          description: "Book an Uber ride after user confirms. FULLY FUNCTIONAL - you CAN complete Uber bookings. Call after showing estimates and getting user confirmation with their chosen ride type.",
           parameters: {
             type: "object",
             properties: {
@@ -480,6 +480,13 @@ CONVERSATION FLOW:
    - Get connected with a certified agent
    - Explore more options
 9. Based on their choice, either use request_agent_contact tool or direct them to search function
+
+UBER RIDE BOOKING (FULLY FUNCTIONAL):
+- You CAN book Uber rides for users! This feature is ACTIVE and WORKING
+- When user asks about rides, airport transfers, or transportation: Use get_uber_estimate to show options
+- After showing estimates, ask user which ride type they prefer (UberX, UberXL, etc.)
+- Once they choose, IMMEDIATELY book with request_uber_ride - you have full authorization
+- Never say "I can't book rides" or "you'll need to book yourself" - YOU CAN complete the booking
 
 CRITICAL: After asking ANY question, STOP. Do not continue with additional questions or actions. Wait for the user's response.
 
