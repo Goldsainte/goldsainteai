@@ -101,7 +101,7 @@ export const AIBookingConcierge = () => {
 
       // Set initial greeting only if not restoring a conversation
       if (shouldUseInitialGreeting) {
-        const agentName = data?.agent_name || "Madison";
+        const agentName = "Madison";
         console.log('Setting initial greeting with agent:', agentName);
         setMessages([{
           role: 'assistant',
@@ -202,7 +202,7 @@ export const AIBookingConcierge = () => {
     localStorage.removeItem('aiConciergeConversation');
     
     // Reset to initial greeting with detailed instructions
-    const agentName = agentProfile?.agent_name || "Madison";
+    const agentName = "Madison";
     setMessages([{
       role: 'assistant',
       content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
@@ -482,6 +482,31 @@ export const AIBookingConcierge = () => {
               setIsProcessing(true);
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
               saveConversationData();
+              
+              // Bridge voice Uber requests to text mode backend
+              const transcript = message.transcript.toLowerCase();
+              if ((transcript.includes('uber') || transcript.includes('ride') || transcript.includes('transport')) &&
+                  (transcript.includes('from') || transcript.includes('to'))) {
+                
+                const fromMatch = transcript.match(/from\s+([^to]+?)(?:\s+to|$)/i);
+                const toMatch = transcript.match(/to\s+(.+?)(?:\.|$|from)/i);
+                
+                if (fromMatch && toMatch) {
+                  const from = fromMatch[1].trim();
+                  const to = toMatch[1].trim();
+                  
+                  toast({
+                    title: "Fetching Uber Options",
+                    description: "Check the chat below for live pricing!",
+                  });
+                  
+                  setTimeout(() => {
+                    sendProgrammaticMessage(
+                      `Get Uber price estimates from ${from} to ${to} and show me the options with pricing.`
+                    );
+                  }, 1000);
+                }
+              }
             } else if (message.type === 'input_audio_buffer.speech_stopped') {
               // User stopped speaking - start processing
               console.log('Speech stopped, starting processing state');
