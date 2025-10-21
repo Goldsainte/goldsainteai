@@ -481,12 +481,17 @@ CONVERSATION FLOW:
    - Explore more options
 9. Based on their choice, either use request_agent_contact tool or direct them to search function
 
-UBER RIDE BOOKING (FULLY FUNCTIONAL):
-- You CAN book Uber rides for users! This feature is ACTIVE and WORKING
-- When user asks about rides, airport transfers, or transportation: Use get_uber_estimate to show options
-- After showing estimates, ask user which ride type they prefer (UberX, UberXL, etc.)
-- Once they choose, IMMEDIATELY book with request_uber_ride - you have full authorization
-- Never say "I can't book rides" or "you'll need to book yourself" - YOU CAN complete the booking
+UBER RIDE BOOKING (ACTIVE & WORKING):
+- YOU HAVE FULL AUTHORITY to book Uber rides directly - this is NOT a placeholder feature
+- When user mentions "ride", "uber", "transportation", "airport transfer", "get me to", etc.:
+  1. IMMEDIATELY call get_uber_estimate with location details
+  2. Display the ride options (UberX, UberXL, etc.) with prices
+  3. Ask "Which ride would you like?" and WAIT for their choice
+  4. Once they pick one, IMMEDIATELY call request_uber_ride with their selection
+  5. Confirm the booking: "✓ Your [ride type] is booked and on the way!"
+- NEVER say "you'll need to book yourself" or "download the app" for Uber rides
+- NEVER present the three booking choices (self-book/agent/explore) for Uber - you handle it directly
+- Only defer to agent if: API returns error twice OR user explicitly asks for human help
 
 CRITICAL: After asking ANY question, STOP. Do not continue with additional questions or actions. Wait for the user's response.
 
@@ -690,17 +695,41 @@ Remember: You're an AI search concierge that helps find perfect travel options a
       });
       
       const finalData = await finalResponse.json();
+      
+      // Format tool results for UI rendering
+      const formattedToolResults = toolResults.map(tr => {
+        const parsed = JSON.parse(tr.content);
+        const result: any = {
+          name: tr.name,
+          data: parsed
+        };
+        
+        // For Uber estimates, augment with coordinates from tool args
+        if (tr.name === 'get_uber_estimate' && aiMessage.tool_calls) {
+          const uberCall = aiMessage.tool_calls.find((tc: any) => tc.function.name === 'get_uber_estimate');
+          if (uberCall) {
+            const args = JSON.parse(uberCall.function.arguments);
+            result.data.pickupLatitude = args.pickupLatitude;
+            result.data.pickupLongitude = args.pickupLongitude;
+            result.data.dropoffLatitude = args.dropoffLatitude;
+            result.data.dropoffLongitude = args.dropoffLongitude;
+          }
+        }
+        
+        return result;
+      });
+      
       return new Response(
         JSON.stringify({ 
-          message: finalData.choices[0].message.content,
-          toolResults: toolResults.map(tr => JSON.parse(tr.content))
+          content: finalData.choices[0].message.content,
+          toolResults: formattedToolResults
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     return new Response(
-      JSON.stringify({ message: aiMessage.content }),
+      JSON.stringify({ content: aiMessage.content }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

@@ -278,7 +278,8 @@ export const AIBookingConcierge = () => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
           ...newMessages[newMessages.length - 1],
-          content: data.content || data.message || "I apologize, I encountered an issue. Please try again."
+          content: data.content || data.message || "I apologize, I encountered an issue. Please try again.",
+          toolResults: Array.isArray(data.toolResults) ? data.toolResults : []
         };
         return newMessages;
       });
@@ -379,7 +380,8 @@ export const AIBookingConcierge = () => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = {
           ...newMessages[newMessages.length - 1],
-          content: data.content || data.message || "I apologize, I encountered an issue. Please try again."
+          content: data.content || data.message || "I apologize, I encountered an issue. Please try again.",
+          toolResults: Array.isArray(data.toolResults) ? data.toolResults : []
         };
         return newMessages;
       });
