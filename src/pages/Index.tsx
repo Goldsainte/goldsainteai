@@ -1135,8 +1135,8 @@ const Index = () => {
                       </div>
                       <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
                         <img 
-                          src={creatorDesertCamel} 
-                          alt="Travel creator capturing unique desert content with camel" 
+                          src={creatorSnowPhotography} 
+                          alt="Content creators filming winter travel photography" 
                           className="w-full h-full object-cover" 
                           loading="lazy"
                           decoding="async"
@@ -1144,8 +1144,8 @@ const Index = () => {
                       </div>
                       <div className="col-span-2 rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
                         <img 
-                          src={creatorSnowPhotography} 
-                          alt="Content creators filming winter travel photography" 
+                          src={creatorDesertCamel} 
+                          alt="Travel creator capturing unique desert content with camel" 
                           className="w-full h-full object-cover" 
                           loading="lazy"
                           decoding="async"
