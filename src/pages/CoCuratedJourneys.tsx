@@ -467,12 +467,12 @@ export default function CoCuratedJourneys() {
               )}
 
               {/* All Travel Packages */}
-              <section className="py-8 sm:py-10 md:py-12 all-packages-section">
+              <section className="py-6 sm:py-8 md:py-10 all-packages-section">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
                   <div>
                     <div className="w-20 h-1 bg-luxury-gold mb-4" />
-                    <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald">All Travel Packages</h2>
-                    <p className="text-sm text-luxury-emerald/60 mt-2">
+                    <h2 className="font-secondary text-xl sm:text-2xl md:text-3xl text-luxury-emerald">All Travel Packages</h2>
+                    <p className="text-xs sm:text-sm text-luxury-emerald/60 mt-2">
                       {selectedDestinationFilter === 'all' 
                         ? `Showing top 5 from each destination (${displayedPackages.length} packages)`
                         : `${displayedPackages.length} packages in ${selectedDestinationFilter}`
@@ -484,7 +484,7 @@ export default function CoCuratedJourneys() {
                     <select
                       value={selectedDestinationFilter}
                       onChange={(e) => setSelectedDestinationFilter(e.target.value)}
-                      className="w-full sm:w-auto px-3 sm:px-4 py-2 min-h-[44px] border border-luxury-gold/30 rounded-lg bg-white text-luxury-emerald text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-luxury-gold transition-all duration-300"
+                      className="w-full sm:w-auto px-2 sm:px-3 md:px-4 py-2 min-h-[44px] border border-luxury-gold/30 rounded-lg bg-white text-luxury-emerald text-xs sm:text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-luxury-gold transition-all duration-300"
                     >
                       <option value="all">All Top Destinations</option>
                       {topDestinationCities.map(city => (
@@ -494,7 +494,7 @@ export default function CoCuratedJourneys() {
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                   {displayedPackages.map((pkg) => (
                     <EnhancedPackageCard
                       key={pkg.id}

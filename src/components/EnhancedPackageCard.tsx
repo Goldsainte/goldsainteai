@@ -44,7 +44,7 @@ export const EnhancedPackageCard = ({
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
       {/* Image */}
-      <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
+      <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden">
         <img
           src={coverImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80"}
           alt={packageName}
@@ -53,14 +53,14 @@ export const EnhancedPackageCard = ({
           decoding="async"
         />
         {influencerCommission && influencerCommission > 0 && (
-          <Badge className="absolute top-3 right-3 bg-green-500 text-white">
+          <Badge className="absolute top-3 right-3 bg-green-500 text-white text-[10px] sm:text-xs">
             <TrendingUp className="h-3 w-3 mr-1" />
             {influencerCommission}% Commission
           </Badge>
         )}
       </div>
 
-      <CardContent className="p-3 sm:p-4">
+      <CardContent className="p-2.5 sm:p-3 md:p-4">
         {/* Source and Agency Badges */}
         <div className="flex items-center gap-2 mb-2">
           {source === 'agent' && (
@@ -76,7 +76,7 @@ export const EnhancedPackageCard = ({
         </div>
 
         {/* Title */}
-        <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="font-semibold text-sm sm:text-base md:text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
           {packageName}
         </h3>
 
@@ -138,18 +138,18 @@ export const EnhancedPackageCard = ({
         </div>
       </CardContent>
 
-      <CardFooter className="p-3 sm:p-4 pt-0 flex gap-2">
+      <CardFooter className="p-2.5 sm:p-3 md:p-4 pt-0 flex gap-2">
         <Button 
           onClick={onViewDetails} 
           variant="outline" 
-          className={`min-h-[44px] ${source === 'agent' ? 'flex-1' : 'w-full'}`}
+          className={`min-h-[44px] min-w-[44px] text-xs sm:text-sm ${source === 'agent' ? 'flex-1' : 'w-full'}`}
         >
           View Details
         </Button>
         {source === 'agent' && (
           <Button 
             onClick={onRequestPromotion} 
-            className="flex-1 min-h-[44px]"
+            className="flex-1 min-h-[44px] min-w-[44px] text-xs sm:text-sm"
             disabled={isPromoting}
           >
             {isPromoting ? "Promoting" : "Request to Promote"}

@@ -56,14 +56,14 @@ export const LuxuryExperiencesSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-luxury-ivory py-12 sm:py-16 md:py-20">
+    <section className="bg-luxury-ivory py-8 sm:py-12 md:py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
-          <h2 className="font-secondary text-3xl sm:text-4xl md:text-5xl text-luxury-emerald mb-4">
+          <h2 className="font-secondary text-xl sm:text-2xl md:text-3xl lg:text-4xl text-luxury-emerald mb-4">
             Curated Luxury Experiences
           </h2>
-          <p className="text-luxury-emerald/70 text-lg max-w-2xl mx-auto">
+          <p className="text-luxury-emerald/70 text-sm sm:text-base max-w-2xl mx-auto">
             Discover exceptional destinations handpicked for the discerning traveller
           </p>
         </div>
@@ -77,7 +77,7 @@ export const LuxuryExperiencesSection = () => {
               } ${index === 0 ? 'lg:col-span-2' : ''}`}
               onClick={() => navigate(`/cocurated-journeys?destination=${experience.destination}&category=${experience.category}`)}
             >
-              <div className="relative h-64 sm:h-72 md:h-80 lg:h-96">
+              <div className="relative h-56 sm:h-64 md:h-72 lg:h-80">
                 <img
                   src={experience.imageUrl}
                   alt={experience.title}
@@ -86,16 +86,16 @@ export const LuxuryExperiencesSection = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/80 via-luxury-emerald/20 to-transparent" />
                 
-                <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
+                <div className="absolute inset-0 flex flex-col justify-end p-3 sm:p-4 md:p-6">
                   <div className="w-16 h-1 bg-luxury-gold mb-4 transform origin-left group-hover:w-24 transition-all duration-500" />
-                  <h3 className="font-secondary text-xl sm:text-2xl md:text-3xl text-white mb-2">
+                  <h3 className="font-secondary text-lg sm:text-xl md:text-2xl text-white mb-2">
                     {experience.title}
                   </h3>
-                  <p className="text-white/90 text-base sm:text-lg mb-4">
+                  <p className="text-white/90 text-sm sm:text-base mb-4">
                     {experience.subtitle}
                   </p>
                   <div className="flex items-center gap-2 text-luxury-gold">
-                    <span className="text-sm tracking-wider uppercase">Explore Collection</span>
+                    <span className="text-xs sm:text-sm tracking-wider uppercase">Explore Collection</span>
                     <span className="transform group-hover:translate-x-2 transition-transform duration-300">→</span>
                   </div>
                 </div>

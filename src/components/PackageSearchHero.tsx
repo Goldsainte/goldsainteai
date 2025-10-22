@@ -34,7 +34,7 @@ export const PackageSearchHero = ({
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[650px] flex items-center justify-center">
+    <div className="relative w-full h-[450px] sm:h-[500px] md:h-[550px] lg:h-[600px] flex items-center justify-center">
       <img
         src={resortPoolHero}
         alt="Luxury Travel Destination"
@@ -45,10 +45,10 @@ export const PackageSearchHero = ({
       
       <div className="relative z-10 w-full max-w-5xl px-3 sm:px-4 md:px-6">
         <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
-        <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white text-center mb-4 font-light">
+        <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white text-center mb-4 font-light">
           Discover Your Perfect Journey
         </h1>
-        <p className="text-white/90 text-center text-base sm:text-lg md:text-xl mb-8 max-w-2xl mx-auto">
+        <p className="text-white/90 text-center text-sm sm:text-base md:text-lg mb-8 max-w-2xl mx-auto">
           Handpicked luxury travel experiences curated for the discerning explorer
         </p>
 
@@ -62,13 +62,13 @@ export const PackageSearchHero = ({
           >
             <ToggleGroupItem 
               value="amadeus" 
-              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-6 hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
+              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-4 sm:px-6 text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
             >
               Amadeus Tours
             </ToggleGroupItem>
             <ToggleGroupItem 
               value="agent" 
-              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-6 hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
+              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-4 sm:px-6 text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
             >
               CoCurated by Agents
             </ToggleGroupItem>
@@ -79,19 +79,19 @@ export const PackageSearchHero = ({
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Where to */}
-            <div className="flex-1 flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 border-b md:border-b-0 md:border-r border-border hover:bg-luxury-gold/10 transition-all duration-300 cursor-pointer">
+            <div className="flex-1 flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 min-h-[56px] border-b md:border-b-0 md:border-r border-border hover:bg-luxury-gold/10 transition-all duration-300 cursor-pointer">
               <div className="flex-shrink-0">
-                <MapPin className="h-5 w-5 text-muted-foreground" />
+                <MapPin className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
               </div>
               <div className="flex-1 text-left">
-                <label className="text-xs font-semibold text-foreground block mb-1">Where to?</label>
+                <label className="text-[10px] sm:text-xs font-semibold text-foreground block mb-1">Where to?</label>
                 <Input
                   type="text"
                   placeholder="Search for a place or activity"
                   value={searchQuery}
                   onChange={(e) => onSearchChange(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-                  className="border-0 focus-visible:ring-0 p-0 h-auto text-base placeholder:text-muted-foreground"
+                  className="border-0 focus-visible:ring-0 p-0 h-auto text-sm sm:text-base placeholder:text-muted-foreground"
                 />
               </div>
             </div>
@@ -100,13 +100,13 @@ export const PackageSearchHero = ({
             <div className="flex-1">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 text-left hover:bg-luxury-gold/10 transition-all duration-300">
+                  <button className="w-full flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 min-h-[56px] text-left hover:bg-luxury-gold/10 transition-all duration-300">
                     <div className="flex-shrink-0">
-                      <CalendarIcon className="h-5 w-5 text-muted-foreground" />
+                      <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
-                      <label className="text-xs font-semibold text-foreground block mb-1">When</label>
-                      <span className="text-base text-muted-foreground">
+                      <label className="text-[10px] sm:text-xs font-semibold text-foreground block mb-1">When</label>
+                      <span className="text-sm sm:text-base text-muted-foreground">
                         {dateRange?.from ? (
                           dateRange.to ? (
                             `${format(dateRange.from, "MMM dd")} - ${format(dateRange.to, "MMM dd")}`
@@ -142,8 +142,8 @@ export const PackageSearchHero = ({
 
             {/* Search Button */}
             <div className="flex items-center p-2">
-              <Button onClick={onSearch} size="lg" className="rounded-xl px-6 md:px-8 h-12 md:h-14 min-h-[44px]">
-                <Search className="h-5 w-5" />
+              <Button onClick={onSearch} size="lg" className="rounded-xl px-6 md:px-8 h-11 sm:h-12 md:h-14 min-h-[44px]">
+                <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
           </div>
@@ -173,12 +173,12 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Quick Filter Chips */}
-        <div className="mt-6 flex flex-wrap gap-3 justify-center">
+        <div className="mt-6 flex flex-wrap gap-2 sm:gap-3 justify-center">
           {['Adventure', 'Luxury', 'Family', 'Romantic', 'Cultural', 'Beach'].map((filter) => (
             <button
               key={filter}
               onClick={() => onQuickFilterClick?.(filter)}
-              className="py-2.5 px-4 min-h-[44px] bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-sm md:text-base backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300"
+              className="py-2 px-3 sm:py-2.5 sm:px-4 min-h-[44px] bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-xs sm:text-sm md:text-base backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300"
             >
               {filter}
             </button>
