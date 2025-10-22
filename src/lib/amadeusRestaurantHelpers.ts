@@ -31,12 +31,15 @@ export type AmadeusRestaurant = GooglePlacesRestaurant;
 export const fetchAmadeusRestaurantsForLocation = async (
   latitude: number,
   longitude: number,
-  radius: number = 5,
-  categories?: string[]
+  radius: number = 10,
+  categories?: string[],
+  keyword?: string
 ): Promise<GooglePlacesRestaurant[]> => {
   try {
     // Convert km to meters for Google Places API
     const radiusInMeters = radius * 1000;
+    
+    console.debug(`🔍 Fetching restaurants at (${latitude}, ${longitude}) with ${radius}km radius`);
     
     let { data, error } = await supabase.functions.invoke('google-places-restaurants', {
       body: {
@@ -52,23 +55,30 @@ export const fetchAmadeusRestaurantsForLocation = async (
     }
 
     let restaurants = data?.data || [];
+    console.debug(`📍 Got ${restaurants.length} restaurants at ${radius}km`);
 
     // If no results, try expanding radius to 10km
     if (restaurants.length === 0 && radius < 10) {
-      console.log(`No results with ${radius}km radius, trying 10km...`);
+      console.debug(`No results with ${radius}km radius, trying 10km...`);
       const result = await supabase.functions.invoke('google-places-restaurants', {
         body: { latitude, longitude, radius: 10000 },
       });
       restaurants = result.data?.data || [];
+      console.debug(`📍 Got ${restaurants.length} restaurants at 10km`);
     }
 
     // If still no results, try 20km
     if (restaurants.length === 0 && radius < 20) {
-      console.log(`No results with 20km radius, trying 20km...`);
+      console.debug(`No results with 10km radius, trying 20km...`);
       const result = await supabase.functions.invoke('google-places-restaurants', {
         body: { latitude, longitude, radius: 20000 },
       });
       restaurants = result.data?.data || [];
+      console.debug(`📍 Got ${restaurants.length} restaurants at 20km`);
+    }
+
+    if (restaurants.length > 0) {
+      console.debug(`✅ Sample restaurants:`, restaurants.slice(0, 2).map(r => r.name));
     }
 
     return restaurants;
@@ -80,6 +90,8 @@ export const fetchAmadeusRestaurantsForLocation = async (
 
 export const fetchAmadeusRestaurantDetails = async (placeId: string): Promise<GooglePlacesRestaurant | null> => {
   try {
+    console.debug(`🔍 Fetching details for place_id: ${placeId}`);
+    
     const { data, error } = await supabase.functions.invoke('google-places-details', {
       body: { placeId },
     });
@@ -89,7 +101,12 @@ export const fetchAmadeusRestaurantDetails = async (placeId: string): Promise<Go
       return null;
     }
 
-    return data?.data || null;
+    const result = data?.data;
+    if (result) {
+      console.debug(`✅ Got details for: ${result.name}`);
+    }
+
+    return result || null;
   } catch (error) {
     console.error('Failed to fetch restaurant details:', error);
     return null;
@@ -114,5 +131,8 @@ export const groupRestaurantsByCity = (restaurants: GooglePlacesRestaurant[], de
 
 export const getPhotoUrl = (photoReference: string, maxWidth: number = 400): string => {
   const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
+  if (!apiKey || apiKey === 'YOUR_GOOGLE_PLACES_API_KEY_HERE') {
+    return ''; // Return empty string if API key not configured
+  }
   return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
 };

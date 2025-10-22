@@ -16,10 +16,17 @@ export default function RestaurantDetail() {
     const loadRestaurant = async () => {
       if (!restaurantId) return;
       
+      console.debug(`🍽️ Loading restaurant details for place_id: ${restaurantId}`);
       setLoading(true);
       const data = await fetchAmadeusRestaurantDetails(restaurantId);
       setRestaurant(data);
       setLoading(false);
+      
+      if (data) {
+        console.debug(`✅ Loaded restaurant: ${data.name}`);
+      } else {
+        console.debug(`❌ Failed to load restaurant details`);
+      }
     };
 
     loadRestaurant();

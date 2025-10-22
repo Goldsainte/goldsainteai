@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { RestaurantSearchHero } from "@/components/RestaurantSearchHero";
+import { PackageSearchHero } from "@/components/PackageSearchHero";
 import { TopDestinationsSection } from "@/components/TopDestinationsSection";
 import { CuisineTypeSection } from "@/components/CuisineTypeSection";
 import { FineDiningRestaurantCard } from "@/components/FineDiningRestaurantCard";
@@ -9,25 +9,26 @@ import { FineDiningFilters, RestaurantFilterState } from "@/components/FineDinin
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchAmadeusRestaurantsForLocation, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
+import { findLocationCoordinates } from "@/lib/locationMapping";
 import { toast } from "sonner";
 
 const globalCulinaryCities = [
-  { name: "Paris", country: "France", lat: 48.8566, lng: 2.3522, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80" },
-  { name: "Tokyo", country: "Japan", lat: 35.6762, lng: 139.6503, image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80" },
-  { name: "New York", country: "USA", lat: 40.7128, lng: -74.0060, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80" },
-  { name: "London", country: "UK", lat: 51.5074, lng: -0.1278, image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80" },
-  { name: "Barcelona", country: "Spain", lat: 41.3851, lng: 2.1734, image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80" },
-  { name: "Rome", country: "Italy", lat: 41.9028, lng: 12.4964, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80" },
-  { name: "Singapore", country: "Singapore", lat: 1.3521, lng: 103.8198, image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80" },
-  { name: "Hong Kong", country: "China", lat: 22.3193, lng: 114.1694, image: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=800&q=80" },
-  { name: "Bangkok", country: "Thailand", lat: 13.7563, lng: 100.5018, image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80" },
-  { name: "Copenhagen", country: "Denmark", lat: 55.6761, lng: 12.5683, image: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=800&q=80" },
-  { name: "Lima", country: "Peru", lat: -12.0464, lng: -77.0428, image: "https://images.unsplash.com/photo-1531968455001-5c5272a41129?w=800&q=80" },
-  { name: "Mexico City", country: "Mexico", lat: 19.4326, lng: -99.1332, image: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=800&q=80" },
-  { name: "Sydney", country: "Australia", lat: -33.8688, lng: 151.2093, image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800&q=80" },
-  { name: "Dubai", country: "UAE", lat: 25.2048, lng: 55.2708, image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" },
-  { name: "Istanbul", country: "Turkey", lat: 41.0082, lng: 28.9784, image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80" },
-  { name: "Mumbai", country: "India", lat: 19.0760, lng: 72.8777, image: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=800&q=80" },
+  { name: "Paris", country: "France", latitude: 48.8566, longitude: 2.3522, image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80" },
+  { name: "Tokyo", country: "Japan", latitude: 35.6762, longitude: 139.6503, image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80" },
+  { name: "New York", country: "USA", latitude: 40.7128, longitude: -74.0060, image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80" },
+  { name: "London", country: "UK", latitude: 51.5074, longitude: -0.1278, image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80" },
+  { name: "Barcelona", country: "Spain", latitude: 41.3851, longitude: 2.1734, image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80" },
+  { name: "Rome", country: "Italy", latitude: 41.9028, longitude: 12.4964, image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80" },
+  { name: "Singapore", country: "Singapore", latitude: 1.3521, longitude: 103.8198, image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80" },
+  { name: "Hong Kong", country: "China", latitude: 22.3193, longitude: 114.1694, image: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=800&q=80" },
+  { name: "Bangkok", country: "Thailand", latitude: 13.7563, longitude: 100.5018, image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80" },
+  { name: "Copenhagen", country: "Denmark", latitude: 55.6761, longitude: 12.5683, image: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=800&q=80" },
+  { name: "Lima", country: "Peru", latitude: -12.0464, longitude: -77.0428, image: "https://images.unsplash.com/photo-1531968455001-5c5272a41129?w=800&q=80" },
+  { name: "Mexico City", country: "Mexico", latitude: 19.4326, longitude: -99.1332, image: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=800&q=80" },
+  { name: "Sydney", country: "Australia", latitude: -33.8688, longitude: 151.2093, image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800&q=80" },
+  { name: "Dubai", country: "UAE", latitude: 25.2048, longitude: 55.2708, image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" },
+  { name: "Istanbul", country: "Turkey", latitude: 41.0082, longitude: 28.9784, image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80" },
+  { name: "Mumbai", country: "India", latitude: 19.0760, longitude: 72.8777, image: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=800&q=80" },
 ];
 
 const cuisineTypes = [
@@ -52,8 +53,7 @@ export default function FineDining() {
   const [restaurants, setRestaurants] = useState<GooglePlacesRestaurant[]>([]);
   const [loading, setLoading] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [selectedQuickFilter, setSelectedQuickFilter] = useState<string>("");
-  const [selectedCity, setSelectedCity] = useState<string>("all");
+  const [selectedCity, setSelectedCity] = useState<string>("Paris");
   
   const [filters, setFilters] = useState<RestaurantFilterState>({
     priceRange: [1, 4],
@@ -68,40 +68,66 @@ export default function FineDining() {
     if (cityParam) {
       const city = globalCulinaryCities.find(c => c.name.toLowerCase() === cityParam.toLowerCase());
       if (city) {
-        fetchRestaurants(city.lat, city.lng, city.name);
-        setSelectedCity(city.name);
+        fetchRestaurants(city.latitude, city.longitude, city.name);
       }
     } else {
       fetchRestaurants(48.8566, 2.3522, "Paris");
-      setSelectedCity("Paris");
     }
   }, [searchParams]);
 
   const fetchRestaurants = async (lat: number, lng: number, cityName: string) => {
     setLoading(true);
-    try {
-      const data = await fetchAmadeusRestaurantsForLocation(lat, lng, 5);
-      setRestaurants(data);
-      if (data.length === 0) {
-        toast.info(`No restaurants found in ${cityName}. Try another city.`);
-      }
-    } catch (error) {
-      console.error('Error fetching restaurants:', error);
-      toast.error("Failed to load restaurants");
-    } finally {
-      setLoading(false);
+    setSelectedCity(cityName);
+    
+    console.debug(`🌍 Fetching restaurants for ${cityName} at (${lat}, ${lng})`);
+    const results = await fetchAmadeusRestaurantsForLocation(lat, lng, 10);
+    
+    setRestaurants(results);
+    setLoading(false);
+    
+    // Only show toast if no results after retries
+    if (results.length === 0) {
+      console.debug(`❌ No restaurants found for ${cityName} even after expanding radius`);
+      toast.error(`No restaurants found in ${cityName}`);
+    } else {
+      console.debug(`✅ Loaded ${results.length} restaurants for ${cityName}`);
     }
   };
 
-  const handleCityClick = (city: { name: string; lat: number; lng: number }) => {
-    setSelectedCity(city.name);
+  const handleCityClick = (city: { name: string; latitude: number; longitude: number }) => {
     navigate(`/fine-dining?city=${city.name}`);
-    fetchRestaurants(city.lat, city.lng, city.name);
+    fetchRestaurants(city.latitude, city.longitude, city.name);
+  };
+
+  const handleSearch = () => {
+    if (!searchQuery.trim()) {
+      toast.error("Please enter a destination to search");
+      return;
+    }
+
+    const location = findLocationCoordinates(searchQuery);
+    if (location) {
+      console.debug(`🔍 Found location for "${searchQuery}":`, location);
+      navigate(`/fine-dining?city=${location.name}`);
+      fetchRestaurants(location.latitude, location.longitude, location.name);
+    } else {
+      toast.error("Destination not found. Try: Paris, Rome, London, Tokyo, New York, etc.");
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery("");
+    // Reset to default city (Paris)
+    const paris = globalCulinaryCities.find(c => c.name === "Paris");
+    if (paris) {
+      navigate("/fine-dining");
+      fetchRestaurants(paris.latitude, paris.longitude, "Paris");
+    }
   };
 
   const handleCuisineClick = (cuisine: string) => {
     setFilters({ ...filters, cuisineTypes: [cuisine] });
-    toast.info(`Filtering by ${cuisine}`);
+    toast.info(`Filtering by ${cuisine} (informational only)`);
   };
 
   const handleClearFilters = () => {
@@ -112,7 +138,6 @@ export default function FineDining() {
       dietary: [],
       minRating: 0,
     });
-    setSelectedQuickFilter("");
   };
 
   const filteredRestaurants = restaurants.filter(restaurant => {
@@ -127,12 +152,14 @@ export default function FineDining() {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <RestaurantSearchHero
+      <PackageSearchHero
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
+        onSearch={handleSearch}
         onOpenFilters={() => setFiltersOpen(true)}
-        selectedQuickFilter={selectedQuickFilter}
-        onQuickFilterSelect={setSelectedQuickFilter}
+        dataSource="amadeus"
+        onDataSourceChange={() => {}}
+        onClearSearch={handleClearSearch}
       />
       <div className="container mx-auto px-4 py-12 sm:py-14 md:py-16 max-w-7xl">
         <TopDestinationsSection
@@ -146,7 +173,7 @@ export default function FineDining() {
         <div className="mb-8">
           <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
           <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
-            {selectedCity === "all" ? "All Restaurants" : `Restaurants in ${selectedCity}`}
+            Restaurants in {selectedCity}
           </h2>
           <p className="text-muted-foreground">{loading ? "Loading..." : `${filteredRestaurants.length} restaurants found`}</p>
         </div>
