@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
+import { LuxuryFooter } from "@/components/LuxuryFooter";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
@@ -305,7 +305,7 @@ function AppContent() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {showFooter && <Footer />}
+      {showFooter && <LuxuryFooter />}
       {showAIBooking && <AIBookingConcierge />}
     </div>
   );

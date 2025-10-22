@@ -2,7 +2,7 @@ import luxuryVilla from "@/assets/luxury-destinations.jpg";
 
 export const WhyGoldsainte = () => {
   return (
-    <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+    <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden animate-fadeIn">
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
         <img

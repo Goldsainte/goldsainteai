@@ -55,7 +55,7 @@ export const FromTheJournal = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-background animate-fadeIn">
       <div className="container px-4">
         <div className="flex items-end justify-between mb-12">
           <div>
@@ -79,7 +79,7 @@ export const FromTheJournal = () => {
           {journalEntries.map((entry) => (
             <Card
               key={entry.id}
-              className="group cursor-pointer border-0 overflow-hidden bg-card hover:shadow-2xl transition-all duration-500"
+              className="group cursor-pointer border-0 overflow-hidden bg-card hover:shadow-2xl transition-all duration-500 hover:scale-105"
               onClick={() => navigate('/journeys')}
             >
               <div className="relative h-64 overflow-hidden">

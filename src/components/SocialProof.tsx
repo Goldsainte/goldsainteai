@@ -42,7 +42,7 @@ const testimonials: Testimonial[] = [
 
 export const SocialProof = () => {
   return (
-    <section className="py-20 bg-background">
+    <section className="py-20 bg-background animate-fadeIn">
       <div className="container px-4">
         <div className="text-center mb-12">
           <h2 className="font-secondary text-4xl md:text-5xl font-bold mb-4 text-foreground tracking-wide">
@@ -57,7 +57,7 @@ export const SocialProof = () => {
           {testimonials.map((testimonial, index) => (
             <Card 
               key={index}
-              className="p-8 border-luxury-gold/20 hover:border-luxury-gold/40 transition-all duration-300 hover:shadow-xl bg-card"
+              className="p-8 border-luxury-gold/20 hover:border-luxury-gold/40 transition-all duration-300 hover:shadow-xl hover:scale-105 bg-card"
             >
               <div className="flex flex-col items-center text-center space-y-4">
                 <div className="relative">
