@@ -60,8 +60,6 @@ import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking-phone.png";
 import cardItinerary from "@/assets/card-itinerary.jpg";
 import cardMessaging from "@/assets/card-messaging-chatting.png";
-import dubaiDesert from "@/assets/dubai-desert.jpg";
-import baliSerenity from "@/assets/bali-serenity.jpg";
 import restaurant1 from "@/assets/restaurant1.jpg";
 import restaurant2 from "@/assets/restaurant2.jpg";
 import restaurant3 from "@/assets/restaurant3.jpg";
@@ -69,8 +67,6 @@ import flight1 from "@/assets/flight1.jpg";
 import flight2 from "@/assets/flight2.jpg";
 import flight3 from "@/assets/flight3.jpg";
 import luxuryHotels from "@/assets/luxury-hotels.jpg";
-import luxuryFlights from "@/assets/luxury-flights.jpg";
-import luxuryDestinations from "@/assets/luxury-destinations.jpg";
 import luxuryRestaurants from "@/assets/luxury-restaurants.jpg";
 import luxuryVisa from "@/assets/luxury-visa.jpg";
 import luxuryEvents from "@/assets/luxury-events.jpg";
@@ -85,7 +81,11 @@ import property4 from "@/assets/property4.jpg";
 import property5 from "@/assets/property5.jpg";
 import creatorYachtParty from "@/assets/creator-yacht-party.jpg";
 import creatorBeachSelfie from "@/assets/creator-beach-selfie.jpg";
-import pinkBeachAerial from "@/assets/pink-beach-aerial.jpg";
+import creatorRoadTrip from "@/assets/creator-road-trip.jpg";
+import creatorMountainGroup from "@/assets/creator-mountain-group.jpg";
+import creatorCanyonViews from "@/assets/creator-canyon-views.jpg";
+import creatorDesertCamel from "@/assets/creator-desert-camel.jpg";
+import creatorSnowPhotography from "@/assets/creator-snow-photography.jpg";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
@@ -1044,7 +1044,7 @@ const Index = () => {
                       <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
                         <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
                           <img
-                            src={pinkBeachAerial}
+                            src={creatorDesertCamel}
                             alt="Travel creator's curated destination storefront with luxury recommendations"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
@@ -1145,8 +1145,8 @@ const Index = () => {
                   <div className="relative h-[400px] sm:h-[500px] lg:h-[650px]" role="img" aria-label="Collage of creator lifestyle images showing luxury travel experiences">
                     <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={luxuryFlights} 
-                        alt="Creator traveling in luxury first class" 
+                        src={creatorRoadTrip} 
+                        alt="Travel creators on road trip adventure with vintage Land Rover" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1156,8 +1156,8 @@ const Index = () => {
                     </div>
                     <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={luxuryDestinations} 
-                        alt="Luxury travel destination at golden hour" 
+                        src={creatorMountainGroup} 
+                        alt="Group of friends creating travel content in mountain adventure" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1178,8 +1178,8 @@ const Index = () => {
                     </div>
                     <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={baliSerenity} 
-                        alt="Tropical paradise content creation spot" 
+                        src={creatorCanyonViews} 
+                        alt="Creators capturing scenic canyon views together" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1200,8 +1200,8 @@ const Index = () => {
                     </div>
                     <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={pinkBeachAerial} 
-                        alt="Aerial drone shot of pink sand beach" 
+                        src={creatorDesertCamel} 
+                        alt="Travel creator capturing unique desert content with camel" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1211,8 +1211,8 @@ const Index = () => {
                     </div>
                     <div className="absolute bottom-0 right-[15%] w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={dubaiDesert} 
-                        alt="Dubai luxury travel experience" 
+                        src={creatorSnowPhotography} 
+                        alt="Content creators filming winter travel photography" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
