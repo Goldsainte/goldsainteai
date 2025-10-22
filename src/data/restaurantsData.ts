@@ -105,7 +105,7 @@ export const topUSRestaurants: Restaurant[] = [
     id: 10,
     name: "Addison",
     location: "San Diego, California",
-    image: "https://images.unsplash.com/photo-1613743983303-b3e89f8a7146?w=800&q=80",
+    image: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=800&q=80",
     priceLevel: "$$$$",
     rating: 4.9,
     cuisine: "Contemporary California",
