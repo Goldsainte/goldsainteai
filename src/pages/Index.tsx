@@ -1075,38 +1075,6 @@ const Index = () => {
               </div>
             </section>
 
-            {/* Mr & Mrs Smith Style Sections */}
-            <WinterSunHero />
-            <ThreeGridGallery />
-            <HotelScrollSection 
-              title="Most popular hotels in Europe"
-              hotels={europeHotels}
-            />
-            <HotelScrollSection 
-              title="Most popular hotels in US"
-              hotels={usHotels}
-            />
-            <PopularSearchGrid />
-
-            {/* Why Goldsainte - Luxury Storytelling Section */}
-            <WhyGoldsainte />
-
-            {/* Hero Image Section */}
-            <div className="w-full overflow-hidden max-h-[600px] md:max-h-[700px] lg:max-h-none">
-              <img 
-                src={heroAiConcierge} 
-                alt="Goldsainte AI Assist - Your personal AI travel concierge for booking flights, hotels and planning perfect trips" 
-                className="w-full h-full object-cover object-center"
-                loading="eager"
-                width="1920"
-                height="1080"
-              />
-            </div>
-
-
-            {/* Curated Collections - Luxury Categories */}
-            <CuratedCollections />
-
             {/* Creator Hero Section */}
             <section className="px-4 sm:px-6 py-20 md:py-24 bg-white" aria-labelledby="creator-section-heading">
               <div className="w-full max-w-7xl mx-auto">
@@ -1224,6 +1192,38 @@ const Index = () => {
                 </div>
               </div>
             </section>
+
+            {/* Mr & Mrs Smith Style Sections */}
+            <WinterSunHero />
+            <ThreeGridGallery />
+            <HotelScrollSection 
+              title="Most popular hotels in Europe"
+              hotels={europeHotels}
+            />
+            <HotelScrollSection 
+              title="Most popular hotels in US"
+              hotels={usHotels}
+            />
+            <PopularSearchGrid />
+
+            {/* Why Goldsainte - Luxury Storytelling Section */}
+            <WhyGoldsainte />
+
+            {/* Hero Image Section */}
+            <div className="w-full overflow-hidden max-h-[600px] md:max-h-[700px] lg:max-h-none">
+              <img 
+                src={heroAiConcierge} 
+                alt="Goldsainte AI Assist - Your personal AI travel concierge for booking flights, hotels and planning perfect trips" 
+                className="w-full h-full object-cover object-center"
+                loading="eager"
+                width="1920"
+                height="1080"
+              />
+            </div>
+
+
+            {/* Curated Collections - Luxury Categories */}
+            <CuratedCollections />
 
             {/* Social Proof - Testimonials */}
             <SocialProof />
