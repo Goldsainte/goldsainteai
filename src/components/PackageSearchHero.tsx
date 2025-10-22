@@ -45,10 +45,10 @@ export const PackageSearchHero = ({
       
       <div className="relative z-10 w-full max-w-5xl px-3 sm:px-4 md:px-6">
         <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
-        <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white text-center mb-4 font-light">
+        <h1 className="hidden sm:block font-secondary text-3xl md:text-4xl lg:text-5xl text-white text-center mb-4 font-light">
           Discover Your Perfect Journey
         </h1>
-        <p className="text-white/90 text-center text-sm sm:text-base md:text-lg mb-8 max-w-2xl mx-auto">
+        <p className="hidden sm:block text-white/90 text-center text-base md:text-lg mb-8 max-w-2xl mx-auto">
           Handpicked luxury travel experiences curated for the discerning explorer
         </p>
 
@@ -62,13 +62,13 @@ export const PackageSearchHero = ({
           >
             <ToggleGroupItem 
               value="amadeus" 
-              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-4 sm:px-6 text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
+              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white h-9 px-3 text-xs sm:h-10 sm:px-5 sm:text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
             >
               Amadeus Tours
             </ToggleGroupItem>
             <ToggleGroupItem 
               value="agent" 
-              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-4 sm:px-6 text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
+              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white h-9 px-3 text-xs sm:h-10 sm:px-5 sm:text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
             >
               CoCurated by Agents
             </ToggleGroupItem>
@@ -150,7 +150,7 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Filters Button Below */}
-        <div className="mt-4 flex flex-wrap gap-3 justify-center">
+        <div className="mt-4 mb-3 sm:mb-4 flex flex-wrap gap-3 justify-center">
           <Button
             variant="outline"
             size="sm"
@@ -175,12 +175,12 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Quick Filter Chips */}
-        <div className="mt-4 flex gap-2 overflow-x-auto flex-nowrap px-2 -mx-2 pb-2">
+        <div className="mt-3 flex gap-2 overflow-x-auto flex-nowrap px-3 pb-2 scrollbar-none relative z-10">
           {['Adventure', 'Luxury', 'Family-Friendly', 'Budget', 'Romantic'].map((filter) => (
             <button
               key={filter}
               onClick={() => onQuickFilterClick?.(filter)}
-              className="h-9 px-3 bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-xs backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300 whitespace-nowrap flex-shrink-0"
+              className="h-8 px-3 bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-[11px] backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300 whitespace-nowrap flex-shrink-0"
             >
               {filter}
             </button>

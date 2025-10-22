@@ -178,7 +178,9 @@ export default function CoCuratedJourneys() {
         setTopDestinations(curatedTopDestinations);
         setTopAttractions(curatedTopAttractions);
         
-        toast.info(`Showing popular options. Click a destination above to explore!`);
+        if (typeof window !== 'undefined' && window.innerWidth >= 640) {
+          toast.info(`Showing popular options. Click a destination above to explore!`);
+        }
         return;
       }
 
@@ -410,9 +412,6 @@ export default function CoCuratedJourneys() {
   return (
     <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Header />
-      <div className="px-3 sm:px-4 md:px-6 py-3 bg-luxury-emerald/5">
-        <h1 className="font-secondary text-lg sm:text-xl md:text-2xl text-luxury-emerald">CoCurated Journeys</h1>
-      </div>
       <main className="flex-1 pb-8 sm:pb-12 md:pb-16">
         <PackageSearchHero
           searchQuery={searchQuery}
