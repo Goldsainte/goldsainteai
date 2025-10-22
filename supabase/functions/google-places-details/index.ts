@@ -36,6 +36,14 @@ function transformPlaceDetails(place: any, apiKey: string): any {
     formatted_phone_number: place.internationalPhoneNumber || place.nationalPhoneNumber,
     website: place.websiteUri,
     business_status: place.businessStatus || 'OPERATIONAL',
+    editorialSummary: place.editorialSummary,
+    reviews: place.reviews?.map((review: any) => ({
+      author_name: review.authorAttribution?.displayName || 'Anonymous',
+      rating: review.rating,
+      text: review.text?.text || review.originalText?.text || '',
+      time: review.publishTime,
+      relative_time_description: review.relativePublishTimeDescription,
+    })),
   };
 }
 
@@ -77,7 +85,7 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': googleApiKey,
-        'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,rating,userRatingCount,priceLevel,currentOpeningHours,regularOpeningHours,photos,types,internationalPhoneNumber,nationalPhoneNumber,websiteUri,businessStatus',
+        'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,rating,userRatingCount,priceLevel,currentOpeningHours,regularOpeningHours,photos,types,internationalPhoneNumber,nationalPhoneNumber,websiteUri,businessStatus,editorialSummary,reviews',
       },
     });
 

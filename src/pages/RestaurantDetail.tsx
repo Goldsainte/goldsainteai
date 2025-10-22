@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, ExternalLink } from "lucide-react";
+import { ArrowLeft, MapPin, Star, ExternalLink, Phone, Globe, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -144,8 +144,8 @@ export default function RestaurantDetail() {
             
             <h2 className="font-secondary text-2xl font-light mb-4">About This Restaurant</h2>
             <p className="text-muted-foreground mb-6">
-              Experience exceptional dining at {restaurant.name}. This highly-rated establishment 
-              offers an unforgettable culinary journey with expertly crafted dishes and impeccable service.
+              {restaurant.editorialSummary?.text || 
+                `Discover ${restaurant.name}, ${restaurant.rating ? 'a highly-rated' : 'an exceptional'} dining destination offering a memorable culinary experience.`}
             </p>
 
             {restaurant.opening_hours?.open_now !== undefined && (
@@ -175,6 +175,86 @@ export default function RestaurantDetail() {
               </Button>
             </div>
           </Card>
+
+          {/* Contact Information */}
+          {(restaurant.formatted_phone_number || restaurant.website) && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="w-20 h-1 bg-luxury-gold mb-6" />
+              <h2 className="font-secondary text-2xl font-light mb-4">Contact Information</h2>
+              <div className="space-y-4">
+                {restaurant.formatted_phone_number && (
+                  <div className="flex items-center gap-3">
+                    <Phone className="h-5 w-5 text-luxury-gold flex-shrink-0" />
+                    <a 
+                      href={`tel:${restaurant.formatted_phone_number}`}
+                      className="text-luxury-emerald hover:underline"
+                    >
+                      {restaurant.formatted_phone_number}
+                    </a>
+                  </div>
+                )}
+                {restaurant.website && (
+                  <div className="flex items-center gap-3">
+                    <Globe className="h-5 w-5 text-luxury-gold flex-shrink-0" />
+                    <a 
+                      href={restaurant.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-luxury-emerald hover:underline flex items-center gap-1"
+                    >
+                      Visit Website
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Hours */}
+          {restaurant.opening_hours?.weekday_text && restaurant.opening_hours.weekday_text.length > 0 && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="w-20 h-1 bg-luxury-gold mb-6" />
+              <h2 className="font-secondary text-2xl font-light mb-4">Hours</h2>
+              <div className="space-y-2">
+                {restaurant.opening_hours.weekday_text.map((day, idx) => (
+                  <div key={idx} className="flex items-start gap-3">
+                    <Clock className="h-4 w-4 text-luxury-gold flex-shrink-0 mt-1" />
+                    <p className="text-sm">{day}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Reviews */}
+          {restaurant.reviews && restaurant.reviews.length > 0 && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="w-20 h-1 bg-luxury-gold mb-6" />
+              <h2 className="font-secondary text-2xl font-light mb-4">Recent Reviews</h2>
+              <div className="space-y-6">
+                {restaurant.reviews.slice(0, 5).map((review, idx) => (
+                  <div key={idx} className="border-b last:border-b-0 pb-6 last:pb-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star 
+                            key={i} 
+                            className={`h-4 w-4 ${i < review.rating ? 'fill-luxury-gold text-luxury-gold' : 'text-gray-300'}`}
+                          />
+                        ))}
+                      </div>
+                      <span className="font-medium">{review.author_name}</span>
+                      {review.relative_time_description && (
+                        <span className="text-sm text-muted-foreground">· {review.relative_time_description}</span>
+                      )}
+                    </div>
+                    <p className="text-sm text-muted-foreground">{review.text}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
 
           {/* Location */}
           {restaurant.geometry?.location && (

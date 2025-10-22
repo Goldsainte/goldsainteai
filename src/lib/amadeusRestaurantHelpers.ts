@@ -4,6 +4,7 @@ export interface GooglePlacesRestaurant {
   place_id: string;
   name: string;
   vicinity?: string;
+  formatted_address?: string;
   rating?: number;
   user_ratings_total?: number;
   price_level?: number;
@@ -15,6 +16,7 @@ export interface GooglePlacesRestaurant {
   };
   opening_hours?: {
     open_now?: boolean;
+    weekday_text?: string[];
   };
   photos?: Array<{
     photo_reference: string;
@@ -23,6 +25,18 @@ export interface GooglePlacesRestaurant {
   }>;
   types?: string[];
   business_status?: string;
+  formatted_phone_number?: string;
+  website?: string;
+  editorialSummary?: {
+    text: string;
+  };
+  reviews?: Array<{
+    author_name: string;
+    rating: number;
+    text: string;
+    time: string;
+    relative_time_description: string;
+  }>;
 }
 
 // For backward compatibility
