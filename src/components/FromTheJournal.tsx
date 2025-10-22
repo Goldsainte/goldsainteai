@@ -58,77 +58,81 @@ export const FromTheJournal = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 bg-background">
+    <section className="py-24 md:py-32 bg-background">
       <div className="container px-4">
-        <div className="flex items-end justify-between mb-12">
+        <div className="flex items-end justify-between mb-16 md:mb-20">
           <div>
-            <h2 className="font-secondary text-4xl md:text-5xl font-bold mb-3 text-foreground tracking-wide">
+            <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-foreground tracking-tight">
               From the Journal
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-xl md:text-2xl font-light text-muted-foreground/80">
               Curated stories from our creator community
             </p>
           </div>
           <button 
             onClick={() => navigate('/journeys')}
-            className="hidden md:flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-semibold"
+            className="hidden md:flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group"
           >
-            View All Stories
-            <ArrowRight className="w-5 h-5" />
+            <span className="relative">
+              View All Stories
+              <span className="absolute bottom-0 left-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            </span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10 lg:gap-12">
           {journalEntries.map((entry) => (
-            <Card
+            <article
               key={entry.id}
-              className="group cursor-pointer border-0 overflow-hidden bg-card hover:shadow-2xl transition-all duration-500"
+              role="article"
+              className="group cursor-pointer overflow-hidden bg-transparent hover:-translate-y-2 hover:shadow-lg transition-all duration-700 ease-out"
               onClick={() => navigate('/journeys')}
             >
-              <div className="relative h-64 overflow-hidden">
+              <div className="relative h-80 md:h-96 overflow-hidden">
                 <img
                   src={entry.imageUrl}
-                  alt={entry.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  alt={`${entry.title} - ${entry.destination}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   loading="lazy"
                   decoding="async"
                 />
-                <div className="absolute top-4 right-4 bg-luxury-gold/90 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                  {entry.readTime}
-                </div>
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-700"></div>
               </div>
 
-              <div className="p-6 space-y-3">
-                <div className="text-xs text-luxury-gold font-semibold tracking-wider uppercase">
+              <div className="p-4 space-y-3">
+                <div className="text-[10px] text-luxury-gold/70 font-semibold tracking-[0.2em] uppercase">
                   {entry.destination}
                 </div>
                 
-                <h3 className="font-secondary text-xl font-bold text-foreground leading-tight group-hover:text-luxury-gold transition-colors">
+                <h3 className="font-secondary text-2xl md:text-3xl font-bold text-foreground/90 leading-tight group-hover:text-luxury-gold transition-colors duration-300">
                   {entry.title}
                 </h3>
                 
-                <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                <p className="text-sm text-muted-foreground/80 leading-relaxed line-clamp-1">
                   {entry.excerpt}
                 </p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-border">
-                  <span className="text-sm text-muted-foreground">
-                    by {entry.creator}
+                <div className="flex items-center pt-4">
+                  <span className="text-sm text-muted-foreground/70">
+                    {entry.creator} · {entry.readTime.replace(' read', '')}
                   </span>
-                  <ArrowRight className="w-4 h-4 text-luxury-gold opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300" />
                 </div>
               </div>
-            </Card>
+            </article>
           ))}
         </div>
 
-        <div className="mt-8 text-center md:hidden">
+        <div className="mt-12 text-center md:hidden">
           <button 
             onClick={() => navigate('/journeys')}
-            className="inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-semibold"
+            className="inline-flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group"
           >
-            View All Stories
-            <ArrowRight className="w-5 h-5" />
+            <span className="relative">
+              View All Stories
+              <span className="absolute bottom-0 left-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
+            </span>
+            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </div>
       </div>
