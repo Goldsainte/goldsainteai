@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,14 +98,27 @@ serve(async (req) => {
       </html>
     `;
 
-    const emailResponse = await resend.emails.send({
-      from: "GoldSainte <onboarding@resend.dev>",
-      to: [email],
-      subject: `Booking Cancelled - ${bookingReference}`,
-      html: emailHtml,
+    const resendResponse = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+      },
+      body: JSON.stringify({
+        from: "GoldSainte <onboarding@resend.dev>",
+        to: [email],
+        subject: `Booking Cancelled - ${bookingReference}`,
+        html: emailHtml,
+      }),
     });
 
-    console.log("Cancellation email sent successfully:", emailResponse);
+    if (!resendResponse.ok) {
+      const errorText = await resendResponse.text();
+      throw new Error(`Failed to send cancellation email: ${errorText}`);
+    }
+
+    const data = await resendResponse.json();
+    console.log("Cancellation email sent successfully:", data);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
