@@ -34,7 +34,7 @@ export const PackageSearchHero = ({
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
-    <div className="relative w-full h-[450px] sm:h-[500px] md:h-[550px] lg:h-[600px] flex items-center justify-center">
+    <div className="relative w-full h-[380px] sm:h-[460px] md:h-[520px] lg:h-[580px] flex items-center justify-center">
       <img
         src={resortPoolHero}
         alt="Luxury Travel Destination"
@@ -120,7 +120,7 @@ export const PackageSearchHero = ({
                     </div>
                   </button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent className="w-auto p-0 max-w-[calc(100vw-2rem)]" align="start">
                   <Calendar
                     initialFocus
                     mode="range"
@@ -142,7 +142,7 @@ export const PackageSearchHero = ({
 
             {/* Search Button */}
             <div className="flex items-center p-2">
-              <Button onClick={onSearch} size="lg" className="rounded-xl px-6 md:px-8 h-11 sm:h-12 md:h-14 min-h-[44px]">
+              <Button onClick={onSearch} size="sm" className="rounded-xl px-4 md:px-6 h-10 sm:h-12 md:h-14">
                 <Search className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </div>
@@ -153,18 +153,20 @@ export const PackageSearchHero = ({
         <div className="mt-4 flex flex-wrap gap-3 justify-center">
           <Button
             variant="outline"
+            size="sm"
             onClick={onOpenFilters}
-            className="bg-luxury-ivory/20 hover:bg-luxury-gold/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300 min-h-[44px]"
+            className="bg-luxury-ivory/20 hover:bg-luxury-gold/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300 rounded-full h-9 px-3 text-xs sm:h-11 sm:px-4 sm:text-sm"
           >
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             Filters
           </Button>
           
-          {(searchQuery || onClearSearch) && (
+          {(searchQuery?.trim() && onClearSearch) && (
             <Button
               variant="outline"
+              size="sm"
               onClick={onClearSearch}
-              className="bg-luxury-ivory/20 hover:bg-red-500/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300 min-h-[44px]"
+              className="bg-luxury-ivory/20 hover:bg-red-500/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300 rounded-full h-9 px-3 text-xs sm:h-11 sm:px-4 sm:text-sm"
             >
               <X className="h-4 w-4 mr-2" />
               Clear Search
@@ -173,12 +175,12 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Quick Filter Chips */}
-        <div className="mt-6 flex flex-wrap gap-2 sm:gap-3 justify-center">
-          {['Adventure', 'Luxury', 'Family', 'Romantic', 'Cultural', 'Beach'].map((filter) => (
+        <div className="mt-4 flex gap-2 overflow-x-auto flex-nowrap px-2 -mx-2 pb-2">
+          {['Adventure', 'Luxury', 'Family-Friendly', 'Budget', 'Romantic'].map((filter) => (
             <button
               key={filter}
               onClick={() => onQuickFilterClick?.(filter)}
-              className="py-2 px-3 sm:py-2.5 sm:px-4 min-h-[44px] bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-xs sm:text-sm md:text-base backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300"
+              className="h-9 px-3 bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-xs backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300 whitespace-nowrap flex-shrink-0"
             >
               {filter}
             </button>
