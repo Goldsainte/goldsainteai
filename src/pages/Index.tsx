@@ -43,6 +43,7 @@ import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
+import { FineDiningHero } from "@/components/FineDiningHero";
 
 
 
@@ -1249,6 +1250,10 @@ const Index = () => {
               title="Most popular hotels in US"
               hotels={usHotels}
             />
+            
+            {/* Fine Dining Around the World - Global Restaurant Discovery */}
+            <FineDiningHero />
+            
             <RestaurantScrollSection 
               title="Fine Dining Across America"
               restaurants={topUSRestaurants}

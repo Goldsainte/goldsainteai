@@ -73,6 +73,8 @@ import CoCuratedPackage from "./pages/CoCuratedPackage";
 import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
 import CoCuratedJourneys from "./pages/CoCuratedJourneys";
 import TourActivityDetail from "./pages/TourActivityDetail";
+import FineDining from "./pages/FineDining";
+import RestaurantDetail from "./pages/RestaurantDetail";
 import BrowseInfluencers from "./pages/BrowseInfluencers";
 import BrowseCreators from "./pages/BrowseCreators";
 import AdminSeed from "./pages/AdminSeed";
@@ -137,7 +139,7 @@ function AppContent() {
   };
   
   // Don't show header on these pages as they have their own custom headers
-  const hideHeaderPages = ['/auth', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/cocurated-journeys'];
+  const hideHeaderPages = ['/auth', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/cocurated-journeys', '/fine-dining'];
   const showHeader = !hideHeaderPages.some(page => location.pathname === page || location.pathname.startsWith(page));
 
   // Don't show AI Booking Concierge on Horizon pages
@@ -289,6 +291,8 @@ function AppContent() {
           <Route path="/cocurated-marketplace" element={<CoCuratedMarketplace />} />
           <Route path="/cocurated-journeys" element={<CoCuratedJourneys />} />
           <Route path="/tour/:tourId" element={<TourActivityDetail />} />
+          <Route path="/fine-dining" element={<FineDining />} />
+          <Route path="/restaurant/:restaurantId" element={<RestaurantDetail />} />
           <Route path="/cocurated-package/:packageId" element={<CoCuratedPackage />} />
           <Route path="/cocurated-booking-success" element={<CoCuratedBookingSuccess />} />
             <Route path="/browse-influencers" element={<BrowseInfluencers />} />
