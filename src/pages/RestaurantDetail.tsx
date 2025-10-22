@@ -18,14 +18,22 @@ export default function RestaurantDetail() {
       
       console.debug(`🍽️ Loading restaurant details for place_id: ${restaurantId}`);
       setLoading(true);
-      const data = await fetchAmadeusRestaurantDetails(restaurantId);
-      setRestaurant(data);
-      setLoading(false);
       
-      if (data) {
-        console.debug(`✅ Loaded restaurant: ${data.name}`);
-      } else {
-        console.debug(`❌ Failed to load restaurant details`);
+      try {
+        const data = await fetchAmadeusRestaurantDetails(restaurantId);
+        
+        if (data) {
+          console.debug(`✅ Loaded restaurant: ${data.name}`);
+          setRestaurant(data);
+        } else {
+          console.error('❌ Failed to load restaurant details - API returned null');
+          setRestaurant(null);
+        }
+      } catch (error) {
+        console.error('❌ Error loading restaurant details:', error);
+        setRestaurant(null);
+      } finally {
+        setLoading(false);
       }
     };
 

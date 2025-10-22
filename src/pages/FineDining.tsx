@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
-import { PackageSearchHero } from "@/components/PackageSearchHero";
+import { FineDiningSearchHero } from "@/components/FineDiningSearchHero";
 import { TopDestinationsSection } from "@/components/TopDestinationsSection";
 import { CuisineTypeSection } from "@/components/CuisineTypeSection";
 import { FineDiningRestaurantCard } from "@/components/FineDiningRestaurantCard";
@@ -140,36 +140,27 @@ export default function FineDining() {
     });
   };
 
+  // Only filter by search query - Google Places types don't map to cuisine names
   const filteredRestaurants = restaurants.filter(restaurant => {
     const matchesSearch = searchQuery === "" || restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCuisine = filters.cuisineTypes.length === 0 || 
-      (restaurant.types && filters.cuisineTypes.some(c => 
-        restaurant.types?.some(t => t.toLowerCase().includes(c.toLowerCase()))
-      ));
-    return matchesSearch && matchesCuisine;
+    return matchesSearch;
   });
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <PackageSearchHero
+      <FineDiningSearchHero
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         onSearch={handleSearch}
         onOpenFilters={() => setFiltersOpen(true)}
-        dataSource="amadeus"
-        onDataSourceChange={() => {}}
         onClearSearch={handleClearSearch}
       />
       <div className="container mx-auto px-4 py-12 sm:py-14 md:py-16 max-w-7xl">
-        <TopDestinationsSection
-          destinations={globalCulinaryCities.map(city => ({ destination: city.name, packageCount: 0, imageUrl: city.image }))}
-          onDestinationClick={(dest) => {
-            const city = globalCulinaryCities.find(c => c.name === dest);
-            if (city) handleCityClick(city);
-          }}
-        />
+        {/* Cuisine Types Section - First */}
         <CuisineTypeSection cuisines={cuisineTypes} onCuisineClick={handleCuisineClick} />
+        
+        {/* Restaurants List - Second */}
         <div className="mb-8">
           <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
           <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
@@ -215,6 +206,17 @@ export default function FineDining() {
             <p className="text-muted-foreground text-lg mb-4">No restaurants found</p>
           </div>
         )}
+        
+        {/* Top Destinations Section - Last */}
+        <div className="mt-16">
+          <TopDestinationsSection
+            destinations={globalCulinaryCities.map(city => ({ destination: city.name, packageCount: 0, imageUrl: city.image }))}
+            onDestinationClick={(dest) => {
+              const city = globalCulinaryCities.find(c => c.name === dest);
+              if (city) handleCityClick(city);
+            }}
+          />
+        </div>
       </div>
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="right" className="w-full sm:w-[400px] p-0">
