@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -81,8 +82,7 @@ Deno.serve(async (req) => {
 
     // Send email notifications
     if (Deno.env.get('RESEND_API_KEY')) {
-      const Resend = (await import('npm:resend@2.0.0')).Resend;
-      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
 
       // Email to customer
       if (customerProfile?.email) {

@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -146,7 +147,6 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     
     if (priorityMatches.length > 0 && resendApiKey) {
-      const { Resend } = await import('npm:resend@2.0.0');
       const resend = new Resend(resendApiKey);
 
       // Get agent details with user info
