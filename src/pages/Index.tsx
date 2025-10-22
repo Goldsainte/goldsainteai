@@ -1171,6 +1171,10 @@ const Index = () => {
               title="Most popular hotels in US"
               hotels={usHotels}
             />
+            <RestaurantScrollSection 
+              title="Fine Dining Across America"
+              restaurants={topUSRestaurants}
+            />
             <PopularSearchGrid />
 
             {/* Why Goldsainte - Luxury Storytelling Section */}
@@ -1206,12 +1210,6 @@ const Index = () => {
             {/* Featured Restaurants and Services */}
             <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
               <div className="w-full max-w-7xl mx-auto">
-                {/* Featured Restaurants */}
-              <RestaurantScrollSection 
-                title="Fine Dining Across America"
-                restaurants={topUSRestaurants}
-              />
-
               {/* Featured Flights */}
               <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
