@@ -127,7 +127,26 @@ export default function FineDining() {
 
   const handleCuisineClick = (cuisine: string) => {
     setFilters({ ...filters, cuisineTypes: [cuisine] });
-    toast.info(`Filtering by ${cuisine} (informational only)`);
+    toast.success(`Filtering by ${cuisine}`);
+  };
+
+  // Map cuisine names to Google Places types
+  const getCuisineTypes = (cuisine: string): string[] => {
+    const mapping: Record<string, string[]> = {
+      'French Fine Dining': ['french_restaurant'],
+      'Italian Trattoria': ['italian_restaurant'],
+      'Japanese Kaiseki': ['japanese_restaurant', 'sushi_restaurant', 'ramen_restaurant'],
+      'Chinese Imperial': ['chinese_restaurant'],
+      'Indian Fine Dining': ['indian_restaurant'],
+      'Thai Royal': ['thai_restaurant'],
+      'Mediterranean': ['mediterranean_restaurant', 'greek_restaurant'],
+      'Middle Eastern': ['middle_eastern_restaurant', 'lebanese_restaurant'],
+      'Modern American': ['american_restaurant'],
+      'Steakhouse': ['steak_house', 'american_restaurant'],
+      'Seafood': ['seafood_restaurant'],
+      'Fusion': ['fusion_restaurant', 'asian_fusion_restaurant'],
+    };
+    return mapping[cuisine] || [];
   };
 
   const handleClearFilters = () => {
@@ -140,10 +159,27 @@ export default function FineDining() {
     });
   };
 
-  // Only filter by search query - Google Places types don't map to cuisine names
+  // Apply all filters: search, cuisine, price, rating
   const filteredRestaurants = restaurants.filter(restaurant => {
+    // Name search
     const matchesSearch = searchQuery === "" || restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
+    
+    // Cuisine filter - check if restaurant types include selected cuisine
+    const matchesCuisine = filters.cuisineTypes.length === 0 || 
+      filters.cuisineTypes.some(cuisine => {
+        const cuisineTypes = getCuisineTypes(cuisine);
+        return restaurant.types?.some(t => cuisineTypes.includes(t));
+      });
+    
+    // Price range filter
+    const matchesPrice = !restaurant.price_level || 
+      (restaurant.price_level >= filters.priceRange[0] && 
+       restaurant.price_level <= filters.priceRange[1]);
+    
+    // Rating filter
+    const matchesRating = !restaurant.rating || restaurant.rating >= filters.minRating;
+    
+    return matchesSearch && matchesCuisine && matchesPrice && matchesRating;
   });
 
   return (

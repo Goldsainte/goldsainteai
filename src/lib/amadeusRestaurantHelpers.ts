@@ -30,6 +30,55 @@ export interface GooglePlacesRestaurant {
   editorialSummary?: {
     text: string;
   };
+  generativeSummary?: {
+    overview?: { text: string };
+    description?: { text: string };
+  };
+  primaryTypeDisplayName?: { text: string };
+  // Service options
+  servesBeer?: boolean;
+  servesWine?: boolean;
+  servesBreakfast?: boolean;
+  servesLunch?: boolean;
+  servesDinner?: boolean;
+  servesBrunch?: boolean;
+  servesVegetarianFood?: boolean;
+  takeout?: boolean;
+  delivery?: boolean;
+  dineIn?: boolean;
+  // Features
+  outdoorSeating?: boolean;
+  liveMusic?: boolean;
+  menuForChildren?: boolean;
+  servesCocktails?: boolean;
+  servesCoffee?: boolean;
+  servesDessert?: boolean;
+  // Amenities
+  restroom?: boolean;
+  goodForChildren?: boolean;
+  goodForGroups?: boolean;
+  allowsDogs?: boolean;
+  // Accessibility
+  accessibilityOptions?: {
+    wheelchairAccessibleEntrance?: boolean;
+    wheelchairAccessibleParking?: boolean;
+    wheelchairAccessibleRestroom?: boolean;
+    wheelchairAccessibleSeating?: boolean;
+  };
+  // Parking
+  parkingOptions?: {
+    freeParking?: boolean;
+    paidParking?: boolean;
+    valetParking?: boolean;
+  };
+  // Payment
+  paymentOptions?: {
+    acceptsCashOnly?: boolean;
+    acceptsCreditCards?: boolean;
+    acceptsDebitCards?: boolean;
+    acceptsNFC?: boolean;
+  };
+  // Reviews
   reviews?: Array<{
     author_name: string;
     rating: number;

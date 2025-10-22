@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Star, ExternalLink, Phone, Globe, Clock } from "lucide-react";
+import { ArrowLeft, MapPin, Star, ExternalLink, Phone, Globe, Clock, Utensils, Coffee, Wine, Users, DoorOpen, Music, Accessibility, ParkingCircle, CreditCard, Dog, Baby } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -223,6 +223,240 @@ export default function RestaurantDetail() {
                     <p className="text-sm">{day}</p>
                   </div>
                 ))}
+              </div>
+            </Card>
+          )}
+
+          {/* Dining Options Card */}
+          {(restaurant.servesBreakfast || restaurant.servesLunch || restaurant.servesDinner || restaurant.servesBrunch || 
+            restaurant.takeout || restaurant.delivery || restaurant.dineIn) && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Utensils className="text-luxury-gold" size={24} />
+                <h2 className="font-secondary text-2xl md:text-3xl text-luxury-emerald">Dining Options</h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {restaurant.servesBreakfast && (
+                  <div className="flex items-center gap-2">
+                    <Coffee size={18} className="text-luxury-gold" />
+                    <span>Breakfast</span>
+                  </div>
+                )}
+                {restaurant.servesLunch && (
+                  <div className="flex items-center gap-2">
+                    <Utensils size={18} className="text-luxury-gold" />
+                    <span>Lunch</span>
+                  </div>
+                )}
+                {restaurant.servesDinner && (
+                  <div className="flex items-center gap-2">
+                    <Utensils size={18} className="text-luxury-gold" />
+                    <span>Dinner</span>
+                  </div>
+                )}
+                {restaurant.servesBrunch && (
+                  <div className="flex items-center gap-2">
+                    <Coffee size={18} className="text-luxury-gold" />
+                    <span>Brunch</span>
+                  </div>
+                )}
+                {restaurant.takeout && (
+                  <div className="flex items-center gap-2">
+                    <DoorOpen size={18} className="text-luxury-gold" />
+                    <span>Takeout</span>
+                  </div>
+                )}
+                {restaurant.delivery && (
+                  <div className="flex items-center gap-2">
+                    <DoorOpen size={18} className="text-luxury-gold" />
+                    <span>Delivery</span>
+                  </div>
+                )}
+                {restaurant.dineIn && (
+                  <div className="flex items-center gap-2">
+                    <Utensils size={18} className="text-luxury-gold" />
+                    <span>Dine-In</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Food & Drink Card */}
+          {(restaurant.servesBeer || restaurant.servesWine || restaurant.servesCocktails || 
+            restaurant.servesCoffee || restaurant.servesDessert || restaurant.servesVegetarianFood) && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Wine className="text-luxury-gold" size={24} />
+                <h2 className="font-secondary text-2xl md:text-3xl text-luxury-emerald">Food & Drink</h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {restaurant.servesBeer && (
+                  <div className="flex items-center gap-2">
+                    <Wine size={18} className="text-luxury-gold" />
+                    <span>Beer</span>
+                  </div>
+                )}
+                {restaurant.servesWine && (
+                  <div className="flex items-center gap-2">
+                    <Wine size={18} className="text-luxury-gold" />
+                    <span>Wine</span>
+                  </div>
+                )}
+                {restaurant.servesCocktails && (
+                  <div className="flex items-center gap-2">
+                    <Wine size={18} className="text-luxury-gold" />
+                    <span>Cocktails</span>
+                  </div>
+                )}
+                {restaurant.servesCoffee && (
+                  <div className="flex items-center gap-2">
+                    <Coffee size={18} className="text-luxury-gold" />
+                    <span>Coffee</span>
+                  </div>
+                )}
+                {restaurant.servesDessert && (
+                  <div className="flex items-center gap-2">
+                    <Utensils size={18} className="text-luxury-gold" />
+                    <span>Dessert</span>
+                  </div>
+                )}
+                {restaurant.servesVegetarianFood && (
+                  <div className="flex items-center gap-2">
+                    <Utensils size={18} className="text-luxury-gold" />
+                    <span>Vegetarian Options</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Features & Amenities Card */}
+          {(restaurant.outdoorSeating || restaurant.liveMusic || restaurant.goodForGroups || 
+            restaurant.goodForChildren || restaurant.menuForChildren || restaurant.allowsDogs) && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Users className="text-luxury-gold" size={24} />
+                <h2 className="font-secondary text-2xl md:text-3xl text-luxury-emerald">Features & Amenities</h2>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {restaurant.outdoorSeating && (
+                  <div className="flex items-center gap-2">
+                    <DoorOpen size={18} className="text-luxury-gold" />
+                    <span>Outdoor Seating</span>
+                  </div>
+                )}
+                {restaurant.liveMusic && (
+                  <div className="flex items-center gap-2">
+                    <Music size={18} className="text-luxury-gold" />
+                    <span>Live Music</span>
+                  </div>
+                )}
+                {restaurant.goodForGroups && (
+                  <div className="flex items-center gap-2">
+                    <Users size={18} className="text-luxury-gold" />
+                    <span>Good for Groups</span>
+                  </div>
+                )}
+                {restaurant.goodForChildren && (
+                  <div className="flex items-center gap-2">
+                    <Baby size={18} className="text-luxury-gold" />
+                    <span>Good for Children</span>
+                  </div>
+                )}
+                {restaurant.menuForChildren && (
+                  <div className="flex items-center gap-2">
+                    <Utensils size={18} className="text-luxury-gold" />
+                    <span>Children's Menu</span>
+                  </div>
+                )}
+                {restaurant.allowsDogs && (
+                  <div className="flex items-center gap-2">
+                    <Dog size={18} className="text-luxury-gold" />
+                    <span>Pet-Friendly</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Accessibility Card */}
+          {restaurant.accessibilityOptions && (
+            restaurant.accessibilityOptions.wheelchairAccessibleEntrance || 
+            restaurant.accessibilityOptions.wheelchairAccessibleParking ||
+            restaurant.accessibilityOptions.wheelchairAccessibleRestroom ||
+            restaurant.accessibilityOptions.wheelchairAccessibleSeating
+          ) && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <Accessibility className="text-luxury-gold" size={24} />
+                <h2 className="font-secondary text-2xl md:text-3xl text-luxury-emerald">Accessibility</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {restaurant.accessibilityOptions.wheelchairAccessibleEntrance && (
+                  <div className="flex items-center gap-2">
+                    <Accessibility size={18} className="text-luxury-gold" />
+                    <span>Wheelchair Accessible Entrance</span>
+                  </div>
+                )}
+                {restaurant.accessibilityOptions.wheelchairAccessibleParking && (
+                  <div className="flex items-center gap-2">
+                    <ParkingCircle size={18} className="text-luxury-gold" />
+                    <span>Wheelchair Accessible Parking</span>
+                  </div>
+                )}
+                {restaurant.accessibilityOptions.wheelchairAccessibleRestroom && (
+                  <div className="flex items-center gap-2">
+                    <Accessibility size={18} className="text-luxury-gold" />
+                    <span>Wheelchair Accessible Restroom</span>
+                  </div>
+                )}
+                {restaurant.accessibilityOptions.wheelchairAccessibleSeating && (
+                  <div className="flex items-center gap-2">
+                    <Accessibility size={18} className="text-luxury-gold" />
+                    <span>Wheelchair Accessible Seating</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+          )}
+
+          {/* Parking & Payment Card */}
+          {((restaurant.parkingOptions && (restaurant.parkingOptions.freeParking || restaurant.parkingOptions.paidParking || restaurant.parkingOptions.valetParking)) ||
+            (restaurant.paymentOptions && (restaurant.paymentOptions.acceptsCreditCards || restaurant.paymentOptions.acceptsDebitCards || restaurant.paymentOptions.acceptsNFC || restaurant.paymentOptions.acceptsCashOnly))) && (
+            <Card className="p-6 md:p-8 mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <ParkingCircle className="text-luxury-gold" size={24} />
+                <h2 className="font-secondary text-2xl md:text-3xl text-luxury-emerald">Parking & Payment</h2>
+              </div>
+              <div className="space-y-4">
+                {restaurant.parkingOptions && (restaurant.parkingOptions.freeParking || restaurant.parkingOptions.paidParking || restaurant.parkingOptions.valetParking) && (
+                  <div>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                      <ParkingCircle size={18} className="text-luxury-gold" />
+                      Parking Options
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 ml-6">
+                      {restaurant.parkingOptions.freeParking && <span>Free Parking</span>}
+                      {restaurant.parkingOptions.paidParking && <span>Paid Parking</span>}
+                      {restaurant.parkingOptions.valetParking && <span>Valet Parking</span>}
+                    </div>
+                  </div>
+                )}
+                {restaurant.paymentOptions && (restaurant.paymentOptions.acceptsCreditCards || restaurant.paymentOptions.acceptsDebitCards || restaurant.paymentOptions.acceptsNFC || restaurant.paymentOptions.acceptsCashOnly) && (
+                  <div>
+                    <h3 className="font-semibold mb-2 flex items-center gap-2">
+                      <CreditCard size={18} className="text-luxury-gold" />
+                      Payment Methods
+                    </h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 ml-6">
+                      {restaurant.paymentOptions.acceptsCreditCards && <span>Credit Cards</span>}
+                      {restaurant.paymentOptions.acceptsDebitCards && <span>Debit Cards</span>}
+                      {restaurant.paymentOptions.acceptsNFC && <span>NFC/Contactless</span>}
+                      {restaurant.paymentOptions.acceptsCashOnly && <span>Cash Only</span>}
+                    </div>
+                  </div>
+                )}
               </div>
             </Card>
           )}

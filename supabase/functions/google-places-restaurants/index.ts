@@ -38,6 +38,7 @@ function transformRestaurant(place: any, apiKey: string): any {
     place_id: place.id,
     name: place.displayName?.text || place.name || '',
     vicinity: place.formattedAddress || place.vicinity || '',
+    formatted_address: place.formattedAddress,
     rating: place.rating,
     user_ratings_total: place.userRatingCount,
     price_level: place.priceLevel,
@@ -49,6 +50,7 @@ function transformRestaurant(place: any, apiKey: string): any {
     },
     opening_hours: {
       open_now: place.currentOpeningHours?.openNow || place.regularOpeningHours?.openNow,
+      weekday_text: place.regularOpeningHours?.weekdayDescriptions || place.currentOpeningHours?.weekdayDescriptions,
     },
     photos: place.photos?.map((photo: any) => ({
       photo_reference: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxWidthPx=800&maxHeightPx=800`,
@@ -57,6 +59,38 @@ function transformRestaurant(place: any, apiKey: string): any {
     })),
     types: place.types || [],
     business_status: place.businessStatus || 'OPERATIONAL',
+    formatted_phone_number: place.nationalPhoneNumber || place.internationalPhoneNumber,
+    website: place.websiteUri,
+    editorialSummary: place.editorialSummary,
+    generativeSummary: place.generativeSummary,
+    primaryTypeDisplayName: place.primaryTypeDisplayName,
+    // Service options
+    servesBeer: place.servesBeer,
+    servesWine: place.servesWine,
+    servesBreakfast: place.servesBreakfast,
+    servesLunch: place.servesLunch,
+    servesDinner: place.servesDinner,
+    servesBrunch: place.servesBrunch,
+    servesVegetarianFood: place.servesVegetarianFood,
+    takeout: place.takeout,
+    delivery: place.delivery,
+    dineIn: place.dineIn,
+    // Features
+    outdoorSeating: place.outdoorSeating,
+    liveMusic: place.liveMusic,
+    menuForChildren: place.menuForChildren,
+    servesCocktails: place.servesCocktails,
+    servesCoffee: place.servesCoffee,
+    servesDessert: place.servesDessert,
+    // Amenities
+    restroom: place.restroom,
+    goodForChildren: place.goodForChildren,
+    goodForGroups: place.goodForGroups,
+    allowsDogs: place.allowsDogs,
+    // Accessibility, parking, payment
+    accessibilityOptions: place.accessibilityOptions,
+    parkingOptions: place.parkingOptions,
+    paymentOptions: place.paymentOptions,
   };
 }
 
@@ -102,7 +136,7 @@ Deno.serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.priceLevel,places.currentOpeningHours,places.regularOpeningHours,places.photos,places.types,places.businessStatus',
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.location,places.rating,places.userRatingCount,places.priceLevel,places.currentOpeningHours,places.regularOpeningHours,places.photos,places.types,places.businessStatus,places.internationalPhoneNumber,places.nationalPhoneNumber,places.websiteUri,places.editorialSummary,places.generativeSummary,places.primaryTypeDisplayName,places.servesBeer,places.servesWine,places.servesBreakfast,places.servesLunch,places.servesDinner,places.servesBrunch,places.servesVegetarianFood,places.takeout,places.delivery,places.dineIn,places.outdoorSeating,places.liveMusic,places.menuForChildren,places.servesCocktails,places.servesCoffee,places.servesDessert,places.restroom,places.goodForChildren,places.goodForGroups,places.allowsDogs,places.accessibilityOptions,places.parkingOptions,places.paymentOptions',
       },
       body: JSON.stringify(requestBody),
     });

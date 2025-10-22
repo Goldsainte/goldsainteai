@@ -10,6 +10,7 @@ function transformPlaceDetails(place: any, apiKey: string): any {
   return {
     place_id: place.id,
     name: place.displayName?.text || place.name || '',
+    vicinity: place.formattedAddress || '',
     formatted_address: place.formattedAddress || '',
     geometry: {
       location: {
@@ -33,17 +34,47 @@ function transformPlaceDetails(place: any, apiKey: string): any {
       width: photo.widthPx || 800,
     })),
     types: place.types || [],
+    business_status: place.businessStatus || 'OPERATIONAL',
     formatted_phone_number: place.internationalPhoneNumber || place.nationalPhoneNumber,
     website: place.websiteUri,
-    business_status: place.businessStatus || 'OPERATIONAL',
     editorialSummary: place.editorialSummary,
+    generativeSummary: place.generativeSummary,
+    primaryTypeDisplayName: place.primaryTypeDisplayName,
+    // Service options
+    servesBeer: place.servesBeer,
+    servesWine: place.servesWine,
+    servesBreakfast: place.servesBreakfast,
+    servesLunch: place.servesLunch,
+    servesDinner: place.servesDinner,
+    servesBrunch: place.servesBrunch,
+    servesVegetarianFood: place.servesVegetarianFood,
+    takeout: place.takeout,
+    delivery: place.delivery,
+    dineIn: place.dineIn,
+    // Features
+    outdoorSeating: place.outdoorSeating,
+    liveMusic: place.liveMusic,
+    menuForChildren: place.menuForChildren,
+    servesCocktails: place.servesCocktails,
+    servesCoffee: place.servesCoffee,
+    servesDessert: place.servesDessert,
+    // Amenities
+    restroom: place.restroom,
+    goodForChildren: place.goodForChildren,
+    goodForGroups: place.goodForGroups,
+    allowsDogs: place.allowsDogs,
+    // Accessibility, parking, payment
+    accessibilityOptions: place.accessibilityOptions,
+    parkingOptions: place.parkingOptions,
+    paymentOptions: place.paymentOptions,
+    // Reviews
     reviews: place.reviews?.map((review: any) => ({
       author_name: review.authorAttribution?.displayName || 'Anonymous',
       rating: review.rating,
       text: review.text?.text || review.originalText?.text || '',
       time: review.publishTime,
       relative_time_description: review.relativePublishTimeDescription,
-    })),
+    })) || [],
   };
 }
 
@@ -85,7 +116,7 @@ serve(async (req) => {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': googleApiKey,
-        'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,rating,userRatingCount,priceLevel,currentOpeningHours,regularOpeningHours,photos,types,internationalPhoneNumber,nationalPhoneNumber,websiteUri,businessStatus,editorialSummary,reviews',
+        'X-Goog-FieldMask': 'id,displayName,formattedAddress,location,rating,userRatingCount,priceLevel,currentOpeningHours,regularOpeningHours,photos,types,internationalPhoneNumber,nationalPhoneNumber,websiteUri,businessStatus,editorialSummary,reviews,generativeSummary,primaryTypeDisplayName,servesBeer,servesWine,servesBreakfast,servesLunch,servesDinner,servesBrunch,servesVegetarianFood,takeout,delivery,dineIn,outdoorSeating,liveMusic,menuForChildren,servesCocktails,servesCoffee,servesDessert,restroom,goodForChildren,goodForGroups,allowsDogs,accessibilityOptions,parkingOptions,paymentOptions',
       },
     });
 
