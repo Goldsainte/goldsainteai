@@ -219,18 +219,18 @@ export const Header = () => {
                   {/* Mobile Navigation Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="h-10 w-10 hover:bg-[#BFAD72] transition-all duration-300 group"
-                        aria-label="Main menu"
-                      >
-                        <Menu className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
-                      </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] transition-all duration-300 group touch-manipulation"
+                          aria-label="Main menu"
+                        >
+                          <Menu className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
+                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="end" 
-                      className="w-80 max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
+                      className="w-80 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
                     >
                       {/* Discover Section */}
                       <div className="px-4 py-3 border-b border-border/50">
@@ -239,28 +239,28 @@ export const Header = () => {
                       <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/travel-feed')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Journeys</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/browse-creators')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Browse Creators</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/browse-agents')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Browse Agents</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/marketplace')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Marketplace</span>
@@ -276,14 +276,14 @@ export const Header = () => {
                       <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/agent-onboarding')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Become an Agent</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/transportation-vendor-partners')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Car className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Become a Transport Vendor</span>
@@ -299,14 +299,14 @@ export const Header = () => {
                       <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/shop')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Shop</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/affiliate-manager')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Link2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">Affiliate Links</span>
@@ -322,7 +322,7 @@ export const Header = () => {
                       <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/about')} 
-                          className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                           <span className="text-sm font-medium">About</span>
@@ -334,18 +334,18 @@ export const Header = () => {
                   {/* Mobile User Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button 
-                        variant="ghost" 
-                        size="icon"
-                        className="h-10 w-10 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group"
-                        aria-label="User menu"
-                      >
-                        <User className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
-                      </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon"
+                          className="h-12 w-12 min-h-[48px] min-w-[48px] hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation"
+                          aria-label="User menu"
+                        >
+                          <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
+                        </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent 
                       align="end" 
-                      className="w-72 bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
+                      className="w-72 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]"
                     >
                       {user ? (
                         <>
@@ -365,21 +365,21 @@ export const Header = () => {
 
                           <DropdownMenuItem 
                             onClick={() => navigate('/profile')} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
                             <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Profile</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/dashboard')} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
                             <LayoutDashboard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={handleCreateClick} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
                             <Plus className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Create Content</span>
@@ -389,7 +389,7 @@ export const Header = () => {
                           
                           <DropdownMenuItem 
                             onClick={signOut} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 text-destructive"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 text-destructive touch-manipulation"
                           >
                             <User className="h-5 w-5 flex-shrink-0" />
                             <span className="text-sm font-medium">Sign Out</span>
@@ -399,14 +399,14 @@ export const Header = () => {
                         <>
                           <DropdownMenuItem 
                             onClick={() => navigate('/auth')} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
                             <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
                             <span className="text-sm font-medium">Sign In</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/auth?mode=signup')} 
-                            className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 bg-secondary/20"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 bg-secondary/20 touch-manipulation"
                           >
                             <User className="h-5 w-5 text-secondary flex-shrink-0" />
                             <span className="text-sm font-medium text-secondary">Sign Up</span>
@@ -460,16 +460,16 @@ export const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-[#BFAD72] transition-all duration-300 group"
+                      className="h-12 w-12 min-h-[48px] min-w-[48px] sm:h-12 sm:w-12 hover:bg-[#BFAD72] transition-all duration-300 group touch-manipulation"
                       aria-label="Main menu"
                       data-tour="navigation"
                     >
-                      <Menu className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
+                      <Menu className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-80 max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                    className="w-80 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
                   >
                     {/* Travel Section */}
                     <div className="px-4 py-3 border-b border-border/50">
@@ -478,35 +478,35 @@ export const Header = () => {
                     <div className="py-2">
                       <DropdownMenuItem 
                         onClick={() => handleServiceClick('hotels')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Hotel className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Hotels & Stays</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleServiceClick('flights')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Plane className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Flights</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleServiceClick('restaurants')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <UtensilsCrossed className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Restaurants</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleServiceClick('events')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Ticket className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Events</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => handleServiceClick('cars')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Car className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Car Rentals</span>
@@ -522,28 +522,28 @@ export const Header = () => {
                     <div className="py-2">
                       <DropdownMenuItem 
                         onClick={() => navigate('/travel-feed')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Video className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Journeys</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/browse-creators')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <User className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Browse Creators</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/browse-agents')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Browse Agents</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/marketplace')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Marketplace</span>
@@ -559,14 +559,14 @@ export const Header = () => {
                     <div className="py-2 pb-3">
                       <DropdownMenuItem 
                         onClick={() => navigate('/agent-onboarding')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Briefcase className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Become an Agent</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/transportation-vendor-partners')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Car className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Become a Transport Vendor</span>
@@ -582,14 +582,14 @@ export const Header = () => {
                     <div className="py-2 pb-3">
                       <DropdownMenuItem 
                         onClick={() => navigate('/shop')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <ShoppingCart className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Shop</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/affiliate-manager')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Link2 className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Affiliate Links</span>
@@ -605,7 +605,7 @@ export const Header = () => {
                     <div className="py-2 pb-3">
                       <DropdownMenuItem 
                         onClick={() => navigate('/about')} 
-                        className="mx-2 px-4 py-3 gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Info className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">About</span>
@@ -620,15 +620,15 @@ export const Header = () => {
                     <Button 
                       variant="ghost" 
                       size="icon"
-                      className="h-10 w-10 sm:h-11 sm:w-11 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group"
+                      className="h-12 w-12 min-h-[48px] min-w-[48px] sm:h-12 sm:w-12 hover:bg-[#BFAD72] rounded-full border border-border shadow-sm transition-all duration-300 group touch-manipulation"
                       aria-label="User menu"
                     >
-                      <User className="h-5 w-5 text-[#BFAD72] group-hover:text-white transition-colors" />
+                      <User className="h-6 w-6 text-[#BFAD72] group-hover:text-white transition-colors" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-72 max-h-[85vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
+                    className="w-72 max-h-[75vh] overflow-y-auto bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100] animate-in fade-in-0 zoom-in-95 duration-200"
                   >
                     {user ? (
                       <>
@@ -654,21 +654,21 @@ export const Header = () => {
                         <div className="py-2">
                           <DropdownMenuItem 
                             onClick={() => navigate('/dashboard')} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={handleCreateClick} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                           >
                             <Plus className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Create Content</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={() => navigate('/creator-dashboard')} 
-                            className="mx-2 px-4 py-3 gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group"
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                             data-tour="creator-dashboard"
                           >
                             <TrendingUp className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
@@ -689,7 +689,7 @@ export const Header = () => {
                             <div className="py-2">
                               <DropdownMenuItem 
                                 onClick={() => navigate('/admin/agent-approvals')} 
-                                className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                                className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
                               >
                                 <span className="text-sm font-semibold text-secondary">Admin Panel</span>
                               </DropdownMenuItem>
@@ -722,7 +722,7 @@ export const Header = () => {
                         <div className="py-2 pb-3">
                           <DropdownMenuItem 
                             onClick={signOut} 
-                            className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-destructive/10 hover:text-destructive"
+                            className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-destructive/10 hover:text-destructive touch-manipulation"
                           >
                             <span className="text-sm font-medium">Sign Out</span>
                           </DropdownMenuItem>
@@ -732,13 +732,13 @@ export const Header = () => {
                       <div className="py-2">
                         <DropdownMenuItem 
                           onClick={() => navigate('/auth')} 
-                          className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                          className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
                         >
                           <span className="text-sm font-semibold">Sign In</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/auth')} 
-                          className="mx-2 px-4 py-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1"
+                          className="mx-2 px-4 py-4 min-h-[48px] cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 touch-manipulation"
                         >
                           <span className="text-sm font-medium">Sign Up</span>
                         </DropdownMenuItem>
