@@ -4,8 +4,8 @@ import { Header } from "@/components/Header";
 import { RestaurantSearchHero } from "@/components/RestaurantSearchHero";
 import { TopDestinationsSection } from "@/components/TopDestinationsSection";
 import { CuisineTypeSection } from "@/components/CuisineTypeSection";
-import { RestaurantCard } from "@/components/RestaurantCard";
-import { RestaurantFilters, RestaurantFilterState } from "@/components/RestaurantFilters";
+import { FineDiningRestaurantCard } from "@/components/FineDiningRestaurantCard";
+import { FineDiningFilters, RestaurantFilterState } from "@/components/FineDiningFilters";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchAmadeusRestaurantsForLocation, AmadeusRestaurant } from "@/lib/amadeusRestaurantHelpers";
@@ -156,7 +156,7 @@ export default function FineDining() {
         ) : filteredRestaurants.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredRestaurants.map((restaurant) => (
-              <RestaurantCard
+              <FineDiningRestaurantCard
                 key={restaurant.id}
                 id={restaurant.id}
                 name={restaurant.name}
@@ -178,7 +178,7 @@ export default function FineDining() {
       </div>
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="right" className="w-full sm:w-[400px] p-0">
-          <RestaurantFilters filters={filters} onFiltersChange={setFilters} onClearAll={handleClearFilters} />
+          <FineDiningFilters filters={filters} onFiltersChange={setFilters} onClearAll={handleClearFilters} />
         </SheetContent>
       </Sheet>
     </div>

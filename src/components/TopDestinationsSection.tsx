@@ -12,9 +12,10 @@ interface Destination {
 
 interface TopDestinationsSectionProps {
   destinations: Destination[];
+  onDestinationClick?: (destination: string) => void;
 }
 
-export const TopDestinationsSection = ({ destinations }: TopDestinationsSectionProps) => {
+export const TopDestinationsSection = ({ destinations, onDestinationClick }: TopDestinationsSectionProps) => {
   const navigate = useNavigate();
 
   if (destinations.length === 0) return null;
@@ -38,7 +39,7 @@ export const TopDestinationsSection = ({ destinations }: TopDestinationsSectionP
           <Card
             key={dest.destination}
             className="relative h-40 sm:h-48 md:h-56 rounded-xl overflow-hidden cursor-pointer group border-luxury-gold/20 hover:shadow-xl transition-all duration-500"
-            onClick={() => navigate(`/cocurated-journeys?destination=${dest.destination}`)}
+            onClick={() => onDestinationClick ? onDestinationClick(dest.destination) : navigate(`/cocurated-journeys?destination=${dest.destination}`)}
           >
             <img
               src={dest.imageUrl || getLuxuryImage(dest.destination)}

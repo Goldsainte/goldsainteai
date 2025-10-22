@@ -1,126 +1,198 @@
-import { Star, MapPin, DollarSign } from "lucide-react";
+import { useState } from "react";
+import { Star, MapPin, Phone, Globe, Heart, Calendar, Clock } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { RestaurantDetailsModal } from "@/components/RestaurantDetailsModal";
+import { useFavorites } from "@/hooks/useFavorites";
 
 interface RestaurantCardProps {
   id: string;
   name: string;
-  city?: string;
-  country?: string;
-  cuisine?: string[];
-  priceLevel?: number;
   rating?: number;
-  reviewCount?: number;
-  imageUrl?: string;
-  rank?: number;
-  tags?: string[];
-  onViewDetails: () => void;
+  userRatingsTotal?: number;
+  priceLevel?: number;
+  address?: string;
+  photoUrl?: string;
+  openNow?: boolean;
+  phone?: string;
+  website?: string;
+  hours?: any;
+  photos?: any[];
+  cuisine?: string;
+  description?: string;
+  reservationUrl?: string;
 }
 
 export const RestaurantCard = ({
+  id,
   name,
-  city,
-  country,
-  cuisine = [],
-  priceLevel = 3,
   rating,
-  reviewCount,
-  imageUrl,
-  rank,
-  tags = [],
-  onViewDetails,
+  userRatingsTotal,
+  priceLevel,
+  address,
+  photoUrl,
+  openNow,
+  phone,
+  website,
+  hours,
+  photos,
+  cuisine,
+  description,
+  reservationUrl,
 }: RestaurantCardProps) => {
-  const getPriceLevelSymbol = (level: number) => {
-    return '$'.repeat(Math.min(level, 4));
+  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const { addFavorite, removeFavorite, isFavorite } = useFavorites();
+  const favorite = isFavorite(id);
+
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (favorite) {
+      removeFavorite(id);
+    } else {
+      addFavorite({
+        id,
+        type: "hotel",
+        name,
+        imageUrl: photoUrl,
+        location: address,
+        rating,
+        additionalInfo: { cuisine, priceLevel },
+      });
+    }
+  };
+
+  const handleCardClick = () => {
+    setShowDetailsModal(true);
+  };
+
+  const handleBookTable = () => {
+    if (reservationUrl) {
+      window.open(reservationUrl, "_blank");
+    } else {
+      const searchQuery = encodeURIComponent(`${name} restaurant reservation`);
+      window.open(`https://www.google.com/search?q=${searchQuery}`, "_blank");
+    }
+  };
+
+  const getPriceLevelSymbol = () => {
+    if (!priceLevel) return "";
+    return "$".repeat(priceLevel);
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
-      {/* Image */}
-      <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden">
-        <img
-          src={imageUrl || "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80"}
-          alt={name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-          loading="lazy"
-          decoding="async"
-        />
-        {rank && (
-          <Badge className="absolute top-3 right-3 bg-luxury-gold text-luxury-emerald text-[10px] sm:text-xs">
-            Rank #{rank}
-          </Badge>
-        )}
-      </div>
-
-      <CardContent className="p-2.5 sm:p-3 md:p-4">
-        {/* Cuisine Badge */}
-        {cuisine.length > 0 && (
-          <div className="flex items-center gap-2 mb-2">
-            <Badge variant="outline" className="text-xs border-luxury-gold/30 text-luxury-emerald">
-              {cuisine[0]}
+    <>
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer">
+        <div className="relative h-48 overflow-hidden" onClick={handleCardClick}>
+          <img
+            src={photoUrl || "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80"}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            loading="lazy"
+          />
+          <button
+            onClick={handleToggleFavorite}
+            className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white transition-colors"
+          >
+            <Heart
+              className={`h-5 w-5 ${favorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+            />
+          </button>
+          {openNow !== undefined && (
+            <Badge
+              className={`absolute top-3 left-3 ${openNow ? "bg-green-500" : "bg-red-500"}`}
+            >
+              {openNow ? "Open Now" : "Closed"}
             </Badge>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Title */}
-        <h3 className="font-secondary text-sm sm:text-base md:text-lg font-light text-luxury-emerald mb-2 line-clamp-2 group-hover:text-luxury-emerald/80 transition-colors">
-          {name}
-        </h3>
-
-        {/* Location */}
-        {(city || country) && (
-          <div className="flex items-center text-muted-foreground mb-3">
-            <MapPin className="h-4 w-4 mr-1" />
-            <span className="text-sm">
-              {city}{city && country ? ', ' : ''}{country}
-            </span>
-          </div>
-        )}
-
-        {/* Details Row */}
-        <div className="flex items-center gap-4 text-sm mb-3">
-          {/* Price Level */}
-          <div className="flex items-center text-luxury-gold">
-            <DollarSign className="h-4 w-4" />
-            <span className="font-medium">{getPriceLevelSymbol(priceLevel)}</span>
-          </div>
-
-          {/* Rating */}
+        <CardContent className="p-4" onClick={handleCardClick}>
           {rating && (
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 fill-luxury-gold text-luxury-gold" />
-              <span className="font-semibold text-luxury-emerald">{rating.toFixed(1)}</span>
-              {reviewCount && reviewCount > 0 && (
-                <span className="text-muted-foreground">
-                  ({reviewCount})
+            <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center">
+                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 mr-1" />
+                <span className="font-semibold">{rating.toFixed(1)}</span>
+              </div>
+              {userRatingsTotal && (
+                <span className="text-sm text-muted-foreground">
+                  ({userRatingsTotal.toLocaleString()} reviews)
+                </span>
+              )}
+              {priceLevel && (
+                <span className="text-sm text-muted-foreground ml-auto">
+                  {getPriceLevelSymbol()}
                 </span>
               )}
             </div>
           )}
-        </div>
 
-        {/* Tags */}
-        {tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
-            {tags.slice(0, 3).map((tag, idx) => (
-              <Badge key={idx} variant="secondary" className="text-xs bg-luxury-gold/10 text-luxury-emerald">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-      </CardContent>
+          <h3 className="font-semibold text-lg mb-2 line-clamp-2">{name}</h3>
 
-      <CardFooter className="p-2.5 sm:p-3 md:p-4 pt-0">
-        <Button 
-          onClick={onViewDetails} 
-          variant="outline" 
-          className="w-full min-h-[44px] text-xs sm:text-sm border-luxury-gold/30 text-luxury-emerald hover:bg-luxury-gold/10"
-        >
-          View Details
-        </Button>
-      </CardFooter>
-    </Card>
+          {cuisine && (
+            <Badge variant="secondary" className="mb-2">
+              {cuisine}
+            </Badge>
+          )}
+
+          {address && (
+            <div className="flex items-start text-muted-foreground text-sm mb-2">
+              <MapPin className="h-4 w-4 mr-1 flex-shrink-0 mt-0.5" />
+              <span className="line-clamp-2">{address}</span>
+            </div>
+          )}
+
+          {phone && (
+            <div className="flex items-center text-muted-foreground text-sm mb-2">
+              <Phone className="h-4 w-4 mr-1" />
+              <span>{phone}</span>
+            </div>
+          )}
+
+          {website && (
+            <div className="flex items-center text-muted-foreground text-sm">
+              <Globe className="h-4 w-4 mr-1" />
+              <a
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline truncate"
+                onClick={(e) => e.stopPropagation()}
+              >
+                Website
+              </a>
+            </div>
+          )}
+        </CardContent>
+
+        <CardFooter className="p-4 pt-0">
+          <Button onClick={handleBookTable} className="w-full" size="lg">
+            <Calendar className="h-4 w-4 mr-2" />
+            Make Reservation
+          </Button>
+        </CardFooter>
+      </Card>
+
+      <RestaurantDetailsModal
+        isOpen={showDetailsModal}
+        onClose={() => setShowDetailsModal(false)}
+        restaurant={{
+          id,
+          name,
+          rating,
+          userRatingsTotal,
+          priceLevel,
+          address,
+          photoUrl,
+          openNow,
+          phone,
+          website,
+          hours,
+          photos,
+          cuisine,
+          description,
+        }}
+      />
+    </>
   );
 };
