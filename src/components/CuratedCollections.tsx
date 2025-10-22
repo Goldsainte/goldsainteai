@@ -45,7 +45,7 @@ export const CuratedCollections = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 bg-luxury-ivory animate-fadeIn">
+    <section className="py-20 bg-luxury-ivory">
       <div className="container px-4">
         <div className="text-center mb-12">
           <h2 className="font-secondary text-4xl md:text-5xl font-bold mb-4 text-foreground tracking-wide">
@@ -60,7 +60,7 @@ export const CuratedCollections = () => {
           {collections.map((collection) => (
             <Card
               key={collection.category}
-              className="relative h-64 md:h-72 rounded-2xl overflow-hidden cursor-pointer group border-0 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105"
+              className="relative h-64 md:h-72 rounded-2xl overflow-hidden cursor-pointer group border-0 shadow-lg hover:shadow-2xl transition-all duration-500"
               onClick={() => navigate(`/cocurated-journeys?category=${collection.category}`)}
             >
               <img
