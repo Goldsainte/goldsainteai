@@ -45,7 +45,7 @@ import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import { WhyGoldsainte } from "@/components/WhyGoldsainte";
 
-import { SocialProof } from "@/components/SocialProof";
+
 import { FromTheJournal } from "@/components/FromTheJournal";
 import { WinterSunHero } from "@/components/WinterSunHero";
 import { ThreeGridGallery } from "@/components/ThreeGridGallery";
@@ -1258,9 +1258,6 @@ const Index = () => {
             {/* Why Goldsainte - Luxury Storytelling Section */}
             <WhyGoldsainte />
 
-
-            {/* Social Proof - Testimonials */}
-            <SocialProof />
 
             {/* Featured Transportation Vendors - Promoted */}
             <section className="px-4 sm:px-6 py-8 sm:py-10 bg-secondary/5">
