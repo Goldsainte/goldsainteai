@@ -847,26 +847,23 @@ const Index = () => {
                       Discover, plan, and share luxury travel — all in one intelligent platform.
                     </p>
             <p>
-              Goldsainte is where technology meets timeless travel. Your journey begins with our AI concierge, available at a touch or by simply saying "Hey Goldsainte." Speak naturally, and your AI learns how you like to travel — your style, your favorite hotels, your preferred restaurants, and the experiences that excite you most. With every conversation, it becomes smarter, offering more refined, personalized recommendations each time you return.
+              Goldsainte blends AI technology with human expertise to make luxury travel effortless. Start by chatting with your personal concierge or saying "Hey Goldsainte." It learns your style — where you love to stay, dine, and explore — refining recommendations with every conversation.
             </p>
             <p>
-              From there, step into a curated world of CoCurated™ travel collections — immersive itineraries crafted by trusted creators and certified agents. Explore cinematic trips, save your favorites to custom boards, and follow tastemakers whose sense of style mirrors your own. Every recommendation blends AI intelligence with human expertise, transforming discovery into an experience that feels personal, effortless, and inspiring.
+              Discover CoCurated™ collections designed by trusted creators and certified agents. Save your favorites, follow tastemakers who inspire you, and let our AI weave everything into itineraries that feel tailor-made.
             </p>
             <p>
-              When you're ready to plan, simply post your trip request. Within moments, certified Goldsainte agents begin bidding to design your perfect journey. Each proposal comes with transparent pricing, milestone payments, and live communication, giving you complete control while professionals compete to deliver exceptional value. It's luxury travel — redefined through access, choice, and trust.
+              Ready to plan? Post your trip and let expert agents bid to design your journey. Compare proposals, chat in real time, and choose the perfect fit — all with transparent pricing and milestone payments for peace of mind.
             </p>
             <p>
-              Seamless booking and itinerary creation complete the experience. Securely book flights, hotels, cars, dining, and exclusive experiences in one place, with instant confirmations. Your AI automatically organizes everything into an elegant, day-by-day itinerary you can edit, share with friends, or hand off to an agent for final touches.
+              Book instantly through Goldsainte — flights, hotels, dining, and more — with secure checkout and automatic itinerary creation. Then, connect, share, and earn by becoming a creator yourself. Curate destinations, inspire travelers, and make money when others book from your recommendations.
             </p>
             <p>
-              Beyond travel, Goldsainte empowers you to create, share, and earn. Become a travel creator, build your own profile, curate destination collections, and earn commissions every time someone books from your recommendations. Track your analytics, grow your following, and turn your influence into income — all from a single dashboard.
-            </p>
-            <p>
-              Throughout it all, Goldsainte keeps you connected. Chat with agents in real time, manage group trips with split payments, receive instant notifications, and monitor every detail from planning to payout. Intelligent, beautiful, and personal — this is travel elevated by AI, powered by creators, and perfected by experts.
+              Everything happens in one elegant platform — AI-driven, creator-powered, and designed for those who travel well.
             </p>
             <p>
               Discover. Plan. Book. Earn.<br />
-              All in one intelligent luxury travel marketplace.
+              Luxury travel, reinvented.
             </p>
                   </div>
                 </div>
