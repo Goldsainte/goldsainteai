@@ -406,7 +406,7 @@ export default function CoCuratedJourneys() {
           onClearSearch={handleClearSearch}
         />
 
-        {/* Luxury Experiences Section - Only show when no active search */}
+        {/* Luxury Experiences Section - Show at top when browsing */}
         {!searchQuery && filteredPackages.length === packages.length && (
           <LuxuryExperiencesSection />
         )}
@@ -506,6 +506,13 @@ export default function CoCuratedJourneys() {
                   </div>
                 )}
               </section>
+
+              {/* Luxury Experiences Section - Show at bottom when searching/filtering */}
+              {(searchQuery || filteredPackages.length !== packages.length) && (
+                <div className="mt-16">
+                  <LuxuryExperiencesSection />
+                </div>
+              )}
             </>
           )}
           </div>
