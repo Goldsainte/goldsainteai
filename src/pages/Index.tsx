@@ -934,6 +934,216 @@ const Index = () => {
               </div>
             </div>
 
+            {/* How it Works Section - Horizontal Scrolling */}
+            <section className="px-4 sm:px-6 py-20 md:py-24 bg-white" aria-labelledby="how-it-works-heading">
+              <div className="w-full max-w-7xl mx-auto space-y-12 md:space-y-16">
+                <div className="text-left space-y-6 px-2">
+                  <div>
+                    <h2 id="how-it-works-heading" className="font-secondary text-5xl md:text-6xl font-light leading-tight text-primary mb-4">
+                      How it Works
+                    </h2>
+                    <div className="w-20 h-1 bg-luxury-gold" />
+                  </div>
+                  <div className="text-lg md:text-xl leading-relaxed text-muted-foreground/90 font-secondary space-y-6">
+                    <p>
+                      Discover, plan, and share luxury travel — all in one intelligent platform.
+                    </p>
+                    <p>
+                      Start by chatting with our AI concierge or say "Hey Goldsainte" to activate voice planning. The more you chat, the smarter it gets — learning your travel style to tailor every recommendation.
+                    </p>
+                    <p>
+                      Browse co-curated collections from trusted travel creators and agents you know. Save favorites to your personal boards, and let our AI weave them into custom itineraries instantly.
+                    </p>
+                    <p>
+                      Book directly through the platform — hotels, experiences, transportation — with expert agent support available 24/7. Your travel intel is private, encrypted, and yours alone.
+                    </p>
+                    <p>
+                      Share your own discoveries by becoming a travel creator. Build your profile, curate destinations, and earn when others book from your recommendations. Travel smarter. Share deeper.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Horizontal scrolling feature cards */}
+                <div className="relative w-full -mx-4 sm:-mx-6">
+                  <div 
+                    className="overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x pb-2"
+                    style={{ 
+                      scrollbarWidth: 'none',
+                      msOverflowStyle: 'none',
+                      WebkitOverflowScrolling: 'touch'
+                    }}
+                  >
+                    <div className="flex gap-6 md:gap-8 px-4 sm:px-6 min-w-max">
+                      {/* Card 1: Voice AI Search */}
+                      <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
+                        <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+                          <img
+                            src={cardAiSearch}
+                            alt="AI-powered voice search interface for luxury travel planning"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <CardContent className="p-0 space-y-3 sm:space-y-4">
+                          <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
+                            Voice AI Search
+                          </h3>
+                          <p className="text-base text-muted-foreground/90 leading-relaxed">
+                            Say "Hey Goldsainte" and speak naturally. Our AI instantly surfaces luxury hotels, experiences, and hidden gems tailored to your style.
+                          </p>
+                          <button 
+                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                          >
+                            Try Voice AI
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 2: CoCurated Itineraries */}
+                      <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
+                        <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+                          <img
+                            src={cardItinerary}
+                            alt="Personalized luxury travel itinerary with curated recommendations"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <CardContent className="p-0 space-y-3 sm:space-y-4">
+                          <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
+                            CoCurated Itineraries
+                          </h3>
+                          <p className="text-base text-muted-foreground/90 leading-relaxed">
+                            Your AI builds complete trip plans instantly — pulling from your saved favorites and trusted creator collections. Edit, refine, or regenerate with one click.
+                          </p>
+                          <button 
+                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
+                            onClick={() => navigate('/itineraries')}
+                          >
+                            Explore Itineraries
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 3: Creator Social Network */}
+                      <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
+                        <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+                          <img
+                            src={cardMessaging}
+                            alt="Travel creator community sharing luxury destination insights"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <CardContent className="p-0 space-y-3 sm:space-y-4">
+                          <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
+                            Creator Social Network
+                          </h3>
+                          <p className="text-base text-muted-foreground/90 leading-relaxed">
+                            Follow tastemakers, luxury agents, and fellow travelers. Discover their curated collections, save their favorites, and chat directly for insider intel.
+                          </p>
+                          <button 
+                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
+                            onClick={() => navigate('/social-feed')}
+                          >
+                            Discover Creators
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 4: Expert Agent Support */}
+                      <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
+                        <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+                          <img
+                            src={cardExpertAgents}
+                            alt="Professional travel agent providing personalized luxury travel consultation"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <CardContent className="p-0 space-y-3 sm:space-y-4">
+                          <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
+                            Expert Agent Support
+                          </h3>
+                          <p className="text-base text-muted-foreground/90 leading-relaxed">
+                            Human travel experts available 24/7 — via chat, voice, or video. They handle complex bookings, negotiate upgrades, and respond instantly when plans change.
+                          </p>
+                          <button 
+                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
+                            onClick={() => navigate('/agents')}
+                          >
+                            Meet Our Agents
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 5: Instant Booking */}
+                      <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
+                        <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+                          <img
+                            src={cardInstantBooking}
+                            alt="Seamless booking interface for luxury hotels and travel experiences"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <CardContent className="p-0 space-y-3 sm:space-y-4">
+                          <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
+                            Instant Booking
+                          </h3>
+                          <p className="text-base text-muted-foreground/90 leading-relaxed">
+                            Book hotels, flights, car rentals, and experiences directly in the platform. Secure checkout, instant confirmation, and encrypted payment — no third-party redirects.
+                          </p>
+                          <button 
+                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
+                            onClick={() => navigate('/hotels')}
+                          >
+                            Start Booking
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Card 6: Creator Stores */}
+                      <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
+                        <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
+                          <img
+                            src={pinkBeachAerial}
+                            alt="Travel creator's curated destination storefront with luxury recommendations"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            loading="lazy"
+                          />
+                        </div>
+                        <CardContent className="p-0 space-y-3 sm:space-y-4">
+                          <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
+                            Creator Stores
+                          </h3>
+                          <p className="text-base text-muted-foreground/90 leading-relaxed">
+                            Become a travel creator. Curate your favorite destinations, build themed collections, and earn when others book from your store. Your taste, monetized.
+                          </p>
+                          <button 
+                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
+                            onClick={() => navigate('/creators')}
+                          >
+                            Explore Creator Stores
+                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                          </button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Padding element to ensure last card is fully visible */}
+                      <div className="flex-shrink-0 w-6" aria-hidden="true"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* Mr & Mrs Smith Style Sections */}
             <WinterSunHero />
             <ThreeGridGallery />
@@ -962,213 +1172,6 @@ const Index = () => {
               />
             </div>
 
-                {/* How it Works Section - Horizontal Scrolling */}
-                <section className="px-4 sm:px-6 py-20 md:py-24 bg-white" aria-labelledby="how-it-works-heading">
-                  <div className="w-full max-w-7xl mx-auto space-y-12 md:space-y-16">
-                    <div className="text-left space-y-6 px-2">
-                      <div>
-                        <h2 id="how-it-works-heading" className="font-secondary text-5xl md:text-6xl font-light leading-tight text-primary mb-4">
-                          How it Works
-                        </h2>
-                        <div className="w-20 h-1 bg-luxury-gold" />
-                      </div>
-                      <div className="text-lg md:text-xl leading-relaxed text-muted-foreground/90 font-secondary space-y-6">
-                        <p>
-                          Discover, plan, and share luxury travel — all in one intelligent platform.
-                        </p>
-                        <p>
-                          Start by chatting with our AI concierge or say "Hey Goldsainte" to activate voice planning. The more you chat, the smarter it gets — learning your travel style to tailor every recommendation.
-                        </p>
-                        <p>
-                          Need expert help? Post your trip details and let certified travel agents compete to offer you the best itinerary and pricing. Or browse CoCurated packages, where agents craft exclusive trips using their insider deals, and creators promote them — earning together through collaboration.
-                        </p>
-                        <p>
-                          Explore our social feed for real travel stories, split payments with friends, and as a creator, monetize your content through packages, partnerships, and commissions.
-                        </p>
-                        <p>
-                          From inspiration to booking, Goldsainte connects every step of your journey — all in one seamless platform.
-                        </p>
-                      </div>
-                    </div>
-
-                {/* Horizontal Scrolling Container */}
-                <div className="relative -mx-4 sm:-mx-6 touch-manipulation">
-                  <div className="overflow-x-auto scrollbar-hide snap-x snap-mandatory">
-                    <div className="flex gap-6 md:gap-8 px-4 sm:px-6 pb-4 min-w-min">
-                      {/* Card 1 - Voice AI Concierge */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-luxury-cream/30 rounded-2xl touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardAiSearch} 
-                            alt="Voice AI Concierge with Hey Goldsainte wake word activation" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-6 md:p-8 space-y-3">
-                          <h3 className="text-xl md:text-2xl font-medium font-secondary text-foreground leading-tight">
-                            Voice AI Concierge
-                          </h3>
-                          <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Just say "Hey Goldsainte" from anywhere on the site to instantly activate our advanced voice AI. Have natural conversations about flights, hotels, dining, and more—hands-free.
-                          </p>
-                          <button 
-                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base mt-4"
-                            onClick={() => {
-                              const aiWidget = document.querySelector('[data-tour="ai-widget"]') as HTMLButtonElement;
-                              if (aiWidget) {
-                                aiWidget.click();
-                              }
-                            }}
-                          >
-                            Try Voice AI
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 2 - CoCurated™ Packages */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-luxury-cream/30 rounded-2xl touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardItinerary} 
-                            alt="CoCurated collaborative travel packages by top creators and agents" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-6 md:p-8 space-y-3">
-                          <h3 className="text-xl md:text-2xl font-medium font-secondary text-foreground leading-tight">
-                            CoCurated™ - Collaborative Travel
-                          </h3>
-                          <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Browse exclusive packages created by top creators and agents. Fixed or flexible dates, secure booking, transparent pricing—all curated by travel experts who know the destinations best.
-                          </p>
-                          <button 
-                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base mt-4"
-                            onClick={() => navigate('/cocurated-journeys')}
-                          >
-                            Explore Curated Journeys
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 3 - Creator Social Network */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-luxury-cream/30 rounded-2xl touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardMessaging} 
-                            alt="Creator social network for sharing luxury travel experiences" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-6 md:p-8 space-y-3">
-                          <h3 className="text-xl md:text-2xl font-medium font-secondary text-foreground leading-tight">
-                            Create. Share. Make Money.
-                          </h3>
-                          <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            A social networking platform for content creators to share their luxury travel experiences and create interactive trip plans. Earn income from your content and build your travel brand.
-                          </p>
-                          <button 
-                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base mt-4"
-                            onClick={() => navigate('/journeys')}
-                          >
-                            Join Our Creator Circle
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 4 - Expert Agent Marketplace */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-luxury-cream/30 rounded-2xl touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardExpertAgents} 
-                            alt="Expert agent marketplace with AI-matching and milestone payments" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-6 md:p-8 space-y-3">
-                          <h3 className="text-xl md:text-2xl font-medium font-secondary text-foreground leading-tight">
-                            Expert Agent Marketplace
-                          </h3>
-                          <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Post complex trips to our marketplace and get AI-matched with certified agents. Pay in milestones, track progress, and chat in real-time with full transparency.
-                          </p>
-                          <button 
-                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base mt-4"
-                            onClick={() => navigate('/browse-agents')}
-                          >
-                            Meet Your Expert Agent
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 5 - Instant Booking */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-luxury-cream/30 rounded-2xl touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={cardInstantBooking} 
-                            alt="Instant booking for flights, hotels, restaurants, and events" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-6 md:p-8 space-y-3">
-                          <h3 className="text-xl md:text-2xl font-medium font-secondary text-foreground leading-tight">
-                            Instant Booking
-                          </h3>
-                          <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Book flights, hotels, restaurants, and events directly on Goldsainte.ai. Transparent pricing, real-time availability, and seamless checkout—all in one platform.
-                          </p>
-                          <button 
-                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base mt-4"
-                            onClick={() => {
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
-                              setTimeout(() => {
-                                const input = document.querySelector('input[placeholder*="Where"]') as HTMLInputElement;
-                                input?.focus();
-                              }, 500);
-                            }}
-                          >
-                            Start Booking
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Card 6 - Creator Stores */}
-                      <Card className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[340px] snap-center overflow-hidden group bg-white shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 border-luxury-cream/30 rounded-2xl touch-manipulation">
-                        <div className="relative h-44 sm:h-48 md:h-52 overflow-hidden">
-                          <img 
-                            src={pinkBeachAerial} 
-                            alt="Creator stores for travel merchandise and exclusive products" 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                        </div>
-                        <CardContent className="p-6 md:p-8 space-y-3">
-                          <h3 className="text-xl md:text-2xl font-medium font-secondary text-foreground leading-tight">
-                            Creator Stores
-                          </h3>
-                          <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Link your Shopify and Etsy stores to sell travel merchandise, guides, and exclusive products. Monetize your brand beyond travel packages.
-                          </p>
-                          <button 
-                            className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base mt-4"
-                            onClick={() => navigate('/shop')}
-                          >
-                            Connect Store
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                          </button>
-                        </CardContent>
-                      </Card>
-
-                      {/* Padding element to ensure last card is fully visible */}
-                      <div className="flex-shrink-0 w-6" aria-hidden="true"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
 
             {/* Curated Collections - Luxury Categories */}
             <CuratedCollections />
