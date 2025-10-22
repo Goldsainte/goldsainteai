@@ -408,9 +408,9 @@ export default function CoCuratedJourneys() {
   const hasActiveSearchOrFilters = hasSearch || hasCategory || hasNonDefaultFilters;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col overflow-x-hidden">
       <Header />
-      <main className="flex-1">
+      <main className="flex-1 pb-8 sm:pb-12 md:pb-16">
         <PackageSearchHero
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
@@ -427,7 +427,7 @@ export default function CoCuratedJourneys() {
           <LuxuryExperiencesSection />
         )}
 
-        <div className="bg-luxury-ivory">
+        <div className="bg-luxury-ivory overflow-x-hidden">
           <div className="container mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-10 md:py-12">
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -32,18 +32,18 @@ export const RestaurantScrollSection = ({ title, restaurants }: RestaurantScroll
   };
 
   return (
-    <section className="py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="font-secondary text-3xl md:text-4xl mb-8 font-light">
+    <section className="py-12 sm:py-14 md:py-16 lg:py-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
+        <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl mb-6 sm:mb-8 font-light">
           {title}
         </h2>
         <ScrollArea className="w-full">
-          <div className="flex gap-4 pb-4">
+          <div className="flex gap-3 sm:gap-4 pb-4" style={{ WebkitOverflowScrolling: 'touch' }}>
             {restaurants.map((restaurant) => (
               <Card
                 key={restaurant.id}
                 onClick={() => handleRestaurantClick(restaurant)}
-                className="flex-shrink-0 w-[320px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300"
+                className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95"
               >
                 <div className="relative aspect-[4/3]">
                   <img
@@ -53,17 +53,17 @@ export const RestaurantScrollSection = ({ title, restaurants }: RestaurantScroll
                     loading="lazy"
                     decoding="async"
                   />
-                  <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-medium">
+                  <div className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium">
                     {restaurant.priceLevel}
                   </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg mb-1">{restaurant.name}</h3>
-                  <p className="text-muted-foreground text-sm mb-1">{restaurant.location}</p>
-                  <p className="text-muted-foreground text-xs mb-2">{restaurant.cuisine}</p>
+                <div className="p-3 sm:p-4">
+                  <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{restaurant.name}</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-1 truncate">{restaurant.location}</p>
+                  <p className="text-muted-foreground text-xs mb-2 truncate">{restaurant.cuisine}</p>
                   <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 fill-current text-accent" />
-                    <span className="text-sm font-medium">{restaurant.rating}</span>
+                    <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current text-accent" />
+                    <span className="text-xs sm:text-sm font-medium">{restaurant.rating}</span>
                   </div>
                 </div>
               </Card>

@@ -53,16 +53,16 @@ const popularSearches = [
 
 export const PopularSearchGrid = () => {
   return (
-    <section className="py-16 md:py-20 bg-luxury-ivory">
-      <div className="max-w-7xl mx-auto px-4">
-        <h2 className="font-secondary text-3xl md:text-4xl mb-8 font-light">
+    <section className="py-12 sm:py-14 md:py-16 lg:py-20 bg-luxury-ivory">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
+        <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl mb-6 sm:mb-8 font-light">
           Popular searches
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           {popularSearches.map((search) => (
             <Card
               key={search.id}
-              className="relative h-[280px] rounded-lg overflow-hidden cursor-pointer group"
+              className="relative h-[240px] sm:h-[260px] md:h-[280px] rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-transform"
             >
               <img
                 src={search.image}
@@ -72,8 +72,8 @@ export const PopularSearchGrid = () => {
                 decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="text-white text-xl font-medium">
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 md:p-6">
+                <h3 className="text-white text-lg sm:text-xl font-medium">
                   {search.title}
                 </h3>
               </div>

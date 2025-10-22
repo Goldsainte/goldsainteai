@@ -755,8 +755,8 @@ const Index = () => {
   const showChat = messages.length > 0;
 
   return (
-    <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40">
-      <div className="w-full h-full flex flex-col">
+    <main className="flex-1 flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40 overflow-x-hidden">
+      <div className="w-full h-full flex flex-col overflow-x-hidden">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
