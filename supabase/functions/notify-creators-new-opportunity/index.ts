@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -62,7 +61,6 @@ Deno.serve(async (req) => {
 
       // Send email notification
       if (creator.email && Deno.env.get('RESEND_API_KEY')) {
-        const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
         const emailHtml = `
           <!DOCTYPE html>
           <html>
@@ -117,13 +115,27 @@ Deno.serve(async (req) => {
         `;
 
         try {
-          await resend.emails.send({
-            from: 'Goldsainte Creators <creators@goldsainte.com>',
-            to: [creator.email],
-            subject: `🎨 New CoCurated Trip to ${job.destination}`,
-            html: emailHtml,
+          const resendResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+            },
+            body: JSON.stringify({
+              from: 'Goldsainte Creators <creators@goldsainte.com>',
+              to: [creator.email],
+              subject: `🎨 New CoCurated Trip to ${job.destination}`,
+              html: emailHtml,
+            }),
           });
-          console.log('Creator notification sent to:', creator.email);
+
+          if (!resendResponse.ok) {
+            const error = await resendResponse.text();
+            throw new Error(`Failed to send email: ${error}`);
+          }
+
+          const data = await resendResponse.json();
+          console.log('Creator notification sent to:', creator.email, 'ID:', data?.id);
         } catch (emailError) {
           console.error('Error sending creator email:', emailError);
         }

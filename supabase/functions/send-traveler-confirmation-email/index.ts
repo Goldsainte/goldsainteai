@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -118,16 +117,31 @@ Deno.serve(async (req) => {
     `;
 
     if (Deno.env.get('RESEND_API_KEY')) {
-      const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
-      
-      await resend.emails.send({
-        from: 'Goldsainte Travel <booking@goldsainte.com>',
-        to: [inquiry.guest_email],
-        subject: `Trip Request Confirmed - ${job.destination} (${referenceNumber})`,
-        html: emailHtml,
-      });
+      try {
+        const resendResponse = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+          },
+          body: JSON.stringify({
+            from: 'Goldsainte Travel <booking@goldsainte.com>',
+            to: [inquiry.guest_email],
+            subject: `Trip Request Confirmed - ${job.destination} (${referenceNumber})`,
+            html: emailHtml,
+          }),
+        });
 
-      console.log('Confirmation email sent to:', inquiry.guest_email);
+        if (!resendResponse.ok) {
+          const error = await resendResponse.text();
+          throw new Error(`Failed to send email: ${error}`);
+        }
+
+        const data = await resendResponse.json();
+        console.log('Confirmation email sent to:', inquiry.guest_email, 'ID:', data?.id);
+      } catch (emailError) {
+        console.error('Error sending confirmation email:', emailError);
+      }
     } else {
       console.log('RESEND_API_KEY not configured, skipping email');
     }

@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -147,8 +146,6 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     
     if (priorityMatches.length > 0 && resendApiKey) {
-      const resend = new Resend(resendApiKey);
-
       // Get agent details with user info
       for (const match of priorityMatches) {
         const { data: agent } = await supabaseClient
@@ -176,59 +173,74 @@ Deno.serve(async (req) => {
 
           // Send priority email
           try {
-            await resend.emails.send({
-              from: 'Goldsainte Marketplace <noreply@goldsainte.com>',
-              to: [agent.profiles.email],
-              subject: `🎯 Priority Match: ${job.title}`,
-              html: `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
-                    <h1 style="margin: 0; font-size: 28px;">🎯 Priority Job Match</h1>
-                    <p style="margin: 10px 0 0; font-size: 16px; opacity: 0.9;">${match.match_score}% Match Score</p>
-                  </div>
-                  
-                  <div style="background: white; padding: 30px; border: 1px solid #e5e7eb;">
-                    <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                      <p style="margin: 0; color: #059669; font-weight: bold; font-size: 14px;">
-                        ⚡ You're in the top 3 matches for this opportunity
-                      </p>
-                    </div>
-                    
-                    <h2 style="color: #1f2937; margin-top: 0;">${job.title}</h2>
-                    
-                    <div style="margin: 20px 0;">
-                      <p style="color: #6b7280; margin: 5px 0;"><strong>Destination:</strong> ${job.destination}</p>
-                      <p style="color: #6b7280; margin: 5px 0;"><strong>Type:</strong> ${job.booking_type}</p>
-                      ${job.budget_max ? `<p style="color: #6b7280; margin: 5px 0;"><strong>Budget:</strong> ${job.currency} ${job.budget_min || 0} - ${job.budget_max}</p>` : ''}
-                    </div>
-                    
-                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
-                      <p style="margin: 0; color: #78350f; font-size: 14px;">
-                        <strong>Why you're a great match:</strong>
-                      </p>
-                      <ul style="margin: 10px 0 0; padding-left: 20px; color: #78350f;">
-                        ${match.matching_factors.specialization_match ? '<li>Your specialization matches this booking type</li>' : ''}
-                        ${match.matching_factors.destination_match ? '<li>You have expertise in this destination</li>' : ''}
-                        ${match.matching_factors.rating_score ? '<li>Your excellent rating and reviews</li>' : ''}
-                      </ul>
-                    </div>
-                    
-                    <div style="margin: 30px 0; text-align: center;">
-                      <a href="${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '')}/marketplace?job=${jobId}" 
-                         style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
-                        View Job & Submit Bid
-                      </a>
-                    </div>
-                    
-                    <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 30px;">
-                      Respond quickly to increase your chances of winning this job
+            const emailHtml = `
+              <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
+                  <h1 style="margin: 0; font-size: 28px;">🎯 Priority Job Match</h1>
+                  <p style="margin: 10px 0 0; font-size: 16px; opacity: 0.9;">${match.match_score}% Match Score</p>
+                </div>
+                
+                <div style="background: white; padding: 30px; border: 1px solid #e5e7eb;">
+                  <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #059669; font-weight: bold; font-size: 14px;">
+                      ⚡ You're in the top 3 matches for this opportunity
                     </p>
                   </div>
+                  
+                  <h2 style="color: #1f2937; margin-top: 0;">${job.title}</h2>
+                  
+                  <div style="margin: 20px 0;">
+                    <p style="color: #6b7280; margin: 5px 0;"><strong>Destination:</strong> ${job.destination}</p>
+                    <p style="color: #6b7280; margin: 5px 0;"><strong>Type:</strong> ${job.booking_type}</p>
+                    ${job.budget_max ? `<p style="color: #6b7280; margin: 5px 0;"><strong>Budget:</strong> ${job.currency} ${job.budget_min || 0} - ${job.budget_max}</p>` : ''}
+                  </div>
+                  
+                  <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+                    <p style="margin: 0; color: #78350f; font-size: 14px;">
+                      <strong>Why you're a great match:</strong>
+                    </p>
+                    <ul style="margin: 10px 0 0; padding-left: 20px; color: #78350f;">
+                      ${match.matching_factors.specialization_match ? '<li>Your specialization matches this booking type</li>' : ''}
+                      ${match.matching_factors.destination_match ? '<li>You have expertise in this destination</li>' : ''}
+                      ${match.matching_factors.rating_score ? '<li>Your excellent rating and reviews</li>' : ''}
+                    </ul>
+                  </div>
+                  
+                  <div style="margin: 30px 0; text-align: center;">
+                    <a href="${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '')}/marketplace?job=${jobId}" 
+                       style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+                      View Job & Submit Bid
+                    </a>
+                  </div>
+                  
+                  <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 30px;">
+                    Respond quickly to increase your chances of winning this job
+                  </p>
                 </div>
-              `
+              </div>
+            `;
+
+            const resendResponse = await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${resendApiKey}`,
+              },
+              body: JSON.stringify({
+                from: 'Goldsainte Marketplace <noreply@goldsainte.com>',
+                to: [agent.profiles.email],
+                subject: `🎯 Priority Match: ${job.title}`,
+                html: emailHtml,
+              }),
             });
-            
-            console.log(`Priority email sent to agent ${agent.id}`);
+
+            if (!resendResponse.ok) {
+              const error = await resendResponse.text();
+              throw new Error(`Failed to send email: ${error}`);
+            }
+
+            const data = await resendResponse.json();
+            console.log(`Priority email sent to agent ${agent.id}, ID:`, data?.id);
           } catch (emailError) {
             console.error(`Failed to send priority email to agent ${agent.id}:`, emailError);
           }

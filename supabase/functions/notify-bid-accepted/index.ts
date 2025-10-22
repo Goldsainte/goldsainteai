@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -82,7 +81,7 @@ Deno.serve(async (req) => {
 
     // Send email notifications
     if (Deno.env.get('RESEND_API_KEY')) {
-      const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
+      const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY');
 
       // Email to customer
       if (customerProfile?.email) {
@@ -128,12 +127,26 @@ Deno.serve(async (req) => {
         `;
 
         try {
-          await resend.emails.send({
-            from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
-            to: [customerProfile.email],
-            subject: `🎉 Bid Accepted - Payment Required for ${job.title}`,
-            html: customerEmailHtml,
+          const resendResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+              to: [customerProfile.email],
+              subject: `🎉 Bid Accepted - Payment Required for ${job.title}`,
+              html: customerEmailHtml,
+            }),
           });
+
+          if (!resendResponse.ok) {
+            const error = await resendResponse.text();
+            throw new Error(`Failed to send customer email: ${error}`);
+          }
+
+          console.log('Customer email sent:', await resendResponse.json());
         } catch (error) {
           console.error('Error sending customer email:', error);
         }
@@ -188,12 +201,26 @@ Deno.serve(async (req) => {
         `;
 
         try {
-          await resend.emails.send({
-            from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
-            to: [agentProfile.email],
-            subject: `🎉 Bid Accepted! New Booking: ${job.title}`,
-            html: agentEmailHtml,
+          const resendResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${RESEND_API_KEY}`,
+            },
+            body: JSON.stringify({
+              from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+              to: [agentProfile.email],
+              subject: `🎉 Bid Accepted! New Booking: ${job.title}`,
+              html: agentEmailHtml,
+            }),
           });
+
+          if (!resendResponse.ok) {
+            const error = await resendResponse.text();
+            throw new Error(`Failed to send agent email: ${error}`);
+          }
+
+          console.log('Agent email sent:', await resendResponse.json());
         } catch (error) {
           console.error('Error sending agent email:', error);
         }

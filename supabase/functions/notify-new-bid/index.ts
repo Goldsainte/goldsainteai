@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { Resend } from 'https://esm.sh/resend@2.0.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,8 +55,6 @@ Deno.serve(async (req) => {
 
     // Send email notification to customer
     if (Deno.env.get('RESEND_API_KEY')) {
-      const resend = new Resend(Deno.env.get('RESEND_API_KEY') as string);
-
       // Get customer email
       const { data: profile } = await supabaseClient
         .from('profiles')
@@ -104,13 +101,27 @@ Deno.serve(async (req) => {
         `;
 
         try {
-          await resend.emails.send({
-            from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
-            to: [profile.email],
-            subject: `📬 New Bid: ${bid.currency} ${bid.customer_facing_price} for ${job.title}`,
-            html: emailHtml,
+          const resendResponse = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+            },
+            body: JSON.stringify({
+              from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+              to: [profile.email],
+              subject: `📬 New Bid: ${bid.currency} ${bid.customer_facing_price} for ${job.title}`,
+              html: emailHtml,
+            }),
           });
-          console.log('Bid notification email sent to:', profile.email);
+
+          if (!resendResponse.ok) {
+            const error = await resendResponse.text();
+            throw new Error(`Failed to send email: ${error}`);
+          }
+
+          const data = await resendResponse.json();
+          console.log('Bid notification email sent to:', profile.email, 'ID:', data?.id);
         } catch (emailError) {
           console.error('Error sending bid email:', emailError);
         }
