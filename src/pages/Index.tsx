@@ -1177,25 +1177,32 @@ const Index = () => {
             <CuratedCollections />
 
             {/* Creator Hero Section */}
-            <section className="px-4 sm:px-6 pt-1 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background" aria-labelledby="creator-section-heading">
+            <section className="px-4 sm:px-6 py-20 md:py-24 bg-white" aria-labelledby="creator-section-heading">
               <div className="w-full max-w-7xl mx-auto">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                   {/* Left: Text Content */}
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <h2 id="creator-section-heading" className="text-[36px] sm:text-[45px] md:text-[54px] font-bold text-primary leading-tight">
-                        Create.
-                      </h2>
-                      <h2 className="text-[36px] sm:text-[45px] md:text-[54px] font-bold text-secondary leading-tight" aria-label="Share">
-                        Share.
-                      </h2>
-                      <h2 className="text-[36px] sm:text-[45px] md:text-[54px] font-bold text-foreground leading-tight" aria-label="Make Money">
-                        Make Money.
-                      </h2>
+                  <div className="space-y-8">
+                    <div>
+                      <div className="space-y-3">
+                        <h2 id="creator-section-heading" className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light text-foreground leading-tight">
+                          Create.
+                        </h2>
+                        <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light text-foreground leading-tight" aria-label="Share">
+                          Share.
+                        </h2>
+                        <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light text-luxury-gold leading-tight" aria-label="Make Money">
+                          Make Money.
+                        </h2>
+                      </div>
+                      <div className="w-24 h-1 bg-luxury-gold mt-6" />
                     </div>
-                     <div className="text-base sm:text-lg md:text-xl text-muted-foreground font-secondary leading-relaxed space-y-4">
+                    
+                    <div className="text-lg md:text-xl leading-relaxed text-muted-foreground/90 space-y-6">
                       <p>
-                        Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages. Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.
+                        Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages.
+                      </p>
+                      <p>
+                        Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.
                       </p>
                       <p>
                         Collaborate with top brands, access powerful creator tools, and inspire a global community of explorers. Whether you're a seasoned influencer or just getting started, this is where your travel story becomes your business.
@@ -1203,12 +1210,12 @@ const Index = () => {
                     </div>
                   </div>
 
-                  {/* Right: Photo Grid */}
-                  <div className="relative h-[500px] sm:h-[600px]" role="img" aria-label="Collage of creator lifestyle images showing luxury travel experiences">
-                    <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
+                  {/* Right: Photo Collage */}
+                  <div className="relative h-[400px] sm:h-[500px] lg:h-[650px]" role="img" aria-label="Collage of creator lifestyle images showing luxury travel experiences">
+                    <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={property1} 
-                        alt="Luxury travel accommodation" 
+                        src={luxuryFlights} 
+                        alt="Creator traveling in luxury first class" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1216,10 +1223,10 @@ const Index = () => {
                         height="320"
                       />
                     </div>
-                    <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={property2} 
-                        alt="Travel destination view" 
+                        src={luxuryDestinations} 
+                        alt="Luxury travel destination at golden hour" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1227,10 +1234,10 @@ const Index = () => {
                         height="350"
                       />
                     </div>
-                    <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl z-20">
+                    <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50 z-20">
                       <img 
                         src={creatorYachtParty} 
-                        alt="Creator lifestyle on yacht" 
+                        alt="Content creators enjoying yacht lifestyle" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1238,10 +1245,10 @@ const Index = () => {
                         height="300"
                       />
                     </div>
-                    <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={property3} 
-                        alt="Adventure travel scene" 
+                        src={baliSerenity} 
+                        alt="Tropical paradise content creation spot" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1249,10 +1256,10 @@ const Index = () => {
                         height="320"
                       />
                     </div>
-                    <div className="absolute top-[40%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl z-10">
+                    <div className="absolute top-[40%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50 z-10">
                       <img 
                         src={creatorBeachSelfie} 
-                        alt="Creator content on beach" 
+                        alt="Creator capturing beach content at sunset" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1260,10 +1267,10 @@ const Index = () => {
                         height="280"
                       />
                     </div>
-                    <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={property4} 
-                        alt="Luxury dining experience" 
+                        src={pinkBeachAerial} 
+                        alt="Aerial drone shot of pink sand beach" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
@@ -1271,10 +1278,10 @@ const Index = () => {
                         height="280"
                       />
                     </div>
-                    <div className="absolute bottom-0 right-[15%] w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl">
+                    <div className="absolute bottom-0 right-[15%] w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
                       <img 
-                        src={property5} 
-                        alt="Coastal travel view" 
+                        src={dubaiDesert} 
+                        alt="Dubai luxury travel experience" 
                         className="w-full h-full object-cover" 
                         loading="lazy"
                         decoding="async"
