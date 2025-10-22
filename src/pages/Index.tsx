@@ -1084,83 +1084,154 @@ const Index = () => {
                   </div>
 
                   {/* Right: Photo Collage */}
-                  <div className="relative h-[400px] sm:h-[500px] lg:h-[650px]" role="img" aria-label="Collage of creator lifestyle images showing luxury travel experiences">
-                    <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
-                      <img 
-                        src={creatorRoadTrip} 
-                        alt="Travel creators on road trip adventure with vintage Land Rover" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="420"
-                        height="320"
-                      />
+                  <div className="relative h-[500px] sm:h-[550px] lg:h-[650px]" role="img" aria-label="Collage of creator lifestyle images showing luxury travel experiences">
+                    
+                    {/* Mobile & Tablet: Clean 2-column grid */}
+                    <div className="lg:hidden grid grid-cols-2 gap-2 h-full">
+                      <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorRoadTrip} 
+                          alt="Travel creators on road trip adventure with vintage Land Rover" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorYachtParty} 
+                          alt="Content creators enjoying yacht lifestyle" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorMountainGroup} 
+                          alt="Group of friends creating travel content in mountain adventure" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorBeachSelfie} 
+                          alt="Creator capturing beach content at sunset" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorCanyonViews} 
+                          alt="Creators capturing scenic canyon views together" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorDesertCamel} 
+                          alt="Travel creator capturing unique desert content with camel" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
+                      <div className="col-span-2 rounded-xl overflow-hidden shadow-lg active:scale-[0.98] transition-transform">
+                        <img 
+                          src={creatorSnowPhotography} 
+                          alt="Content creators filming winter travel photography" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      </div>
                     </div>
-                    <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
-                      <img 
-                        src={creatorMountainGroup} 
-                        alt="Group of friends creating travel content in mountain adventure" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="450"
-                        height="350"
-                      />
-                    </div>
-                    <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50 z-20">
-                      <img 
-                        src={creatorYachtParty} 
-                        alt="Content creators enjoying yacht lifestyle" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="400"
-                        height="300"
-                      />
-                    </div>
-                    <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
-                      <img 
-                        src={creatorCanyonViews} 
-                        alt="Creators capturing scenic canyon views together" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="450"
-                        height="320"
-                      />
-                    </div>
-                    <div className="absolute top-[40%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50 z-10">
-                      <img 
-                        src={creatorBeachSelfie} 
-                        alt="Creator capturing beach content at sunset" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="380"
-                        height="280"
-                      />
-                    </div>
-                    <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
-                      <img 
-                        src={creatorDesertCamel} 
-                        alt="Travel creator capturing unique desert content with camel" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="400"
-                        height="280"
-                      />
-                    </div>
-                    <div className="absolute bottom-0 right-[15%] w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
-                      <img 
-                        src={creatorSnowPhotography} 
-                        alt="Content creators filming winter travel photography" 
-                        className="w-full h-full object-cover" 
-                        loading="lazy"
-                        decoding="async"
-                        width="420"
-                        height="350"
-                      />
+
+                    {/* Desktop: Artistic collage (original layout) */}
+                    <div className="hidden lg:block">
+                      <div className="absolute top-0 right-0 w-[42%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
+                        <img 
+                          src={creatorRoadTrip} 
+                          alt="Travel creators on road trip adventure with vintage Land Rover" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="420"
+                          height="320"
+                        />
+                      </div>
+                      <div className="absolute top-[10%] left-0 w-[45%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
+                        <img 
+                          src={creatorMountainGroup} 
+                          alt="Group of friends creating travel content in mountain adventure" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="450"
+                          height="350"
+                        />
+                      </div>
+                      <div className="absolute top-[5%] left-[35%] w-[40%] h-[30%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50 z-20">
+                        <img 
+                          src={creatorYachtParty} 
+                          alt="Content creators enjoying yacht lifestyle" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="400"
+                          height="300"
+                        />
+                      </div>
+                      <div className="absolute top-[42%] right-[5%] w-[45%] h-[32%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
+                        <img 
+                          src={creatorCanyonViews} 
+                          alt="Creators capturing scenic canyon views together" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="450"
+                          height="320"
+                        />
+                      </div>
+                      <div className="absolute top-[40%] left-[5%] w-[38%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50 z-10">
+                        <img 
+                          src={creatorBeachSelfie} 
+                          alt="Creator capturing beach content at sunset" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="380"
+                          height="280"
+                        />
+                      </div>
+                      <div className="absolute bottom-0 left-[0%] w-[40%] h-[28%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
+                        <img 
+                          src={creatorDesertCamel} 
+                          alt="Travel creator capturing unique desert content with camel" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="400"
+                          height="280"
+                        />
+                      </div>
+                      <div className="absolute bottom-0 right-[15%] w-[42%] h-[35%] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.02] transition-all duration-500 ring-1 ring-white/50">
+                        <img 
+                          src={creatorSnowPhotography} 
+                          alt="Content creators filming winter travel photography" 
+                          className="w-full h-full object-cover" 
+                          loading="lazy"
+                          decoding="async"
+                          width="420"
+                          height="350"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
