@@ -428,7 +428,7 @@ export default function CoCuratedJourneys() {
         )}
 
         <div className="bg-luxury-ivory">
-          <div className="container mx-auto px-4 py-12">
+          <div className="container mx-auto px-3 sm:px-4 md:px-6 py-8 sm:py-10 md:py-12">
             {loading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(6)].map((_, i) => (
@@ -467,11 +467,11 @@ export default function CoCuratedJourneys() {
               )}
 
               {/* All Travel Packages */}
-              <section className="py-12 all-packages-section">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+              <section className="py-8 sm:py-10 md:py-12 all-packages-section">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
                   <div>
                     <div className="w-20 h-1 bg-luxury-gold mb-4" />
-                    <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald">All Travel Packages</h2>
+                    <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald">All Travel Packages</h2>
                     <p className="text-sm text-luxury-emerald/60 mt-2">
                       {selectedDestinationFilter === 'all' 
                         ? `Showing top 5 from each destination (${displayedPackages.length} packages)`
@@ -480,11 +480,11 @@ export default function CoCuratedJourneys() {
                     </p>
                   </div>
                   
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 w-full sm:w-auto">
                     <select
                       value={selectedDestinationFilter}
                       onChange={(e) => setSelectedDestinationFilter(e.target.value)}
-                      className="px-4 py-2 border border-luxury-gold/30 rounded-lg bg-white text-luxury-emerald focus:outline-none focus:ring-2 focus:ring-luxury-gold transition-all duration-300"
+                      className="w-full sm:w-auto px-3 sm:px-4 py-2 min-h-[44px] border border-luxury-gold/30 rounded-lg bg-white text-luxury-emerald text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-luxury-gold transition-all duration-300"
                     >
                       <option value="all">All Top Destinations</option>
                       {topDestinationCities.map(city => (

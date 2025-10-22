@@ -30,14 +30,14 @@ export const TopDestinationsSection = ({ destinations }: TopDestinationsSectionP
   };
 
   return (
-    <div className="mb-16">
+    <div className="mb-12 md:mb-16">
       <div className="w-20 h-1 bg-luxury-gold mb-6" />
-      <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald mb-6">Top Destinations</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald mb-6">Top Destinations</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         {destinations.map((dest) => (
           <Card
             key={dest.destination}
-            className="relative h-48 rounded-xl overflow-hidden cursor-pointer group border-luxury-gold/20 hover:shadow-xl transition-all duration-500"
+            className="relative h-40 sm:h-48 md:h-56 rounded-xl overflow-hidden cursor-pointer group border-luxury-gold/20 hover:shadow-xl transition-all duration-500"
             onClick={() => navigate(`/cocurated-journeys?destination=${dest.destination}`)}
           >
             <img
@@ -48,12 +48,12 @@ export const TopDestinationsSection = ({ destinations }: TopDestinationsSectionP
               decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/80 via-luxury-emerald/20 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 p-4">
+            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4">
               <div className="w-12 h-1 bg-luxury-gold mb-2 transform origin-left group-hover:w-20 transition-all duration-500" />
-              <h3 className="text-white font-secondary text-xl font-light drop-shadow-lg">
+              <h3 className="text-white font-secondary text-base sm:text-lg md:text-xl font-light drop-shadow-lg">
                 {dest.destination}
               </h3>
-              <p className="text-white/80 text-sm">{dest.packageCount} Experiences</p>
+              <p className="text-white/80 text-xs sm:text-sm">{dest.packageCount} Experiences</p>
             </div>
           </Card>
         ))}

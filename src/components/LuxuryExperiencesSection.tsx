@@ -68,16 +68,16 @@ export const LuxuryExperiencesSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {luxuryExperiences.map((experience, index) => (
             <Card
               key={experience.title}
               className={`relative overflow-hidden cursor-pointer group border-luxury-gold/20 ${
-                index === 2 ? 'md:col-span-2 lg:col-span-1' : ''
+                index === 2 ? 'sm:col-span-2 lg:col-span-1' : ''
               } ${index === 0 ? 'lg:col-span-2' : ''}`}
               onClick={() => navigate(`/cocurated-journeys?destination=${experience.destination}&category=${experience.category}`)}
             >
-              <div className="relative h-80 md:h-96 lg:h-[28rem]">
+              <div className="relative h-64 sm:h-72 md:h-80 lg:h-96">
                 <img
                   src={experience.imageUrl}
                   alt={experience.title}
@@ -88,10 +88,10 @@ export const LuxuryExperiencesSection = () => {
                 
                 <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
                   <div className="w-16 h-1 bg-luxury-gold mb-4 transform origin-left group-hover:w-24 transition-all duration-500" />
-                  <h3 className="font-secondary text-2xl md:text-3xl text-white mb-2">
+                  <h3 className="font-secondary text-xl sm:text-2xl md:text-3xl text-white mb-2">
                     {experience.title}
                   </h3>
-                  <p className="text-white/90 text-lg mb-4">
+                  <p className="text-white/90 text-base sm:text-lg mb-4">
                     {experience.subtitle}
                   </p>
                   <div className="flex items-center gap-2 text-luxury-gold">

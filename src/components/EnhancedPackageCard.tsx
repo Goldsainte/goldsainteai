@@ -44,7 +44,7 @@ export const EnhancedPackageCard = ({
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group">
       {/* Image */}
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden">
         <img
           src={coverImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80"}
           alt={packageName}
@@ -60,7 +60,7 @@ export const EnhancedPackageCard = ({
         )}
       </div>
 
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4">
         {/* Source and Agency Badges */}
         <div className="flex items-center gap-2 mb-2">
           {source === 'agent' && (
@@ -138,18 +138,18 @@ export const EnhancedPackageCard = ({
         </div>
       </CardContent>
 
-      <CardFooter className="p-4 pt-0 flex gap-2">
+      <CardFooter className="p-3 sm:p-4 pt-0 flex gap-2">
         <Button 
           onClick={onViewDetails} 
           variant="outline" 
-          className={source === 'agent' ? 'flex-1' : 'w-full'}
+          className={`min-h-[44px] ${source === 'agent' ? 'flex-1' : 'w-full'}`}
         >
           View Details
         </Button>
         {source === 'agent' && (
           <Button 
             onClick={onRequestPromotion} 
-            className="flex-1"
+            className="flex-1 min-h-[44px]"
             disabled={isPromoting}
           >
             {isPromoting ? "Promoting" : "Request to Promote"}

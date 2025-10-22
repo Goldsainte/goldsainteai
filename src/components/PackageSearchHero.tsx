@@ -132,8 +132,9 @@ export const PackageSearchHero = ({
                         setCalendarOpen(false);
                       }
                     }}
-                    numberOfMonths={2}
+                    numberOfMonths={window.innerWidth < 768 ? 1 : 2}
                     disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    className="pointer-events-auto"
                   />
                 </PopoverContent>
               </Popover>
@@ -141,7 +142,7 @@ export const PackageSearchHero = ({
 
             {/* Search Button */}
             <div className="flex items-center p-2">
-              <Button onClick={onSearch} size="lg" className="rounded-xl px-8 h-full">
+              <Button onClick={onSearch} size="lg" className="rounded-xl px-6 md:px-8 h-12 md:h-14 min-h-[44px]">
                 <Search className="h-5 w-5" />
               </Button>
             </div>
@@ -149,11 +150,11 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Filters Button Below */}
-        <div className="mt-4 flex gap-3 justify-center">
+        <div className="mt-4 flex flex-wrap gap-3 justify-center">
           <Button
             variant="outline"
             onClick={onOpenFilters}
-            className="bg-luxury-ivory/20 hover:bg-luxury-gold/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300"
+            className="bg-luxury-ivory/20 hover:bg-luxury-gold/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300 min-h-[44px]"
           >
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             Filters
@@ -163,7 +164,7 @@ export const PackageSearchHero = ({
             <Button
               variant="outline"
               onClick={onClearSearch}
-              className="bg-luxury-ivory/20 hover:bg-red-500/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300"
+              className="bg-luxury-ivory/20 hover:bg-red-500/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300 min-h-[44px]"
             >
               <X className="h-4 w-4 mr-2" />
               Clear Search
