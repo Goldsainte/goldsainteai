@@ -1,336 +1,288 @@
-import { useState } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { SlidersHorizontal, ArrowUpDown, X, DollarSign, Utensils } from "lucide-react";
-import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
-interface RestaurantFiltersProps {
-  onSortChange: (sortBy: string) => void;
-  onPriceRangeChange?: (min: number, max: number) => void;
-  onCuisineChange?: (cuisines: string[]) => void;
-  onDietaryChange?: (dietary: string[]) => void;
-  currentSort?: string;
-  currentPriceRange?: [number, number];
-  resultsCount: number;
+export interface RestaurantFilterState {
+  priceRange: [number, number];
+  cuisineTypes: string[];
+  features: string[];
+  dietary: string[];
+  minRating: number;
 }
 
-export const RestaurantFilters = ({ 
-  onSortChange, 
-  onPriceRangeChange,
-  onCuisineChange,
-  onDietaryChange,
-  currentSort = 'rating',
-  currentPriceRange = [0, 200],
-  resultsCount 
+interface RestaurantFiltersProps {
+  filters: RestaurantFilterState;
+  onFiltersChange: (filters: RestaurantFilterState) => void;
+  onClearAll: () => void;
+}
+
+const cuisineOptions = [
+  'French', 'Italian', 'Japanese', 'Chinese', 'Indian', 'Thai',
+  'Mediterranean', 'Middle Eastern', 'American', 'Steakhouse',
+  'Seafood', 'Vegetarian/Vegan', 'Fusion'
+];
+
+const featureOptions = [
+  'Michelin Star', 'Fine Dining', 'Romantic', 'Outdoor Seating',
+  'Tasting Menu', "Chef's Table", 'Wine Pairing'
+];
+
+const dietaryOptions = [
+  'Vegetarian Options', 'Vegan Options', 'Gluten-Free', 'Halal', 'Kosher'
+];
+
+export const RestaurantFilters = ({
+  filters,
+  onFiltersChange,
+  onClearAll,
 }: RestaurantFiltersProps) => {
-  const [priceRange, setPriceRange] = useState<[number, number]>(currentPriceRange);
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-  const [selectedDietary, setSelectedDietary] = useState<string[]>([]);
-  
-  const cuisineTypes = [
-    "Italian",
-    "Japanese",
-    "Chinese",
-    "Mexican",
-    "Indian",
-    "French",
-    "Thai",
-    "American",
-    "Mediterranean",
-    "Steakhouse",
-    "Seafood",
-    "Vegetarian",
-    "Vegan"
-  ];
-
-  const dietaryOptions = [
-    "Vegetarian",
-    "Vegan",
-    "Gluten-Free",
-    "Halal",
-    "Kosher",
-    "Dairy-Free"
-  ];
-  
   const handlePriceChange = (value: number[]) => {
-    const range: [number, number] = [value[0], value[1]];
-    setPriceRange(range);
-    onPriceRangeChange?.(range[0], range[1]);
-  };
-  
-  const handleCuisineToggle = (cuisine: string) => {
-    const newSelection = selectedCuisines.includes(cuisine)
-      ? selectedCuisines.filter(c => c !== cuisine)
-      : [...selectedCuisines, cuisine];
-    setSelectedCuisines(newSelection);
-    onCuisineChange?.(newSelection);
+    onFiltersChange({
+      ...filters,
+      priceRange: [value[0], value[1]],
+    });
   };
 
-  const handleDietaryToggle = (option: string) => {
-    const newSelection = selectedDietary.includes(option)
-      ? selectedDietary.filter(d => d !== option)
-      : [...selectedDietary, option];
-    setSelectedDietary(newSelection);
-    onDietaryChange?.(newSelection);
+  const handleCuisineToggle = (cuisine: string) => {
+    const newCuisines = filters.cuisineTypes.includes(cuisine)
+      ? filters.cuisineTypes.filter(c => c !== cuisine)
+      : [...filters.cuisineTypes, cuisine];
+    
+    onFiltersChange({
+      ...filters,
+      cuisineTypes: newCuisines,
+    });
   };
-  
+
+  const handleFeatureToggle = (feature: string) => {
+    const newFeatures = filters.features.includes(feature)
+      ? filters.features.filter(f => f !== feature)
+      : [...filters.features, feature];
+    
+    onFiltersChange({
+      ...filters,
+      features: newFeatures,
+    });
+  };
+
+  const handleDietaryToggle = (dietary: string) => {
+    const newDietary = filters.dietary.includes(dietary)
+      ? filters.dietary.filter(d => d !== dietary)
+      : [...filters.dietary, dietary];
+    
+    onFiltersChange({
+      ...filters,
+      dietary: newDietary,
+    });
+  };
+
+  const handleRatingChange = (value: number[]) => {
+    onFiltersChange({
+      ...filters,
+      minRating: value[0],
+    });
+  };
+
   const clearAllFilters = () => {
-    setPriceRange([0, 200]);
-    setSelectedCuisines([]);
-    setSelectedDietary([]);
-    onPriceRangeChange?.(0, 200);
-    onCuisineChange?.([]);
-    onDietaryChange?.([]);
-    onSortChange('rating');
+    onClearAll();
   };
-  
+
   const hasActiveFilters = 
-    selectedCuisines.length > 0 || 
-    selectedDietary.length > 0 ||
-    priceRange[0] !== 0 || 
-    priceRange[1] !== 200;
-  
+    filters.priceRange[0] > 1 || 
+    filters.priceRange[1] < 4 ||
+    filters.cuisineTypes.length > 0 ||
+    filters.features.length > 0 ||
+    filters.dietary.length > 0 ||
+    filters.minRating > 0;
+
   const activeFilterCount = 
-    selectedCuisines.length + 
-    selectedDietary.length +
-    (priceRange[0] !== 0 || priceRange[1] !== 200 ? 1 : 0);
+    (filters.priceRange[0] > 1 || filters.priceRange[1] < 4 ? 1 : 0) +
+    filters.cuisineTypes.length +
+    filters.features.length +
+    filters.dietary.length +
+    (filters.minRating > 0 ? 1 : 0);
 
   return (
-    <div className="space-y-4">
-      {/* Quick filters bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 bg-muted/50 rounded-lg">
-        <div className="flex items-center gap-2">
-          <Utensils className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">{resultsCount} restaurants</span>
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="px-6 py-4 border-b">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="text-xl font-semibold">Filters</h2>
+          {hasActiveFilters && (
+            <Badge variant="secondary" className="bg-luxury-gold/20 text-luxury-emerald">
+              {activeFilterCount} Active
+            </Badge>
+          )}
         </div>
-        
-         <div className="flex items-center gap-3">
-           <Select value={currentSort} onValueChange={onSortChange}>
-             <SelectTrigger className="w-[180px]" aria-label="Sort restaurants">
-               <ArrowUpDown className="h-4 w-4 mr-2" />
-               <SelectValue placeholder="Sort by" />
-             </SelectTrigger>
-             <SelectContent className="bg-background z-[100]">
-               <SelectItem value="rating">Rating</SelectItem>
-               <SelectItem value="price_low">Price: Low to High</SelectItem>
-               <SelectItem value="price_high">Price: High to Low</SelectItem>
-               <SelectItem value="distance">Distance</SelectItem>
-             </SelectContent>
-           </Select>
- 
-           {/* Quick Price Slider */}
-           <div className="flex items-center gap-2">
-             <DollarSign className="h-4 w-4 text-muted-foreground" />
-             <div className="w-40">
-               <Slider
-                 value={priceRange}
-                 onValueChange={handlePriceChange}
-                 max={200}
-                 step={5}
-                 className="w-full"
-               />
-               <div className="flex justify-between text-xs text-muted-foreground">
-                 <span>${priceRange[0]}</span>
-                 <span>${priceRange[1]}</span>
-               </div>
-             </div>
-           </div>
- 
-           {/* Mobile filters */}
-           <Sheet>
-             <SheetTrigger asChild>
-               <Button variant="outline" size="sm" className="relative">
-                 <SlidersHorizontal className="h-4 w-4 mr-2" />
-                 Filters
-                 {activeFilterCount > 0 && (
-                   <Badge variant="destructive" className="ml-2 px-1.5 py-0.5 text-xs">
-                     {activeFilterCount}
-                   </Badge>
-                 )}
-               </Button>
-             </SheetTrigger>
-             <SheetContent side="left" className="w-80 overflow-y-auto">
-               <SheetHeader>
-                 <SheetTitle>Restaurant Filters</SheetTitle>
-               </SheetHeader>
-               <div className="mt-6 space-y-6">
-                 <FilterContent
-                   priceRange={priceRange}
-                   handlePriceChange={handlePriceChange}
-                   cuisineTypes={cuisineTypes}
-                   selectedCuisines={selectedCuisines}
-                   handleCuisineToggle={handleCuisineToggle}
-                   dietaryOptions={dietaryOptions}
-                   selectedDietary={selectedDietary}
-                   handleDietaryToggle={handleDietaryToggle}
-                   clearAllFilters={clearAllFilters}
-                   hasActiveFilters={hasActiveFilters}
-                 />
-               </div>
-             </SheetContent>
-           </Sheet>
-         </div>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearAllFilters}
+            className="text-luxury-emerald hover:text-luxury-emerald/80"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Clear All
+          </Button>
+        )}
       </div>
 
-      {/* Active filters display */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap items-center gap-2 p-4 bg-muted/30 rounded-lg">
-          <span className="text-sm font-medium">Active filters:</span>
-          
-          {priceRange[0] !== 0 || priceRange[1] !== 200 ? (
-            <Badge variant="secondary" className="gap-1">
-              ${priceRange[0]} - ${priceRange[1]}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handlePriceChange([0, 200])}
-              />
-            </Badge>
-          ) : null}
-          
-          {selectedCuisines.map(cuisine => (
-            <Badge key={cuisine} variant="secondary" className="gap-1">
-              {cuisine}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleCuisineToggle(cuisine)}
-              />
-            </Badge>
-          ))}
+      {/* Filters Content */}
+      <ScrollArea className="flex-1">
+        <div className="px-6 py-4">
+          <Accordion type="multiple" defaultValue={["price", "cuisine", "features", "dietary", "rating"]} className="space-y-4">
+            {/* Price Level */}
+            <AccordionItem value="price" className="border-luxury-gold/20">
+              <AccordionTrigger className="text-luxury-emerald hover:text-luxury-emerald/80">
+                Price Level
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-4">
+                  <div className="flex justify-between text-sm">
+                    <span>{'$'.repeat(filters.priceRange[0])}</span>
+                    <span>{'$'.repeat(filters.priceRange[1])}</span>
+                  </div>
+                  <Slider
+                    min={1}
+                    max={4}
+                    step={1}
+                    value={filters.priceRange}
+                    onValueChange={handlePriceChange}
+                    className="[&_[role=slider]]:bg-luxury-gold [&_[role=slider]]:border-luxury-gold"
+                  />
+                  <div className="text-xs text-muted-foreground">
+                    $ = Budget • $$ = Moderate • $$$ = Upscale • $$$$ = Fine Dining
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-          {selectedDietary.map(option => (
-            <Badge key={option} variant="secondary" className="gap-1">
-              {option}
-              <X 
-                className="h-3 w-3 cursor-pointer" 
-                onClick={() => handleDietaryToggle(option)}
-              />
-            </Badge>
-          ))}
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={clearAllFilters}
-            className="ml-auto"
-          >
-            Clear all
-          </Button>
+            {/* Cuisine Types */}
+            <AccordionItem value="cuisine" className="border-luxury-gold/20">
+              <AccordionTrigger className="text-luxury-emerald hover:text-luxury-emerald/80">
+                Cuisine Type
+                {filters.cuisineTypes.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 bg-luxury-gold/20">
+                    {filters.cuisineTypes.length}
+                  </Badge>
+                )}
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-3 pt-4">
+                  {cuisineOptions.map((cuisine) => (
+                    <div key={cuisine} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`cuisine-${cuisine}`}
+                        checked={filters.cuisineTypes.includes(cuisine)}
+                        onCheckedChange={() => handleCuisineToggle(cuisine)}
+                        className="border-luxury-gold data-[state=checked]:bg-luxury-gold data-[state=checked]:text-luxury-emerald"
+                      />
+                      <Label
+                        htmlFor={`cuisine-${cuisine}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {cuisine}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Features */}
+            <AccordionItem value="features" className="border-luxury-gold/20">
+              <AccordionTrigger className="text-luxury-emerald hover:text-luxury-emerald/80">
+                Restaurant Features
+                {filters.features.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 bg-luxury-gold/20">
+                    {filters.features.length}
+                  </Badge>
+                )}
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-3 pt-4">
+                  {featureOptions.map((feature) => (
+                    <div key={feature} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`feature-${feature}`}
+                        checked={filters.features.includes(feature)}
+                        onCheckedChange={() => handleFeatureToggle(feature)}
+                        className="border-luxury-gold data-[state=checked]:bg-luxury-gold data-[state=checked]:text-luxury-emerald"
+                      />
+                      <Label
+                        htmlFor={`feature-${feature}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {feature}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Dietary Options */}
+            <AccordionItem value="dietary" className="border-luxury-gold/20">
+              <AccordionTrigger className="text-luxury-emerald hover:text-luxury-emerald/80">
+                Dietary Options
+                {filters.dietary.length > 0 && (
+                  <Badge variant="secondary" className="ml-2 bg-luxury-gold/20">
+                    {filters.dietary.length}
+                  </Badge>
+                )}
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-3 pt-4">
+                  {dietaryOptions.map((dietary) => (
+                    <div key={dietary} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`dietary-${dietary}`}
+                        checked={filters.dietary.includes(dietary)}
+                        onCheckedChange={() => handleDietaryToggle(dietary)}
+                        className="border-luxury-gold data-[state=checked]:bg-luxury-gold data-[state=checked]:text-luxury-emerald"
+                      />
+                      <Label
+                        htmlFor={`dietary-${dietary}`}
+                        className="text-sm cursor-pointer"
+                      >
+                        {dietary}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Rating */}
+            <AccordionItem value="rating" className="border-luxury-gold/20">
+              <AccordionTrigger className="text-luxury-emerald hover:text-luxury-emerald/80">
+                Minimum Rating
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-4">
+                  <div className="flex justify-between text-sm">
+                    <span>Any Rating</span>
+                    <span>{filters.minRating > 0 ? `${filters.minRating.toFixed(1)}+ Stars` : 'All'}</span>
+                  </div>
+                  <Slider
+                    min={0}
+                    max={5}
+                    step={0.5}
+                    value={[filters.minRating]}
+                    onValueChange={handleRatingChange}
+                    className="[&_[role=slider]]:bg-luxury-gold [&_[role=slider]]:border-luxury-gold"
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
         </div>
-      )}
+      </ScrollArea>
     </div>
   );
 };
-
-// Extracted filter content component for reuse
-const FilterContent = ({ 
-  priceRange, 
-  handlePriceChange, 
-  cuisineTypes, 
-  selectedCuisines, 
-  handleCuisineToggle,
-  dietaryOptions,
-  selectedDietary,
-  handleDietaryToggle,
-  clearAllFilters, 
-  hasActiveFilters 
-}: any) => (
-  <Accordion type="multiple" className="w-full" defaultValue={["price", "cuisine"]}>
-    <AccordionItem value="price">
-      <AccordionTrigger>
-        <div className="flex items-center gap-2">
-          <DollarSign className="h-4 w-4" />
-          Price per Person
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <div className="space-y-4 pt-2">
-          <Slider
-            value={priceRange}
-            onValueChange={handlePriceChange}
-            max={200}
-            step={5}
-            className="w-full"
-          />
-          <div className="flex justify-between text-sm text-muted-foreground">
-            <span>${priceRange[0]}</span>
-            <span>${priceRange[1]}</span>
-          </div>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-
-    <AccordionItem value="cuisine">
-      <AccordionTrigger>
-        <div className="flex items-center gap-2">
-          <Utensils className="h-4 w-4" />
-          Cuisine Type
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <div className="space-y-3 pt-2">
-          {cuisineTypes.map((cuisine: string) => (
-            <div key={cuisine} className="flex items-center space-x-2">
-              <Checkbox
-                id={`cuisine-${cuisine}`}
-                checked={selectedCuisines.includes(cuisine)}
-                onCheckedChange={() => handleCuisineToggle(cuisine)}
-              />
-              <Label 
-                htmlFor={`cuisine-${cuisine}`} 
-                className="text-sm cursor-pointer"
-              >
-                {cuisine}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-
-    <AccordionItem value="dietary">
-      <AccordionTrigger>
-        <div className="flex items-center gap-2">
-          <Utensils className="h-4 w-4" />
-          Dietary Options
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <div className="space-y-3 pt-2">
-          {dietaryOptions.map((option: string) => (
-            <div key={option} className="flex items-center space-x-2">
-              <Checkbox
-                id={`dietary-${option}`}
-                checked={selectedDietary.includes(option)}
-                onCheckedChange={() => handleDietaryToggle(option)}
-              />
-              <Label 
-                htmlFor={`dietary-${option}`} 
-                className="text-sm cursor-pointer"
-              >
-                {option}
-              </Label>
-            </div>
-          ))}
-        </div>
-      </AccordionContent>
-    </AccordionItem>
-
-    {hasActiveFilters && (
-      <div className="pt-4">
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={clearAllFilters}
-          className="w-full"
-        >
-          Clear All Filters
-        </Button>
-      </div>
-    )}
-  </Accordion>
-);
