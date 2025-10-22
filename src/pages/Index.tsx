@@ -43,7 +43,7 @@ import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
-import { WhyGoldsainte } from "@/components/WhyGoldsainte";
+
 
 
 import { FromTheJournal } from "@/components/FromTheJournal";
@@ -1254,9 +1254,6 @@ const Index = () => {
               restaurants={topUSRestaurants}
             />
             <PopularSearchGrid />
-
-            {/* Why Goldsainte - Luxury Storytelling Section */}
-            <WhyGoldsainte />
 
 
             {/* Featured Transportation Vendors - Promoted */}
