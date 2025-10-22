@@ -43,22 +43,32 @@ export const RestaurantCard = ({
 }: RestaurantCardProps) => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
-  const favorite = isFavorite(id);
+  
+  const restaurantData = {
+    id,
+    name,
+    rating,
+    userRatingsTotal,
+    priceLevel,
+    address,
+    photoUrl,
+    openNow,
+    phone,
+    website,
+    hours,
+    photos,
+    cuisine,
+    description,
+  };
+  
+  const favoriteId = isFavorite('restaurant', restaurantData);
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
+  const handleToggleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (favorite) {
-      removeFavorite(id);
+    if (favoriteId) {
+      await removeFavorite(favoriteId);
     } else {
-      addFavorite({
-        id,
-        type: "hotel",
-        name,
-        imageUrl: photoUrl,
-        location: address,
-        rating,
-        additionalInfo: { cuisine, priceLevel },
-      });
+      await addFavorite('restaurant', restaurantData);
     }
   };
 
@@ -95,7 +105,7 @@ export const RestaurantCard = ({
             className="absolute top-3 right-3 p-2 rounded-full bg-white/90 hover:bg-white transition-colors"
           >
             <Heart
-              className={`h-5 w-5 ${favorite ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+              className={`h-5 w-5 ${favoriteId ? "fill-red-500 text-red-500" : "text-gray-600"}`}
             />
           </button>
           {openNow !== undefined && (
