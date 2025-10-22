@@ -47,6 +47,11 @@ import { WhyGoldsainte } from "@/components/WhyGoldsainte";
 import { CuratedCollections } from "@/components/CuratedCollections";
 import { SocialProof } from "@/components/SocialProof";
 import { FromTheJournal } from "@/components/FromTheJournal";
+import { WinterSunHero } from "@/components/WinterSunHero";
+import { ThreeGridGallery } from "@/components/ThreeGridGallery";
+import { HotelScrollSection } from "@/components/HotelScrollSection";
+import { PopularSearchGrid } from "@/components/PopularSearchGrid";
+import { europeHotels, usHotels } from "@/data/hotelsData";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
 import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
@@ -926,6 +931,19 @@ const Index = () => {
                 </p>
               </div>
             </div>
+
+            {/* Mr & Mrs Smith Style Sections */}
+            <WinterSunHero />
+            <ThreeGridGallery />
+            <HotelScrollSection 
+              title="Most popular hotels in Europe"
+              hotels={europeHotels}
+            />
+            <HotelScrollSection 
+              title="Most popular hotels in US"
+              hotels={usHotels}
+            />
+            <PopularSearchGrid />
 
             {/* Why Goldsainte - Luxury Storytelling Section */}
             <WhyGoldsainte />
