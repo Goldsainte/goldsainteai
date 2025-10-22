@@ -58,16 +58,17 @@ export const FromTheJournal = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-24 md:py-32 bg-background">
+    <section className="py-20 md:py-24 bg-white">
       <div className="container px-4">
         <div className="flex items-end justify-between mb-16 md:mb-20">
           <div>
-            <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-bold mb-4 text-foreground tracking-tight">
+            <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light mb-4 text-foreground tracking-tight">
               From the Journal
             </h2>
             <p className="text-xl md:text-2xl font-light text-muted-foreground/80">
               Curated stories from our creator community
             </p>
+            <div className="w-20 h-1 bg-luxury-gold mt-4"></div>
           </div>
           <button 
             onClick={() => navigate('/journeys')}
@@ -86,7 +87,7 @@ export const FromTheJournal = () => {
             <article
               key={entry.id}
               role="article"
-              className="group cursor-pointer overflow-hidden bg-transparent hover:-translate-y-2 hover:shadow-lg transition-all duration-700 ease-out"
+              className="group cursor-pointer overflow-hidden bg-transparent hover:-translate-y-1 transition-all duration-700 ease-out"
               onClick={() => navigate('/journeys')}
             >
               <div className="relative h-80 md:h-96 overflow-hidden">
@@ -100,7 +101,7 @@ export const FromTheJournal = () => {
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-700"></div>
               </div>
 
-              <div className="p-4 space-y-3">
+              <div className="pt-6 space-y-3">
                 <div className="text-[10px] text-luxury-gold/70 font-semibold tracking-[0.2em] uppercase">
                   {entry.destination}
                 </div>
