@@ -255,4 +255,16 @@ verify_jwt = false
 [functions.apple-signin-callback]
 verify_jwt = false
 
+[functions.create-agent-inquiry]
+verify_jwt = false
+
+[functions.convert-inquiry-to-marketplace-job]
+verify_jwt = false
+
+[functions.send-traveler-confirmation-email]
+verify_jwt = false
+
+[functions.notify-creators-new-opportunity]
+verify_jwt = false
+
 
