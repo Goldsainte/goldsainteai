@@ -38,6 +38,11 @@ All colors MUST be HSL.
     --accent-dark: 187 57% 9%;
     --accent-gray: 0 0% 55%;
     
+    /* Luxury Palette */
+    --luxury-emerald: 160 60% 20%;
+    --luxury-gold: 43 74% 49%;
+    --luxury-ivory: 40 23% 97%;
+    
     /* Dashboard Colors */
     --dashboard-bg: 42 44% 60%;
     --dashboard-text: 174 74% 18%;
@@ -96,6 +101,11 @@ All colors MUST be HSL.
     --accent-cream: 48 39% 84%;
     --accent-dark: 187 57% 9%;
     --accent-gray: 0 0% 55%;
+    
+    /* Luxury Palette */
+    --luxury-emerald: 160 60% 20%;
+    --luxury-gold: 43 74% 49%;
+    --luxury-ivory: 40 23% 97%;
     
     /* Dashboard Colors */
     --dashboard-bg: 42 44% 60%;

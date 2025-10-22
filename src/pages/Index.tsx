@@ -43,6 +43,7 @@ import { FlightFilters } from "@/components/FlightFilters";
 import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
+import { WhyGoldsainte } from "@/components/WhyGoldsainte";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
 import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
@@ -923,6 +924,9 @@ const Index = () => {
               </div>
             </div>
 
+            {/* Why Goldsainte - Luxury Storytelling Section */}
+            <WhyGoldsainte />
+
             {/* Hero Image Section */}
             <div className="w-full overflow-hidden max-h-[600px] md:max-h-[700px] lg:max-h-none">
               <img 
@@ -1017,7 +1021,7 @@ const Index = () => {
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => navigate('/cocurated-journeys')}
                           >
-                            Browse Packages
+                            Explore Curated Journeys
                           </Button>
                         </CardContent>
                       </Card>
@@ -1043,7 +1047,7 @@ const Index = () => {
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => navigate('/journeys')}
                           >
-                            Join Creators
+                            Join Our Creator Circle
                           </Button>
                         </CardContent>
                       </Card>
@@ -1069,7 +1073,7 @@ const Index = () => {
                             className="w-full mt-3 sm:mt-4 h-11 sm:h-10 md:h-auto border-secondary text-secondary hover:bg-secondary hover:text-primary-foreground touch-manipulation min-h-[44px] text-sm sm:text-base"
                             onClick={() => navigate('/browse-agents')}
                           >
-                            Find an Agent
+                            Meet Your Expert Agent
                           </Button>
                         </CardContent>
                       </Card>

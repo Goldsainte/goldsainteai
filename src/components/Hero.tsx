@@ -25,29 +25,34 @@ export const Hero = () => {
   };
 
   return (
-    <section className="bg-gradient-hero text-primary-foreground py-12 sm:py-16 md:py-24 pb-32 sm:pb-16" aria-label="Hero section with search form">
-      <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center sm:text-left">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-            Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs
+    <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden" aria-label="Hero section with search form">
+      {/* Full-width background with subtle overlay */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-luxury-emerald/95 via-luxury-emerald/85 to-luxury-emerald/75" />
+      </div>
+
+      <div className="container relative z-10 mx-auto px-4 py-20">
+        <div className="max-w-5xl mx-auto text-center">
+          <h1 className="font-secondary text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-6 leading-tight tracking-wide text-white drop-shadow-lg">
+            Where Luxury Meets Intelligence
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl mb-8 text-primary-foreground/90 max-w-3xl">
-            Use AI to plan fast, get agents bidding to save more, or book CoCurated trips — built by pros, backed by influencers, and designed to deliver value.
+          <p className="text-xl sm:text-2xl md:text-3xl mb-12 text-white/95 max-w-4xl mx-auto font-light leading-relaxed">
+            AI-powered planning. Expert agents bidding for your business. Creator-curated journeys. Travel reimagined for the discerning explorer.
           </p>
 
           <form 
-            className="bg-card rounded-lg shadow-xl p-4 sm:p-6" 
+            className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8 border border-white/20" 
             onSubmit={handleSearch}
             aria-label="Hotel search form"
           >
             <div className="flex flex-col gap-3 sm:gap-4">
               <div className="relative">
                 <label htmlFor="location" className="sr-only">Destination</label>
-                <MapPin className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                <MapPin className="absolute left-3 top-3 h-5 w-5 text-white/70 pointer-events-none" aria-hidden="true" />
                 <Input
                   id="location"
-                  placeholder="Where are you going?"
-                  className="pl-10 h-12 bg-background text-foreground w-full"
+                  placeholder="Where shall we take you?"
+                  className="pl-10 h-14 bg-white/20 backdrop-blur-sm text-white placeholder:text-white/60 border-white/30 focus:border-luxury-gold focus:ring-luxury-gold w-full"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                   required
@@ -58,11 +63,11 @@ export const Hero = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div className="relative">
                   <label htmlFor="check-in" className="sr-only">Check-in date</label>
-                  <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                  <Calendar className="absolute left-3 top-3 h-5 w-5 text-white/70 pointer-events-none" aria-hidden="true" />
                   <Input
                     id="check-in"
                     type="date"
-                    className="pl-10 h-12 bg-background text-foreground w-full"
+                    className="pl-10 h-14 bg-white/20 backdrop-blur-sm text-white border-white/30 focus:border-luxury-gold focus:ring-luxury-gold w-full"
                     value={checkIn}
                     onChange={(e) => setCheckIn(e.target.value)}
                     aria-label="Check-in date"
@@ -71,11 +76,11 @@ export const Hero = () => {
 
                 <div className="relative">
                   <label htmlFor="check-out" className="sr-only">Check-out date</label>
-                  <Calendar className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                  <Calendar className="absolute left-3 top-3 h-5 w-5 text-white/70 pointer-events-none" aria-hidden="true" />
                   <Input
                     id="check-out"
                     type="date"
-                    className="pl-10 h-12 bg-background text-foreground w-full"
+                    className="pl-10 h-14 bg-white/20 backdrop-blur-sm text-white border-white/30 focus:border-luxury-gold focus:ring-luxury-gold w-full"
                     value={checkOut}
                     onChange={(e) => setCheckOut(e.target.value)}
                     aria-label="Check-out date"
@@ -85,14 +90,14 @@ export const Hero = () => {
 
               <div className="relative">
                 <label htmlFor="guests" className="sr-only">Number of guests</label>
-                <Users className="absolute left-3 top-3 h-5 w-5 text-muted-foreground pointer-events-none" aria-hidden="true" />
+                <Users className="absolute left-3 top-3 h-5 w-5 text-white/70 pointer-events-none" aria-hidden="true" />
                 <Input
                   id="guests"
                   type="number"
                   min="1"
                   max="20"
                   placeholder="2 guests"
-                  className="pl-10 h-12 bg-background text-foreground w-full"
+                  className="pl-10 h-14 bg-white/20 backdrop-blur-sm text-white placeholder:text-white/60 border-white/30 focus:border-luxury-gold focus:ring-luxury-gold w-full"
                   value={guests}
                   onChange={(e) => setGuests(e.target.value)}
                   aria-label="Number of guests"
@@ -101,10 +106,10 @@ export const Hero = () => {
 
               <Button 
                 type="submit"
-                className="h-12 px-6 sm:px-8 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold w-full min-h-[48px]"
-                aria-label="Search hotels"
+                className="h-14 px-8 sm:px-10 bg-luxury-gold text-white hover:bg-luxury-gold/90 font-semibold w-full min-h-[48px] text-lg border-2 border-luxury-gold/30 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+                aria-label="Begin your journey"
               >
-                Search
+                Begin Your Journey
               </Button>
             </div>
           </form>

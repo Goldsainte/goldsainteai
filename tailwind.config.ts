@@ -48,6 +48,11 @@ export default {
           dark: "hsl(var(--accent-dark))",
           gray: "hsl(var(--accent-gray))",
         },
+        luxury: {
+          emerald: "hsl(var(--luxury-emerald))",
+          gold: "hsl(var(--luxury-gold))",
+          ivory: "hsl(var(--luxury-ivory))",
+        },
         dashboard: {
           bg: "hsl(var(--dashboard-bg))",
           text: "hsl(var(--dashboard-text))",
