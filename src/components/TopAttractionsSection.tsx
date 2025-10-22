@@ -36,6 +36,8 @@ export const TopAttractionsSection = ({ attractions }: TopAttractionsSectionProp
                 src={attraction.imageUrl || `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80`}
                 alt={attraction.destination}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                loading="lazy"
+                decoding="async"
               />
             </div>
             <div className="flex-1">

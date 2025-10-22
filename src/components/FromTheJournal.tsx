@@ -90,6 +90,8 @@ export const FromTheJournal = () => {
                   src={entry.imageUrl}
                   alt={entry.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                  loading="lazy"
+                  decoding="async"
                 />
                 <div className="absolute top-4 right-4 bg-luxury-gold/90 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
                   {entry.readTime}

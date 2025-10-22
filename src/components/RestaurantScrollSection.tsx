@@ -50,6 +50,8 @@ export const RestaurantScrollSection = ({ title, restaurants }: RestaurantScroll
                     src={restaurant.image}
                     alt={`${restaurant.name} - ${restaurant.cuisine} restaurant in ${restaurant.location}`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute top-4 right-4 bg-white px-3 py-1 rounded-full text-sm font-medium">
                     {restaurant.priceLevel}

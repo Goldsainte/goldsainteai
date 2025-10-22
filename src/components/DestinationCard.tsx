@@ -27,6 +27,8 @@ export const DestinationCard = ({
           src={imageUrl || `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80`}
           alt={destination}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         

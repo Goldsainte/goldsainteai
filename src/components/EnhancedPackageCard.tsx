@@ -49,6 +49,8 @@ export const EnhancedPackageCard = ({
           src={coverImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80"}
           alt={packageName}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+          loading="lazy"
+          decoding="async"
         />
         {influencerCommission && influencerCommission > 0 && (
           <Badge className="absolute top-3 right-3 bg-green-500 text-white">

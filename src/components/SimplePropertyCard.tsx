@@ -148,6 +148,8 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
             src={image}
             alt={title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               e.currentTarget.src = getHotelImage(undefined, property.hotel_id || title);
             }}

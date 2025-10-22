@@ -109,6 +109,8 @@ export const RestaurantCard = ({
               src={photoUrl} 
               alt={name}
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
+              decoding="async"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">

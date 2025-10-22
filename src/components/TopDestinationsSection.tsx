@@ -44,6 +44,8 @@ export const TopDestinationsSection = ({ destinations }: TopDestinationsSectionP
               src={dest.imageUrl || getLuxuryImage(dest.destination)}
               alt={dest.destination}
               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              loading="lazy"
+              decoding="async"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/80 via-luxury-emerald/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
