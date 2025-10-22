@@ -1,5 +1,8 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.google-places-restaurants]
+verify_jwt = false
+
 [functions.uber-request-ride]
 verify_jwt = true
 

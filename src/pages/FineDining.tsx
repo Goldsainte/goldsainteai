@@ -8,7 +8,7 @@ import { FineDiningRestaurantCard } from "@/components/FineDiningRestaurantCard"
 import { FineDiningFilters, RestaurantFilterState } from "@/components/FineDiningFilters";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAmadeusRestaurantsForLocation, AmadeusRestaurant } from "@/lib/amadeusRestaurantHelpers";
+import { fetchAmadeusRestaurantsForLocation, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
 import { toast } from "sonner";
 
 const globalCulinaryCities = [
@@ -49,7 +49,7 @@ export default function FineDining() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [restaurants, setRestaurants] = useState<AmadeusRestaurant[]>([]);
+  const [restaurants, setRestaurants] = useState<GooglePlacesRestaurant[]>([]);
   const [loading, setLoading] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedQuickFilter, setSelectedQuickFilter] = useState<string>("");
@@ -117,7 +117,10 @@ export default function FineDining() {
 
   const filteredRestaurants = restaurants.filter(restaurant => {
     const matchesSearch = searchQuery === "" || restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCuisine = filters.cuisineTypes.length === 0 || (restaurant.category && filters.cuisineTypes.some(c => restaurant.category?.toLowerCase().includes(c.toLowerCase())));
+    const matchesCuisine = filters.cuisineTypes.length === 0 || 
+      (restaurant.types && filters.cuisineTypes.some(c => 
+        restaurant.types?.some(t => t.toLowerCase().includes(c.toLowerCase()))
+      ));
     return matchesSearch && matchesCuisine;
   });
 
@@ -155,20 +158,30 @@ export default function FineDining() {
           </div>
         ) : filteredRestaurants.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredRestaurants.map((restaurant) => (
-              <FineDiningRestaurantCard
-                key={restaurant.id}
-                id={restaurant.id}
-                name={restaurant.name}
-                cuisine={restaurant.category ? [restaurant.category] : []}
-                priceLevel={3}
-                rating={restaurant.rank ? Math.min(restaurant.rank / 20, 5) : undefined}
-                imageUrl={undefined}
-                rank={restaurant.rank}
-                tags={restaurant.tags}
-                onViewDetails={() => navigate(`/restaurant/${restaurant.id}`)}
-              />
-            ))}
+            {filteredRestaurants.map((restaurant) => {
+              const photoUrl = restaurant.photos?.[0]?.photo_reference 
+                ? getPhotoUrl(restaurant.photos[0].photo_reference, 800)
+                : undefined;
+              
+              const cuisineTypes = restaurant.types?.filter(t => 
+                !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)
+              ) || [];
+
+              return (
+                <FineDiningRestaurantCard
+                  key={restaurant.place_id}
+                  id={restaurant.place_id}
+                  name={restaurant.name}
+                  city={restaurant.vicinity}
+                  cuisine={cuisineTypes}
+                  priceLevel={restaurant.price_level || 3}
+                  rating={restaurant.rating}
+                  reviewCount={restaurant.user_ratings_total}
+                  imageUrl={photoUrl}
+                  onViewDetails={() => navigate(`/restaurant/${restaurant.place_id}`)}
+                />
+              );
+            })}
           </div>
         ) : (
           <div className="text-center py-12">

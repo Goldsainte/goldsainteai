@@ -4,12 +4,12 @@ import { ArrowLeft, MapPin, Star, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { fetchAmadeusRestaurantDetails, AmadeusRestaurant } from "@/lib/amadeusRestaurantHelpers";
+import { fetchAmadeusRestaurantDetails, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
 
 export default function RestaurantDetail() {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
-  const [restaurant, setRestaurant] = useState<AmadeusRestaurant | null>(null);
+  const [restaurant, setRestaurant] = useState<GooglePlacesRestaurant | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -67,16 +67,23 @@ export default function RestaurantDetail() {
 
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] overflow-hidden">
+        <img 
+          src={restaurant.photos?.[0]?.photo_reference 
+            ? getPhotoUrl(restaurant.photos[0].photo_reference, 1200) 
+            : "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80"}
+          alt={restaurant.name}
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-4">
           <div className="container mx-auto">
             <h1 className="font-secondary text-4xl md:text-5xl text-white font-light mb-2">
               {restaurant.name}
             </h1>
-            {restaurant.geoCode && (
+            {restaurant.vicinity && (
               <div className="flex items-center gap-2 text-white/90">
                 <MapPin className="h-4 w-4" />
-                <span>Latitude: {restaurant.geoCode.latitude}, Longitude: {restaurant.geoCode.longitude}</span>
+                <span>{restaurant.vicinity}</span>
               </div>
             )}
           </div>
@@ -89,16 +96,32 @@ export default function RestaurantDetail() {
           {/* Overview */}
           <Card className="p-6 md:p-8 mb-8">
             <div className="flex flex-wrap gap-4 mb-6">
-              {restaurant.category && (
-                <Badge variant="secondary" className="px-4 py-2">
-                  {restaurant.category}
-                </Badge>
+              {restaurant.types && restaurant.types.length > 0 && (
+                <>
+                  {restaurant.types
+                    .filter(t => !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t))
+                    .slice(0, 3)
+                    .map((type, idx) => (
+                      <Badge key={idx} variant="secondary" className="px-4 py-2 capitalize">
+                        {type.replace(/_/g, ' ')}
+                      </Badge>
+                    ))
+                  }
+                </>
               )}
-              {restaurant.rank && (
+              {restaurant.rating && (
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-luxury-gold text-luxury-gold" />
-                  <span className="font-medium">Rank: {restaurant.rank}</span>
+                  <span className="font-medium">{restaurant.rating.toFixed(1)}</span>
+                  {restaurant.user_ratings_total && (
+                    <span className="text-muted-foreground">({restaurant.user_ratings_total} reviews)</span>
+                  )}
                 </div>
+              )}
+              {restaurant.price_level && (
+                <Badge variant="outline" className="px-4 py-2">
+                  {'$'.repeat(restaurant.price_level)}
+                </Badge>
               )}
             </div>
 
@@ -110,45 +133,45 @@ export default function RestaurantDetail() {
               offers an unforgettable culinary journey with expertly crafted dishes and impeccable service.
             </p>
 
-            {restaurant.tags && restaurant.tags.length > 0 && (
+            {restaurant.opening_hours?.open_now !== undefined && (
               <div className="mb-6">
-                <h3 className="font-medium mb-3">Features</h3>
-                <div className="flex flex-wrap gap-2">
-                  {restaurant.tags.map((tag, index) => (
-                    <Badge key={index} variant="outline">{tag}</Badge>
-                  ))}
-                </div>
+                <Badge variant={restaurant.opening_hours.open_now ? "default" : "secondary"} className="text-sm">
+                  {restaurant.opening_hours.open_now ? "Open Now" : "Closed"}
+                </Badge>
               </div>
             )}
 
-            {/* Primary CTA - Amadeus Booking */}
+            {/* Primary CTA - Google Maps */}
             <div className="mt-8 p-6 bg-luxury-gold/10 rounded-lg border-2 border-luxury-gold">
-              <h3 className="font-secondary text-xl font-light mb-2">Book Your Table</h3>
+              <h3 className="font-secondary text-xl font-light mb-2">Visit This Restaurant</h3>
               <p className="text-sm text-muted-foreground mb-4">
-                Reserve through our partner for the best rates and exclusive benefits
+                View details, hours, and directions on Google Maps
               </p>
               <Button 
                 size="lg"
                 className="w-full bg-luxury-gold text-luxury-emerald hover:bg-luxury-gold/90"
-                onClick={() => window.open(`https://www.amadeus.com`, '_blank')}
+                onClick={() => window.open(
+                  `https://www.google.com/maps/search/?api=1&query=${restaurant.name}&query_place_id=${restaurant.place_id}`,
+                  '_blank'
+                )}
               >
                 <ExternalLink className="h-4 w-4 mr-2" />
-                Book via Amadeus
+                View on Google Maps
               </Button>
             </div>
           </Card>
 
           {/* Location */}
-          {restaurant.geoCode && (
+          {restaurant.geometry?.location && (
             <Card className="p-6 md:p-8">
               <div className="w-20 h-1 bg-luxury-gold mb-6" />
               <h2 className="font-secondary text-2xl font-light mb-4">Location</h2>
               <div className="flex items-start gap-3 mb-4">
                 <MapPin className="h-5 w-5 text-luxury-gold flex-shrink-0 mt-1" />
                 <div>
-                  <p className="font-medium">Coordinates</p>
-                  <p className="text-muted-foreground">
-                    {restaurant.geoCode.latitude}, {restaurant.geoCode.longitude}
+                  <p className="font-medium">{restaurant.vicinity || 'Address'}</p>
+                  <p className="text-muted-foreground text-sm">
+                    {restaurant.geometry.location.lat.toFixed(6)}, {restaurant.geometry.location.lng.toFixed(6)}
                   </p>
                 </div>
               </div>
@@ -156,7 +179,7 @@ export default function RestaurantDetail() {
                 variant="outline"
                 className="w-full"
                 onClick={() => window.open(
-                  `https://www.google.com/maps/search/?api=1&query=${restaurant.geoCode?.latitude},${restaurant.geoCode?.longitude}`,
+                  `https://www.google.com/maps/search/?api=1&query=${restaurant.geometry?.location.lat},${restaurant.geometry?.location.lng}`,
                   '_blank'
                 )}
               >
