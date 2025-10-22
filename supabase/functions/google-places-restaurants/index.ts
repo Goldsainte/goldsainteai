@@ -61,6 +61,8 @@ function transformRestaurant(place: any, apiKey: string): any {
 }
 
 Deno.serve(async (req) => {
+  console.log('🚀 NEW VERSION WITH FILTERING - v2.0');
+  
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -68,7 +70,7 @@ Deno.serve(async (req) => {
   try {
     const { latitude, longitude, radius = 5000, type = 'restaurant' } = await req.json();
     
-    console.log(`Searching restaurants near (${latitude}, ${longitude}) with radius ${radius}m`);
+    console.log(`🔍 Searching restaurants near (${latitude}, ${longitude}) with radius ${radius}m`);
     
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
