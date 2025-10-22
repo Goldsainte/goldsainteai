@@ -44,7 +44,7 @@ import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import { WhyGoldsainte } from "@/components/WhyGoldsainte";
-import { CuratedCollections } from "@/components/CuratedCollections";
+
 import { SocialProof } from "@/components/SocialProof";
 import { FromTheJournal } from "@/components/FromTheJournal";
 import { WinterSunHero } from "@/components/WinterSunHero";
@@ -56,7 +56,7 @@ import { europeHotels, usHotels } from "@/data/hotelsData";
 import { topUSRestaurants } from "@/data/restaurantsData";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
-import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
+
 import cardAiSearch from "@/assets/card-ai-search.jpg";
 import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking-phone.png";
@@ -1187,21 +1187,6 @@ const Index = () => {
             {/* Why Goldsainte - Luxury Storytelling Section */}
             <WhyGoldsainte />
 
-            {/* Hero Image Section */}
-            <div className="w-full overflow-hidden max-h-[600px] md:max-h-[700px] lg:max-h-none">
-              <img 
-                src={heroAiConcierge} 
-                alt="Goldsainte AI Assist - Your personal AI travel concierge for booking flights, hotels and planning perfect trips" 
-                className="w-full h-full object-cover object-center"
-                loading="eager"
-                width="1920"
-                height="1080"
-              />
-            </div>
-
-
-            {/* Curated Collections - Luxury Categories */}
-            <CuratedCollections />
 
             {/* Social Proof - Testimonials */}
             <SocialProof />
@@ -1217,44 +1202,6 @@ const Index = () => {
             {/* Featured Restaurants and Services */}
             <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
               <div className="w-full max-w-7xl mx-auto">
-              {/* Featured Flights */}
-              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
-                <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary">
-                    Premium Flight Services
-                  </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
-                    Fly in comfort and style to destinations worldwide
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                  {featuredFlights.map((flight, idx) => (
-                    <Card
-                      key={idx}
-                      className="group relative overflow-hidden cursor-pointer transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 border border-primary/20"
-                      onClick={() => handleDatePickerRequest("flight", "Show me flights from my location")}
-                    >
-                      <div className="relative h-64 overflow-hidden">
-                        <img
-                          src={flight.image}
-                          alt={flight.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                        <div className="absolute top-4 right-4">
-                          <Plane className="h-6 w-6 text-white drop-shadow-lg" />
-                        </div>
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                        <h3 className="text-2xl font-bold mb-1">{flight.title}</h3>
-                        <p className="text-sm text-primary mb-2">{flight.route}</p>
-                        <p className="text-sm text-white/80 line-clamp-2">{flight.description}</p>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
 
               {/* Become a Travel Agent CTA */}
               <div className="pt-12 pb-8">
