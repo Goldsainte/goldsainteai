@@ -29,7 +29,6 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { SimplePropertyCard } from "@/components/SimplePropertyCard";
-import { InspirationCard } from "@/components/InspirationCard";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
@@ -61,13 +60,7 @@ import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking-phone.png";
 import cardItinerary from "@/assets/card-itinerary.jpg";
 import cardMessaging from "@/assets/card-messaging-chatting.png";
-import santoriniGreece from "@/assets/santorini-greece.jpg";
-import swissAlps from "@/assets/swiss-alps.jpg";
-import maldivesTropical from "@/assets/maldives-tropical.jpg";
-import parisUrban from "@/assets/paris-urban.jpg";
 import dubaiDesert from "@/assets/dubai-desert.jpg";
-import amalfiCoast from "@/assets/amalfi-coast.jpg";
-import icelandNorthernLights from "@/assets/iceland-northern-lights.jpg";
 import baliSerenity from "@/assets/bali-serenity.jpg";
 import restaurant1 from "@/assets/restaurant1.jpg";
 import restaurant2 from "@/assets/restaurant2.jpg";
@@ -279,56 +272,6 @@ const Index = () => {
     }
   };
 
-  const inspirationDestinations = [
-    {
-      image: santoriniGreece,
-      title: "Santorini Paradise",
-      location: "Greece",
-      description: "Experience breathtaking sunsets and pristine white architecture overlooking the Aegean Sea."
-    },
-    {
-      image: swissAlps,
-      title: "Alpine Luxury",
-      location: "Swiss Alps",
-      description: "Discover world-class skiing and cozy mountain retreats in the heart of the Alps."
-    },
-    {
-      image: maldivesTropical,
-      title: "Tropical Escape",
-      location: "Maldives",
-      description: "Unwind in overwater bungalows surrounded by crystal-clear turquoise waters."
-    },
-    {
-      image: parisUrban,
-      title: "Urban Elegance",
-      location: "Paris, France",
-      description: "Immerse yourself in art, culture, and world-renowned cuisine in the City of Light."
-    },
-    {
-      image: dubaiDesert,
-      title: "Desert Oasis",
-      location: "Dubai, UAE",
-      description: "Experience luxury redefined with stunning architecture and endless entertainment."
-    },
-    {
-      image: amalfiCoast,
-      title: "Coastal Charm",
-      location: "Amalfi Coast, Italy",
-      description: "Explore picturesque villages, stunning cliffs, and authentic Italian hospitality."
-    },
-    {
-      image: icelandNorthernLights,
-      title: "Northern Lights",
-      location: "Iceland",
-      description: "Witness the magical aurora borealis in a winter wonderland of natural beauty."
-    },
-    {
-      image: baliSerenity,
-      title: "Bali Serenity",
-      location: "Bali, Indonesia",
-      description: "Find peace in lush rice terraces and traditional temples with world-class hospitality."
-    }
-  ];
 
   const featuredRestaurants = [
     {
@@ -801,18 +744,6 @@ const Index = () => {
     if (e.key === 'Enter' && !isLoading) {
       handleSearch();
     }
-  };
-
-  const handleInspirationClick = async (destination: { title: string; location: string; description: string }) => {
-    // Scroll to top (chat area)
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Wait for scroll to complete
-    setTimeout(() => {
-      // Pre-populate message asking about travel to this destination
-      const message = `I'm interested in traveling to ${destination.location}. Can you help me find flights and hotels?`;
-      handleSearch(message);
-    }, 500);
   };
 
   const resetChat = () => {
@@ -1305,33 +1236,10 @@ const Index = () => {
             {/* From the Journal - Editorial Content */}
             <FromTheJournal />
 
-            {/* Inspiration Content - Far below the fold */}
-            <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10" data-tour="explore" aria-labelledby="inspiration-heading">
-              <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6">
-                <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 id="inspiration-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent font-secondary leading-tight">
-                    Get Inspired
-                  </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
-                    Discover your next dream destination
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-                  {inspirationDestinations.map((destination, idx) => (
-                    <InspirationCard
-                      key={idx}
-                      image={destination.image}
-                      title={destination.title}
-                      location={destination.location}
-                      description={destination.description}
-                      onClick={() => handleInspirationClick(destination)}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Featured Restaurants */}
+            {/* Featured Restaurants and Services */}
+            <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
+              <div className="w-full max-w-7xl mx-auto">
+                {/* Featured Restaurants */}
               <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12" aria-labelledby="dining-heading">
                 <div className="text-center space-y-2 sm:space-y-3 px-2">
                   <h2 id="dining-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-secondary leading-tight">
@@ -1471,7 +1379,8 @@ const Index = () => {
                   </CardContent>
                 </Card>
               </div>
-            </section>
+            </div>
+          </section>
 
             {/* Cuisine Selector - Initial View */}
             {showCuisineSelector && (
