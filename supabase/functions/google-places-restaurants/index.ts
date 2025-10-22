@@ -3,6 +3,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Filter out non-restaurant places (hotels, spas, etc.)
+function isActualRestaurant(place: any): boolean {
+  const types = place.types || [];
+  
+  // Exclude lodging, spas, hotels, gyms, health facilities
+  const excludeTypes = ['lodging', 'spa', 'gym', 'health', 'hotel', 'motel', 'resort', 'inn'];
+  const hasExcludedType = types.some((t: string) => 
+    excludeTypes.some(excluded => t.toLowerCase().includes(excluded))
+  );
+  
+  if (hasExcludedType) {
+    console.log(`Filtering out ${place.displayName?.text || place.name} - has excluded type:`, types);
+    return false;
+  }
+  
+  // Must have restaurant or meal-related type
+  const restaurantTypes = ['restaurant', 'food', 'meal_takeaway', 'meal_delivery', 'cafe', 'bar', 'bakery', 'meal'];
+  const hasRestaurantType = types.some((t: string) => 
+    restaurantTypes.some(restaurant => t.toLowerCase().includes(restaurant))
+  );
+  
+  if (!hasRestaurantType) {
+    console.log(`Filtering out ${place.displayName?.text || place.name} - no restaurant type:`, types);
+    return false;
+  }
+  
+  return true;
+}
+
 // Transform new API response to legacy format for frontend compatibility
 function transformRestaurant(place: any, apiKey: string): any {
   return {
@@ -50,7 +79,7 @@ Deno.serve(async (req) => {
     const url = 'https://places.googleapis.com/v1/places:searchNearby';
     
     const requestBody = {
-      includedTypes: ['restaurant'],
+      includedPrimaryTypes: ['restaurant'],  // More strict - only primary restaurants
       locationRestriction: {
         circle: {
           center: {
@@ -85,10 +114,15 @@ Deno.serve(async (req) => {
     const data = await response.json();
     const places = data.places || [];
     
-    console.log(`Found ${places.length} restaurants`);
+    console.log(`Found ${places.length} places from API`);
+    
+    // Filter to only actual restaurants (exclude hotels, spas, etc.)
+    const actualRestaurants = places.filter(isActualRestaurant);
+    
+    console.log(`Filtered to ${actualRestaurants.length} actual restaurants`);
     
     // Transform to legacy format
-    const transformedPlaces = places.map((place: any) => transformRestaurant(place, apiKey));
+    const transformedPlaces = actualRestaurants.map((place: any) => transformRestaurant(place, apiKey));
     
     return new Response(
       JSON.stringify({ data: transformedPlaces }),
