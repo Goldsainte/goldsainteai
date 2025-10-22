@@ -50,8 +50,10 @@ import { FromTheJournal } from "@/components/FromTheJournal";
 import { WinterSunHero } from "@/components/WinterSunHero";
 import { ThreeGridGallery } from "@/components/ThreeGridGallery";
 import { HotelScrollSection } from "@/components/HotelScrollSection";
+import { RestaurantScrollSection } from "@/components/RestaurantScrollSection";
 import { PopularSearchGrid } from "@/components/PopularSearchGrid";
 import { europeHotels, usHotels } from "@/data/hotelsData";
+import { topUSRestaurants } from "@/data/restaurantsData";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
 import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
@@ -60,9 +62,6 @@ import cardExpertAgents from "@/assets/card-expert-agents.jpg";
 import cardInstantBooking from "@/assets/card-instant-booking-phone.png";
 import cardItinerary from "@/assets/card-itinerary.jpg";
 import cardMessaging from "@/assets/card-messaging-chatting.png";
-import restaurant1 from "@/assets/restaurant1.jpg";
-import restaurant2 from "@/assets/restaurant2.jpg";
-import restaurant3 from "@/assets/restaurant3.jpg";
 import flight1 from "@/assets/flight1.jpg";
 import flight2 from "@/assets/flight2.jpg";
 import flight3 from "@/assets/flight3.jpg";
@@ -87,7 +86,6 @@ import creatorCanyonViews from "@/assets/creator-canyon-views.jpg";
 import creatorDesertCamel from "@/assets/creator-desert-camel.jpg";
 import creatorSnowPhotography from "@/assets/creator-snow-photography.jpg";
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
 import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 
@@ -271,37 +269,6 @@ const Index = () => {
       });
     }
   };
-
-
-  const featuredRestaurants = [
-    {
-      id: "le-bernardin",
-      image: restaurant1,
-      title: "Le Bernardin",
-      cuisine: "French Seafood",
-      address: "155 W 51st St, New York, NY 10019",
-      rating: 4.8,
-      description: "Three Michelin-starred seafood restaurant offering refined French cuisine."
-    },
-    {
-      id: "eleven-madison-park",
-      image: restaurant2,
-      title: "Eleven Madison Park",
-      cuisine: "Contemporary American",
-      address: "11 Madison Ave, New York, NY 10010",
-      rating: 4.7,
-      description: "Iconic three-Michelin-starred restaurant featuring seasonal plant-based tasting menu."
-    },
-    {
-      id: "per-se",
-      image: restaurant3,
-      title: "Per Se",
-      cuisine: "French Contemporary",
-      address: "10 Columbus Circle, New York, NY 10019",
-      rating: 4.6,
-      description: "Thomas Keller's three-Michelin-starred restaurant with stunning Central Park views."
-    }
-  ];
 
   const featuredFlights = [
     {
@@ -1240,58 +1207,10 @@ const Index = () => {
             <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10">
               <div className="w-full max-w-7xl mx-auto">
                 {/* Featured Restaurants */}
-              <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12" aria-labelledby="dining-heading">
-                <div className="text-center space-y-2 sm:space-y-3 px-2">
-                  <h2 id="dining-heading" className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-accent via-primary to-accent bg-clip-text text-transparent font-secondary leading-tight">
-                    Fine Dining Experiences
-                  </h2>
-                  <p className="text-base sm:text-lg text-muted-foreground font-secondary max-w-2xl mx-auto leading-relaxed">
-                    Savor exceptional cuisine at world-renowned restaurants
-                  </p>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                  {featuredRestaurants.map((restaurant, idx) => (
-                    <Card
-                      key={idx}
-                      className="group relative overflow-hidden transition-all duration-500 hover:shadow-2xl border border-accent/20"
-                    >
-                      <div className="relative h-64 overflow-hidden">
-                        <img
-                          src={restaurant.image}
-                          alt={restaurant.title}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                        <Badge className="absolute top-4 right-4 bg-accent/90 backdrop-blur-sm border-accent/50 gap-1">
-                          <Star className="h-3 w-3 fill-current" />
-                          {restaurant.rating}
-                        </Badge>
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 p-6 text-white space-y-3">
-                        <div>
-                          <h3 className="text-2xl font-bold mb-1">{restaurant.title}</h3>
-                          <p className="text-sm text-accent mb-2">{restaurant.cuisine}</p>
-                          <p className="text-sm text-white/80 line-clamp-2">{restaurant.description}</p>
-                        </div>
-                        <Button 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const query = encodeURIComponent(`${restaurant.title} ${restaurant.address} reservations`);
-                            const reservationUrl = `https://www.google.com/search?q=${query}`;
-                            window.open(reservationUrl, '_blank', 'noopener,noreferrer');
-                          }}
-                          className="w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          size="sm"
-                        >
-                          <UtensilsCrossed className="h-4 w-4 mr-2" />
-                          Make Reservation
-                        </Button>
-                      </div>
-                    </Card>
-                  ))}
-                </div>
-              </div>
+              <RestaurantScrollSection 
+                title="Fine Dining Across America"
+                restaurants={topUSRestaurants}
+              />
 
               {/* Featured Flights */}
               <div className="space-y-5 sm:space-y-6 pt-10 sm:pt-12">
