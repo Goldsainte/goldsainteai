@@ -19,12 +19,12 @@ export const PartnersHero = () => {
       </div>
 
       {/* Content */}
-      <div className="container relative z-10 px-4 py-20">
+      <div className="container relative z-10 px-3 sm:px-4 md:px-6 py-12 sm:py-16 md:py-20">
         <div className="max-w-3xl">
-          <h1 className="font-secondary text-3xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
+          <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight drop-shadow-lg">
             Partner with <span className="text-primary">Goldsainte</span>
           </h1>
-          <p className="text-lg md:text-xl text-gray-200 mb-4 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-200 mb-4 leading-relaxed">
             Join a Luxury Travel Ecosystem Designed for Modern Transportation Providers
           </p>
           <p className="text-base text-gray-200 mb-4 leading-relaxed">

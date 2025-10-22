@@ -34,20 +34,21 @@ export const PackageSearchHero = ({
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
-    <div className="relative w-full h-[600px] flex items-center justify-center">
+    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[650px] flex items-center justify-center">
       <img
         src={resortPoolHero}
         alt="Luxury Travel Destination"
         className="absolute inset-0 w-full h-full object-cover"
+        loading="eager"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/90 via-luxury-emerald/50 to-luxury-emerald/30" />
       
-      <div className="relative z-10 w-full max-w-5xl px-4">
+      <div className="relative z-10 w-full max-w-5xl px-3 sm:px-4 md:px-6">
         <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
-        <h1 className="font-secondary text-4xl md:text-6xl text-white text-center mb-4 font-light">
+        <h1 className="font-secondary text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white text-center mb-4 font-light">
           Discover Your Perfect Journey
         </h1>
-        <p className="text-white/90 text-center text-lg mb-8 max-w-2xl mx-auto">
+        <p className="text-white/90 text-center text-base sm:text-lg md:text-xl mb-8 max-w-2xl mx-auto">
           Handpicked luxury travel experiences curated for the discerning explorer
         </p>
 
@@ -78,7 +79,7 @@ export const PackageSearchHero = ({
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Where to */}
-            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border hover:bg-luxury-gold/10 transition-all duration-300 cursor-pointer">
+            <div className="flex-1 flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 border-b md:border-b-0 md:border-r border-border hover:bg-luxury-gold/10 transition-all duration-300 cursor-pointer">
               <div className="flex-shrink-0">
                 <MapPin className="h-5 w-5 text-muted-foreground" />
               </div>
@@ -99,7 +100,7 @@ export const PackageSearchHero = ({
             <div className="flex-1">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-luxury-gold/10 transition-all duration-300">
+                  <button className="w-full flex items-center gap-3 px-4 py-3 md:px-6 md:py-4 text-left hover:bg-luxury-gold/10 transition-all duration-300">
                     <div className="flex-shrink-0">
                       <CalendarIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -176,7 +177,7 @@ export const PackageSearchHero = ({
             <button
               key={filter}
               onClick={() => onQuickFilterClick?.(filter)}
-              className="px-4 py-2 bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-sm backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300"
+              className="py-2.5 px-4 min-h-[44px] bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-sm md:text-base backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300"
             >
               {filter}
             </button>

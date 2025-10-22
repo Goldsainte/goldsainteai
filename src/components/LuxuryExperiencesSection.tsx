@@ -56,11 +56,11 @@ export const LuxuryExperiencesSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="bg-luxury-ivory py-20">
+    <section className="bg-luxury-ivory py-12 sm:py-16 md:py-20">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
-          <h2 className="font-secondary text-4xl md:text-5xl text-luxury-emerald mb-4">
+          <h2 className="font-secondary text-3xl sm:text-4xl md:text-5xl text-luxury-emerald mb-4">
             Curated Luxury Experiences
           </h2>
           <p className="text-luxury-emerald/70 text-lg max-w-2xl mx-auto">
@@ -77,17 +77,18 @@ export const LuxuryExperiencesSection = () => {
               } ${index === 0 ? 'lg:col-span-2' : ''}`}
               onClick={() => navigate(`/cocurated-journeys?destination=${experience.destination}&category=${experience.category}`)}
             >
-              <div className="relative h-96">
+              <div className="relative h-80 md:h-96 lg:h-[28rem]">
                 <img
                   src={experience.imageUrl}
                   alt={experience.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-all duration-500"
+                  loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/80 via-luxury-emerald/20 to-transparent" />
                 
-                <div className="absolute inset-0 flex flex-col justify-end p-8">
+                <div className="absolute inset-0 flex flex-col justify-end p-4 sm:p-6 md:p-8">
                   <div className="w-16 h-1 bg-luxury-gold mb-4 transform origin-left group-hover:w-24 transition-all duration-500" />
-                  <h3 className="font-secondary text-3xl text-white mb-2">
+                  <h3 className="font-secondary text-2xl md:text-3xl text-white mb-2">
                     {experience.title}
                   </h3>
                   <p className="text-white/90 text-lg mb-4">

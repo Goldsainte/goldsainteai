@@ -6,13 +6,13 @@ export const FinalCTA = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="py-20 bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-white">
-      <div className="container px-4">
+    <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-primary via-primary/90 to-primary/80 text-white">
+      <div className="container px-3 sm:px-4 md:px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-secondary text-3xl md:text-5xl font-bold mb-6">
+          <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6">
             Ready to Elevate Your Business?
           </h2>
-          <p className="text-lg md:text-xl mb-10 text-white/90 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl mb-10 text-white/90 leading-relaxed">
             Join a growing network of premium transportation vendors powering the future of luxury travel.
           </p>
 
