@@ -1,7 +1,10 @@
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import pinkBeachImage from "@/assets/pink-beach-aerial.jpg";
 
 export const WinterSunHero = () => {
+  const navigate = useNavigate();
+  
   return (
     <section className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
       <img
@@ -20,6 +23,7 @@ export const WinterSunHero = () => {
         <Button 
           size="lg"
           className="bg-white text-primary hover:bg-white/90"
+          onClick={() => navigate('/cocurated-journeys')}
         >
           Explore Destinations
         </Button>
