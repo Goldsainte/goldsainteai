@@ -1,5 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
+import veniceSunset from "@/assets/luxury-venice-sunset.jpg";
+import resortPool from "@/assets/luxury-resort-pool.jpg";
+import arcticSpa from "@/assets/luxury-arctic-spa.jpg";
 
 interface Destination {
   destination: string;
@@ -16,26 +19,39 @@ export const TopDestinationsSection = ({ destinations }: TopDestinationsSectionP
 
   if (destinations.length === 0) return null;
 
+  const getLuxuryImage = (destination: string) => {
+    const dest = destination.toLowerCase();
+    if (dest.includes('venice') || dest.includes('paris') || dest.includes('rome') || dest.includes('europe')) {
+      return veniceSunset;
+    } else if (dest.includes('iceland') || dest.includes('norway') || dest.includes('arctic')) {
+      return arcticSpa;
+    }
+    return resortPool;
+  };
+
   return (
     <div className="mb-16">
-      <h2 className="text-3xl font-bold mb-6">Top Destinations</h2>
+      <div className="w-20 h-1 bg-luxury-gold mb-6" />
+      <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald mb-6">Top Destinations</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {destinations.map((dest) => (
           <Card
             key={dest.destination}
-            className="relative h-48 rounded-xl overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300"
+            className="relative h-48 rounded-xl overflow-hidden cursor-pointer group border-luxury-gold/20 hover:shadow-xl transition-all duration-500"
             onClick={() => navigate(`/cocurated-journeys?destination=${dest.destination}`)}
           >
             <img
-              src={dest.imageUrl || `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80`}
+              src={dest.imageUrl || getLuxuryImage(dest.destination)}
               alt={dest.destination}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/80 via-luxury-emerald/20 to-transparent" />
             <div className="absolute bottom-0 left-0 right-0 p-4">
-              <h3 className="text-white text-xl font-bold drop-shadow-lg">
+              <div className="w-12 h-1 bg-luxury-gold mb-2 transform origin-left group-hover:w-20 transition-all duration-500" />
+              <h3 className="text-white font-secondary text-xl font-light drop-shadow-lg">
                 {dest.destination}
               </h3>
+              <p className="text-white/80 text-sm">{dest.packageCount} Experiences</p>
             </div>
           </Card>
         ))}

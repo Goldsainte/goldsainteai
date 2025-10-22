@@ -8,9 +8,11 @@ import { DestinationCard } from "@/components/DestinationCard";
 import { TopDestinationsSection } from "@/components/TopDestinationsSection";
 import { TopAttractionsSection } from "@/components/TopAttractionsSection";
 import { TopToursCarousel } from "@/components/TopToursCarousel";
+import { LuxuryExperiencesSection } from "@/components/LuxuryExperiencesSection";
 import { EnhancedPackageCard } from "@/components/EnhancedPackageCard";
 import { PackageFilters, PackageFilterState } from "@/components/PackageFilters";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   fetchAmadeusToursForLocation, 
@@ -404,13 +406,25 @@ export default function CoCuratedJourneys() {
           onClearSearch={handleClearSearch}
         />
 
-        <div className="container mx-auto px-4 py-12">
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-lg text-muted-foreground">Loading tours from {currentLocation.name}...</p>
-            </div>
-          ) : (
-            <>
+        {/* Luxury Experiences Section - Only show when no active search */}
+        {!searchQuery && filteredPackages.length === packages.length && (
+          <LuxuryExperiencesSection />
+        )}
+
+        <div className="bg-luxury-ivory">
+          <div className="container mx-auto px-4 py-12">
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="space-y-4">
+                    <Skeleton className="h-48 w-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <>
               {/* Top Destinations */}
               {topDestinations.length > 0 && (
                 <TopDestinationsSection destinations={topDestinations} />
@@ -428,7 +442,8 @@ export default function CoCuratedJourneys() {
               {/* Top Tours Carousel */}
               {topTours.length > 0 && (
                 <section className="mb-16">
-                  <h2 className="text-3xl font-bold mb-8">
+                  <div className="w-20 h-1 bg-luxury-gold mb-6" />
+                  <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald mb-8">
                     {dataSource === 'amadeus' ? `Top Tours in ${currentLocation.name}` : 'Featured CoCurated Packages'}
                   </h2>
                   <TopToursCarousel tours={topTours} />
@@ -439,8 +454,9 @@ export default function CoCuratedJourneys() {
               <section className="py-12 all-packages-section">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                   <div>
-                    <h2 className="text-3xl font-bold">All Travel Packages</h2>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <div className="w-20 h-1 bg-luxury-gold mb-4" />
+                    <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald">All Travel Packages</h2>
+                    <p className="text-sm text-luxury-emerald/60 mt-2">
                       {selectedDestinationFilter === 'all' 
                         ? `Showing top 5 from each destination (${displayedPackages.length} packages)`
                         : `${displayedPackages.length} packages in ${selectedDestinationFilter}`
@@ -452,7 +468,7 @@ export default function CoCuratedJourneys() {
                     <select
                       value={selectedDestinationFilter}
                       onChange={(e) => setSelectedDestinationFilter(e.target.value)}
-                      className="px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      className="px-4 py-2 border border-luxury-gold/30 rounded-lg bg-white text-luxury-emerald focus:outline-none focus:ring-2 focus:ring-luxury-gold transition-all duration-300"
                     >
                       <option value="all">All Top Destinations</option>
                       {topDestinationCities.map(city => (
@@ -492,6 +508,7 @@ export default function CoCuratedJourneys() {
               </section>
             </>
           )}
+          </div>
         </div>
       </main>
 

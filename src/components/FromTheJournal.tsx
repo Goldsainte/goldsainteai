@@ -1,6 +1,9 @@
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import veniceSunset from "@/assets/luxury-venice-sunset.jpg";
+import tropicalHideaway from "@/assets/luxury-tropical-hideaway.jpg";
+import resortPool from "@/assets/luxury-resort-pool.jpg";
 
 interface JournalEntry {
   id: string;
@@ -15,39 +18,39 @@ interface JournalEntry {
 const journalEntries: JournalEntry[] = [
   {
     id: "1",
-    title: "A Week in Santorini's Hidden Gems",
-    excerpt: "Beyond the postcard-perfect sunsets lie authentic experiences waiting to be discovered.",
-    creator: "Elena Vasquez",
-    destination: "Santorini, Greece",
-    imageUrl: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=80",
+    title: "European City Breaks: A Romance Renaissance",
+    excerpt: "Discover the timeless elegance of Venice, where gondolas glide through centuries of history and modern luxury...",
+    creator: "Sophie Anderson",
+    destination: "Venice, Italy",
+    imageUrl: veniceSunset,
     readTime: "8 min read"
   },
   {
     id: "2",
-    title: "Luxury Safari: Where Wildlife Meets Elegance",
-    excerpt: "Experience the raw beauty of Africa from the comfort of world-class accommodations.",
-    creator: "Marcus Wellington",
-    destination: "Maasai Mara, Kenya",
-    imageUrl: "https://images.unsplash.com/photo-1516426122078-c23e76319801?w=800&q=80",
-    readTime: "12 min read"
+    title: "Eco-Luxury Escapes: Jungle Hideaways",
+    excerpt: "Experience the perfect blend of nature and sophistication in Bali's most exclusive eco-resorts...",
+    creator: "Marco Rossi",
+    destination: "Bali, Indonesia",
+    imageUrl: tropicalHideaway,
+    readTime: "6 min read"
   },
   {
     id: "3",
-    title: "Tokyo After Dark: A Culinary Journey",
-    excerpt: "Navigate the neon-lit streets discovering Michelin stars and hidden izakayas.",
-    creator: "Yuki Tanaka",
-    destination: "Tokyo, Japan",
-    imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80",
+    title: "Top Beach Resorts for 2025",
+    excerpt: "Our expertly curated selection of the world's most stunning beachfront properties, from Maldives to Caribbean...",
+    creator: "Isabella Laurent",
+    destination: "Global Collection",
+    imageUrl: resortPool,
     readTime: "10 min read"
   },
   {
     id: "4",
-    title: "The Art of Slow Travel in Tuscany",
-    excerpt: "Vineyard dinners, hilltop villages, and the Italian dolce vita at its finest.",
-    creator: "Isabella Romano",
-    destination: "Tuscany, Italy",
-    imageUrl: "https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?w=800&q=80",
-    readTime: "15 min read"
+    title: "Safari Under the Stars",
+    excerpt: "An intimate look at luxury camping in the Serengeti, where wildlife encounters meet five-star service...",
+    creator: "David Chen",
+    destination: "Tanzania",
+    imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+    readTime: "7 min read"
   }
 ];
 

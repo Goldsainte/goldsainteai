@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import pinkBeachImage from "@/assets/pink-beach-aerial.jpg";
+import infinityPoolImage from "@/assets/luxury-infinity-pool.jpg";
 
 export const WinterSunHero = () => {
   const navigate = useNavigate();
@@ -8,12 +8,13 @@ export const WinterSunHero = () => {
   return (
     <section className="relative w-full h-[500px] md:h-[600px] overflow-hidden">
       <img
-        src={pinkBeachImage}
+        src={infinityPoolImage}
         alt="Winter Sun Destinations"
         className="w-full h-full object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/80 via-luxury-emerald/40 to-transparent" />
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
+        <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
         <h2 className="font-secondary text-4xl md:text-6xl text-white mb-4 font-light">
           Winter Sun
         </h2>
@@ -22,7 +23,7 @@ export const WinterSunHero = () => {
         </p>
         <Button 
           size="lg"
-          className="bg-white text-primary hover:bg-white/90"
+          className="bg-luxury-gold text-luxury-emerald hover:bg-luxury-gold/90 transition-all duration-300"
           onClick={() => navigate('/cocurated-journeys')}
         >
           Explore Destinations

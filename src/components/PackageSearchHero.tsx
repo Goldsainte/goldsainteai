@@ -7,6 +7,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { format } from "date-fns";
 import { DateRange } from "react-day-picker";
+import resortPoolHero from "@/assets/luxury-resort-pool.jpg";
 
 interface PackageSearchHeroProps {
   searchQuery: string;
@@ -33,23 +34,21 @@ export const PackageSearchHero = ({
   const [calendarOpen, setCalendarOpen] = useState(false);
 
   return (
-    <div className="relative h-[500px] flex items-center justify-center overflow-hidden">
-      {/* Background with gradient overlay */}
-      <div className="absolute inset-0 bg-black/60 z-0" />
-      <div 
-        className="absolute inset-0 bg-cover bg-center z-0 opacity-30"
-        style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1920&q=80')"
-        }}
+    <div className="relative w-full h-[600px] flex items-center justify-center">
+      <img
+        src={resortPoolHero}
+        alt="Luxury Travel Destination"
+        className="absolute inset-0 w-full h-full object-cover"
       />
+      <div className="absolute inset-0 bg-gradient-to-t from-luxury-emerald/90 via-luxury-emerald/50 to-luxury-emerald/30" />
       
-      {/* Content */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-        <h1 className="text-[36px] sm:text-[45px] md:text-[54px] font-bold text-white mb-4 font-secondary">
-          CoCurated Journeys + Live Deals
+      <div className="relative z-10 w-full max-w-5xl px-4">
+        <div className="w-20 h-1 bg-luxury-gold mx-auto mb-6" />
+        <h1 className="font-secondary text-4xl md:text-6xl text-white text-center mb-4 font-light">
+          Discover Your Perfect Journey
         </h1>
-        <p className="text-xl text-white/90 mb-6">
-          Discover exclusive travel experiences co-created with top creators and agents, alongside real-time packages you can book instantly. Curated inspiration meets live deals, all in one place.
+        <p className="text-white/90 text-center text-lg mb-8 max-w-2xl mx-auto">
+          Handpicked luxury travel experiences curated for the discerning explorer
         </p>
 
         {/* Data Source Toggle */}
@@ -62,13 +61,13 @@ export const PackageSearchHero = ({
           >
             <ToggleGroupItem 
               value="amadeus" 
-              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6 hover:bg-[#bfad72] hover:text-white transition-colors"
+              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-6 hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
             >
               Amadeus Tours
             </ToggleGroupItem>
             <ToggleGroupItem 
               value="agent" 
-              className="data-[state=on]:bg-white data-[state=on]:text-primary text-white px-6 hover:bg-[#bfad72] hover:text-white transition-colors"
+              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald text-white px-6 hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300"
             >
               CoCurated by Agents
             </ToggleGroupItem>
@@ -79,7 +78,7 @@ export const PackageSearchHero = ({
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">
           <div className="flex flex-col md:flex-row">
             {/* Where to */}
-            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border hover:bg-[#bfad72]/20 transition-colors cursor-pointer">
+            <div className="flex-1 flex items-center gap-3 px-6 py-4 border-b md:border-b-0 md:border-r border-border hover:bg-luxury-gold/10 transition-all duration-300 cursor-pointer">
               <div className="flex-shrink-0">
                 <MapPin className="h-5 w-5 text-muted-foreground" />
               </div>
@@ -100,7 +99,7 @@ export const PackageSearchHero = ({
             <div className="flex-1">
               <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
                 <PopoverTrigger asChild>
-                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-[#bfad72]/20 transition-colors">
+                  <button className="w-full flex items-center gap-3 px-6 py-4 text-left hover:bg-luxury-gold/10 transition-all duration-300">
                     <div className="flex-shrink-0">
                       <CalendarIcon className="h-5 w-5 text-muted-foreground" />
                     </div>
@@ -153,7 +152,7 @@ export const PackageSearchHero = ({
           <Button
             variant="outline"
             onClick={onOpenFilters}
-            className="bg-white/20 hover:bg-[#bfad72] text-white border-white/30 backdrop-blur-sm"
+            className="bg-luxury-ivory/20 hover:bg-luxury-gold/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300"
           >
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             Filters
@@ -163,7 +162,7 @@ export const PackageSearchHero = ({
             <Button
               variant="outline"
               onClick={onClearSearch}
-              className="bg-white/20 hover:bg-red-500 text-white border-white/30 backdrop-blur-sm"
+              className="bg-luxury-ivory/20 hover:bg-red-500/90 text-white border-luxury-gold/30 backdrop-blur-sm transition-all duration-300"
             >
               <X className="h-4 w-4 mr-2" />
               Clear Search
@@ -172,14 +171,14 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Quick Filter Chips */}
-        <div className="flex flex-wrap gap-3 justify-center mt-6">
-          {["Adventure", "Luxury", "Family-Friendly", "Budget", "Romantic"].map((tag) => (
+        <div className="mt-6 flex flex-wrap gap-3 justify-center">
+          {['Adventure', 'Luxury', 'Family', 'Romantic', 'Cultural', 'Beach'].map((filter) => (
             <button
-              key={tag}
-              onClick={() => onQuickFilterClick?.(tag)}
-              className="px-4 py-2 bg-white/20 hover:bg-[#bfad72] hover:text-white text-white rounded-full text-sm font-medium transition-colors backdrop-blur-sm cursor-pointer"
+              key={filter}
+              onClick={() => onQuickFilterClick?.(filter)}
+              className="px-4 py-2 bg-luxury-ivory/10 hover:bg-luxury-gold text-white hover:text-luxury-emerald rounded-full text-sm backdrop-blur-sm border border-luxury-gold/30 transition-all duration-300"
             >
-              {tag}
+              {filter}
             </button>
           ))}
         </div>
