@@ -243,6 +243,34 @@ export default function CoCuratedJourneys() {
     }
   };
 
+  const handleClearSearch = async () => {
+    // Clear URL parameters
+    navigate('/cocurated-journeys', { replace: true });
+    
+    // Reset all filters and search
+    setSearchQuery("");
+    setSelectedDestinationFilter('all');
+    setPackageFilters({
+      priceRange: [0, 10000],
+      durationRanges: [],
+      destinations: [],
+      tripTypes: [],
+      minRating: 0,
+      dateRange: {},
+    });
+    
+    // Fetch fresh data based on current location or user location
+    if (dataSource === 'amadeus') {
+      const location = await getUserLocation();
+      setCurrentLocation(location);
+      await fetchToursForLocation(location.latitude, location.longitude, location.name);
+    } else {
+      await fetchAgentPackagesData();
+    }
+    
+    toast.success("Search cleared");
+  };
+
   const handleQuickFilter = (filterType: string) => {
     const filterMap: Record<string, Partial<PackageFilterState>> = {
       'Adventure': { 
@@ -373,6 +401,7 @@ export default function CoCuratedJourneys() {
           dataSource={dataSource}
           onDataSourceChange={setDataSource}
           onQuickFilterClick={handleQuickFilter}
+          onClearSearch={handleClearSearch}
         />
 
         <div className="container mx-auto px-4 py-12">

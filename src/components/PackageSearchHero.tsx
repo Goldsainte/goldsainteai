@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, MapPin, Calendar as CalendarIcon, SlidersHorizontal } from "lucide-react";
+import { Search, MapPin, Calendar as CalendarIcon, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -16,6 +16,7 @@ interface PackageSearchHeroProps {
   dataSource: 'amadeus' | 'agent';
   onDataSourceChange: (source: 'amadeus' | 'agent') => void;
   onQuickFilterClick?: (filterType: string) => void;
+  onClearSearch?: () => void;
 }
 
 export const PackageSearchHero = ({
@@ -26,6 +27,7 @@ export const PackageSearchHero = ({
   dataSource,
   onDataSourceChange,
   onQuickFilterClick,
+  onClearSearch,
 }: PackageSearchHeroProps) => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [calendarOpen, setCalendarOpen] = useState(false);
@@ -147,7 +149,7 @@ export const PackageSearchHero = ({
         </div>
 
         {/* Filters Button Below */}
-        <div className="mt-4">
+        <div className="mt-4 flex gap-3 justify-center">
           <Button
             variant="outline"
             onClick={onOpenFilters}
@@ -156,6 +158,17 @@ export const PackageSearchHero = ({
             <SlidersHorizontal className="h-4 w-4 mr-2" />
             Filters
           </Button>
+          
+          {(searchQuery || onClearSearch) && (
+            <Button
+              variant="outline"
+              onClick={onClearSearch}
+              className="bg-white/20 hover:bg-red-500 text-white border-white/30 backdrop-blur-sm"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear Search
+            </Button>
+          )}
         </div>
 
         {/* Quick Filter Chips */}
