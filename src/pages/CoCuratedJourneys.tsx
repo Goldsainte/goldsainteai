@@ -65,6 +65,9 @@ export default function CoCuratedJourneys() {
       const destParam = searchParams.get('destination');
       const categoryParam = searchParams.get('category');
       
+      // Sync search query with URL params
+      setSearchQuery(destParam || "");
+      
       if (dataSource === 'amadeus') {
         if (destParam) {
           // URL has destination, fetch that
@@ -391,6 +394,19 @@ export default function CoCuratedJourneys() {
 
   const displayedPackages = getDefaultPackages();
 
+  // Determine if there's an active search or filter
+  const destParam = searchParams.get('destination');
+  const categoryParam = searchParams.get('category');
+  const hasSearch = Boolean(destParam || searchQuery.trim());
+  const hasCategory = Boolean(categoryParam);
+  const hasNonDefaultFilters =
+    selectedDestinationFilter !== 'all' ||
+    packageFilters.minRating > 0 ||
+    packageFilters.tripTypes.length > 0 ||
+    packageFilters.destinations.length > 0 ||
+    (packageFilters.priceRange[0] !== 0 || packageFilters.priceRange[1] !== 10000);
+  const hasActiveSearchOrFilters = hasSearch || hasCategory || hasNonDefaultFilters;
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -407,7 +423,7 @@ export default function CoCuratedJourneys() {
         />
 
         {/* Luxury Experiences Section - Show at top when browsing */}
-        {!searchQuery && filteredPackages.length === packages.length && (
+        {!hasActiveSearchOrFilters && (
           <LuxuryExperiencesSection />
         )}
 
@@ -508,7 +524,7 @@ export default function CoCuratedJourneys() {
               </section>
 
               {/* Luxury Experiences Section - Show at bottom when searching/filtering */}
-              {(searchQuery || filteredPackages.length !== packages.length) && (
+              {hasActiveSearchOrFilters && (
                 <div className="mt-16">
                   <LuxuryExperiencesSection />
                 </div>
