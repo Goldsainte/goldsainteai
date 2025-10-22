@@ -7,6 +7,7 @@ const corsHeaders = {
 
 interface MatchingRequest {
   jobId: string;
+  inquiryId?: string;
   generateScores?: boolean;
 }
 
@@ -21,7 +22,7 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { jobId, generateScores = true } = await req.json() as MatchingRequest;
+    const { jobId, inquiryId, generateScores = true } = await req.json() as MatchingRequest;
 
     // Get job details
     const { data: job, error: jobError } = await supabaseClient
@@ -140,10 +141,118 @@ Deno.serve(async (req) => {
         .insert(scoresData);
     }
 
+    // Send priority notifications to top 3 high-confidence agents
+    const priorityMatches = topMatches.filter(m => m.confidence_level === 'high').slice(0, 3);
+    const resendApiKey = Deno.env.get('RESEND_API_KEY');
+    
+    if (priorityMatches.length > 0 && resendApiKey) {
+      const { Resend } = await import('npm:resend@2.0.0');
+      const resend = new Resend(resendApiKey);
+
+      // Get agent details with user info
+      for (const match of priorityMatches) {
+        const { data: agent } = await supabaseClient
+          .from('travel_agents')
+          .select('*, profiles(email, username)')
+          .eq('id', match.agent_id)
+          .single();
+
+        if (agent?.profiles?.email) {
+          // Create in-app notification
+          await supabaseClient
+            .from('notifications')
+            .insert({
+              user_id: agent.user_id,
+              notification_type: 'priority_job_match',
+              title: '🎯 Priority Job Match',
+              message: `You're a ${match.match_score}% match for ${job.title}`,
+              metadata: {
+                job_id: jobId,
+                match_score: match.match_score,
+                confidence_level: match.confidence_level
+              },
+              link: `/marketplace?job=${jobId}`
+            });
+
+          // Send priority email
+          try {
+            await resend.emails.send({
+              from: 'Goldsainte Marketplace <noreply@goldsainte.com>',
+              to: [agent.profiles.email],
+              subject: `🎯 Priority Match: ${job.title}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center;">
+                    <h1 style="margin: 0; font-size: 28px;">🎯 Priority Job Match</h1>
+                    <p style="margin: 10px 0 0; font-size: 16px; opacity: 0.9;">${match.match_score}% Match Score</p>
+                  </div>
+                  
+                  <div style="background: white; padding: 30px; border: 1px solid #e5e7eb;">
+                    <div style="background: #f3f4f6; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                      <p style="margin: 0; color: #059669; font-weight: bold; font-size: 14px;">
+                        ⚡ You're in the top 3 matches for this opportunity
+                      </p>
+                    </div>
+                    
+                    <h2 style="color: #1f2937; margin-top: 0;">${job.title}</h2>
+                    
+                    <div style="margin: 20px 0;">
+                      <p style="color: #6b7280; margin: 5px 0;"><strong>Destination:</strong> ${job.destination}</p>
+                      <p style="color: #6b7280; margin: 5px 0;"><strong>Type:</strong> ${job.booking_type}</p>
+                      ${job.budget_max ? `<p style="color: #6b7280; margin: 5px 0;"><strong>Budget:</strong> ${job.currency} ${job.budget_min || 0} - ${job.budget_max}</p>` : ''}
+                    </div>
+                    
+                    <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0;">
+                      <p style="margin: 0; color: #78350f; font-size: 14px;">
+                        <strong>Why you're a great match:</strong>
+                      </p>
+                      <ul style="margin: 10px 0 0; padding-left: 20px; color: #78350f;">
+                        ${match.matching_factors.specialization_match ? '<li>Your specialization matches this booking type</li>' : ''}
+                        ${match.matching_factors.destination_match ? '<li>You have expertise in this destination</li>' : ''}
+                        ${match.matching_factors.rating_score ? '<li>Your excellent rating and reviews</li>' : ''}
+                      </ul>
+                    </div>
+                    
+                    <div style="margin: 30px 0; text-align: center;">
+                      <a href="${Deno.env.get('SUPABASE_URL')?.replace('.supabase.co', '')}/marketplace?job=${jobId}" 
+                         style="background: #667eea; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: bold;">
+                        View Job & Submit Bid
+                      </a>
+                    </div>
+                    
+                    <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 30px;">
+                      Respond quickly to increase your chances of winning this job
+                    </p>
+                  </div>
+                </div>
+              `
+            });
+            
+            console.log(`Priority email sent to agent ${agent.id}`);
+          } catch (emailError) {
+            console.error(`Failed to send priority email to agent ${agent.id}:`, emailError);
+          }
+        }
+      }
+    }
+
+    // Update inquiry with matched agents if inquiryId provided
+    if (inquiryId) {
+      const matchedAgentIds = topMatches.map(m => m.agent_id);
+      await supabaseClient
+        .from('agent_inquiries')
+        .update({
+          matched_agent_ids: matchedAgentIds,
+          notification_sent_at: new Date().toISOString()
+        })
+        .eq('id', inquiryId);
+    }
+
     return new Response(
       JSON.stringify({
         matches: topMatches,
         total_agents_evaluated: agents.length,
+        priority_notifications_sent: priorityMatches.length,
         job_details: {
           title: job.title,
           booking_type: job.booking_type,

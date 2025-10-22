@@ -66,9 +66,9 @@ serve(async (req) => {
 
     const jobId = jobResult?.jobId;
 
-    // Trigger AI matching
+    // Trigger AI matching with inquiryId to update inquiry record
     await supabase.functions.invoke('ai-agent-matching', {
-      body: { jobId, inquiryId: inquiry.id, conversationData }
+      body: { jobId, inquiryId: inquiry.id, generateScores: true }
     });
 
     // Notify agents
