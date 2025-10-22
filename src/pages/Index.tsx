@@ -44,6 +44,9 @@ import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import { WhyGoldsainte } from "@/components/WhyGoldsainte";
+import { CuratedCollections } from "@/components/CuratedCollections";
+import { SocialProof } from "@/components/SocialProof";
+import { FromTheJournal } from "@/components/FromTheJournal";
 import logomark from "@/assets/logomark-seal-gold.png";
 import luxuryAiHero from "@/assets/luxury-ai-hero.jpg";
 import heroAiConcierge from "@/assets/hero-ai-concierge-2.png";
@@ -1140,6 +1143,9 @@ const Index = () => {
               </div>
             </section>
 
+            {/* Curated Collections - Luxury Categories */}
+            <CuratedCollections />
+
             {/* Creator Hero Section */}
             <section className="px-4 sm:px-6 pt-1 pb-16 sm:pb-20 md:pb-24 bg-gradient-to-br from-background via-muted/20 to-background" aria-labelledby="creator-section-heading">
               <div className="w-full max-w-7xl mx-auto">
@@ -1251,10 +1257,16 @@ const Index = () => {
               </div>
             </section>
 
+            {/* Social Proof - Testimonials */}
+            <SocialProof />
+
             {/* Featured Transportation Vendors - Promoted */}
             <section className="px-4 sm:px-6 py-8 sm:py-10 bg-secondary/5">
               <VendorPromotionFeed displayContext="homepage" limit={3} />
             </section>
+
+            {/* From the Journal - Editorial Content */}
+            <FromTheJournal />
 
             {/* Inspiration Content - Far below the fold */}
             <section className="px-4 sm:px-6 pb-10 sm:pb-12 pt-6 sm:pt-8 md:pt-10" data-tour="explore" aria-labelledby="inspiration-heading">
