@@ -130,9 +130,11 @@ export const groupRestaurantsByCity = (restaurants: GooglePlacesRestaurant[], de
 };
 
 export const getPhotoUrl = (photoReference: string, maxWidth: number = 400): string => {
-  const apiKey = import.meta.env.VITE_GOOGLE_PLACES_API_KEY;
-  if (!apiKey || apiKey === 'YOUR_GOOGLE_PLACES_API_KEY_HERE') {
-    return ''; // Return empty string if API key not configured
+  // Photo URLs are now generated on the backend for security
+  // photoReference already contains the full URL
+  if (photoReference?.startsWith('http')) {
+    return photoReference;
   }
-  return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoReference}&key=${apiKey}`;
+  // Fallback for any legacy data
+  return photoReference || '';
 };
