@@ -404,7 +404,10 @@ export type Database = {
           guest_phone: string | null
           id: string
           inquiry_source: string
+          marketplace_job_id: string | null
+          matched_agent_ids: string[] | null
           notes: string | null
+          notification_sent_at: string | null
           priority: string | null
           status: string
           updated_at: string
@@ -424,7 +427,10 @@ export type Database = {
           guest_phone?: string | null
           id?: string
           inquiry_source?: string
+          marketplace_job_id?: string | null
+          matched_agent_ids?: string[] | null
           notes?: string | null
+          notification_sent_at?: string | null
           priority?: string | null
           status?: string
           updated_at?: string
@@ -444,7 +450,10 @@ export type Database = {
           guest_phone?: string | null
           id?: string
           inquiry_source?: string
+          marketplace_job_id?: string | null
+          matched_agent_ids?: string[] | null
           notes?: string | null
+          notification_sent_at?: string | null
           priority?: string | null
           status?: string
           updated_at?: string
@@ -461,6 +470,13 @@ export type Database = {
           {
             foreignKeyName: "agent_inquiries_converted_to_job_id_fkey"
             columns: ["converted_to_job_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agent_inquiries_marketplace_job_id_fkey"
+            columns: ["marketplace_job_id"]
             isOneToOne: false
             referencedRelation: "marketplace_jobs"
             referencedColumns: ["id"]
@@ -3310,12 +3326,14 @@ export type Database = {
           additional_emails: Json | null
           agent_payout_amount: number | null
           agent_payout_status: string | null
+          ai_matched_agents: string[] | null
           assigned_agent_id: string | null
           booking_type: string
           budget_max: number | null
           budget_min: number | null
           completed_at: string | null
           completion_notes: string | null
+          contact_info: Json | null
           created_at: string
           currency: string
           customer_approved_at: string | null
@@ -3331,6 +3349,7 @@ export type Database = {
           group_organizer_email: string | null
           group_payment_mode: string | null
           id: string
+          inquiry_source: string | null
           installment_plan_id: string | null
           is_group_booking: boolean | null
           notify_all_emails: boolean | null
@@ -3363,12 +3382,14 @@ export type Database = {
           additional_emails?: Json | null
           agent_payout_amount?: number | null
           agent_payout_status?: string | null
+          ai_matched_agents?: string[] | null
           assigned_agent_id?: string | null
           booking_type: string
           budget_max?: number | null
           budget_min?: number | null
           completed_at?: string | null
           completion_notes?: string | null
+          contact_info?: Json | null
           created_at?: string
           currency?: string
           customer_approved_at?: string | null
@@ -3384,6 +3405,7 @@ export type Database = {
           group_organizer_email?: string | null
           group_payment_mode?: string | null
           id?: string
+          inquiry_source?: string | null
           installment_plan_id?: string | null
           is_group_booking?: boolean | null
           notify_all_emails?: boolean | null
@@ -3416,12 +3438,14 @@ export type Database = {
           additional_emails?: Json | null
           agent_payout_amount?: number | null
           agent_payout_status?: string | null
+          ai_matched_agents?: string[] | null
           assigned_agent_id?: string | null
           booking_type?: string
           budget_max?: number | null
           budget_min?: number | null
           completed_at?: string | null
           completion_notes?: string | null
+          contact_info?: Json | null
           created_at?: string
           currency?: string
           customer_approved_at?: string | null
@@ -3437,6 +3461,7 @@ export type Database = {
           group_organizer_email?: string | null
           group_payment_mode?: string | null
           id?: string
+          inquiry_source?: string | null
           installment_plan_id?: string | null
           is_group_booking?: boolean | null
           notify_all_emails?: boolean | null

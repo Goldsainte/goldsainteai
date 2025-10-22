@@ -14,6 +14,7 @@ serve(async (req) => {
   try {
     const { 
       travelerInfo, 
+      travelDetails,
       conversationData, 
       inquirySource = 'ai_chat',
       priority = 'medium'
@@ -21,13 +22,11 @@ serve(async (req) => {
 
     console.log('Creating agent inquiry:', { travelerInfo, inquirySource });
 
-    // Create Supabase client with service role for writing
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Try to get authenticated user
     const authHeader = req.headers.get('Authorization');
     let userId = null;
     
@@ -37,10 +36,8 @@ serve(async (req) => {
       userId = user?.id;
     }
 
-    // Extract additional emails from travelerInfo
     const additionalEmails = travelerInfo.additionalEmails || [];
 
-    // Create the inquiry
     const { data: inquiry, error: inquiryError } = await supabase
       .from('agent_inquiries')
       .insert({
@@ -50,50 +47,65 @@ serve(async (req) => {
         guest_phone: travelerInfo.phone,
         additional_emails: additionalEmails,
         inquiry_source: inquirySource,
-        conversation_data: conversationData || {},
+        conversation_data: { travelerInfo, travelDetails, ...conversationData },
         status: 'pending',
         priority: priority
       })
       .select()
       .single();
 
-    if (inquiryError) {
-      console.error('Error creating inquiry:', inquiryError);
-      throw inquiryError;
-    }
+    if (inquiryError) throw inquiryError;
 
-    console.log('Inquiry created successfully:', inquiry.id);
+    const referenceNumber = `INQ-${inquiry.id.slice(0, 8).toUpperCase()}`;
 
-    // Trigger AI matching
-    const { data: matchingResult, error: matchingError } = await supabase.functions.invoke(
-      'ai-agent-matching',
-      {
-        body: { inquiryId: inquiry.id, conversationData }
-      }
+    // Convert to marketplace job
+    const { data: jobResult } = await supabase.functions.invoke(
+      'convert-inquiry-to-marketplace-job',
+      { body: { inquiryId: inquiry.id } }
     );
 
-    if (matchingError) {
-      console.error('AI matching error (non-blocking):', matchingError);
-    } else {
-      console.log('AI matching completed:', matchingResult);
+    const jobId = jobResult?.jobId;
+
+    // Trigger AI matching
+    await supabase.functions.invoke('ai-agent-matching', {
+      body: { jobId, inquiryId: inquiry.id, conversationData }
+    });
+
+    // Notify agents
+    if (jobId) {
+      await supabase.functions.invoke('notify-agents-new-job', {
+        body: { 
+          jobId,
+          title: jobResult.jobTitle,
+          destination: travelDetails?.destination,
+          budget: travelDetails?.budget?.amount,
+          currency: travelDetails?.budget?.currency || 'USD'
+        }
+      });
     }
 
-    // Generate reference number for user
-    const referenceNumber = `INQ-${inquiry.id.slice(0, 8).toUpperCase()}`;
+    // Send confirmation email
+    await supabase.functions.invoke('send-traveler-confirmation-email', {
+      body: { inquiryId: inquiry.id, jobId, referenceNumber }
+    });
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         inquiryId: inquiry.id,
-        referenceNumber: referenceNumber,
-        message: "Your request has been received! A Goldsainte agent will contact you shortly.",
+        jobId,
+        jobUrl: jobResult?.jobUrl,
+        referenceNumber,
+        message: "Your request has been posted to our agent marketplace!",
         contactEmail: travelerInfo.email,
         contactPhone: travelerInfo.phone,
         estimatedResponseTime: "2-4 hours",
         nextSteps: [
-          "Our team is reviewing your request",
-          `You'll be contacted at ${travelerInfo.phone}`,
-          `Confirmation email sent to ${travelerInfo.email}`
+          "Your trip is now live in the marketplace",
+          "AI matched you with certified agents",
+          "Agents will submit bids within 2-4 hours",
+          `You'll be notified at ${travelerInfo.email}`,
+          `Track bids at ${jobResult?.jobUrl || '/marketplace'}`
         ]
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

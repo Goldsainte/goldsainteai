@@ -43,7 +43,21 @@ Deno.serve(async (req) => {
       throw new Error('Job, bid, or agent not found');
     }
 
-    // Notify customer
+    // Get customer email
+    const { data: customerProfile } = await supabaseClient
+      .from('profiles')
+      .select('email')
+      .eq('id', customerId)
+      .single();
+
+    // Get agent email
+    const { data: agentProfile } = agent.user_id ? await supabaseClient
+      .from('profiles')
+      .select('email')
+      .eq('id', agent.user_id)
+      .single() : { data: null };
+
+    // Notify customer via in-app notification
     await supabaseClient.from('notifications').insert({
       user_id: customerId,
       notification_type: 'bid_accepted',
@@ -53,7 +67,7 @@ Deno.serve(async (req) => {
       link: `/marketplace`,
     });
 
-    // Notify agent
+    // Notify agent via in-app notification
     if (agent.user_id) {
       await supabaseClient.from('notifications').insert({
         user_id: agent.user_id,
@@ -63,6 +77,127 @@ Deno.serve(async (req) => {
         metadata: { jobId, bidId },
         link: `/agent-dashboard`,
       });
+    }
+
+    // Send email notifications
+    if (Deno.env.get('RESEND_API_KEY')) {
+      const Resend = (await import('npm:resend@2.0.0')).Resend;
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+
+      // Email to customer
+      if (customerProfile?.email) {
+        const customerEmailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+              .section { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; }
+              .button { display: inline-block; background: #10b981; color: white !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1 style="margin: 0;">🎉 Bid Accepted!</h1>
+              </div>
+              <div class="content">
+                <div class="section">
+                  <h2 style="margin-top: 0; color: #10b981;">Your trip is moving forward!</h2>
+                  <p><strong>Agent:</strong> ${agent.agency_name}</p>
+                  <p><strong>Trip:</strong> ${job.title}</p>
+                  <p><strong>Total Price:</strong> ${bid.currency} ${bid.customer_facing_price}</p>
+                </div>
+
+                <div class="section">
+                  <h3 style="margin-top: 0;">Next Steps</h3>
+                  <ol>
+                    <li>Complete payment to secure your booking</li>
+                    <li>Your agent will begin planning immediately</li>
+                    <li>You'll receive trip details within 24-48 hours</li>
+                  </ol>
+                  <a href="${Deno.env.get('SUPABASE_URL').replace('//', '//app.')}/marketplace?job=${jobId}" class="button">Complete Payment</a>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        try {
+          await resend.emails.send({
+            from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+            to: [customerProfile.email],
+            subject: `🎉 Bid Accepted - Payment Required for ${job.title}`,
+            html: customerEmailHtml,
+          });
+        } catch (error) {
+          console.error('Error sending customer email:', error);
+        }
+      }
+
+      // Email to agent
+      if (agentProfile?.email) {
+        const agentEmailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+              .section { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1 style="margin: 0;">🎉 Congratulations!</h1>
+              </div>
+              <div class="content">
+                <div class="section">
+                  <h2 style="margin-top: 0; color: #10b981;">Your bid was accepted!</h2>
+                  <p><strong>Trip:</strong> ${job.title}</p>
+                  <p><strong>Customer:</strong> ${job.contact_info?.name || 'Customer'}</p>
+                  <p><strong>Your Payout:</strong> ${bid.currency} ${bid.agent_payout}</p>
+                </div>
+
+                <div class="section">
+                  <h3 style="margin-top: 0;">Customer Contact Information</h3>
+                  <p><strong>Email:</strong> ${job.contact_info?.email}</p>
+                  <p><strong>Phone:</strong> ${job.contact_info?.phone || 'Not provided'}</p>
+                </div>
+
+                <div class="section">
+                  <h3 style="margin-top: 0;">Next Steps</h3>
+                  <ol>
+                    <li>Wait for customer to complete payment</li>
+                    <li>Begin planning the trip immediately after payment confirmation</li>
+                    <li>Contact the customer within 24 hours</li>
+                    <li>Deliver trip details within 48 hours</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        try {
+          await resend.emails.send({
+            from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+            to: [agentProfile.email],
+            subject: `🎉 Bid Accepted! New Booking: ${job.title}`,
+            html: agentEmailHtml,
+          });
+        } catch (error) {
+          console.error('Error sending agent email:', error);
+        }
+      }
     }
 
     console.log(`Bid accepted notifications sent for job ${jobId}`);

@@ -43,7 +43,7 @@ Deno.serve(async (req) => {
       throw new Error('Job or bid not found');
     }
 
-    // Notify customer
+    // Notify customer via in-app notification
     await supabaseClient.from('notifications').insert({
       user_id: job.user_id,
       notification_type: 'new_bid',
@@ -52,6 +52,70 @@ Deno.serve(async (req) => {
       metadata: { jobId, bidId },
       link: `/marketplace`,
     });
+
+    // Send email notification to customer
+    if (Deno.env.get('RESEND_API_KEY')) {
+      const Resend = (await import('npm:resend@2.0.0')).Resend;
+      const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
+
+      // Get customer email
+      const { data: profile } = await supabaseClient
+        .from('profiles')
+        .select('email')
+        .eq('id', job.user_id)
+        .single();
+
+      if (profile?.email) {
+        const emailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+              .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+              .section { background: white; padding: 20px; margin: 15px 0; border-radius: 8px; }
+              .price { font-size: 32px; color: #667eea; font-weight: bold; text-align: center; margin: 20px 0; }
+              .button { display: inline-block; background: #667eea; color: white !important; padding: 12px 30px; text-decoration: none; border-radius: 6px; margin: 20px 0; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1 style="margin: 0;">📬 New Bid Received!</h1>
+              </div>
+              <div class="content">
+                <div class="section">
+                  <h2 style="margin-top: 0; color: #667eea;">${agent?.agency_name || 'An Agent'} submitted a bid</h2>
+                  <p><strong>Trip:</strong> ${job.title}</p>
+                  <div class="price">${bid.currency} ${bid.customer_facing_price}</div>
+                </div>
+
+                <div class="section">
+                  <h3 style="margin-top: 0;">Next Steps</h3>
+                  <p>Review this bid along with any others you've received and choose the agent that best fits your needs.</p>
+                  <a href="${Deno.env.get('SUPABASE_URL').replace('//', '//app.')}/marketplace?job=${jobId}" class="button">Review Bid</a>
+                </div>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        try {
+          await resend.emails.send({
+            from: 'Goldsainte Marketplace <marketplace@goldsainte.com>',
+            to: [profile.email],
+            subject: `📬 New Bid: ${bid.currency} ${bid.customer_facing_price} for ${job.title}`,
+            html: emailHtml,
+          });
+          console.log('Bid notification email sent to:', profile.email);
+        } catch (emailError) {
+          console.error('Error sending bid email:', emailError);
+        }
+      }
+    }
 
     console.log(`New bid notification sent for job ${jobId}`);
 
