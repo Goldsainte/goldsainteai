@@ -303,10 +303,7 @@ export default function FineDining() {
                               if (restaurant.website) {
                                 window.open(restaurant.website, '_blank', 'noopener,noreferrer');
                               } else {
-                                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
-                                  `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
-                                )}`;
-                                window.open(searchUrl, '_blank', 'noopener,noreferrer');
+                                toast.error(`Website not available for ${restaurant.name}`);
                               }
                             }}
                             />
@@ -376,10 +373,7 @@ export default function FineDining() {
                       if (restaurant.website) {
                         window.open(restaurant.website, '_blank', 'noopener,noreferrer');
                       } else {
-                        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
-                          `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
-                        )}`;
-                        window.open(searchUrl, '_blank', 'noopener,noreferrer');
+                        toast.error(`Website not available for ${restaurant.name}`);
                       }
                     }}
                   />
