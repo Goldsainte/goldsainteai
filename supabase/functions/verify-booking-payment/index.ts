@@ -12,6 +12,15 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Get authenticated user from JWT
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "Missing authorization" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 401,
+    });
+  }
+
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -21,6 +30,24 @@ serve(async (req) => {
     const { sessionId } = await req.json();
     
     console.log("Verifying payment for session:", sessionId);
+
+    // Check idempotency - prevent duplicate processing
+    const { data: existingPayment } = await supabaseClient
+      .from("processed_payments")
+      .select("id")
+      .eq("stripe_session_id", sessionId)
+      .maybeSingle();
+
+    if (existingPayment) {
+      console.log("Payment already processed:", sessionId);
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: "Payment already processed" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -41,6 +68,19 @@ serve(async (req) => {
     // Parse booking data from metadata
     const bookingData = JSON.parse(session.metadata.booking_data);
     const userId = session.metadata.user_id !== "guest" ? session.metadata.user_id : null;
+
+    // Record payment as processed for idempotency
+    await supabaseClient
+      .from("processed_payments")
+      .insert({
+        payment_intent_id: session.payment_intent as string || sessionId,
+        stripe_session_id: sessionId,
+        user_id: userId,
+        amount_cents: session.amount_total,
+        currency: session.currency,
+        payment_type: "booking",
+        metadata: { booking_data: bookingData }
+      });
 
     // Create booking record
     const { data: booking, error: bookingError } = await supabaseClient

@@ -1759,10 +1759,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "commission_payout_requests_processed_by_fkey"
+            columns: ["processed_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "commission_payout_requests_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commission_payout_requests_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2496,6 +2510,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "favorites_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       gift_transactions: {
@@ -2729,6 +2750,13 @@ export type Database = {
             columns: ["influencer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "influencer_promotions_influencer_id_fkey"
+            columns: ["influencer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -3842,6 +3870,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "moments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       notifications: {
@@ -4467,10 +4502,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "paid_partnerships_brand_id_fkey"
+            columns: ["brand_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "paid_partnerships_creator_id_fkey"
             columns: ["creator_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paid_partnerships_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -4997,6 +5046,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      processed_payments: {
+        Row: {
+          amount_cents: number
+          currency: string
+          id: string
+          metadata: Json | null
+          payment_intent_id: string
+          payment_type: string
+          processed_at: string
+          stripe_session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          currency: string
+          id?: string
+          metadata?: Json | null
+          payment_intent_id: string
+          payment_type: string
+          processed_at?: string
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          currency?: string
+          id?: string
+          metadata?: Json | null
+          payment_intent_id?: string
+          payment_type?: string
+          processed_at?: string
+          stripe_session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
       }
       product_orders: {
         Row: {
@@ -5720,6 +5805,13 @@ export type Database = {
             columns: ["customer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shared_commission_bookings_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -8676,6 +8768,33 @@ export type Database = {
         }
         Relationships: []
       }
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          id: string | null
+          is_verified: boolean | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_verified?: boolean | null
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       award_loyalty_points: {
@@ -8751,22 +8870,13 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
-      cleanup_expired_oauth_states: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      cleanup_old_rate_limits: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_expired_oauth_states: { Args: never; Returns: undefined }
+      cleanup_old_rate_limits: { Args: never; Returns: undefined }
       convert_currency: {
         Args: { amount: number; from_curr: string; to_curr: string }
         Returns: number
       }
-      detect_bot_pattern: {
-        Args: { p_user_id: string }
-        Returns: boolean
-      }
+      detect_bot_pattern: { Args: { p_user_id: string }; Returns: boolean }
       evaluate_agent_badges: {
         Args: { target_agent_id: string }
         Returns: boolean
@@ -8775,10 +8885,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: Json
       }
-      expire_old_marketplace_jobs: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      expire_old_marketplace_jobs: { Args: never; Returns: undefined }
       extract_and_store_hashtags: {
         Args: { p_caption: string; p_post_id: string }
         Returns: undefined
@@ -8793,14 +8900,8 @@ export type Database = {
           rating: number
         }[]
       }
-      generate_invoice_number: {
-        Args: Record<PropertyKey, never>
-        Returns: string
-      }
-      get_user_tier_bonus: {
-        Args: { p_user_id: string }
-        Returns: number
-      }
+      generate_invoice_number: { Args: never; Returns: string }
+      get_user_tier_bonus: { Args: { p_user_id: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -8808,10 +8909,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_user_restricted: {
-        Args: { target_user_id: string }
-        Returns: boolean
-      }
+      is_user_restricted: { Args: { target_user_id: string }; Returns: boolean }
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string; p_user_type: string }
         Returns: undefined

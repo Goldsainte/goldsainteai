@@ -70,7 +70,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.verify-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.get-hotel-details]
 verify_jwt = false
@@ -160,7 +160,7 @@ verify_jwt = false
 verify_jwt = true
 
 [functions.verify-group-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.moderate-content]
 verify_jwt = false
@@ -172,7 +172,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.verify-coin-payment]
-verify_jwt = false
+verify_jwt = true
 
 [functions.creator-stripe-onboarding]
 verify_jwt = true
@@ -275,3 +275,15 @@ verify_jwt = false
 
 [functions.notify-creators-new-opportunity]
 verify_jwt = false
+
+[functions.verify-booking-payment]
+verify_jwt = true
+
+[functions.verify-transportation-payment]
+verify_jwt = true
+
+[functions.verify-promotion-payment]
+verify_jwt = true
+
+[functions.verify-cocurated-payment]
+verify_jwt = true

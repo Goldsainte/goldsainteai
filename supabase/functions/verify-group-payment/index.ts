@@ -12,6 +12,15 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Get authenticated user from JWT
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "Missing authorization" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 401,
+    });
+  }
+
   const supabaseClient = createClient(
     Deno.env.get('SUPABASE_URL') ?? '',
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
@@ -22,12 +31,38 @@ serve(async (req) => {
     
     console.log('Verifying group payment:', { paymentIntentId, jobId, travelerNumber });
 
+    // Check idempotency
+    const { data: existingPayment } = await supabaseClient
+      .from("processed_payments")
+      .select("id")
+      .eq("payment_intent_id", paymentIntentId)
+      .maybeSingle();
+
+    if (existingPayment) {
+      return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    }
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2025-08-27.basil'
     });
 
     // Verify payment with Stripe
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+
+    // Record payment as processed
+    await supabaseClient
+      .from("processed_payments")
+      .insert({
+        payment_intent_id: paymentIntentId,
+        user_id: null,
+        amount_cents: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        payment_type: "group_booking",
+        metadata: { job_id: jobId, traveler_number: travelerNumber }
+      });
 
     if (paymentIntent.status !== 'succeeded') {
       throw new Error('Payment not completed');

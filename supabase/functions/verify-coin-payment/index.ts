@@ -12,6 +12,15 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Get authenticated user from JWT
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader) {
+    return new Response(JSON.stringify({ error: "Missing authorization" }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 401,
+    });
+  }
+
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -19,6 +28,20 @@ serve(async (req) => {
 
   try {
     const { session_id } = await req.json();
+
+    // Check idempotency
+    const { data: existingPayment } = await supabaseClient
+      .from("processed_payments")
+      .select("id")
+      .eq("stripe_session_id", session_id)
+      .maybeSingle();
+
+    if (existingPayment) {
+      return new Response(JSON.stringify({ success: true, message: 'Already processed' }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
@@ -29,6 +52,19 @@ serve(async (req) => {
     if (session.payment_status === 'paid' && session.metadata?.user_id && session.metadata?.coin_amount) {
       const userId = session.metadata.user_id;
       const coinAmount = parseInt(session.metadata.coin_amount);
+
+      // Record payment as processed
+      await supabaseClient
+        .from("processed_payments")
+        .insert({
+          payment_intent_id: session.payment_intent as string || session_id,
+          stripe_session_id: session_id,
+          user_id: userId,
+          amount_cents: session.amount_total || 0,
+          currency: session.currency || 'usd',
+          payment_type: "coins",
+          metadata: { coin_amount: coinAmount }
+        });
 
       // Update coin purchase status
       await supabaseClient

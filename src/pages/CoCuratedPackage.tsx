@@ -12,6 +12,7 @@ import { MapPin, Users, DollarSign, Tag, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
 import { fetchAmadeusTourDetails, AmadeusActivity } from "@/lib/amadeusHelpers";
+import DOMPurify from "dompurify";
 
 export default function CoCuratedPackage() {
   const { packageId } = useParams();
@@ -238,7 +239,13 @@ export default function CoCuratedPackage() {
                 <div 
                   className="prose prose-sm max-w-none text-foreground"
                   dangerouslySetInnerHTML={{ 
-                    __html: packageData.description || packageData.shortDescription || "Explore this amazing tour and create unforgettable memories."
+                    __html: DOMPurify.sanitize(
+                      packageData.description || packageData.shortDescription || "Explore this amazing tour and create unforgettable memories.",
+                      {
+                        ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'ul', 'ol', 'li', 'h3', 'h4', 'h5', 'h6', 'a', 'span', 'div'],
+                        ALLOWED_ATTR: ['href', 'target', 'rel', 'class']
+                      }
+                    )
                   }}
                 />
               </CardContent>
