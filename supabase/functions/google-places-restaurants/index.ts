@@ -7,11 +7,9 @@ const corsHeaders = {
 function isActualRestaurant(place: any): boolean {
   const types = place.types || [];
   
-  // Exclude lodging, spas, hotels, gyms, health facilities
-  const excludeTypes = ['lodging', 'spa', 'gym', 'health', 'hotel', 'motel', 'resort', 'inn'];
-  const hasExcludedType = types.some((t: string) => 
-    excludeTypes.some(excluded => t.toLowerCase().includes(excluded))
-  );
+  // Exclude specific non-restaurant types using EXACT matching
+  const excludedTypes = ['lodging', 'spa', 'gym', 'hotel', 'motel', 'resort'];
+  const hasExcludedType = types.some((t: string) => excludedTypes.includes(t.toLowerCase()));
   
   if (hasExcludedType) {
     console.log(`Filtering out ${place.displayName?.text || place.name} - has excluded type:`, types);

@@ -55,6 +55,7 @@ export default function FineDining() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
   const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [lastCuisineQuery, setLastCuisineQuery] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<RestaurantFilterState>({
     priceRange: [1, 4],
@@ -96,11 +97,24 @@ export default function FineDining() {
     setSelectedCity(cityName);
     setCurrentCoords({ lat, lng });
     
+    // Set lastCuisineQuery based on whether we're doing a cuisine-targeted search
+    if (cuisine) {
+      // Normalize cuisine to simple keyword (e.g., "French Fine Dining" -> "french")
+      const normalized = cuisine.split(' ')[0].toLowerCase();
+      setLastCuisineQuery(normalized);
+      console.debug(`🍽️ Cuisine-targeted search: "${cuisine}" -> normalized: "${normalized}"`);
+    } else {
+      setLastCuisineQuery(null);
+      console.debug(`🌍 General city search (no cuisine filter)`);
+    }
+    
     console.debug(`🌍 Fetching restaurants for ${cityName} at (${lat}, ${lng})${cuisine ? ` - ${cuisine}` : ''}`);
     const results = await fetchAmadeusRestaurantsForLocation(lat, lng, 10, undefined, undefined, cuisine);
     
     setRestaurants(results);
     setLoading(false);
+    
+    console.debug(`📊 Backend returned ${results.length} restaurants`);
     
     // Only show toast if no results after retries
     if (results.length === 0) {
@@ -148,13 +162,14 @@ export default function FineDining() {
     // If we have current coordinates, do a cuisine-targeted fetch
     if (currentCoords) {
       toast.info(`Searching for ${cuisine} restaurants...`);
+      // Pass the original cuisine string to fetchRestaurants for backend search
       await fetchRestaurants(currentCoords.lat, currentCoords.lng, selectedCity, cuisine);
     } else {
       toast.success(`Filtering by ${cuisine}`);
     }
   };
 
-  // Map cuisine names to Google Places types
+  // Map cuisine names to Google Places types (ONLY valid types)
   const getCuisineTypes = (cuisine: string): string[] => {
     const mapping: Record<string, string[]> = {
       'French Fine Dining': ['french_restaurant'],
@@ -168,7 +183,8 @@ export default function FineDining() {
       'Modern American': ['american_restaurant'],
       'Steakhouse': ['steak_house', 'american_restaurant'],
       'Seafood': ['seafood_restaurant'],
-      'Fusion': ['fusion_restaurant', 'asian_fusion_restaurant'],
+      // Removed invalid types: fusion_restaurant, asian_fusion_restaurant
+      'Fusion': ['restaurant'],
     };
     return mapping[cuisine] || [];
   };
@@ -188,12 +204,31 @@ export default function FineDining() {
     // Name search
     const matchesSearch = searchQuery === "" || restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
     
-    // Cuisine filter - check if restaurant types include selected cuisine
-    const matchesCuisine = filters.cuisineTypes.length === 0 || 
-      filters.cuisineTypes.some(cuisine => {
-        const cuisineTypes = getCuisineTypes(cuisine);
-        return restaurant.types?.some(t => cuisineTypes.includes(t));
-      });
+    // Cuisine filter - RELAXED MODE when lastCuisineQuery is set
+    let matchesCuisine = true;
+    if (filters.cuisineTypes.length > 0) {
+      if (lastCuisineQuery) {
+        // RELAXED: Check name, primaryTypeDisplayName, editorialSummary, generativeSummary
+        const keyword = lastCuisineQuery.toLowerCase();
+        const primaryType = restaurant.primaryTypeDisplayName?.text?.toLowerCase() || '';
+        const name = restaurant.name.toLowerCase();
+        const editorial = restaurant.editorialSummary?.text?.toLowerCase() || '';
+        const generativeOverview = restaurant.generativeSummary?.overview?.text?.toLowerCase() || '';
+        const generativeDescription = restaurant.generativeSummary?.description?.text?.toLowerCase() || '';
+        
+        matchesCuisine = primaryType.includes(keyword) ||
+                        name.includes(keyword) ||
+                        editorial.includes(keyword) ||
+                        generativeOverview.includes(keyword) ||
+                        generativeDescription.includes(keyword);
+      } else {
+        // STRICT: Check exact type matches
+        matchesCuisine = filters.cuisineTypes.some(cuisine => {
+          const cuisineTypes = getCuisineTypes(cuisine);
+          return restaurant.types?.some(t => cuisineTypes.includes(t));
+        });
+      }
+    }
     
     // Price range filter
     const matchesPrice = !restaurant.price_level || 
@@ -203,8 +238,12 @@ export default function FineDining() {
     // Rating filter
     const matchesRating = !restaurant.rating || restaurant.rating >= filters.minRating;
     
-    return matchesSearch && matchesCuisine && matchesPrice && matchesRating;
+    const result = matchesSearch && matchesCuisine && matchesPrice && matchesRating;
+    return result;
   });
+
+  // Debug logging after filtering
+  console.debug(`🔍 Filtering: ${restaurants.length} total -> ${filteredRestaurants.length} after filters (mode: ${lastCuisineQuery ? 'targeted/relaxed' : 'strict'})`);
 
   return (
     <div className="min-h-screen bg-background">
@@ -264,6 +303,11 @@ export default function FineDining() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg mb-4">No restaurants found</p>
+            {lastCuisineQuery && filters.cuisineTypes.length > 0 && (
+              <p className="text-sm text-muted-foreground">
+                Try clearing cuisine filters or searching a different location
+              </p>
+            )}
           </div>
         )}
         
