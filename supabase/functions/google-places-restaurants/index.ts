@@ -129,7 +129,7 @@ Deno.serve(async (req) => {
             radius: radius,
           },
         },
-        maxResultCount: 50,
+        maxResultCount: 20,
       };
       console.log(`Calling text search for "${cuisine} restaurant"`);
     } else {
@@ -153,8 +153,6 @@ Deno.serve(async (req) => {
           'ramen_restaurant',
           'greek_restaurant',
           'lebanese_restaurant',
-          'fusion_restaurant',
-          'asian_fusion_restaurant',
           'vegan_restaurant',
           'vegetarian_restaurant',
           'mexican_restaurant',
@@ -181,7 +179,7 @@ Deno.serve(async (req) => {
             radius: radius,
           },
         },
-        maxResultCount: 100,
+        maxResultCount: 20,
         rankPreference: 'DISTANCE',
       };
       console.log('Calling nearby search for all restaurants');
