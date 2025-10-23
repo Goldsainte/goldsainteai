@@ -49,20 +49,20 @@ const cuisineTypes = [
 // Helper function to extract the correct cuisine keyword for filtering
 const getCuisineKeyword = (cuisine: string): string => {
   const keywordMap: Record<string, string> = {
-    'French Fine Dining': 'french',
-    'Italian Trattoria': 'italian',
-    'Japanese Kaiseki': 'japanese',
-    'Chinese Imperial': 'chinese',
-    'Indian Fine Dining': 'indian',
-    'Thai Royal': 'thai',
-    'Mediterranean': 'mediterranean',
-    'Middle Eastern': 'middle eastern',
-    'Modern American': 'american',
-    'Steakhouse': 'steak',
-    'Seafood': 'seafood',
-    'Fusion': 'restaurant', // broad match for fusion
+    "French Fine Dining": "french",
+    "Italian Trattoria": "italian",
+    "Japanese Kaiseki": "japanese",
+    "Chinese Imperial": "chinese",
+    "Indian Fine Dining": "indian",
+    "Thai Royal": "thai",
+    "Mediterranean": "mediterranean",
+    "Middle Eastern": "middle eastern",
+    "Modern American": "american",
+    "Steakhouse": "steak",
+    "Seafood": "seafood",
+    "Fusion": "restaurant",
   };
-  return keywordMap[cuisine] || cuisine.split(' ')[0].toLowerCase();
+  return keywordMap[cuisine] || cuisine.split(" ")[0].toLowerCase();
 };
 
 export default function FineDining() {
