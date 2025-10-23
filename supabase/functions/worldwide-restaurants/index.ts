@@ -14,6 +14,12 @@ function isActualRestaurant(place: any): boolean {
   );
 }
 
+// Filter for high-quality restaurants only (4+ stars)
+function isHighQualityRestaurant(place: any): boolean {
+  const rating = place.rating || place.average_rating || 0;
+  return rating >= 4.0;
+}
+
 // Transform Worldwide Restaurants API response to legacy format
 function transformRestaurant(place: any): any {
   // Convert price range (e.g., "$$") to price_level (1-4)
@@ -128,9 +134,10 @@ serve(async (req) => {
     // Filter and transform restaurants
     const restaurants = results
       .filter(isActualRestaurant)
+      .filter(isHighQualityRestaurant)
       .map(transformRestaurant);
 
-    console.info(`Returning ${restaurants.length} restaurants after filtering`);
+    console.info(`Filtered to ${restaurants.length} high-quality (4+ stars) restaurants from ${results.length} total`);
 
     return new Response(
       JSON.stringify({ restaurants, count: restaurants.length }),
