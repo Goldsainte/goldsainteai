@@ -235,6 +235,7 @@ export default function FineDining() {
   }, [backfillQueue, isBackfilling, photoMap]);
 
   const handleCityClick = (city: { name: string }) => {
+    setSearchQuery(""); // Clear search to prevent name filtering
     navigate(`/fine-dining?city=${city.name}`);
     fetchRestaurants(city.name);
   };
@@ -248,6 +249,7 @@ export default function FineDining() {
     const cityName = searchQuery.trim();
     navigate(`/fine-dining?city=${cityName}`);
     fetchRestaurants(cityName);
+    setSearchQuery(""); // Clear search to prevent name filtering
   };
 
   const handleClearSearch = () => {
@@ -294,14 +296,17 @@ export default function FineDining() {
 
   // Apply all filters: search, cuisine, price, rating
   const filteredRestaurants = restaurants.filter(restaurant => {
-    // Name search
-    const matchesSearch = searchQuery === "" || restaurant.name.toLowerCase().includes(searchQuery.toLowerCase());
+    // Name search - ignore if it matches the selected city
+    const trimmed = searchQuery.trim().toLowerCase();
+    const matchesSearch = trimmed === "" || 
+                         trimmed === selectedCity.toLowerCase() || 
+                         restaurant.name.toLowerCase().includes(trimmed);
     
     // Cuisine filter - RELAXED MODE when lastCuisineQuery is set
     let matchesCuisine = true;
     if (filters.cuisineTypes.length > 0) {
       if (lastCuisineQuery) {
-        // RELAXED: Check name, primaryTypeDisplayName, editorialSummary, generativeSummary
+        // RELAXED: Check name, primaryTypeDisplayName, editorialSummary, generativeSummary, types
         const keyword = lastCuisineQuery.toLowerCase();
         const primaryType = restaurant.primaryTypeDisplayName?.text?.toLowerCase() || '';
         const name = restaurant.name.toLowerCase();
@@ -313,7 +318,8 @@ export default function FineDining() {
                         name.includes(keyword) ||
                         editorial.includes(keyword) ||
                         generativeOverview.includes(keyword) ||
-                        generativeDescription.includes(keyword);
+                        generativeDescription.includes(keyword) ||
+                        (restaurant.types?.some(t => t.includes(keyword)) ?? false);
       } else {
         // STRICT: Check exact type matches
         matchesCuisine = filters.cuisineTypes.some(cuisine => {

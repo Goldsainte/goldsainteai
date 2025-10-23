@@ -141,44 +141,53 @@ export const fetchAmadeusRestaurantsForLocation = async (
 
     // Map TripAdvisor results to GooglePlacesRestaurant format
     const tripAdvisorResults = data?.results || [];
-    const restaurants: GooglePlacesRestaurant[] = tripAdvisorResults.map((r: any) => ({
-      place_id: String(r.id || r.location_id || ''),
-      name: r.name || '',
-      vicinity: r.city || r.address || '',
-      formatted_address: r.address || `${r.city}, ${r.country}`,
-      rating: Number(r.rating) || 0,
-      user_ratings_total: Number(r.num_reviews || r.userRatingsTotal) || 0,
-      price_level: r.priceLevel || (r.price_level ? r.price_level.length : 0),
-      geometry: r.latitude && r.longitude ? {
-        location: {
-          lat: Number(r.latitude),
-          lng: Number(r.longitude),
-        },
-      } : undefined,
-      opening_hours: r.openNow !== undefined ? {
-        open_now: r.openNow,
-      } : undefined,
-      photos: r.photoUrl ? [{
-        photo_reference: r.photoUrl,
-        height: 800,
-        width: 1200,
-      }] : (r.photos && r.photos.length > 0 ? r.photos.map((p: any) => ({
-        photo_reference: p.url,
-        height: 800,
-        width: 1200,
-      })) : []),
-      types: ['restaurant'],
-      business_status: 'OPERATIONAL',
-      formatted_phone_number: r.phone || '',
-      website: r.website || r.web_url || '',
-      reviews: r.reviews ? r.reviews.map((rev: any) => ({
-        author_name: rev.user || 'Anonymous',
-        rating: Number(rev.rating) || 0,
-        text: rev.text || '',
-        time: rev.published_date || '',
-        relative_time_description: rev.published_date || '',
-      })) : [],
-    }));
+    const restaurants: GooglePlacesRestaurant[] = tripAdvisorResults.map((r: any) => {
+      // Parse and normalize cuisines
+      const cuisines = (r.cuisine ? String(r.cuisine).split(',').map((s: string) => s.trim()) : []);
+      const cuisineTypes = cuisines.map((c: string) => c.toLowerCase().replace(/\s+/g, '_') + '_restaurant');
+      
+      return {
+        place_id: String(r.id || r.location_id || ''),
+        name: r.name || '',
+        vicinity: r.city || r.address || '',
+        formatted_address: r.address || `${r.city}, ${r.country}`,
+        rating: Number(r.rating) || 0,
+        user_ratings_total: Number(r.num_reviews || r.userRatingsTotal) || 0,
+        price_level: r.priceLevel || (r.price_level ? r.price_level.length : 0),
+        geometry: r.latitude && r.longitude ? {
+          location: {
+            lat: Number(r.latitude),
+            lng: Number(r.longitude),
+          },
+        } : undefined,
+        opening_hours: r.openNow !== undefined ? {
+          open_now: r.openNow,
+        } : undefined,
+        photos: r.photoUrl ? [{
+          photo_reference: r.photoUrl,
+          height: 800,
+          width: 1200,
+        }] : (r.photos && r.photos.length > 0 ? r.photos.map((p: any) => ({
+          photo_reference: p.url,
+          height: 800,
+          width: 1200,
+        })) : []),
+        types: ['restaurant', ...cuisineTypes],
+        primaryTypeDisplayName: cuisines.length ? { text: cuisines[0] } : undefined,
+        editorialSummary: r.description ? { text: r.description } : undefined,
+        generativeSummary: r.description ? { overview: { text: r.description } } : undefined,
+        business_status: 'OPERATIONAL',
+        formatted_phone_number: r.phone || '',
+        website: r.website || r.web_url || '',
+        reviews: r.reviews ? r.reviews.map((rev: any) => ({
+          author_name: rev.user || 'Anonymous',
+          rating: Number(rev.rating) || 0,
+          text: rev.text || '',
+          time: rev.published_date || '',
+          relative_time_description: rev.published_date || '',
+        })) : [],
+      };
+    });
 
     console.info(`Found ${restaurants.length} TripAdvisor restaurants`);
     return restaurants;
