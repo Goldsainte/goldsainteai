@@ -100,16 +100,17 @@ export const HotelFilters = ({
   return (
     <div className="space-y-3">
       {/* Quick Filters Bar */}
-      <div className="flex flex-wrap items-center gap-3 p-4 bg-card border border-accent/20 rounded-lg">
-        <div className="flex items-center gap-2">
-          <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium">{resultsCount} properties</span>
-        </div>
-
-         <div className="flex items-center gap-2 flex-1">
-           <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+      <div className="flex items-center justify-between p-3 bg-card border border-accent/20 rounded-lg">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium">{resultsCount} properties</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
             <Select value={currentSort} onValueChange={onSortChange}>
-              <SelectTrigger className="w-[180px]" aria-label="Sort properties">
+              <SelectTrigger className="w-[160px]" aria-label="Sort properties">
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent className="bg-background z-[100]">
@@ -119,60 +120,39 @@ export const HotelFilters = ({
                 <SelectItem value="price_desc">Highest Price</SelectItem>
               </SelectContent>
             </Select>
- 
-           {/* Quick Price Slider */}
-           <div className="flex items-center gap-2 ml-4">
-             <DollarSign className="h-4 w-4 text-muted-foreground" />
-             <div className="w-48">
-               <Slider
-                 min={0}
-                 max={1000}
-                 step={50}
-                 value={priceRange}
-                 onValueChange={(value) => {
-                   setPriceRange(value as [number, number]);
-                   onPriceRangeChange?.(value[0], value[1]);
-                 }}
-               />
-               <div className="flex justify-between text-xs text-muted-foreground">
-                 <span>${priceRange[0]}</span>
-                 <span>${priceRange[1]}</span>
-               </div>
-             </div>
-           </div>
-         </div>
+          </div>
+        </div>
 
-        {/* Quick Rating Filters */}
         <div className="flex items-center gap-2">
+          {/* Quick Rating Filters */}
           <Star className="h-4 w-4 text-muted-foreground" />
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             {[7, 8, 9].map((rating) => (
               <Button
                 key={rating}
                 variant={currentMinRating === rating ? "default" : "outline"}
                 size="sm"
                 onClick={() => onMinRatingChange(currentMinRating === rating ? null : rating)}
-                className="h-8 min-w-[3rem]"
+                className="h-7 min-w-[2.5rem] text-xs"
               >
                 {rating}+
               </Button>
             ))}
           </div>
-        </div>
 
-        {/* Advanced Filters Sheet */}
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" size="sm" className="gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              More Filters
-              {(selectedAmenities.length + selectedPropertyTypes.length + selectedStarRatings.length) > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 min-w-[1.25rem] px-1">
-                  {selectedAmenities.length + selectedPropertyTypes.length + selectedStarRatings.length}
-                </Badge>
-              )}
-            </Button>
-          </SheetTrigger>
+          {/* Advanced Filters Sheet */}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2 h-7">
+                <SlidersHorizontal className="h-3 w-3" />
+                Filters
+                {(selectedAmenities.length + selectedPropertyTypes.length + selectedStarRatings.length) > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 min-w-[1.25rem] px-1">
+                    {selectedAmenities.length + selectedPropertyTypes.length + selectedStarRatings.length}
+                  </Badge>
+                )}
+              </Button>
+            </SheetTrigger>
           <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
             <SheetHeader>
               <SheetTitle>Filter Properties</SheetTitle>
@@ -327,28 +307,29 @@ export const HotelFilters = ({
           </SheetContent>
         </Sheet>
 
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              onSortChange('popularity');
-              onMinRatingChange(null);
-              setSelectedAmenities([]);
-              onAmenitiesChange?.([]);
-              setSelectedPropertyTypes([]);
-              onPropertyTypesChange?.([]);
-              setSelectedStarRatings([]);
-              onStarRatingsChange?.([]);
-              setPriceRange([0, 1000]);
-              onPriceRangeChange?.(0, 1000);
-            }}
-            className="text-xs gap-1"
-          >
-            <X className="h-3 w-3" />
-            Clear all
-          </Button>
-        )}
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                onSortChange('popularity');
+                onMinRatingChange(null);
+                setSelectedAmenities([]);
+                onAmenitiesChange?.([]);
+                setSelectedPropertyTypes([]);
+                onPropertyTypesChange?.([]);
+                setSelectedStarRatings([]);
+                onStarRatingsChange?.([]);
+                setPriceRange([0, 1000]);
+                onPriceRangeChange?.(0, 1000);
+              }}
+              className="text-xs gap-1 h-7"
+            >
+              <X className="h-3 w-3" />
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Active Filters Display */}

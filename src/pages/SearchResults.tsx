@@ -723,7 +723,7 @@ if (minRating && searchType !== "restaurants") {
         </div>
         
         {/* Search bar - always visible */}
-        <div className="mb-6">
+        <div className="mb-4">
           <EnhancedSearchBar />
         </div>
 
@@ -924,9 +924,9 @@ if (minRating && searchType !== "restaurants") {
             </div>
 
             {/* Main Content Area */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
               {/* Filters Sidebar - Desktop */}
-              <aside className="hidden sm:block lg:col-span-3">
+              <aside className="hidden sm:block lg:col-span-2">
                 <div className="sticky top-4">
                   {searchType === "hotels" || searchType === "packages" ? (
                     <HotelFilters
@@ -976,7 +976,7 @@ if (minRating && searchType !== "restaurants") {
               </aside>
 
               {/* Results List */}
-              <main className="lg:col-span-9">
+              <main className="lg:col-span-10">
                 {/* Promoted Transportation Vendors */}
                 <div className="mb-6">
                   <VendorPromotionFeed displayContext="search" limit={2} />
