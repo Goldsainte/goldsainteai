@@ -71,7 +71,7 @@ function transformRestaurant(place: any): any {
     price_level: priceLevel,
     opening_hours: undefined,
     photos: photos,
-    types: place.cuisine || [],
+    types: place.cuisine_types || place.cuisine?.map((c: any) => c.name) || place.cuisine || [],
     business_status: place.is_closed ? 'CLOSED' : 'OPERATIONAL',
     formatted_phone_number: place.phone || '',
     website: place.website || '',
@@ -118,7 +118,13 @@ serve(async (req) => {
         'X-RapidAPI-Host': 'worldwide-restaurants.p.rapidapi.com',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ q: location }),
+      body: JSON.stringify({ 
+        q: location,
+        language: "en_US",
+        units: "km",
+        currency: "USD",
+        limit: 20
+      }),
     });
 
     if (!typeaheadResponse.ok) {
@@ -134,7 +140,8 @@ serve(async (req) => {
     }
 
     const typeaheadData = await typeaheadResponse.json();
-    const locationId = typeaheadData.results?.[0]?.location_id;
+    const locationId = typeaheadData.results?.find((r: any) => r.result_object?.location_id)?.result_object?.location_id 
+      || typeaheadData.results?.[0]?.location_id;
 
     if (!locationId) {
       console.error(`❌ City not found: ${location}`);
@@ -161,6 +168,7 @@ serve(async (req) => {
       body: JSON.stringify({
         location_id: locationId,
         limit: 50,
+        language: "en_US",
         currency: 'USD',
       }),
     });
