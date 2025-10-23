@@ -8,7 +8,7 @@ import { FineDiningRestaurantCard } from "@/components/FineDiningRestaurantCard"
 import { FineDiningFilters, RestaurantFilterState } from "@/components/FineDiningFilters";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAmadeusRestaurantsForLocation, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
+import { fetchAmadeusRestaurantsForLocation, fetchAmadeusRestaurantDetails, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
 import { findLocationCoordinates } from "@/lib/locationMapping";
 import { isValidImageUrl } from "@/lib/imageHelpers";
 import { toast } from "sonner";
@@ -76,6 +76,9 @@ export default function FineDining() {
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
   const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [lastCuisineQuery, setLastCuisineQuery] = useState<string | null>(null);
+  const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
+  const [backfillQueue, setBackfillQueue] = useState<string[]>([]);
+  const [isBackfilling, setIsBackfilling] = useState(false);
   
   const [filters, setFilters] = useState<RestaurantFilterState>({
     priceRange: [1, 4],
@@ -84,6 +87,37 @@ export default function FineDining() {
     dietary: [],
     minRating: 0,
   });
+
+  // Load cached photos from localStorage on mount
+  useEffect(() => {
+    const cached = localStorage.getItem('restaurant_photos_v1');
+    if (cached) {
+      try {
+        const { data, timestamp } = JSON.parse(cached);
+        const now = Date.now();
+        const sevenDays = 7 * 24 * 60 * 60 * 1000;
+        if (now - timestamp < sevenDays) {
+          setPhotoMap(data);
+          console.debug('📸 Loaded cached photos:', Object.keys(data).length);
+        } else {
+          localStorage.removeItem('restaurant_photos_v1');
+          console.debug('🗑️ Cleared expired photo cache');
+        }
+      } catch (e) {
+        console.debug('⚠️ Failed to load photo cache:', e);
+      }
+    }
+  }, []);
+
+  // Save photoMap to localStorage whenever it changes
+  useEffect(() => {
+    if (Object.keys(photoMap).length > 0) {
+      localStorage.setItem('restaurant_photos_v1', JSON.stringify({
+        data: photoMap,
+        timestamp: Date.now()
+      }));
+    }
+  }, [photoMap]);
 
   useEffect(() => {
     const cityParam = searchParams.get('city');
@@ -137,14 +171,96 @@ export default function FineDining() {
     
     console.debug(`📊 Backend returned ${results.length} restaurants`);
     
+    // Collect place_ids without photos for backfill
+    const missingPhotos = results.filter(r => {
+      const rawUrl = r.photos?.[0]?.photo_reference 
+        ? getPhotoUrl(r.photos[0].photo_reference, 800)
+        : "";
+      return !isValidImageUrl(rawUrl) && !photoMap[r.place_id];
+    }).map(r => r.place_id);
+    
+    if (missingPhotos.length > 0) {
+      console.debug(`📸 Found ${missingPhotos.length} restaurants missing photos, adding to backfill queue`);
+      setBackfillQueue(prev => {
+        const newQueue = [...new Set([...prev, ...missingPhotos])];
+        return newQueue;
+      });
+    }
+    
     // Only show toast if no results after retries
     if (results.length === 0) {
       console.debug(`❌ No restaurants found for ${cityName} even after expanding radius`);
       toast.error(`No ${cuisine || ''} restaurants found in ${cityName}`);
     } else {
-      console.debug(`✅ Loaded ${results.length} restaurants for ${cityName}`);
+      const withPhotos = results.filter(r => {
+        const rawUrl = r.photos?.[0]?.photo_reference 
+          ? getPhotoUrl(r.photos[0].photo_reference, 800)
+          : "";
+        return isValidImageUrl(rawUrl) || photoMap[r.place_id];
+      }).length;
+      console.debug(`✅ Loaded ${results.length} restaurants for ${cityName} (${withPhotos} with photos, ${missingPhotos.length} missing)`);
     }
   };
+
+  // Process photo backfill queue
+  useEffect(() => {
+    if (backfillQueue.length === 0 || isBackfilling) return;
+
+    const processQueue = async () => {
+      setIsBackfilling(true);
+      console.debug(`🔄 Processing photo backfill queue (${backfillQueue.length} items)`);
+      
+      // Process in batches of 3 for concurrency control
+      const batchSize = 3;
+      const queue = [...backfillQueue];
+      
+      for (let i = 0; i < queue.length; i += batchSize) {
+        const batch = queue.slice(i, i + batchSize);
+        
+        const results = await Promise.allSettled(
+          batch.map(async (placeId) => {
+            try {
+              const details = await fetchAmadeusRestaurantDetails(placeId);
+              if (details?.photos?.[0]?.photo_reference) {
+                const photoUrl = getPhotoUrl(details.photos[0].photo_reference, 800);
+                if (isValidImageUrl(photoUrl)) {
+                  console.debug(`✅ Backfilled photo for ${details.name}`);
+                  return { placeId, photoUrl };
+                }
+              }
+              return null;
+            } catch (error) {
+              console.debug(`❌ Failed to backfill photo for ${placeId}:`, error);
+              return null;
+            }
+          })
+        );
+        
+        // Update photoMap with successful results
+        const newPhotos: Record<string, string> = {};
+        results.forEach((result) => {
+          if (result.status === 'fulfilled' && result.value) {
+            newPhotos[result.value.placeId] = result.value.photoUrl;
+          }
+        });
+        
+        if (Object.keys(newPhotos).length > 0) {
+          setPhotoMap(prev => ({ ...prev, ...newPhotos }));
+        }
+        
+        // Small delay between batches to avoid rate limits
+        if (i + batchSize < queue.length) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+      
+      console.debug(`✅ Photo backfill complete`);
+      setBackfillQueue([]);
+      setIsBackfilling(false);
+    };
+
+    processQueue();
+  }, [backfillQueue, isBackfilling, photoMap]);
 
   const handleCityClick = (city: { name: string; latitude: number; longitude: number }) => {
     navigate(`/fine-dining?city=${city.name}`);
@@ -300,7 +416,8 @@ export default function FineDining() {
               const rawUrl = restaurant.photos?.[0]?.photo_reference 
                 ? getPhotoUrl(restaurant.photos[0].photo_reference, 800)
                 : "";
-              const photoUrl = isValidImageUrl(rawUrl) ? rawUrl : undefined;
+              // Try base URL first, then check photoMap for backfilled photos
+              const photoUrl = isValidImageUrl(rawUrl) ? rawUrl : (photoMap[restaurant.place_id] || undefined);
               
               const cuisineTypes = restaurant.types?.filter(t => 
                 !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)
