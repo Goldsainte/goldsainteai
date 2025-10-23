@@ -1,9 +1,6 @@
 project_id = "iwdevxltjuedijrcdejs"
 
-[functions.google-places-restaurants]
-verify_jwt = false
-
-[functions.google-places-details]
+[functions.worldwide-restaurants]
 verify_jwt = false
 
 [functions.uber-request-ride]
@@ -272,5 +269,3 @@ verify_jwt = false
 
 [functions.notify-creators-new-opportunity]
 verify_jwt = false
-
-

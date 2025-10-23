@@ -91,89 +91,60 @@ export interface GooglePlacesRestaurant {
 // For backward compatibility
 export type AmadeusRestaurant = GooglePlacesRestaurant;
 
+/**
+ * Fetch restaurants in a given city using Worldwide Restaurants API
+ * 
+ * @param cityName - Name of the city (e.g., "Paris", "Tokyo", "Dallas")
+ * @param cuisine - Optional cuisine type (e.g., "french", "italian")
+ * @param keyword - Optional keyword to search for
+ * @returns Array of restaurants
+ */
 export const fetchAmadeusRestaurantsForLocation = async (
-  latitude: number,
-  longitude: number,
-  radius: number = 10,
-  categories?: string[],
-  keyword?: string,
-  cuisine?: string
+  cityName: string,
+  cuisine?: string,
+  keyword?: string
 ): Promise<GooglePlacesRestaurant[]> => {
   try {
-    // Convert km to meters for Google Places API
-    const radiusInMeters = radius * 1000;
-    
-    console.debug(`🔍 Fetching restaurants at (${latitude}, ${longitude}) with ${radius}km radius`);
-    
-    let { data, error } = await supabase.functions.invoke('google-places-restaurants', {
+    console.info(
+      `Fetching restaurants in ${cityName}${cuisine ? ` [cuisine: ${cuisine}]` : ""}`
+    );
+
+    // Invoke the edge function with the search parameters
+    const { data, error } = await supabase.functions.invoke('worldwide-restaurants', {
       body: {
-        latitude,
-        longitude,
-        radius: radiusInMeters,
-        type: 'restaurant',
+        location: cityName,
         cuisine,
+        keyword,
       },
     });
 
     if (error) {
-      console.error('Error fetching Google Places restaurants:', error);
+      console.error('Edge function error:', error);
+      throw error;
     }
 
-    let restaurants = data?.data || [];
-    console.debug(`📍 Got ${restaurants.length} restaurants at ${radius}km`);
-
-    // If no results, try expanding radius to 10km
-    if (restaurants.length === 0 && radius < 10) {
-      console.debug(`No results with ${radius}km radius, trying 10km...`);
-      const result = await supabase.functions.invoke('google-places-restaurants', {
-        body: { latitude, longitude, radius: 10000, type: 'restaurant', cuisine },
-      });
-      restaurants = result.data?.data || [];
-      console.debug(`📍 Got ${restaurants.length} restaurants at 10km`);
-    }
-
-    // If still no results, try 20km
-    if (restaurants.length === 0 && radius < 20) {
-      console.debug(`No results with 10km radius, trying 20km...`);
-      const result = await supabase.functions.invoke('google-places-restaurants', {
-        body: { latitude, longitude, radius: 20000, type: 'restaurant', cuisine },
-      });
-      restaurants = result.data?.data || [];
-      console.debug(`📍 Got ${restaurants.length} restaurants at 20km`);
-    }
-
-    if (restaurants.length > 0) {
-      console.debug(`✅ Sample restaurants:`, restaurants.slice(0, 2).map(r => r.name));
-    }
+    const restaurants = data?.restaurants || [];
+    console.info(`Found ${restaurants.length} restaurants`);
 
     return restaurants;
   } catch (error) {
-    console.error('Failed to fetch Google Places restaurants:', error);
+    console.error('Error fetching restaurants:', error);
     return [];
   }
 };
 
-export const fetchAmadeusRestaurantDetails = async (placeId: string): Promise<GooglePlacesRestaurant | null> => {
+export const fetchAmadeusRestaurantDetails = async (
+  placeId: string
+): Promise<GooglePlacesRestaurant | null> => {
   try {
-    console.debug(`🔍 Fetching details for place_id: ${placeId}`);
-    
-    const { data, error } = await supabase.functions.invoke('google-places-details', {
-      body: { placeId },
-    });
+    console.info(`Fetching details for restaurant: ${placeId}`);
 
-    if (error) {
-      console.error('Error fetching restaurant details:', error);
-      return null;
-    }
-
-    const result = data?.data;
-    if (result) {
-      console.debug(`✅ Got details for: ${result.name}`);
-    }
-
-    return result || null;
+    // For now, return null - photo backfill will use the initial data
+    // Can implement a separate details endpoint if Worldwide Restaurants API provides one
+    console.warn('Restaurant details endpoint not yet implemented for Worldwide Restaurants API');
+    return null;
   } catch (error) {
-    console.error('Failed to fetch restaurant details:', error);
+    console.error('Error fetching restaurant details:', error);
     return null;
   }
 };
@@ -194,12 +165,9 @@ export const groupRestaurantsByCity = (restaurants: GooglePlacesRestaurant[], de
   }));
 };
 
-export const getPhotoUrl = (photoReference: string, maxWidth: number = 400): string => {
-  // Photo URLs are now generated on the backend for security
-  // photoReference already contains the full URL
-  if (photoReference?.startsWith('http')) {
-    return photoReference;
-  }
-  // Fallback for any legacy data
-  return photoReference || '';
+export const getPhotoUrl = (photoReference: string, maxWidth: number = 800): string => {
+  if (!photoReference) return '';
+  
+  // Worldwide Restaurants API provides direct photo URLs
+  return photoReference;
 };
