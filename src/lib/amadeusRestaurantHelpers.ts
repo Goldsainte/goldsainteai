@@ -92,7 +92,7 @@ export interface GooglePlacesRestaurant {
 export type AmadeusRestaurant = GooglePlacesRestaurant;
 
 /**
- * Fetch restaurants in a given city using Worldwide Restaurants API
+ * Fetch restaurants in a given city using TripAdvisor API
  * 
  * @param cityName - Name of the city (e.g., "Paris", "Tokyo", "Dallas")
  * @param cuisine - Optional cuisine type (e.g., "french", "italian")
@@ -109,39 +109,83 @@ export const fetchAmadeusRestaurantsForLocation = async (
       `Fetching restaurants in ${cityName}${cuisine ? ` [cuisine: ${cuisine}]` : ""}`
     );
 
-    // Invoke the edge function with the search parameters
-    const { data, error } = await supabase.functions.invoke('worldwide-restaurants', {
+    // Invoke TripAdvisor search
+    const { data, error } = await supabase.functions.invoke('tripadvisor-search-restaurants', {
       body: {
         location: cityName,
-        cuisine,
-        keyword,
+        cuisine: cuisine || keyword,
+        sortBy: 'best_value',
       },
     });
 
     if (error) {
-      console.error('Edge function error:', error);
+      console.error('TripAdvisor edge function error:', error);
       const { toast } = await import('sonner');
       toast.error("Unable to search restaurants. Please try again.");
-      throw error;
+      return [];
     }
 
     if (data?.error) {
-      console.error('API error:', data.error);
+      console.error('TripAdvisor API error:', data.error);
       const { toast } = await import('sonner');
-      if (data.error === 'City not found') {
-        toast.error(`"${cityName}" not found. Try a major city like Paris, Tokyo, or New York.`);
+      
+      if (data.error.includes('Rate limit')) {
+        toast.error("Too many requests. Please wait a moment and try again.");
+      } else if (data.error.includes('not configured')) {
+        toast.error("Restaurant search is not configured. Please contact support.");
       } else {
-        toast.error("Restaurant search temporarily unavailable.");
+        toast.error(`Unable to find restaurants in "${cityName}". Try a major city.`);
       }
       return [];
     }
 
-    const restaurants = data?.restaurants || [];
-    console.info(`Found ${restaurants.length} restaurants`);
+    // Map TripAdvisor results to GooglePlacesRestaurant format
+    const tripAdvisorResults = data?.results || [];
+    const restaurants: GooglePlacesRestaurant[] = tripAdvisorResults.map((r: any) => ({
+      place_id: String(r.id || r.location_id || ''),
+      name: r.name || '',
+      vicinity: r.city || r.address || '',
+      formatted_address: r.address || `${r.city}, ${r.country}`,
+      rating: Number(r.rating) || 0,
+      user_ratings_total: Number(r.num_reviews || r.userRatingsTotal) || 0,
+      price_level: r.priceLevel || (r.price_level ? r.price_level.length : 0),
+      geometry: r.latitude && r.longitude ? {
+        location: {
+          lat: Number(r.latitude),
+          lng: Number(r.longitude),
+        },
+      } : undefined,
+      opening_hours: r.openNow !== undefined ? {
+        open_now: r.openNow,
+      } : undefined,
+      photos: r.photoUrl ? [{
+        photo_reference: r.photoUrl,
+        height: 800,
+        width: 1200,
+      }] : (r.photos && r.photos.length > 0 ? r.photos.map((p: any) => ({
+        photo_reference: p.url,
+        height: 800,
+        width: 1200,
+      })) : []),
+      types: ['restaurant'],
+      business_status: 'OPERATIONAL',
+      formatted_phone_number: r.phone || '',
+      website: r.website || r.web_url || '',
+      reviews: r.reviews ? r.reviews.map((rev: any) => ({
+        author_name: rev.user || 'Anonymous',
+        rating: Number(rev.rating) || 0,
+        text: rev.text || '',
+        time: rev.published_date || '',
+        relative_time_description: rev.published_date || '',
+      })) : [],
+    }));
 
+    console.info(`Found ${restaurants.length} TripAdvisor restaurants`);
     return restaurants;
   } catch (error) {
     console.error('Error fetching restaurants:', error);
+    const { toast } = await import('sonner');
+    toast.error("An unexpected error occurred. Please try again.");
     return [];
   }
 };
