@@ -248,6 +248,9 @@ export const EnhancedSearchBar = () => {
       if (!pickupLocation.trim() || !pickupDateCar || !returnDateCar) {
         return;
       }
+      if (carTripType === 'one-way' && !dropoffLocation.trim()) {
+        return; // Prevent search without dropoff location for one-way trips
+      }
       const finalDrop = carTripType === 'one-way' ? dropoffLocation.trim() : pickupLocation.trim();
       searchData = {
         ...searchData,
@@ -268,7 +271,7 @@ export const EnhancedSearchBar = () => {
     // Normalize search type to singular form for database
     const normalizedType = searchType.replace(/s$/, '') as 'hotel' | 'flight' | 'car' | 'restaurant' | 'event' | 'destination';
     trackSearch(normalizedType, searchData);
-    navigate(`/search?${params.toString()}`);
+    navigate(`/search-results?${params.toString()}`);
   };
 
   // Flight Search UI
@@ -633,12 +636,10 @@ export const EnhancedSearchBar = () => {
   const renderEventSearch = () => (
     <div className="space-y-4">
       <div className="relative">
-        <MapPin className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-        <Input
-          placeholder="City or venue"
-          className="pl-10 h-12 border-border text-base"
+        <CityAutocomplete
           value={eventLocation}
-          onChange={(e) => setEventLocation(e.target.value)}
+          onChange={setEventLocation}
+          placeholder="City or venue"
         />
       </div>
 
