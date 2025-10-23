@@ -72,6 +72,7 @@ export default function FineDining() {
   const [searchQuery, setSearchQuery] = useState("");
   const [restaurants, setRestaurants] = useState<GooglePlacesRestaurant[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
   const [lastCuisineQuery, setLastCuisineQuery] = useState<string | null>(null);
@@ -132,6 +133,7 @@ export default function FineDining() {
   ) => {
     setRestaurants([]);
     setLoading(true);
+    setError(null);
     setSelectedCity(cityName);
     
     if (cuisine) {
@@ -143,26 +145,32 @@ export default function FineDining() {
       console.debug(`🌍 General city search: ${cityName}`);
     }
     
-    const results = await fetchAmadeusRestaurantsForLocation(
-      cityName,
-      cuisine
-    );
-    
-    setRestaurants(results);
-    setLoading(false);
-    
-    // Photo backfill logic
-    const missingPhotos = results
-      .filter(r => !r.photos?.[0] && !photoMap[r.place_id])
-      .map(r => r.place_id);
-    
-    if (missingPhotos.length > 0) {
-      console.debug(`📸 Queuing ${missingPhotos.length} restaurants for photo backfill`);
-      setBackfillQueue(prev => [...new Set([...prev, ...missingPhotos])]);
-    }
-    
-    if (results.length === 0) {
-      toast.error(`No ${cuisine || ''} restaurants found in ${cityName}`);
+    try {
+      const results = await fetchAmadeusRestaurantsForLocation(
+        cityName,
+        cuisine
+      );
+      
+      setRestaurants(results);
+      
+      // Photo backfill logic
+      const missingPhotos = results
+        .filter(r => !r.photos?.[0] && !photoMap[r.place_id])
+        .map(r => r.place_id);
+      
+      if (missingPhotos.length > 0) {
+        console.debug(`📸 Queuing ${missingPhotos.length} restaurants for photo backfill`);
+        setBackfillQueue(prev => [...new Set([...prev, ...missingPhotos])]);
+      }
+      
+      if (results.length === 0 && !error) {
+        toast.error(`No ${cuisine || ''} restaurants found in ${cityName}`);
+      }
+    } catch (err) {
+      console.error('Error fetching restaurants:', err);
+      setError('Unable to load restaurants. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -357,6 +365,10 @@ export default function FineDining() {
             {[...Array(6)].map((_, i) => (
               <div key={i} className="space-y-4"><Skeleton className="h-48 w-full" /><Skeleton className="h-4 w-3/4" /></div>
             ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-500 text-lg mb-4">{error}</p>
           </div>
         ) : filteredRestaurants.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

@@ -120,7 +120,20 @@ export const fetchAmadeusRestaurantsForLocation = async (
 
     if (error) {
       console.error('Edge function error:', error);
+      const { toast } = await import('sonner');
+      toast.error("Unable to search restaurants. Please try again.");
       throw error;
+    }
+
+    if (data?.error) {
+      console.error('API error:', data.error);
+      const { toast } = await import('sonner');
+      if (data.error === 'City not found') {
+        toast.error(`"${cityName}" not found. Try a major city like Paris, Tokyo, or New York.`);
+      } else {
+        toast.error("Restaurant search temporarily unavailable.");
+      }
+      return [];
     }
 
     const restaurants = data?.restaurants || [];

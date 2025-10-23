@@ -22,39 +22,59 @@ function isHighQualityRestaurant(place: any): boolean {
 
 // Transform Worldwide Restaurants API response to legacy format
 function transformRestaurant(place: any): any {
-  // Convert price range (e.g., "$$") to price_level (1-4)
-  const priceLevel = place.price_range ? place.price_range.length : 2;
+  // Handle rating as string or number
+  const rating = typeof place.rating === 'string' 
+    ? parseFloat(place.rating) 
+    : (place.rating || 0);
+  
+  // Handle price_level - convert $ signs to numeric ($ = 1, $$ = 2, etc.)
+  const priceRange = place.price_level || place.price || '';
+  const priceLevel = typeof priceRange === 'string' ? priceRange.length : 2;
+  
+  // Handle address - try multiple fields
+  const address = place.address || place.location_string || place.address_obj?.street1 || '';
+  
+  // Handle photos - check different possible structures
+  const photos = [];
+  if (place.photo?.images?.large?.url) {
+    photos.push({
+      photo_reference: place.photo.images.large.url,
+      height: 800,
+      width: 800,
+    });
+  } else if (place.photo?.images?.medium?.url) {
+    photos.push({
+      photo_reference: place.photo.images.medium.url,
+      height: 800,
+      width: 800,
+    });
+  }
+  
+  // Handle coordinates - convert strings to floats
+  const lat = typeof place.latitude === 'string' 
+    ? parseFloat(place.latitude) 
+    : (place.latitude || 0);
+  const lng = typeof place.longitude === 'string' 
+    ? parseFloat(place.longitude) 
+    : (place.longitude || 0);
   
   return {
-    place_id: place.id || place.restaurant_id || `worldwide_${Date.now()}_${Math.random()}`,
+    place_id: place.location_id || `worldwide_${Date.now()}_${Math.random()}`,
     name: place.name || '',
-    vicinity: place.address || place.location || '',
-    formatted_address: place.full_address || place.address || '',
+    vicinity: address,
+    formatted_address: address,
     geometry: {
-      location: {
-        lat: place.latitude || place.lat || 0,
-        lng: place.longitude || place.lng || place.lon || 0,
-      },
+      location: { lat, lng },
     },
-    rating: place.rating || place.average_rating || 0,
-    user_ratings_total: place.reviews_count || place.review_count || 0,
+    rating: rating,
+    user_ratings_total: place.num_reviews || 0,
     price_level: priceLevel,
-    opening_hours: place.hours ? {
-      open_now: place.is_open || false,
-      weekday_text: Array.isArray(place.hours) ? place.hours : [],
-    } : undefined,
-    photos: place.photos?.map((photo: any) => {
-      const photoUrl = typeof photo === 'string' ? photo : photo.url || photo.image_url;
-      return {
-        photo_reference: photoUrl,
-        height: 800,
-        width: 800,
-      };
-    }) || [],
-    types: place.cuisine_types || place.cuisines || place.categories || [],
+    opening_hours: undefined,
+    photos: photos,
+    types: place.cuisine || [],
     business_status: place.is_closed ? 'CLOSED' : 'OPERATIONAL',
-    formatted_phone_number: place.phone || place.phone_number || place.contact?.phone,
-    website: place.website || place.url,
+    formatted_phone_number: place.phone || '',
+    website: place.website || '',
   };
 }
 
@@ -84,60 +104,93 @@ serve(async (req) => {
       );
     }
 
-    console.info(`Searching restaurants in: ${location}${cuisine ? `, cuisine: ${cuisine}` : ''}`);
+    console.info(`🔍 Searching restaurants in: ${location}${cuisine ? `, cuisine: ${cuisine}` : ''}`);
 
-    // Build query parameters
-    const params = new URLSearchParams({
-      location: location,
-      limit: '50',
-    });
-
-    if (cuisine) {
-      params.append('cuisine', cuisine);
-    }
-
-    if (keyword) {
-      params.append('query', keyword);
-    }
-
-    const url = `https://worldwide-restaurants.p.rapidapi.com/search?${params.toString()}`;
+    // Step 1: Get location_id from city name using typeahead
+    const typeaheadUrl = 'https://worldwide-restaurants.p.rapidapi.com/typeahead';
     
-    console.info(`Calling Worldwide Restaurants API`);
+    console.info(`📍 Resolving city name to location_id...`);
 
-    const response = await fetch(url, {
-      method: 'GET',
+    const typeaheadResponse = await fetch(typeaheadUrl, {
+      method: 'POST',
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': 'worldwide-restaurants.p.rapidapi.com',
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ q: location }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Worldwide Restaurants API error: ${response.status} - ${errorText}`);
+    if (!typeaheadResponse.ok) {
+      const errorText = await typeaheadResponse.text();
+      console.error(`Typeahead API error: ${typeaheadResponse.status} - ${errorText}`);
       return new Response(
         JSON.stringify({ 
-          error: 'Failed to fetch restaurants',
-          status: response.status,
-          message: errorText,
+          error: 'Failed to resolve city location',
+          restaurants: [],
         }),
-        { status: response.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: typeaheadResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const data = await response.json();
-    console.info(`Received ${data.results?.length || 0} results from API`);
+    const typeaheadData = await typeaheadResponse.json();
+    const locationId = typeaheadData.results?.[0]?.location_id;
 
-    // Extract restaurants array (API response structure may vary)
-    const results = data.results || data.restaurants || data.data || [];
+    if (!locationId) {
+      console.error(`❌ City not found: ${location}`);
+      return new Response(
+        JSON.stringify({ error: 'City not found', restaurants: [] }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.info(`✅ Found location_id: ${locationId}`);
+
+    // Step 2: Fetch restaurants using location_id
+    const restaurantsUrl = 'https://worldwide-restaurants.p.rapidapi.com/restaurants/list';
+    
+    console.info(`📡 Fetching restaurants for location_id: ${locationId}`);
+
+    const restaurantsResponse = await fetch(restaurantsUrl, {
+      method: 'POST',
+      headers: {
+        'X-RapidAPI-Key': rapidApiKey,
+        'X-RapidAPI-Host': 'worldwide-restaurants.p.rapidapi.com',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        location_id: locationId,
+        limit: 50,
+        currency: 'USD',
+      }),
+    });
+
+    if (!restaurantsResponse.ok) {
+      const errorText = await restaurantsResponse.text();
+      console.error(`Restaurants API error: ${restaurantsResponse.status} - ${errorText}`);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to fetch restaurants',
+          restaurants: [],
+        }),
+        { status: restaurantsResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const restaurantsData = await restaurantsResponse.json();
+    const results = restaurantsData.data || [];
+    
+    console.info(`✅ Received ${results.length} total restaurants`);
     
     // Filter and transform restaurants
-    const restaurants = results
-      .filter(isActualRestaurant)
+    const afterFirstFilter = results.filter(isActualRestaurant);
+    console.info(`🏪 After filtering non-restaurants: ${afterFirstFilter.length} remaining`);
+    
+    const restaurants = afterFirstFilter
       .filter(isHighQualityRestaurant)
       .map(transformRestaurant);
 
-    console.info(`Filtered to ${restaurants.length} high-quality (4+ stars) restaurants from ${results.length} total`);
+    console.info(`⭐ Filtered to ${restaurants.length} high-quality (4+ stars) restaurants`);
 
     return new Response(
       JSON.stringify({ restaurants, count: restaurants.length }),
