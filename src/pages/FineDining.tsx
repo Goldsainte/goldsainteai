@@ -83,7 +83,6 @@ const transformToGooglePlacesFormat = (curated: CuratedRestaurant): GooglePlaces
 export default function FineDining() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState("");
   const [restaurants, setRestaurants] = useState<GooglePlacesRestaurant[]>([]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
@@ -114,7 +113,6 @@ export default function FineDining() {
   }, [searchParams]);
 
   const handleCityClick = (city: { name: string }) => {
-    setSearchQuery("");
     setSelectedCity(city.name);
     setViewMode('city');
     setSelectedCuisine(null);
@@ -123,23 +121,7 @@ export default function FineDining() {
     navigate(`/fine-dining?city=${city.name}`);
   };
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      toast.error("Please enter a city to search");
-      return;
-    }
-    
-    const cityName = searchQuery.trim();
-    handleCityClick({ name: cityName });
-  };
-
-  const handleClearSearch = () => {
-    setSearchQuery("");
-    handleCityClick({ name: 'Paris' });
-  };
-
   const handleCuisineClick = (cuisine: string) => {
-    setSearchQuery("");
     setSelectedCuisine(cuisine);
     setViewMode('cuisine');
     setSelectedCity("");
@@ -156,18 +138,13 @@ export default function FineDining() {
       dietary: [],
       minRating: 0,
     });
-    setSearchQuery("");
     setSelectedCuisine(null);
     setViewMode('city');
     handleCityClick({ name: 'Paris' });
   };
 
-  // Apply all filters: search, cuisine, price, rating
+  // Apply filters: price and rating
   const filteredRestaurants = restaurants.filter(restaurant => {
-    // Name search
-    const trimmed = searchQuery.trim().toLowerCase();
-    const matchesSearch = trimmed === "" || restaurant.name.toLowerCase().includes(trimmed);
-    
     // Price range filter
     const matchesPrice = !restaurant.price_level || 
       (restaurant.price_level >= filters.priceRange[0] && 
@@ -176,7 +153,7 @@ export default function FineDining() {
     // Rating filter
     const matchesRating = !restaurant.rating || restaurant.rating >= filters.minRating;
     
-    return matchesSearch && matchesPrice && matchesRating;
+    return matchesPrice && matchesRating;
   });
 
   // Group restaurants by region and then by city for cuisine view
@@ -196,17 +173,40 @@ export default function FineDining() {
     <div className="min-h-screen bg-background">
       <Header />
       <FineDiningSearchHero
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        onSearch={handleSearch}
         onOpenFilters={() => setFiltersOpen(true)}
-        onClearSearch={handleClearSearch}
       />
       <div className="container mx-auto px-4 py-12 sm:py-14 md:py-16 max-w-7xl">
-        {/* Cuisine Types Section - First */}
-        <CuisineTypeSection cuisines={cuisineTypes} onCuisineClick={handleCuisineClick} />
+        {/* Top Destinations Section - First */}
+        <div className="mb-16">
+          <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
+          <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
+            Browse by Destination
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Explore curated restaurants in 30 world-class culinary destinations
+          </p>
+          <TopDestinationsSection
+            destinations={globalCulinaryCities.map(city => ({ destination: city.name, packageCount: 0, imageUrl: city.image }))}
+            onDestinationClick={(dest) => {
+              const city = globalCulinaryCities.find(c => c.name === dest);
+              if (city) handleCityClick(city);
+            }}
+          />
+        </div>
+
+        {/* Cuisine Types Section - Second */}
+        <div className="mb-16">
+          <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
+          <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
+            Browse by Cuisine
+          </h2>
+          <p className="text-muted-foreground mb-6">
+            Discover restaurants by culinary style from around the world
+          </p>
+          <CuisineTypeSection cuisines={cuisineTypes} onCuisineClick={handleCuisineClick} />
+        </div>
         
-        {/* Restaurants List - Second */}
+        {/* Restaurants List - Last */}
         {viewMode === 'cuisine' && groupedByRegionAndCity ? (
           // Cuisine View: Group by Region → City
           <div className="space-y-16">
@@ -246,7 +246,13 @@ export default function FineDining() {
                               rating={restaurant.rating}
                               reviewCount={restaurant.user_ratings_total}
                               imageUrl={restaurant.photos?.[0]?.photo_reference}
-                              onViewDetails={() => window.open(restaurant.website, '_blank')}
+                              onViewDetails={() => {
+                                if (restaurant.website) {
+                                  window.open(restaurant.website, '_blank');
+                                } else {
+                                  toast.error('Website URL not available');
+                                }
+                              }}
                             />
                           ))}
                         </div>
@@ -281,7 +287,13 @@ export default function FineDining() {
                     rating={restaurant.rating}
                     reviewCount={restaurant.user_ratings_total}
                     imageUrl={restaurant.photos?.[0]?.photo_reference}
-                    onViewDetails={() => window.open(restaurant.website, '_blank')}
+                    onViewDetails={() => {
+                      if (restaurant.website) {
+                        window.open(restaurant.website, '_blank');
+                      } else {
+                        toast.error('Website URL not available');
+                      }
+                    }}
                   />
                 ))}
               </div>
@@ -292,17 +304,6 @@ export default function FineDining() {
             )}
           </div>
         )}
-        
-        {/* Top Destinations Section - Last */}
-        <div className="mt-16">
-          <TopDestinationsSection
-            destinations={globalCulinaryCities.map(city => ({ destination: city.name, packageCount: 0, imageUrl: city.image }))}
-            onDestinationClick={(dest) => {
-              const city = globalCulinaryCities.find(c => c.name === dest);
-              if (city) handleCityClick(city);
-            }}
-          />
-        </div>
       </div>
       <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
         <SheetContent side="right" className="w-full sm:w-[400px] p-0">
