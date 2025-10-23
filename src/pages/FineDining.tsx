@@ -7,29 +7,46 @@ import { CuisineTypeSection } from "@/components/CuisineTypeSection";
 import { FineDiningRestaurantCard } from "@/components/FineDiningRestaurantCard";
 import { FineDiningFilters, RestaurantFilterState } from "@/components/FineDiningFilters";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Skeleton } from "@/components/ui/skeleton";
-import { fetchAmadeusRestaurantsForLocation, fetchAmadeusRestaurantDetails, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
-import { findLocationCoordinates } from "@/lib/locationMapping";
-import { isValidImageUrl } from "@/lib/imageHelpers";
+import { GooglePlacesRestaurant } from "@/lib/amadeusRestaurantHelpers";
+import { 
+  curatedFineDiningByCuisine, 
+  curatedFineDiningByCity, 
+  CuratedRestaurant,
+  regionMapping 
+} from "@/lib/curatedFineDining";
 import { toast } from "sonner";
 
 const globalCulinaryCities = [
   { name: "Paris", country: "France", image: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80" },
   { name: "Tokyo", country: "Japan", image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80" },
-  { name: "New York", country: "USA", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80" },
+  { name: "New York City", country: "USA", image: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80" },
   { name: "London", country: "UK", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80" },
-  { name: "Barcelona", country: "Spain", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80" },
+  { name: "Dubai", country: "UAE", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" },
   { name: "Rome", country: "Italy", image: "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=800&q=80" },
+  { name: "Barcelona", country: "Spain", image: "https://images.unsplash.com/photo-1583422409516-2895a77efded?w=800&q=80" },
   { name: "Singapore", country: "Singapore", image: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80" },
   { name: "Hong Kong", country: "China", image: "https://images.unsplash.com/photo-1536599018102-9f803c140fc1?w=800&q=80" },
   { name: "Bangkok", country: "Thailand", image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=800&q=80" },
-  { name: "Copenhagen", country: "Denmark", image: "https://images.unsplash.com/photo-1513622470522-26c3c8a854bc?w=800&q=80" },
-  { name: "Lima", country: "Peru", image: "https://images.unsplash.com/photo-1531968455001-5c5272a41129?w=800&q=80" },
-  { name: "Mexico City", country: "Mexico", image: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=800&q=80" },
   { name: "Sydney", country: "Australia", image: "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?w=800&q=80" },
-  { name: "Dubai", country: "UAE", image: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" },
-  { name: "Istanbul", country: "Turkey", image: "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=800&q=80" },
-  { name: "Mumbai", country: "India", image: "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?w=800&q=80" },
+  { name: "Buenos Aires", country: "Argentina", image: "https://images.unsplash.com/photo-1589909202802-8f4aadce1849?w=800&q=80" },
+  { name: "Amsterdam", country: "Netherlands", image: "https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=800&q=80" },
+  { name: "Lisbon", country: "Portugal", image: "https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=800&q=80" },
+  { name: "Kyoto", country: "Japan", image: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80" },
+  { name: "Cape Town", country: "South Africa", image: "https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=800&q=80" },
+  { name: "Marrakesh", country: "Morocco", image: "https://images.unsplash.com/photo-1597212618440-806262de4f6b?w=800&q=80" },
+  { name: "Vancouver", country: "Canada", image: "https://images.unsplash.com/photo-1559511260-66a654ae982d?w=800&q=80" },
+  { name: "Rio de Janeiro", country: "Brazil", image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&q=80" },
+  { name: "Cairo", country: "Egypt", image: "https://images.unsplash.com/photo-1572252009286-268acec5ca0a?w=800&q=80" },
+  { name: "Seville", country: "Spain", image: "https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=800&q=80" },
+  { name: "Reykjavik", country: "Iceland", image: "https://images.unsplash.com/photo-1504893524553-b855bce32c67?w=800&q=80" },
+  { name: "Santorini", country: "Greece", image: "https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?w=800&q=80" },
+  { name: "Abu Dhabi", country: "UAE", image: "https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=800&q=80" },
+  { name: "Doha", country: "Qatar", image: "https://images.unsplash.com/photo-1559628376-f3fe5f782a2e?w=800&q=80" },
+  { name: "Maldives", country: "Maldives", image: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80" },
+  { name: "Bhutan", country: "Bhutan", image: "https://images.unsplash.com/photo-1561361513-2d000a50f0dc?w=800&q=80" },
+  { name: "Queenstown", country: "New Zealand", image: "https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=800&q=80" },
+  { name: "Havana", country: "Cuba", image: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?w=800&q=80" },
+  { name: "Luxor", country: "Egypt", image: "https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=800&q=80" },
 ];
 
 const cuisineTypes = [
@@ -47,38 +64,31 @@ const cuisineTypes = [
   { name: "Fusion", imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80" },
 ];
 
-// Helper function to extract the correct cuisine keyword for filtering
-const getCuisineKeyword = (cuisine: string): string => {
-  const keywordMap: Record<string, string> = {
-    "French Fine Dining": "french",
-    "Italian Trattoria": "italian",
-    "Japanese Kaiseki": "japanese",
-    "Chinese Imperial": "chinese",
-    "Indian Fine Dining": "indian",
-    "Thai Royal": "thai",
-    "Mediterranean": "mediterranean",
-    "Middle Eastern": "middle eastern",
-    "Modern American": "american",
-    "Steakhouse": "steak",
-    "Seafood": "seafood",
-    "Fusion": "restaurant",
-  };
-  return keywordMap[cuisine] || cuisine.split(" ")[0].toLowerCase();
-};
+// Transform curated restaurant to GooglePlaces format for compatibility
+const transformToGooglePlacesFormat = (curated: CuratedRestaurant): GooglePlacesRestaurant => ({
+  place_id: curated.id,
+  name: curated.name,
+  vicinity: curated.city,
+  formatted_address: curated.address,
+  rating: curated.rating,
+  user_ratings_total: 0,
+  price_level: curated.priceLevel,
+  geometry: { location: { lat: 0, lng: 0 } },
+  types: ['restaurant', ...curated.cuisine.map(c => c.toLowerCase().replace(/\s+/g, '_'))],
+  photos: [{ photo_reference: curated.imageUrl, height: 800, width: 1200 }],
+  website: curated.websiteUrl,
+  editorial_summary: { overview: curated.description },
+});
 
 export default function FineDining() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [restaurants, setRestaurants] = useState<GooglePlacesRestaurant[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
-  const [lastCuisineQuery, setLastCuisineQuery] = useState<string | null>(null);
-  const [photoMap, setPhotoMap] = useState<Record<string, string>>({});
-  const [backfillQueue, setBackfillQueue] = useState<string[]>([]);
-  const [isBackfilling, setIsBackfilling] = useState(false);
+  const [viewMode, setViewMode] = useState<'city' | 'cuisine'>('city');
+  const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
   
   const [filters, setFilters] = useState<RestaurantFilterState>({
     priceRange: [1, 4],
@@ -235,9 +245,13 @@ export default function FineDining() {
   }, [backfillQueue, isBackfilling, photoMap]);
 
   const handleCityClick = (city: { name: string }) => {
-    setSearchQuery(""); // Clear search to prevent name filtering
+    setSearchQuery("");
+    setSelectedCity(city.name);
+    setViewMode('city');
+    setSelectedCuisine(null);
+    const cityRestaurants = curatedFineDiningByCity[city.name] || [];
+    setRestaurants(cityRestaurants.map(transformToGooglePlacesFormat));
     navigate(`/fine-dining?city=${city.name}`);
-    fetchRestaurants(city.name);
   };
 
   const handleSearch = () => {
@@ -247,41 +261,22 @@ export default function FineDining() {
     }
     
     const cityName = searchQuery.trim();
-    navigate(`/fine-dining?city=${cityName}`);
-    fetchRestaurants(cityName);
-    setSearchQuery(""); // Clear search to prevent name filtering
+    handleCityClick({ name: cityName });
   };
 
   const handleClearSearch = () => {
     setSearchQuery("");
-    navigate("/fine-dining");
-    fetchRestaurants("Paris");
+    handleCityClick({ name: 'Paris' });
   };
 
-  const handleCuisineClick = async (cuisine: string) => {
-    setFilters({ ...filters, cuisineTypes: [cuisine] });
-    toast.info(`Searching for ${cuisine} restaurants...`);
-    await fetchRestaurants(selectedCity, cuisine);
-  };
-
-  // Map cuisine names to Google Places types (ONLY valid types)
-  const getCuisineTypes = (cuisine: string): string[] => {
-    const mapping: Record<string, string[]> = {
-      'French Fine Dining': ['french_restaurant'],
-      'Italian Trattoria': ['italian_restaurant'],
-      'Japanese Kaiseki': ['japanese_restaurant', 'sushi_restaurant', 'ramen_restaurant'],
-      'Chinese Imperial': ['chinese_restaurant'],
-      'Indian Fine Dining': ['indian_restaurant'],
-      'Thai Royal': ['thai_restaurant'],
-      'Mediterranean': ['mediterranean_restaurant', 'greek_restaurant'],
-      'Middle Eastern': ['middle_eastern_restaurant', 'lebanese_restaurant'],
-      'Modern American': ['american_restaurant'],
-      'Steakhouse': ['steak_house', 'american_restaurant'],
-      'Seafood': ['seafood_restaurant'],
-      // Removed invalid types: fusion_restaurant, asian_fusion_restaurant
-      'Fusion': ['restaurant'],
-    };
-    return mapping[cuisine] || [];
+  const handleCuisineClick = (cuisine: string) => {
+    setSearchQuery("");
+    setSelectedCuisine(cuisine);
+    setViewMode('cuisine');
+    setSelectedCity("");
+    const cuisineRestaurants = curatedFineDiningByCuisine[cuisine] || [];
+    setRestaurants(cuisineRestaurants.map(transformToGooglePlacesFormat));
+    toast.info(`Showing ${cuisineRestaurants.length} ${cuisine} restaurants worldwide`);
   };
 
   const handleClearFilters = () => {
@@ -292,42 +287,17 @@ export default function FineDining() {
       dietary: [],
       minRating: 0,
     });
+    setSearchQuery("");
+    setSelectedCuisine(null);
+    setViewMode('city');
+    handleCityClick({ name: 'Paris' });
   };
 
   // Apply all filters: search, cuisine, price, rating
   const filteredRestaurants = restaurants.filter(restaurant => {
-    // Name search - ignore if it matches the selected city
+    // Name search
     const trimmed = searchQuery.trim().toLowerCase();
-    const matchesSearch = trimmed === "" || 
-                         trimmed === selectedCity.toLowerCase() || 
-                         restaurant.name.toLowerCase().includes(trimmed);
-    
-    // Cuisine filter - RELAXED MODE when lastCuisineQuery is set
-    let matchesCuisine = true;
-    if (filters.cuisineTypes.length > 0) {
-      if (lastCuisineQuery) {
-        // RELAXED: Check name, primaryTypeDisplayName, editorialSummary, generativeSummary, types
-        const keyword = lastCuisineQuery.toLowerCase();
-        const primaryType = restaurant.primaryTypeDisplayName?.text?.toLowerCase() || '';
-        const name = restaurant.name.toLowerCase();
-        const editorial = restaurant.editorialSummary?.text?.toLowerCase() || '';
-        const generativeOverview = restaurant.generativeSummary?.overview?.text?.toLowerCase() || '';
-        const generativeDescription = restaurant.generativeSummary?.description?.text?.toLowerCase() || '';
-        
-        matchesCuisine = primaryType.includes(keyword) ||
-                        name.includes(keyword) ||
-                        editorial.includes(keyword) ||
-                        generativeOverview.includes(keyword) ||
-                        generativeDescription.includes(keyword) ||
-                        (restaurant.types?.some(t => t.includes(keyword)) ?? false);
-      } else {
-        // STRICT: Check exact type matches
-        matchesCuisine = filters.cuisineTypes.some(cuisine => {
-          const cuisineTypes = getCuisineTypes(cuisine);
-          return restaurant.types?.some(t => cuisineTypes.includes(t));
-        });
-      }
-    }
+    const matchesSearch = trimmed === "" || restaurant.name.toLowerCase().includes(trimmed);
     
     // Price range filter
     const matchesPrice = !restaurant.price_level || 
@@ -337,12 +307,21 @@ export default function FineDining() {
     // Rating filter
     const matchesRating = !restaurant.rating || restaurant.rating >= filters.minRating;
     
-    const result = matchesSearch && matchesCuisine && matchesPrice && matchesRating;
-    return result;
+    return matchesSearch && matchesPrice && matchesRating;
   });
 
-  // Debug logging after filtering
-  console.debug(`🔍 Filtering: ${restaurants.length} total -> ${filteredRestaurants.length} after filters (mode: ${lastCuisineQuery ? 'targeted/relaxed' : 'strict'})`);
+  // Group restaurants by region and then by city for cuisine view
+  const groupedByRegionAndCity = viewMode === 'cuisine' && selectedCuisine ? 
+    filteredRestaurants.reduce((acc, r) => {
+      const city = r.vicinity || 'Unknown';
+      const region = regionMapping[city] || 'Other';
+      
+      if (!acc[region]) acc[region] = {};
+      if (!acc[region][city]) acc[region][city] = [];
+      acc[region][city].push(r);
+      return acc;
+    }, {} as Record<string, Record<string, GooglePlacesRestaurant[]>>) 
+    : null;
 
   return (
     <div className="min-h-screen bg-background">

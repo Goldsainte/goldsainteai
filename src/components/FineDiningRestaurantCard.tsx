@@ -1,4 +1,4 @@
-import { Star, MapPin, DollarSign } from "lucide-react";
+import { Star, MapPin, DollarSign, ExternalLink } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -120,11 +120,14 @@ export const FineDiningRestaurantCard = ({
 
       <CardFooter className="p-2.5 sm:p-3 md:p-4 pt-0">
         <Button 
-          onClick={onViewDetails} 
-          variant="outline" 
-          className="w-full min-h-[44px] text-xs sm:text-sm border-luxury-gold/30 text-luxury-emerald hover:bg-luxury-gold/10"
+          onClick={(e) => {
+            e.stopPropagation();
+            onViewDetails();
+          }}
+          className="w-full min-h-[44px] text-xs sm:text-sm bg-luxury-gold hover:bg-luxury-gold/90 text-luxury-emerald gap-2"
         >
-          View Details
+          Visit Website
+          <ExternalLink className="h-4 w-4" />
         </Button>
       </CardFooter>
     </Card>
