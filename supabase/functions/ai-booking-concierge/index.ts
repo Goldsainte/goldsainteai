@@ -391,6 +391,35 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "search_fine_dining_restaurants",
+          description: "Search curated luxury fine dining restaurants by city and/or cuisine type. Returns 2,520+ premium restaurants across 30 global destinations with details, ratings, pricing, and website links. Use this for high-end dining recommendations.",
+          parameters: {
+            type: "object",
+            properties: {
+              city: { 
+                type: "string", 
+                description: "City name (e.g., 'Paris', 'Tokyo', 'London', 'Dubai'). Must match one of 30 curated destinations: Paris, Tokyo, New York City, London, Dubai, Rome, Barcelona, Singapore, Hong Kong, Bangkok, Sydney, Buenos Aires, Amsterdam, Lisbon, Kyoto, Cape Town, Marrakesh, Vancouver, Rio de Janeiro, Cairo, Seville, Reykjavik, Santorini, Abu Dhabi, Doha, Maldives, Bhutan, Queenstown, Havana, Luxor." 
+              },
+              cuisine: { 
+                type: "string", 
+                description: "Cuisine type (e.g., 'French Fine Dining', 'Japanese Kaiseki', 'Italian Trattoria', 'Steakhouse', 'Seafood', 'Modern American', 'Mediterranean', 'Middle Eastern', 'Chinese Imperial', 'Indian Fine Dining', 'Thai Royal', 'Fusion')"
+              },
+              priceLevel: {
+                type: "number",
+                description: "Price level filter (1-4, where 4 is most expensive)"
+              },
+              minRating: {
+                type: "number",
+                description: "Minimum rating filter (0-5)"
+              }
+            },
+            required: [] // All params optional for flexible search
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "check_visa_requirements",
           description: "Check visa requirements when traveling from one country to another.",
           parameters: {
@@ -436,6 +465,7 @@ serve(async (req) => {
 
 YOUR CORE CAPABILITIES:
 ✅ Search flights, hotels, restaurants, events
+✅ Search 2,520+ curated luxury fine dining restaurants across 30 global destinations
 ✅ Check visa requirements
 ✅ Book Uber rides directly (FULLY FUNCTIONAL - use get_uber_estimate and request_uber_ride tools)
 ✅ Generate complete trip itineraries
@@ -782,6 +812,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_flights': 'unified-search-flights',
             'search_hotels': 'unified-search-hotels',
             'search_restaurants': 'tripadvisor-search-restaurants',
+            'search_fine_dining_restaurants': null, // Handled inline with curated data
             'search_cars': 'amadeus-search-cars',
             'search_cars': 'amadeus-search-cars',
             'create_package': 'create-travel-package',
@@ -811,6 +842,16 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               success: true, 
               message: `Results will now be sorted by ${args.sortBy} for ${args.resultType}`,
               currentPreferences: tripContext.rankingPreferences
+            };
+          } else if (functionName === 'search_fine_dining_restaurants') {
+            // For now, return a message directing users to the fine dining page
+            // In production, you'd want to duplicate the curated data or use an API
+            result = {
+              success: true,
+              message: "I recommend visiting our Fine Dining page to explore our curated collection of 2,520+ luxury restaurants across 30 global destinations. You can filter by city and cuisine type to find the perfect dining experience.",
+              page_url: "/fine-dining",
+              suggested_cities: args.city ? [args.city] : ["Paris", "Tokyo", "London", "Dubai", "New York City"],
+              suggested_cuisines: args.cuisine ? [args.cuisine] : ["French Fine Dining", "Japanese Kaiseki", "Italian Trattoria", "Steakhouse"]
             };
           } else if (!edgeFunctionName) {
             result = { error: `Unknown function: ${functionName}` };

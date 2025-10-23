@@ -54,7 +54,6 @@ export const TopDestinationsSection = ({ destinations, onDestinationClick }: Top
               <h3 className="text-white font-secondary text-base sm:text-lg md:text-xl font-light drop-shadow-lg">
                 {dest.destination}
               </h3>
-              <p className="text-white/80 text-xs sm:text-sm">{dest.packageCount} Experiences</p>
             </div>
           </Card>
         ))}

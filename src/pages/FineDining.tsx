@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Header } from "@/components/Header";
 import { FineDiningSearchHero } from "@/components/FineDiningSearchHero";
@@ -88,6 +88,8 @@ export default function FineDining() {
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
   const [viewMode, setViewMode] = useState<'city' | 'cuisine'>('city');
   const [selectedCuisine, setSelectedCuisine] = useState<string | null>(null);
+  const [localCuisineFilter, setLocalCuisineFilter] = useState<string | null>(null);
+  const restaurantsRef = useRef<HTMLDivElement>(null);
   
   const [filters, setFilters] = useState<RestaurantFilterState>({
     priceRange: [1, 4],
@@ -116,18 +118,28 @@ export default function FineDining() {
     setSelectedCity(city.name);
     setViewMode('city');
     setSelectedCuisine(null);
+    setLocalCuisineFilter(null);
     const cityRestaurants = curatedFineDiningByCity[city.name] || [];
     setRestaurants(cityRestaurants.map(transformToGooglePlacesFormat));
     navigate(`/fine-dining?city=${city.name}`);
+    
+    setTimeout(() => {
+      restaurantsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleCuisineClick = (cuisine: string) => {
     setSelectedCuisine(cuisine);
     setViewMode('cuisine');
     setSelectedCity("");
+    setLocalCuisineFilter(null);
     const cuisineRestaurants = curatedFineDiningByCuisine[cuisine] || [];
     setRestaurants(cuisineRestaurants.map(transformToGooglePlacesFormat));
     toast.info(`Showing ${cuisineRestaurants.length} ${cuisine} restaurants worldwide`);
+    
+    setTimeout(() => {
+      restaurantsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   const handleClearFilters = () => {
@@ -139,6 +151,7 @@ export default function FineDining() {
       minRating: 0,
     });
     setSelectedCuisine(null);
+    setLocalCuisineFilter(null);
     setViewMode('city');
     handleCityClick({ name: 'Paris' });
   };
@@ -156,9 +169,21 @@ export default function FineDining() {
     return matchesPrice && matchesRating;
   });
 
+  // Get unique cuisines from filtered restaurants
+  const availableCuisines = [...new Set(
+    filteredRestaurants.flatMap(r => r.types?.filter(t => 
+      !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)
+    ) || [])
+  )].sort();
+
+  // Apply local cuisine filter
+  const finalFilteredRestaurants = localCuisineFilter
+    ? filteredRestaurants.filter(r => r.types?.includes(localCuisineFilter))
+    : filteredRestaurants;
+
   // Group restaurants by region and then by city for cuisine view
   const groupedByRegionAndCity = viewMode === 'cuisine' && selectedCuisine ? 
-    filteredRestaurants.reduce((acc, r) => {
+    finalFilteredRestaurants.reduce((acc, r) => {
       const city = r.vicinity || 'Unknown';
       const region = regionMapping[city] || 'Other';
       
@@ -209,13 +234,42 @@ export default function FineDining() {
         {/* Restaurants List - Last */}
         {viewMode === 'cuisine' && groupedByRegionAndCity ? (
           // Cuisine View: Group by Region → City
-          <div className="space-y-16">
+          <div ref={restaurantsRef} className="space-y-16">
+            {/* Cuisine Filter Pills */}
+            {availableCuisines.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                <button
+                  onClick={() => setLocalCuisineFilter(null)}
+                  className={`px-4 py-2 rounded-full text-sm transition-all ${
+                    localCuisineFilter === null
+                      ? 'bg-luxury-gold text-luxury-emerald'
+                      : 'bg-luxury-ivory/20 text-luxury-emerald hover:bg-luxury-gold/20'
+                  }`}
+                >
+                  All Cuisines ({filteredRestaurants.length})
+                </button>
+                {availableCuisines.map(cuisine => (
+                  <button
+                    key={cuisine}
+                    onClick={() => setLocalCuisineFilter(cuisine)}
+                    className={`px-4 py-2 rounded-full text-sm transition-all ${
+                      localCuisineFilter === cuisine
+                        ? 'bg-luxury-gold text-luxury-emerald'
+                        : 'bg-luxury-ivory/20 text-luxury-emerald hover:bg-luxury-gold/20'
+                    }`}
+                  >
+                    {cuisine.replace(/_/g, ' ')} ({filteredRestaurants.filter(r => r.types?.includes(cuisine)).length})
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="mb-8">
               <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
               <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
                 {selectedCuisine} Restaurants Worldwide
               </h2>
-              <p className="text-muted-foreground">{filteredRestaurants.length} restaurants found</p>
+              <p className="text-muted-foreground">{finalFilteredRestaurants.length} restaurants found</p>
             </div>
 
             {Object.entries(groupedByRegionAndCity)
@@ -246,13 +300,12 @@ export default function FineDining() {
                               rating={restaurant.rating}
                               reviewCount={restaurant.user_ratings_total}
                               imageUrl={restaurant.photos?.[0]?.photo_reference}
-                              onViewDetails={() => {
-                                if (restaurant.website) {
-                                  window.open(restaurant.website, '_blank');
-                                } else {
-                                  toast.error('Website URL not available');
-                                }
-                              }}
+                            onViewDetails={() => {
+                              const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
+                                `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
+                              )}`;
+                              window.open(searchUrl, '_blank');
+                            }}
                             />
                           ))}
                         </div>
@@ -263,18 +316,47 @@ export default function FineDining() {
           </div>
         ) : (
           // City View: Single grid
-          <div className="space-y-4">
+          <div ref={restaurantsRef} className="space-y-4">
+            {/* Cuisine Filter Pills */}
+            {availableCuisines.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                <button
+                  onClick={() => setLocalCuisineFilter(null)}
+                  className={`px-4 py-2 rounded-full text-sm transition-all ${
+                    localCuisineFilter === null
+                      ? 'bg-luxury-gold text-luxury-emerald'
+                      : 'bg-luxury-ivory/20 text-luxury-emerald hover:bg-luxury-gold/20'
+                  }`}
+                >
+                  All Cuisines ({filteredRestaurants.length})
+                </button>
+                {availableCuisines.map(cuisine => (
+                  <button
+                    key={cuisine}
+                    onClick={() => setLocalCuisineFilter(cuisine)}
+                    className={`px-4 py-2 rounded-full text-sm transition-all ${
+                      localCuisineFilter === cuisine
+                        ? 'bg-luxury-gold text-luxury-emerald'
+                        : 'bg-luxury-ivory/20 text-luxury-emerald hover:bg-luxury-gold/20'
+                    }`}
+                  >
+                    {cuisine.replace(/_/g, ' ')} ({filteredRestaurants.filter(r => r.types?.includes(cuisine)).length})
+                  </button>
+                ))}
+              </div>
+            )}
+
             <div className="mb-8">
               <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
               <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
                 {selectedCity ? `Restaurants in ${selectedCity}` : 'All Restaurants'}
               </h2>
-              <p className="text-muted-foreground">{filteredRestaurants.length} restaurants found</p>
+              <p className="text-muted-foreground">{finalFilteredRestaurants.length} restaurants found</p>
             </div>
             
-            {filteredRestaurants.length > 0 ? (
+            {finalFilteredRestaurants.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                {filteredRestaurants.map(restaurant => (
+                {finalFilteredRestaurants.map(restaurant => (
                   <FineDiningRestaurantCard
                     key={restaurant.place_id}
                     id={restaurant.place_id}
@@ -288,11 +370,10 @@ export default function FineDining() {
                     reviewCount={restaurant.user_ratings_total}
                     imageUrl={restaurant.photos?.[0]?.photo_reference}
                     onViewDetails={() => {
-                      if (restaurant.website) {
-                        window.open(restaurant.website, '_blank');
-                      } else {
-                        toast.error('Website URL not available');
-                      }
+                      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
+                        `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
+                      )}`;
+                      window.open(searchUrl, '_blank');
                     }}
                   />
                 ))}
