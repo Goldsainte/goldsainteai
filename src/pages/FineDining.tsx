@@ -46,6 +46,25 @@ const cuisineTypes = [
   { name: "Fusion", imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80" },
 ];
 
+// Helper function to extract the correct cuisine keyword for filtering
+const getCuisineKeyword = (cuisine: string): string => {
+  const keywordMap: Record<string, string> = {
+    'French Fine Dining': 'french',
+    'Italian Trattoria': 'italian',
+    'Japanese Kaiseki': 'japanese',
+    'Chinese Imperial': 'chinese',
+    'Indian Fine Dining': 'indian',
+    'Thai Royal': 'thai',
+    'Mediterranean': 'mediterranean',
+    'Middle Eastern': 'middle eastern',
+    'Modern American': 'american',
+    'Steakhouse': 'steak',
+    'Seafood': 'seafood',
+    'Fusion': 'restaurant', // broad match for fusion
+  };
+  return keywordMap[cuisine] || cuisine.split(' ')[0].toLowerCase();
+};
+
 export default function FineDining() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -93,14 +112,15 @@ export default function FineDining() {
   }, [searchParams]);
 
   const fetchRestaurants = async (lat: number, lng: number, cityName: string, cuisine?: string) => {
+    setRestaurants([]); // Clear old results immediately
     setLoading(true);
     setSelectedCity(cityName);
     setCurrentCoords({ lat, lng });
     
     // Set lastCuisineQuery based on whether we're doing a cuisine-targeted search
     if (cuisine) {
-      // Normalize cuisine to simple keyword (e.g., "French Fine Dining" -> "french")
-      const normalized = cuisine.split(' ')[0].toLowerCase();
+      // Use improved cuisine keyword extraction
+      const normalized = getCuisineKeyword(cuisine);
       setLastCuisineQuery(normalized);
       console.debug(`🍽️ Cuisine-targeted search: "${cuisine}" -> normalized: "${normalized}"`);
     } else {
