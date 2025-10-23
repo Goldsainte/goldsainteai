@@ -57,11 +57,14 @@ export const CityAutocomplete = ({
   };
 
 const isCityLike = (r: CitySuggestion) => {
-  const placeTypes = ["city", "town", "village", "municipality", "locality", "hamlet", "suburb"];
+  const placeTypes = [
+    "city", "town", "village", "municipality", "locality", "hamlet", "suburb",
+    "island", "archipelago", "region", "state", "county", "district"
+  ];
   if (r.class === "place" && placeTypes.includes(r.type)) return true;
   // Accept administrative boundaries that represent city-like areas (common in Nominatim responses)
   if (r.class === "boundary") {
-    if (r.type === "administrative" && ["6", "7", "8", "9", "10"].includes(r.extratags?.admin_level || "")) return true;
+    if (r.type === "administrative" && ["4", "5", "6", "7", "8", "9", "10"].includes(r.extratags?.admin_level || "")) return true;
     if (r.addresstype && placeTypes.includes(r.addresstype)) return true;
   }
   return false;
@@ -82,7 +85,7 @@ const isCityLike = (r: CitySuggestion) => {
         controllerRef.current?.abort();
         controllerRef.current = new AbortController();
         setLoading(true);
-        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&extratags=1&dedupe=1&limit=8&q=${encodeURIComponent(
+        const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&extratags=1&dedupe=1&limit=15&q=${encodeURIComponent(
           value.trim()
         )}`;
         const res = await fetch(url, {
@@ -104,7 +107,14 @@ const isCityLike = (r: CitySuggestion) => {
           return acc;
         }, []);
         
-        setResults(uniqueData);
+        // Prioritize travel destinations (islands, cities, regions)
+        const sortedData = uniqueData.sort((a, b) => {
+          const aPriority = ["island", "archipelago", "city", "town"].includes(a.type) ? 1 : 0;
+          const bPriority = ["island", "archipelago", "city", "town"].includes(b.type) ? 1 : 0;
+          return bPriority - aPriority;
+        });
+        
+        setResults(sortedData);
         setOpen(isFocused && uniqueData.length > 0);
       } catch (e) {
         if ((e as any).name !== "AbortError") {
