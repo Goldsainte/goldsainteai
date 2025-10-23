@@ -8,10 +8,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Input validation schema
+// Input validation schema - bookingId is optional for AI chat bookings
 const paymentVerificationSchema = z.object({
   sessionId: z.string().min(1).max(500),
-  bookingId: z.string().uuid(),
+  bookingId: z.string().uuid().optional(),
 });
 
 serve(async (req) => {
@@ -62,34 +62,143 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // Check idempotency - prevent duplicate processing
+    const { data: existingPayment } = await supabaseClient
+      .from("processed_payments")
+      .select("id, metadata")
+      .eq("stripe_session_id", sessionId)
+      .maybeSingle();
+
+    if (existingPayment) {
+      console.log("Payment already processed:", sessionId);
+      
+      // Retrieve the booking that was created
+      const bookingIdFromMetadata = existingPayment.metadata?.booking_data ? null : bookingId;
+      if (bookingIdFromMetadata || existingPayment.metadata?.booking_id) {
+        const { data: existingBooking } = await supabaseClient
+          .from("bookings")
+          .select("*, guests(*)")
+          .eq("id", bookingIdFromMetadata || existingPayment.metadata.booking_id)
+          .single();
+        
+        return new Response(JSON.stringify({ 
+          paymentStatus: 'paid',
+          booking: existingBooking,
+          message: "Payment already processed" 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      
+      return new Response(JSON.stringify({ 
+        paymentStatus: 'paid',
+        message: "Payment already processed" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     // Retrieve the checkout session
     const session = await stripe.checkout.sessions.retrieve(sessionId);
 
     console.log('Session status:', session.payment_status);
 
-    // Update payment status
-    const { error: paymentError } = await supabaseClient
-      .from('payments')
-      .update({
-        status: session.payment_status === 'paid' ? 'succeeded' : 'failed',
-        stripe_payment_intent_id: session.payment_intent as string,
-        payment_method: session.payment_method_types?.[0]
-      })
-      .eq('stripe_session_id', sessionId);
-
-    if (paymentError) {
-      console.error('Payment update error:', paymentError);
+    if (session.payment_status !== "paid") {
+      return new Response(JSON.stringify({ 
+        paymentStatus: session.payment_status,
+        message: "Payment not completed" 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
 
-    // Get booking details and verify ownership
-    const { data: booking } = await supabaseClient
-      .from('bookings')
-      .select('*, guests(*)')
-      .eq('id', bookingId)
-      .single();
+    let booking: any;
+    let actualBookingId: string;
 
-    if (!booking) {
-      throw new Error('Booking not found');
+    // Two paths: Standard UI booking (has bookingId) or AI chat booking (no bookingId)
+    if (bookingId) {
+      // STANDARD UI BOOKING PATH
+      console.log('Processing standard UI booking with bookingId:', bookingId);
+      
+      // Update payment status
+      const { error: paymentError } = await supabaseClient
+        .from('payments')
+        .update({
+          status: 'succeeded',
+          stripe_payment_intent_id: session.payment_intent as string,
+          payment_method: session.payment_method_types?.[0]
+        })
+        .eq('stripe_session_id', sessionId);
+
+      if (paymentError) {
+        console.error('Payment update error:', paymentError);
+      }
+
+      // Get booking details
+      const { data: existingBooking } = await supabaseClient
+        .from('bookings')
+        .select('*, guests(*)')
+        .eq('id', bookingId)
+        .single();
+
+      if (!existingBooking) {
+        throw new Error('Booking not found');
+      }
+
+      booking = existingBooking;
+      actualBookingId = bookingId;
+    } else {
+      // AI CHAT BOOKING PATH - Create booking from session metadata
+      console.log('Processing AI chat booking without bookingId');
+      
+      const bookingData = JSON.parse(session.metadata.booking_data);
+      const userId = session.metadata.user_id !== "guest" ? session.metadata.user_id : null;
+
+      // Record payment as processed for idempotency
+      await supabaseClient
+        .from("processed_payments")
+        .insert({
+          payment_intent_id: session.payment_intent as string || sessionId,
+          stripe_session_id: sessionId,
+          user_id: userId,
+          amount_cents: session.amount_total,
+          currency: session.currency,
+          payment_type: "booking",
+          metadata: { booking_data: bookingData }
+        });
+
+      // Create booking record
+      const { data: newBooking, error: bookingError } = await supabaseClient
+        .from("bookings")
+        .insert({
+          user_id: userId,
+          booking_type: bookingData.bookingType,
+          booking_data: bookingData,
+          total_price: session.amount_total / 100,
+          currency: session.currency.toUpperCase(),
+          status: "confirmed",
+          booking_reference: `GS-${Date.now()}`,
+        })
+        .select('*, guests(*)')
+        .single();
+
+      if (bookingError) {
+        console.error("Error creating booking:", bookingError);
+        throw bookingError;
+      }
+
+      console.log("Booking created:", newBooking.id);
+      booking = newBooking;
+      actualBookingId = newBooking.id;
+
+      // Update processed_payments with booking_id
+      await supabaseClient
+        .from("processed_payments")
+        .update({ metadata: { booking_id: actualBookingId, booking_data: bookingData } })
+        .eq("stripe_session_id", sessionId);
     }
 
     // SECURITY: Verify user owns this booking (guest bookings have null user_id)
@@ -103,8 +212,8 @@ serve(async (req) => {
       });
     }
 
-    // Update booking status and process external booking if payment succeeded
-    if (session.payment_status === 'paid') {
+    // Process external booking APIs (Amadeus, Expedia)
+    if (booking.status !== 'confirmed') { // Only process if not already confirmed
       // For flight bookings, create actual Amadeus booking
       if (booking.booking_type === 'flight' && booking.booking_data?.flight_offer) {
         try {
@@ -121,7 +230,7 @@ serve(async (req) => {
               selectedSeats: flightData.selected_seats || [],
               selectedBaggage: flightData.selected_baggage || [],
               additionalFees: flightData.fees || { baggage: 0, seats: 0 },
-              bookingId: bookingId // Pass booking ID to update instead of create
+              bookingId: actualBookingId // Pass booking ID to update instead of create
             }
           });
           
@@ -137,7 +246,7 @@ serve(async (req) => {
                   amadeus_error: amadeusBookingResult.error
                 }
               })
-              .eq('id', bookingId);
+              .eq('id', actualBookingId);
           } else {
             console.log('Amadeus booking successful');
             // Status will be updated by amadeus-book-flight function
@@ -149,7 +258,7 @@ serve(async (req) => {
             .update({
               status: 'cancelled'
             })
-            .eq('id', bookingId);
+              .eq('id', actualBookingId);
         }
       }
       // For hotel bookings with Expedia data, create the actual Expedia booking
@@ -200,7 +309,7 @@ serve(async (req) => {
                   stripe_fee: stripeFee,
                   net_profit: netProfit
                 })
-                .eq('id', bookingId);
+                  .eq('id', actualBookingId);
             }
 
             if (expediaBookingResult.error) {
@@ -215,7 +324,7 @@ serve(async (req) => {
                     expedia_error: expediaBookingResult.error
                   }
                 })
-                .eq('id', bookingId);
+                  .eq('id', actualBookingId);
             } else {
               console.log('Expedia booking successful:', expediaBookingResult.data);
             }
@@ -227,7 +336,7 @@ serve(async (req) => {
             .update({
               status: 'cancelled'
             })
-            .eq('id', bookingId);
+              .eq('id', actualBookingId);
         }
       } else {
         // For non-Expedia bookings, just mark as confirmed
@@ -236,7 +345,7 @@ serve(async (req) => {
           .update({
             status: 'confirmed'
           })
-          .eq('id', bookingId);
+          .eq('id', actualBookingId);
 
         if (bookingError) {
           console.error('Booking update error:', bookingError);
@@ -248,7 +357,7 @@ serve(async (req) => {
     const { data: finalBooking } = await supabaseClient
       .from('bookings')
       .select('*, guests(*)')
-      .eq('id', bookingId)
+      .eq('id', actualBookingId)
       .single();
 
     // SECURITY: Filter sensitive guest data from response

@@ -276,9 +276,6 @@ verify_jwt = false
 [functions.notify-creators-new-opportunity]
 verify_jwt = false
 
-[functions.verify-booking-payment]
-verify_jwt = true
-
 [functions.verify-transportation-payment]
 verify_jwt = true
 
