@@ -159,10 +159,32 @@ serve(async (req) => {
     const searchData = await searchResponse.json();
     const places = searchData.places || [];
 
-    console.log(`Found ${places.length} places from Google`);
+    console.log(`Found ${places.length} places from Google Text Search`);
+
+    // Fetch Place Details for each place to ensure we get websiteUri
+    const detailedPlaces = [];
+    for (const place of places) {
+      try {
+        const detailsResponse = await fetch(`https://places.googleapis.com/v1/${place.id}`, {
+          headers: {
+            'X-Goog-Api-Key': apiKey,
+            'X-Goog-FieldMask': 'displayName,formattedAddress,rating,userRatingCount,priceLevel,websiteUri,types,businessStatus,photos'
+          }
+        });
+
+        if (detailsResponse.ok) {
+          const detailedPlace = await detailsResponse.json();
+          detailedPlaces.push(detailedPlace);
+        }
+      } catch (error) {
+        console.error(`Failed to fetch details for place ${place.id}:`, error);
+      }
+    }
+
+    console.log(`Fetched details for ${detailedPlaces.length} places`);
 
     // Filter and transform results
-    const restaurants = places
+    const restaurants = detailedPlaces
       .filter((place: any) => {
         // Must be operational
         if (place.businessStatus !== 'OPERATIONAL') return false;
@@ -173,7 +195,7 @@ serve(async (req) => {
         // Must have minimum rating
         if (!place.rating || place.rating < minRating) return false;
         
-        // Must have a website
+        // Must have a website (http or https)
         if (!place.websiteUri || !place.websiteUri.startsWith('http')) return false;
         
         return true;
@@ -182,7 +204,7 @@ serve(async (req) => {
         const reservationPlatform = detectReservationPlatform(place.websiteUri);
         
         return {
-          id: place.id,
+          id: place.name, // Use the full resource name as ID
           name: place.displayName?.text || 'Unknown',
           location: place.formattedAddress || '',
           rating: place.rating || 0,
@@ -193,10 +215,12 @@ serve(async (req) => {
             : 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0',
           website: place.websiteUri,
           reservationPlatform: reservationPlatform,
-          googlePlacesId: place.id,
+          googlePlacesId: place.name,
           userRatingCount: place.userRatingCount || 0
         };
       });
+
+    console.log(`Filtered to ${restaurants.length} valid restaurants with websites`);
 
     console.log(`Filtered to ${restaurants.length} valid restaurants`);
 

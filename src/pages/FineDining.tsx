@@ -94,9 +94,9 @@ export default function FineDining() {
 
       if (error) throw error;
 
-      // Strict filter: only restaurants with valid website
+      // Strict filter: only restaurants with valid website (http or https)
       const validRestaurants = (data?.restaurants || []).filter(
-        (r: any) => r.website && r.website.startsWith('https://')
+        (r: any) => r.website && r.website.startsWith('http')
       );
 
       // Transform to GooglePlacesRestaurant format
@@ -327,7 +327,7 @@ export default function FineDining() {
         <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
           <FineDiningFilters
             filters={filters}
-            onChange={setFilters}
+            onFiltersChange={setFilters}
             onClear={handleClearFilters}
             availableCuisines={availableCuisines}
           />

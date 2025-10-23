@@ -1,5 +1,11 @@
 project_id = "iwdevxltjuedijrcdejs"
 
+[functions.get-promoted-vendors]
+verify_jwt = false
+
+[functions.restaurants-search-google]
+verify_jwt = false
+
 [functions.worldwide-restaurants]
 verify_jwt = false
 
