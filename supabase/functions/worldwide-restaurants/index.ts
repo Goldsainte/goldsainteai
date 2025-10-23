@@ -116,14 +116,11 @@ serve(async (req) => {
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': 'worldwide-restaurants.p.rapidapi.com',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({ 
+      body: new URLSearchParams({ 
         q: location,
-        language: "en_US",
-        units: "km",
-        currency: "USD",
-        limit: 20
+        language: 'en_US'
       }),
     });
 
@@ -163,12 +160,12 @@ serve(async (req) => {
       headers: {
         'X-RapidAPI-Key': rapidApiKey,
         'X-RapidAPI-Host': 'worldwide-restaurants.p.rapidapi.com',
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify({
+      body: new URLSearchParams({
         location_id: locationId,
-        limit: 50,
-        language: "en_US",
+        limit: '50',
+        language: 'en_US',
         currency: 'USD',
       }),
     });
