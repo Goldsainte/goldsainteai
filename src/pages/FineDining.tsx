@@ -328,8 +328,7 @@ export default function FineDining() {
           <FineDiningFilters
             filters={filters}
             onFiltersChange={setFilters}
-            onClear={handleClearFilters}
-            availableCuisines={availableCuisines}
+            onClearAll={handleClearFilters}
           />
         </SheetContent>
       </Sheet>
