@@ -34,14 +34,16 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
           {tours.map((tour) => (
             <Card
               key={tour.id}
-              className="w-[240px] sm:w-[280px] inline-block overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group active:scale-95"
+              className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95"
               onClick={() => navigate(`/cocurated-package/${tour.id}`)}
             >
-              <div className="relative h-32 sm:h-36 md:h-40 overflow-hidden">
+              <div className="relative aspect-[4/3]">
                 <img
                   src={tour.coverImage || `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80`}
                   alt={tour.packageName}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                  decoding="async"
                 />
                 {tour.likelyToSellOut && (
                   <Badge className="absolute top-2 sm:top-3 left-2 sm:left-3 bg-destructive text-destructive-foreground text-xs">
@@ -54,37 +56,27 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
               </div>
               
               <div className="p-3 sm:p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground flex-shrink-0" />
-                  <span className="text-xs sm:text-sm text-muted-foreground truncate">{tour.destination}</span>
-                </div>
-                
-                <h3 className="font-bold text-base sm:text-lg mb-2 line-clamp-2 min-h-[2.5rem] sm:min-h-[3rem]">{tour.packageName}</h3>
+                <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{tour.packageName}</h3>
+                <p className="text-muted-foreground text-xs sm:text-sm mb-2 truncate flex items-center gap-1">
+                  <MapPin className="h-3 w-3 flex-shrink-0" />
+                  {tour.destination}
+                </p>
                 
                 {tour.rating && (
-                  <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                    <div className="flex items-center gap-1">
-                      <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400" />
-                      <span className="font-semibold text-sm sm:text-base">{tour.rating.toFixed(1)}</span>
-                    </div>
+                  <div className="flex items-center gap-1 mb-2 text-xs sm:text-sm text-muted-foreground">
+                    <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                    <span className="font-semibold">{tour.rating.toFixed(1)}</span>
                     {tour.totalReviews && (
-                      <span className="text-xs sm:text-sm text-muted-foreground truncate">
-                        ({tour.totalReviews.toLocaleString()} reviews)
-                      </span>
+                      <span className="truncate">({tour.totalReviews.toLocaleString()})</span>
                     )}
                   </div>
                 )}
                 
-                {tour.agencyName && (
-                  <p className="text-xs sm:text-sm text-muted-foreground mb-2 sm:mb-3 truncate">{tour.agencyName}</p>
-                )}
-                
-                <div className="flex items-baseline gap-1 flex-wrap">
-                  <span className="text-xs sm:text-sm text-muted-foreground">from</span>
-                  <span className="text-xl sm:text-2xl font-bold">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs text-muted-foreground">from</span>
+                  <span className="text-lg sm:text-xl font-bold">
                     {tour.currency} {tour.retailPrice.toLocaleString()}
                   </span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">per person</span>
                 </div>
               </div>
             </Card>
