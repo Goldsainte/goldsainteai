@@ -51,17 +51,16 @@ const globalCulinaryCities = [
 
 const cuisineTypes = [
   { name: "French Fine Dining", imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80" },
-  { name: "Italian Trattoria", imageUrl: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80" },
-  { name: "Japanese Kaiseki", imageUrl: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80" },
-  { name: "Chinese Imperial", imageUrl: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&q=80" },
-  { name: "Indian Fine Dining", imageUrl: "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=800&q=80" },
-  { name: "Thai Royal", imageUrl: "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800&q=80" },
-  { name: "Mediterranean", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80" },
-  { name: "Middle Eastern", imageUrl: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&q=80" },
-  { name: "Modern American", imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80" },
-  { name: "Steakhouse", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=800&q=80" },
-  { name: "Seafood", imageUrl: "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=800&q=80" },
-  { name: "Fusion", imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80" },
+  { name: "Italian Fine Dining", imageUrl: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80" },
+  { name: "Japanese Fine Dining", imageUrl: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&q=80" },
+  { name: "Modern American Fine Dining", imageUrl: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80" },
+  { name: "Steakhouse Fine Dining", imageUrl: "https://images.unsplash.com/photo-1558030006-450675393462?w=800&q=80" },
+  { name: "Seafood Fine Dining", imageUrl: "https://images.unsplash.com/photo-1615141982883-c7ad0e69fd62?w=800&q=80" },
+  { name: "Mediterranean Fine Dining", imageUrl: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&q=80" },
+  { name: "Asian Fusion Fine Dining", imageUrl: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?w=800&q=80" },
+  { name: "Middle Eastern Fine Dining", imageUrl: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=800&q=80" },
+  { name: "Latin American Fine Dining", imageUrl: "https://images.unsplash.com/photo-1604909052743-94e838986d24?w=800&q=80" },
+  { name: "European Contemporary Fine Dining", imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80" },
 ];
 
 // Transform curated restaurant to GooglePlaces format for compatibility
@@ -301,10 +300,14 @@ export default function FineDining() {
                               reviewCount={restaurant.user_ratings_total}
                               imageUrl={restaurant.photos?.[0]?.photo_reference}
                             onViewDetails={() => {
-                              const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
-                                `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
-                              )}`;
-                              window.open(searchUrl, '_blank');
+                              if (restaurant.website) {
+                                window.open(restaurant.website, '_blank', 'noopener,noreferrer');
+                              } else {
+                                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
+                                  `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
+                                )}`;
+                                window.open(searchUrl, '_blank', 'noopener,noreferrer');
+                              }
                             }}
                             />
                           ))}
@@ -370,10 +373,14 @@ export default function FineDining() {
                     reviewCount={restaurant.user_ratings_total}
                     imageUrl={restaurant.photos?.[0]?.photo_reference}
                     onViewDetails={() => {
-                      const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
-                        `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
-                      )}`;
-                      window.open(searchUrl, '_blank');
+                      if (restaurant.website) {
+                        window.open(restaurant.website, '_blank', 'noopener,noreferrer');
+                      } else {
+                        const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(
+                          `${restaurant.name} ${restaurant.vicinity || ''} restaurant`
+                        )}`;
+                        window.open(searchUrl, '_blank', 'noopener,noreferrer');
+                      }
                     }}
                   />
                 ))}

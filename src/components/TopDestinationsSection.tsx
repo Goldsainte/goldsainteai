@@ -32,8 +32,6 @@ export const TopDestinationsSection = ({ destinations, onDestinationClick }: Top
 
   return (
     <div className="mb-12 md:mb-16">
-      <div className="w-20 h-1 bg-luxury-gold mb-6" />
-      <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald mb-6">Top Destinations</h2>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
         {destinations.map((dest) => (
           <Card

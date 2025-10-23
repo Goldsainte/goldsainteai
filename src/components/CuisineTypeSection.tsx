@@ -15,10 +15,6 @@ export const CuisineTypeSection = ({ cuisines, onCuisineClick }: CuisineTypeSect
 
   return (
     <div className="mb-12 sm:mb-14 md:mb-16">
-      <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4 sm:mb-6" />
-      <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-4 sm:mb-6">
-        Explore by Cuisine
-      </h2>
       <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {cuisines.map((cuisine) => (
           <Card
