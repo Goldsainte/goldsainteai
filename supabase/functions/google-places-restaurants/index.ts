@@ -115,7 +115,42 @@ Deno.serve(async (req) => {
     const url = 'https://places.googleapis.com/v1/places:searchNearby';
     
     const requestBody = {
-      includedPrimaryTypes: ['restaurant'],  // More strict - only primary restaurants
+      includedPrimaryTypes: [
+        'restaurant',
+        'french_restaurant',
+        'italian_restaurant',
+        'japanese_restaurant',
+        'chinese_restaurant',
+        'indian_restaurant',
+        'thai_restaurant',
+        'mediterranean_restaurant',
+        'middle_eastern_restaurant',
+        'american_restaurant',
+        'steak_house',
+        'seafood_restaurant',
+        'sushi_restaurant',
+        'ramen_restaurant',
+        'greek_restaurant',
+        'lebanese_restaurant',
+        'fusion_restaurant',
+        'asian_fusion_restaurant',
+        'vegan_restaurant',
+        'vegetarian_restaurant',
+        'mexican_restaurant',
+        'spanish_restaurant',
+        'vietnamese_restaurant',
+        'korean_restaurant',
+        'turkish_restaurant',
+        'brazilian_restaurant',
+        'fine_dining_restaurant',
+        'fast_food_restaurant',
+        'sandwich_shop',
+        'pizza_restaurant',
+        'hamburger_restaurant',
+        'brunch_restaurant',
+        'bar',
+        'cafe'
+      ],
       locationRestriction: {
         circle: {
           center: {
@@ -125,7 +160,7 @@ Deno.serve(async (req) => {
           radius: radius,
         },
       },
-      maxResultCount: 20,
+      maxResultCount: 100,
       rankPreference: 'DISTANCE',
     };
     
