@@ -126,7 +126,7 @@ export const fetchAmadeusRestaurantsForLocation = async (
     if (restaurants.length === 0 && radius < 10) {
       console.debug(`No results with ${radius}km radius, trying 10km...`);
       const result = await supabase.functions.invoke('google-places-restaurants', {
-        body: { latitude, longitude, radius: 10000 },
+        body: { latitude, longitude, radius: 10000, type: 'restaurant', cuisine },
       });
       restaurants = result.data?.data || [];
       console.debug(`📍 Got ${restaurants.length} restaurants at 10km`);
@@ -136,7 +136,7 @@ export const fetchAmadeusRestaurantsForLocation = async (
     if (restaurants.length === 0 && radius < 20) {
       console.debug(`No results with 10km radius, trying 20km...`);
       const result = await supabase.functions.invoke('google-places-restaurants', {
-        body: { latitude, longitude, radius: 20000 },
+        body: { latitude, longitude, radius: 20000, type: 'restaurant', cuisine },
       });
       restaurants = result.data?.data || [];
       console.debug(`📍 Got ${restaurants.length} restaurants at 20km`);
