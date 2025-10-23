@@ -77,7 +77,7 @@ const transformToGooglePlacesFormat = (curated: CuratedRestaurant): GooglePlaces
   types: ['restaurant', ...curated.cuisine.map(c => c.toLowerCase().replace(/\s+/g, '_'))],
   photos: [{ photo_reference: curated.imageUrl, height: 800, width: 1200 }],
   website: curated.websiteUrl,
-  editorial_summary: { overview: curated.description },
+  editorialSummary: { text: curated.description || '' },
 });
 
 export default function FineDining() {
@@ -98,151 +98,20 @@ export default function FineDining() {
     minRating: 0,
   });
 
-  // Load cached photos from localStorage on mount
-  useEffect(() => {
-    const cached = localStorage.getItem('restaurant_photos_v1');
-    if (cached) {
-      try {
-        const { data, timestamp } = JSON.parse(cached);
-        const now = Date.now();
-        const sevenDays = 7 * 24 * 60 * 60 * 1000;
-        if (now - timestamp < sevenDays) {
-          setPhotoMap(data);
-          console.debug('📸 Loaded cached photos:', Object.keys(data).length);
-        } else {
-          localStorage.removeItem('restaurant_photos_v1');
-          console.debug('🗑️ Cleared expired photo cache');
-        }
-      } catch (e) {
-        console.debug('⚠️ Failed to load photo cache:', e);
-      }
-    }
-  }, []);
-
-  // Save photoMap to localStorage whenever it changes
-  useEffect(() => {
-    if (Object.keys(photoMap).length > 0) {
-      localStorage.setItem('restaurant_photos_v1', JSON.stringify({
-        data: photoMap,
-        timestamp: Date.now()
-      }));
-    }
-  }, [photoMap]);
-
   // Handle URL params on mount and changes
   useEffect(() => {
     const cityParam = searchParams.get('city');
-    const cityName = cityParam || "Paris";
-    fetchRestaurants(cityName);
-  }, [searchParams]);
-
-  // Fetch restaurants based on city name
-  const fetchRestaurants = async (
-    cityName: string,
-    cuisine?: string
-  ) => {
-    setRestaurants([]);
-    setLoading(true);
-    setError(null);
-    setSelectedCity(cityName);
-    
-    if (cuisine) {
-      const normalized = getCuisineKeyword(cuisine);
-      setLastCuisineQuery(normalized);
-      console.debug(`🍽️ Cuisine search: "${cuisine}" -> "${normalized}"`);
+    if (cityParam) {
+      const cityRestaurants = curatedFineDiningByCity[cityParam] || [];
+      setSelectedCity(cityParam);
+      setViewMode('city');
+      setSelectedCuisine(null);
+      setRestaurants(cityRestaurants.map(transformToGooglePlacesFormat));
     } else {
-      setLastCuisineQuery(null);
-      console.debug(`🌍 General city search: ${cityName}`);
+      // Default to Paris
+      handleCityClick({ name: 'Paris' });
     }
-    
-    try {
-      const results = await fetchAmadeusRestaurantsForLocation(
-        cityName,
-        cuisine
-      );
-      
-      setRestaurants(results);
-      
-      // Photo backfill logic
-      const missingPhotos = results
-        .filter(r => !r.photos?.[0] && !photoMap[r.place_id])
-        .map(r => r.place_id);
-      
-      if (missingPhotos.length > 0) {
-        console.debug(`📸 Queuing ${missingPhotos.length} restaurants for photo backfill`);
-        setBackfillQueue(prev => [...new Set([...prev, ...missingPhotos])]);
-      }
-      
-      if (results.length === 0 && !error) {
-        toast.error(`No ${cuisine || ''} restaurants found in ${cityName}`);
-      }
-    } catch (err) {
-      console.error('Error fetching restaurants:', err);
-      setError('Unable to load restaurants. Please try again later.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Process photo backfill queue
-  useEffect(() => {
-    if (backfillQueue.length === 0 || isBackfilling) return;
-
-    const processQueue = async () => {
-      setIsBackfilling(true);
-      console.debug(`🔄 Processing photo backfill queue (${backfillQueue.length} items)`);
-      
-      // Process in batches of 3 for concurrency control
-      const batchSize = 3;
-      const queue = [...backfillQueue];
-      
-      for (let i = 0; i < queue.length; i += batchSize) {
-        const batch = queue.slice(i, i + batchSize);
-        
-        const results = await Promise.allSettled(
-          batch.map(async (placeId) => {
-            try {
-              const details = await fetchAmadeusRestaurantDetails(placeId);
-              if (details?.photos?.[0]?.photo_reference) {
-                const photoUrl = getPhotoUrl(details.photos[0].photo_reference, 800);
-                if (isValidImageUrl(photoUrl)) {
-                  console.debug(`✅ Backfilled photo for ${details.name}`);
-                  return { placeId, photoUrl };
-                }
-              }
-              return null;
-            } catch (error) {
-              console.debug(`❌ Failed to backfill photo for ${placeId}:`, error);
-              return null;
-            }
-          })
-        );
-        
-        // Update photoMap with successful results
-        const newPhotos: Record<string, string> = {};
-        results.forEach((result) => {
-          if (result.status === 'fulfilled' && result.value) {
-            newPhotos[result.value.placeId] = result.value.photoUrl;
-          }
-        });
-        
-        if (Object.keys(newPhotos).length > 0) {
-          setPhotoMap(prev => ({ ...prev, ...newPhotos }));
-        }
-        
-        // Small delay between batches to avoid rate limits
-        if (i + batchSize < queue.length) {
-          await new Promise(resolve => setTimeout(resolve, 500));
-        }
-      }
-      
-      console.debug(`✅ Photo backfill complete`);
-      setBackfillQueue([]);
-      setIsBackfilling(false);
-    };
-
-    processQueue();
-  }, [backfillQueue, isBackfilling, photoMap]);
+  }, [searchParams]);
 
   const handleCityClick = (city: { name: string }) => {
     setSearchQuery("");
@@ -338,59 +207,88 @@ export default function FineDining() {
         <CuisineTypeSection cuisines={cuisineTypes} onCuisineClick={handleCuisineClick} />
         
         {/* Restaurants List - Second */}
-        <div className="mb-8">
-          <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
-          <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
-            Restaurants in {selectedCity}
-          </h2>
-          <p className="text-muted-foreground">{loading ? "Loading..." : `${filteredRestaurants.length} restaurants found`}</p>
-        </div>
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="space-y-4"><Skeleton className="h-48 w-full" /><Skeleton className="h-4 w-3/4" /></div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="text-center py-12">
-            <p className="text-red-500 text-lg mb-4">{error}</p>
-          </div>
-        ) : filteredRestaurants.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {filteredRestaurants.map((restaurant) => {
-              const rawUrl = restaurant.photos?.[0]?.photo_reference 
-                ? getPhotoUrl(restaurant.photos[0].photo_reference, 800)
-                : "";
-              // Try base URL first, then check photoMap for backfilled photos
-              const photoUrl = isValidImageUrl(rawUrl) ? rawUrl : (photoMap[restaurant.place_id] || undefined);
-              
-              const cuisineTypes = restaurant.types?.filter(t => 
-                !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)
-              ) || [];
+        {viewMode === 'cuisine' && groupedByRegionAndCity ? (
+          // Cuisine View: Group by Region → City
+          <div className="space-y-16">
+            <div className="mb-8">
+              <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
+              <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
+                {selectedCuisine} Restaurants Worldwide
+              </h2>
+              <p className="text-muted-foreground">{filteredRestaurants.length} restaurants found</p>
+            </div>
 
-              return (
-                <FineDiningRestaurantCard
-                  key={restaurant.place_id}
-                  id={restaurant.place_id}
-                  name={restaurant.name}
-                  city={restaurant.vicinity}
-                  cuisine={cuisineTypes}
-                  priceLevel={restaurant.price_level || 3}
-                  rating={restaurant.rating}
-                  reviewCount={restaurant.user_ratings_total}
-                  imageUrl={photoUrl}
-                  onViewDetails={() => navigate(`/restaurant/${restaurant.place_id}`)}
-                />
-              );
-            })}
+            {Object.entries(groupedByRegionAndCity)
+              .sort((a, b) => a[0].localeCompare(b[0]))
+              .map(([region, cities]) => (
+                <div key={region} className="space-y-8">
+                  <h2 className="text-3xl font-secondary text-luxury-gold border-b border-luxury-gold/30 pb-2">
+                    {region}
+                  </h2>
+                  {Object.entries(cities)
+                    .sort((a, b) => b[1].length - a[1].length)
+                    .map(([city, cityRestaurants]) => (
+                      <div key={city} className="space-y-4">
+                        <h3 className="text-2xl font-secondary text-luxury-emerald">
+                          {city} ({cityRestaurants.length})
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                          {cityRestaurants.map(restaurant => (
+                            <FineDiningRestaurantCard
+                              key={restaurant.place_id}
+                              id={restaurant.place_id}
+                              name={restaurant.name}
+                              city={restaurant.vicinity}
+                              cuisine={restaurant.types?.filter(t => 
+                                !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)
+                              ) || []}
+                              priceLevel={restaurant.price_level || 3}
+                              rating={restaurant.rating}
+                              reviewCount={restaurant.user_ratings_total}
+                              imageUrl={restaurant.photos?.[0]?.photo_reference}
+                              onViewDetails={() => window.open(restaurant.website, '_blank')}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              ))}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg mb-4">No restaurants found</p>
-            {lastCuisineQuery && filters.cuisineTypes.length > 0 && (
-              <p className="text-sm text-muted-foreground">
-                Try clearing cuisine filters or searching a different location
-              </p>
+          // City View: Single grid
+          <div className="space-y-4">
+            <div className="mb-8">
+              <div className="w-16 sm:w-20 h-1 bg-luxury-gold mb-4" />
+              <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl text-luxury-emerald font-light mb-2">
+                {selectedCity ? `Restaurants in ${selectedCity}` : 'All Restaurants'}
+              </h2>
+              <p className="text-muted-foreground">{filteredRestaurants.length} restaurants found</p>
+            </div>
+            
+            {filteredRestaurants.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                {filteredRestaurants.map(restaurant => (
+                  <FineDiningRestaurantCard
+                    key={restaurant.place_id}
+                    id={restaurant.place_id}
+                    name={restaurant.name}
+                    city={restaurant.vicinity}
+                    cuisine={restaurant.types?.filter(t => 
+                      !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)
+                    ) || []}
+                    priceLevel={restaurant.price_level || 3}
+                    rating={restaurant.rating}
+                    reviewCount={restaurant.user_ratings_total}
+                    imageUrl={restaurant.photos?.[0]?.photo_reference}
+                    onViewDetails={() => window.open(restaurant.website, '_blank')}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground text-lg">No restaurants found matching your criteria.</p>
+              </div>
             )}
           </div>
         )}
