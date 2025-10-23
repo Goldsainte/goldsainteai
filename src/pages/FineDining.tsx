@@ -54,6 +54,7 @@ export default function FineDining() {
   const [loading, setLoading] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedCity, setSelectedCity] = useState<string>("Paris");
+  const [currentCoords, setCurrentCoords] = useState<{ lat: number; lng: number } | null>(null);
   
   const [filters, setFilters] = useState<RestaurantFilterState>({
     priceRange: [1, 4],
@@ -66,21 +67,37 @@ export default function FineDining() {
   useEffect(() => {
     const cityParam = searchParams.get('city');
     if (cityParam) {
-      const city = globalCulinaryCities.find(c => c.name.toLowerCase() === cityParam.toLowerCase());
-      if (city) {
-        fetchRestaurants(city.latitude, city.longitude, city.name);
+      // Try location mapping first (supports all cities in locationMapping.ts)
+      const location = findLocationCoordinates(cityParam);
+      if (location) {
+        setCurrentCoords({ lat: location.latitude, lng: location.longitude });
+        fetchRestaurants(location.latitude, location.longitude, location.name);
+      } else {
+        // Fallback: check if it's in our culinary cities list
+        const city = globalCulinaryCities.find(c => c.name.toLowerCase() === cityParam.toLowerCase());
+        if (city) {
+          setCurrentCoords({ lat: city.latitude, lng: city.longitude });
+          fetchRestaurants(city.latitude, city.longitude, city.name);
+        } else {
+          toast.error(`Destination "${cityParam}" not found. Try: Paris, Atlanta, Tokyo, etc.`);
+          // Default to Paris
+          setCurrentCoords({ lat: 48.8566, lng: 2.3522 });
+          fetchRestaurants(48.8566, 2.3522, "Paris");
+        }
       }
     } else {
+      setCurrentCoords({ lat: 48.8566, lng: 2.3522 });
       fetchRestaurants(48.8566, 2.3522, "Paris");
     }
   }, [searchParams]);
 
-  const fetchRestaurants = async (lat: number, lng: number, cityName: string) => {
+  const fetchRestaurants = async (lat: number, lng: number, cityName: string, cuisine?: string) => {
     setLoading(true);
     setSelectedCity(cityName);
+    setCurrentCoords({ lat, lng });
     
-    console.debug(`🌍 Fetching restaurants for ${cityName} at (${lat}, ${lng})`);
-    const results = await fetchAmadeusRestaurantsForLocation(lat, lng, 10);
+    console.debug(`🌍 Fetching restaurants for ${cityName} at (${lat}, ${lng})${cuisine ? ` - ${cuisine}` : ''}`);
+    const results = await fetchAmadeusRestaurantsForLocation(lat, lng, 10, undefined, undefined, cuisine);
     
     setRestaurants(results);
     setLoading(false);
@@ -88,7 +105,7 @@ export default function FineDining() {
     // Only show toast if no results after retries
     if (results.length === 0) {
       console.debug(`❌ No restaurants found for ${cityName} even after expanding radius`);
-      toast.error(`No restaurants found in ${cityName}`);
+      toast.error(`No ${cuisine || ''} restaurants found in ${cityName}`);
     } else {
       console.debug(`✅ Loaded ${results.length} restaurants for ${cityName}`);
     }
@@ -125,9 +142,16 @@ export default function FineDining() {
     }
   };
 
-  const handleCuisineClick = (cuisine: string) => {
+  const handleCuisineClick = async (cuisine: string) => {
     setFilters({ ...filters, cuisineTypes: [cuisine] });
-    toast.success(`Filtering by ${cuisine}`);
+    
+    // If we have current coordinates, do a cuisine-targeted fetch
+    if (currentCoords) {
+      toast.info(`Searching for ${cuisine} restaurants...`);
+      await fetchRestaurants(currentCoords.lat, currentCoords.lng, selectedCity, cuisine);
+    } else {
+      toast.success(`Filtering by ${cuisine}`);
+    }
   };
 
   // Map cuisine names to Google Places types

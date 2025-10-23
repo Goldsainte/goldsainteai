@@ -102,69 +102,90 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { latitude, longitude, radius = 5000, type = 'restaurant' } = await req.json();
+    const { latitude, longitude, radius = 5000, type = 'restaurant', cuisine } = await req.json();
     
-    console.log(`🔍 Searching restaurants near (${latitude}, ${longitude}) with radius ${radius}m`);
+    console.log(`🔍 Searching restaurants near (${latitude}, ${longitude}) with radius ${radius}m${cuisine ? ` for ${cuisine} cuisine` : ''}`);
     
     const apiKey = Deno.env.get('GOOGLE_PLACES_API_KEY');
     if (!apiKey) {
       throw new Error('GOOGLE_PLACES_API_KEY not configured');
     }
     
-    // New Google Places API (v1) - searchNearby endpoint
-    const url = 'https://places.googleapis.com/v1/places:searchNearby';
+    // If cuisine is specified, use text search instead of nearby search
+    let url: string;
+    let requestBody: any;
     
-    const requestBody = {
-      includedPrimaryTypes: [
-        'restaurant',
-        'french_restaurant',
-        'italian_restaurant',
-        'japanese_restaurant',
-        'chinese_restaurant',
-        'indian_restaurant',
-        'thai_restaurant',
-        'mediterranean_restaurant',
-        'middle_eastern_restaurant',
-        'american_restaurant',
-        'steak_house',
-        'seafood_restaurant',
-        'sushi_restaurant',
-        'ramen_restaurant',
-        'greek_restaurant',
-        'lebanese_restaurant',
-        'fusion_restaurant',
-        'asian_fusion_restaurant',
-        'vegan_restaurant',
-        'vegetarian_restaurant',
-        'mexican_restaurant',
-        'spanish_restaurant',
-        'vietnamese_restaurant',
-        'korean_restaurant',
-        'turkish_restaurant',
-        'brazilian_restaurant',
-        'fine_dining_restaurant',
-        'fast_food_restaurant',
-        'sandwich_shop',
-        'pizza_restaurant',
-        'hamburger_restaurant',
-        'brunch_restaurant',
-        'bar',
-        'cafe'
-      ],
-      locationRestriction: {
-        circle: {
-          center: {
-            latitude,
-            longitude,
+    if (cuisine) {
+      // Use searchText endpoint for cuisine-specific searches
+      url = 'https://places.googleapis.com/v1/places:searchText';
+      requestBody = {
+        textQuery: `${cuisine} restaurant`,
+        locationBias: {
+          circle: {
+            center: {
+              latitude,
+              longitude,
+            },
+            radius: radius,
           },
-          radius: radius,
         },
-      },
-      maxResultCount: 100,
-      rankPreference: 'DISTANCE',
-    };
-    
-    console.log('Calling new Google Places API (v1)');
+        maxResultCount: 50,
+      };
+      console.log(`Calling text search for "${cuisine} restaurant"`);
+    } else {
+      // Use searchNearby endpoint for general searches
+      url = 'https://places.googleapis.com/v1/places:searchNearby';
+      requestBody = {
+        includedPrimaryTypes: [
+          'restaurant',
+          'french_restaurant',
+          'italian_restaurant',
+          'japanese_restaurant',
+          'chinese_restaurant',
+          'indian_restaurant',
+          'thai_restaurant',
+          'mediterranean_restaurant',
+          'middle_eastern_restaurant',
+          'american_restaurant',
+          'steak_house',
+          'seafood_restaurant',
+          'sushi_restaurant',
+          'ramen_restaurant',
+          'greek_restaurant',
+          'lebanese_restaurant',
+          'fusion_restaurant',
+          'asian_fusion_restaurant',
+          'vegan_restaurant',
+          'vegetarian_restaurant',
+          'mexican_restaurant',
+          'spanish_restaurant',
+          'vietnamese_restaurant',
+          'korean_restaurant',
+          'turkish_restaurant',
+          'brazilian_restaurant',
+          'fine_dining_restaurant',
+          'fast_food_restaurant',
+          'sandwich_shop',
+          'pizza_restaurant',
+          'hamburger_restaurant',
+          'brunch_restaurant',
+          'bar',
+          'cafe'
+        ],
+        locationRestriction: {
+          circle: {
+            center: {
+              latitude,
+              longitude,
+            },
+            radius: radius,
+          },
+        },
+        maxResultCount: 100,
+        rankPreference: 'DISTANCE',
+      };
+      console.log('Calling nearby search for all restaurants');
+    }
     
     const response = await fetch(url, {
       method: 'POST',

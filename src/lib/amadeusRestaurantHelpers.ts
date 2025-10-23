@@ -96,7 +96,8 @@ export const fetchAmadeusRestaurantsForLocation = async (
   longitude: number,
   radius: number = 10,
   categories?: string[],
-  keyword?: string
+  keyword?: string,
+  cuisine?: string
 ): Promise<GooglePlacesRestaurant[]> => {
   try {
     // Convert km to meters for Google Places API
@@ -110,6 +111,7 @@ export const fetchAmadeusRestaurantsForLocation = async (
         longitude,
         radius: radiusInMeters,
         type: 'restaurant',
+        cuisine,
       },
     });
 
