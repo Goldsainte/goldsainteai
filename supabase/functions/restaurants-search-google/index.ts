@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -112,18 +111,10 @@ serve(async (req) => {
       });
     }
 
-    // Get API key from Lovable Cloud secrets
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    const { data: secretData } = await supabase.rpc('get_secret', {
-      secret_name: 'GOOGLE_MAPS_API_KEY'
-    });
-
-    const apiKey = secretData;
+    // Get API key from environment (Lovable Cloud secrets)
+    const apiKey = Deno.env.get('GOOGLE_MAPS_API_KEY');
     if (!apiKey) {
-      throw new Error('GOOGLE_MAPS_API_KEY not configured');
+      throw new Error('GOOGLE_MAPS_API_KEY not configured. Please add it in settings.');
     }
 
     // Build search query
