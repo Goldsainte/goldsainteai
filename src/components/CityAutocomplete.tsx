@@ -12,6 +12,8 @@ interface CitySuggestion {
   lon: string;
   class: string;
   type: string;
+  name?: string;
+  importance?: number;
   addresstype?: string;
   address?: {
     city?: string;
@@ -50,13 +52,21 @@ export const CityAutocomplete = ({
   // Build a user-friendly label
   const getLabel = (s: CitySuggestion) => {
     const cityField = s.address?.city || s.address?.town || s.address?.village || s.address?.municipality || s.address?.locality;
-    const city = cityField || (s.display_name ? s.display_name.split(",")[0] : "");
+    
+    // For islands/archipelagos, use the name directly
+    const city = (s.type === "island" || s.type === "archipelago") ? s.name :
+                 (cityField || (s.display_name ? s.display_name.split(",")[0] : ""));
+    
     const state = s.address?.state;
     const country = s.address?.country;
     return [city, state, country].filter(Boolean).join(", ");
   };
 
 const isCityLike = (r: CitySuggestion) => {
+  // Exclude specific POI classes that are too granular for city search
+  const excludedClasses = ["natural", "tourism", "amenity", "landuse", "building"];
+  if (excludedClasses.includes(r.class)) return false;
+  
   const placeTypes = [
     "city", "town", "village", "municipality", "locality", "hamlet", "suburb",
     "island", "archipelago", "region", "state", "county", "district"
@@ -109,9 +119,16 @@ const isCityLike = (r: CitySuggestion) => {
         
         // Prioritize travel destinations (islands, cities, regions)
         const sortedData = uniqueData.sort((a, b) => {
-          const aPriority = ["island", "archipelago", "city", "town"].includes(a.type) ? 1 : 0;
-          const bPriority = ["island", "archipelago", "city", "town"].includes(b.type) ? 1 : 0;
-          return bPriority - aPriority;
+          // Primary: Prioritize islands and major cities
+          const aPriority = ["island", "archipelago", "city", "town"].includes(a.type) ? 2 : 
+                            ["region", "state"].includes(a.type) ? 1 : 0;
+          const bPriority = ["island", "archipelago", "city", "town"].includes(b.type) ? 2 : 
+                            ["region", "state"].includes(b.type) ? 1 : 0;
+          
+          if (aPriority !== bPriority) return bPriority - aPriority;
+          
+          // Secondary: For same priority, prefer higher importance score
+          return (b.importance || 0) - (a.importance || 0);
         });
         
         setResults(sortedData);
