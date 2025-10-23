@@ -27,9 +27,9 @@ export const HotelScrollSection = ({ title, hotels }: HotelScrollSectionProps) =
             {hotels.map((hotel) => (
               <Card
                 key={hotel.id}
-                className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95"
+                className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] h-[340px] sm:h-[360px] md:h-[380px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95 flex flex-col"
               >
-                <div className="relative aspect-[4/3]">
+                <div className="relative h-[200px] sm:h-[210px] md:h-[220px] flex-shrink-0">
                   <img
                     src={hotel.image}
                     alt={hotel.name}
@@ -41,7 +41,7 @@ export const HotelScrollSection = ({ title, hotels }: HotelScrollSectionProps) =
                     {hotel.price}
                   </div>
                 </div>
-                <div className="p-3 sm:p-4">
+                <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
                   <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{hotel.name}</h3>
                   <p className="text-muted-foreground text-xs sm:text-sm truncate">{hotel.location}</p>
                 </div>

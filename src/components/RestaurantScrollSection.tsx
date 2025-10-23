@@ -43,9 +43,9 @@ export const RestaurantScrollSection = ({ title, restaurants }: RestaurantScroll
               <Card
                 key={restaurant.id}
                 onClick={() => handleRestaurantClick(restaurant)}
-                className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95"
+                className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] h-[340px] sm:h-[360px] md:h-[380px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95 flex flex-col"
               >
-                <div className="relative aspect-[4/3]">
+                <div className="relative h-[200px] sm:h-[210px] md:h-[220px] flex-shrink-0">
                   <img
                     src={restaurant.image}
                     alt={`${restaurant.name} - ${restaurant.cuisine} restaurant in ${restaurant.location}`}
@@ -57,10 +57,12 @@ export const RestaurantScrollSection = ({ title, restaurants }: RestaurantScroll
                     {restaurant.priceLevel}
                   </div>
                 </div>
-                <div className="p-3 sm:p-4">
-                  <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{restaurant.name}</h3>
-                  <p className="text-muted-foreground text-xs sm:text-sm mb-1 truncate">{restaurant.location}</p>
-                  <p className="text-muted-foreground text-xs mb-2 truncate">{restaurant.cuisine}</p>
+                <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{restaurant.name}</h3>
+                    <p className="text-muted-foreground text-xs sm:text-sm mb-1 truncate">{restaurant.location}</p>
+                    <p className="text-muted-foreground text-xs mb-2 truncate">{restaurant.cuisine}</p>
+                  </div>
                   <div className="flex items-center gap-1">
                     <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-current text-accent" />
                     <span className="text-xs sm:text-sm font-medium">{restaurant.rating}</span>

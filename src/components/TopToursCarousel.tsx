@@ -34,10 +34,10 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
           {tours.map((tour) => (
             <Card
               key={tour.id}
-              className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95"
+              className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] h-[340px] sm:h-[360px] md:h-[380px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95 flex flex-col"
               onClick={() => navigate(`/cocurated-package/${tour.id}`)}
             >
-              <div className="relative aspect-[4/3]">
+              <div className="relative h-[200px] sm:h-[210px] md:h-[220px] flex-shrink-0">
                 <img
                   src={tour.coverImage || `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80`}
                   alt={tour.packageName}
@@ -55,22 +55,24 @@ export const TopToursCarousel = ({ tours }: TopToursCarouselProps) => {
                 </button>
               </div>
               
-              <div className="p-3 sm:p-4">
-                <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{tour.packageName}</h3>
-                <p className="text-muted-foreground text-xs sm:text-sm mb-2 truncate flex items-center gap-1">
-                  <MapPin className="h-3 w-3 flex-shrink-0" />
-                  {tour.destination}
-                </p>
-                
-                {tour.rating && (
-                  <div className="flex items-center gap-1 mb-2 text-xs sm:text-sm text-muted-foreground">
-                    <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
-                    <span className="font-semibold">{tour.rating.toFixed(1)}</span>
-                    {tour.totalReviews && (
-                      <span className="truncate">({tour.totalReviews.toLocaleString()})</span>
-                    )}
-                  </div>
-                )}
+              <div className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-semibold text-base sm:text-lg mb-1 truncate">{tour.packageName}</h3>
+                  <p className="text-muted-foreground text-xs sm:text-sm mb-2 truncate flex items-center gap-1">
+                    <MapPin className="h-3 w-3 flex-shrink-0" />
+                    {tour.destination}
+                  </p>
+                  
+                  {tour.rating && (
+                    <div className="flex items-center gap-1 mb-2 text-xs sm:text-sm text-muted-foreground">
+                      <Star className="h-3 w-3 sm:h-4 sm:w-4 fill-yellow-400 text-yellow-400 flex-shrink-0" />
+                      <span className="font-semibold">{tour.rating.toFixed(1)}</span>
+                      {tour.totalReviews && (
+                        <span className="truncate">({tour.totalReviews.toLocaleString()})</span>
+                      )}
+                    </div>
+                  )}
+                </div>
                 
                 <div className="flex items-baseline gap-1">
                   <span className="text-xs text-muted-foreground">from</span>
