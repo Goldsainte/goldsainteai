@@ -13,6 +13,7 @@ const bookingSchema = z.object({
   bookingData: z.record(z.unknown()),
   totalPrice: z.number().positive().max(1000000),
   currency: z.string().length(3),
+  source: z.enum(['homepage_featured', 'ai_search', 'manual_search', 'ai_concierge']).optional(),
   guestInfo: z.object({
     email: z.string().email().max(255),
     firstName: z.string().trim().min(1).max(100),
@@ -44,9 +45,9 @@ serve(async (req) => {
       });
     }
     
-    const { bookingType, bookingData, totalPrice, currency, guestInfo } = validationResult.data;
+    const { bookingType, bookingData, totalPrice, currency, source, guestInfo } = validationResult.data;
     
-    console.log('Creating booking:', { bookingType, totalPrice, currency });
+    console.log('Creating booking:', { bookingType, totalPrice, currency, source });
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -99,7 +100,10 @@ serve(async (req) => {
         status: 'pending',
         total_price: totalPrice,
         currency: currency,
-        booking_data: bookingData,
+        booking_data: {
+          ...bookingData,
+          source: source || 'manual_search' // Track booking source for commission analytics
+        },
         guest_id: guest.id,
         user_id: userId // Link to authenticated user if available
       })

@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 export interface Hotel {
   id: number;
@@ -16,6 +17,20 @@ interface HotelScrollSectionProps {
 }
 
 export const HotelScrollSection = ({ title, hotels }: HotelScrollSectionProps) => {
+  const navigate = useNavigate();
+
+  const handleHotelClick = (hotel: Hotel) => {
+    // Navigate to search results to trigger Amadeus search for this location
+    const params = new URLSearchParams({
+      type: 'hotels',
+      location: hotel.location,
+      checkIn: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 1 week from now
+      checkOut: new Date(Date.now() + 9 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 2 nights
+      guests: '2'
+    });
+    navigate(`/search-results?${params.toString()}`);
+  };
+
   return (
     <section className="py-12 sm:py-14 md:py-16 lg:py-20">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
@@ -27,6 +42,7 @@ export const HotelScrollSection = ({ title, hotels }: HotelScrollSectionProps) =
             {hotels.map((hotel) => (
               <Card
                 key={hotel.id}
+                onClick={() => handleHotelClick(hotel)}
                 className="flex-shrink-0 w-[280px] sm:w-[300px] md:w-[320px] h-[340px] sm:h-[360px] md:h-[380px] rounded-lg overflow-hidden cursor-pointer group hover:shadow-xl transition-all duration-300 active:scale-95 flex flex-col"
               >
                 <div className="relative h-[200px] sm:h-[210px] md:h-[220px] flex-shrink-0">
