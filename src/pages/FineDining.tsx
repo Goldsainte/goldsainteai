@@ -10,6 +10,7 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchAmadeusRestaurantsForLocation, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
 import { findLocationCoordinates } from "@/lib/locationMapping";
+import { isValidImageUrl } from "@/lib/imageHelpers";
 import { toast } from "sonner";
 
 const globalCulinaryCities = [
@@ -296,9 +297,10 @@ export default function FineDining() {
         ) : filteredRestaurants.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {filteredRestaurants.map((restaurant) => {
-              const photoUrl = restaurant.photos?.[0]?.photo_reference 
+              const rawUrl = restaurant.photos?.[0]?.photo_reference 
                 ? getPhotoUrl(restaurant.photos[0].photo_reference, 800)
-                : undefined;
+                : "";
+              const photoUrl = isValidImageUrl(rawUrl) ? rawUrl : undefined;
               
               const cuisineTypes = restaurant.types?.filter(t => 
                 !['restaurant', 'food', 'point_of_interest', 'establishment'].includes(t)

@@ -2,6 +2,7 @@ import { Star, MapPin, DollarSign } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 interface FineDiningRestaurantCardProps {
   id: string;
@@ -39,13 +40,18 @@ export const FineDiningRestaurantCard = ({
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
       {/* Image */}
       <div className="relative h-40 sm:h-48 md:h-56 overflow-hidden">
-        <img
-          src={imageUrl || "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80"}
-          alt={name}
-          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-          loading="lazy"
-          decoding="async"
-        />
+        {imageUrl ? (
+          <OptimizedImage
+            src={imageUrl}
+            alt={name}
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            aspectRatio="auto"
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-xs text-muted-foreground">No photo available</span>
+          </div>
+        )}
         {rank && (
           <Badge className="absolute top-3 right-3 bg-luxury-gold text-luxury-emerald text-[10px] sm:text-xs">
             Rank #{rank}
