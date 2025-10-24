@@ -108,11 +108,11 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
     }
   };
 
-  const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
+  const handleAvailabilityConfirmed = ({ checkIn, checkOut, adults }: { checkIn: string; checkOut: string; adults: number }) => {
     const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
     
     const bookingData = {
-      ...hotelOffer,
+      available: true,
       hotel: property,
       hotelName: title,
       hotelAddress: property.location || property.address,
@@ -123,8 +123,8 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
       guests: adults,
       rooms: 1,
       nights,
-      totalPrice: parseFloat(hotelOffer.offers?.[0]?.price?.total || hotelOffer.price?.total || displayPrice || 0),
-      currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || currency,
+      totalPrice: displayPrice,
+      currency: currency,
     };
     
     navigate(`/hotel-booking?data=${encodeData(bookingData)}`);

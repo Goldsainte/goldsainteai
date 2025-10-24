@@ -25,7 +25,7 @@ const bookingFormSchema = z.object({
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Invalid email address"),
   country: z.string().min(1, "Country is required"),
-  region: z.string().min(1, "Region/State is required"),
+  region: z.string().optional(),
   phoneCountryCode: z.string().min(1, "Country code is required"),
   phone: z.string().min(1, "Phone number is required"),
   paperlessConfirmation: z.boolean().default(false),
@@ -175,6 +175,7 @@ export const BookingModal = ({
         timestamp: new Date().toISOString()
       };
       localStorage.setItem('booking_draft', JSON.stringify(draft));
+      localStorage.setItem('reopen_booking_modal', 'true');
       
       toast({
         title: "Sign in required",
@@ -197,6 +198,8 @@ export const BookingModal = ({
           guestInfo: values
         }
       });
+
+      console.log('create-booking response:', { bookingResult, bookingError });
 
       if (bookingError) throw bookingError;
 
@@ -224,6 +227,8 @@ export const BookingModal = ({
         }
       });
 
+      console.log('create-checkout response:', { checkoutResult, checkoutError });
+
       if (checkoutError) {
         if (checkoutError.message?.includes('429') || checkoutError.message?.includes('rate limit')) {
           throw new Error('Too many payment requests. Please wait a moment and try again.');
@@ -232,6 +237,16 @@ export const BookingModal = ({
           throw new Error('Service temporarily unavailable. Please contact support.');
         }
         throw checkoutError;
+      }
+
+      if (!checkoutResult?.url) {
+        toast({
+          title: "Payment Error",
+          description: "Payment couldn't be started. Please try again.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
       }
 
       if (checkoutResult.url) {

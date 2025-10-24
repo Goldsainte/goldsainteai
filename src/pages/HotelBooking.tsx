@@ -22,6 +22,23 @@ export default function HotelBooking() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
 
+  useEffect(() => {
+    const shouldReopen = localStorage.getItem('reopen_booking_modal');
+    if (shouldReopen === 'true') {
+      localStorage.removeItem('reopen_booking_modal');
+      setShowBookingModal(true);
+    }
+  }, []);
+
+  // Auto-open modal if returning from auth
+  useEffect(() => {
+    const shouldReopen = localStorage.getItem('reopen_booking_modal');
+    if (shouldReopen === 'true') {
+      localStorage.removeItem('reopen_booking_modal');
+      setShowBookingModal(true);
+    }
+  }, []);
+
   // Parse booking data from URL params using safe base64 decoding
   const bookingDataParam = searchParams.get('data');
   const bookingData = bookingDataParam ? decodeData(bookingDataParam) : null;

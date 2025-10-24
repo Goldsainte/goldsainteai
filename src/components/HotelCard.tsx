@@ -28,15 +28,15 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
   const currencyInfo = getCurrencyFromLocation(hotelCity);
   const currencySymbol = currencyInfo.symbol;
 
-  const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
+  const handleAvailabilityConfirmed = ({ checkIn, checkOut, adults }: { checkIn: string; checkOut: string; adults: number }) => {
     const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
     
     // Use base price if available (for booking backend), otherwise use displayed price
-    const displayPrice = parseFloat(hotelOffer.offers?.[0]?.price?.total || hotelOffer.price?.total || 0);
-    const basePrice = parseFloat(hotelOffer.offers?.[0]?.price?.base || hotelOffer.basePrice || displayPrice / 1.15);
+    const displayPrice = parseFloat(offer?.price?.total || 0);
+    const basePrice = parseFloat(offer?.price?.base || displayPrice / 1.15);
     
     const bookingData = {
-      ...hotelOffer,
+      available: true,
       hotel: hotelData,
       hotelName: hotelData.name,
       hotelAddress: hotelData.address?.lines?.[0] || hotelData.address,
@@ -49,7 +49,7 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
       nights,
       totalPrice: displayPrice, // Customer-facing price with markup
       basePrice: basePrice, // Original price for backend
-      currency: hotelOffer.offers?.[0]?.price?.currency || hotelOffer.price?.currency || 'USD',
+      currency: offer?.price?.currency || 'USD',
     };
     
     navigate(`/hotel-booking?data=${encodeData(bookingData)}`);

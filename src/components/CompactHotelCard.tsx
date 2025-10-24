@@ -51,11 +51,12 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const reviews = Number(property.property?.reviewCount ?? property.num_reviews ?? 0);
   
   const getCleanPrice = () => {
-    if (property.price) return property.price;
-    if (property.estimated_price) return property.estimated_price;
+    // Priority to priceBreakdown (most reliable from tool results)
     if (property.priceBreakdown?.grossPrice?.value) {
       return property.priceBreakdown.grossPrice.value;
     }
+    if (property.price) return property.price;
+    if (property.estimated_price) return property.estimated_price;
     const label = property.accessibilityLabel || "";
     const priceMatch = label.match(/(\d+) USD/);
     return priceMatch ? parseInt(priceMatch[1]) : 0;
@@ -79,14 +80,14 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     return symbols[curr] || curr + ' ';
   };
 
-  const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
-    // Use provided dates OR fall back to searchDates from AI context OR defaults
+  const handleAvailabilityConfirmed = ({ checkIn, checkOut, adults }: { checkIn: string; checkOut: string; adults: number }) => {
+    // Use provided dates OR fall back to searchDates from AI context
     const finalCheckIn = checkIn || searchDates?.checkIn || format(addDays(new Date(), 1), 'yyyy-MM-dd');
     const finalCheckOut = checkOut || searchDates?.checkOut || format(addDays(new Date(), 3), 'yyyy-MM-dd');
     const nights = Math.ceil((new Date(finalCheckOut).getTime() - new Date(finalCheckIn).getTime()) / (1000 * 60 * 60 * 24));
     
     const bookingData = {
-      ...hotelOffer,
+      available: true,
       hotel: property,
       hotelName: title,
       hotelAddress: location,
@@ -97,8 +98,9 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
       guests: adults,
       rooms: 1,
       nights,
-      totalPrice: parseFloat(hotelOffer.offers?.[0]?.price?.total || displayPrice || 0),
-      currency: hotelOffer.offers?.[0]?.price?.currency || currency,
+      totalPrice: displayPrice,
+      perNightPrice: displayPrice,
+      currency: currency,
     };
     
     navigate(`/hotel-booking?data=${encodeData(bookingData)}`);
