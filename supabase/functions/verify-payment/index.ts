@@ -258,7 +258,7 @@ serve(async (req) => {
             .update({
               status: 'cancelled'
             })
-              .eq('id', actualBookingId);
+            .eq('id', actualBookingId);
         }
       }
       // For hotel bookings with Expedia data, create the actual Expedia booking
@@ -309,7 +309,7 @@ serve(async (req) => {
                   stripe_fee: stripeFee,
                   net_profit: netProfit
                 })
-                  .eq('id', actualBookingId);
+                .eq('id', actualBookingId);
             }
 
             if (expediaBookingResult.error) {
@@ -324,7 +324,7 @@ serve(async (req) => {
                     expedia_error: expediaBookingResult.error
                   }
                 })
-                  .eq('id', actualBookingId);
+                .eq('id', actualBookingId);
             } else {
               console.log('Expedia booking successful:', expediaBookingResult.data);
             }
@@ -336,7 +336,7 @@ serve(async (req) => {
             .update({
               status: 'cancelled'
             })
-              .eq('id', actualBookingId);
+            .eq('id', actualBookingId);
         }
       } else {
         // For non-Expedia bookings, just mark as confirmed
