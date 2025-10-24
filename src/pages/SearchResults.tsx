@@ -6,6 +6,7 @@ import { CompactHotelCard } from "@/components/CompactHotelCard";
 import { CompactFlightCard } from "@/components/CompactFlightCard";
 import { CompactRestaurantCard } from "@/components/CompactRestaurantCard";
 import { CarCard } from "@/components/CarCard";
+import { TransferCard } from "@/components/TransferCard";
 import { UberProductCard } from "@/components/UberProductCard";
 import { UberBookingModal } from "@/components/UberBookingModal";
 import { ResultsMapView } from "@/components/ResultsMapView";
@@ -196,62 +197,45 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
       try {
         if (searchType === "hotels") {
-          let hotelResults: any[] = [];
-          try {
-            const { data, error } = await invokeEdgeFunction('unified-search-hotels', {
-              body: { 
-                location, 
-                checkIn, 
-                checkOut, 
-                guests: parseInt(guests),
-                sortBy: rankingSort 
-              },
-              timeout: 30000,
-              showToastOnError: false, // Handle errors with fallback
-            });
-            if (error && error.type === 'RATE_LIMIT') {
+          const { getHotelBedsDestinationCode } = await import('@/lib/hotelbedsHelpers');
+          const destinationCode = getHotelBedsDestinationCode(location);
+          
+          console.log('[HotelBeds] Searching hotels:', { location, destinationCode, checkIn, checkOut, guests });
+          
+          const { data, error } = await invokeEdgeFunction('hotelbeds-search-hotels', {
+            body: {
+              destination: destinationCode,
+              checkIn,
+              checkOut,
+              adults: parseInt(guests),
+              children: 0,
+              rooms: 1
+            },
+            timeout: 30000,
+            showToastOnError: true,
+          });
+
+          if (error) {
+            if (error.type === 'RATE_LIMIT') {
               setError('Too many requests. Please wait a moment and try again.');
               return;
             }
-            if (error && error.type === 'PAYMENT_REQUIRED') {
+            if (error.type === 'PAYMENT_REQUIRED') {
               setError('Service temporarily unavailable. Please try again later.');
               return;
             }
-            hotelResults = data?.results || [];
-          } catch (e) {
-            console.warn('Unified hotel search failed, attempting fallbacks:', e);
-            // Fallback chain just in case
-            try {
-              const getCityCode = (loc: string): string => {
-                const cityMap: { [key: string]: string } = {
-                  'charlotte': 'CLT', 'new york': 'NYC', 'los angeles': 'LAX', 'miami': 'MIA',
-                  'chicago': 'CHI', 'san francisco': 'SFO', 'las vegas': 'LAS', 'seattle': 'SEA',
-                  'boston': 'BOS', 'washington': 'WAS', 'atlanta': 'ATL', 'dallas': 'DFW',
-                  'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO', 'dubai': 'DXB'
-                };
-                const cityName = loc.split(',')[0].trim().toLowerCase();
-                return cityMap[cityName] || 'NYC';
-              };
-              const cityCode = getCityCode(location);
-              const { data } = await supabase.functions.invoke('amadeus-search-hotels', {
-                body: { cityCode, checkInDate: checkIn, checkOutDate: checkOut, adults: parseInt(guests), cityName: location }
-              });
-              hotelResults = data?.results || [];
-            } catch {}
-            
-            if (!hotelResults || hotelResults.length === 0) {
-              const { data: expediaData } = await supabase.functions.invoke('expedia-search-hotels', {
-                body: { location, checkIn, checkOut, guests: parseInt(guests), rooms: 1 }
-              }).catch(() => ({ data: { hotels: [] } } as any));
-              hotelResults = expediaData?.hotels || [];
-            }
+            throw error;
           }
 
-          // Clean out test/dummy hotels and empty names
-          const cleanedHotels = (hotelResults || []).filter((h: any) => {
-            const raw = (h?.property?.name || h?.name || h?.title || '').toString().trim();
-            if (!raw) return false;
-            const lower = raw.toLowerCase();
+          const hotelResults = data?.hotels || [];
+          
+          console.log(`[HotelBeds] Found ${hotelResults.length} hotels`);
+
+          // Clean out test/dummy hotels
+          const cleanedHotels = hotelResults.filter((h: any) => {
+            const name = (h?.name || '').toString().trim();
+            if (!name) return false;
+            const lower = name.toLowerCase();
             return !(
               lower.includes('test') ||
               lower.includes('do not use') ||
@@ -353,9 +337,11 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           setResults(restaurantResults);
           setFilteredResults(restaurantResults);
         } else if (searchType === "cars") {
-          // Check if we have full rental params or just location
+          // Cars section now includes both car rentals and transfers (via HotelBeds)
+          const { getDestinationFromAirportCode } = await import('@/lib/hotelbedsHelpers');
+          
           if (pickup && pickupDateCar && returnDateCar) {
-            // Full car rental search
+            // Car rental search via Amadeus
             console.log('[Car Search] Calling amadeus with:', { 
               pickupCode, 
               dropoffCode, 
@@ -386,9 +372,36 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
               
               const carResults = data.results || [];
               
+              // Also fetch transfers from HotelBeds in parallel
+              console.log('[Transfers] Fetching HotelBeds transfers');
+              const fromCode = getDestinationFromAirportCode(pickupCode);
+              const toCode = getDestinationFromAirportCode(dropoffCode || pickupCode);
+              
+              const { data: transferData } = await invokeEdgeFunction('hotelbeds-search-transfers', {
+                body: {
+                  from: fromCode,
+                  to: toCode,
+                  date: pickupDateCar,
+                  time: '10:00',
+                  passengers: parseInt(guests) || 2,
+                  vehicleType: 'SEDAN'
+                },
+                timeout: 25000,
+                showToastOnError: false,
+              }).catch(() => ({ data: { transfers: [] } }));
+              
+              const transfers = transferData?.transfers || [];
+              console.log(`[Transfers] Found ${transfers.length} transfer options`);
+              
+              // Combine car rentals and transfers, marking each type
+              const combinedResults = [
+                ...carResults.map((c: any) => ({ ...c, resultType: 'rental' })),
+                ...transfers.map((t: any) => ({ ...t, resultType: 'transfer' }))
+              ];
+              
               // Show helpful message if no results
-              if (carResults.length === 0) {
-                const helpMessage = data.meta?.message || 'No car rentals found. Try different dates or major airports like LAX, JFK, LHR, CDG, or DXB.';
+              if (combinedResults.length === 0) {
+                const helpMessage = 'No car rentals or transfers found. Try different dates or major airports like LAX, JFK, LHR, CDG, or DXB.';
                 console.log('[Car Search] No results:', helpMessage);
                 toast({
                   title: "No Cars Available",
@@ -398,8 +411,8 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
                 setError(helpMessage);
               }
               
-              setResults(carResults);
-              setFilteredResults(carResults);
+              setResults(combinedResults);
+              setFilteredResults(combinedResults);
             } catch (err) {
               console.error('Car search failed:', err);
               setResults([]);
@@ -426,11 +439,14 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             setFilteredResults([]);
           }
         } else if (searchType === "packages") {
-          // Fetch hotels via unified function, plus flights and restaurants in parallel
+          // Fetch hotels via HotelBeds, plus flights and restaurants in parallel
+          const { getHotelBedsDestinationCode } = await import('@/lib/hotelbedsHelpers');
+          const destinationCode = getHotelBedsDestinationCode(location);
+          
           const [hotelsRes, flightsRes, restaurantsRes] = await Promise.all([
-            supabase.functions.invoke('unified-search-hotels', {
-              body: { location, checkIn, checkOut, guests: parseInt(guests) }
-            }).catch(() => ({ data: { results: [] }, error: null })),
+            supabase.functions.invoke('hotelbeds-search-hotels', {
+              body: { destination: destinationCode, checkIn, checkOut, adults: parseInt(guests), children: 0, rooms: 1 }
+            }).catch(() => ({ data: { hotels: [] }, error: null })),
             supabase.functions.invoke('unified-search-flights', {
               body: { origin: 'JFK', destination: location, departureDate: checkIn, adults: parseInt(guests) }
             }).catch(() => ({ data: { results: [] }, error: null })),
@@ -439,7 +455,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             }).catch(() => ({ data: { results: [] }, error: null }))
           ]);
 
-          const hotelsList: any[] = hotelsRes.data?.results || [];
+          const hotelsList: any[] = hotelsRes.data?.hotels || [];
 
           const packageResults = [
             ...hotelsList.slice(0, 3).map((r: any) => ({ ...r, packageType: 'hotel' })),
@@ -1016,6 +1032,21 @@ if (minRating && searchType !== "restaurants") {
                           />
                         );
                       } else if (searchType === "cars") {
+                        // Handle both car rentals and transfers
+                        if (result.resultType === 'transfer') {
+                          return (
+                            <TransferCard
+                              key={`transfer-${result.code || index}`}
+                              transfer={result}
+                              onBook={() => {
+                                toast({
+                                  title: "Transfer Booking",
+                                  description: "Transfer booking coming soon!",
+                                });
+                              }}
+                            />
+                          );
+                        }
                         return (
                           <CarCard
                             key={`${result.id || result.offerId || 'car'}-${index}`}

@@ -43,43 +43,62 @@ export const fetchAmadeusToursForLocation = async (
   categories?: string[]
 ): Promise<AmadeusActivity[]> => {
   try {
-    // Try with initial radius
-    let { data, error } = await supabase.functions.invoke('amadeus-search-tours', {
+    // Use HotelBeds activities API
+    // First, get approximate destination code from coordinates
+    const { getHotelBedsDestinationCode } = await import('./hotelbedsHelpers');
+    
+    console.log('[Activities] Fetching HotelBeds activities for coordinates:', latitude, longitude);
+    
+    // Use a simple approximation based on major cities' coordinates
+    let destinationCode = 'NYC'; // Default
+    if (latitude > 40 && latitude < 41 && longitude > -74 && longitude < -73) destinationCode = 'NYC';
+    else if (latitude > 34 && latitude < 35 && longitude > -118 && longitude < -117) destinationCode = 'LAX';
+    else if (latitude > 48 && latitude < 49 && longitude > 2 && longitude < 3) destinationCode = 'PAR';
+    else if (latitude > 51 && latitude < 52 && longitude > -1 && longitude < 1) destinationCode = 'LON';
+    else if (latitude > 35 && latitude < 36 && longitude > 139 && longitude < 140) destinationCode = 'TYO';
+    
+    // Get today's date for activity search
+    const today = new Date().toISOString().split('T')[0];
+    
+    const { data, error } = await supabase.functions.invoke('hotelbeds-search-activities', {
       body: {
-        latitude,
-        longitude,
-        radius,
-        categories,
+        destination: destinationCode,
+        date: today,
+        category: categories?.[0]
       },
     });
 
     if (error) {
-      console.error('Error fetching Amadeus tours:', error);
+      console.error('Error fetching HotelBeds activities:', error);
+      return [];
     }
 
-    let activities = data?.data || [];
-
-    // If no results, try expanding radius to 50km
-    if (activities.length === 0 && radius < 50) {
-      console.log(`No results with ${radius}km radius, trying 50km...`);
-      const result = await supabase.functions.invoke('amadeus-search-tours', {
-        body: { latitude, longitude, radius: 50, categories },
-      });
-      activities = result.data?.data || [];
-    }
-
-    // If still no results, try 100km
-    if (activities.length === 0 && radius < 100) {
-      console.log(`No results with 50km radius, trying 100km...`);
-      const result = await supabase.functions.invoke('amadeus-search-tours', {
-        body: { latitude, longitude, radius: 100, categories },
-      });
-      activities = result.data?.data || [];
-    }
-
-    return activities;
+    const activities = data?.activities || [];
+    
+    console.log(`[Activities] Found ${activities.length} activities from HotelBeds`);
+    
+    // Transform HotelBeds activities to match Amadeus format
+    return activities.map((activity: any) => ({
+      id: activity.code,
+      name: activity.name,
+      shortDescription: activity.description?.substring(0, 200),
+      description: activity.description,
+      price: {
+        amount: activity.price?.toString() || '0',
+        currencyCode: activity.currency || 'USD'
+      },
+      pictures: activity.images || [],
+      rating: '0',
+      numberOfRatings: 0,
+      bookingLink: '',
+      geoCode: {
+        latitude: activity.location?.latitude || latitude,
+        longitude: activity.location?.longitude || longitude
+      },
+      categories: [activity.category || 'Activity']
+    }));
   } catch (error) {
-    console.error('Failed to fetch Amadeus tours:', error);
+    console.error('Failed to fetch HotelBeds activities:', error);
     return [];
   }
 };
@@ -134,7 +153,7 @@ export const transformAmadeusToPackage = (
     currency: activity.price.currencyCode,
     rating: activity.rating ? parseFloat(activity.rating) : 0,
     totalReviews: activity.numberOfRatings || 0,
-    agencyName: 'Via Amadeus',
+    agencyName: 'Via HotelBeds',
     likelyToSellOut: !!activity.bookingLink,
     tripType: inferTripType(activity.categories),
     description: activity.shortDescription || activity.description,
