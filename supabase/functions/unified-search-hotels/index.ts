@@ -168,7 +168,7 @@ async function enrichWithGooglePlaces(hotels: any[], location: string) {
     return hotels;
   }
 
-  const limit = Math.min(hotels.length, 10);
+  const limit = Math.min(hotels.length, 20);
   const target = hotels.slice(0, limit);
   console.log(`Enriching ${target.length} hotels with Google Places photos and reviews...`);
 

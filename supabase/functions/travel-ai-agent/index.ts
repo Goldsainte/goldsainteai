@@ -112,7 +112,7 @@ function parseDates(input: string): { checkIn?: string; checkOut?: string } {
 }
 
 // Helper functions for tool execution
-async function searchHotels(args: any, apiKey: string) {
+async function searchHotels(args: any) {
   // Use unified hotel search for consistency with Search page
   try {
     const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
@@ -954,7 +954,7 @@ async function searchPackages(args: any) {
         guests: travelers,
         sortBy: 'price',
         ...(maxHotelPrice && { maxPrice: maxHotelPrice })
-      }, Deno.env.get('BOOKING_API_KEY') || ''));
+      }));
     }
 
     if (includeCar) {
@@ -1319,7 +1319,7 @@ The user has saved preferences but has chosen to search without strict filtering
             checkIn: nextData.checkIn,
             checkOut: nextData.checkOut,
             guests: 2
-          }, userContext);
+          });
         } else if (type === 'flights') {
           toolResult = await searchFlights({
             origin: nextData.origin,
@@ -1422,7 +1422,7 @@ The user has saved preferences but has chosen to search without strict filtering
           checkIn: dates.checkIn,
           checkOut: dates.checkOut,
           guests: 2
-        }, userContext);
+        });
         
         return new Response(JSON.stringify({
           message: `Here are hotels in ${location} for your dates:`,
@@ -1994,7 +1994,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
             forUser: fullResult
           };
         } else if (functionName === 'search_hotels') {
-          toolResult = await searchHotels(functionArgs, BOOKING_API_KEY);
+          toolResult = await searchHotels(functionArgs);
         } else if (functionName === 'search_destinations') {
           toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
         } else if (functionName === 'search_restaurants') {
