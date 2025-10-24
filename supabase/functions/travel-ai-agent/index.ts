@@ -1535,48 +1535,6 @@ The user has saved preferences but has chosen to search without strict filtering
       {
         type: "function",
         function: {
-          name: "search_destinations",
-          description: "Search for travel destinations, cities, regions, or points of interest. Use this when users ask about places to visit, destinations, or where to go.",
-          parameters: {
-            type: "object",
-            properties: {
-              query: {
-                type: "string",
-                description: "The destination, city, or region to search for"
-              }
-            },
-            required: ["query"]
-          }
-        }
-      },
-      {
-        type: "function",
-        function: {
-          name: "search_restaurants",
-          description: "Search for restaurants in a specific city or location. Use this when users ask about restaurants, dining, food, or places to eat. Always provide the location (city name).",
-          parameters: {
-            type: "object",
-            properties: {
-              location: {
-                type: "string",
-                description: "The city or area to search for restaurants (e.g., 'New York', 'Paris', 'London')"
-              },
-              cuisine: {
-                type: "string",
-                description: "Type of cuisine if specified (e.g., 'Italian', 'Japanese', 'Mexican')"
-              },
-              priceRange: {
-                type: "string",
-                description: "Price range filter: '$' (budget), '$$ - $$$' (moderate), or '$$$$' (expensive)"
-              }
-            },
-            required: ["location"]
-          }
-        }
-      },
-      {
-        type: "function",
-        function: {
           name: "search_flights",
           description: "Search for flights between two cities. Use this when users ask about flights, airfare, or flying from one place to another. You can specify one-way or round-trip, cabin class, and whether direct flights only.",
           parameters: {
@@ -1658,6 +1616,39 @@ The user has saved preferences but has chosen to search without strict filtering
       {
         type: "function",
         function: {
+          name: "search_events",
+          description: "Search for events, concerts, shows, and entertainment using Ticketmaster. Use this when users ask about events, concerts, shows, performances, or things happening in a city.",
+          parameters: {
+            type: "object",
+            properties: {
+              city: {
+                type: "string",
+                description: "City name to search for events (e.g., 'New York', 'Los Angeles', 'London')"
+              },
+              keyword: {
+                type: "string",
+                description: "Keyword to search for (e.g., artist name, event type, venue)"
+              },
+              startDate: {
+                type: "string",
+                description: "Start date in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)"
+              },
+              endDate: {
+                type: "string",
+                description: "End date in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)"
+              },
+              classificationName: {
+                type: "string",
+                description: "Event classification (e.g., 'Music', 'Sports', 'Arts & Theatre', 'Family')"
+              }
+            },
+            required: ["city"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "check_visa_requirements",
           description: "Check visa requirements for travel between two countries. Use this when users ask about visa requirements, travel documents needed, or whether they need a visa to visit a country. Provide country names or ISO codes.",
           parameters: {
@@ -1688,18 +1679,18 @@ The user has saved preferences but has chosen to search without strict filtering
 CRITICAL CONVERSATIONAL BEHAVIOR - YOUR PRIMARY MODE:
 You are a thoughtful travel advisor who guides users through planning their trips by asking smart, leading questions. Think of yourself as a luxury travel concierge having a natural conversation.
 
-🎯 AVAILABLE SERVICES (AMADEUS-POWERED ONLY):
+🎯 AVAILABLE SERVICES:
 You can help users search for:
-- ✈️ **Flights** - Search flights between cities using Amadeus
-- 🏨 **Hotels** - Find and compare hotels using Amadeus
-- 🎭 **Activities** - Discover tours, attractions, and experiences using Amadeus
+- ✈️ **Flights** - Search flights between cities (Amadeus)
+- 🏨 **Hotels** - Find and compare hotels (Amadeus)
+- 🎭 **Activities** - Discover tours, attractions, and experiences (Amadeus)
+- 🎫 **Events & Concerts** - Find live events, concerts, shows, and performances (Ticketmaster)
 
 You CANNOT help with:
 - Restaurants (not available)
-- Events/concerts (not available)
 - Car rentals (not available)
 
-If users ask for restaurants, events, or cars, politely explain these services are not currently available and suggest they explore hotels, flights, or activities instead.
+If users ask for restaurants or cars, politely explain these services are not currently available and suggest they explore hotels, flights, activities, or events instead.
 
 🎯 CONVERSATION STRATEGY:
 1. **Understand the Intent First**: When a user mentions travel, ask clarifying questions to understand:
@@ -2005,16 +1996,33 @@ Always show results first with minimal text, ask questions later. Be conversatio
           };
         } else if (functionName === 'search_hotels') {
           toolResult = await searchHotels(functionArgs);
-        } else if (functionName === 'search_destinations') {
-          if (!BOOKING_API_KEY) {
-            toolResult = { error: 'Booking.com API not configured. Please use search_hotels instead.' };
-          } else {
-            toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
-          }
-        } else if (functionName === 'search_restaurants') {
-          toolResult = await searchRestaurants(functionArgs);
         } else if (functionName === 'search_flights') {
           toolResult = await searchFlights(functionArgs);
+        } else if (functionName === 'search_activities') {
+          // Call amadeus-search-tours edge function
+          const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
+          const SUPABASE_ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY');
+          
+          const response = await fetch(`${SUPABASE_URL}/functions/v1/amadeus-search-tours`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(functionArgs)
+          });
+          
+          if (!response.ok) {
+            console.error('Failed to fetch activities:', response.status);
+            toolResult = { error: 'Failed to fetch activities', results: [] };
+          } else {
+            const data = await response.json();
+            toolResult = { 
+              type: 'activities',
+              results: data.activities?.slice(0, 15) || [],
+              location: functionArgs.location
+            };
+          }
         } else if (functionName === 'search_events') {
           toolResult = await searchEvents(functionArgs);
         } else if (functionName === 'check_visa_requirements') {
