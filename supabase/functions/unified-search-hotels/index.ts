@@ -168,75 +168,65 @@ async function enrichWithGooglePlaces(hotels: any[], location: string) {
     return hotels;
   }
 
-  const limit = Math.min(hotels.length, 20);
+  // Only enrich top 10 hotels for speed
+  const limit = Math.min(hotels.length, 10);
   const target = hotels.slice(0, limit);
-  console.log(`Enriching ${target.length} hotels with Google Places photos and reviews...`);
+  console.log(`Enriching ${target.length} hotels with Google Places (optimized)...`);
 
-  // Simple concurrency control
-  const batchSize = 5;
-  for (let i = 0; i < target.length; i += batchSize) {
-    const slice = target.slice(i, i + batchSize);
-    await Promise.all(
-      slice.map(async (hotel: any) => {
-        try {
-          const name = hotel.hotel?.name || "";
-          const city = hotel.hotel?.address?.cityName || (location.split(",")[0] || "");
+  // Increased batch size for faster parallel processing
+  const batchSize = 10;
+  await Promise.all(
+    target.map(async (hotel: any) => {
+      try {
+        const name = hotel.hotel?.name || "";
+        const city = hotel.hotel?.address?.cityName || (location.split(",")[0] || "");
 
-          // Text Search for hotel
-          const searchRes = await fetch("https://places.googleapis.com/v1/places:searchText", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Goog-Api-Key": apiKey,
-              "X-Goog-FieldMask": "places.id,places.displayName,places.photos,places.rating,places.userRatingCount,places.reviews"
-            },
-            body: JSON.stringify({
-              textQuery: `${name} hotel ${city}`,
-              maxResultCount: 1
-            })
-          });
+        // Text Search for hotel - reduced field mask for faster response
+        const searchRes = await fetch("https://places.googleapis.com/v1/places:searchText", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": apiKey,
+            "X-Goog-FieldMask": "places.photos,places.rating,places.userRatingCount,places.reviews"
+          },
+          body: JSON.stringify({
+            textQuery: `${name} hotel ${city}`,
+            maxResultCount: 1
+          })
+        });
 
-          if (!searchRes.ok) {
-            console.log(`Google Places search failed for ${name}: ${searchRes.status}`);
-            return;
-          }
-
-          const searchData = await searchRes.json();
-          if (!searchData.places || searchData.places.length === 0) return;
-
-          const place = searchData.places[0];
-
-          // Extract photos
-          hotel.__googlePhotos = (place.photos || []).slice(0, 12).map((photo: any) => ({
-            url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=1200&maxWidthPx=1600`,
-            attribution: photo.authorAttributions?.[0]?.displayName || ""
-          }));
-
-          // Extract reviews
-          hotel.__googleReviews = (place.reviews || []).slice(0, 5).map((review: any) => ({
-            author: review.authorAttribution?.displayName || "Anonymous",
-            rating: review.rating || 0,
-            text: review.text?.text || review.originalText?.text || "",
-            date: review.publishTime || "",
-            relativeTime: review.relativePublishTimeDescription || ""
-          }));
-
-          // Overall rating
-          hotel.__googleRating = place.rating || 0;
-          hotel.__googleRatingCount = place.userRatingCount || 0;
-
-          console.log(`Enriched ${name}: ${hotel.__googlePhotos?.length || 0} photos, ${hotel.__googleReviews?.length || 0} reviews, rating: ${hotel.__googleRating}`);
-        } catch (e) {
-          console.warn(`Google Places enrichment failed for ${hotel.hotel?.name}:`, e);
+        if (!searchRes.ok) {
+          return;
         }
-      })
-    );
-    
-    // Small delay between batches
-    if (i + batchSize < target.length) {
-      await new Promise(r => setTimeout(r, 100));
-    }
-  }
+
+        const searchData = await searchRes.json();
+        if (!searchData.places || searchData.places.length === 0) return;
+
+        const place = searchData.places[0];
+
+        // Reduced photos (6 instead of 12) for faster load
+        hotel.__googlePhotos = (place.photos || []).slice(0, 6).map((photo: any) => ({
+          url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=800&maxWidthPx=1200`,
+          attribution: photo.authorAttributions?.[0]?.displayName || ""
+        }));
+
+        // Reduced reviews (3 instead of 5) for faster processing
+        hotel.__googleReviews = (place.reviews || []).slice(0, 3).map((review: any) => ({
+          author: review.authorAttribution?.displayName || "Anonymous",
+          rating: review.rating || 0,
+          text: review.text?.text || review.originalText?.text || "",
+          date: review.publishTime || "",
+          relativeTime: review.relativePublishTimeDescription || ""
+        }));
+
+        // Overall rating
+        hotel.__googleRating = place.rating || 0;
+        hotel.__googleRatingCount = place.userRatingCount || 0;
+      } catch (e) {
+        // Silently skip enrichment failures
+      }
+    })
+  );
   
   const enrichedCount = hotels.filter(h => h.__googlePhotos?.length > 0).length;
   console.log(`Google Places enrichment complete: ${enrichedCount}/${target.length} hotels have photos`);
