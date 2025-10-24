@@ -30,12 +30,12 @@ serve(async (req) => {
       throw new Error('Missing required parameters: destination, date');
     }
 
-    const apiKey = Deno.env.get('HOTELBEDS_ACTIVITIES_API_KEY');
-    const secret = Deno.env.get('HOTELBEDS_ACTIVITIES_SECRET');
+    const apiKey = Deno.env.get('HOTELBEDS_API_KEY');
+    const secret = Deno.env.get('HOTELBEDS_SECRET');
     const sandboxMode = Deno.env.get('HOTELBEDS_SANDBOX_MODE') === 'true';
 
     if (!apiKey || !secret) {
-      throw new Error('HotelBeds Activities API credentials not configured');
+      throw new Error('HotelBeds API credentials not configured');
     }
 
     const { signature, timestamp } = await generateSignature(apiKey, secret);
