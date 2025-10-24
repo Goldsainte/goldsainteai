@@ -187,12 +187,17 @@ export const BookingModal = ({
       if (checkoutError) throw checkoutError;
 
       if (checkoutResult.url) {
-        window.open(checkoutResult.url, '_blank');
-        onClose();
         toast({
-          title: "Redirecting to payment",
-          description: `Booking reference: ${bookingResult.bookingReference}`,
+          title: "Redirecting to payment...",
+          description: "Please complete payment to confirm your booking",
         });
+        
+        // Small delay to let user see the toast
+        setTimeout(() => {
+          window.location.href = checkoutResult.url;
+        }, 1000);
+        
+        onClose();
       }
     } catch (error: any) {
       console.error('Booking error:', error);

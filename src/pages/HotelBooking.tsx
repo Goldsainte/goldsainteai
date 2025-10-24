@@ -372,10 +372,19 @@ export default function HotelBooking() {
                   
                   <div className="pt-4 border-t">
                     <h3 className="font-semibold mb-2">Cancellation policy</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Free cancellation before {checkIn ? formatDate(checkIn) : 'check-in date'}. 
-                      Cancel before this date and get a full refund. Times are based on the property's local time.
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-muted-foreground text-sm">
+                        Free cancellation before {checkIn ? formatDate(checkIn) : 'check-in date'}. 
+                        Cancel before this date and get a full refund. Times are based on the property's local time.
+                      </p>
+                      <Button 
+                        variant="link" 
+                        className="p-0 h-auto text-primary"
+                        onClick={() => window.open('/cancellation-refund-policy', '_blank')}
+                      >
+                        View full cancellation & refund policy →
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               </TabsContent>

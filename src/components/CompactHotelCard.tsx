@@ -8,12 +8,14 @@ import { DateSelectionModal } from "./DateSelectionModal";
 import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
 import { encodeData } from "@/lib/utils";
+import { format, addDays } from "date-fns";
 
 interface CompactHotelCardProps {
   property: any;
+  searchDates?: { checkIn: string; checkOut: string };
 }
 
-export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
+export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProps) => {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
@@ -78,7 +80,10 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
   };
 
   const handleAvailabilityConfirmed = (hotelOffer: any, checkIn: string, checkOut: string, adults: number) => {
-    const nights = Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24));
+    // Use provided dates OR fall back to searchDates from AI context OR defaults
+    const finalCheckIn = checkIn || searchDates?.checkIn || format(addDays(new Date(), 1), 'yyyy-MM-dd');
+    const finalCheckOut = checkOut || searchDates?.checkOut || format(addDays(new Date(), 3), 'yyyy-MM-dd');
+    const nights = Math.ceil((new Date(finalCheckOut).getTime() - new Date(finalCheckIn).getTime()) / (1000 * 60 * 60 * 24));
     
     const bookingData = {
       ...hotelOffer,
@@ -86,8 +91,8 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
       hotelName: title,
       hotelAddress: location,
       hotelImage: imageUrl,
-      checkIn,
-      checkOut,
+      checkIn: finalCheckIn,
+      checkOut: finalCheckOut,
       adults,
       guests: adults,
       rooms: 1,
@@ -174,6 +179,7 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
                   {getCurrencySymbol(currency)}{Math.round(displayPrice)}
                 </div>
                 <div className="text-xs text-muted-foreground">per night</div>
+                <div className="text-xs text-muted-foreground">+taxes & fees</div>
               </div>
             )}
             <div className="flex gap-1">
@@ -225,6 +231,8 @@ export const CompactHotelCard = ({ property }: CompactHotelCardProps) => {
         cityCode={getCityCode()}
         hotelName={title}
         currency={currency}
+        initialCheckIn={searchDates?.checkIn}
+        initialCheckOut={searchDates?.checkOut}
       />
     </>
   );

@@ -17,6 +17,8 @@ interface DateSelectionModalProps {
   hotelName: string;
   propertyId?: string;
   currency?: string;
+  initialCheckIn?: string;
+  initialCheckOut?: string;
 }
 
 export const DateSelectionModal = ({ 
@@ -26,7 +28,9 @@ export const DateSelectionModal = ({
   cityCode,
   hotelName,
   propertyId,
-  currency = 'USD'
+  currency = 'USD',
+  initialCheckIn,
+  initialCheckOut
 }: DateSelectionModalProps) => {
   const { toast } = useToast();
   const [checkInDate, setCheckInDate] = useState<Date>();
@@ -38,19 +42,34 @@ export const DateSelectionModal = ({
   // Default dates sourced from URL or sensible defaults when modal opens
   useEffect(() => {
     if (!open) return;
-    const ci = searchParams.get('checkIn');
-    const co = searchParams.get('checkOut');
-    if (ci) setCheckInDate(new Date(ci));
-    if (co) setCheckOutDate(new Date(co));
-    if (!ci || !co) {
-      const start = new Date();
-      start.setDate(start.getDate() + 1);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 2);
-      setCheckInDate((prev) => prev ?? start);
-      setCheckOutDate((prev) => prev ?? end);
+    
+    // Priority: 1. Props from AI context, 2. URL params, 3. Defaults
+    if (initialCheckIn) {
+      setCheckInDate(new Date(initialCheckIn));
+    } else {
+      const ci = searchParams.get('checkIn');
+      if (ci) {
+        setCheckInDate(new Date(ci));
+      } else {
+        const start = new Date();
+        start.setDate(start.getDate() + 1);
+        setCheckInDate((prev) => prev ?? start);
+      }
     }
-  }, [open]);
+    
+    if (initialCheckOut) {
+      setCheckOutDate(new Date(initialCheckOut));
+    } else {
+      const co = searchParams.get('checkOut');
+      if (co) {
+        setCheckOutDate(new Date(co));
+      } else {
+        const end = new Date();
+        end.setDate(end.getDate() + 3);
+        setCheckOutDate((prev) => prev ?? end);
+      }
+    }
+  }, [open, initialCheckIn, initialCheckOut, searchParams]);
 
   const handleCheckAvailability = async () => {
     if (!checkInDate || !checkOutDate) {

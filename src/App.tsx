@@ -139,7 +139,7 @@ function AppContent() {
   };
   
   // Don't show header on these pages as they have their own custom headers
-  const hideHeaderPages = ['/auth', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/cocurated-journeys', '/fine-dining'];
+  const hideHeaderPages = ['/auth', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/cocurated-journeys', '/fine-dining', '/hotel-booking'];
   const showHeader = !hideHeaderPages.some(page => location.pathname === page || location.pathname.startsWith(page));
 
   // Don't show AI Booking Concierge on Horizon pages
