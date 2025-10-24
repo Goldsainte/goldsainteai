@@ -273,39 +273,29 @@ export const BookingModal = ({
 
         toast({
           title: "Redirecting to Payment",
-          description: "Please complete payment to confirm your booking",
+          description: "Opening secure payment page...",
         });
         
-        // Small delay, then force top-level navigation to escape iframe
-        setTimeout(() => {
-          if (isInIframe) {
-            window.top!.location.href = checkoutResult.url;
-          } else {
-            window.location.href = checkoutResult.url;
-          }
-        }, 800);
+        // Open payment in new tab (works in all contexts including iframes)
+        const paymentWindow = window.open(checkoutResult.url, '_blank', 'noopener,noreferrer');
         
-        // Show manual fallback button after 3 seconds if redirect fails
-        setTimeout(() => {
-          toast({
-            title: "Having trouble?",
-            description: "Click here to open payment page",
-            action: (
-              <button 
-                onClick={() => {
-                  if (isInIframe && window.top) {
-                    window.top.location.href = checkoutResult.url;
-                  } else {
-                    window.open(checkoutResult.url, '_blank');
-                  }
-                }}
-                className="px-3 py-1 bg-primary text-primary-foreground rounded"
-              >
-                Open Payment
-              </button>
-            ),
-          });
-        }, 3000);
+        // If popup was blocked, show fallback toast with manual button
+        if (!paymentWindow) {
+          setTimeout(() => {
+            toast({
+              title: "Payment Window Blocked",
+              description: "Please allow popups and click to open payment",
+              action: (
+                <button 
+                  onClick={() => window.open(checkoutResult.url, '_blank', 'noopener,noreferrer')}
+                  className="px-3 py-1 bg-primary text-primary-foreground rounded"
+                >
+                  Open Payment
+                </button>
+              ),
+            });
+          }, 500);
+        }
         
         onClose();
       }

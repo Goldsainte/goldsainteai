@@ -481,11 +481,10 @@ const Index = () => {
           aiMessage.includes('would you like a one-way') ||
           aiMessage.includes('one-way rental or round-trip') ||
           aiMessage.includes('is this a one-way rental')) {
-        // Only show selector if we have location data (step > 1) or it's a flight
-        const isCarWithLocation = activeQuickLink === 'cars' && data.quickLinkState?.step >= 2;
+        // Only show selector for flights
         const isFlightQuestion = aiMessage.includes('flight');
         
-        if (!tripTypeResolvedRef.current && !showTripTypeSelector && (isCarWithLocation || isFlightQuestion)) {
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightQuestion) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }

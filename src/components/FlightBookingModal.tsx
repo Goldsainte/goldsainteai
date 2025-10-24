@@ -324,8 +324,13 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
         throw new Error(checkoutError?.message || 'Failed to create payment session');
       }
 
-      // Redirect to Stripe checkout
-      window.location.href = checkoutData.url;
+      // Open payment in new tab (works in iframes)
+      const paymentWindow = window.open(checkoutData.url, '_blank', 'noopener,noreferrer');
+      
+      // If popup was blocked, show error
+      if (!paymentWindow) {
+        toast.error('Please allow popups to complete payment');
+      }
 
     } catch (error: any) {
       console.error('Booking error:', error);
