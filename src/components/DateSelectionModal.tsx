@@ -137,7 +137,7 @@ export const DateSelectionModal = ({
                       {checkInDate ? format(checkInDate, 'PPP') : 'Select check-in date'}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-50">
+                  <PopoverContent className="w-auto p-0 bg-background z-[100]">
                     <Calendar
                       mode="single"
                       selected={checkInDate}
@@ -158,7 +158,7 @@ export const DateSelectionModal = ({
                       {checkOutDate ? format(checkOutDate, 'PPP') : 'Select check-out date'}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-50">
+                  <PopoverContent className="w-auto p-0 bg-background z-[100]">
                     <Calendar
                       mode="single"
                       selected={checkOutDate}

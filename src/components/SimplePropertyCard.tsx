@@ -167,7 +167,7 @@ export const SimplePropertyCard = ({ property, type = "hotels" }: SimpleProperty
         <div className="flex-1 p-5 flex flex-col justify-between min-h-[200px]">
           <div className="space-y-3 flex-1">
             <div className="space-y-2">
-              <h3 className="font-semibold text-xl leading-tight group-hover:text-primary transition-colors line-clamp-2">
+              <h3 className="font-secondary font-semibold text-xl leading-tight group-hover:text-primary transition-colors line-clamp-2">
                 {title}
               </h3>
               <p className="text-sm text-muted-foreground flex items-center gap-1">

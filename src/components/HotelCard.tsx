@@ -86,7 +86,7 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
         <div className="p-3 md:p-4 space-y-3 flex-1 flex flex-col">
           <div className="flex-1">
             <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="font-semibold text-base md:text-lg line-clamp-2 md:line-clamp-1">{hotelData.name}</h3>
+              <h3 className="font-secondary font-semibold text-base md:text-lg line-clamp-2 md:line-clamp-1">{hotelData.name}</h3>
               {hotelData.rating && (
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <Star className="h-4 w-4 fill-primary text-primary" />

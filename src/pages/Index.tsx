@@ -1698,8 +1698,8 @@ const Index = () => {
           />
         )}
 
-        {/* Date Picker Modal */}
-        {showDatePicker && (
+        {/* Date Picker Modal - Disabled to prevent duplication with hotel date selector */}
+        {/* {showDatePicker && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
             <ChatDatePicker
               type={showDatePicker.type}
@@ -1708,7 +1708,7 @@ const Index = () => {
               suggestedDate={showDatePicker.suggestedDate}
             />
           </div>
-        )}
+        )} */}
 
         {/* Welcome Modal */}
         <WelcomeModal 
