@@ -862,8 +862,9 @@ export const AIBookingConcierge = () => {
                       );
                     }
                     
-                    // Display activity search results
-                    if (result.data && Array.isArray(result.data) && result.data.length > 0 && result.data[0].name && result.data[0].price) {
+                    // Display activity search results (check for unique activity properties)
+                    if (result.data && Array.isArray(result.data) && result.data.length > 0 && 
+                        result.data[0].geoCode && result.data[0].categories && !result.data[0].vehicle && !result.data[0].hotelName) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8 space-y-2">
                           <p className="text-xs text-muted-foreground mb-2">Top {Math.min(5, result.data.length)} activities:</p>
