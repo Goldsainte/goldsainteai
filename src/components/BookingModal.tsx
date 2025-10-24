@@ -258,39 +258,54 @@ export const BookingModal = ({
       }
 
       if (checkoutResult.url) {
+        const isInIframe = window.top && window.top !== window;
         console.log('[BookingModal] Redirecting to Stripe checkout:', checkoutResult.url);
+        console.log('[BookingModal] Running in iframe:', isInIframe);
         
         // Store add-on requests for post-payment follow-up
         if (values.needFlight || values.needCarTransfer) {
           localStorage.setItem('booking_addons', JSON.stringify({
-            bookingId: bookingResult.booking.id,
             needFlight: values.needFlight,
             needCarTransfer: values.needCarTransfer,
-            checkIn: bookingData.checkIn,
-            checkOut: bookingData.checkOut,
-            destination: bookingData.hotel?.address?.cityName || bookingData.hotelAddress
+            bookingId: checkoutResult.bookingId || 'pending'
           }));
         }
-        
+
         toast({
-          title: "Redirecting to payment...",
+          title: "Redirecting to Payment",
           description: "Please complete payment to confirm your booking",
         });
         
-        // Small delay to let user see the toast, then redirect robustly
+        // Small delay, then force top-level navigation to escape iframe
         setTimeout(() => {
-          window.location.replace(checkoutResult.url);
-        }, 1000);
+          if (isInIframe) {
+            window.top!.location.href = checkoutResult.url;
+          } else {
+            window.location.href = checkoutResult.url;
+          }
+        }, 800);
         
-        // Fallback safety net in case redirect doesn't work
+        // Show manual fallback button after 3 seconds if redirect fails
         setTimeout(() => {
-          if (!checkoutResult.url) return;
           toast({
-            title: "Payment Page Ready",
-            description: "Opening payment page...",
+            title: "Having trouble?",
+            description: "Click here to open payment page",
+            action: (
+              <button 
+                onClick={() => {
+                  if (isInIframe && window.top) {
+                    window.top.location.href = checkoutResult.url;
+                  } else {
+                    window.open(checkoutResult.url, '_blank');
+                  }
+                }}
+                className="px-3 py-1 bg-primary text-primary-foreground rounded"
+              >
+                Open Payment
+              </button>
+            ),
           });
-          window.open(checkoutResult.url, '_blank');
-        }, 10000);
+        }, 3000);
         
         onClose();
       }
