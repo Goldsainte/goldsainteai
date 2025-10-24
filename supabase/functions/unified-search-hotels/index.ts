@@ -135,40 +135,25 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
       bestRateOnly: "true",
     });
 
-    let attempt = 1;
-    const maxAttempts = 3;
-    while (attempt <= maxAttempts) {
-      try {
-        console.log(`Fetching offers for chunk size ${chunk.length}, attempt ${attempt}/${maxAttempts}`);
-        const offersRes = await fetch(`https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    try {
+      console.log(`Fetching offers for chunk size ${chunk.length}`);
+      const offersRes = await fetch(`https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        if (!offersRes.ok) {
-          const errorText = await offersRes.text();
-          console.error(`Hotel offers failed (status ${offersRes.status}) for chunk:`, errorText);
-          // On 4xx other than 429, don't retry this chunk; continue to next chunk
-          if (offersRes.status >= 400 && offersRes.status < 500 && offersRes.status !== 429) {
-            break;
-          }
-          if (attempt === maxAttempts) {
-            break;
-          }
-          await new Promise(r => setTimeout(r, 500 * attempt));
-          attempt++;
-          continue;
-        }
-
-        const offers = await offersRes.json();
-        const available = (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
-        aggregated.push(...available);
-        break; // success, move to next chunk
-      } catch (e) {
-        console.error('Error fetching offers for chunk:', e);
-        if (attempt === maxAttempts) break;
-        await new Promise(r => setTimeout(r, 500 * attempt));
-        attempt++;
+      if (!offersRes.ok) {
+        const errorText = await offersRes.text();
+        console.error(`Hotel offers failed (status ${offersRes.status}) for chunk:`, errorText);
+        // On error, skip this chunk and continue
+        continue;
       }
+
+      const offers = await offersRes.json();
+      const available = (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
+      aggregated.push(...available);
+    } catch (e) {
+      console.error('Error fetching offers for chunk:', e);
+      // Skip failed chunk
     }
   }
 
@@ -183,7 +168,7 @@ async function enrichWithGooglePlaces(hotels: any[], location: string) {
     return hotels;
   }
 
-  const limit = Math.min(hotels.length, 20);
+  const limit = Math.min(hotels.length, 10);
   const target = hotels.slice(0, limit);
   console.log(`Enriching ${target.length} hotels with Google Places photos and reviews...`);
 
@@ -222,7 +207,7 @@ async function enrichWithGooglePlaces(hotels: any[], location: string) {
           const place = searchData.places[0];
 
           // Extract photos
-          hotel.__googlePhotos = (place.photos || []).slice(0, 12).map((photo: any) => ({
+          hotel.__googlePhotos = (place.photos || []).slice(0, 3).map((photo: any) => ({
             url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=1200&maxWidthPx=1600`,
             attribution: photo.authorAttributions?.[0]?.displayName || ""
           }));

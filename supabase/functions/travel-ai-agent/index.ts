@@ -504,11 +504,42 @@ The user has saved preferences but has chosen to search without strict filtering
       });
     }
 
-    // Conversational approach for non-quick link interactions
+    // Phase 3: Smart query detection - bypass AI for simple direct searches
+    const simplifiedMessage = message.toLowerCase().trim();
+    
+    // Hotel search patterns
+    const hotelPattern = /(?:find|search|show|get|book|need|looking for|look for)\s+(?:me\s+)?(?:hotels?|accommodations?|places to stay|rooms?)\s+(?:in|at|near)\s+([a-zA-Z\s,]+?)(?:\s+(?:from|for|on|between)\s+([\d\-\/]+))?(?:\s+to\s+([\d\-\/]+))?/i;
+    const hotelMatch = simplifiedMessage.match(hotelPattern);
+    
+    if (hotelMatch && conversationHistory.length < 2) {
+      const location = hotelMatch[1].trim();
+      const dates = parseDates(message);
+      
+      // If we have location and dates, search immediately
+      if (location && dates.checkIn && dates.checkOut) {
+        console.log('[Fast Path] Direct hotel search detected:', { location, ...dates });
+        const toolResult = await searchHotels({
+          location,
+          checkIn: dates.checkIn,
+          checkOut: dates.checkOut,
+          guests: 2
+        }, userContext);
+        
+        return new Response(JSON.stringify({
+          message: `Here are hotels in ${location} for your dates:`,
+          toolResults: [toolResult],
+          conversationHistory: [...conversationHistory,
+            { role: 'user', content: message },
+            { role: 'assistant', content: `Here are hotels in ${location} for your dates:` }
+          ]
+        }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        });
+      }
+    }
 
-
-
-
+    // Conversational approach for complex queries
 
     // Define tools for the AI agent
     const tools = [
@@ -827,19 +858,16 @@ ONLY search when you have enough information to provide relevant results. It's b
     const messages = [
       {
         role: "system",
-        content: `You are Goldsainte AI, a sophisticated travel assistant. You help users plan trips, find hotels, discover destinations, search for restaurants, book flights, answer travel-related questions, and provide visa information.${locationInfo}${userContext}
-${conversationalBehavior}
+        content: `You are Goldsainte AI, a travel assistant. Help users find hotels, flights, restaurants, events, and plan trips.${locationInfo}${userContext}
 
-⚠️ CRITICAL PREFERENCE ENFORCEMENT:
-If the user has set booking preferences (shown above), you MUST strictly apply them to ALL search tool calls:
-- ONLY call search_hotels with their price range, star rating, amenities, property types, and distance requirements
-- ONLY call search_flights with their cabin class, max price, airline preferences, and baggage requirements
-- ONLY call search_restaurants matching their cuisine types, dietary restrictions, and price range
-- ONLY call search_events matching their preferred event types and budget
-- DO NOT show results that violate their preferences unless they explicitly ask to "ignore preferences" or "see all options"
-- When showing results, mention that they match their saved preferences
+KEY RULES:
+- Ask ONE clear question at a time
+- Search when you have enough info (location + dates for hotels/flights)
+- Use natural, conversational responses
+- Apply user preferences when available
+${userPreferences && usePreferences ? '- Filter searches by their saved preferences (price, rating, amenities)' : ''}
 
-🍽️ RESTAURANT RESERVATION PROTOCOL:
+🍽️ RESTAURANT RESERVATIONS:
 When showing restaurant results or when users ask about making reservations:
 1. Explain that reservations can be made through Google Reservations
 2. Let them know they can click "Make Reservation" on any restaurant card to be taken to Google where they can:
@@ -1023,7 +1051,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-5-mini-2025-08-07',
         messages,
         tools,
         tool_choice: 'auto',
@@ -1121,7 +1149,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-5-2025-08-07',
+            model: 'gpt-5-mini-2025-08-07',
             messages: finalMessages,
             max_completion_tokens: 500, // Limit response size
           }),
@@ -1908,7 +1936,7 @@ Be specific and factual. Always recommend verifying exact fees and requirements 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
+        model: 'gpt-5-mini-2025-08-07',
         messages: [
           {
             role: 'user',
