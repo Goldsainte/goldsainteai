@@ -836,6 +836,10 @@ export const AIBookingConcierge = () => {
                             <CompactHotelCard 
                               key={hotelIdx} 
                               property={hotel}
+                              searchDates={{
+                                checkIn: result.searchParams?.checkInDate || result.checkInDate || '',
+                                checkOut: result.searchParams?.checkOutDate || result.checkOutDate || ''
+                              }}
                             />
                           ))}
                         </div>

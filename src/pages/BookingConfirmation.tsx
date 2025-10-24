@@ -37,6 +37,18 @@ const BookingConfirmation = () => {
 
       setPaymentStatus(data.paymentStatus);
       setBooking(data.booking);
+      
+      // Check for add-on follow-ups
+      const addonsStr = localStorage.getItem('booking_addons');
+      if (addonsStr && data.paymentStatus === 'paid') {
+        try {
+          const addons = JSON.parse(addonsStr);
+          localStorage.setItem('pending_addons', addonsStr);
+          localStorage.removeItem('booking_addons');
+        } catch (e) {
+          console.error('Failed to process addons:', e);
+        }
+      }
     } catch (error) {
       console.error('Payment verification error:', error);
       setPaymentStatus('failed');
@@ -59,6 +71,20 @@ const BookingConfirmation = () => {
 
   const isSuccess = paymentStatus === 'paid' && booking?.status !== 'cancelled';
   const flightData = booking?.booking_data;
+  
+  // Check for pending add-ons
+  const [addons, setAddons] = useState<any>(null);
+  
+  useEffect(() => {
+    const addonsStr = localStorage.getItem('pending_addons');
+    if (addonsStr && isSuccess) {
+      try {
+        setAddons(JSON.parse(addonsStr));
+      } catch (e) {
+        console.error('Failed to parse addons:', e);
+      }
+    }
+  }, [isSuccess]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-background">
@@ -226,6 +252,56 @@ const BookingConfirmation = () => {
                     Please check your inbox and spam folder.
                   </p>
                 </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Add-on Follow-ups Banner */}
+        {isSuccess && addons && (addons.needFlight || addons.needCarTransfer) && (
+          <Card className="mt-6 border-primary/20 bg-primary/5">
+            <div className="p-6 space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Complete Your Travel Plans</h3>
+              <p className="text-sm text-muted-foreground">
+                You indicated you need additional services. Continue booking:
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                {addons.needFlight && (
+                  <Button
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        type: 'flights',
+                        destination: addons.destination || '',
+                        departureDate: addons.checkIn || '',
+                        returnDate: addons.checkOut || ''
+                      });
+                      localStorage.removeItem('pending_addons');
+                      navigate(`/search-results?${params.toString()}`);
+                    }}
+                    variant="default"
+                    className="flex-1"
+                  >
+                    Book Flights
+                  </Button>
+                )}
+                {addons.needCarTransfer && (
+                  <Button
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        type: 'cars',
+                        location: addons.destination || '',
+                        pickupDate: addons.checkIn || '',
+                        returnDate: addons.checkOut || ''
+                      });
+                      localStorage.removeItem('pending_addons');
+                      navigate(`/search-results?${params.toString()}`);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Arrange Car Transfer
+                  </Button>
+                )}
               </div>
             </div>
           </Card>

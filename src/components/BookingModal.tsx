@@ -94,7 +94,7 @@ export const BookingModal = ({
     },
   });
 
-  // Auto-populate user details from account
+  // Auto-populate user details from account and restore draft
   useEffect(() => {
     const loadUserProfile = async () => {
       if (!user) return;
@@ -114,14 +114,41 @@ export const BookingModal = ({
           form.setValue('firstName', nameParts[0] || '');
           form.setValue('lastName', nameParts.slice(1).join(' ') || '');
           form.setValue('email', user.email || '');
+          
+          // Auto-fill country if available
+          if (profile.country) form.setValue('country', profile.country);
         }
       } catch (error) {
         console.error('Error loading profile:', error);
       }
     };
 
+    // Restore draft booking if returning from auth
+    const restoreDraft = () => {
+      try {
+        const draftStr = localStorage.getItem('booking_draft');
+        if (!draftStr) return;
+        
+        const draft = JSON.parse(draftStr);
+        const draftAge = Date.now() - new Date(draft.timestamp).getTime();
+        
+        // Only restore if < 24 hours old
+        if (draftAge < 24 * 60 * 60 * 1000 && draft.formData) {
+          console.log('Restoring booking draft');
+          Object.keys(draft.formData).forEach(key => {
+            form.setValue(key as any, draft.formData[key]);
+          });
+          localStorage.removeItem('booking_draft');
+        }
+      } catch (e) {
+        console.error('Failed to restore draft:', e);
+        localStorage.removeItem('booking_draft');
+      }
+    };
+
     if (open) {
       loadUserProfile();
+      restoreDraft();
     }
   }, [user, open, form]);
 
@@ -138,9 +165,20 @@ export const BookingModal = ({
 
   const onSubmit = async (values: z.infer<typeof bookingFormSchema>) => {
     if (!user) {
+      // Save draft before redirecting to auth
+      const draft = {
+        bookingType,
+        bookingData,
+        totalPrice: total,
+        currency,
+        formData: values,
+        timestamp: new Date().toISOString()
+      };
+      localStorage.setItem('booking_draft', JSON.stringify(draft));
+      
       toast({
         title: "Sign in required",
-        description: "Please sign in to complete your booking. You'll be redirected back to checkout.",
+        description: "Please sign in to complete your booking. Your details will be saved.",
         variant: "destructive",
       });
       navigate('/auth?redirect=checkout');
@@ -171,7 +209,9 @@ export const BookingModal = ({
           bookingType, 
           totalPrice: total, 
           currency,
-          bookingReference: bookingResult.bookingReference 
+          bookingReference: bookingResult.bookingReference,
+          needFlight: values.needFlight,
+          needCarTransfer: values.needCarTransfer
         }
       });
 
@@ -184,9 +224,29 @@ export const BookingModal = ({
         }
       });
 
-      if (checkoutError) throw checkoutError;
+      if (checkoutError) {
+        if (checkoutError.message?.includes('429') || checkoutError.message?.includes('rate limit')) {
+          throw new Error('Too many payment requests. Please wait a moment and try again.');
+        }
+        if (checkoutError.message?.includes('402') || checkoutError.message?.includes('credits')) {
+          throw new Error('Service temporarily unavailable. Please contact support.');
+        }
+        throw checkoutError;
+      }
 
       if (checkoutResult.url) {
+        // Store add-on requests for post-payment follow-up
+        if (values.needFlight || values.needCarTransfer) {
+          localStorage.setItem('booking_addons', JSON.stringify({
+            bookingId: bookingResult.booking.id,
+            needFlight: values.needFlight,
+            needCarTransfer: values.needCarTransfer,
+            checkIn: bookingData.checkIn,
+            checkOut: bookingData.checkOut,
+            destination: bookingData.hotel?.address?.cityName || bookingData.hotelAddress
+          }));
+        }
+        
         toast({
           title: "Redirecting to payment...",
           description: "Please complete payment to confirm your booking",
@@ -421,11 +481,16 @@ export const BookingModal = ({
                 control={form.control}
                 name="travelingForWork"
                 render={({ field }) => (
-                  <FormItem className="flex items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl>
-                    <FormLabel className="!mt-0 font-normal">I'm traveling for work</FormLabel>
+                  <FormItem className="space-y-2">
+                    <div className="flex items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                      </FormControl>
+                      <FormLabel className="!mt-0 font-normal">I'm traveling for work</FormLabel>
+                    </div>
+                    <p className="text-xs text-muted-foreground ml-6">
+                      Check this if you're booking for business purposes. This helps us prioritize business-friendly amenities and may be needed for expense reporting.
+                    </p>
                   </FormItem>
                 )}
               />
