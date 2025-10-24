@@ -1032,9 +1032,7 @@ serve(async (req) => {
     if (!OPENAI_API_KEY) {
       throw new Error('OPENAI_API_KEY not configured');
     }
-    if (!BOOKING_API_KEY) {
-      throw new Error('BOOKING_API_KEY not configured');
-    }
+    // BOOKING_API_KEY is optional - only needed for search_destinations
 
     // Get user preferences if authenticated
     const authHeader = req.headers.get('authorization');
@@ -1996,7 +1994,11 @@ Always show results first with minimal text, ask questions later. Be conversatio
         } else if (functionName === 'search_hotels') {
           toolResult = await searchHotels(functionArgs);
         } else if (functionName === 'search_destinations') {
-          toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
+          if (!BOOKING_API_KEY) {
+            toolResult = { error: 'Booking.com API not configured. Please use search_hotels instead.' };
+          } else {
+            toolResult = await searchDestinations(functionArgs, BOOKING_API_KEY);
+          }
         } else if (functionName === 'search_restaurants') {
           toolResult = await searchRestaurants(functionArgs);
         } else if (functionName === 'search_flights') {
