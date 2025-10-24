@@ -152,7 +152,7 @@ const Index = () => {
   const selectedTripTypeRef = useRef<"one-way" | "round-trip" | null>(null);
   const tripTypeResolvedRef = useRef<boolean>(false);
   const lastRequestIdRef = useRef<number>(0);
-  const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "restaurants" | "events" | "cars" | null>(null);
+  const [activeQuickLink, setActiveQuickLink] = useState<"hotels" | "flights" | "activities" | null>(null);
   const [usePreferences, setUsePreferences] = useState(true);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
@@ -171,7 +171,7 @@ const Index = () => {
     const params = new URLSearchParams(location.search);
     const service = params.get('service');
     
-    if (service && ['hotels', 'flights', 'restaurants', 'events', 'cars'].includes(service)) {
+    if (service && ['hotels', 'flights', 'activities'].includes(service)) {
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
       // Trigger the quick action after a short delay
@@ -581,11 +581,7 @@ const Index = () => {
     const queries = {
       hotels: "I'm looking for hotels",
       flights: "I need to find flights",
-      destinations: "What are some popular travel destinations?",
-      restaurants: "I'm looking for restaurants",
-      visa: "What are visa requirements for traveling abroad?",
-      events: "I'm looking for events",
-      cars: "I need a car rental"
+      activities: "I'm looking for activities and things to do"
     };
     const query = queries[action as keyof typeof queries];
     console.log('Quick action selected:', action, '->', query);
@@ -596,7 +592,7 @@ const Index = () => {
     const requestId = ++lastRequestIdRef.current;
 
     try {
-      setActiveQuickLink(action as "hotels" | "flights" | "restaurants" | "events" | "cars");
+      setActiveQuickLink(action as "hotels" | "flights" | "activities");
       const { data, error } = await invokeEdgeFunction('travel-ai-agent', {
         body: {
           message: query,
@@ -747,9 +743,7 @@ const Index = () => {
   const getPlaceholderText = () => {
     if (activeQuickLink === 'hotels') return 'Ask about hotels, accommodations, or places to stay...';
     if (activeQuickLink === 'flights') return 'Ask about flights, airfare, or travel...';
-    if (activeQuickLink === 'restaurants') return 'Ask about restaurants, dining, or cuisine...';
-    if (activeQuickLink === 'events') return 'Ask about events, concerts, or entertainment...';
-    if (activeQuickLink === 'cars') return 'Ask about car rentals or transportation...';
+    if (activeQuickLink === 'activities') return 'Ask about activities, tours, or things to do...';
     return 'Ask me anything about travel...';
   };
 

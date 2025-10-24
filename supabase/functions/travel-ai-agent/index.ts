@@ -1624,34 +1624,34 @@ The user has saved preferences but has chosen to search without strict filtering
       {
         type: "function",
         function: {
-          name: "search_events",
-          description: "Search for upcoming events, concerts, sports, theater shows, and entertainment using Ticketmaster. Use this when users ask about events, concerts, shows, tickets, or things to do.",
+          name: "search_activities",
+          description: "Search for tours, activities, and things to do using Amadeus API. Use this when users ask about activities, tours, things to do, attractions, or experiences in a location.",
           parameters: {
             type: "object",
             properties: {
-              city: {
+              location: {
                 type: "string",
-                description: "The city name to search events in"
+                description: "City or destination name (e.g., 'Barcelona', 'New York', 'Tokyo')"
               },
-              keyword: {
-                type: "string",
-                description: "Search keyword for event name, artist, or venue"
+              latitude: {
+                type: "number",
+                description: "Latitude coordinate of the search location (optional)"
               },
-              startDate: {
-                type: "string",
-                description: "Start date for event search in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)"
+              longitude: {
+                type: "number",
+                description: "Longitude coordinate of the search location (optional)"
               },
-              endDate: {
-                type: "string",
-                description: "End date for event search in ISO 8601 format (YYYY-MM-DDTHH:MM:SSZ)"
+              radius: {
+                type: "number",
+                description: "Search radius in kilometers (default 5)"
               },
-              classificationName: {
-                type: "string",
-                enum: ["Music", "Sports", "Arts & Theatre", "Film", "Miscellaneous"],
-                description: "Event category/classification"
+              categories: {
+                type: "array",
+                items: { type: "string" },
+                description: "Activity categories to filter by (e.g., 'SIGHTSEEING', 'ADVENTURE', 'FOOD_AND_DRINK', 'WATER_SPORTS')"
               }
             },
-            required: []
+            required: ["location"]
           }
         }
       },
@@ -1688,6 +1688,19 @@ The user has saved preferences but has chosen to search without strict filtering
 CRITICAL CONVERSATIONAL BEHAVIOR - YOUR PRIMARY MODE:
 You are a thoughtful travel advisor who guides users through planning their trips by asking smart, leading questions. Think of yourself as a luxury travel concierge having a natural conversation.
 
+🎯 AVAILABLE SERVICES (AMADEUS-POWERED ONLY):
+You can help users search for:
+- ✈️ **Flights** - Search flights between cities using Amadeus
+- 🏨 **Hotels** - Find and compare hotels using Amadeus
+- 🎭 **Activities** - Discover tours, attractions, and experiences using Amadeus
+
+You CANNOT help with:
+- Restaurants (not available)
+- Events/concerts (not available)
+- Car rentals (not available)
+
+If users ask for restaurants, events, or cars, politely explain these services are not currently available and suggest they explore hotels, flights, or activities instead.
+
 🎯 CONVERSATION STRATEGY:
 1. **Understand the Intent First**: When a user mentions travel, ask clarifying questions to understand:
    - What type of trip? (vacation, business, special occasion, weekend getaway)
@@ -1704,8 +1717,7 @@ You are a thoughtful travel advisor who guides users through planning their trip
 3. **Build Context Before Searching**: Gather key information through conversation:
    - For Hotels: destination → dates → budget → preferences (amenities, neighborhood, style)
    - For Flights: purpose of trip → origin → destination → dates → flexibility → budget
-   - For Restaurants: city → occasion/meal type → cuisine preferences → budget
-   - For Events: city → interests → date range
+   - For Activities: destination → interests → date range (optional)
 
 4. **Be Adaptive**: 
    - If they give you everything upfront, acknowledge and search immediately
