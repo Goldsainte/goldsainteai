@@ -43,62 +43,48 @@ export const fetchAmadeusToursForLocation = async (
   categories?: string[]
 ): Promise<AmadeusActivity[]> => {
   try {
-    // Use HotelBeds activities API
-    // First, get approximate destination code from coordinates
-    const { getHotelBedsDestinationCode } = await import('./hotelbedsHelpers');
+    console.log('[Activities] Fetching Amadeus activities for coordinates:', latitude, longitude);
     
-    console.log('[Activities] Fetching HotelBeds activities for coordinates:', latitude, longitude);
-    
-    // Use a simple approximation based on major cities' coordinates
-    let destinationCode = 'NYC'; // Default
-    if (latitude > 40 && latitude < 41 && longitude > -74 && longitude < -73) destinationCode = 'NYC';
-    else if (latitude > 34 && latitude < 35 && longitude > -118 && longitude < -117) destinationCode = 'LAX';
-    else if (latitude > 48 && latitude < 49 && longitude > 2 && longitude < 3) destinationCode = 'PAR';
-    else if (latitude > 51 && latitude < 52 && longitude > -1 && longitude < 1) destinationCode = 'LON';
-    else if (latitude > 35 && latitude < 36 && longitude > 139 && longitude < 140) destinationCode = 'TYO';
-    
-    // Get today's date for activity search
-    const today = new Date().toISOString().split('T')[0];
-    
-    const { data, error } = await supabase.functions.invoke('hotelbeds-search-activities', {
+    const { data, error } = await supabase.functions.invoke('amadeus-search-tours', {
       body: {
-        destination: destinationCode,
-        date: today,
-        category: categories?.[0]
+        latitude,
+        longitude,
+        radius,
+        categories
       },
     });
 
     if (error) {
-      console.error('Error fetching HotelBeds activities:', error);
+      console.error('Error fetching Amadeus activities:', error);
       return [];
     }
 
-    const activities = data?.activities || [];
+    const activities = data?.data || [];
     
-    console.log(`[Activities] Found ${activities.length} activities from HotelBeds`);
+    console.log(`[Activities] Found ${activities.length} activities from Amadeus`);
     
-    // Transform HotelBeds activities to match Amadeus format
+    // Transform Amadeus activities to our format (already includes 15% markup from edge function)
     return activities.map((activity: any) => ({
-      id: activity.code,
+      id: activity.id,
       name: activity.name,
-      shortDescription: activity.description?.substring(0, 200),
+      shortDescription: activity.shortDescription,
       description: activity.description,
       price: {
-        amount: activity.price?.toString() || '0',
-        currencyCode: activity.currency || 'USD'
+        amount: activity.price?.amount || '0',
+        currencyCode: activity.price?.currencyCode || 'USD'
       },
-      pictures: activity.images || [],
-      rating: '0',
-      numberOfRatings: 0,
-      bookingLink: '',
-      geoCode: {
-        latitude: activity.location?.latitude || latitude,
-        longitude: activity.location?.longitude || longitude
+      pictures: activity.pictures || [],
+      rating: activity.rating || '0',
+      numberOfRatings: activity.bookingLink ? 1 : 0,
+      bookingLink: activity.bookingLink || '',
+      geoCode: activity.geoCode || {
+        latitude,
+        longitude
       },
-      categories: [activity.category || 'Activity']
+      categories: activity.categories || ['Activity']
     }));
   } catch (error) {
-    console.error('Failed to fetch HotelBeds activities:', error);
+    console.error('Failed to fetch Amadeus activities:', error);
     return [];
   }
 };
@@ -153,7 +139,7 @@ export const transformAmadeusToPackage = (
     currency: activity.price.currencyCode,
     rating: activity.rating ? parseFloat(activity.rating) : 0,
     totalReviews: activity.numberOfRatings || 0,
-    agencyName: 'Via HotelBeds',
+    agencyName: 'Via Amadeus',
     likelyToSellOut: !!activity.bookingLink,
     tripType: inferTripType(activity.categories),
     description: activity.shortDescription || activity.description,
