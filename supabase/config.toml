@@ -284,3 +284,12 @@ verify_jwt = true
 
 [functions.verify-cocurated-payment]
 verify_jwt = true
+
+[functions.hotelbeds-search-hotels]
+verify_jwt = false
+
+[functions.hotelbeds-search-activities]
+verify_jwt = false
+
+[functions.hotelbeds-search-transfers]
+verify_jwt = false
