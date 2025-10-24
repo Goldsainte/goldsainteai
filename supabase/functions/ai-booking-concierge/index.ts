@@ -281,6 +281,28 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "search_activities",
+          description: "Search for tours, activities, and experiences at a destination. Returns activity options with prices, descriptions, duration, and booking information. Use this for sightseeing, tours, excursions, and local experiences.",
+          parameters: {
+            type: "object",
+            properties: {
+              location: { type: "string", description: "City or destination name" },
+              latitude: { type: "number", description: "Latitude of destination (improves accuracy)" },
+              longitude: { type: "number", description: "Longitude of destination (improves accuracy)" },
+              radius: { type: "number", description: "Search radius in kilometers", default: 20 },
+              categories: { 
+                type: "array",
+                items: { type: "string" },
+                description: "Activity categories: SIGHTSEEING, SHOWS_EVENTS, SPORTS, ADVENTURE, CULTURAL, FOOD_WINE, WELLNESS, WATER_ACTIVITIES, NATURE, SHOPPING"
+              }
+            },
+            required: ["location"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "create_package",
           description: "Create a bundled travel package combining flight, hotel, and/or car rental with a 7% discount. Use after user has selected their preferred options.",
           parameters: {
@@ -814,7 +836,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_fine_dining_restaurants': null, // Handled inline with curated data
             'search_cars': 'amadeus-search-cars',
-            'search_cars': 'amadeus-search-cars',
+            'search_activities': 'amadeus-search-tours',
             'create_package': 'create-travel-package',
             'search_events': 'search-events',
             'check_visa_requirements': 'check-visa-requirements',

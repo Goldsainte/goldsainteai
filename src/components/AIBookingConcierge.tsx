@@ -16,6 +16,7 @@ import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 import { CompactFlightCard } from "./CompactFlightCard";
 import { CompactHotelCard } from "./CompactHotelCard";
 import { CompactCarCard } from "./CompactCarCard";
+import { CompactActivityCard } from "./CompactActivityCard";
 import { TravelPackageCard } from "./TravelPackageCard";
 import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
@@ -855,6 +856,22 @@ export const AIBookingConcierge = () => {
                             <CompactCarCard 
                               key={carIdx} 
                               car={car}
+                            />
+                          ))}
+                        </div>
+                      );
+                    }
+                    
+                    // Display activity search results
+                    if (result.data && Array.isArray(result.data) && result.data.length > 0 && result.data[0].name && result.data[0].price) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                          <p className="text-xs text-muted-foreground mb-2">Top {Math.min(5, result.data.length)} activities:</p>
+                          {result.data.slice(0, 5).map((activity: any, actIdx: number) => (
+                            <CompactActivityCard 
+                              key={actIdx} 
+                              activity={activity}
+                              searchParams={result.searchParams}
                             />
                           ))}
                         </div>
