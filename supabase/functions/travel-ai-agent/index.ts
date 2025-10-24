@@ -111,6 +111,905 @@ function parseDates(input: string): { checkIn?: string; checkOut?: string } {
   return {};
 }
 
+// Helper functions for tool execution
+async function searchHotels(args: any, apiKey: string) {
+  // Use unified hotel search for consistency with Search page
+  try {
+    const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
+    console.log('searchHotels called with unified function:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice });
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    const response = await fetch(`${supabaseUrl}/functions/v1/unified-search-hotels`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        location,
+        checkIn: checkIn || new Date().toISOString().split('T')[0],
+        checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        guests: guests || 2
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Unified hotel search error:', response.status, errorText);
+      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
+    }
+
+    const data = await response.json();
+    let hotels = data.results || [];
+    
+    console.log(`Unified search returned ${hotels.length} hotels`);
+
+    // Apply filters
+    if (typeof minRating === 'number') {
+      const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
+      hotels = hotels.filter((h: any) => (h.rating || 0) >= minRatingNormalized);
+    }
+    if (typeof maxPrice === 'number') {
+      hotels = hotels.filter((h: any) => (h.price || 0) <= maxPrice);
+    }
+    if (sortBy === 'price') {
+      hotels.sort((a: any, b: any) => (a.price || 0) - (b.price || 0));
+    } else if (sortBy === 'review_score') {
+      hotels.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
+    }
+
+    console.log(`After filters: ${hotels.length} hotels`);
+    
+    // LIMIT hotels to 15 max to prevent token overflow
+    hotels = hotels.slice(0, 15);
+
+    return {
+      type: 'hotels',
+      location: { name: location, dest_id: location },
+      results: hotels,
+      checkIn: checkIn || new Date().toISOString().split('T')[0],
+      checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+      guests,
+      filters: { sortBy, minRating, maxPrice }
+    };
+  } catch (error) {
+    console.error('Error in searchHotels:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+async function searchDestinations(args: any, apiKey: string) {
+  try {
+    const { query } = args;
+
+    const response = await fetch(
+      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(query)}`,
+      {
+        method: 'GET',
+        headers: {
+          'x-rapidapi-key': apiKey,
+          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      return { error: 'Failed to search destinations', results: [] };
+    }
+
+    const data = await response.json();
+    
+    return {
+      type: 'destinations',
+      results: data.data || []
+    };
+  } catch (error) {
+    console.error('Error searching destinations:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { error: errorMessage, results: [] };
+  }
+}
+
+async function searchRestaurants(args: any) {
+  try {
+    const { location, cuisine, priceRange } = args;
+    
+    // Normalize location using abbreviation mapping
+    const normalizedLocation = normalizeCityName(location);
+    console.log('searchRestaurants called with:', { location, normalizedLocation, cuisine, priceRange });
+
+    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
+    if (!tripAdvisorKey) {
+      return { error: 'TripAdvisor API key not configured', results: [] };
+    }
+
+    // Build search query with normalized location
+    let searchQuery = normalizedLocation;
+    if (cuisine) {
+      searchQuery += ` ${cuisine}`;
+    }
+
+    // Paginated search for restaurants to get a broader set of candidates
+    const perPage = 10;
+    let offset = 0;
+    const allSearchResults: any[] = [];
+
+    while (true) {
+      const searchParams = new URLSearchParams({
+        key: tripAdvisorKey,
+        searchQuery: searchQuery,
+        category: 'restaurants',
+        language: 'en',
+        limit: String(perPage),
+        offset: String(offset),
+      });
+
+      const searchResponse = await fetch(
+        `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
+        { headers: { 'Accept': 'application/json' } }
+      );
+
+      if (!searchResponse.ok) {
+        const errorText = await searchResponse.text();
+        console.error('TripAdvisor search error:', searchResponse.status, errorText);
+        return { error: `Could not find restaurants in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
+      }
+
+      const searchData = await searchResponse.json();
+      const page = searchData.data || [];
+      allSearchResults.push(...page);
+      console.log(`TripAdvisor page fetched: ${page.length} items (total: ${allSearchResults.length})`);
+
+      if (page.length === 0) break;
+      offset += page.length;
+
+      // Cap for latency; we don't need thousands for a good UX
+      if (allSearchResults.length >= 30) break;
+    }
+
+    // Get detailed information for each restaurant with throttling and fallback
+    const MAX_RESULTS = 20;
+    const batchSize = 5;
+    const items = allSearchResults.slice(0, MAX_RESULTS);
+
+    const chunks: any[][] = [];
+    for (let i = 0; i < items.length; i += batchSize) {
+      chunks.push(items.slice(i, i + batchSize));
+    }
+
+    const restaurantDetails: any[] = [];
+    for (const group of chunks) {
+      const groupResults = await Promise.all(
+        group.map(async (restaurant: any) => {
+          try {
+            const detailsParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+
+            const detailsResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+
+            if (!detailsResponse.ok) {
+              // Fallback minimal info when details endpoint fails (rate limits, missing entity, etc.)
+              const fallbackCity = restaurant.address_obj?.city || normalizedLocation;
+              const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
+              return {
+                id: restaurant.location_id,
+                name: restaurant.name,
+                address: restaurant.address_obj?.address_string || '',
+                city: fallbackCity,
+                country: restaurant.address_obj?.country || '',
+                rating: 0,
+                num_reviews: 0,
+                userRatingsTotal: 0,
+                price_level: '',
+                priceLevel: 0,
+                cuisine: '',
+                description: '',
+                photos: [],
+                photoUrl: null,
+                web_url: '',
+                phone: '',
+                website: '',
+                reservationUrl: googleReservationsUrl,
+                reviews: [],
+                hours: {},
+                openNow: undefined,
+                latitude: undefined,
+                longitude: undefined
+              };
+            }
+
+            const details = await detailsResponse.json();
+
+            // Get photos (optional)
+            const photosParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+
+            const photosResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${photosParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+
+            // Fetch reviews (optional)
+            const reviewsParams = new URLSearchParams({
+              key: tripAdvisorKey,
+              language: 'en'
+            });
+            const reviewsResponse = await fetch(
+              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${reviewsParams}`,
+              { headers: { 'Accept': 'application/json' } }
+            );
+
+            let photos: any[] = [];
+            if (photosResponse.ok) {
+              const photosData = await photosResponse.json();
+              photos = photosData.data || [];
+            }
+
+            let reviews: any[] = [];
+            if (reviewsResponse.ok) {
+              const reviewsData = await reviewsResponse.json();
+              reviews = (reviewsData.data || []).slice(0, 3);
+            }
+
+            if (priceRange && details.price_level && details.price_level !== priceRange) {
+              return null;
+            }
+
+            // Construct Google Reservations URL for consistency
+            const primaryUrl = details.website || details.web_url || '';
+            const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || normalizedLocation}`)}`;
+            const reservationUrl = primaryUrl 
+              ? (primaryUrl.startsWith('http') ? primaryUrl : `https://${primaryUrl}`)
+              : googleReservationsUrl;
+
+            return {
+              id: restaurant.location_id,
+              name: details.name || restaurant.name,
+              address: details.address_obj?.address_string || '',
+              city: details.address_obj?.city || '',
+              country: details.address_obj?.country || '',
+              rating: details.rating || 0,
+              num_reviews: details.num_reviews || 0,
+              userRatingsTotal: details.num_reviews || 0,
+              price_level: details.price_level || '',
+              priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
+              cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
+              description: details.description || '',
+              photos: photos.map((photo: any) => ({
+                url: photo.images?.large?.url || photo.images?.original?.url,
+                caption: photo.caption || ''
+              })),
+              photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
+              web_url: details.web_url || '',
+              phone: details.phone || '',
+              website: details.website || '',
+              reservationUrl,
+              reviews: reviews.map((review: any) => ({
+                rating: review.rating || 0,
+                text: review.text || '',
+                published_date: review.published_date || '',
+                user: review.user?.username || 'Anonymous'
+              })),
+              hours: details.hours || {},
+              openNow: details.is_closed === false,
+              latitude: details.latitude,
+              longitude: details.longitude
+            };
+          } catch (error) {
+            console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
+            return null;
+          }
+        })
+      );
+      restaurantDetails.push(...groupResults);
+    }
+
+    // Filter out nulls and verify location match (be lenient if city is missing)
+    const validRestaurants = restaurantDetails.filter(restaurant => {
+      if (restaurant === null) return false;
+      const restaurantCity = (restaurant.city || '').toLowerCase().trim();
+      const requestedCity = normalizedLocation.toLowerCase().trim();
+      const locationVariations = getCityVariations(location).map(v => v.toLowerCase().trim());
+
+      // If we couldn't resolve a city (due to API limits), keep the item
+      if (!restaurantCity) return true;
+
+      return locationVariations.some(variation =>
+        restaurantCity.includes(variation) ||
+        variation.includes(restaurantCity) ||
+        (restaurant.name || '').toLowerCase().includes(variation)
+      );
+    });
+    
+    console.log(`Filtered restaurants: ${validRestaurants.length} out of ${restaurantDetails.length} are in ${location}`);
+    
+    return {
+      type: 'restaurants',
+      results: validRestaurants,
+      location: location
+    };
+  } catch (error) {
+    console.error('Error searching restaurants:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return { error: errorMessage, results: [] };
+  }
+}
+
+async function searchFlights(args: any) {
+  try {
+    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false, sortBy = 'best' } = args;
+    console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop, sortBy });
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return { error: 'Supabase configuration missing', results: [] };
+    }
+
+    // Convert city names to airport codes if needed (improved lookup)
+    const getAirportCode = (location: string) => {
+      // If already looks like an airport code (3 letters), use it
+      if (/^[A-Z]{3}$/i.test(location.trim())) {
+        return location.toUpperCase();
+      }
+
+      // Comprehensive city to code mapping
+      const cityToCode: Record<string, string> = {
+        // US Cities
+        'new york': 'NYC', 'los angeles': 'LAX', 'san francisco': 'SFO',
+        'washington': 'WAS', 'chicago': 'CHI', 'miami': 'MIA',
+        'seattle': 'SEA', 'atlanta': 'ATL', 'dallas': 'DFW',
+        'houston': 'HOU', 'phoenix': 'PHX', 'denver': 'DEN',
+        'orlando': 'MCO', 'detroit': 'DTW', 'minneapolis': 'MSP',
+        'portland': 'PDX', 'san diego': 'SAN', 'austin': 'AUS',
+        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
+        'boston': 'BOS', 'las vegas': 'LAS', 'philadelphia': 'PHL',
+        // Global Cities
+        'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO',
+        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
+        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
+        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
+        // Japan (closest major airports for city names)
+        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
+        // Switzerland
+        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
+        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
+        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
+        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
+        'grindelwald': 'ZRH', 'montreux': 'GVA'
+      };
+      
+      const lowerLocation = location.toLowerCase().trim();
+      
+      // Check exact match first
+      if (cityToCode[lowerLocation]) {
+        return cityToCode[lowerLocation];
+      }
+      
+      // Check if location contains any city name (for phrases like "ski destination in Zermatt")
+      for (const [city, code] of Object.entries(cityToCode)) {
+        if (lowerLocation.includes(city)) {
+          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
+          return code;
+        }
+      }
+      
+      // If no match found, try to use first 3 letters but log a warning
+      console.warn(`No airport mapping found for "${location}", using fallback code`);
+      return location.toUpperCase().slice(0, 3);
+    };
+
+    const originCode = getAirportCode(origin);
+    const destinationCode = getAirportCode(destination);
+
+    console.log('Airport codes:', { originCode, destinationCode });
+
+    // Call unified flight search
+    const flightResponse = await fetch(
+      `${supabaseUrl}/functions/v1/unified-search-flights`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabaseAnonKey}`
+        },
+        body: JSON.stringify({
+          origin: originCode,
+          destination: destinationCode,
+          departureDate,
+          returnDate,
+          adults,
+          travelClass,
+          nonStop: nonStop ? 'true' : 'false',
+          destinationCity: destination
+        })
+      }
+    );
+
+    if (!flightResponse.ok) {
+      console.error('Flight search failed:', flightResponse.status);
+      return { 
+        error: `Could not find flights from ${origin} to ${destination}. Try different dates or cities.`,
+        results: [] 
+      };
+    }
+
+    const flightData = await flightResponse.json();
+    console.log('Flights found:', flightData.results?.length || 0);
+
+    // Sort flights based on sortBy parameter and LIMIT to 15 results max
+    let sortedFlights = flightData.results || [];
+    
+    if (sortBy && sortedFlights.length > 0) {
+      switch (sortBy) {
+        case 'price':
+          sortedFlights.sort((a: any, b: any) => {
+            const priceA = parseFloat(a.price.total);
+            const priceB = parseFloat(b.price.total);
+            return priceA - priceB;
+          });
+          break;
+          
+        case 'duration':
+          sortedFlights.sort((a: any, b: any) => {
+            const getDurationMinutes = (duration: string) => {
+              const hours = duration.match(/(\d+)H/)?.[1] || '0';
+              const minutes = duration.match(/(\d+)M/)?.[1] || '0';
+              return parseInt(hours) * 60 + parseInt(minutes);
+            };
+            const durationA = getDurationMinutes(a.itineraries[0].duration);
+            const durationB = getDurationMinutes(b.itineraries[0].duration);
+            return durationA - durationB;
+          });
+          break;
+          
+        case 'departure_early':
+          sortedFlights.sort((a: any, b: any) => {
+            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
+            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
+            return timeA - timeB;
+          });
+          break;
+          
+        case 'departure_late':
+          sortedFlights.sort((a: any, b: any) => {
+            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
+            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
+            return timeB - timeA;
+          });
+          break;
+          
+        case 'best':
+        default:
+          // Keep default sorting
+          break;
+      }
+    }
+    
+    // LIMIT results to prevent token overflow
+    sortedFlights = sortedFlights.slice(0, 15);
+
+    return {
+      type: 'flights',
+      origin: { code: originCode, name: origin },
+      destination: { code: destinationCode, name: destination },
+      departureDate,
+      returnDate,
+      results: sortedFlights,
+      dictionaries: flightData.dictionaries,
+      meta: flightData.meta,
+      filters: { sortBy }
+    };
+
+  } catch (error) {
+    console.error('Error in searchFlights:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+async function searchCars(args: any) {
+  try {
+    const { pickupLocation, pickupDate, returnDate, dropoffLocation } = args;
+    console.log('searchCars called with:', { pickupLocation, pickupDate, returnDate, dropoffLocation });
+
+    // Convert city names to airport codes if needed
+    const getAirportCode = (location: string) => {
+      // If already looks like an airport code (3 letters), use it
+      if (/^[A-Z]{3}$/i.test(location.trim())) {
+        return location.toUpperCase();
+      }
+
+      // Comprehensive city to code mapping
+      const cityToCode: Record<string, string> = {
+        // US Cities
+        'new york': 'JFK', 'los angeles': 'LAX', 'san francisco': 'SFO',
+        'washington': 'IAD', 'chicago': 'ORD', 'miami': 'MIA',
+        'boston': 'BOS', 'seattle': 'SEA', 'atlanta': 'ATL',
+        'denver': 'DEN', 'las vegas': 'LAS', 'phoenix': 'PHX',
+        'dallas': 'DFW', 'houston': 'IAH', 'detroit': 'DTW',
+        'minneapolis': 'MSP', 'orlando': 'MCO', 'philadelphia': 'PHL',
+        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
+        // Global Cities
+        'paris': 'CDG', 'london': 'LHR', 'tokyo': 'NRT',
+        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
+        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
+        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
+        // Japan (closest major airports for city names)
+        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
+        // Swiss Cities & Destinations  
+        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
+        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
+        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
+        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
+        'grindelwald': 'ZRH', 'montreux': 'GVA'
+      };
+      
+      const lowerLocation = location.toLowerCase().trim();
+      
+      // Check exact match first
+      if (cityToCode[lowerLocation]) {
+        return cityToCode[lowerLocation];
+      }
+      
+      // Check if location contains any city name (for phrases)
+      for (const [city, code] of Object.entries(cityToCode)) {
+        if (lowerLocation.includes(city)) {
+          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
+          return code;
+        }
+      }
+      
+      // If no match found, try to use first 3 letters but log a warning
+      console.warn(`No airport mapping found for "${location}", using fallback code`);
+      return location.toUpperCase().slice(0, 3);
+    };
+
+    const pickupCode = getAirportCode(pickupLocation);
+    const dropoffCode = dropoffLocation ? getAirportCode(dropoffLocation) : pickupCode;
+    console.log('Converted locations to airport codes:', { pickupCode, dropoffCode });
+
+    // Get Amadeus credentials
+    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
+    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
+    if (!amadeusKey || !amadeusSecret) {
+      return { error: 'Amadeus credentials not configured', results: [] };
+    }
+
+    // Get Amadeus token
+    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
+    });
+
+    if (!tokenResponse.ok) {
+      return { error: 'Failed to authenticate with Amadeus', results: [] };
+    }
+
+    const { access_token } = await tokenResponse.json();
+
+    // Add times to dates (10:00 AM for pickup and return)
+    const pickupDateTime = `${pickupDate}T10:00:00`;
+    const returnDateTime = `${returnDate}T10:00:00`;
+
+    // Build query parameters
+    const params = new URLSearchParams({
+      pickupLocation: pickupCode,
+      pickupDateTime: pickupDateTime,
+      returnDateTime: returnDateTime,
+      currencyCode: 'USD'
+    });
+
+    // Add dropoff location if different from pickup
+    if (dropoffCode && dropoffCode !== pickupCode) {
+      params.append('dropoffLocation', dropoffCode);
+    }
+
+    console.log('Calling Amadeus API with params:', params.toString());
+
+    const response = await fetch(
+      `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${access_token}`
+        }
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('Amadeus car search error:', error);
+      return { error: 'Car search failed', results: [] };
+    }
+
+    const data = await response.json();
+    console.log('Cars found:', data.data?.length || 0);
+    
+    // LIMIT cars to 10 max to prevent token overflow
+    const cars = (data.data || []).slice(0, 10);
+
+    return {
+      type: 'cars',
+      pickupLocation: pickupCode,
+      dropoffLocation: dropoffCode,
+      pickupDate: pickupDateTime,
+      returnDate: returnDateTime,
+      results: cars,
+      meta: data.meta
+    };
+
+  } catch (error) {
+    console.error('Error in searchCars:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+async function checkVisaRequirements(args: any) {
+  try {
+    const { fromCountry, toCountry } = args;
+    console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
+
+    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    
+    if (!OPENAI_API_KEY) {
+      return { 
+        error: 'Visa check service not configured',
+        requirement: 'unknown'
+      };
+    }
+
+    // Use OpenAI to get accurate visa information
+    const prompt = `Provide accurate and up-to-date visa requirements for a traveler from ${fromCountry} visiting ${toCountry}. Include:
+    
+1. Visa requirement status (visa required, visa-free, visa on arrival, eVisa available, etc.)
+2. Maximum stay duration if visa-free or visa on arrival
+3. Passport validity requirements (e.g., must be valid for 6 months beyond stay)
+
+IMPORTANT - VISA FEE CONSIDERATIONS:
+Explain that visa fees vary based on:
+- Destination Country: Each country has different fee structures
+- Visa Type: Purpose of visit (tourism, business, study, work) affects the category and fee
+- Petition vs. Non-Petition Based: Some visas (like work visas) are petition-based with different fees
+- Application Processing Time: Expedited processing may cost more
+- Additional Charges: May include SEVIS fees (for exchange visitors) or visa service center fees
+
+4. Estimated fee range (if available) and note that exact fees should be verified on:
+   - Official embassy or consulate website of ${toCountry}
+   - Official government visa fee schedules (.gov websites)
+
+5. Any special conditions or requirements
+6. Official embassy/government website link if available
+
+If visa is required, mention that Goldsainte can assist with the application process and handle all the complexity.
+
+Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-5-mini-2025-08-07',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        max_completion_tokens: 1000
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI error:', response.status, errorText);
+      return { 
+        error: `Visa information lookup failed: ${response.statusText}`,
+        requirement: 'unknown'
+      };
+    }
+
+    const data = await response.json();
+    const aiResponse = data.choices[0].message.content;
+    console.log('Visa requirement AI response:', aiResponse);
+
+    return {
+      type: 'visa',
+      fromCountry,
+      toCountry,
+      information: aiResponse,
+      source: 'AI-powered visa information'
+    };
+
+  } catch (error) {
+    console.error('Error in checkVisaRequirements:', error);
+    return { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      requirement: 'unknown'
+    };
+  }
+}
+
+async function searchEvents(args: any) {
+  try {
+    const { city, keyword, startDate, endDate, classificationName } = args;
+    
+    // Normalize city using abbreviation mapping
+    const normalizedCity = normalizeCityName(city);
+    console.log('searchEvents called with:', { city, normalizedCity, keyword, startDate, endDate, classificationName });
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+      return { error: 'Supabase configuration missing', results: [] };
+    }
+
+    const response = await fetch(`${supabaseUrl}/functions/v1/search-events`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${supabaseAnonKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ city: normalizedCity, keyword, startDate, endDate, classificationName }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('search-events error:', response.status, errorText);
+      return { error: `Failed to fetch events: ${response.statusText}`, results: [] };
+    }
+
+    const data = await response.json();
+    console.log('Events found:', data.events?.length || 0);
+
+    return {
+      type: 'events',
+      results: data.events || [],
+      page: data.page,
+      city
+    };
+
+  } catch (error) {
+    console.error('Error in searchEvents:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
+function trimPackageDataForAI(packageData: any) {
+  return {
+    type: packageData.type,
+    origin: packageData.origin,
+    destination: packageData.destination,
+    departureDate: packageData.departureDate,
+    returnDate: packageData.returnDate,
+    travelers: packageData.travelers,
+    estimatedTotal: packageData.estimatedTotal,
+    savings: packageData.savings,
+    flightCount: packageData.flights?.length || 0,
+    hotelCount: packageData.hotels?.length || 0,
+    carCount: packageData.cars?.length || 0,
+    // Only include summary of cheapest options
+    cheapestFlight: packageData.flights?.[0] ? {
+      price: packageData.flights[0].price?.total,
+      airline: packageData.flights[0].validatingAirlineCodes?.[0],
+      duration: packageData.flights[0].itineraries?.[0]?.duration
+    } : null,
+    cheapestHotel: packageData.hotels?.[0] ? {
+      name: packageData.hotels[0].name,
+      price: packageData.hotels[0].offers?.[0]?.price?.total,
+      rating: packageData.hotels[0].rating
+    } : null
+  };
+}
+
+async function searchPackages(args: any) {
+  try {
+    const { origin, destination, departureDate, returnDate, travelers, includeHotel = true, includeCar = true, budget } = args;
+    console.log('searchPackages called with:', { origin, destination, departureDate, returnDate, travelers, includeHotel, includeCar, budget });
+
+    // Parse budget if provided
+    let maxFlightPrice, maxHotelPrice, maxCarPrice;
+    if (budget) {
+      const match = budget.match(/\$?(\d+)-\$?(\d+)/);
+      if (match) {
+        const totalMax = parseInt(match[2]);
+        // Allocate budget: 50% flights, 30% hotel, 20% car
+        maxFlightPrice = Math.floor(totalMax * 0.5);
+        maxHotelPrice = Math.floor(totalMax * 0.3);
+        maxCarPrice = Math.floor(totalMax * 0.2);
+      }
+    }
+
+    // Search all components in parallel
+    const searches: Promise<any>[] = [
+      searchFlights({
+        origin,
+        destination,
+        departureDate,
+        returnDate,
+        adults: travelers,
+        travelClass: 'ECONOMY',
+        sortBy: 'price'
+      })
+    ];
+
+    if (includeHotel) {
+      searches.push(searchHotels({
+        location: destination,
+        checkIn: departureDate,
+        checkOut: returnDate,
+        guests: travelers,
+        sortBy: 'price',
+        ...(maxHotelPrice && { maxPrice: maxHotelPrice })
+      }, Deno.env.get('BOOKING_API_KEY') || ''));
+    }
+
+    if (includeCar) {
+      searches.push(searchCars({
+        pickupLocation: destination,
+        pickupDate: departureDate,
+        returnDate,
+      }));
+    }
+
+    const results = await Promise.all(searches);
+    
+    // Combine results with LIMITS to prevent token overflow
+    const packageResult: any = {
+      type: 'package',
+      flights: (results[0]?.results || []).slice(0, 10), // Max 10 flights
+      hotels: includeHotel ? ((results[1]?.results || []).slice(0, 10)) : [], // Max 10 hotels
+      cars: includeCar ? ((results[includeHotel ? 2 : 1]?.results || []).slice(0, 8)) : [], // Max 8 cars
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      travelers
+    };
+
+    // Calculate sample package prices
+    if (packageResult.flights.length > 0 && packageResult.hotels.length > 0) {
+      const cheapestFlight = packageResult.flights[0];
+      const cheapestHotel = packageResult.hotels[0];
+      const flightPrice = parseFloat(cheapestFlight.price?.total || 0);
+      const hotelPrice = parseFloat(cheapestHotel.offers?.[0]?.price?.total || 0);
+      
+      let carPrice = 0;
+      if (packageResult.cars.length > 0) {
+        carPrice = parseFloat(packageResult.cars[0].price?.total || 0);
+      }
+
+      packageResult.estimatedTotal = flightPrice + hotelPrice + carPrice;
+      packageResult.savings = Math.floor((flightPrice + hotelPrice + carPrice) * 0.1); // 10% package discount
+    }
+
+    console.log('Package search completed:', {
+      flights: packageResult.flights.length,
+      hotels: packageResult.hotels.length,
+      cars: packageResult.cars.length
+    });
+
+    return packageResult;
+
+  } catch (error) {
+    console.error('Error in searchPackages:', error);
+    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -1245,903 +2144,3 @@ Always show results first with minimal text, ask questions later. Be conversatio
   }
 });
 
-async function searchHotels(args: any, apiKey: string) {
-  // Use unified hotel search for consistency with Search page
-  try {
-    const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
-    console.log('searchHotels called with unified function:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice });
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-    
-    const response = await fetch(`${supabaseUrl}/functions/v1/unified-search-hotels`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        location,
-        checkIn: checkIn || new Date().toISOString().split('T')[0],
-        checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-        guests: guests || 2
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Unified hotel search error:', response.status, errorText);
-      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
-    }
-
-    const data = await response.json();
-    let hotels = data.results || [];
-    
-    console.log(`Unified search returned ${hotels.length} hotels`);
-
-    // Apply filters
-    if (typeof minRating === 'number') {
-      const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
-      hotels = hotels.filter((h: any) => (h.rating || 0) >= minRatingNormalized);
-    }
-    if (typeof maxPrice === 'number') {
-      hotels = hotels.filter((h: any) => (h.price || 0) <= maxPrice);
-    }
-    if (sortBy === 'price') {
-      hotels.sort((a: any, b: any) => (a.price || 0) - (b.price || 0));
-    } else if (sortBy === 'review_score') {
-      hotels.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
-    }
-
-    console.log(`After filters: ${hotels.length} hotels`);
-    
-    // LIMIT hotels to 15 max to prevent token overflow
-    hotels = hotels.slice(0, 15);
-
-    return {
-      type: 'hotels',
-      location: { name: location, dest_id: location },
-      results: hotels,
-      checkIn: checkIn || new Date().toISOString().split('T')[0],
-      checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
-      guests,
-      filters: { sortBy, minRating, maxPrice }
-    };
-  } catch (error) {
-    console.error('Error in searchHotels:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
-  }
-}
-
-async function searchDestinations(args: any, apiKey: string) {
-  try {
-    const { query } = args;
-
-    const response = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(query)}`,
-      {
-        method: 'GET',
-        headers: {
-          'x-rapidapi-key': apiKey,
-          'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
-        }
-      }
-    );
-
-    if (!response.ok) {
-      return { error: 'Failed to search destinations', results: [] };
-    }
-
-    const data = await response.json();
-    
-    return {
-      type: 'destinations',
-      results: data.data || []
-    };
-  } catch (error) {
-    console.error('Error searching destinations:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { error: errorMessage, results: [] };
-  }
-}
-
-async function searchRestaurants(args: any) {
-  try {
-    const { location, cuisine, priceRange } = args;
-    
-    // Normalize location using abbreviation mapping
-    const normalizedLocation = normalizeCityName(location);
-    console.log('searchRestaurants called with:', { location, normalizedLocation, cuisine, priceRange });
-
-    const tripAdvisorKey = Deno.env.get('TRIPADVISOR_API_KEY');
-    if (!tripAdvisorKey) {
-      return { error: 'TripAdvisor API key not configured', results: [] };
-    }
-
-    // Build search query with normalized location
-    let searchQuery = normalizedLocation;
-    if (cuisine) {
-      searchQuery += ` ${cuisine}`;
-    }
-
-    // Paginated search for restaurants to get a broader set of candidates
-    const perPage = 10;
-    let offset = 0;
-    const allSearchResults: any[] = [];
-
-    while (true) {
-      const searchParams = new URLSearchParams({
-        key: tripAdvisorKey,
-        searchQuery: searchQuery,
-        category: 'restaurants',
-        language: 'en',
-        limit: String(perPage),
-        offset: String(offset),
-      });
-
-      const searchResponse = await fetch(
-        `https://api.content.tripadvisor.com/api/v1/location/search?${searchParams}`,
-        { headers: { 'Accept': 'application/json' } }
-      );
-
-      if (!searchResponse.ok) {
-        const errorText = await searchResponse.text();
-        console.error('TripAdvisor search error:', searchResponse.status, errorText);
-        return { error: `Could not find restaurants in "${location}". Please try a different location. (Status: ${searchResponse.status})`, results: [] };
-      }
-
-      const searchData = await searchResponse.json();
-      const page = searchData.data || [];
-      allSearchResults.push(...page);
-      console.log(`TripAdvisor page fetched: ${page.length} items (total: ${allSearchResults.length})`);
-
-      if (page.length === 0) break;
-      offset += page.length;
-
-      // Cap for latency; we don't need thousands for a good UX
-      if (allSearchResults.length >= 30) break;
-    }
-
-    // Get detailed information for each restaurant with throttling and fallback
-    const MAX_RESULTS = 20;
-    const batchSize = 5;
-    const items = allSearchResults.slice(0, MAX_RESULTS);
-
-    const chunks: any[][] = [];
-    for (let i = 0; i < items.length; i += batchSize) {
-      chunks.push(items.slice(i, i + batchSize));
-    }
-
-    const restaurantDetails: any[] = [];
-    for (const group of chunks) {
-      const groupResults = await Promise.all(
-        group.map(async (restaurant: any) => {
-          try {
-            const detailsParams = new URLSearchParams({
-              key: tripAdvisorKey,
-              language: 'en'
-            });
-
-            const detailsResponse = await fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/details?${detailsParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-
-            if (!detailsResponse.ok) {
-              // Fallback minimal info when details endpoint fails (rate limits, missing entity, etc.)
-              const fallbackCity = restaurant.address_obj?.city || normalizedLocation;
-              const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${restaurant.name} ${fallbackCity}`)}`;
-              return {
-                id: restaurant.location_id,
-                name: restaurant.name,
-                address: restaurant.address_obj?.address_string || '',
-                city: fallbackCity,
-                country: restaurant.address_obj?.country || '',
-                rating: 0,
-                num_reviews: 0,
-                userRatingsTotal: 0,
-                price_level: '',
-                priceLevel: 0,
-                cuisine: '',
-                description: '',
-                photos: [],
-                photoUrl: null,
-                web_url: '',
-                phone: '',
-                website: '',
-                reservationUrl: googleReservationsUrl,
-                reviews: [],
-                hours: {},
-                openNow: undefined,
-                latitude: undefined,
-                longitude: undefined
-              };
-            }
-
-            const details = await detailsResponse.json();
-
-            // Get photos (optional)
-            const photosParams = new URLSearchParams({
-              key: tripAdvisorKey,
-              language: 'en'
-            });
-
-            const photosResponse = await fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/photos?${photosParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-
-            // Fetch reviews (optional)
-            const reviewsParams = new URLSearchParams({
-              key: tripAdvisorKey,
-              language: 'en'
-            });
-            const reviewsResponse = await fetch(
-              `https://api.content.tripadvisor.com/api/v1/location/${restaurant.location_id}/reviews?${reviewsParams}`,
-              { headers: { 'Accept': 'application/json' } }
-            );
-
-            let photos: any[] = [];
-            if (photosResponse.ok) {
-              const photosData = await photosResponse.json();
-              photos = photosData.data || [];
-            }
-
-            let reviews: any[] = [];
-            if (reviewsResponse.ok) {
-              const reviewsData = await reviewsResponse.json();
-              reviews = (reviewsData.data || []).slice(0, 3);
-            }
-
-            if (priceRange && details.price_level && details.price_level !== priceRange) {
-              return null;
-            }
-
-            // Construct Google Reservations URL for consistency
-            const primaryUrl = details.website || details.web_url || '';
-            const googleReservationsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${details.name || restaurant.name} ${details.address_obj?.city || normalizedLocation}`)}`;
-            const reservationUrl = primaryUrl 
-              ? (primaryUrl.startsWith('http') ? primaryUrl : `https://${primaryUrl}`)
-              : googleReservationsUrl;
-
-            return {
-              id: restaurant.location_id,
-              name: details.name || restaurant.name,
-              address: details.address_obj?.address_string || '',
-              city: details.address_obj?.city || '',
-              country: details.address_obj?.country || '',
-              rating: details.rating || 0,
-              num_reviews: details.num_reviews || 0,
-              userRatingsTotal: details.num_reviews || 0,
-              price_level: details.price_level || '',
-              priceLevel: details.price_level ? details.price_level.split('$').length - 1 : 0,
-              cuisine: details.cuisine?.map((c: any) => c.name).join(', ') || '',
-              description: details.description || '',
-              photos: photos.map((photo: any) => ({
-                url: photo.images?.large?.url || photo.images?.original?.url,
-                caption: photo.caption || ''
-              })),
-              photoUrl: photos[0]?.images?.large?.url || photos[0]?.images?.original?.url || null,
-              web_url: details.web_url || '',
-              phone: details.phone || '',
-              website: details.website || '',
-              reservationUrl,
-              reviews: reviews.map((review: any) => ({
-                rating: review.rating || 0,
-                text: review.text || '',
-                published_date: review.published_date || '',
-                user: review.user?.username || 'Anonymous'
-              })),
-              hours: details.hours || {},
-              openNow: details.is_closed === false,
-              latitude: details.latitude,
-              longitude: details.longitude
-            };
-          } catch (error) {
-            console.error(`Error fetching details for restaurant ${restaurant.location_id}:`, error);
-            return null;
-          }
-        })
-      );
-      restaurantDetails.push(...groupResults);
-    }
-
-    // Filter out nulls and verify location match (be lenient if city is missing)
-    const validRestaurants = restaurantDetails.filter(restaurant => {
-      if (restaurant === null) return false;
-      const restaurantCity = (restaurant.city || '').toLowerCase().trim();
-      const requestedCity = normalizedLocation.toLowerCase().trim();
-      const locationVariations = getCityVariations(location).map(v => v.toLowerCase().trim());
-
-      // If we couldn't resolve a city (due to API limits), keep the item
-      if (!restaurantCity) return true;
-
-      return locationVariations.some(variation =>
-        restaurantCity.includes(variation) ||
-        variation.includes(restaurantCity) ||
-        (restaurant.name || '').toLowerCase().includes(variation)
-      );
-    });
-    
-    console.log(`Filtered restaurants: ${validRestaurants.length} out of ${restaurantDetails.length} are in ${location}`);
-    
-    return {
-      type: 'restaurants',
-      results: validRestaurants,
-      location: location
-    };
-  } catch (error) {
-    console.error('Error searching restaurants:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return { error: errorMessage, results: [] };
-  }
-}
-
-// Search flights using Amadeus API
-// Search flights using unified flight search function
-async function searchFlights(args: any) {
-  try {
-    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false, sortBy = 'best' } = args;
-    console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop, sortBy });
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return { error: 'Supabase configuration missing', results: [] };
-    }
-
-    // Convert city names to airport codes if needed (improved lookup)
-    const getAirportCode = (location: string) => {
-      // If already looks like an airport code (3 letters), use it
-      if (/^[A-Z]{3}$/i.test(location.trim())) {
-        return location.toUpperCase();
-      }
-
-      // Comprehensive city to code mapping
-      const cityToCode: Record<string, string> = {
-        // US Cities
-        'new york': 'NYC', 'los angeles': 'LAX', 'san francisco': 'SFO',
-        'washington': 'WAS', 'chicago': 'CHI', 'miami': 'MIA',
-        'seattle': 'SEA', 'atlanta': 'ATL', 'dallas': 'DFW',
-        'houston': 'HOU', 'phoenix': 'PHX', 'denver': 'DEN',
-        'orlando': 'MCO', 'detroit': 'DTW', 'minneapolis': 'MSP',
-        'portland': 'PDX', 'san diego': 'SAN', 'austin': 'AUS',
-        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
-        'boston': 'BOS', 'las vegas': 'LAS', 'philadelphia': 'PHL',
-        // Global Cities
-        'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO',
-        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
-        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
-        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
-        // Japan (closest major airports for city names)
-        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
-        // Switzerland
-        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
-        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
-        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
-        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
-        'grindelwald': 'ZRH', 'montreux': 'GVA'
-      };
-      
-      const lowerLocation = location.toLowerCase().trim();
-      
-      // Check exact match first
-      if (cityToCode[lowerLocation]) {
-        return cityToCode[lowerLocation];
-      }
-      
-      // Check if location contains any city name (for phrases like "ski destination in Zermatt")
-      for (const [city, code] of Object.entries(cityToCode)) {
-        if (lowerLocation.includes(city)) {
-          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
-          return code;
-        }
-      }
-      
-      // If no match found, try to use first 3 letters but log a warning
-      console.warn(`No airport mapping found for "${location}", using fallback code`);
-      return location.toUpperCase().slice(0, 3);
-    };
-
-    const originCode = getAirportCode(origin);
-    const destinationCode = getAirportCode(destination);
-
-    console.log('Airport codes:', { originCode, destinationCode });
-
-    // Call unified flight search
-    const flightResponse = await fetch(
-      `${supabaseUrl}/functions/v1/unified-search-flights`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`
-        },
-        body: JSON.stringify({
-          origin: originCode,
-          destination: destinationCode,
-          departureDate,
-          returnDate,
-          adults,
-          travelClass,
-          nonStop: nonStop ? 'true' : 'false',
-          destinationCity: destination
-        })
-      }
-    );
-
-    if (!flightResponse.ok) {
-      console.error('Flight search failed:', flightResponse.status);
-      return { 
-        error: `Could not find flights from ${origin} to ${destination}. Try different dates or cities.`,
-        results: [] 
-      };
-    }
-
-    const flightData = await flightResponse.json();
-    console.log('Flights found:', flightData.results?.length || 0);
-
-    // Sort flights based on sortBy parameter and LIMIT to 15 results max
-    let sortedFlights = flightData.results || [];
-    
-    if (sortBy && sortedFlights.length > 0) {
-      switch (sortBy) {
-        case 'price':
-          sortedFlights.sort((a: any, b: any) => {
-            const priceA = parseFloat(a.price.total);
-            const priceB = parseFloat(b.price.total);
-            return priceA - priceB;
-          });
-          break;
-          
-        case 'duration':
-          sortedFlights.sort((a: any, b: any) => {
-            const getDurationMinutes = (duration: string) => {
-              const hours = duration.match(/(\d+)H/)?.[1] || '0';
-              const minutes = duration.match(/(\d+)M/)?.[1] || '0';
-              return parseInt(hours) * 60 + parseInt(minutes);
-            };
-            const durationA = getDurationMinutes(a.itineraries[0].duration);
-            const durationB = getDurationMinutes(b.itineraries[0].duration);
-            return durationA - durationB;
-          });
-          break;
-          
-        case 'departure_early':
-          sortedFlights.sort((a: any, b: any) => {
-            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
-            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
-            return timeA - timeB;
-          });
-          break;
-          
-        case 'departure_late':
-          sortedFlights.sort((a: any, b: any) => {
-            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
-            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
-            return timeB - timeA;
-          });
-          break;
-          
-        case 'best':
-        default:
-          // Keep default sorting
-          break;
-      }
-    }
-    
-    // LIMIT results to prevent token overflow
-    sortedFlights = sortedFlights.slice(0, 15);
-
-    return {
-      type: 'flights',
-      origin: { code: originCode, name: origin },
-      destination: { code: destinationCode, name: destination },
-      departureDate,
-      returnDate,
-      results: sortedFlights,
-      dictionaries: flightData.dictionaries,
-      meta: flightData.meta,
-      filters: { sortBy }
-    };
-
-  } catch (error) {
-    console.error('Error in searchFlights:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
-  }
-}
-
-async function searchCars(args: any) {
-  try {
-    const { pickupLocation, pickupDate, returnDate, dropoffLocation } = args;
-    console.log('searchCars called with:', { pickupLocation, pickupDate, returnDate, dropoffLocation });
-
-    // Convert city names to airport codes if needed
-    const getAirportCode = (location: string) => {
-      // If already looks like an airport code (3 letters), use it
-      if (/^[A-Z]{3}$/i.test(location.trim())) {
-        return location.toUpperCase();
-      }
-
-      // Comprehensive city to code mapping
-      const cityToCode: Record<string, string> = {
-        // US Cities
-        'new york': 'JFK', 'los angeles': 'LAX', 'san francisco': 'SFO',
-        'washington': 'IAD', 'chicago': 'ORD', 'miami': 'MIA',
-        'boston': 'BOS', 'seattle': 'SEA', 'atlanta': 'ATL',
-        'denver': 'DEN', 'las vegas': 'LAS', 'phoenix': 'PHX',
-        'dallas': 'DFW', 'houston': 'IAH', 'detroit': 'DTW',
-        'minneapolis': 'MSP', 'orlando': 'MCO', 'philadelphia': 'PHL',
-        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
-        // Global Cities
-        'paris': 'CDG', 'london': 'LHR', 'tokyo': 'NRT',
-        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
-        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
-        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
-        // Japan (closest major airports for city names)
-        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
-        // Swiss Cities & Destinations  
-        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
-        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
-        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
-        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
-        'grindelwald': 'ZRH', 'montreux': 'GVA'
-      };
-      
-      const lowerLocation = location.toLowerCase().trim();
-      
-      // Check exact match first
-      if (cityToCode[lowerLocation]) {
-        return cityToCode[lowerLocation];
-      }
-      
-      // Check if location contains any city name (for phrases)
-      for (const [city, code] of Object.entries(cityToCode)) {
-        if (lowerLocation.includes(city)) {
-          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
-          return code;
-        }
-      }
-      
-      // If no match found, try to use first 3 letters but log a warning
-      console.warn(`No airport mapping found for "${location}", using fallback code`);
-      return location.toUpperCase().slice(0, 3);
-    };
-
-    const pickupCode = getAirportCode(pickupLocation);
-    const dropoffCode = dropoffLocation ? getAirportCode(dropoffLocation) : pickupCode;
-    console.log('Converted locations to airport codes:', { pickupCode, dropoffCode });
-
-    // Get Amadeus credentials
-    const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
-    const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
-    if (!amadeusKey || !amadeusSecret) {
-      return { error: 'Amadeus credentials not configured', results: [] };
-    }
-
-    // Get Amadeus token
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
-    });
-
-    if (!tokenResponse.ok) {
-      return { error: 'Failed to authenticate with Amadeus', results: [] };
-    }
-
-    const { access_token } = await tokenResponse.json();
-
-    // Add times to dates (10:00 AM for pickup and return)
-    const pickupDateTime = `${pickupDate}T10:00:00`;
-    const returnDateTime = `${returnDate}T10:00:00`;
-
-    // Build query parameters
-    const params = new URLSearchParams({
-      pickupLocation: pickupCode,
-      pickupDateTime: pickupDateTime,
-      returnDateTime: returnDateTime,
-      currencyCode: 'USD'
-    });
-
-    // Add dropoff location if different from pickup
-    if (dropoffCode && dropoffCode !== pickupCode) {
-      params.append('dropoffLocation', dropoffCode);
-    }
-
-    console.log('Calling Amadeus API with params:', params.toString());
-
-    const response = await fetch(
-      `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
-      {
-        headers: {
-          'Authorization': `Bearer ${access_token}`
-        }
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('Amadeus car search error:', error);
-      return { error: 'Car search failed', results: [] };
-    }
-
-    const data = await response.json();
-    console.log('Cars found:', data.data?.length || 0);
-    
-    // LIMIT cars to 10 max to prevent token overflow
-    const cars = (data.data || []).slice(0, 10);
-
-    return {
-      type: 'cars',
-      pickupLocation: pickupCode,
-      dropoffLocation: dropoffCode,
-      pickupDate: pickupDateTime,
-      returnDate: returnDateTime,
-      results: cars,
-      meta: data.meta
-    };
-
-  } catch (error) {
-    console.error('Error in searchCars:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
-  }
-}
-
-async function checkVisaRequirements(args: any) {
-  try {
-    const { fromCountry, toCountry } = args;
-    console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
-
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
-    
-    if (!OPENAI_API_KEY) {
-      return { 
-        error: 'Visa check service not configured',
-        requirement: 'unknown'
-      };
-    }
-
-    // Use OpenAI to get accurate visa information
-    const prompt = `Provide accurate and up-to-date visa requirements for a traveler from ${fromCountry} visiting ${toCountry}. Include:
-    
-1. Visa requirement status (visa required, visa-free, visa on arrival, eVisa available, etc.)
-2. Maximum stay duration if visa-free or visa on arrival
-3. Passport validity requirements (e.g., must be valid for 6 months beyond stay)
-
-IMPORTANT - VISA FEE CONSIDERATIONS:
-Explain that visa fees vary based on:
-- Destination Country: Each country has different fee structures
-- Visa Type: Purpose of visit (tourism, business, study, work) affects the category and fee
-- Petition vs. Non-Petition Based: Some visas (like work visas) are petition-based with different fees
-- Application Processing Time: Expedited processing may cost more
-- Additional Charges: May include SEVIS fees (for exchange visitors) or visa service center fees
-
-4. Estimated fee range (if available) and note that exact fees should be verified on:
-   - Official embassy or consulate website of ${toCountry}
-   - Official government visa fee schedules (.gov websites)
-
-5. Any special conditions or requirements
-6. Official embassy/government website link if available
-
-If visa is required, mention that Goldsainte can assist with the application process and handle all the complexity.
-
-Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
-        messages: [
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        max_completion_tokens: 1000
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('OpenAI error:', response.status, errorText);
-      return { 
-        error: `Visa information lookup failed: ${response.statusText}`,
-        requirement: 'unknown'
-      };
-    }
-
-    const data = await response.json();
-    const aiResponse = data.choices[0].message.content;
-    console.log('Visa requirement AI response:', aiResponse);
-
-    return {
-      type: 'visa',
-      fromCountry,
-      toCountry,
-      information: aiResponse,
-      source: 'AI-powered visa information'
-    };
-
-  } catch (error) {
-    console.error('Error in checkVisaRequirements:', error);
-    return { 
-      error: error instanceof Error ? error.message : 'Unknown error',
-      requirement: 'unknown'
-    };
-  }
-}
-
-async function searchEvents(args: any) {
-  try {
-    const { city, keyword, startDate, endDate, classificationName } = args;
-    
-    // Normalize city using abbreviation mapping
-    const normalizedCity = normalizeCityName(city);
-    console.log('searchEvents called with:', { city, normalizedCity, keyword, startDate, endDate, classificationName });
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return { error: 'Supabase configuration missing', results: [] };
-    }
-
-    const response = await fetch(`${supabaseUrl}/functions/v1/search-events`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ city: normalizedCity, keyword, startDate, endDate, classificationName }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('search-events error:', response.status, errorText);
-      return { error: `Failed to fetch events: ${response.statusText}`, results: [] };
-    }
-
-    const data = await response.json();
-    console.log('Events found:', data.events?.length || 0);
-
-    return {
-      type: 'events',
-      results: data.events || [],
-      page: data.page,
-      city
-    };
-
-  } catch (error) {
-    console.error('Error in searchEvents:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
-  }
-}
-
-// Helper to trim down package data for AI response
-function trimPackageDataForAI(packageData: any) {
-  return {
-    type: packageData.type,
-    origin: packageData.origin,
-    destination: packageData.destination,
-    departureDate: packageData.departureDate,
-    returnDate: packageData.returnDate,
-    travelers: packageData.travelers,
-    estimatedTotal: packageData.estimatedTotal,
-    savings: packageData.savings,
-    flightCount: packageData.flights?.length || 0,
-    hotelCount: packageData.hotels?.length || 0,
-    carCount: packageData.cars?.length || 0,
-    // Only include summary of cheapest options
-    cheapestFlight: packageData.flights?.[0] ? {
-      price: packageData.flights[0].price?.total,
-      airline: packageData.flights[0].validatingAirlineCodes?.[0],
-      duration: packageData.flights[0].itineraries?.[0]?.duration
-    } : null,
-    cheapestHotel: packageData.hotels?.[0] ? {
-      name: packageData.hotels[0].name,
-      price: packageData.hotels[0].offers?.[0]?.price?.total,
-      rating: packageData.hotels[0].rating
-    } : null
-  };
-}
-
-async function searchPackages(args: any) {
-  try {
-    const { origin, destination, departureDate, returnDate, travelers, includeHotel = true, includeCar = true, budget } = args;
-    console.log('searchPackages called with:', { origin, destination, departureDate, returnDate, travelers, includeHotel, includeCar, budget });
-
-    // Parse budget if provided
-    let maxFlightPrice, maxHotelPrice, maxCarPrice;
-    if (budget) {
-      const match = budget.match(/\$?(\d+)-\$?(\d+)/);
-      if (match) {
-        const totalMax = parseInt(match[2]);
-        // Allocate budget: 50% flights, 30% hotel, 20% car
-        maxFlightPrice = Math.floor(totalMax * 0.5);
-        maxHotelPrice = Math.floor(totalMax * 0.3);
-        maxCarPrice = Math.floor(totalMax * 0.2);
-      }
-    }
-
-    // Search all components in parallel
-    const searches: Promise<any>[] = [
-      searchFlights({
-        origin,
-        destination,
-        departureDate,
-        returnDate,
-        adults: travelers,
-        travelClass: 'ECONOMY',
-        sortBy: 'price'
-      })
-    ];
-
-    if (includeHotel) {
-      searches.push(searchHotels({
-        location: destination,
-        checkIn: departureDate,
-        checkOut: returnDate,
-        guests: travelers,
-        sortBy: 'price',
-        ...(maxHotelPrice && { maxPrice: maxHotelPrice })
-      }, Deno.env.get('BOOKING_API_KEY') || ''));
-    }
-
-    if (includeCar) {
-      searches.push(searchCars({
-        pickupLocation: destination,
-        pickupDate: departureDate,
-        returnDate,
-      }));
-    }
-
-    const results = await Promise.all(searches);
-    
-    // Combine results with LIMITS to prevent token overflow
-    const packageResult: any = {
-      type: 'package',
-      flights: (results[0]?.results || []).slice(0, 10), // Max 10 flights
-      hotels: includeHotel ? ((results[1]?.results || []).slice(0, 10)) : [], // Max 10 hotels
-      cars: includeCar ? ((results[includeHotel ? 2 : 1]?.results || []).slice(0, 8)) : [], // Max 8 cars
-      origin,
-      destination,
-      departureDate,
-      returnDate,
-      travelers
-    };
-
-    // Calculate sample package prices
-    if (packageResult.flights.length > 0 && packageResult.hotels.length > 0) {
-      const cheapestFlight = packageResult.flights[0];
-      const cheapestHotel = packageResult.hotels[0];
-      const flightPrice = parseFloat(cheapestFlight.price?.total || 0);
-      const hotelPrice = parseFloat(cheapestHotel.offers?.[0]?.price?.total || 0);
-      
-      let carPrice = 0;
-      if (packageResult.cars.length > 0) {
-        carPrice = parseFloat(packageResult.cars[0].price?.total || 0);
-      }
-
-      packageResult.estimatedTotal = flightPrice + hotelPrice + carPrice;
-      packageResult.savings = Math.floor((flightPrice + hotelPrice + carPrice) * 0.1); // 10% package discount
-    }
-
-    console.log('Package search completed:', {
-      flights: packageResult.flights.length,
-      hotels: packageResult.hotels.length,
-      cars: packageResult.cars.length
-    });
-
-    return packageResult;
-
-  } catch (error) {
-    console.error('Error in searchPackages:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
-  }
-}

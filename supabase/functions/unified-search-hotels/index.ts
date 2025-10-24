@@ -207,7 +207,7 @@ async function enrichWithGooglePlaces(hotels: any[], location: string) {
           const place = searchData.places[0];
 
           // Extract photos
-          hotel.__googlePhotos = (place.photos || []).slice(0, 3).map((photo: any) => ({
+          hotel.__googlePhotos = (place.photos || []).slice(0, 12).map((photo: any) => ({
             url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=1200&maxWidthPx=1600`,
             attribution: photo.authorAttributions?.[0]?.displayName || ""
           }));
