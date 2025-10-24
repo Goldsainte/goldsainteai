@@ -59,18 +59,42 @@ serve(async (req) => {
       }
     };
 
-    console.log('HotelBeds hotel search request:', { destination, checkIn, checkOut, adults });
+    const startTime = Date.now();
+    console.log('HotelBeds API call started:', { destination, checkIn, checkOut, adults, rooms });
 
-    const response = await fetch(`${baseUrl}/hotel-api/1.0/hotels`, {
-      method: 'POST',
-      headers: {
-        'Api-key': apiKey,
-        'X-Signature': signature,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Accept-Encoding': 'gzip'
-      },
-      body: JSON.stringify(requestBody)
+    // Add timeout controller
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
+    let response;
+    try {
+      response = await fetch(`${baseUrl}/hotel-api/1.0/hotels`, {
+        method: 'POST',
+        headers: {
+          'Api-key': apiKey,
+          'X-Signature': signature,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Accept-Encoding': 'gzip'
+        },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+    } catch (error: any) {
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.error('HotelBeds API request timed out after 15 seconds');
+        throw new Error('HotelBeds API request timed out');
+      }
+      console.error('HotelBeds API fetch error:', error);
+      throw error;
+    }
+
+    const fetchDuration = Date.now() - startTime;
+    console.log('HotelBeds API call completed:', {
+      duration: `${fetchDuration}ms`,
+      status: response.status
     });
 
     if (!response.ok) {
@@ -81,8 +105,11 @@ serve(async (req) => {
 
     const data = await response.json();
     
-    // Transform to consistent format
-    const hotels = (data.hotels?.hotels || []).map((hotel: any) => {
+    // Transform to consistent format - limit to first 100 hotels for performance
+    const rawHotels = data.hotels?.hotels || [];
+    console.log(`Processing ${rawHotels.length} hotels from HotelBeds (limiting to 100)`);
+    
+    const hotels = rawHotels.slice(0, 100).map((hotel: any) => {
       const minRate = hotel.rooms?.[0]?.rates?.[0];
       return {
         hotelId: hotel.code,
