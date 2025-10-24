@@ -160,6 +160,14 @@ export const BookingModal = ({
   const serviceFee = subtotal * 0.05;
   const total = subtotal + tax + serviceFee;
   
+  console.log('[BookingModal] Price breakdown:', {
+    subtotal,
+    tax,
+    serviceFee,
+    total,
+    currency
+  });
+  
   // Get currency symbol from currency code
   const currencySymbol = getCurrencySymbol(currency);
 
@@ -250,6 +258,8 @@ export const BookingModal = ({
       }
 
       if (checkoutResult.url) {
+        console.log('[BookingModal] Redirecting to Stripe checkout:', checkoutResult.url);
+        
         // Store add-on requests for post-payment follow-up
         if (values.needFlight || values.needCarTransfer) {
           localStorage.setItem('booking_addons', JSON.stringify({
@@ -267,10 +277,20 @@ export const BookingModal = ({
           description: "Please complete payment to confirm your booking",
         });
         
-        // Small delay to let user see the toast
+        // Small delay to let user see the toast, then redirect robustly
         setTimeout(() => {
-          window.location.href = checkoutResult.url;
+          window.location.replace(checkoutResult.url);
         }, 1000);
+        
+        // Fallback safety net in case redirect doesn't work
+        setTimeout(() => {
+          if (!checkoutResult.url) return;
+          toast({
+            title: "Payment Page Ready",
+            description: "Opening payment page...",
+          });
+          window.open(checkoutResult.url, '_blank');
+        }, 10000);
         
         onClose();
       }

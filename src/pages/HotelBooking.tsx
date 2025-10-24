@@ -113,6 +113,13 @@ export default function HotelBooking() {
   };
 
   const handleSelectRoom = (room: any) => {
+    console.log('[Booking] Room selected:', {
+      roomName: room.name,
+      pricePerNight: room.price,
+      nights,
+      totalForStay: room.price * nights,
+      currency: room.currency
+    });
     setSelectedRoom(room);
     setShowBookingModal(true);
   };
@@ -545,9 +552,13 @@ export default function HotelBooking() {
           checkOut,
           nights,
           guests,
+          basePricePerNight: selectedRoom?.basePrice,
+          baseCost: selectedRoom ? selectedRoom.basePrice * nights : undefined,
+          displayPricePerNight: selectedRoom?.price,
+          totalDisplayPrice: selectedRoom ? selectedRoom.price * nights : undefined,
         }}
         bookingType="hotel"
-        totalPrice={selectedRoom?.price || bookingData.totalPrice || 200}
+        totalPrice={selectedRoom ? selectedRoom.price * nights : (bookingData.totalPrice || 200) * nights}
         currency={selectedRoom?.currency || bookingData.currency || 'USD'}
       />
     </div>
