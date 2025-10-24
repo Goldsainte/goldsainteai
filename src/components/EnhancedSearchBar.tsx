@@ -112,50 +112,98 @@ export const EnhancedSearchBar = () => {
 
     if (currentType === "hotels") {
       setHotelLocation(loc);
-      const checkIn = params.get("checkIn");
-      const checkOut = params.get("checkOut");
-      if (checkIn) setCheckInDate(new Date(checkIn));
-      if (checkOut) setCheckOutDate(new Date(checkOut));
+      const checkInParam = params.get("checkIn");
+      const checkOutParam = params.get("checkOut");
+      
+      if (checkInParam) {
+        const newCheckIn = new Date(checkInParam);
+        if (!checkInDate || newCheckIn.getTime() !== checkInDate.getTime()) {
+          setCheckInDate(newCheckIn);
+        }
+      }
+      if (checkOutParam) {
+        const newCheckOut = new Date(checkOutParam);
+        if (!checkOutDate || newCheckOut.getTime() !== checkOutDate.getTime()) {
+          setCheckOutDate(newCheckOut);
+        }
+      }
     } else if (currentType === "restaurants") {
       setRestaurantLocation(loc);
-      const date = params.get("date");
-      const time = params.get("time");
-      if (date) setRestaurantDate(new Date(date));
-      if (time) setRestaurantTime(time);
+      const dateParam = params.get("date");
+      const timeParam = params.get("time");
+      
+      if (dateParam) {
+        const newDate = new Date(dateParam);
+        if (!restaurantDate || newDate.getTime() !== restaurantDate.getTime()) {
+          setRestaurantDate(newDate);
+        }
+      }
+      if (timeParam) setRestaurantTime(timeParam);
     } else if (currentType === "events") {
       setEventLocation(loc);
-      const date = params.get("date");
-      if (date) setEventDate(parseLocalDate(date));
-    } else if (currentType === "flights") {
-      const origin = params.get("origin");
-      const destination = params.get("destination");
-      const departureDate = params.get("departureDate");
-      const returnDate = params.get("returnDate");
-
-      if (origin) setOrigin(origin);
-      if (destination) setDestination(destination);
-      if (departureDate) setDepartureDate(parseLocalDate(departureDate));
-      if (returnDate) setReturnDate(parseLocalDate(returnDate));
-    } else if (currentType === "cars") {
-      const pu = params.get("pickup");
-      const doLoc = params.get("dropoff");
-      const puDate = params.get("pickupDate");
-      const rtDate = params.get("returnDate");
-      const tt = (params.get("carTripType") as any) || "round-trip";
+      const dateParam = params.get("date");
       
-      // Pre-fill pickup from location param if it looks like an airport code
-      if (!pu && loc && /^[A-Z]{3}$/i.test(loc.trim())) {
-        setPickupLocation(loc.toUpperCase());
-      } else if (pu) {
-        setPickupLocation(pu);
+      if (dateParam) {
+        const newDate = parseLocalDate(dateParam);
+        if (!eventDate || !newDate || newDate.getTime() !== eventDate.getTime()) {
+          setEventDate(newDate);
+        }
+      }
+    } else if (currentType === "flights") {
+      const originParam = params.get("origin");
+      const destinationParam = params.get("destination");
+      const departureDateParam = params.get("departureDate");
+      const returnDateParam = params.get("returnDate");
+
+      if (originParam) setOrigin(originParam);
+      if (destinationParam) setDestination(destinationParam);
+      
+      if (departureDateParam) {
+        const newDepartureDate = parseLocalDate(departureDateParam);
+        if (!departureDate || !newDepartureDate || newDepartureDate.getTime() !== departureDate.getTime()) {
+          setDepartureDate(newDepartureDate);
+        }
       }
       
-      if (doLoc) setDropoffLocation(doLoc);
-      if (puDate) setPickupDateCar(parseLocalDate(puDate));
-      if (rtDate) setReturnDateCar(parseLocalDate(rtDate));
-      setCarTripType(tt);
+      if (returnDateParam) {
+        const newReturnDate = parseLocalDate(returnDateParam);
+        if (!returnDate || !newReturnDate || newReturnDate.getTime() !== returnDate.getTime()) {
+          setReturnDate(newReturnDate);
+        }
+      }
+    } else if (currentType === "cars") {
+      const puParam = params.get("pickup");
+      const doLocParam = params.get("dropoff");
+      const puDateParam = params.get("pickupDate");
+      const rtDateParam = params.get("returnDate");
+      const ttParam = (params.get("carTripType") as any) || "round-trip";
+      
+      // Pre-fill pickup from location param if it looks like an airport code
+      if (!puParam && loc && /^[A-Z]{3}$/i.test(loc.trim())) {
+        setPickupLocation(loc.toUpperCase());
+      } else if (puParam) {
+        setPickupLocation(puParam);
+      }
+      
+      if (doLocParam) setDropoffLocation(doLocParam);
+      
+      if (puDateParam) {
+        const newPickupDate = parseLocalDate(puDateParam);
+        if (!pickupDateCar || !newPickupDate || newPickupDate.getTime() !== pickupDateCar.getTime()) {
+          setPickupDateCar(newPickupDate);
+        }
+      }
+      
+      if (rtDateParam) {
+        const newReturnDate = parseLocalDate(rtDateParam);
+        if (!returnDateCar || !newReturnDate || newReturnDate.getTime() !== returnDateCar.getTime()) {
+          setReturnDateCar(newReturnDate);
+        }
+      }
+      
+      setCarTripType(ttParam);
     }
-  }, [routeLocation.search]);
+  }, [routeLocation.search, checkInDate, checkOutDate, restaurantDate, eventDate, departureDate, returnDate, pickupDateCar, returnDateCar]);
 
   const handleSwapLocations = () => {
     const temp = origin;
