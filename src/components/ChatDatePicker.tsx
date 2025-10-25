@@ -18,6 +18,15 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [singleDate, setSingleDate] = useState<Date>();
 
+  // Ensure calendar always shows current or future month
+  const getDefaultMonth = () => {
+    const today = new Date();
+    if (suggestedDate && suggestedDate >= today) {
+      return suggestedDate;
+    }
+    return today;
+  };
+
   const handleDateSelect = (range: DateRange | undefined) => {
     setDateRange(range);
   };
@@ -84,7 +93,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
   };
 
   return (
-    <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4">
+    <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 bg-gradient-to-br from-background to-background/95 border-primary/20 shadow-2xl max-w-md">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -125,8 +134,8 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
               selected={singleDate}
               onSelect={handleSingleDateSelect}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              defaultMonth={suggestedDate}
-              className="rounded-md border pointer-events-auto"
+              defaultMonth={getDefaultMonth()}
+              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg"
             />
           ) : (
             <Calendar
@@ -134,8 +143,8 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
               selected={dateRange}
               onSelect={handleDateSelect}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              defaultMonth={suggestedDate}
-              className="rounded-md border pointer-events-auto"
+              defaultMonth={getDefaultMonth()}
+              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg"
             />
           )}
 
@@ -156,7 +165,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
             <Button
               onClick={handleConfirm}
               disabled={!canConfirm()}
-              className="flex-1"
+              className="flex-1 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
             >
               Confirm Date{((type === "hotel" || tripType === "round-trip") && dateRange?.from && dateRange?.to) ? "s" : ""}
             </Button>
