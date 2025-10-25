@@ -1937,11 +1937,6 @@ Always show results first with minimal text, ask questions later. Be conversatio
     ];
 
     console.log('Calling Lovable AI Gateway (Gemini)...');
-    
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) {
-      throw new Error('LOVABLE_API_KEY not configured');
-    }
 
     const aiResponse = await fetch(LOVABLE_AI_URL, {
       method: 'POST',
