@@ -7,6 +7,9 @@ const corsHeaders = {
 };
 
 const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
+const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+
+console.log('[BOOT] Lovable AI key present:', !!LOVABLE_API_KEY);
 
 // Shared helper: Map common city abbreviations and airport codes to full names
 function getCityVariations(location: string): string[] {
@@ -758,8 +761,6 @@ async function checkVisaRequirements(args: any) {
   try {
     const { fromCountry, toCountry } = args;
     console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
-
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
       return { 
@@ -1020,7 +1021,6 @@ serve(async (req) => {
     }
     console.log('Has location:', !!userLocation);
 
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
     
     if (!LOVABLE_API_KEY) {
