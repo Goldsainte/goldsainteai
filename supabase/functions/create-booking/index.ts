@@ -47,7 +47,31 @@ serve(async (req) => {
     
     const { bookingType, bookingData, totalPrice, currency, source, guestInfo } = validationResult.data;
     
-    console.log('Creating booking:', { bookingType, totalPrice, currency, source });
+    // CRITICAL: Validate and extract dates for hotel bookings
+    let checkInDate = null;
+    let checkOutDate = null;
+    let guests = 2;
+    
+    if (bookingType === 'hotel') {
+      checkInDate = bookingData.checkInDate || bookingData.checkIn;
+      checkOutDate = bookingData.checkOutDate || bookingData.checkOut;
+      guests = bookingData.guests || bookingData.adults || 2;
+      
+      console.log('🔍 [CREATE-BOOKING] Hotel date validation:', {
+        checkInDate,
+        checkOutDate,
+        guests,
+        rawCheckIn: bookingData.checkIn,
+        rawCheckInDate: bookingData.checkInDate
+      });
+      
+      if (!checkInDate || !checkOutDate) {
+        console.error('❌ Missing hotel dates:', { bookingData });
+        throw new Error('Hotel bookings require check-in and check-out dates');
+      }
+    }
+    
+    console.log('Creating booking:', { bookingType, totalPrice, currency, source, checkInDate, checkOutDate });
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -117,19 +141,29 @@ serve(async (req) => {
 
     console.log('Booking created:', booking.id, 'Reference:', bookingReference);
 
-    // Send confirmation email in the background
+    // Send acknowledgment email (first email) in the background
     const emailData = {
       guestEmail: guestInfo.email,
       guestName: `${guestInfo.firstName} ${guestInfo.lastName}`,
       bookingReference,
       bookingType,
-      bookingData,
-      checkInDate: bookingData.checkInDate,
-      checkOutDate: bookingData.checkOutDate,
+      bookingData: {
+        ...bookingData,
+        guests: guests // Include standardized guest count
+      },
+      // CRITICAL: Pass standardized date fields
+      checkInDate: checkInDate || bookingData.checkInDate || bookingData.checkIn,
+      checkOutDate: checkOutDate || bookingData.checkOutDate || bookingData.checkOut,
       totalPrice,
       currency,
       specialRequests: guestInfo.specialRequests
     };
+    
+    console.log('📧 [EMAIL] Sending acknowledgment email with dates:', {
+      checkInDate: emailData.checkInDate,
+      checkOutDate: emailData.checkOutDate,
+      guests: emailData.bookingData.guests
+    });
 
     // Send email without blocking the response
     fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-confirmation-email`, {

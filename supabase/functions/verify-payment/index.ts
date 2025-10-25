@@ -338,8 +338,69 @@ serve(async (req) => {
             })
             .eq('id', actualBookingId);
         }
+      } else if (booking.booking_type === 'hotel' && booking.booking_data?.offers?.[0]) {
+        // For Amadeus hotel bookings
+        try {
+          console.log('Processing Amadeus hotel booking...');
+          
+          const selectedOffer = booking.booking_data.offers[0];
+          const hotelData = booking.booking_data.hotel || booking.booking_data;
+          
+          const amadeusBookingResult = await supabaseClient.functions.invoke('amadeus-book-hotel', {
+            body: {
+              offerId: selectedOffer.id,
+              hotelId: hotelData.hotelId,
+              guestInfo: {
+                firstName: booking.guests?.first_name || 'Guest',
+                lastName: booking.guests?.last_name || 'Guest',
+                email: booking.guests?.email,
+                phone: booking.guests?.phone
+              },
+              bookingReference: booking.booking_reference,
+              baseCost: booking.base_cost || booking.total_price
+            }
+          });
+
+          if (!amadeusBookingResult.error && amadeusBookingResult.data?.confirmationNumber) {
+            console.log('✅ Amadeus booking successful, sending confirmation email...');
+            
+            // Send second confirmation email with Amadeus confirmation number
+            const emailResult = await supabaseClient.functions.invoke('send-amadeus-confirmation-email', {
+              body: {
+                guestEmail: booking.guests?.email,
+                guestName: `${booking.guests?.first_name || 'Guest'} ${booking.guests?.last_name || ''}`.trim(),
+                bookingReference: booking.booking_reference,
+                amadeusConfirmationNumber: amadeusBookingResult.data.confirmationNumber,
+                bookingData: booking.booking_data,
+                hotelName: hotelData.name || hotelData.hotelName || 'Hotel',
+                hotelAddress: hotelData.address?.lines?.[0] || hotelData.hotelAddress || 'Address',
+                checkInDate: booking.booking_data.checkInDate || booking.booking_data.checkIn,
+                checkOutDate: booking.booking_data.checkOutDate || booking.booking_data.checkOut,
+                roomType: booking.booking_data.selectedRoom?.name || booking.booking_data.room?.description?.text || 'Standard Room',
+                guests: booking.booking_data.guests || booking.booking_data.adults || 2,
+                nights: booking.booking_data.nights || 1,
+                totalPrice: booking.total_price,
+                currency: booking.currency
+              }
+            });
+            
+            if (emailResult.error) {
+              console.error('❌ Failed to send Amadeus confirmation email:', emailResult.error);
+            } else {
+              console.log('✅ Amadeus confirmation email sent successfully');
+            }
+          } else {
+            console.error('❌ Amadeus booking failed:', amadeusBookingResult.error);
+          }
+        } catch (amadeusError) {
+          console.error('Failed to create Amadeus booking:', amadeusError);
+          await supabaseClient
+            .from('bookings')
+            .update({ status: 'cancelled' })
+            .eq('id', actualBookingId);
+        }
       } else {
-        // For non-Expedia bookings, just mark as confirmed
+        // For non-Amadeus/Expedia bookings, just mark as confirmed
         const { error: bookingError } = await supabaseClient
           .from('bookings')
           .update({

@@ -197,13 +197,44 @@ export const BookingModal = ({
     setLoading(true);
 
     try {
+      // CRITICAL: Standardize date fields and guest count before sending to backend
+      console.log('🔍 [BOOKING DEBUG] Pre-submission validation:', {
+        checkIn: bookingData.checkIn,
+        checkOut: bookingData.checkOut,
+        checkInDate: bookingData.checkInDate,
+        checkOutDate: bookingData.checkOutDate,
+        guests: bookingData.guests,
+        adults: bookingData.adults,
+        children: bookingData.children,
+        bookingType
+      });
+
+      // Validate dates exist for hotel bookings
+      if (bookingType === 'hotel' && (!bookingData.checkIn && !bookingData.checkInDate)) {
+        throw new Error('Check-in and check-out dates are required for hotel bookings');
+      }
+
       const { data: bookingResult, error: bookingError } = await supabase.functions.invoke('create-booking', {
         body: {
           bookingType,
-          bookingData,
+          bookingData: {
+            ...bookingData,
+            // Standardize date fields - ensure both formats are present
+            checkIn: bookingData.checkIn || bookingData.checkInDate,
+            checkOut: bookingData.checkOut || bookingData.checkOutDate,
+            checkInDate: bookingData.checkInDate || bookingData.checkIn,
+            checkOutDate: bookingData.checkOutDate || bookingData.checkOut,
+            // Standardize guest count
+            guests: bookingData.guests || bookingData.adults || 2,
+            adults: bookingData.adults || bookingData.guests || 2,
+            children: bookingData.children || 0,
+            // Include source for tracking
+            source: bookingData.source || 'manual_search'
+          },
           totalPrice: total,
           currency,
-          guestInfo: values
+          guestInfo: values,
+          source: bookingData.source || 'manual_search'
         }
       });
 

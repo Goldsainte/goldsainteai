@@ -78,12 +78,20 @@ const handler = async (req: Request): Promise<Response> => {
     let emailSubject = '';
     
     if (bookingType === 'hotel') {
-      const hotelName = bookingData.hotel?.name || bookingData.hotelName || 'Hotel';
+      const hotelName = bookingData.hotel?.name || bookingData.hotelName || bookingData.selectedRoom?.hotelName || 'Hotel';
       const hotelAddress = bookingData.hotel?.address?.lines?.[0] || bookingData.hotelAddress || 'Hotel Address';
-      const roomType = bookingData.room?.description?.text || bookingData.roomType || 'Standard Room';
-      const bedType = bookingData.room?.typeEstimated?.bedType || bookingData.bedType || 'Not specified';
+      const roomType = bookingData.selectedRoom?.name || bookingData.room?.description?.text || bookingData.roomType || 'Standard Room';
+      const bedType = bookingData.selectedRoom?.bedType || bookingData.room?.typeEstimated?.bedType || bookingData.bedType || 'Not specified';
       const guests = bookingData.guests || bookingData.adults || 2;
       const nights = bookingData.nights || 1;
+      
+      console.log('📧 [EMAIL-TEMPLATE] Hotel email data:', {
+        checkInDate,
+        checkOutDate,
+        guests,
+        nights,
+        hotelName
+      });
       
       emailSubject = `Hotel Booking Confirmed - ${hotelName}`;
       
@@ -147,7 +155,7 @@ const handler = async (req: Request): Promise<Response> => {
             <table>
               <tr>
                 <td class="info-label">Check-in date</td>
-                <td class="info-value">${checkInDate || 'TBD'}</td>
+                <td class="info-value"><strong>${checkInDate ? new Date(checkInDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'To be confirmed'}</strong></td>
               </tr>
             </table>
           </div>
@@ -155,7 +163,7 @@ const handler = async (req: Request): Promise<Response> => {
             <table>
               <tr>
                 <td class="info-label">Check-out date</td>
-                <td class="info-value">${checkOutDate || 'TBD'}</td>
+                <td class="info-value"><strong>${checkOutDate ? new Date(checkOutDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) : 'To be confirmed'}</strong></td>
               </tr>
             </table>
           </div>

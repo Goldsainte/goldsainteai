@@ -62,10 +62,13 @@ export default function HotelBooking() {
   const hotelAddress = bookingData.hotel?.address || bookingData.hotelAddress || 'Address';
   const rating = Number(bookingData.hotel?.property?.reviewScore ?? bookingData.hotel?.rating ?? 8.5);
   const reviewCount = Number(bookingData.hotel?.property?.reviewCount ?? 1043);
-  const checkIn = bookingData.checkIn;
-  const checkOut = bookingData.checkOut;
+  // Standardize date and guest fields with fallbacks
+  const checkIn = bookingData.checkIn || bookingData.checkInDate;
+  const checkOut = bookingData.checkOut || bookingData.checkOutDate;
   const nights = bookingData.nights || 1;
-  const guests = bookingData.guests || 2;
+  const guests = bookingData.guests || bookingData.adults || 2;
+  const adults = bookingData.adults || bookingData.guests || 2;
+  const children = bookingData.children || 0;
 
 // Generate comprehensive image gallery - use real photos from Google Places
   const hotelPhotos = bookingData.hotel?.property?.photoUrls || 
