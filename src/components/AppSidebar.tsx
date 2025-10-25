@@ -1,4 +1,4 @@
-import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, UtensilsCrossed, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Package, TrendingUp, Info, DollarSign, Users } from "lucide-react";
+import { Home, Search, Heart, User, LogIn, LogOut, Clock, Hotel, Plane, Ticket, X, LayoutDashboard, Briefcase, ShieldCheck, Package, TrendingUp, Info, DollarSign, Users } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logomark from "@/assets/logomark-gold.png";
@@ -50,8 +50,6 @@ export function AppSidebar() {
       case "hotels": return Hotel;
       case "flight":
       case "flights": return Plane;
-      case "restaurant":
-      case "restaurants": return UtensilsCrossed;
       case "event":
       case "events": return Ticket;
       default: return Search;
@@ -66,8 +64,6 @@ export function AppSidebar() {
           return 'flights';
         case 'hotel':
           return 'hotels';
-        case 'restaurant':
-          return 'restaurants';
         case 'event':
           return 'events';
         case 'destination':
@@ -93,7 +89,7 @@ export function AppSidebar() {
       } as any);
       navigate(`/search?${params.toString()}`);
     } else {
-      // Handle hotels/restaurants/events/destinations
+      // Handle hotels/events/destinations
       const params = new URLSearchParams({
         type: getPluralType(item.type),
         location: item.location || '',
@@ -276,7 +272,7 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {history
-                  .filter((item) => searchFilter === null || item.type === searchFilter)
+                  .filter((item) => !['restaurant', 'restaurants', 'car', 'cars'].includes(item.type) && (searchFilter === null || item.type === searchFilter))
                   .map((item) => {
                   const Icon = getSearchIcon(item.type);
                   return (
