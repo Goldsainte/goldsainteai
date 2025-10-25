@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
+const LOVABLE_AI_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 
 // Shared helper: Map common city abbreviations and airport codes to full names
 function getCityVariations(location: string): string[] {
@@ -759,49 +759,30 @@ async function checkVisaRequirements(args: any) {
     const { fromCountry, toCountry } = args;
     console.log('checkVisaRequirements called with:', { fromCountry, toCountry });
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
-    if (!OPENAI_API_KEY) {
+    if (!LOVABLE_API_KEY) {
       return { 
         error: 'Visa check service not configured',
         requirement: 'unknown'
       };
     }
 
-    // Use OpenAI to get accurate visa information
+    // Use Lovable AI (Gemini) to get accurate visa information
     const prompt = `Provide accurate and up-to-date visa requirements for a traveler from ${fromCountry} visiting ${toCountry}. Include:
-    
-1. Visa requirement status (visa required, visa-free, visa on arrival, eVisa available, etc.)
-2. Maximum stay duration if visa-free or visa on arrival
-3. Passport validity requirements (e.g., must be valid for 6 months beyond stay)
-
-IMPORTANT - VISA FEE CONSIDERATIONS:
-Explain that visa fees vary based on:
-- Destination Country: Each country has different fee structures
-- Visa Type: Purpose of visit (tourism, business, study, work) affects the category and fee
-- Petition vs. Non-Petition Based: Some visas (like work visas) are petition-based with different fees
-- Application Processing Time: Expedited processing may cost more
-- Additional Charges: May include SEVIS fees (for exchange visitors) or visa service center fees
-
-4. Estimated fee range (if available) and note that exact fees should be verified on:
-   - Official embassy or consulate website of ${toCountry}
-   - Official government visa fee schedules (.gov websites)
-
-5. Any special conditions or requirements
-6. Official embassy/government website link if available
-
+...
 If visa is required, mention that Goldsainte can assist with the application process and handle all the complexity.
 
 Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
+        model: 'google/gemini-2.5-flash',
         messages: [
           {
             role: 'user',
@@ -1026,11 +1007,11 @@ serve(async (req) => {
     }
     console.log('Has location:', !!userLocation);
 
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
     
-    if (!OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY not configured');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
     }
     // BOOKING_API_KEY is optional - only needed for search_destinations
 
@@ -1942,16 +1923,21 @@ Always show results first with minimal text, ask questions later. Be conversatio
       }
     ];
 
-    console.log('Calling OpenAI with tools...');
+    console.log('Calling Lovable AI Gateway (Gemini)...');
+    
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    if (!LOVABLE_API_KEY) {
+      throw new Error('LOVABLE_API_KEY not configured');
+    }
 
-    const aiResponse = await fetch(OPENAI_URL, {
+    const aiResponse = await fetch(LOVABLE_AI_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-5-mini-2025-08-07',
+        model: 'google/gemini-2.5-flash',
         messages,
         tools,
         tool_choice: 'auto',
@@ -2063,14 +2049,14 @@ Always show results first with minimal text, ask questions later. Be conversatio
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
 
-        const finalResponse = await fetch(OPENAI_URL, {
+        const finalResponse = await fetch(LOVABLE_AI_URL, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${OPENAI_API_KEY}`,
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-5-mini-2025-08-07',
+            model: 'google/gemini-2.5-flash',
             messages: finalMessages,
             max_completion_tokens: 500, // Limit response size
           }),

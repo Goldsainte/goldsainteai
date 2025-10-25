@@ -51,25 +51,42 @@ const RESERVATION_PLATFORMS = [
   'covermanager.com'
 ];
 
-// Simple in-memory cache with 5-minute TTL
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Database cache with 24-hour TTL
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 function getCacheKey(city: string, cuisine?: string, minRating?: number): string {
-  return `${city}|${cuisine || 'all'}|${minRating || 4.3}`;
+  return `restaurants|${city}|${cuisine || 'all'}|${minRating || 4.3}`;
 }
 
-function getFromCache(key: string): any | null {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+async function getFromCache(supabase: any, key: string): Promise<any | null> {
+  try {
+    const { data, error } = await supabase
+      .from('search_cache')
+      .select('data')
+      .eq('cache_key', key)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+    
+    if (error || !data) return null;
+    return data.data;
+  } catch {
+    return null;
   }
-  cache.delete(key);
-  return null;
 }
 
-function setCache(key: string, data: any): void {
-  cache.set(key, { data, timestamp: Date.now() });
+async function setCache(supabase: any, key: string, data: any): Promise<void> {
+  try {
+    const expiresAt = new Date(Date.now() + CACHE_TTL);
+    await supabase
+      .from('search_cache')
+      .upsert({
+        cache_key: key,
+        data,
+        expires_at: expiresAt.toISOString()
+      });
+  } catch (error) {
+    console.error('Cache write error:', error);
+  }
 }
 
 function detectReservationPlatform(websiteUri: string): string | null {
@@ -100,10 +117,17 @@ serve(async (req) => {
     }
 
     console.log(`Searching for restaurants in ${city}${cuisine ? ` (${cuisine})` : ''}`);
+    
+    // Initialize Supabase client for database caching
+    const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
-    // Check cache
+    // Check database cache
     const cacheKey = getCacheKey(city, cuisine, minRating);
-    const cachedData = getFromCache(cacheKey);
+    const cachedData = await getFromCache(supabaseClient, cacheKey);
     if (cachedData) {
       console.log('Returning cached data');
       return new Response(JSON.stringify(cachedData), {
@@ -231,8 +255,8 @@ serve(async (req) => {
       cuisine: cuisine || null
     };
 
-    // Cache the result
-    setCache(cacheKey, result);
+    // Cache the result (fire and forget)
+    setCache(supabaseClient, cacheKey, result);
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

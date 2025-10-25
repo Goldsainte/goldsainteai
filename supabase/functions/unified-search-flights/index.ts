@@ -7,25 +7,42 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Simple in-memory cache with TTL
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Database cache with 24-hour TTL
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 function getCacheKey(params: any): string {
   return JSON.stringify(params);
 }
 
-function getFromCache(key: string): any | null {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+async function getFromCache(supabase: any, key: string): Promise<any | null> {
+  try {
+    const { data, error } = await supabase
+      .from('search_cache')
+      .select('data')
+      .eq('cache_key', key)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+    
+    if (error || !data) return null;
+    return data.data;
+  } catch {
+    return null;
   }
-  cache.delete(key);
-  return null;
 }
 
-function setCache(key: string, data: any): void {
-  cache.set(key, { data, timestamp: Date.now() });
+async function setCache(supabase: any, key: string, data: any): Promise<void> {
+  try {
+    const expiresAt = new Date(Date.now() + CACHE_TTL);
+    await supabase
+      .from('search_cache')
+      .upsert({
+        cache_key: key,
+        data,
+        expires_at: expiresAt.toISOString()
+      });
+  } catch (error) {
+    console.error('Cache write error:', error);
+  }
 }
 
 // Get Amadeus access token with retry
@@ -124,7 +141,13 @@ serve(async (req) => {
     const params = await req.json();
     console.log('Unified flight search request:', params);
     
-    const sortBy = params.sortBy || 'best_value'; // Extract sortBy parameter
+    const sortBy = params.sortBy || 'best_value';
+    
+    // Initialize Supabase client for caching
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
     
     // Determine currency from destination
     const currencyCode = params.destinationCity 
@@ -136,9 +159,9 @@ serve(async (req) => {
       currencyCode
     };
 
-    // Check cache first
+    // Check database cache first
     const cacheKey = getCacheKey(searchParams);
-    const cachedResult = getFromCache(cacheKey);
+    const cachedResult = await getFromCache(supabaseClient, cacheKey);
     
     if (cachedResult) {
       console.log('Returning cached flight results');
@@ -151,11 +174,12 @@ serve(async (req) => {
       });
     }
 
-    // Get token and search
+    // Get token and search with performance logging
+    const searchStart = Date.now();
     const token = await getAmadeusToken();
     const flightData = await searchAmadeusFlights(searchParams, token);
     
-    console.log('Flights found:', flightData.results.length);
+    console.log(`Flights found: ${flightData.results.length} in ${Date.now() - searchStart}ms`);
 
     // Apply 15% markup to all flight prices
     const MARKUP_PERCENTAGE = 15;
@@ -185,12 +209,7 @@ serve(async (req) => {
       };
     });
 
-    // Rank flights using Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
+    // Rank flights
     let rankedResults = markedUpResults;
     try {
       const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
@@ -219,8 +238,8 @@ serve(async (req) => {
       results: rankedResults
     };
 
-    // Cache the result with markup
-    setCache(cacheKey, responseData);
+    // Cache the result with markup (fire and forget)
+    setCache(supabaseClient, cacheKey, responseData);
 
     return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

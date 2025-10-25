@@ -6,25 +6,42 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Simple in-memory cache with TTL
-const cache = new Map<string, { data: any; timestamp: number }>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+// Database cache with 24-hour TTL
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
 function getCacheKey(params: any): string {
-  return JSON.stringify(params);
+  return `hotels|${JSON.stringify(params)}`;
 }
 
-function getFromCache(key: string): any | null {
-  const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
+async function getFromCache(supabase: any, key: string): Promise<any | null> {
+  try {
+    const { data, error } = await supabase
+      .from('search_cache')
+      .select('data')
+      .eq('cache_key', key)
+      .gt('expires_at', new Date().toISOString())
+      .single();
+    
+    if (error || !data) return null;
+    return data.data;
+  } catch {
+    return null;
   }
-  cache.delete(key);
-  return null;
 }
 
-function setCache(key: string, data: any): void {
-  cache.set(key, { data, timestamp: Date.now() });
+async function setCache(supabase: any, key: string, data: any): Promise<void> {
+  try {
+    const expiresAt = new Date(Date.now() + CACHE_TTL);
+    await supabase
+      .from('search_cache')
+      .upsert({
+        cache_key: key,
+        data,
+        expires_at: expiresAt.toISOString()
+      });
+  } catch (error) {
+    console.error('Cache write error:', error);
+  }
 }
 
 async function getAmadeusToken() {
@@ -253,10 +270,12 @@ serve(async (req) => {
     );
 
     console.log("Unified hotel search:", { location, checkIn, checkOut, guests });
+    
+    const searchStart = Date.now();
 
-    // Check cache first
+    // Check database cache first
     const cacheKey = getCacheKey({ location, checkIn, checkOut, guests });
-    const cachedResult = getFromCache(cacheKey);
+    const cachedResult = await getFromCache(supabaseClient, cacheKey);
     
     if (cachedResult) {
       clearTimeout(timeoutId);
@@ -379,8 +398,10 @@ serve(async (req) => {
       console.error('Ranking failed, returning unranked results:', error);
     }
     
-    // Cache the result
-    setCache(cacheKey, responseData);
+    // Cache the result (fire and forget)
+    setCache(supabaseClient, cacheKey, responseData);
+    
+    console.log(`Hotel search completed in ${Date.now() - searchStart}ms`);
     clearTimeout(timeoutId);
 
     return new Response(JSON.stringify(responseData), {

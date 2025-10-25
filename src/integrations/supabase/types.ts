@@ -5669,6 +5669,27 @@ export type Database = {
           },
         ]
       }
+      search_cache: {
+        Row: {
+          cache_key: string
+          cached_at: string | null
+          data: Json
+          expires_at: string
+        }
+        Insert: {
+          cache_key: string
+          cached_at?: string | null
+          data: Json
+          expires_at: string
+        }
+        Update: {
+          cache_key?: string
+          cached_at?: string | null
+          data?: Json
+          expires_at?: string
+        }
+        Relationships: []
+      }
       search_history: {
         Row: {
           created_at: string
@@ -8870,6 +8891,7 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: boolean
       }
+      cleanup_expired_cache: { Args: never; Returns: undefined }
       cleanup_expired_oauth_states: { Args: never; Returns: undefined }
       cleanup_old_rate_limits: { Args: never; Returns: undefined }
       convert_currency: {
