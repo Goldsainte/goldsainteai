@@ -263,15 +263,6 @@ export function AppSidebar() {
                   Hotels
                 </Button>
                 <Button
-                  variant={searchFilter === "restaurant" ? "default" : "outline"}
-                  size="sm"
-                  className="h-6 text-xs px-2"
-                  onClick={() => setSearchFilter("restaurant")}
-                >
-                  <UtensilsCrossed className="h-3 w-3 mr-1" />
-                  Dining
-                </Button>
-                <Button
                   variant={searchFilter === "event" ? "default" : "outline"}
                   size="sm"
                   className="h-6 text-xs px-2"

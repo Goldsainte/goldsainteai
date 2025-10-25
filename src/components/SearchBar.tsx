@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Calendar, MapPin, Users, Search, Plane, Hotel, UtensilsCrossed, Ticket, Car } from "lucide-react";
+import { Calendar, MapPin, Users, Search, Plane, Hotel, Ticket } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -105,8 +105,6 @@ export const SearchBar = () => {
     switch (searchType) {
       case "hotels": return "Search hotels";
       case "flights": return "Search flights";
-      case "cars": return "Search cars";
-      case "restaurants": return "Search restaurants";
       case "events": return "Search events";
       default: return "Search";
     }
@@ -116,7 +114,7 @@ export const SearchBar = () => {
     <div className="w-full">
       <div className="bg-background" role="search" aria-label="Travel search">
         <Tabs value={searchType} onValueChange={setSearchType} className="mb-4">
-          <TabsList className="grid w-full grid-cols-5 bg-muted/50 p-1 h-auto rounded-xl" aria-label="Search type selection">
+          <TabsList className="grid w-full grid-cols-3 bg-muted/50 p-1 h-auto rounded-xl" aria-label="Search type selection">
             <TabsTrigger 
               value="hotels" 
               className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
@@ -132,20 +130,6 @@ export const SearchBar = () => {
               <Plane className="h-4 w-4" aria-hidden="true" />
             </TabsTrigger>
             <TabsTrigger 
-              value="cars" 
-              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
-              aria-label="Search cars"
-            >
-              <Car className="h-4 w-4" aria-hidden="true" />
-            </TabsTrigger>
-            <TabsTrigger 
-              value="restaurants" 
-              className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
-              aria-label="Search restaurants"
-            >
-              <UtensilsCrossed className="h-4 w-4" aria-hidden="true" />
-            </TabsTrigger>
-            <TabsTrigger 
               value="events" 
               className="gap-1 py-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm rounded-lg" 
               aria-label="Search events"
@@ -157,24 +141,13 @@ export const SearchBar = () => {
 
         <div className="space-y-3">
           <div className="relative">
-            {searchType === "restaurants" ? (
-              <CityAutocomplete
-                placeholder="City, restaurant name, or cuisine"
-                className="h-14 text-base rounded-xl pl-12 bg-muted/30 border-muted"
-                value={location}
-                onChange={setLocation}
-              />
-            ) : (
-              <>
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
-                <Input
-                  placeholder={searchType === "flights" ? "From where?" : searchType === "cars" ? "Pick-up location" : "Where to?"}
-                  className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                />
-              </>
-            )}
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
+            <Input
+              placeholder={searchType === "flights" ? "From where?" : "Where to?"}
+              className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+            />
           </div>
 
           {searchType === "hotels" && (
@@ -205,20 +178,18 @@ export const SearchBar = () => {
             </>
           )}
 
-          {(searchType === "flights" || searchType === "cars") && (
+          {searchType === "flights" && (
             <div className="relative">
-              <label htmlFor="departure-date" className="sr-only">
-                {searchType === "cars" ? "Pick-up date" : "Departure date"}
-              </label>
+              <label htmlFor="departure-date" className="sr-only">Departure date</label>
               <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
               <Input
                 id="departure-date"
                 type="date"
-                placeholder={searchType === "cars" ? "Pick-up date" : "Departure date"}
+                placeholder="Departure date"
                 className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
                 value={singleDate}
                 onChange={(e) => setSingleDate(e.target.value)}
-                aria-label={searchType === "cars" ? "Pick-up date" : "Departure date"}
+                aria-label="Departure date"
               />
             </div>
           )}
