@@ -85,6 +85,193 @@ function normalizeCityName(location: string): string {
   return variations.sort((a, b) => b.length - a.length)[0] || location;
 }
 
+// ============= SLOT-FILLING SYSTEM =============
+
+interface SearchSlots {
+  // Hotel slots
+  location?: string;
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number;
+  budget?: { min?: number; max?: number };
+  
+  // Flight slots
+  origin?: string;
+  destination?: string;
+  departureDate?: string;
+  returnDate?: string;
+  adults?: number;
+  tripType?: 'one-way' | 'round-trip';
+  
+  // Universal
+  preferences?: string[];
+}
+
+interface SearchState {
+  type?: 'hotel' | 'flight' | 'restaurant' | 'event' | 'package';
+  slots: SearchSlots;
+  filledSlots: string[];
+  requiredSlots: string[];
+  lastSearch?: {
+    params: any;
+    timestamp: number;
+  };
+}
+
+// Calculate next weekend dates
+function calculateNextWeekend(currentDate: Date): { checkIn: string; checkOut: string } {
+  const day = currentDate.getDay();
+  const daysUntilFriday = (5 - day + 7) % 7 || 7; // If today is Friday, go to next Friday
+  const friday = new Date(currentDate);
+  friday.setDate(friday.getDate() + daysUntilFriday);
+  const sunday = new Date(friday);
+  sunday.setDate(sunday.getDate() + 2);
+  
+  return {
+    checkIn: friday.toISOString().split('T')[0],
+    checkOut: sunday.toISOString().split('T')[0]
+  };
+}
+
+// Calculate relative date (tomorrow, in X days, etc.)
+function calculateRelativeDate(currentDate: Date, daysToAdd: number): string {
+  const targetDate = new Date(currentDate);
+  targetDate.setDate(targetDate.getDate() + daysToAdd);
+  return targetDate.toISOString().split('T')[0];
+}
+
+// Extract parameters from natural language message
+function extractParametersFromMessage(message: string, currentDate = new Date()): Partial<SearchSlots> {
+  const extracted: Partial<SearchSlots> = {};
+  const normalized = message.toLowerCase();
+  
+  // Extract dates using existing parseDates function
+  const dates = parseDates(message);
+  if (dates.checkIn) extracted.checkIn = dates.checkIn;
+  if (dates.checkOut) extracted.checkOut = dates.checkOut;
+  
+  // Extract relative dates
+  if (/next weekend|this weekend/i.test(normalized)) {
+    const { checkIn, checkOut } = calculateNextWeekend(currentDate);
+    extracted.checkIn = checkIn;
+    extracted.checkOut = checkOut;
+  } else if (/tomorrow/i.test(normalized)) {
+    extracted.checkIn = calculateRelativeDate(currentDate, 1);
+  } else if (/in (\d+) days?/i.test(normalized)) {
+    const match = normalized.match(/in (\d+) days?/);
+    if (match) {
+      extracted.checkIn = calculateRelativeDate(currentDate, parseInt(match[1]));
+    }
+  }
+  
+  // Extract guest/passenger counts
+  const guestMatch = normalized.match(/(\d+)\s*(people|guests|adults|travelers|persons|pax)/);
+  if (guestMatch) {
+    const count = parseInt(guestMatch[1]);
+    extracted.guests = count;
+    extracted.adults = count;
+  }
+  
+  // Extract trip type
+  if (/round.?trip|return/i.test(normalized)) {
+    extracted.tripType = 'round-trip';
+  } else if (/one.?way/i.test(normalized)) {
+    extracted.tripType = 'one-way';
+  }
+  
+  // Extract locations using patterns
+  const locationPatterns = [
+    /\b(?:in|to|at|near)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g,
+    /\b(?:from)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g
+  ];
+  
+  // Extract destination (in/to/at/near)
+  const destMatches = [...message.matchAll(locationPatterns[0])];
+  if (destMatches.length > 0) {
+    const city = destMatches[destMatches.length - 1][1]; // Get last match
+    extracted.location = city;
+    extracted.destination = city;
+  }
+  
+  // Extract origin (from)
+  const originMatches = [...message.matchAll(locationPatterns[1])];
+  if (originMatches.length > 0) {
+    extracted.origin = originMatches[0][1];
+  }
+  
+  return extracted;
+}
+
+// Detect search intent type
+function detectSearchType(message: string): 'hotel' | 'flight' | 'restaurant' | 'event' | 'package' | undefined {
+  const normalized = message.toLowerCase();
+  
+  if (/\b(hotel|stay|accommodation|lodging|room)\b/i.test(normalized)) {
+    return 'hotel';
+  } else if (/\b(flight|fly|plane|airline)\b/i.test(normalized)) {
+    return 'flight';
+  } else if (/\b(restaurant|food|dining|eat)\b/i.test(normalized)) {
+    return 'restaurant';
+  } else if (/\b(event|concert|show|performance)\b/i.test(normalized)) {
+    return 'event';
+  } else if (/\b(package|trip|vacation|getaway)\b/i.test(normalized)) {
+    return 'package';
+  }
+  
+  return undefined;
+}
+
+// Get required slots for search type
+function getRequiredSlots(type: string | undefined): string[] {
+  switch (type) {
+    case 'hotel':
+      return ['location', 'checkIn', 'checkOut'];
+    case 'flight':
+      return ['origin', 'destination', 'departureDate'];
+    case 'package':
+      return ['origin', 'destination', 'departureDate', 'returnDate'];
+    case 'restaurant':
+      return ['location'];
+    case 'event':
+      return ['location'];
+    default:
+      return [];
+  }
+}
+
+// Check if all required slots are filled
+function checkSlotCompleteness(state: SearchState): {
+  complete: boolean;
+  missing: string[];
+  canSearch: boolean;
+} {
+  const { slots, requiredSlots } = state;
+  const missing: string[] = [];
+  
+  for (const slot of requiredSlots) {
+    const value = (slots as any)[slot];
+    if (!value || value === undefined || value === null || value === '') {
+      missing.push(slot);
+    }
+  }
+  
+  return {
+    complete: missing.length === 0,
+    missing,
+    canSearch: missing.length === 0
+  };
+}
+
+// Get latest conversation state from history
+function getLatestConversationState(history: any[]): SearchState | null {
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].conversationState) {
+      return history[i].conversationState;
+    }
+  }
+  return null;
+}
+
 // Helpers: parse single dates or ranges and normalize to YYYY-MM-DD
 function pad(n: number) { return n.toString().padStart(2, '0'); }
 function toISO(y: number, m: number, d: number) { return `${y}-${pad(m)}-${pad(d)}`; }
@@ -1247,6 +1434,108 @@ The user has saved preferences but has chosen to search without strict filtering
       };
     }
     
+    // ============= SLOT-FILLING LOGIC =============
+    // Extract parameters from current message
+    const extractedParams = extractParametersFromMessage(message, new Date());
+    console.log('📊 Extracted parameters from message:', extractedParams);
+    
+    // Get or initialize conversation state
+    let currentState = getLatestConversationState(conversationHistory);
+    
+    // Detect search type if not already set
+    const detectedType = detectSearchType(message);
+    
+    if (!currentState && detectedType) {
+      // Initialize new state
+      currentState = {
+        type: detectedType,
+        slots: {},
+        filledSlots: [],
+        requiredSlots: getRequiredSlots(detectedType)
+      };
+      console.log('🆕 Initialized new conversation state:', currentState.type);
+    }
+    
+    // Update state with extracted parameters
+    if (currentState && !isQuickLink) {
+      currentState.slots = { ...currentState.slots, ...extractedParams };
+      currentState.filledSlots = Object.keys(currentState.slots).filter(
+        k => (currentState!.slots as any)[k] !== undefined && (currentState!.slots as any)[k] !== null && (currentState!.slots as any)[k] !== ''
+      );
+      console.log('✅ Updated state - Filled slots:', currentState.filledSlots);
+      
+      // Check if we can search directly
+      const slotStatus = checkSlotCompleteness(currentState);
+      console.log('🎯 Slot status:', slotStatus);
+      
+      // Apply smart defaults for missing non-critical slots
+      if (slotStatus.missing.length === 1 && slotStatus.missing[0] === 'guests' && currentState.type === 'hotel') {
+        console.log('🔧 Applying default: guests = 2');
+        currentState.slots.guests = 2;
+        currentState.filledSlots.push('guests');
+      }
+      
+      // Check again after applying defaults
+      const finalSlotStatus = checkSlotCompleteness(currentState);
+      
+      // Prevent duplicate searches
+      const currentParams = JSON.stringify(currentState.slots);
+      const isDuplicate = currentState.lastSearch && 
+        JSON.stringify(currentState.lastSearch.params) === currentParams &&
+        (Date.now() - currentState.lastSearch.timestamp) < 30000;
+      
+      if (finalSlotStatus.canSearch && !isDuplicate) {
+        console.log('🚀 All required slots filled - executing direct search');
+        
+        let toolResult: any = null;
+        let searchMessage = '';
+        
+        if (currentState.type === 'hotel') {
+          searchMessage = `Perfect! Let me search for hotels in ${currentState.slots.location} for you. This usually takes about 30-45 seconds as I compare options from multiple sources...`;
+          toolResult = await searchHotels(currentState.slots);
+          
+          // Update last search
+          currentState.lastSearch = {
+            params: currentState.slots,
+            timestamp: Date.now()
+          };
+        } else if (currentState.type === 'flight') {
+          searchMessage = `Great! Searching for flights from ${currentState.slots.origin} to ${currentState.slots.destination}. This may take a minute as I check availability across airlines...`;
+          toolResult = await searchFlights(currentState.slots);
+          
+          currentState.lastSearch = {
+            params: currentState.slots,
+            timestamp: Date.now()
+          };
+        }
+        
+        if (toolResult && !toolResult.error) {
+          const resultCount = toolResult.results?.length || 0;
+          const finalMessage = resultCount > 0 
+            ? `I found ${resultCount} excellent ${currentState.type === 'hotel' ? 'hotels' : 'flights'} for you! Check them out below.\n\nWould you like to book this yourself, or would you prefer to be matched with a Goldsainte certified travel agent who can handle all the details?`
+            : "I couldn't find any available options for those criteria. Try different dates or location?";
+          
+          return new Response(JSON.stringify({
+            message: finalMessage,
+            toolResults: [toolResult.forUser || toolResult],
+            conversationHistory: [
+              ...conversationHistory,
+              { role: 'user', content: message },
+              { role: 'assistant', content: finalMessage, conversationState: currentState }
+            ]
+          }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 200,
+          });
+        }
+      } else if (!finalSlotStatus.canSearch) {
+        console.log(`⏳ Missing required slots: ${finalSlotStatus.missing.join(', ')}`);
+        // Continue to AI with state context
+      } else if (isDuplicate) {
+        console.log('⚠️ Duplicate search prevented - continuing to AI for clarification');
+      }
+    }
+    
     // State machine for sequential questions
     if (isQuickLink && quickLinkState) {
       const { type, step, data } = quickLinkState;
@@ -1896,6 +2185,37 @@ When you call a search tool, ALWAYS inform the user about expected wait time:
 - Activities: "Finding activities in [location]... this should take about 15-20 seconds..."
 
 This sets proper expectations and prevents user frustration during API calls.
+
+🎯 SLOT-FILLING PROTOCOL (CRITICAL):
+The system tracks conversation state across messages. Before asking questions, check what information is already known:
+
+**Current Conversation State:** ${currentState ? JSON.stringify({ type: currentState.type, filledSlots: currentState.filledSlots }) : 'None'}
+**Filled Slots:** ${currentState?.filledSlots.join(', ') || 'None'}
+**Missing Required Slots:** ${currentState ? checkSlotCompleteness(currentState).missing.join(', ') : 'Unknown'}
+
+CRITICAL RULES:
+1. **NEVER ask for information that's already in filledSlots**
+2. **ONLY ask for the FIRST missing required slot** (ask ONE question at a time)
+3. **Acknowledge what you already know** before asking for missing info
+4. **If all required slots are filled**, the system will search automatically - you don't need to call tools
+
+Example Good Flow:
+User: "Find me a hotel in Paris next weekend"
+State: { location: 'Paris', checkIn: '2025-11-01', checkOut: '2025-11-03' }
+Missing: ['guests']
+You: "Great! I see you want to stay in Paris from November 1-3. How many people will be staying?"
+
+Example Bad Flow (DON'T DO THIS):
+User: "Find me a hotel in Paris next weekend"
+You: "Where would you like to stay?" ❌ (already know: Paris)
+You: "What are your dates?" ❌ (already know: Nov 1-3)
+
+RESULT REFINEMENT PROTOCOL:
+When users ask to adjust search parameters AFTER seeing results:
+- "show me cheaper options" → Call search again with maxPrice filter
+- "different dates" → Call search again with new dates
+- "tell me more about #3" → Answer from EXISTING results, DON'T re-search
+- "which one is best?" → Answer from EXISTING results, DON'T re-search
 `;
 
     const messages = [
