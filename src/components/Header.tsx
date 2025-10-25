@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, UtensilsCrossed, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -195,9 +195,7 @@ export const Header = () => {
   const travelCategories = [
     { label: "Hotels", icon: Hotel, service: "hotels" },
     { label: "Flights", icon: Plane, service: "flights" },
-    { label: "Restaurants", icon: UtensilsCrossed, service: "restaurants" },
     { label: "Events", icon: Ticket, service: "events" },
-    { label: "Car Rentals", icon: Car, service: "cars" },
   ];
 
   return (
@@ -491,25 +489,11 @@ export const Header = () => {
                         <span className="text-sm font-medium">Flights</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem 
-                        onClick={() => handleServiceClick('restaurants')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <UtensilsCrossed className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Restaurants</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
                         onClick={() => handleServiceClick('events')} 
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
                       >
                         <Ticket className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                         <span className="text-sm font-medium">Events</span>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleServiceClick('cars')} 
-                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
-                      >
-                        <Car className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
-                        <span className="text-sm font-medium">Car Rentals</span>
                       </DropdownMenuItem>
                     </div>
                     
