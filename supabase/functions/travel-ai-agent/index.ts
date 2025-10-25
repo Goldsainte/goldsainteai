@@ -208,6 +208,15 @@ async function searchHotels(args: any) {
       }
     }
     
+    // Require dates before searching
+    if (!checkIn || !checkOut) {
+      console.error('❌ [HOTEL SEARCH] Missing required dates');
+      return {
+        error: 'Check-in and check-out dates are required to search hotels. Please provide dates.',
+        results: []
+      };
+    }
+    
     console.log('✅ [HOTEL SEARCH] Date validation passed:', { checkIn, checkOut });
     console.log('🔍 [HOTEL SEARCH] Calling unified-search-hotels with:', { location, checkIn, checkOut, guests });
 
@@ -222,8 +231,8 @@ async function searchHotels(args: any) {
       },
       body: JSON.stringify({
         location,
-        checkIn: checkIn || new Date().toISOString().split('T')[0],
-        checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+        checkIn,
+        checkOut,
         guests: guests || 2
       })
     });
@@ -262,8 +271,8 @@ async function searchHotels(args: any) {
       type: 'hotels',
       location: { name: location, dest_id: location },
       results: hotels,
-      checkIn: checkIn || new Date().toISOString().split('T')[0],
-      checkOut: checkOut || new Date(Date.now() + 86400000).toISOString().split('T')[0],
+      checkIn,
+      checkOut,
       guests,
       filters: { sortBy, minRating, maxPrice }
     };
@@ -1573,7 +1582,7 @@ The user has saved preferences but has chosen to search without strict filtering
         type: "function",
         function: {
           name: "search_hotels",
-          description: "Search for hotels in a specific location with various filters. Use this when users ask about hotels, accommodations, or places to stay. You can filter by price, rating, amenities, and sort by different criteria.",
+          description: "Search for hotels in a specific location. IMPORTANT: You must have location, check-in date (YYYY-MM-DD), and check-out date (YYYY-MM-DD) before calling this tool. Ask the user for these details if not provided. You can also filter by price, rating, amenities, and sort by different criteria.",
           parameters: {
             type: "object",
             properties: {
@@ -1612,7 +1621,7 @@ The user has saved preferences but has chosen to search without strict filtering
                 description: "Required amenities like 'wifi', 'pool', 'parking', 'gym', 'restaurant', 'spa'"
               }
             },
-            required: ["location"]
+            required: ["location", "checkIn", "checkOut"]
           }
         }
       },
@@ -1837,7 +1846,57 @@ CRITICAL RULES:
 - BUT if they give you clear criteria upfront, search immediately
 - After showing results, continue the conversation naturally
 
-ONLY search when you have enough information to provide relevant results. It's better to ask one more question than to show irrelevant results.`;
+ONLY search when you have enough information to provide relevant results. It's better to ask one more question than to show irrelevant results.
+
+🏨 HOTEL SEARCH QUALIFICATION PROTOCOL (MANDATORY):
+Before calling search_hotels, you MUST collect these details through conversation:
+
+**Required Information:**
+1. **Destination**: "What city or area are you looking to stay in?"
+   - Optional follow-up: "Do you want to be near a specific landmark, airport, or neighborhood?"
+
+2. **Check-in / Check-out Dates**: "What are your check-in and check-out dates?"
+   - If not provided: "When would you like to check in and check out?"
+   - Accept formats: "november 10-14", "2025-11-10 to 2025-11-14", "Nov 10th-14th"
+   - ALWAYS convert to YYYY-MM-DD before calling search_hotels
+
+3. **Number of Guests**: "How many people will be staying?"
+   - Optional: "Do you need more than one room?"
+
+**Optional but Helpful:**
+4. **Budget Range**: "Do you have a nightly budget in mind?"
+   - If skipped: Use mid-range estimate ($150-250/night) as default filter after showing results
+
+5. **Preferences** (refine after initial results):
+   - "Do you prefer a certain star rating or brand?"
+   - "Would you like free breakfast, a pool, or pet-friendly options?"
+
+✅ **Minimum Required to Call search_hotels:**
+- Destination ✓
+- Check-in date (YYYY-MM-DD) ✓  
+- Check-out date (YYYY-MM-DD) ✓
+- Guests (default to 2 if not mentioned)
+
+❌ **NEVER call search_hotels without:**
+- Valid check-in and check-out dates in YYYY-MM-DD format
+- Future dates (not in the past)
+
+**Example Conversation Flow:**
+User: "I need a hotel in Miami"
+You: "Great choice! When are you planning to visit Miami?"
+User: "november 10-14"
+You: "Perfect! How many people will be staying?"
+User: "2 people"
+You: [Now call search_hotels with location="Miami", checkIn="2025-11-10", checkOut="2025-11-14", guests=2]
+
+SEARCH TIMING EXPECTATIONS:
+When you call a search tool, ALWAYS inform the user about expected wait time:
+- Hotels: "Let me search for hotels in [location] for you. This usually takes about 30-45 seconds as I compare options from multiple sources..."
+- Flights: "Searching for flights now. This may take a minute as I check availability across airlines..."
+- Activities: "Finding activities in [location]... this should take about 15-20 seconds..."
+
+This sets proper expectations and prevents user frustration during API calls.
+`;
 
     const messages = [
       {
