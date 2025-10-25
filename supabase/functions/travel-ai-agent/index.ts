@@ -1460,7 +1460,10 @@ The user has saved preferences but has chosen to search without strict filtering
     if (currentState && !isQuickLink) {
       currentState.slots = { ...currentState.slots, ...extractedParams };
       currentState.filledSlots = Object.keys(currentState.slots).filter(
-        k => (currentState!.slots as any)[k] !== undefined && (currentState!.slots as any)[k] !== null && (currentState!.slots as any)[k] !== ''
+        k => {
+          const value = (currentState!.slots as any)[k];
+          return value !== undefined && value !== null && value !== '';
+        }
       );
       console.log('✅ Updated state - Filled slots:', currentState.filledSlots);
       
@@ -1488,10 +1491,8 @@ The user has saved preferences but has chosen to search without strict filtering
         console.log('🚀 All required slots filled - executing direct search');
         
         let toolResult: any = null;
-        let searchMessage = '';
         
         if (currentState.type === 'hotel') {
-          searchMessage = `Perfect! Let me search for hotels in ${currentState.slots.location} for you. This usually takes about 30-45 seconds as I compare options from multiple sources...`;
           toolResult = await searchHotels(currentState.slots);
           
           // Update last search
@@ -1500,7 +1501,6 @@ The user has saved preferences but has chosen to search without strict filtering
             timestamp: Date.now()
           };
         } else if (currentState.type === 'flight') {
-          searchMessage = `Great! Searching for flights from ${currentState.slots.origin} to ${currentState.slots.destination}. This may take a minute as I check availability across airlines...`;
           toolResult = await searchFlights(currentState.slots);
           
           currentState.lastSearch = {
