@@ -770,7 +770,20 @@ async function checkVisaRequirements(args: any) {
 
     // Use Lovable AI (Gemini) to get accurate visa information
     const prompt = `Provide accurate and up-to-date visa requirements for a traveler from ${fromCountry} visiting ${toCountry}. Include:
-...
+    
+1. Visa requirement status (required, visa-free, visa on arrival, eVisa)
+2. Duration of stay allowed
+3. Passport validity requirements
+4. Approximate visa fee considerations:
+   - Fees vary by destination country
+   - Different visa types (tourism, business, study, work) have different fees
+   - Petition-based visas (like work visas) may have different fee structures
+   - Expedited processing typically costs more
+   - Additional charges may apply (SEVIS fees, service center fees)
+   - User should verify exact fees on official embassy/consulate website
+5. Processing time
+6. Official embassy/government website link if available
+
 If visa is required, mention that Goldsainte can assist with the application process and handle all the complexity.
 
 Be specific and factual. Always recommend verifying exact fees and requirements with official government sources.`;
