@@ -91,26 +91,82 @@ function toISO(y: number, m: number, d: number) { return `${y}-${pad(m)}-${pad(d
 
 function parseDates(input: string): { checkIn?: string; checkOut?: string } {
   if (!input) return {};
-  const s = input.trim();
+  const s = input.trim().toLowerCase();
+  
+  // Month name mapping for natural language parsing
+  const monthMap: Record<string, number> = {
+    'january': 1, 'jan': 1,
+    'february': 2, 'feb': 2,
+    'march': 3, 'mar': 3,
+    'april': 4, 'apr': 4,
+    'may': 5,
+    'june': 6, 'jun': 6,
+    'july': 7, 'jul': 7,
+    'august': 8, 'aug': 8,
+    'september': 9, 'sep': 9, 'sept': 9,
+    'october': 10, 'oct': 10,
+    'november': 11, 'nov': 11,
+    'december': 12, 'dec': 12
+  };
+  
+  // System date context: October 25, 2025
+  const currentYear = 2025;
+  const currentMonth = 10; // October
+  
+  // Parse "november 10-14" or "nov 10th-14th" or "november 10 to 14"
+  const naturalRange = s.match(/\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)\s+(\d{1,2})(?:st|nd|rd|th)?\s*(?:to|-|–|—|through|until)\s*(\d{1,2})(?:st|nd|rd|th)?/i);
+  
+  if (naturalRange) {
+    const month = monthMap[naturalRange[1].toLowerCase()];
+    const day1 = Number(naturalRange[2]);
+    const day2 = Number(naturalRange[3]);
+    
+    // Determine year: if month is before current month, use next year
+    let year = currentYear;
+    if (month < currentMonth) {
+      year = currentYear + 1;
+    }
+    
+    console.log(`[parseDates] Natural range: ${naturalRange[1]} ${day1}-${day2} → ${year}-${pad(month)}-${pad(day1)} to ${year}-${pad(month)}-${pad(day2)}`);
+    
+    return {
+      checkIn: toISO(year, month, day1),
+      checkOut: toISO(year, month, day2)
+    };
+  }
+  
   // ISO range: 2025-10-10 to 2025-10-13
   const isoRange = s.match(/(\d{4}-\d{2}-\d{2})\s*(?:to|-|–|—|until)\s*(\d{4}-\d{2}-\d{2})/i);
-  if (isoRange) return { checkIn: isoRange[1], checkOut: isoRange[2] };
+  if (isoRange) {
+    console.log(`[parseDates] ISO range: ${isoRange[1]} to ${isoRange[2]}`);
+    return { checkIn: isoRange[1], checkOut: isoRange[2] };
+  }
 
   // MM/DD/YYYY range
   const mdyRange = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})\s*(?:to|-|–|—|until)\s*(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/i);
   if (mdyRange) {
     const m1 = Number(mdyRange[1]), d1 = Number(mdyRange[2]), y1 = Number(mdyRange[3]);
     const m2 = Number(mdyRange[4]), d2 = Number(mdyRange[5]), y2 = Number(mdyRange[6]);
+    console.log(`[parseDates] MM/DD/YYYY range: ${m1}/${d1}/${y1} to ${m2}/${d2}/${y2}`);
     return { checkIn: toISO(y1, m1, d1), checkOut: toISO(y2, m2, d2) };
   }
 
   // Single ISO date
   const isoSingle = s.match(/(\d{4}-\d{2}-\d{2})/);
-  if (isoSingle) return { checkIn: isoSingle[1] };
+  if (isoSingle) {
+    console.log(`[parseDates] ISO single: ${isoSingle[1]}`);
+    return { checkIn: isoSingle[1] };
+  }
+  
   // Single MM/DD/YYYY
   const mdy = s.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-  if (mdy) return { checkIn: toISO(Number(mdy[3]), Number(mdy[1]), Number(mdy[2])) };
+  if (mdy) {
+    const date = toISO(Number(mdy[3]), Number(mdy[1]), Number(mdy[2]));
+    console.log(`[parseDates] MM/DD/YYYY single: ${date}`);
+    return { checkIn: date };
+  }
 
+  console.log('[parseDates] No date pattern matched:', input);
   return {};
 }
 
@@ -118,8 +174,42 @@ function parseDates(input: string): { checkIn?: string; checkOut?: string } {
 async function searchHotels(args: any) {
   // Use unified hotel search for consistency with Search page
   try {
-    const { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
-    console.log('searchHotels called with unified function:', { location, checkIn, checkOut, guests, sortBy, minRating, maxPrice });
+    let { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
+    console.log('🔍 [HOTEL SEARCH] Raw arguments:', args);
+    
+    // Validate dates are in the future
+    const today = new Date('2025-10-25'); // Current system date
+    today.setHours(0, 0, 0, 0); // Reset time for fair comparison
+    
+    if (checkIn) {
+      const checkInDate = new Date(checkIn);
+      checkInDate.setHours(0, 0, 0, 0);
+      
+      if (checkInDate < today) {
+        console.error(`❌ [HOTEL SEARCH] Check-in date ${checkIn} is in the past`);
+        return {
+          error: `Check-in date ${checkIn} is in the past. Please provide future dates (November 2025 or later).`,
+          results: [],
+          suggestion: 'Try dates in November 2025 or later'
+        };
+      }
+    }
+    
+    if (checkIn && checkOut) {
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+      
+      if (checkOutDate <= checkInDate) {
+        console.error(`❌ [HOTEL SEARCH] Check-out ${checkOut} must be after check-in ${checkIn}`);
+        return {
+          error: 'Check-out date must be after check-in date',
+          results: []
+        };
+      }
+    }
+    
+    console.log('✅ [HOTEL SEARCH] Date validation passed:', { checkIn, checkOut });
+    console.log('🔍 [HOTEL SEARCH] Calling unified-search-hotels with:', { location, checkIn, checkOut, guests });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
@@ -1881,6 +1971,39 @@ Smart Defaults (Use only when user provides complete information upfront):
 - For restaurants: if city not mentioned, ask conversationally
 
 CALCULATING DATES: When using "tomorrow", calculate the actual date. For example, if today is 2025-09-30, tomorrow is 2025-10-01. For "next week" add 7 days.
+
+🗓️ CRITICAL DATE HANDLING RULES:
+**Current System Date: October 25, 2025**
+
+When users provide dates in natural language, YOU MUST convert them to YYYY-MM-DD format before calling search tools:
+
+1. **Year Inference Logic** (NEVER use past dates):
+   - October, November, December dates → Use 2025
+   - January through September dates → Use 2026 (next year)
+   - If user explicitly provides a year, use that year
+   - NEVER infer dates in 2024 or earlier
+
+2. **Natural Language Examples:**
+   - "november 10-14" → checkIn: "2025-11-10", checkOut: "2025-11-14"
+   - "nov 10th-14th" → checkIn: "2025-11-10", checkOut: "2025-11-14"
+   - "december 1-5" → checkIn: "2025-12-01", checkOut: "2025-12-05"
+   - "january 15-20" → checkIn: "2026-01-15", checkOut: "2026-01-20"
+   - "next month" → Calculate based on current date (e.g., November 2025)
+
+3. **Format Requirements:**
+   - ALL dates passed to search tools MUST be in YYYY-MM-DD format
+   - Check-out date MUST be after check-in date
+   - Dates MUST be in the future (not before October 25, 2025)
+
+4. **Error Prevention:**
+   - Double-check year inference before calling search tools
+   - If unsure about dates, ask the user to clarify
+   - Never pass dates in MM/DD/YYYY or natural language format to tools
+
+**Examples of CORRECT conversions:**
+- User: "book hotel in Miami november 10-14" → Call search_hotels with checkIn: "2025-11-10", checkOut: "2025-11-14"
+- User: "flights to Paris in january" → Ask for specific dates, then use 2026 for January
+- User: "hotel next week" → Calculate the actual dates and use YYYY-MM-DD format
 
 EXAMPLE CONVERSATIONAL FLOWS (Follow this natural pattern):
 
