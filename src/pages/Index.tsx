@@ -18,7 +18,8 @@ import {
   Briefcase, 
   Bike, 
   MessageCircle,
-  ArrowRight
+  ArrowRight,
+  Calendar
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -558,22 +559,49 @@ const Index = () => {
     setShowDatePicker({ type, context, suggestedDate });
   };
 
+  const handleCalendarClick = () => {
+    // Determine type based on context
+    let type: 'hotel' | 'flight' = 'hotel';
+    
+    if (activeQuickLink === 'flights') {
+      type = 'flight';
+    } else if (activeQuickLink === 'hotels') {
+      type = 'hotel';
+    }
+    
+    // Open date picker
+    const suggestedDate = extractSuggestedDate();
+    setShowDatePicker({ type, context: 'manual', suggestedDate });
+  };
+
   const handleDatesSelected = async (dates: { checkIn?: string; checkOut?: string; departureDate?: string; returnDate?: string }) => {
     if (!showDatePicker) return;
 
-    const { type, context } = showDatePicker;
+    const { type } = showDatePicker;
     setShowDatePicker(null);
 
+    let dateQuery = '';
+    
     if (type === "hotel" && dates.checkIn && dates.checkOut) {
-      const query = `${dates.checkIn} to ${dates.checkOut}`;
-      handleSearch(query);
-    } else if (type === "flight" && dates.departureDate) {
-      // Send the date selection as a message to continue the conversation
-      const dateMessage = dates.returnDate 
-        ? `${dates.departureDate} returning ${dates.returnDate}`
-        : dates.departureDate;
-      handleSearch(dateMessage);
+      dateQuery = `${dates.checkIn} to ${dates.checkOut}`;
+    } else if (type === "flight") {
+      if (dates.departureDate && dates.returnDate) {
+        dateQuery = `departing ${dates.departureDate} returning ${dates.returnDate}`;
+      } else if (dates.departureDate) {
+        dateQuery = `departing ${dates.departureDate}`;
+      }
     }
+
+    // If there's existing text in search query, append dates; otherwise use dates as query
+    const finalQuery = searchQuery.trim() 
+      ? `${searchQuery.trim()} ${dateQuery}` 
+      : dateQuery;
+    
+    // Update search query to show selected dates
+    setSearchQuery(finalQuery);
+    
+    // Automatically trigger search with the dates
+    handleSearch(finalQuery);
   };
 
   const handleQuickAction = async (action: string) => {
@@ -1635,12 +1663,22 @@ const queries = {
                     <div className="relative">
                       <Input
                         placeholder={getPlaceholderText()}
-                        className="w-full h-11 md:h-12 px-4 pr-12 md:pr-14 text-sm md:text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="w-full h-11 md:h-12 px-4 pr-20 md:pr-24 text-sm md:text-base border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyPress={handleKeyPress}
                         disabled={isLoading}
                       />
+                      <Button
+                        onClick={handleCalendarClick}
+                        size="icon"
+                        variant="ghost"
+                        className="absolute right-12 md:right-14 top-1/2 -translate-y-1/2 h-8 w-8 rounded-lg hover:bg-muted"
+                        disabled={isLoading}
+                        title="Pick dates from calendar"
+                      >
+                        <Calendar className="h-4 w-4" />
+                      </Button>
                       <Button
                         onClick={() => handleSearch()}
                         size="icon"
@@ -1693,9 +1731,9 @@ const queries = {
           />
         )}
 
-        {/* Date Picker Modal - Disabled to prevent duplication with hotel date selector */}
-        {/* {showDatePicker && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+        {/* Date Picker Modal */}
+        {showDatePicker && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <ChatDatePicker
               type={showDatePicker.type}
               onDatesSelected={handleDatesSelected}
@@ -1703,7 +1741,7 @@ const queries = {
               suggestedDate={showDatePicker.suggestedDate}
             />
           </div>
-        )} */}
+        )}
 
         {/* Welcome Modal */}
         <WelcomeModal 
