@@ -155,6 +155,77 @@ export const AIBookingConcierge = () => {
     }
   };
 
+  const handleQuickStart = async () => {
+    // Example booking information
+    const exampleInfo = {
+      greeting: "Hi! I want to plan a trip",
+      destination: "Paris",
+      dates: "March 15 to March 22, 2025",
+      guests: "2 people",
+      budget: "$3000 per person"
+    };
+
+    // Add greeting message
+    const greetingMsg = { role: 'user' as const, content: exampleInfo.greeting };
+    setMessages(prev => [...prev, greetingMsg]);
+    
+    // Send greeting and wait for response
+    try {
+      setIsLoading(true);
+      const response = await supabase.functions.invoke('ai-booking-concierge', {
+        body: { 
+          messages: [...messages, greetingMsg],
+          agentProfile,
+          preferences
+        }
+      });
+
+      if (response.error) throw response.error;
+
+      const assistantMsg = { 
+        role: 'assistant' as const, 
+        content: response.data.content,
+        toolResults: response.data.toolResults 
+      };
+      setMessages(prev => [...prev, assistantMsg]);
+
+      // Now add the example info in sequence with delays
+      setTimeout(() => {
+        const destMsg = { role: 'user' as const, content: exampleInfo.destination };
+        setMessages(prev => [...prev, destMsg]);
+        sendProgrammaticMessage(exampleInfo.destination);
+      }, 1500);
+
+      setTimeout(() => {
+        const datesMsg = { role: 'user' as const, content: exampleInfo.dates };
+        setMessages(prev => [...prev, datesMsg]);
+        sendProgrammaticMessage(exampleInfo.dates);
+      }, 3000);
+
+      setTimeout(() => {
+        const guestsMsg = { role: 'user' as const, content: exampleInfo.guests };
+        setMessages(prev => [...prev, guestsMsg]);
+        sendProgrammaticMessage(exampleInfo.guests);
+      }, 4500);
+
+      setTimeout(() => {
+        const budgetMsg = { role: 'user' as const, content: exampleInfo.budget };
+        setMessages(prev => [...prev, budgetMsg]);
+        sendProgrammaticMessage(exampleInfo.budget);
+      }, 6000);
+
+      setIsLoading(false);
+    } catch (error: any) {
+      console.error('[AIBookingConcierge] Quick start error:', error);
+      setIsLoading(false);
+      toast({
+        title: "Error",
+        description: "Failed to start demo. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Load user's AI agent profile and restore conversation
   useEffect(() => {
     const loadAgentProfile = async () => {
@@ -943,6 +1014,7 @@ export const AIBookingConcierge = () => {
               <BookingProgressTracker 
                 bookingInfo={bookingInfo}
                 onEdit={handleEditBookingInfo}
+                onQuickStart={handleQuickStart}
               />
               
               {messages.map((msg, idx) => (

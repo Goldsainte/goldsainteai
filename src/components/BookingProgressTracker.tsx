@@ -1,4 +1,4 @@
-import { MapPin, Calendar, Users, DollarSign, CheckCircle2, Circle, Edit2 } from "lucide-react";
+import { MapPin, Calendar, Users, DollarSign, CheckCircle2, Circle, Edit2, Zap } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,10 @@ interface BookingInfo {
 interface BookingProgressTrackerProps {
   bookingInfo: BookingInfo;
   onEdit: (field: keyof BookingInfo, value: string) => void;
+  onQuickStart?: () => void;
 }
 
-export const BookingProgressTracker = ({ bookingInfo, onEdit }: BookingProgressTrackerProps) => {
+export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: BookingProgressTrackerProps) => {
   const [editingField, setEditingField] = useState<keyof BookingInfo | null>(null);
   const [editValue, setEditValue] = useState("");
 
@@ -88,8 +89,30 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit }: BookingProgressT
   const completedCount = [hasDestination, hasDates, hasGuests, hasBudget].filter(Boolean).length;
   const totalCount = 4;
 
-  // Don't show if no information collected
-  if (completedCount === 0) return null;
+  // Show Quick Start button if no information collected
+  if (completedCount === 0) {
+    return onQuickStart ? (
+      <Card className="bg-gradient-to-br from-accent/5 to-primary/5 border-accent/20 mb-3 animate-fade-in">
+        <div className="p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <Zap className="h-4 w-4 text-accent" />
+            <p className="text-xs font-semibold text-foreground">Quick Start Demo</p>
+          </div>
+          <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
+            Try the booking flow with example information to see how it works
+          </p>
+          <Button
+            onClick={onQuickStart}
+            size="sm"
+            className="w-full bg-gradient-to-r from-accent to-primary hover:opacity-90 transition-opacity"
+          >
+            <Zap className="h-3 w-3 mr-1" />
+            Fill Example Info
+          </Button>
+        </div>
+      </Card>
+    ) : null;
+  }
 
   return (
     <>
