@@ -17,6 +17,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
   const [tripType, setTripType] = useState<"round-trip" | "one-way" | null>(type === "hotel" ? "round-trip" : null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [singleDate, setSingleDate] = useState<Date>();
+  const [validationError, setValidationError] = useState<string>("");
 
   // Ensure calendar always shows current or future month
   const getDefaultMonth = () => {
@@ -27,12 +28,73 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
     return today;
   };
 
+  // Validate date ranges
+  const validateDateRange = (range: DateRange | undefined): string => {
+    if (!range?.from || !range?.to) return "";
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Check if dates are in the past
+    if (range.from < today) {
+      return type === "hotel" ? "Check-in date cannot be in the past" : "Departure date cannot be in the past";
+    }
+    
+    if (range.to < today) {
+      return type === "hotel" ? "Check-out date cannot be in the past" : "Return date cannot be in the past";
+    }
+    
+    // Check if end date is before start date
+    if (range.to <= range.from) {
+      if (type === "hotel") {
+        return "Check-out date must be at least 1 day after check-in";
+      } else {
+        return "Return date must be after departure date";
+      }
+    }
+    
+    // Check minimum stay for hotels (at least 1 night)
+    if (type === "hotel") {
+      const diffTime = Math.abs(range.to.getTime() - range.from.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays < 1) {
+        return "Minimum stay is 1 night";
+      }
+    }
+    
+    // Check maximum date range (e.g., 365 days)
+    const diffTime = Math.abs(range.to.getTime() - range.from.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays > 365) {
+      return "Date range cannot exceed 365 days";
+    }
+    
+    return "";
+  };
+
+  const validateSingleDate = (date: Date | undefined): string => {
+    if (!date) return "";
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (date < today) {
+      return "Departure date cannot be in the past";
+    }
+    
+    return "";
+  };
+
   const handleDateSelect = (range: DateRange | undefined) => {
     setDateRange(range);
+    const error = validateDateRange(range);
+    setValidationError(error);
   };
 
   const handleSingleDateSelect = (date: Date | undefined) => {
     setSingleDate(date);
+    const error = validateSingleDate(date);
+    setValidationError(error);
   };
 
   const handleConfirm = () => {
@@ -56,6 +118,9 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
   };
 
   const canConfirm = () => {
+    // Don't allow confirm if there's a validation error
+    if (validationError) return false;
+    
     if (type === "hotel") {
       return dateRange?.from && dateRange?.to;
     }
@@ -102,6 +167,9 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
           </h3>
           {getSelectedDates() && (
             <p className="text-sm text-muted-foreground mt-1">{getSelectedDates()}</p>
+          )}
+          {validationError && (
+            <p className="text-sm text-destructive mt-1 font-medium">{validationError}</p>
           )}
         </div>
         <Button variant="ghost" size="icon" onClick={onCancel}>
@@ -156,6 +224,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
                   setTripType(null);
                   setDateRange(undefined);
                   setSingleDate(undefined);
+                  setValidationError("");
                 }}
                 className="flex-1"
               >
