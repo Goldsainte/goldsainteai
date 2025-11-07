@@ -70,7 +70,77 @@
         "title": "Réservation Instantanée",
         "description": "Réservez vols, hôtels, restaurants instantanément avec paiement sécurisé.",
         "cta": "Commencer à Réserver"
+      },
+      "stores": {
+        "title": "Boutiques de Créateurs",
+        "description": "Devenez créateur de voyages. Sélectionnez vos destinations préférées, créez des collections thématiques et gagnez lorsque d'autres réservent depuis votre boutique. Votre goût, monétisé.",
+        "cta": "Explorer les Boutiques de Créateurs"
       }
+    },
+    "creatorHero": {
+      "create": "Créer.",
+      "share": "Partager.",
+      "makeMoney": "Gagner de l'Argent.",
+      "paragraph1": "Transformez votre passion pour les voyages en profit. Partagez du contenu époustouflant, développez votre audience et débloquez de nouvelles sources de revenus grâce aux récompenses d'engagement, aux collaborations avec les marques et aux forfaits de voyages sélectionnés.",
+      "paragraph2": "Gagnez de l'argent réel au fur et à mesure que vos publications obtiennent des likes, des commentaires et des partages — ou créez et vendez des expériences de voyage directement à vos abonnés.",
+      "paragraph3": "Collaborez avec les meilleures marques, accédez à des outils de création puissants et inspirez une communauté mondiale d'explorateurs. Que vous soyez un influenceur chevronné ou débutant, c'est ici que votre histoire de voyage devient votre entreprise."
+    },
+    "winterSun": {
+      "title": "Soleil d'Hiver",
+      "subtitle": "Évadez-vous au paradis avec notre sélection de complexes de plage de luxe",
+      "cta": "Explorer les Destinations"
+    },
+    "journal": {
+      "title": "Du Journal",
+      "subtitle": "Histoires sélectionnées de notre communauté de créateurs",
+      "viewAll": "Voir Toutes les Histoires",
+      "entries": {
+        "entry1": {
+          "title": "Escapades Urbaines Européennes : Une Renaissance Romantique",
+          "excerpt": "Découvrez l'élégance intemporelle de Venise, où les gondoles glissent à travers des siècles d'histoire et de luxe moderne...",
+          "creator": "Sophie Anderson",
+          "destination": "Venise, Italie",
+          "readTime": "8 min de lecture"
+        },
+        "entry2": {
+          "title": "Escapades Éco-Luxe : Refuges dans la Jungle",
+          "excerpt": "Vivez le mélange parfait de nature et de sophistication dans les éco-complexes les plus exclusifs de Bali...",
+          "creator": "Marco Rossi",
+          "destination": "Bali, Indonésie",
+          "readTime": "6 min de lecture"
+        },
+        "entry3": {
+          "title": "Les Meilleurs Complexes de Plage pour 2025",
+          "excerpt": "Notre sélection expertisée des propriétés en bord de mer les plus époustouflantes du monde, des Maldives aux Caraïbes...",
+          "creator": "Isabella Laurent",
+          "destination": "Collection Mondiale",
+          "readTime": "10 min de lecture"
+        },
+        "entry4": {
+          "title": "Safari Sous les Étoiles",
+          "excerpt": "Un regard intime sur le camping de luxe dans le Serengeti, où les rencontres avec la faune rencontrent le service cinq étoiles...",
+          "creator": "David Chen",
+          "destination": "Tanzanie",
+          "readTime": "7 min de lecture"
+        }
+      }
+    },
+    "popularSearches": {
+      "title": "Recherches populaires",
+      "beachResorts": "Complexes de Plage",
+      "cityBreaks": "Escapades Urbaines",
+      "romanticGetaways": "Escapades Romantiques",
+      "luxuryHotels": "Hôtels de Luxe",
+      "culturalExperiences": "Expériences Culturelles",
+      "wellnessRetreats": "Retraites Bien-être",
+      "adventureTravel": "Voyage d'Aventure",
+      "islandEscapes": "Escapades Insulaires"
+    },
+    "agentCTA": {
+      "title": "Devenez Agent de Voyage",
+      "subtitle": "Rejoignez notre réseau et gagnez des commissions sur les réservations de voyages de luxe",
+      "apply": "Postuler Maintenant",
+      "browse": "Parcourir les Agents"
     }
   }
 }

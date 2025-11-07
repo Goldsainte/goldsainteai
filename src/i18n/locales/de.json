@@ -70,7 +70,77 @@
         "title": "Sofortbuchung",
         "description": "Buchen Sie Flüge, Hotels, Restaurants sofort mit sicherer Bezahlung.",
         "cta": "Jetzt Buchen"
+      },
+      "stores": {
+        "title": "Creator-Shops",
+        "description": "Werden Sie Reise-Creator. Kuratieren Sie Ihre Lieblingsziele, erstellen Sie thematische Kollektionen und verdienen Sie, wenn andere aus Ihrem Shop buchen. Ihr Geschmack, monetarisiert.",
+        "cta": "Creator-Shops Erkunden"
       }
+    },
+    "creatorHero": {
+      "create": "Erstellen.",
+      "share": "Teilen.",
+      "makeMoney": "Geld Verdienen.",
+      "paragraph1": "Verwandeln Sie Ihre Leidenschaft für Reisen in Profit. Teilen Sie beeindruckende Inhalte, vergrößern Sie Ihr Publikum und erschließen Sie neue Einnahmequellen durch Engagement-Belohnungen, Markenkooperationen und kuratierte Reisepakete.",
+      "paragraph2": "Verdienen Sie echtes Geld, während Ihre Beiträge Likes, Kommentare und Shares erhalten — oder erstellen und verkaufen Sie Reiseerlebnisse direkt an Ihre Follower.",
+      "paragraph3": "Arbeiten Sie mit Top-Marken zusammen, nutzen Sie leistungsstarke Creator-Tools und inspirieren Sie eine globale Community von Entdeckern. Ob Sie ein erfahrener Influencer sind oder gerade erst anfangen, hier wird Ihre Reisegeschichte zu Ihrem Geschäft."
+    },
+    "winterSun": {
+      "title": "Wintersonne",
+      "subtitle": "Entfliehen Sie ins Paradies mit unserer handverlesenen Auswahl an Luxus-Strandresorts",
+      "cta": "Destinationen Erkunden"
+    },
+    "journal": {
+      "title": "Aus dem Journal",
+      "subtitle": "Kuratierte Geschichten aus unserer Creator-Community",
+      "viewAll": "Alle Geschichten Ansehen",
+      "entries": {
+        "entry1": {
+          "title": "Europäische Städtereisen: Eine Romantische Renaissance",
+          "excerpt": "Entdecken Sie die zeitlose Eleganz von Venedig, wo Gondeln durch Jahrhunderte von Geschichte und modernem Luxus gleiten...",
+          "creator": "Sophie Anderson",
+          "destination": "Venedig, Italien",
+          "readTime": "8 Min. Lesezeit"
+        },
+        "entry2": {
+          "title": "Öko-Luxus-Fluchten: Dschungel-Hideaways",
+          "excerpt": "Erleben Sie die perfekte Mischung aus Natur und Raffinesse in Balis exklusivsten Öko-Resorts...",
+          "creator": "Marco Rossi",
+          "destination": "Bali, Indonesien",
+          "readTime": "6 Min. Lesezeit"
+        },
+        "entry3": {
+          "title": "Top Strandresorts für 2025",
+          "excerpt": "Unsere fachmännisch kuratierte Auswahl der atemberaubendsten Strandimmobilien der Welt, von den Malediven bis zur Karibik...",
+          "creator": "Isabella Laurent",
+          "destination": "Globale Kollektion",
+          "readTime": "10 Min. Lesezeit"
+        },
+        "entry4": {
+          "title": "Safari Unter den Sternen",
+          "excerpt": "Ein intimer Blick auf Luxus-Camping in der Serengeti, wo Wildtierbegegnungen auf Fünf-Sterne-Service treffen...",
+          "creator": "David Chen",
+          "destination": "Tansania",
+          "readTime": "7 Min. Lesezeit"
+        }
+      }
+    },
+    "popularSearches": {
+      "title": "Beliebte Suchen",
+      "beachResorts": "Strandresorts",
+      "cityBreaks": "Städtereisen",
+      "romanticGetaways": "Romantische Ausflüge",
+      "luxuryHotels": "Luxushotels",
+      "culturalExperiences": "Kulturelle Erlebnisse",
+      "wellnessRetreats": "Wellness-Retreats",
+      "adventureTravel": "Abenteuerreisen",
+      "islandEscapes": "Inselausflüge"
+    },
+    "agentCTA": {
+      "title": "Werden Sie Reiseagent",
+      "subtitle": "Treten Sie unserem Netzwerk bei und verdienen Sie Provisionen für Luxusreisebuchungen",
+      "apply": "Jetzt Bewerben",
+      "browse": "Agenten Durchsuchen"
     }
   }
 }
