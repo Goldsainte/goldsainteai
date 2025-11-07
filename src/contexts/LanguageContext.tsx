@@ -11,7 +11,7 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [language, setLanguageState] = useState<string>('en');
+  const [language, setLanguageState] = useState<string>(i18n.language || 'en');
   const { user } = useAuth();
 
   // Load language preference on mount and when user changes
