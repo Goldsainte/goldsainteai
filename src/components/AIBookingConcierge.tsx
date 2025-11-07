@@ -1062,6 +1062,14 @@ export const AIBookingConcierge = () => {
                     }}
                     disabled={isLoading}
                     language={preferences.general.voiceLanguage}
+                    onLanguageChange={(newLang) => {
+                      const newPrefs = {
+                        ...preferences,
+                        general: { ...preferences.general, voiceLanguage: newLang }
+                      };
+                      setPreferences(newPrefs);
+                      localStorage.setItem('aiChatPreferences', JSON.stringify(newPrefs));
+                    }}
                   />
                   <Button
                     onClick={handleSend}

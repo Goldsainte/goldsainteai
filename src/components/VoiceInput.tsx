@@ -1,18 +1,38 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Mic, Square, Check, X } from 'lucide-react';
+import { Mic, Square, Check, X, ChevronDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
   language?: string;
+  onLanguageChange?: (language: string) => void;
 }
 
-export const VoiceInput = ({ onTranscript, disabled, language = 'en' }: VoiceInputProps) => {
+const LANGUAGES = [
+  { code: 'en', name: 'English' },
+  { code: 'es', name: 'Spanish' },
+  { code: 'fr', name: 'French' },
+  { code: 'de', name: 'German' },
+  { code: 'it', name: 'Italian' },
+  { code: 'pt', name: 'Portuguese' },
+  { code: 'ru', name: 'Russian' },
+  { code: 'ja', name: 'Japanese' },
+  { code: 'ko', name: 'Korean' },
+  { code: 'zh', name: 'Chinese' },
+  { code: 'ar', name: 'Arabic' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'nl', name: 'Dutch' },
+  { code: 'pl', name: 'Polish' },
+  { code: 'tr', name: 'Turkish' },
+];
+
+export const VoiceInput = ({ onTranscript, disabled, language = 'en', onLanguageChange }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcriptPreview, setTranscriptPreview] = useState<string | null>(null);
@@ -153,7 +173,7 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en' }: VoiceInp
   }
 
   return (
-    <div className="relative">
+    <div className="relative flex gap-1">
       <Button
         type="button"
         size="icon"
@@ -169,13 +189,39 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en' }: VoiceInp
           <Mic className="h-4 w-4" />
         )}
       </Button>
-      {!isRecording && (
-        <Badge 
-          variant="secondary" 
-          className="absolute -top-1 -right-1 h-4 px-1 text-[9px] font-mono pointer-events-none"
-        >
-          {language.toUpperCase()}
-        </Badge>
+      
+      {!isRecording && onLanguageChange && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              disabled={disabled || isProcessing}
+              className="shrink-0 h-12 w-12 md:h-11 md:w-11 px-1"
+              title="Change language"
+            >
+              <div className="flex flex-col items-center justify-center">
+                <span className="text-[9px] font-mono leading-none">{language.toUpperCase()}</span>
+                <ChevronDown className="h-2.5 w-2.5" />
+              </div>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="max-h-[300px] overflow-y-auto bg-background z-50">
+            {LANGUAGES.map((lang) => (
+              <DropdownMenuItem
+                key={lang.code}
+                onClick={() => onLanguageChange(lang.code)}
+                className={language === lang.code ? "bg-accent" : ""}
+              >
+                <div className="flex items-center justify-between w-full">
+                  <span>{lang.name}</span>
+                  <span className="text-xs text-muted-foreground ml-2">{lang.code.toUpperCase()}</span>
+                </div>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       )}
     </div>
   );
