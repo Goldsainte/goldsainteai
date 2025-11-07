@@ -14,6 +14,7 @@ import { PackageFilters, PackageFilterState } from "@/components/PackageFilters"
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
+import { Globe, Briefcase } from "lucide-react";
 import { 
   fetchAmadeusToursForLocation, 
   transformAmadeusToPackage,
@@ -69,6 +70,7 @@ export default function CoCuratedJourneys() {
       setSearchQuery(destParam || "");
       
       if (dataSource === 'amadeus') {
+        toast.info("Showing Amadeus Tours - Real-time availability from thousands of tour operators");
         if (destParam) {
           // URL has destination, fetch that
           const location = findLocationCoordinates(destParam);
@@ -93,6 +95,7 @@ export default function CoCuratedJourneys() {
           await fetchToursForLocation(location.latitude, location.longitude, location.name);
         }
       } else {
+        toast.info("Showing CoCurated by Agents - Expertly designed packages by certified travel professionals");
         await fetchAgentPackagesData();
       }
       setLoading(false);
@@ -484,7 +487,21 @@ export default function CoCuratedJourneys() {
               {/* Top Tours Carousel */}
               {topTours.length > 0 && (
                 <section className="mb-16">
-                  <div className="w-20 h-1 bg-luxury-gold mb-6" />
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-20 h-1 bg-luxury-gold" />
+                    {dataSource === 'agent' && (
+                      <span className="px-3 py-1 bg-luxury-gold/20 text-luxury-emerald text-xs font-semibold rounded-full border border-luxury-gold/40 flex items-center gap-2">
+                        <Briefcase className="h-3 w-3" />
+                        Agent Curated
+                      </span>
+                    )}
+                    {dataSource === 'amadeus' && (
+                      <span className="px-3 py-1 bg-blue-500/20 text-blue-700 text-xs font-semibold rounded-full border border-blue-500/40 flex items-center gap-2">
+                        <Globe className="h-3 w-3" />
+                        Via Amadeus
+                      </span>
+                    )}
+                  </div>
                   <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald mb-8">
                     {dataSource === 'amadeus' ? `Top Tours in ${currentLocation.name}` : 'Featured CoCurated Packages'}
                   </h2>
@@ -496,8 +513,24 @@ export default function CoCuratedJourneys() {
               <section className="py-6 sm:py-8 md:py-10 all-packages-section">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 sm:mb-8 gap-4">
                   <div>
-                    <div className="w-20 h-1 bg-luxury-gold mb-4" />
-                    <h2 className="font-secondary text-xl sm:text-2xl md:text-3xl text-luxury-emerald">All Travel Packages</h2>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-20 h-1 bg-luxury-gold" />
+                      {dataSource === 'agent' && (
+                        <span className="px-3 py-1 bg-luxury-gold/20 text-luxury-emerald text-xs font-semibold rounded-full border border-luxury-gold/40 flex items-center gap-2">
+                          <Briefcase className="h-3 w-3" />
+                          Agent Curated
+                        </span>
+                      )}
+                      {dataSource === 'amadeus' && (
+                        <span className="px-3 py-1 bg-blue-500/20 text-blue-700 text-xs font-semibold rounded-full border border-blue-500/40 flex items-center gap-2">
+                          <Globe className="h-3 w-3" />
+                          Via Amadeus
+                        </span>
+                      )}
+                    </div>
+                    <h2 className="font-secondary text-xl sm:text-2xl md:text-3xl text-luxury-emerald">
+                      {dataSource === 'amadeus' ? 'All Amadeus Tours' : 'All CoCurated Packages'}
+                    </h2>
                     <p className="text-xs sm:text-sm text-luxury-emerald/60 mt-2">
                       {selectedDestinationFilter === 'all' 
                         ? `Showing top 5 from each destination (${displayedPackages.length} packages)`
