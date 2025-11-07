@@ -5,19 +5,6 @@ import { Button } from "./ui/button";
 import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 
-const popularDestinations = [
-  { name: "Maldives", region: "Indian Ocean" },
-  { name: "Dubai", region: "United Arab Emirates" },
-  { name: "Paris", region: "France" },
-  { name: "Bali", region: "Indonesia" },
-  { name: "Santorini", region: "Greece" },
-  { name: "Tokyo", region: "Japan" },
-  { name: "New York", region: "USA" },
-  { name: "London", region: "United Kingdom" },
-  { name: "Barcelona", region: "Spain" },
-  { name: "Thailand", region: "Southeast Asia" },
-];
-
 const currencies = [
   { code: "USD", symbol: "$", name: "US Dollar" },
   { code: "EUR", symbol: "€", name: "Euro" },
@@ -28,35 +15,9 @@ const currencies = [
 
 export const Footer = () => {
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
-  const [showAllDestinations, setShowAllDestinations] = useState(false);
 
   return (
     <footer className="bg-background border-t border-border mt-16">
-      {/* Popular Destinations Section */}
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 border-b border-border">
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
-          {popularDestinations.slice(0, showAllDestinations ? undefined : 10).map((dest, idx) => (
-            <Link 
-              key={idx}
-              to={`/?aiChat=true&destination=${encodeURIComponent(dest.name)}`}
-              className="text-sm hover:text-primary transition-colors group"
-            >
-              <div className="font-medium group-hover:underline">{dest.name}</div>
-              <div className="text-xs text-muted-foreground">{dest.region}</div>
-            </Link>
-          ))}
-        </div>
-        {popularDestinations.length > 10 && (
-          <Button
-            variant="link"
-            onClick={() => setShowAllDestinations(!showAllDestinations)}
-            className="mt-4 text-primary"
-          >
-            {showAllDestinations ? "Show less" : "Show more destinations"}
-          </Button>
-        )}
-      </div>
-
       {/* Navigation Links Section */}
       <div className="container mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {/* MOBILE: Accordion Layout */}
