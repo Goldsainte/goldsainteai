@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -319,6 +319,13 @@ export const Header = () => {
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
+                          onClick={() => navigate('/subscription')} 
+                          className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                        >
+                          <Crown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-sm font-medium">Subscription</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
                           onClick={() => navigate('/about')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
@@ -587,6 +594,13 @@ export const Header = () => {
                       <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Company</p>
                     </div>
                     <div className="py-2 pb-3">
+                      <DropdownMenuItem 
+                        onClick={() => navigate('/subscription')} 
+                        className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                      >
+                        <Crown className="h-5 w-5 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                        <span className="text-sm font-medium">Subscription</span>
+                      </DropdownMenuItem>
                       <DropdownMenuItem 
                         onClick={() => navigate('/about')} 
                         className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"

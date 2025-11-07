@@ -78,19 +78,21 @@ export default function Admin() {
 
   const loadData = async () => {
     try {
-      // Load user subscriptions with email from profiles
+      // Load user subscriptions
       const { data: subs, error: subsError } = await supabase
         .from('user_subscriptions')
-        .select(`
-          *,
-          profiles:user_id (
-            email
-          )
-        `)
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (subsError) throw subsError;
-      setSubscriptions(subs || []);
+      
+      // Add empty profiles object for display
+      const subscriptionsWithPlaceholder = (subs || []).map(sub => ({
+        ...sub,
+        profiles: { email: undefined }
+      }));
+      
+      setSubscriptions(subscriptionsWithPlaceholder);
 
       // Load rate limit stats
       const { data: stats, error: statsError } = await supabase
@@ -235,18 +237,18 @@ export default function Admin() {
           <CardContent>
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>User Email</TableHead>
-                  <TableHead>Current Tier</TableHead>
-                  <TableHead>Created</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
+              <TableRow>
+                <TableHead>User ID</TableHead>
+                <TableHead>Current Tier</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
               </TableHeader>
               <TableBody>
                 {subscriptions.map((sub) => (
                   <TableRow key={sub.id}>
                     <TableCell className="font-medium">
-                      {sub.profiles?.email || sub.user_id.substring(0, 8) + '...'}
+                      {sub.user_id.substring(0, 8) + '...'}
                     </TableCell>
                     <TableCell>
                       <Badge variant={getTierBadgeVariant(sub.tier)}>

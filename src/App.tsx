@@ -33,6 +33,7 @@ import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import Admin from "./pages/Admin";
 import AdminInquiries from "./pages/AdminInquiries";
+import Subscription from "./pages/Subscription";
 import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
 import MyJobs from "./pages/MyJobs";
@@ -225,6 +226,7 @@ function AppContent() {
           <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/subscription" element={<Subscription />} />
           <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
           <Route path="/admin/seed" element={<AdminSeed />} />
