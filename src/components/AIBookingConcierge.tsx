@@ -24,6 +24,7 @@ import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
 import { VoiceInput } from "./VoiceInput";
+import { BookingProgressTracker } from "./BookingProgressTracker";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -72,6 +73,62 @@ export const AIBookingConcierge = () => {
   const navigate = useNavigate();
 
   console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
+
+  // Extract booking information from conversation
+  const extractBookingInfo = () => {
+    const conversationText = messages.map(m => m.content).join(' ').toLowerCase();
+    
+    // Extract destination (look for common patterns)
+    let destination = undefined;
+    const destMatch = conversationText.match(/(?:to|going to|visit|travel to|in)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
+    if (destMatch) destination = destMatch[1];
+    
+    // Extract dates (look for date patterns)
+    let dates = undefined;
+    const datePatterns = [
+      /(\d{4}-\d{2}-\d{2})\s*(?:to|through|-)\s*(\d{4}-\d{2}-\d{2})/i,
+      /(?:from|departing)?\s*([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?)\s*(?:to|through|-)\s*([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?)/i,
+    ];
+    for (const pattern of datePatterns) {
+      const match = conversationText.match(pattern);
+      if (match) {
+        dates = `${match[1]} - ${match[2]}`;
+        break;
+      }
+    }
+    
+    // Extract number of guests/travelers
+    let guests = undefined;
+    const guestPatterns = [
+      /(\d+)\s+(?:people|guests?|travelers?|persons?|adults?)/i,
+      /(?:for|party of)\s+(\d+)/i,
+    ];
+    for (const pattern of guestPatterns) {
+      const match = conversationText.match(pattern);
+      if (match) {
+        guests = parseInt(match[1]);
+        break;
+      }
+    }
+    
+    // Extract budget
+    let budget = undefined;
+    const budgetPatterns = [
+      /budget\s*(?:of|is|around)?\s*\$?([\d,]+)\s*(?:per person|each|pp)?/i,
+      /\$?([\d,]+)\s*(?:budget|per person|pp)/i,
+    ];
+    for (const pattern of budgetPatterns) {
+      const match = conversationText.match(pattern);
+      if (match) {
+        budget = `$${match[1]}`;
+        break;
+      }
+    }
+    
+    return { destination, dates, guests, budget };
+  };
+
+  const bookingInfo = extractBookingInfo();
 
   // Load user's AI agent profile and restore conversation
   useEffect(() => {
@@ -857,6 +914,9 @@ export const AIBookingConcierge = () => {
         <>
           <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden" ref={scrollRef}>
             <div className="space-y-3">
+              {/* Booking Progress Tracker */}
+              <BookingProgressTracker bookingInfo={bookingInfo} />
+              
               {messages.map((msg, idx) => (
                 <div key={idx} className="w-full">
                   <div
