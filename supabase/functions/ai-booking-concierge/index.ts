@@ -30,7 +30,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, stream = false, agentProfile, preferences } = await req.json();
+    const { messages, stream = false, agentProfile, preferences, language = 'en' } = await req.json();
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     
     if (!OPENAI_API_KEY) {
@@ -487,6 +487,23 @@ serve(async (req) => {
     if (agentProfile?.custom_knowledge && Array.isArray(agentProfile.custom_knowledge) && agentProfile.custom_knowledge.length > 0) {
       systemPrompt += `\n\nIMPORTANT USER INFORMATION TO REMEMBER:\n${agentProfile.custom_knowledge.map((item: string, i: number) => `${i + 1}. ${item}`).join('\n')}`;
     }
+
+    // Add language instruction
+    const languageNames: Record<string, string> = {
+      en: 'English',
+      es: 'Spanish',
+      fr: 'French',
+      de: 'German',
+      it: 'Italian',
+      pt: 'Portuguese',
+      ja: 'Japanese',
+      zh: 'Chinese',
+      ko: 'Korean',
+      ar: 'Arabic'
+    };
+
+    const languageName = languageNames[language] || 'English';
+    systemPrompt += `\n\nLANGUAGE:\nYou MUST respond in ${languageName}. All your responses, explanations, and recommendations should be in ${languageName}.`;
 
     // Add the rest of the system prompt
     systemPrompt += `

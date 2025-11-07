@@ -7,6 +7,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -337,9 +338,11 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <AuthProvider>
-            <AppContent />
-          </AuthProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <AppContent />
+            </AuthProvider>
+          </LanguageProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

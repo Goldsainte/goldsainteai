@@ -25,6 +25,7 @@ import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
 import { VoiceInput } from "./VoiceInput";
 import { BookingProgressTracker, type QuickStartTemplate } from "./BookingProgressTracker";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -69,6 +70,7 @@ export const AIBookingConcierge = () => {
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { language } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -176,7 +178,8 @@ export const AIBookingConcierge = () => {
         body: { 
           messages: [...messages, greetingMsg],
           agentProfile,
-          preferences
+          preferences,
+          language
         }
       });
 
@@ -426,7 +429,8 @@ export const AIBookingConcierge = () => {
           messages: [...messages, { role: 'user', content: userMessage }],
           stream: false,  // Disable streaming to allow tool execution
           agentProfile: agentProfile,  // Pass agent profile to backend
-          preferences: preferences  // Pass all user preferences
+          preferences: preferences,  // Pass all user preferences
+          language: language  // Pass selected language
         }),
       });
 
@@ -523,7 +527,8 @@ export const AIBookingConcierge = () => {
           messages: [...messages, userMessage],
           stream: false,
           agentProfile: agentProfile,
-          preferences: preferences  // Pass all user preferences
+          preferences: preferences,  // Pass all user preferences
+          language: language  // Pass selected language
         }),
       });
 

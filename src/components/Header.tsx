@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLanguage } from "@/contexts/LanguageContext";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
@@ -34,6 +35,7 @@ export const Header = () => {
   const { toast } = useToast();
   const { isAdmin } = useUserRole();
   const isMobile = useIsMobile();
+  const { language: currentLanguage, setLanguage: setCurrentLanguage } = useLanguage();
   const [usePreferences, setUsePreferences] = useState(true);
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
@@ -42,20 +44,10 @@ export const Header = () => {
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
-  const [currentLanguage, setCurrentLanguage] = useState<string>('en');
   const { balance } = useCoinBalance();
-
-  // Load language from localStorage on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('appLanguage');
-    if (savedLanguage) {
-      setCurrentLanguage(savedLanguage);
-    }
-  }, []);
 
   const handleLanguageChange = (language: string) => {
     setCurrentLanguage(language);
-    localStorage.setItem('appLanguage', language);
     toast({
       title: "Language Changed",
       description: `Interface language set to ${language.toUpperCase()}`,
