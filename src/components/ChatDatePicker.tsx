@@ -93,7 +93,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
   };
 
   return (
-    <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 bg-gradient-to-br from-background to-background/95 border-primary/20 shadow-2xl max-w-md">
+    <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 bg-gradient-to-br from-background to-background/95 border-primary/20 shadow-2xl w-full max-w-[420px]">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -135,7 +135,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
               onSelect={handleSingleDateSelect}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
               defaultMonth={getDefaultMonth()}
-              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg"
+              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg mx-auto"
             />
           ) : (
             <Calendar
@@ -144,7 +144,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
               onSelect={handleDateSelect}
               disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
               defaultMonth={getDefaultMonth()}
-              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg"
+              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg mx-auto"
             />
           )}
 
