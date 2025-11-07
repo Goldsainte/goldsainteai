@@ -130,6 +130,31 @@ export const AIBookingConcierge = () => {
 
   const bookingInfo = extractBookingInfo();
 
+  const handleEditBookingInfo = (field: keyof typeof bookingInfo, value: string) => {
+    let message = "";
+    
+    switch (field) {
+      case 'destination':
+        message = `Actually, I want to change the destination to ${value}`;
+        break;
+      case 'dates':
+        message = `I need to update the travel dates to ${value}`;
+        break;
+      case 'guests':
+        message = `Change the number of travelers to ${value}`;
+        break;
+      case 'budget':
+        message = `Update my budget to ${value}`;
+        break;
+    }
+    
+    if (message) {
+      // Send the update as a user message
+      setMessages(prev => [...prev, { role: 'user', content: message }]);
+      sendProgrammaticMessage(message);
+    }
+  };
+
   // Load user's AI agent profile and restore conversation
   useEffect(() => {
     const loadAgentProfile = async () => {
@@ -915,7 +940,10 @@ export const AIBookingConcierge = () => {
           <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden" ref={scrollRef}>
             <div className="space-y-3">
               {/* Booking Progress Tracker */}
-              <BookingProgressTracker bookingInfo={bookingInfo} />
+              <BookingProgressTracker 
+                bookingInfo={bookingInfo}
+                onEdit={handleEditBookingInfo}
+              />
               
               {messages.map((msg, idx) => (
                 <div key={idx} className="w-full">
