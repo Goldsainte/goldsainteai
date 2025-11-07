@@ -96,6 +96,15 @@ serve(async (req) => {
       tier = PRODUCT_TIER_MAP[productId] || 'free';
       logStep("Determined subscription tier", { productId, tier });
 
+      // Get previous tier to detect changes
+      const { data: existingSub } = await supabaseClient
+        .from('user_subscriptions')
+        .select('tier')
+        .eq('user_id', user.id)
+        .single();
+
+      const oldTier = existingSub?.tier || 'free';
+      
       // Update user_subscriptions table
       await supabaseClient
         .from('user_subscriptions')
@@ -103,8 +112,43 @@ serve(async (req) => {
           user_id: user.id, 
           tier: tier
         });
+
+      // Send email notification if tier changed
+      if (oldTier !== tier && oldTier !== 'free') {
+        const emailType = tier > oldTier ? 'upgrade' : 'downgrade';
+        logStep("Tier change detected, sending email", { oldTier, newTier: tier, emailType });
+        
+        await supabaseClient.functions.invoke('send-subscription-email', {
+          body: {
+            email: user.email,
+            type: emailType,
+            newTier: tier,
+            oldTier: oldTier,
+          },
+        });
+      } else if (oldTier === 'free' && tier !== 'free') {
+        // New subscription
+        logStep("New subscription detected, sending upgrade email");
+        await supabaseClient.functions.invoke('send-subscription-email', {
+          body: {
+            email: user.email,
+            type: 'upgrade',
+            newTier: tier,
+            oldTier: 'free',
+          },
+        });
+      }
     } else {
       logStep("No active subscription found, updating to free tier");
+      
+      // Get previous tier
+      const { data: existingSub } = await supabaseClient
+        .from('user_subscriptions')
+        .select('tier')
+        .eq('user_id', user.id)
+        .single();
+
+      const oldTier = existingSub?.tier;
       
       // Update to free tier
       await supabaseClient
@@ -113,6 +157,19 @@ serve(async (req) => {
           user_id: user.id, 
           tier: 'free'
         });
+
+      // Send downgrade email if they had a paid subscription
+      if (oldTier && oldTier !== 'free') {
+        logStep("Subscription ended, sending downgrade email");
+        await supabaseClient.functions.invoke('send-subscription-email', {
+          body: {
+            email: user.email,
+            type: 'downgrade',
+            newTier: 'free',
+            oldTier: oldTier,
+          },
+        });
+      }
     }
 
     return new Response(JSON.stringify({
