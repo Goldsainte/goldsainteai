@@ -14,6 +14,12 @@ interface UserSubscription {
   created_at: string;
 }
 
+const TIER_PRICE_IDS: Record<SubscriptionTier, string> = {
+  free: '',
+  premium: 'price_1SQe1cF9Y0dnmu4YKaVKPSU6',
+  enterprise: 'price_1SQe1uF9Y0dnmu4Yk53KjWru',
+};
+
 const tierFeatures = {
   free: {
     name: "Free",
@@ -73,6 +79,20 @@ export default function Subscription() {
 
   useEffect(() => {
     loadUserSubscription();
+    
+    // Check for success/canceled query params
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success')) {
+      toast.success("Subscription activated! Refreshing status...");
+      // Refresh subscription status after successful payment
+      setTimeout(() => loadUserSubscription(), 2000);
+      // Clean up URL
+      window.history.replaceState({}, '', '/subscription');
+    } else if (params.get('canceled')) {
+      toast.info("Checkout canceled");
+      // Clean up URL
+      window.history.replaceState({}, '', '/subscription');
+    }
   }, []);
 
   const loadUserSubscription = async () => {
@@ -86,20 +106,30 @@ export default function Subscription() {
 
       setUser(authUser);
 
-      const { data, error } = await supabase
-        .from('user_subscriptions')
-        .select('tier, created_at')
-        .eq('user_id', authUser.id)
-        .single();
+      // Check subscription status from Stripe
+      const { data: subData, error: subError } = await supabase.functions.invoke('check-subscription');
+      
+      if (subError) {
+        console.error('Error checking subscription:', subError);
+        // Fallback to database
+        const { data, error } = await supabase
+          .from('user_subscriptions')
+          .select('tier, created_at')
+          .eq('user_id', authUser.id)
+          .single();
 
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error loading subscription:', error);
-        toast.error("Failed to load subscription details");
-        return;
-      }
+        if (error && error.code !== 'PGRST116') {
+          console.error('Error loading subscription:', error);
+          toast.error("Failed to load subscription details");
+          return;
+        }
 
-      if (data) {
-        setCurrentTier(data.tier as SubscriptionTier);
+        if (data) {
+          setCurrentTier(data.tier as SubscriptionTier);
+        }
+      } else {
+        // Use tier from Stripe check
+        setCurrentTier(subData.tier as SubscriptionTier);
       }
     } catch (error) {
       console.error('Load subscription error:', error);
@@ -115,8 +145,49 @@ export default function Subscription() {
       return;
     }
 
-    // TODO: Integrate with payment provider (Stripe, etc.)
-    toast.info("Payment integration coming soon! Contact support for manual upgrade.");
+    try {
+      const priceId = TIER_PRICE_IDS[tier];
+      if (!priceId) {
+        toast.error("Invalid subscription tier");
+        return;
+      }
+
+      toast.loading("Redirecting to checkout...");
+      
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error("No checkout URL received");
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error("Failed to start checkout process");
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    try {
+      toast.loading("Opening subscription management...");
+      
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      } else {
+        throw new Error("No portal URL received");
+      }
+    } catch (error) {
+      console.error('Portal error:', error);
+      toast.error("Failed to open subscription management");
+    }
   };
 
   const getTierIndex = (tier: SubscriptionTier): number => {
@@ -153,10 +224,19 @@ export default function Subscription() {
             Unlock more features and higher rate limits with our flexible subscription plans
           </p>
           {user && (
-            <div className="mt-6">
+            <div className="mt-6 flex flex-col items-center gap-3">
               <Badge variant="secondary" className="text-base px-4 py-2">
                 Current Plan: <span className="font-bold ml-2 capitalize">{currentTier}</span>
               </Badge>
+              {currentTier !== 'free' && (
+                <Button 
+                  variant="outline" 
+                  onClick={handleManageSubscription}
+                  className="text-sm"
+                >
+                  Manage Subscription
+                </Button>
+              )}
             </div>
           )}
         </div>

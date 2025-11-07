@@ -1,187 +1,85 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Input validation schema
-const checkoutSchema = z.object({
-  bookingId: z.string().uuid(),
-  amount: z.number().positive().max(1000000),
-  currency: z.string().length(3).default('USD'),
-  guestEmail: z.string().email().max(255),
-});
+const logStep = (step: string, details?: any) => {
+  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
+  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? ""
+  );
+
   try {
-    // SECURITY: Authenticate user first
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      console.error('Missing authorization header');
-      return new Response(JSON.stringify({ 
-        error: 'Authentication required'
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 401,
-      });
-    }
+    logStep("Function started");
 
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    const authHeader = req.headers.get("Authorization")!;
+    const token = authHeader.replace("Bearer ", "");
+    const { data } = await supabaseClient.auth.getUser(token);
+    const user = data.user;
     
-    if (authError || !user) {
-      console.error('Authentication failed:', authError);
-      return new Response(JSON.stringify({ 
-        error: 'Invalid authentication'
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 401,
-      });
+    if (!user?.email) {
+      throw new Error("User not authenticated or email not available");
     }
+    logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const body = await req.json();
+    const { priceId } = await req.json();
+    if (!priceId) {
+      throw new Error("Price ID is required");
+    }
+    logStep("Price ID received", { priceId });
+
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
+      apiVersion: "2025-08-27.basil" 
+    });
+
+    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    let customerId;
     
-    // Validate input
-    const validationResult = checkoutSchema.safeParse(body);
-    if (!validationResult.success) {
-      console.error('Validation error:', validationResult.error);
-      return new Response(JSON.stringify({ 
-        error: 'Invalid request data'
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      });
-    }
-    
-    const { bookingId, amount, currency, guestEmail } = validationResult.data;
-
-    console.log('Creating checkout session for booking:', bookingId);
-
-    // SECURITY: Verify booking exists and belongs to authenticated user
-    const { data: booking, error: bookingError } = await supabaseClient
-      .from('bookings')
-      .select('id, total_price, currency, user_id, booking_type')
-      .eq('id', bookingId)
-      .single();
-
-    if (bookingError || !booking) {
-      console.error('Booking not found:', bookingError);
-      return new Response(JSON.stringify({ 
-        error: 'Booking not found'
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 404,
-      });
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+      logStep("Found existing customer", { customerId });
+    } else {
+      logStep("Creating new customer");
     }
 
-    // SECURITY: Verify ownership
-    if (booking.user_id !== user.id) {
-      console.error('Unauthorized access attempt for booking:', bookingId);
-      return new Response(JSON.stringify({ 
-        error: 'Unauthorized'
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 403,
-      });
-    }
-
-    // SECURITY: Verify amount matches booking total
-    if (Math.abs(booking.total_price - amount) > 0.01) {
-      console.error('Price mismatch - Expected:', booking.total_price, 'Got:', amount);
-      return new Response(JSON.stringify({ 
-        error: 'Invalid payment amount'
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 400,
-      });
-    }
-
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
-
-    // Create payment record
-    const { data: payment, error: paymentError } = await supabaseClient
-      .from('payments')
-      .insert({
-        booking_id: bookingId,
-        amount: amount,
-        currency: currency,
-        status: 'pending'
-      })
-      .select()
-      .single();
-
-    if (paymentError) {
-      console.error('Payment record creation error:', paymentError);
-      throw new Error('Failed to create payment record');
-    }
-
-    // Create Stripe checkout session with custom branding
+    const origin = req.headers.get("origin") || "http://localhost:3000";
     const session = await stripe.checkout.sessions.create({
-      customer_email: guestEmail,
+      customer: customerId,
+      customer_email: customerId ? undefined : user.email,
       line_items: [
         {
-          price_data: {
-            currency: currency.toLowerCase(),
-            product_data: {
-              name: 'Luxury Travel Booking',
-              description: `Premium ${booking.booking_type} reservation`
-            },
-            unit_amount: Math.round(amount * 100), // Convert to cents
-          },
+          price: priceId,
           quantity: 1,
         },
       ],
-      mode: "payment",
-      success_url: `${req.headers.get("origin")}/booking-confirmation?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}`,
-      cancel_url: `${req.headers.get("origin")}/booking-cancelled`,
-      payment_method_types: ['card'],
-      billing_address_collection: 'required',
-      custom_text: {
-        submit: {
-          message: 'Complete your luxury travel booking'
-        }
-      },
-      metadata: {
-        booking_id: bookingId,
-        payment_id: payment.id
-      }
+      mode: "subscription",
+      success_url: `${origin}/subscription?success=true`,
+      cancel_url: `${origin}/subscription?canceled=true`,
     });
 
-    // Update payment record with session ID
-    await supabaseClient
-      .from('payments')
-      .update({
-        stripe_session_id: session.id,
-        status: 'processing'
-      })
-      .eq('id', payment.id);
+    logStep("Checkout session created", { sessionId: session.id, url: session.url });
 
-    console.log('Checkout session created:', session.id);
-
-    return new Response(JSON.stringify({ 
-      url: session.url,
-      sessionId: session.id 
-    }), {
+    return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    console.error('Error in create-checkout:', error);
-    // SECURITY: Return generic error message, log details server-side only
-    return new Response(JSON.stringify({ error: 'Payment processing failed. Please try again.' }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logStep("ERROR in create-checkout", { message: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });
