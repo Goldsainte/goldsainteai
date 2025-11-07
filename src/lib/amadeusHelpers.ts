@@ -167,6 +167,17 @@ export const groupByDestination = (activities: AmadeusActivity[], defaultDestina
 export const groupByCategory = (activities: AmadeusActivity[]) => {
   const categoryMap: Record<string, { name: string; activities: AmadeusActivity[] }> = {};
 
+  // Fallback images for common categories
+  const categoryFallbackImages: Record<string, string> = {
+    'Museums and Galleries': 'https://images.unsplash.com/photo-1566127444979-b3d2b73053d5?w=800&q=80',
+    'Museums & Galleries': 'https://images.unsplash.com/photo-1566127444979-b3d2b73053d5?w=800&q=80',
+    'Historical Landmarks': 'https://images.unsplash.com/photo-1549144511-f099e773c147?w=800&q=80',
+    'Food & Wine Tours': 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80',
+    'Day Trips': 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+    'Water Sports & Cruises': 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
+    'Cultural Experiences': 'https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&q=80',
+  };
+
   activities.forEach(activity => {
     if (activity.categories && activity.categories.length > 0) {
       const category = activity.categories[0];
@@ -185,9 +196,12 @@ export const groupByCategory = (activities: AmadeusActivity[]) => {
       activity.pictures[0] !== '/placeholder.svg'
     );
     
+    // Use activity image, or fallback to category-specific image, or placeholder
+    const imageUrl = activityWithImage?.pictures?.[0] || categoryFallbackImages[name] || '/placeholder.svg';
+    
     return {
       name,
-      imageUrl: activityWithImage?.pictures?.[0] || '/placeholder.svg',
+      imageUrl,
       packageCount: acts.length,
       startingPrice: Math.min(...acts.map(a => parseFloat(a.price.amount))),
     };
