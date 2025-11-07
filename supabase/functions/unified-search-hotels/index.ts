@@ -294,11 +294,15 @@ serve(async (req) => {
   const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
   
   try {
-    const { location, checkIn, checkOut, guests = 2, sortBy = 'best_value' } = await req.json();
+    const { location, checkIn, checkOut, guests = 2, sortBy = 'best_value', filter = 'all' } = await req.json();
     if (!location || !checkIn || !checkOut) {
       clearTimeout(timeoutId);
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
     }
+    
+    // Validate filter parameter
+    const validFilters = ['all', 'amadeus', 'curated'];
+    const hotelFilter = validFilters.includes(filter) ? filter : 'all';
 
     // Initialize Supabase client for ranking
     const supabaseClient = createClient(
@@ -329,21 +333,30 @@ serve(async (req) => {
     const token = await getAmadeusToken();
     const cityCode = await resolveCityCode(token, location);
 
-    const amadeusHotels = await fetchAmadeusHotels(token, cityCode, checkIn, checkOut, Number(guests) || 2);
-    console.log("Amadeus hotels fetched:", amadeusHotels.length);
+    let amadeusHotels: any[] = [];
+    let enriched: any[] = [];
+    
+    // Fetch Amadeus hotels only if filter allows
+    if (hotelFilter === 'all' || hotelFilter === 'amadeus') {
+      amadeusHotels = await fetchAmadeusHotels(token, cityCode, checkIn, checkOut, Number(guests) || 2);
+      console.log("Amadeus hotels fetched:", amadeusHotels.length);
+      enriched = await enrichWithGooglePlaces(amadeusHotels, location);
+    }
 
-    let enriched = await enrichWithGooglePlaces(amadeusHotels, location);
-
-    // If no hotels from Amadeus, use curated recommendations from database
-    if (enriched.length === 0) {
-      console.log(`No Amadeus results, fetching curated recommendations for ${cityCode}`);
+    // Fetch curated hotels if filter allows or if no Amadeus results
+    if (hotelFilter === 'curated' || (hotelFilter === 'all' && enriched.length === 0)) {
+      const logMessage = hotelFilter === 'curated' 
+        ? `Fetching curated recommendations for ${cityCode} (user filter: curated only)`
+        : `No Amadeus results, fetching curated recommendations for ${cityCode}`;
+      console.log(logMessage);
+      
       const curatedHotels = await getCuratedHotels(supabaseClient, cityCode);
       
       if (curatedHotels.length > 0) {
         // Transform curated hotels to match Amadeus format
         const nights = Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)));
         
-        enriched = curatedHotels.map((hotel: any) => ({
+        const curatedResults = curatedHotels.map((hotel: any) => ({
           id: `curated-${hotel.id}`,
           hotel: {
             name: hotel.name,
@@ -378,7 +391,14 @@ serve(async (req) => {
           __googleRatingCount: 100 + Math.floor(Math.random() * 400)
         }));
         
-        console.log(`Using ${enriched.length} curated hotel recommendations from database`);
+        // If filter is 'all', merge curated with existing Amadeus results
+        if (hotelFilter === 'all') {
+          enriched = [...enriched, ...curatedResults];
+          console.log(`Merged ${curatedResults.length} curated recommendations with ${enriched.length - curatedResults.length} Amadeus results`);
+        } else {
+          enriched = curatedResults;
+          console.log(`Using ${enriched.length} curated hotel recommendations from database`);
+        }
       }
     }
 
@@ -484,12 +504,18 @@ serve(async (req) => {
     }
     
     // Cache the result (fire and forget)
-    setCache(supabaseClient, cacheKey, responseData);
+    setCache(supabaseClient, cacheKey, {
+      ...responseData,
+      filter: hotelFilter // Include filter in cached response
+    });
     
-    console.log(`Hotel search completed in ${Date.now() - searchStart}ms`);
+    console.log(`Hotel search completed in ${Date.now() - searchStart}ms with filter: ${hotelFilter}`);
     clearTimeout(timeoutId);
 
-    return new Response(JSON.stringify(responseData), {
+    return new Response(JSON.stringify({
+      ...responseData,
+      filter: hotelFilter // Include filter in response for client reference
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

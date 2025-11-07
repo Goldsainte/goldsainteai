@@ -30,7 +30,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, stream = false, agentProfile } = await req.json();
+    const { messages, stream = false, agentProfile, hotelFilter = 'all' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -884,6 +884,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               requestBody.sortBy = tripContext.rankingPreferences.flights || 'best_value';
             } else if (functionName === 'search_hotels') {
               requestBody.sortBy = tripContext.rankingPreferences.hotels || 'best_value';
+              requestBody.filter = hotelFilter; // Add hotel filter
             } else if (functionName === 'search_cars') {
               // Store car rental context
               if (!tripContext.carRental) tripContext.carRental = {};

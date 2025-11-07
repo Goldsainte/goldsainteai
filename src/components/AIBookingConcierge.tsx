@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2 } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -41,6 +42,10 @@ export const AIBookingConcierge = () => {
   const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
   const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
   const [isUberModalOpen, setIsUberModalOpen] = useState(false);
+  const [hotelFilter, setHotelFilter] = useState<'all' | 'amadeus' | 'curated'>(() => {
+    const saved = localStorage.getItem('hotelFilter');
+    return (saved === 'all' || saved === 'amadeus' || saved === 'curated') ? saved : 'all';
+  });
   const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -247,7 +252,8 @@ export const AIBookingConcierge = () => {
         body: JSON.stringify({ 
           messages: [...messages, { role: 'user', content: userMessage }],
           stream: false,  // Disable streaming to allow tool execution
-          agentProfile: agentProfile  // Pass agent profile to backend
+          agentProfile: agentProfile,  // Pass agent profile to backend
+          hotelFilter: hotelFilter  // Pass hotel filter preference
         }),
       });
 
@@ -343,7 +349,8 @@ export const AIBookingConcierge = () => {
         body: JSON.stringify({ 
           messages: [...messages, userMessage],
           stream: false,
-          agentProfile: agentProfile
+          agentProfile: agentProfile,
+          hotelFilter: hotelFilter  // Pass hotel filter preference
         }),
       });
 
@@ -741,6 +748,43 @@ export const AIBookingConcierge = () => {
           </div>
         </div>
         <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  const filterElement = document.getElementById('hotel-filter-select');
+                  filterElement?.click();
+                }}
+                className="text-primary-foreground hover:bg-white/10 h-8 w-8"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Hotel filter: {hotelFilter === 'all' ? 'All sources' : hotelFilter === 'amadeus' ? 'Real-time only' : 'Curated only'}</p>
+            </TooltipContent>
+          </Tooltip>
+          <div className="hidden">
+            <Select value={hotelFilter} onValueChange={(value: 'all' | 'amadeus' | 'curated') => {
+              setHotelFilter(value);
+              localStorage.setItem('hotelFilter', value);
+              toast({
+                title: "Hotel Filter Updated",
+                description: `Now showing ${value === 'all' ? 'all hotels' : value === 'amadeus' ? 'real-time availability only' : 'curated recommendations only'}`,
+              });
+            }}>
+              <SelectTrigger id="hotel-filter-select" className="w-32 h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Hotels</SelectItem>
+                <SelectItem value="amadeus">Real-time Only</SelectItem>
+                <SelectItem value="curated">Curated Only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
