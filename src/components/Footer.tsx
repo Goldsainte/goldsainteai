@@ -42,6 +42,7 @@ export const Footer = () => {
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
                 <li><Link to="/journeys" className="hover:text-primary transition-colors">Journeys</Link></li>
+                <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">CoCurated Journeys</Link></li>
                 <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">Travel Agent Services</Link></li>
                 <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">Co-Curated Packages</Link></li>
@@ -115,6 +116,7 @@ export const Footer = () => {
             <h4 className="font-semibold mb-4 text-base">Discover</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
               <li><Link to="/journeys" className="hover:text-primary transition-colors">Journeys</Link></li>
+              <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">CoCurated Journeys</Link></li>
               <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">Travel Agent Services</Link></li>
               <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">Co-Curated Packages</Link></li>
