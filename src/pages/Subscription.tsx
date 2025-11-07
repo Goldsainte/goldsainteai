@@ -228,15 +228,24 @@ export default function Subscription() {
               <Badge variant="secondary" className="text-base px-4 py-2">
                 Current Plan: <span className="font-bold ml-2 capitalize">{currentTier}</span>
               </Badge>
-              {currentTier !== 'free' && (
+              <div className="flex gap-3">
+                {currentTier !== 'free' && (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleManageSubscription}
+                    className="text-sm"
+                  >
+                    Manage Subscription
+                  </Button>
+                )}
                 <Button 
                   variant="outline" 
-                  onClick={handleManageSubscription}
+                  onClick={() => navigate('/billing-dashboard')}
                   className="text-sm"
                 >
-                  Manage Subscription
+                  View Billing History
                 </Button>
-              )}
+              </div>
             </div>
           )}
         </div>
