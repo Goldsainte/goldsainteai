@@ -51,9 +51,16 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
   
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
+  
+  // Validate price data
   const basePrice = parseFloat(flight.price.total);
+  if (isNaN(basePrice) || basePrice <= 0) {
+    console.warn('Invalid flight price:', flight.price.total);
+    return null;
+  }
+  
   const markedUpPrice = (basePrice * 1.15).toFixed(2);
-  const currency = flight.price.currency;
+  const currency = flight.price.currency || 'USD';
 
   const formatTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleTimeString('en-US', { 

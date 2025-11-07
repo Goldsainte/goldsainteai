@@ -1960,7 +1960,7 @@ The user has saved preferences but has chosen to search without strict filtering
         type: "function",
         function: {
           name: "search_flights",
-          description: "Search for flights between two cities. Use this when users ask about flights, airfare, or flying from one place to another. You can specify one-way or round-trip, cabin class, and whether direct flights only.",
+          description: "Search for flights between two cities. CRITICAL: You MUST ask the user for the departure date before calling this tool. NEVER use default dates or infer dates. Use this when users ask about flights, airfare, or flying from one place to another. You can specify one-way or round-trip, cabin class, and whether direct flights only.",
           parameters: {
             type: "object",
             properties: {
@@ -1974,7 +1974,7 @@ The user has saved preferences but has chosen to search without strict filtering
               },
               departureDate: {
                 type: "string",
-                description: "Departure date in YYYY-MM-DD format"
+                description: "Departure date in YYYY-MM-DD format. MUST be explicitly provided by user - do not use defaults or infer dates."
               },
               returnDate: {
                 type: "string",
@@ -2193,6 +2193,26 @@ Before calling search_hotels, you MUST collect these details through conversatio
 
 3. **Number of Guests**: "How many people will be staying?"
    - Optional: "Do you need more than one room?"
+
+✈️ FLIGHT SEARCH QUALIFICATION PROTOCOL (MANDATORY):
+Before calling search_flights, you MUST collect these details through conversation:
+
+**Required Information:**
+1. **Origin**: "Where will you be flying from?"
+2. **Destination**: "Where are you flying to?"
+3. **Departure Date**: "What date would you like to depart?"
+   - CRITICAL: NEVER assume or use default dates
+   - ALWAYS ask explicitly if not provided
+   - Accept formats: "november 25", "2025-11-25", "Nov 25th"
+   - ALWAYS convert to YYYY-MM-DD before calling search_flights
+
+4. **Return Date** (for round-trip): "When would you like to return?" or "Is this a one-way or round-trip flight?"
+   - If one-way, skip this step
+
+❌ **NEVER call search_flights without:**
+- Explicitly asking user for departure date first
+- Valid dates in YYYY-MM-DD format
+- Future dates (not in the past)
 
 **Optional but Helpful:**
 4. **Budget Range**: "Do you have a nightly budget in mind?"
