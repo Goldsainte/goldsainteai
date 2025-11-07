@@ -42,7 +42,25 @@ export const Header = () => {
   const [buyCoinsOpen, setBuyCoinsOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
   const [profileAvatarUrl, setProfileAvatarUrl] = useState<string | null>(null);
+  const [currentLanguage, setCurrentLanguage] = useState<string>('en');
   const { balance } = useCoinBalance();
+
+  // Load language from localStorage on mount
+  useEffect(() => {
+    const savedLanguage = localStorage.getItem('appLanguage');
+    if (savedLanguage) {
+      setCurrentLanguage(savedLanguage);
+    }
+  }, []);
+
+  const handleLanguageChange = (language: string) => {
+    setCurrentLanguage(language);
+    localStorage.setItem('appLanguage', language);
+    toast({
+      title: "Language Changed",
+      description: `Interface language set to ${language.toUpperCase()}`,
+    });
+  };
 
   // Fetch user's preference setting
   useEffect(() => {
@@ -214,7 +232,12 @@ export const Header = () => {
                 
                 <div className="flex items-center gap-2">
                   {user && <NotificationCenter showLabel={false} />}
-                  <LanguageSelector variant="ghost" size="sm" />
+                  <LanguageSelector 
+                    variant="ghost" 
+                    size="sm" 
+                    currentLanguage={currentLanguage}
+                    onLanguageChange={handleLanguageChange}
+                  />
                   
                   {/* Mobile Navigation Menu */}
                   <DropdownMenu>
@@ -473,6 +496,12 @@ export const Header = () => {
 
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                <LanguageSelector 
+                  variant="ghost" 
+                  size="sm"
+                  currentLanguage={currentLanguage}
+                  onLanguageChange={handleLanguageChange}
+                />
                 {user && <NotificationCenter showLabel={false} />}
                 
                 {/* Main Navigation - Desktop */}
