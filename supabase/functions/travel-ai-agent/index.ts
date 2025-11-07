@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { validateHotelDates, validateFlightDates, validateNumericParam } from "../_shared/dateValidation.ts";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -1315,6 +1316,40 @@ serve(async (req) => {
     }
     console.log('Has location:', !!userLocation);
 
+    // ⚠️ SECURITY: Rate limiting - 50 requests per 10 minutes per user/IP
+    const authHeader = req.headers.get('authorization');
+    let userId: string | undefined;
+    
+    // Try to get user ID for better rate limiting
+    if (authHeader) {
+      try {
+        const tempClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+          { global: { headers: { Authorization: authHeader } } }
+        );
+        const { data: { user } } = await tempClient.auth.getUser();
+        userId = user?.id;
+      } catch (error) {
+        console.log('Could not extract user ID for rate limiting:', error);
+      }
+    }
+    
+    const clientId = getClientIdentifier(req, userId);
+    const rateLimit = await checkRateLimit({
+      maxRequests: 50,
+      windowMs: 10 * 60 * 1000, // 10 minutes
+      identifier: clientId,
+      endpoint: 'travel-ai-agent'
+    });
+    
+    if (!rateLimit.allowed) {
+      console.log('❌ [RATE LIMIT] Request blocked for:', clientId);
+      return createRateLimitResponse(rateLimit, corsHeaders);
+    }
+    
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} requests remaining`);
+
     const BOOKING_API_KEY = Deno.env.get('BOOKING_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -1323,7 +1358,6 @@ serve(async (req) => {
     // BOOKING_API_KEY is optional - only needed for search_destinations
 
     // Get user preferences if authenticated
-    const authHeader = req.headers.get('authorization');
     let userPreferences = null;
     let userContext = '';
     

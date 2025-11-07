@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 import { validateFlightDates, validateNumericParam } from "../_shared/dateValidation.ts";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -42,6 +43,22 @@ serve(async (req) => {
 
   try {
     const { origin, destination, departureDate, returnDate, adults, travelClass = 'ECONOMY', cabinClass, nonStop = 'false', max = 250, includedAirlineCodes, destinationCity } = await req.json();
+    
+    // ⚠️ SECURITY: Rate limiting - 30 requests per 5 minutes per IP
+    const clientId = getClientIdentifier(req);
+    const rateLimit = await checkRateLimit({
+      maxRequests: 30,
+      windowMs: 5 * 60 * 1000, // 5 minutes
+      identifier: clientId,
+      endpoint: 'amadeus-search-flights'
+    });
+    
+    if (!rateLimit.allowed) {
+      console.log('❌ [RATE LIMIT] Request blocked for:', clientId);
+      return createRateLimitResponse(rateLimit, corsHeaders);
+    }
+    
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} requests remaining`);
     
     // ⚠️ SECURITY: Server-side date validation
     console.log('🔒 [VALIDATION] Validating flight dates:', { departureDate, returnDate });
