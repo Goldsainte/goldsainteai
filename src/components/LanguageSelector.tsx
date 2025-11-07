@@ -46,7 +46,7 @@ export const LanguageSelector = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className="gap-2 text-[#BFAD72] hover:text-[#BFAD72]/80">
+        <Button variant={variant} size={size} className="gap-2 text-[#BFAD72] hover:text-white transition-colors">
           <Globe className="h-4 w-4" />
           <span className="uppercase font-medium">{currentLang.code}</span>
         </Button>
