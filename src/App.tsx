@@ -142,7 +142,7 @@ function AppContent() {
   };
   
   // Don't show header on these pages as they have their own custom headers
-  const hideHeaderPages = ['/auth', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/cocurated-journeys', '/fine-dining', '/hotel-booking'];
+  const hideHeaderPages = ['/auth', '/login', '/signup', '/travel-feed', '/journeys', '/travel-profile', '/travel-settings', '/cocurated-journeys', '/fine-dining', '/hotel-booking'];
   const showHeader = !hideHeaderPages.some(page => location.pathname === page || location.pathname.startsWith(page));
 
   // Don't show AI Booking Concierge on Horizon pages
@@ -153,6 +153,8 @@ function AppContent() {
   const hideFooterPages = [
     // Auth & Onboarding
     '/auth',
+    '/login',
+    '/signup',
     '/reset-password',
     '/onboarding',
     '/ai-agent-setup',
@@ -212,6 +214,8 @@ function AppContent() {
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/journeys" element={<TravelFeed />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/login" element={<Auth />} />
+          <Route path="/signup" element={<Auth />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/onboarding" element={<Onboarding />} />
@@ -268,6 +272,7 @@ function AppContent() {
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
+          <Route path="/trust-safety" element={<TrustSafety />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
           <Route path="/cancellation-refund-policy" element={<CancellationRefundPolicy />} />
           <Route path="/corporate-contact" element={<CorporateContact />} />

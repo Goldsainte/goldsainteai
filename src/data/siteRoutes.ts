@@ -11,6 +11,8 @@ export const siteRoutes: RouteInfo[] = [
   // Core User Pages
   { path: '/', label: 'Home', description: 'Main landing page with AI search', category: 'core' },
   { path: '/auth', label: 'Sign In / Sign Up', description: 'Authentication page', category: 'core' },
+  { path: '/login', label: 'Login', description: 'Login page', category: 'core' },
+  { path: '/signup', label: 'Sign Up', description: 'Sign up page', category: 'core' },
   { path: '/onboarding', label: 'Onboarding', description: 'First-time user setup', category: 'core', requiresAuth: true },
   { path: '/ai-agent-setup', label: 'AI Agent Setup', description: 'Configure your personal AI agent', category: 'core', requiresAuth: true },
   { path: '/profile', label: 'Profile', description: 'Your account profile', category: 'core', requiresAuth: true },
@@ -65,6 +67,7 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/emergency-contacts', label: 'Emergency Contacts', description: 'Manage emergency contacts', category: 'trust', requiresAuth: true },
   { path: '/activity-logs', label: 'Activity Logs', description: 'View account activity', category: 'trust', requiresAuth: true },
   { path: '/community-guidelines', label: 'Community Guidelines', description: 'Platform rules', category: 'trust' },
+  { path: '/trust-safety', label: 'Trust & Safety', description: 'Safety Resource Center', category: 'trust' },
   { path: '/cancellation-refund-policy', label: 'Cancellation & Refund Policy', description: 'Cancellation policy', category: 'trust' },
   { path: '/dispute-resolution', label: 'Dispute Resolution', description: 'Resolve disputes', category: 'trust' },
   
