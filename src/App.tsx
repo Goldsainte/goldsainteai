@@ -338,11 +338,11 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <LanguageProvider>
-            <AuthProvider>
+          <AuthProvider>
+            <LanguageProvider>
               <AppContent />
-            </AuthProvider>
-          </LanguageProvider>
+            </LanguageProvider>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
