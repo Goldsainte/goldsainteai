@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,6 +51,15 @@ export const AIBookingConcierge = () => {
   });
   const hotelFilter = preferences.hotels.filter;
   const customPrefsCount = countNonDefaultPreferences(preferences);
+  
+  const handleQuickReset = () => {
+    setPreferences(DEFAULT_PREFERENCES);
+    localStorage.setItem('aiChatPreferences', JSON.stringify(DEFAULT_PREFERENCES));
+    toast({
+      title: "Settings Reset",
+      description: "All preferences restored to defaults.",
+    });
+  };
   const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -752,26 +762,69 @@ export const AIBookingConcierge = () => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowSettings(true)}
-                className="text-primary-foreground hover:bg-white/10 h-8 w-8 relative"
-              >
-                <Settings className="h-4 w-4" />
-                {customPrefsCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
+          {customPrefsCount > 0 ? (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    // Only open settings if clicking the icon directly, not the popover
+                    if (e.currentTarget === e.target || e.currentTarget.contains(e.target as Node)) {
+                      const isPopoverOpen = e.currentTarget.getAttribute('data-state') === 'open';
+                      if (!isPopoverOpen) {
+                        setShowSettings(true);
+                      }
+                    }
+                  }}
+                  className="text-primary-foreground hover:bg-white/10 h-8 w-8 relative"
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-lg pointer-events-none">
                     {customPrefsCount}
                   </span>
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Chat preferences {customPrefsCount > 0 && `(${customPrefsCount} custom)`}</p>
-            </TooltipContent>
-          </Tooltip>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent side="bottom" className="w-64 p-3">
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">{customPrefsCount} Custom Setting{customPrefsCount !== 1 ? 's' : ''}</p>
+                  <p className="text-xs text-muted-foreground">You have {customPrefsCount} preference{customPrefsCount !== 1 ? 's' : ''} different from defaults.</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleQuickReset}
+                    className="w-full"
+                  >
+                    Reset to Defaults
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => setShowSettings(true)}
+                    className="w-full"
+                  >
+                    Open Settings
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setShowSettings(true)}
+                  className="text-primary-foreground hover:bg-white/10 h-8 w-8"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Chat preferences</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
