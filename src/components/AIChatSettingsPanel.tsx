@@ -443,4 +443,34 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
   );
 };
 
+// Count how many preferences differ from defaults
+export const countNonDefaultPreferences = (preferences: ChatPreferences): number => {
+  let count = 0;
+  
+  // General preferences
+  if (preferences.general.voiceEnabled !== DEFAULT_PREFERENCES.general.voiceEnabled) count++;
+  if (preferences.general.wakeWordEnabled !== DEFAULT_PREFERENCES.general.wakeWordEnabled) count++;
+  if (preferences.general.autoSaveConversation !== DEFAULT_PREFERENCES.general.autoSaveConversation) count++;
+  
+  // Hotel preferences
+  if (preferences.hotels.filter !== DEFAULT_PREFERENCES.hotels.filter) count++;
+  if (preferences.hotels.sortBy !== DEFAULT_PREFERENCES.hotels.sortBy) count++;
+  if (preferences.hotels.minRating !== DEFAULT_PREFERENCES.hotels.minRating) count++;
+  if (preferences.hotels.maxPrice !== DEFAULT_PREFERENCES.hotels.maxPrice) count++;
+  if (preferences.hotels.searchRadius !== DEFAULT_PREFERENCES.hotels.searchRadius) count++;
+  
+  // Flight preferences
+  if (preferences.flights.sortBy !== DEFAULT_PREFERENCES.flights.sortBy) count++;
+  if (preferences.flights.cabinClass !== DEFAULT_PREFERENCES.flights.cabinClass) count++;
+  if (preferences.flights.maxStops !== DEFAULT_PREFERENCES.flights.maxStops) count++;
+  if (preferences.flights.flexibleDates !== DEFAULT_PREFERENCES.flights.flexibleDates) count++;
+  
+  // Car preferences
+  if (preferences.cars.sortBy !== DEFAULT_PREFERENCES.cars.sortBy) count++;
+  if (preferences.cars.carType !== DEFAULT_PREFERENCES.cars.carType) count++;
+  if (preferences.cars.transmission !== DEFAULT_PREFERENCES.cars.transmission) count++;
+  
+  return count;
+};
+
 export { DEFAULT_PREFERENCES };

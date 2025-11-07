@@ -21,7 +21,7 @@ import { CompactActivityCard } from "./CompactActivityCard";
 import { TravelPackageCard } from "./TravelPackageCard";
 import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
-import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences } from "./AIChatSettingsPanel";
+import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -49,6 +49,7 @@ export const AIBookingConcierge = () => {
     return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
   });
   const hotelFilter = preferences.hotels.filter;
+  const customPrefsCount = countNonDefaultPreferences(preferences);
   const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -757,13 +758,18 @@ export const AIBookingConcierge = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setShowSettings(true)}
-                className="text-primary-foreground hover:bg-white/10 h-8 w-8"
+                className="text-primary-foreground hover:bg-white/10 h-8 w-8 relative"
               >
                 <Settings className="h-4 w-4" />
+                {customPrefsCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-lg">
+                    {customPrefsCount}
+                  </span>
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Chat preferences</p>
+              <p>Chat preferences {customPrefsCount > 0 && `(${customPrefsCount} custom)`}</p>
             </TooltipContent>
           </Tooltip>
           <Tooltip>
