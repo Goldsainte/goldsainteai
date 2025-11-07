@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Heart, ChevronDown, ChevronUp } from "lucide-react";
+import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
 import { DateSelectionModal } from "./DateSelectionModal";
+import { HotelImageGallery } from "./HotelImageGallery";
 import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
 import { encodeData } from "@/lib/utils";
@@ -19,6 +20,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
@@ -31,8 +33,10 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   
   const title = property.property?.name || property.name || property.title || "Hotel";
   // HotelBeds returns 'images', other sources use 'photos' or 'photoUrls'
-  const imageUrl = property.images?.[0] || property.photos?.[0] || property.property?.photoUrls?.[0] || property.image;
+  const allImages = property.images || property.photos || property.property?.photoUrls || (property.image ? [property.image] : []);
+  const imageUrl = allImages[0];
   const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
+  const hasMultipleImages = allImages && allImages.length > 1;
   
   const getCityCode = () => {
     return property.cityCode || "PAR";
@@ -134,18 +138,29 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
       <Card className="group hover:shadow-md transition-all overflow-hidden">
         <div className="flex gap-3 p-3">
           {/* Image */}
-          <div className="relative w-32 h-24 flex-shrink-0 rounded-md overflow-hidden bg-muted">
+          <div 
+            className="relative w-32 h-24 flex-shrink-0 rounded-md overflow-hidden bg-muted cursor-pointer"
+            onClick={() => allImages.length > 0 && setShowGallery(true)}
+          >
             {image ? (
-              <img
-                src={image}
-                alt={title}
-                loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                onError={(e) => {
-                  // Hide broken image so muted background shows instead
-                  (e.currentTarget as HTMLImageElement).style.display = 'none';
-                }}
-              />
+              <>
+                <img
+                  src={image}
+                  alt={title}
+                  loading="lazy"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  onError={(e) => {
+                    // Hide broken image so muted background shows instead
+                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+                {hasMultipleImages && (
+                  <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                    <ImageIcon className="h-3 w-3" />
+                    {allImages.length}
+                  </div>
+                )}
+              </>
             ) : (
               <div className="w-full h-full animate-pulse" aria-label="No image available" />
             )}
@@ -273,6 +288,13 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
         currency={currency}
         initialCheckIn={searchDates?.checkIn}
         initialCheckOut={searchDates?.checkOut}
+      />
+
+      <HotelImageGallery
+        images={allImages}
+        hotelName={title}
+        open={showGallery}
+        onOpenChange={setShowGallery}
       />
     </>
   );
