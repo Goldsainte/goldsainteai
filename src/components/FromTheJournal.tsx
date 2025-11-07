@@ -16,48 +16,49 @@ interface JournalEntry {
   readTime: string;
 }
 
-const journalEntries: JournalEntry[] = [
+const getJournalEntries = (t: any): JournalEntry[] => [
   {
     id: "1",
-    title: "European City Breaks: A Romance Renaissance",
-    excerpt: "Discover the timeless elegance of Venice, where gondolas glide through centuries of history and modern luxury...",
-    creator: "Sophie Anderson",
-    destination: "Venice, Italy",
+    title: t('home.journal.entries.entry1.title'),
+    excerpt: t('home.journal.entries.entry1.excerpt'),
+    creator: t('home.journal.entries.entry1.creator'),
+    destination: t('home.journal.entries.entry1.destination'),
     imageUrl: veniceSunset,
-    readTime: "8 min read"
+    readTime: t('home.journal.entries.entry1.readTime')
   },
   {
     id: "2",
-    title: "Eco-Luxury Escapes: Jungle Hideaways",
-    excerpt: "Experience the perfect blend of nature and sophistication in Bali's most exclusive eco-resorts...",
-    creator: "Marco Rossi",
-    destination: "Bali, Indonesia",
+    title: t('home.journal.entries.entry2.title'),
+    excerpt: t('home.journal.entries.entry2.excerpt'),
+    creator: t('home.journal.entries.entry2.creator'),
+    destination: t('home.journal.entries.entry2.destination'),
     imageUrl: tropicalHideaway,
-    readTime: "6 min read"
+    readTime: t('home.journal.entries.entry2.readTime')
   },
   {
     id: "3",
-    title: "Top Beach Resorts for 2025",
-    excerpt: "Our expertly curated selection of the world's most stunning beachfront properties, from Maldives to Caribbean...",
-    creator: "Isabella Laurent",
-    destination: "Global Collection",
+    title: t('home.journal.entries.entry3.title'),
+    excerpt: t('home.journal.entries.entry3.excerpt'),
+    creator: t('home.journal.entries.entry3.creator'),
+    destination: t('home.journal.entries.entry3.destination'),
     imageUrl: resortPool,
-    readTime: "10 min read"
+    readTime: t('home.journal.entries.entry3.readTime')
   },
   {
     id: "4",
-    title: "Safari Under the Stars",
-    excerpt: "An intimate look at luxury camping in the Serengeti, where wildlife encounters meet five-star service...",
-    creator: "David Chen",
-    destination: "Tanzania",
+    title: t('home.journal.entries.entry4.title'),
+    excerpt: t('home.journal.entries.entry4.excerpt'),
+    creator: t('home.journal.entries.entry4.creator'),
+    destination: t('home.journal.entries.entry4.destination'),
     imageUrl: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-    readTime: "7 min read"
+    readTime: t('home.journal.entries.entry4.readTime')
   }
 ];
 
 export const FromTheJournal = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const journalEntries = getJournalEntries(t);
 
   return (
     <section className="py-20 md:py-24 bg-white">

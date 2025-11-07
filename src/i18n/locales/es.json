@@ -93,7 +93,37 @@
     "journal": {
       "title": "Del Diario",
       "subtitle": "Historias curadas de nuestra comunidad de creadores",
-      "viewAll": "Ver Todas las Historias"
+      "viewAll": "Ver Todas las Historias",
+      "entries": {
+        "entry1": {
+          "title": "Escapadas Urbanas Europeas: Un Renacimiento Romántico",
+          "excerpt": "Descubre la elegancia atemporal de Venecia, donde las góndolas se deslizan a través de siglos de historia y lujo moderno...",
+          "creator": "Sophie Anderson",
+          "destination": "Venecia, Italia",
+          "readTime": "8 min de lectura"
+        },
+        "entry2": {
+          "title": "Escapadas Eco-Lujosas: Refugios en la Selva",
+          "excerpt": "Experimenta la mezcla perfecta de naturaleza y sofisticación en los eco-resorts más exclusivos de Bali...",
+          "creator": "Marco Rossi",
+          "destination": "Bali, Indonesia",
+          "readTime": "6 min de lectura"
+        },
+        "entry3": {
+          "title": "Los Mejores Resorts de Playa para 2025",
+          "excerpt": "Nuestra selección expertamente curada de las propiedades frente al mar más impresionantes del mundo, desde Maldivas hasta el Caribe...",
+          "creator": "Isabella Laurent",
+          "destination": "Colección Global",
+          "readTime": "10 min de lectura"
+        },
+        "entry4": {
+          "title": "Safari Bajo las Estrellas",
+          "excerpt": "Una mirada íntima al camping de lujo en el Serengeti, donde los encuentros con vida salvaje se encuentran con servicio de cinco estrellas...",
+          "creator": "David Chen",
+          "destination": "Tanzania",
+          "readTime": "7 min de lectura"
+        }
+      }
     },
     "popularSearches": {
       "title": "Búsquedas populares",

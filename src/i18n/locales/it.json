@@ -70,7 +70,77 @@
         "title": "Prenotazione Istantanea",
         "description": "Prenota voli, hotel, ristoranti istantaneamente con pagamento sicuro.",
         "cta": "Inizia a Prenotare"
+      },
+      "stores": {
+        "title": "Negozi dei Creator",
+        "description": "Diventa un creator di viaggi. Cura le tue destinazioni preferite, crea collezioni tematiche e guadagna quando altri prenotano dal tuo negozio. Il tuo gusto, monetizzato.",
+        "cta": "Esplora Negozi dei Creator"
       }
+    },
+    "creatorHero": {
+      "create": "Crea.",
+      "share": "Condividi.",
+      "makeMoney": "Guadagna.",
+      "paragraph1": "Trasforma la tua passione per i viaggi in profitto. Condividi contenuti straordinari, fai crescere il tuo pubblico e sblocca nuove fonti di reddito attraverso premi di coinvolgimento, collaborazioni con brand e pacchetti di viaggio curati.",
+      "paragraph2": "Guadagna denaro reale mentre i tuoi post ottengono like, commenti e condivisioni — o crea e vendi esperienze di viaggio direttamente ai tuoi follower.",
+      "paragraph3": "Collabora con i migliori brand, accedi a potenti strumenti per creator e ispira una comunità globale di esploratori. Che tu sia un influencer esperto o appena agli inizi, qui è dove la tua storia di viaggio diventa il tuo business."
+    },
+    "winterSun": {
+      "title": "Sole Invernale",
+      "subtitle": "Fuggi in paradiso con la nostra selezione di resort di lusso sulla spiaggia",
+      "cta": "Esplora Destinazioni"
+    },
+    "journal": {
+      "title": "Dal Diario",
+      "subtitle": "Storie curate dalla nostra comunità di creator",
+      "viewAll": "Vedi Tutte le Storie",
+      "entries": {
+        "entry1": {
+          "title": "Fughe Urbane Europee: Un Rinascimento Romantico",
+          "excerpt": "Scopri l'eleganza senza tempo di Venezia, dove le gondole scivolano attraverso secoli di storia e lusso moderno...",
+          "creator": "Sophie Anderson",
+          "destination": "Venezia, Italia",
+          "readTime": "8 min di lettura"
+        },
+        "entry2": {
+          "title": "Fughe Eco-Lusso: Rifugi nella Giungla",
+          "excerpt": "Vivi la perfetta combinazione di natura e raffinatezza negli eco-resort più esclusivi di Bali...",
+          "creator": "Marco Rossi",
+          "destination": "Bali, Indonesia",
+          "readTime": "6 min di lettura"
+        },
+        "entry3": {
+          "title": "I Migliori Resort sulla Spiaggia per il 2025",
+          "excerpt": "La nostra selezione curata delle proprietà fronte mare più straordinarie del mondo, dalle Maldive ai Caraibi...",
+          "creator": "Isabella Laurent",
+          "destination": "Collezione Globale",
+          "readTime": "10 min di lettura"
+        },
+        "entry4": {
+          "title": "Safari Sotto le Stelle",
+          "excerpt": "Uno sguardo intimo al campeggio di lusso nel Serengeti, dove gli incontri con la fauna selvatica incontrano il servizio a cinque stelle...",
+          "creator": "David Chen",
+          "destination": "Tanzania",
+          "readTime": "7 min di lettura"
+        }
+      }
+    },
+    "popularSearches": {
+      "title": "Ricerche popolari",
+      "beachResorts": "Resort sulla Spiaggia",
+      "cityBreaks": "Fughe Urbane",
+      "romanticGetaways": "Fughe Romantiche",
+      "luxuryHotels": "Hotel di Lusso",
+      "culturalExperiences": "Esperienze Culturali",
+      "wellnessRetreats": "Ritiri Benessere",
+      "adventureTravel": "Viaggi Avventura",
+      "islandEscapes": "Fughe Insulari"
+    },
+    "agentCTA": {
+      "title": "Diventa un Agente di Viaggio",
+      "subtitle": "Unisciti alla nostra rete e guadagna commissioni sulle prenotazioni di viaggi di lusso",
+      "apply": "Candidati Ora",
+      "browse": "Sfoglia Agenti"
     }
   }
 }

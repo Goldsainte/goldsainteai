@@ -70,7 +70,77 @@
         "title": "Reserva Instantânea",
         "description": "Reserve voos, hotéis, restaurantes instantaneamente com pagamento seguro.",
         "cta": "Começar a Reservar"
+      },
+      "stores": {
+        "title": "Lojas de Criadores",
+        "description": "Torne-se um criador de viagens. Curre seus destinos favoritos, crie coleções temáticas e ganhe quando outros reservarem da sua loja. Seu gosto, monetizado.",
+        "cta": "Explorar Lojas de Criadores"
       }
+    },
+    "creatorHero": {
+      "create": "Criar.",
+      "share": "Compartilhar.",
+      "makeMoney": "Ganhar Dinheiro.",
+      "paragraph1": "Transforme sua paixão por viagens em lucro. Compartilhe conteúdo impressionante, aumente seu público e desbloqueie novas fontes de receita através de recompensas de engajamento, colaborações com marcas e pacotes de viagem curados.",
+      "paragraph2": "Ganhe dinheiro real enquanto suas postagens recebem curtidas, comentários e compartilhamentos — ou crie e venda experiências de viagem diretamente para seus seguidores.",
+      "paragraph3": "Colabore com as melhores marcas, acesse ferramentas poderosas para criadores e inspire uma comunidade global de exploradores. Seja você um influenciador experiente ou apenas começando, aqui é onde sua história de viagem se torna seu negócio."
+    },
+    "winterSun": {
+      "title": "Sol de Inverno",
+      "subtitle": "Fuja para o paraíso com nossa seleção de resorts de praia de luxo",
+      "cta": "Explorar Destinos"
+    },
+    "journal": {
+      "title": "Do Diário",
+      "subtitle": "Histórias curadas da nossa comunidade de criadores",
+      "viewAll": "Ver Todas as Histórias",
+      "entries": {
+        "entry1": {
+          "title": "Escapadas Urbanas Europeias: Um Renascimento Romântico",
+          "excerpt": "Descubra a elegância atemporal de Veneza, onde gôndolas deslizam através de séculos de história e luxo moderno...",
+          "creator": "Sophie Anderson",
+          "destination": "Veneza, Itália",
+          "readTime": "8 min de leitura"
+        },
+        "entry2": {
+          "title": "Escapadas Eco-Luxo: Refúgios na Selva",
+          "excerpt": "Experimente a combinação perfeita de natureza e sofisticação nos eco-resorts mais exclusivos de Bali...",
+          "creator": "Marco Rossi",
+          "destination": "Bali, Indonésia",
+          "readTime": "6 min de leitura"
+        },
+        "entry3": {
+          "title": "Os Melhores Resorts de Praia para 2025",
+          "excerpt": "Nossa seleção especializada das propriedades à beira-mar mais deslumbrantes do mundo, das Maldivas ao Caribe...",
+          "creator": "Isabella Laurent",
+          "destination": "Coleção Global",
+          "readTime": "10 min de leitura"
+        },
+        "entry4": {
+          "title": "Safari Sob as Estrelas",
+          "excerpt": "Um olhar íntimo sobre o camping de luxo no Serengeti, onde encontros com vida selvagem encontram serviço cinco estrelas...",
+          "creator": "David Chen",
+          "destination": "Tanzânia",
+          "readTime": "7 min de leitura"
+        }
+      }
+    },
+    "popularSearches": {
+      "title": "Pesquisas populares",
+      "beachResorts": "Resorts de Praia",
+      "cityBreaks": "Escapadas Urbanas",
+      "romanticGetaways": "Escapadas Românticas",
+      "luxuryHotels": "Hotéis de Luxo",
+      "culturalExperiences": "Experiências Culturais",
+      "wellnessRetreats": "Retiros de Bem-Estar",
+      "adventureTravel": "Viagem de Aventura",
+      "islandEscapes": "Escapadas Insulares"
+    },
+    "agentCTA": {
+      "title": "Torne-se um Agente de Viagens",
+      "subtitle": "Junte-se à nossa rede e ganhe comissões em reservas de viagens de luxo",
+      "apply": "Candidatar-se Agora",
+      "browse": "Navegar Agentes"
     }
   }
 }

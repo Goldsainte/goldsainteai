@@ -93,7 +93,37 @@
     "journal": {
       "title": "From the Journal",
       "subtitle": "Curated stories from our creator community",
-      "viewAll": "View All Stories"
+      "viewAll": "View All Stories",
+      "entries": {
+        "entry1": {
+          "title": "European City Breaks: A Romance Renaissance",
+          "excerpt": "Discover the timeless elegance of Venice, where gondolas glide through centuries of history and modern luxury...",
+          "creator": "Sophie Anderson",
+          "destination": "Venice, Italy",
+          "readTime": "8 min read"
+        },
+        "entry2": {
+          "title": "Eco-Luxury Escapes: Jungle Hideaways",
+          "excerpt": "Experience the perfect blend of nature and sophistication in Bali's most exclusive eco-resorts...",
+          "creator": "Marco Rossi",
+          "destination": "Bali, Indonesia",
+          "readTime": "6 min read"
+        },
+        "entry3": {
+          "title": "Top Beach Resorts for 2025",
+          "excerpt": "Our expertly curated selection of the world's most stunning beachfront properties, from Maldives to Caribbean...",
+          "creator": "Isabella Laurent",
+          "destination": "Global Collection",
+          "readTime": "10 min read"
+        },
+        "entry4": {
+          "title": "Safari Under the Stars",
+          "excerpt": "An intimate look at luxury camping in the Serengeti, where wildlife encounters meet five-star service...",
+          "creator": "David Chen",
+          "destination": "Tanzania",
+          "readTime": "7 min read"
+        }
+      }
     },
     "popularSearches": {
       "title": "Popular searches",
