@@ -46,12 +46,12 @@ export const LanguageSelector = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} size={size} className="gap-2">
+        <Button variant={variant} size={size} className="gap-2 text-[#BFAD72] hover:text-[#BFAD72]/80">
           <Globe className="h-4 w-4" />
           <span className="uppercase font-medium">{currentLang.code}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="w-48 bg-background/95 backdrop-blur-xl border border-border/50 shadow-2xl z-[100]">
         {LANGUAGES.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
