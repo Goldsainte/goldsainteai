@@ -9,80 +9,22 @@ const corsHeaders = {
 // Database cache with 24-hour TTL
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours
 
-// Curated hotel recommendations by city (fallback when Amadeus returns no results)
-const CURATED_HOTELS: Record<string, any[]> = {
-  "MIA": [
-    {
-      name: "The Fontainebleau Miami Beach",
-      address: "4441 Collins Avenue",
-      city: "Miami Beach",
-      rating: 4.5,
-      price: 350,
-      imageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
-      amenities: ["Pool", "Spa", "Beach Access", "Fitness Center", "Restaurant"]
-    },
-    {
-      name: "Mandarin Oriental Miami",
-      address: "500 Brickell Key Drive",
-      city: "Miami",
-      rating: 4.7,
-      price: 425,
-      imageUrl: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80",
-      amenities: ["Spa", "Pool", "Restaurant", "Fitness Center", "Room Service"]
-    },
-    {
-      name: "The Betsy Hotel",
-      address: "1440 Ocean Drive",
-      city: "Miami Beach",
-      rating: 4.6,
-      price: 380,
-      imageUrl: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80",
-      amenities: ["Beach Access", "Pool", "Restaurant", "Bar", "WiFi"]
-    }
-  ],
-  "NYC": [
-    {
-      name: "The Plaza Hotel",
-      address: "768 5th Avenue",
-      city: "New York",
-      rating: 4.6,
-      price: 550,
-      imageUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80",
-      amenities: ["Spa", "Restaurant", "Concierge", "Fitness Center"]
-    },
-    {
-      name: "The Standard High Line",
-      address: "848 Washington Street",
-      city: "New York",
-      rating: 4.4,
-      price: 380,
-      imageUrl: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80",
-      amenities: ["Pool", "Restaurant", "Bar", "Views", "WiFi"]
-    }
-  ],
-  "LAX": [
-    {
-      name: "The Beverly Hills Hotel",
-      address: "9641 Sunset Boulevard",
-      city: "Los Angeles",
-      rating: 4.7,
-      price: 650,
-      imageUrl: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80",
-      amenities: ["Pool", "Spa", "Restaurant", "Valet", "Tennis Courts"]
-    }
-  ],
-  "PAR": [
-    {
-      name: "Le Royal Monceau",
-      address: "37 Avenue Hoche",
-      city: "Paris",
-      rating: 4.8,
-      price: 580,
-      imageUrl: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80",
-      amenities: ["Spa", "Pool", "Restaurant", "Art Gallery", "Cinema"]
-    }
-  ]
-};
+// Fetch curated hotels from database
+async function getCuratedHotels(supabase: any, cityCode: string) {
+  const { data, error } = await supabase
+    .from('curated_hotels')
+    .select('*')
+    .eq('city_code', cityCode)
+    .eq('is_active', true)
+    .order('display_order', { ascending: true });
+  
+  if (error) {
+    console.error('Error fetching curated hotels:', error);
+    return [];
+  }
+  
+  return data || [];
+}
 
 function getCacheKey(params: any): string {
   return `hotels|${JSON.stringify(params)}`;
@@ -392,36 +334,36 @@ serve(async (req) => {
 
     let enriched = await enrichWithGooglePlaces(amadeusHotels, location);
 
-    // If no hotels from Amadeus, use curated recommendations
+    // If no hotels from Amadeus, use curated recommendations from database
     if (enriched.length === 0) {
-      console.log(`No Amadeus results, using curated recommendations for ${cityCode}`);
-      const curatedForCity = CURATED_HOTELS[cityCode] || [];
+      console.log(`No Amadeus results, fetching curated recommendations for ${cityCode}`);
+      const curatedHotels = await getCuratedHotels(supabaseClient, cityCode);
       
-      if (curatedForCity.length > 0) {
+      if (curatedHotels.length > 0) {
         // Transform curated hotels to match Amadeus format
         const nights = Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)));
         
-        enriched = curatedForCity.map((hotel: any, index: number) => ({
-          id: `curated-${cityCode}-${index}`,
+        enriched = curatedHotels.map((hotel: any) => ({
+          id: `curated-${hotel.id}`,
           hotel: {
             name: hotel.name,
             address: {
               lines: [hotel.address],
               cityName: hotel.city,
-              countryCode: "US"
+              countryCode: hotel.country_code
             },
             amenities: hotel.amenities,
             rating: hotel.rating
           },
           offers: [{
-            id: `offer-curated-${index}`,
+            id: `offer-curated-${hotel.id}`,
             price: {
-              total: (hotel.price * nights).toString(),
-              currency: "USD"
+              total: (hotel.price_per_night * nights).toString(),
+              currency: hotel.currency
             },
             room: {
               description: {
-                text: `Experience luxury accommodation in ${hotel.city}`
+                text: hotel.description || `Experience luxury accommodation in ${hotel.city}`
               }
             },
             checkInDate: checkIn,
@@ -429,14 +371,14 @@ serve(async (req) => {
           }],
           available: true,
           __googlePhotos: [{
-            url: hotel.imageUrl,
-            attribution: "Stock Photo"
+            url: hotel.image_url,
+            attribution: "Curated Recommendation"
           }],
-          __googleRating: hotel.rating,
+          __googleRating: parseFloat(hotel.rating),
           __googleRatingCount: 100 + Math.floor(Math.random() * 400)
         }));
         
-        console.log(`Using ${enriched.length} curated hotel recommendations`);
+        console.log(`Using ${enriched.length} curated hotel recommendations from database`);
       }
     }
 

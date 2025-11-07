@@ -2186,6 +2186,63 @@ export type Database = {
         }
         Relationships: []
       }
+      curated_hotels: {
+        Row: {
+          address: string
+          amenities: Json
+          city: string
+          city_code: string
+          country_code: string
+          created_at: string
+          currency: string
+          description: string | null
+          display_order: number
+          id: string
+          image_url: string
+          is_active: boolean
+          name: string
+          price_per_night: number
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          amenities?: Json
+          city: string
+          city_code: string
+          country_code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url: string
+          is_active?: boolean
+          name: string
+          price_per_night: number
+          rating?: number
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          amenities?: Json
+          city?: string
+          city_code?: string
+          country_code?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          image_url?: string
+          is_active?: boolean
+          name?: string
+          price_per_night?: number
+          rating?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       currency_exchange_rates: {
         Row: {
           created_at: string
