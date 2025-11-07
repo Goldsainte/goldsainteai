@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,6 +32,45 @@ serve(async (req) => {
   }
 
   try {
+    // ⚠️ SECURITY: Rate limiting for AI concierge
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | undefined;
+    let tier: SubscriptionTier = 'unauthenticated';
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const tempClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+        );
+        const { data: { user } } = await tempClient.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          tier = await getUserTier(userId);
+        }
+      } catch (error) {
+        console.log('Failed to authenticate user, treating as unauthenticated');
+      }
+    }
+    
+    const clientId = getClientIdentifier(req, userId);
+    const limits = getTieredRateLimit(tier, 'ai-booking-concierge');
+    
+    const rateLimit = await checkRateLimit({
+      ...limits,
+      identifier: clientId,
+      endpoint: 'ai-booking-concierge',
+      tier
+    });
+    
+    if (!rateLimit.allowed) {
+      console.log('❌ [RATE LIMIT] AI concierge request blocked for:', clientId);
+      return createRateLimitResponse(rateLimit, corsHeaders);
+    }
+    
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} AI concierge requests remaining`);
+
     const { messages, stream = false, agentProfile, preferences, language = 'en' } = await req.json();
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     

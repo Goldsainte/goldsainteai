@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -496,6 +497,44 @@ serve(async (req) => {
   }
 
   try {
+    // ⚠️ SECURITY: Rate limiting for AI assistant
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | undefined;
+    let tier: SubscriptionTier = 'unauthenticated';
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const supabaseUrl = Deno.env.get('SUPABASE_URL');
+        const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
+        const tempClient = createClient(supabaseUrl!, supabaseKey!);
+        const { data: { user } } = await tempClient.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          tier = await getUserTier(userId);
+        }
+      } catch (error) {
+        console.log('Failed to authenticate user, treating as unauthenticated');
+      }
+    }
+    
+    const clientId = getClientIdentifier(req, userId);
+    const limits = getTieredRateLimit(tier, 'ai-booking-assistant');
+    
+    const rateLimit = await checkRateLimit({
+      ...limits,
+      identifier: clientId,
+      endpoint: 'ai-booking-assistant',
+      tier
+    });
+    
+    if (!rateLimit.allowed) {
+      console.log('❌ [RATE LIMIT] Request blocked for:', clientId);
+      return createRateLimitResponse(rateLimit, corsHeaders);
+    }
+    
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} requests remaining`);
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for AI responses
 

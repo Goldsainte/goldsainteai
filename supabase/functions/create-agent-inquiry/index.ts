@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +13,45 @@ serve(async (req) => {
   }
 
   try {
+    // ⚠️ SECURITY: Rate limiting to prevent inquiry spam
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | undefined;
+    let tier: SubscriptionTier = 'unauthenticated';
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const supabase = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+        );
+        const { data: { user } } = await supabase.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          tier = await getUserTier(userId);
+        }
+      } catch (error) {
+        console.log('Failed to authenticate user, treating as unauthenticated');
+      }
+    }
+    
+    const clientId = getClientIdentifier(req, userId);
+    const limits = getTieredRateLimit(tier, 'create-agent-inquiry');
+    
+    const rateLimit = await checkRateLimit({
+      ...limits,
+      identifier: clientId,
+      endpoint: 'create-agent-inquiry',
+      tier
+    });
+    
+    if (!rateLimit.allowed) {
+      console.log('❌ [RATE LIMIT] Inquiry request blocked for:', clientId);
+      return createRateLimitResponse(rateLimit, corsHeaders);
+    }
+    
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} inquiry requests remaining`);
+
     const { 
       travelerInfo, 
       travelDetails,
@@ -27,14 +67,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const authHeader = req.headers.get('Authorization');
-    let userId = null;
-    
-    if (authHeader) {
-      const token = authHeader.replace('Bearer ', '');
-      const { data: { user } } = await supabase.auth.getUser(token);
-      userId = user?.id;
-    }
+    userId = userId || null;
 
     const additionalEmails = travelerInfo.additionalEmails || [];
 

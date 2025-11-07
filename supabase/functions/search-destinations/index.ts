@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,10 +12,49 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
   try {
+    // ⚠️ SECURITY: Rate limiting for destination searches
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | undefined;
+    let tier: SubscriptionTier = 'unauthenticated';
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const tempClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+        );
+        const { data: { user } } = await tempClient.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          tier = await getUserTier(userId);
+        }
+      } catch (error) {
+        console.log('Failed to authenticate user, treating as unauthenticated');
+      }
+    }
+    
+    const clientId = getClientIdentifier(req, userId);
+    const limits = getTieredRateLimit(tier, 'search-destinations');
+    
+    const rateLimit = await checkRateLimit({
+      ...limits,
+      identifier: clientId,
+      endpoint: 'search-destinations',
+      tier
+    });
+    
+    if (!rateLimit.allowed) {
+      console.log('❌ [RATE LIMIT] Destination search blocked for:', clientId);
+      return createRateLimitResponse(rateLimit, corsHeaders);
+    }
+    
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} destination searches remaining`);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    
     const { query } = await req.json();
     
     console.log('Search destinations request:', { query });
