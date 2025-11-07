@@ -2,6 +2,51 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
+// ⚠️ SECURITY: Input validation schema
+const validateInquiry = (data: any): { success: boolean; error?: string; data?: any } => {
+  const { travelerInfo, travelDetails } = data;
+  
+  // Validate traveler info
+  if (!travelerInfo || typeof travelerInfo !== 'object') {
+    return { success: false, error: 'Traveler information is required' };
+  }
+  
+  const name = travelerInfo.name?.trim();
+  const email = travelerInfo.email?.trim();
+  const phone = travelerInfo.phone?.trim();
+  
+  if (!name || name.length < 2 || name.length > 100) {
+    return { success: false, error: 'Name must be between 2 and 100 characters' };
+  }
+  
+  // Email validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email || !emailRegex.test(email) || email.length > 255) {
+    return { success: false, error: 'Valid email address is required' };
+  }
+  
+  // Phone validation (optional but if provided must be valid)
+  if (phone && (phone.length < 10 || phone.length > 20 || !/^[\d\s\-\+\(\)]+$/.test(phone))) {
+    return { success: false, error: 'Phone number must be 10-20 digits' };
+  }
+  
+  // Sanitize inputs
+  return {
+    success: true,
+    data: {
+      travelerInfo: {
+        name: name.substring(0, 100),
+        email: email.toLowerCase().substring(0, 255),
+        phone: phone ? phone.substring(0, 20) : undefined,
+        additionalEmails: Array.isArray(travelerInfo.additionalEmails) 
+          ? travelerInfo.additionalEmails.slice(0, 5).map((e: string) => e.trim().toLowerCase().substring(0, 255))
+          : []
+      },
+      travelDetails: travelDetails || {}
+    }
+  };
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -52,15 +97,25 @@ serve(async (req) => {
     
     console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} inquiry requests remaining`);
 
-    const { 
-      travelerInfo, 
-      travelDetails,
-      conversationData, 
-      inquirySource = 'ai_chat',
-      priority = 'medium'
-    } = await req.json();
+    const body = await req.json();
+    
+    // ⚠️ SECURITY: Validate and sanitize input
+    console.log('🔒 [VALIDATION] Validating inquiry data');
+    const validation = validateInquiry(body);
+    if (!validation.success) {
+      console.error('❌ [VALIDATION] Invalid inquiry data:', validation.error);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    console.log('✅ [VALIDATION] Inquiry data validated');
+    
+    const { travelerInfo, travelDetails } = validation.data;
+    const { conversationData, inquirySource = 'ai_chat', priority = 'medium' } = body;
 
-    console.log('Creating agent inquiry:', { travelerInfo, inquirySource });
+    console.log('Creating agent inquiry:', { travelerEmail: travelerInfo.email, inquirySource });
 
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',

@@ -2,6 +2,38 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
+// ⚠️ SECURITY: Zod validation for input sanitization
+const z = {
+  object: (shape: any) => ({
+    safeParse: (data: any) => {
+      try {
+        const query = data.query;
+        if (typeof query !== 'string') {
+          return { success: false, error: { message: 'Query must be a string' } };
+        }
+        const trimmed = query.trim();
+        if (trimmed.length === 0) {
+          return { success: false, error: { message: 'Query cannot be empty' } };
+        }
+        if (trimmed.length > 100) {
+          return { success: false, error: { message: 'Query must be less than 100 characters' } };
+        }
+        // Block potential injection patterns
+        if (/<script|javascript:|onerror=/i.test(trimmed)) {
+          return { success: false, error: { message: 'Invalid characters in query' } };
+        }
+        return { success: true, data: { query: trimmed } };
+      } catch (error) {
+        return { success: false, error: { message: 'Invalid input format' } };
+      }
+    }
+  })
+};
+
+const searchSchema = z.object({
+  query: true // Validated above
+});
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -55,7 +87,28 @@ serve(async (req) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
     
-    const { query } = await req.json();
+    const body = await req.json();
+    
+    // ⚠️ SECURITY: Validate input with schema
+    console.log('🔒 [VALIDATION] Validating search query');
+    const validation = searchSchema.safeParse(body);
+    if (!validation.success) {
+      console.error('❌ [VALIDATION] Invalid input:', validation.error);
+      clearTimeout(timeoutId);
+      return new Response(
+        JSON.stringify({ 
+          error: validation.error.message || 'Invalid input',
+          results: [] 
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
+    }
+    
+    const { query } = validation.data;
+    console.log('✅ [VALIDATION] Input validated');
     
     console.log('Search destinations request:', { query });
 

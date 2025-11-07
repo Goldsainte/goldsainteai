@@ -2,6 +2,31 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
+// ⚠️ SECURITY: Input validation for AI messages
+const validateAIInput = (data: any): { success: boolean; error?: string } => {
+  if (!data.messages || !Array.isArray(data.messages)) {
+    return { success: false, error: 'Messages array is required' };
+  }
+  
+  if (data.messages.length === 0 || data.messages.length > 50) {
+    return { success: false, error: 'Messages must contain 1-50 entries' };
+  }
+  
+  for (const msg of data.messages) {
+    if (!msg.role || !msg.content) {
+      return { success: false, error: 'Each message must have role and content' };
+    }
+    if (typeof msg.content !== 'string' || msg.content.length > 10000) {
+      return { success: false, error: 'Message content must be a string under 10000 characters' };
+    }
+    if (!['user', 'assistant', 'system'].includes(msg.role)) {
+      return { success: false, error: 'Invalid message role' };
+    }
+  }
+  
+  return { success: true };
+};
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -533,13 +558,26 @@ serve(async (req) => {
       return createRateLimitResponse(rateLimit, corsHeaders);
     }
     
-    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} requests remaining`);
+    console.log(`✅ [RATE LIMIT] ${rateLimit.remaining} AI assistant requests remaining`);
+
+    // ⚠️ SECURITY: Validate input
+    const body = await req.json();
+    console.log('🔒 [VALIDATION] Validating AI assistant input');
+    const validation = validateAIInput(body);
+    if (!validation.success) {
+      console.error('❌ [VALIDATION] Invalid input:', validation.error);
+      return new Response(
+        JSON.stringify({ error: validation.error }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    console.log('✅ [VALIDATION] Input validated');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout for AI responses
 
     try {
-      const { messages } = await req.json();
+      const { messages } = body;
     const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY is not configured");
 
