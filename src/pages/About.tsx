@@ -7,6 +7,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useTranslation } from "react-i18next";
 import founderImage from "@/assets/founder.jpg";
 import amadeusLogo from "@/assets/Amadeus_CRS_Logo.svg";
 import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
@@ -22,6 +23,7 @@ import {
 } from "lucide-react";
 
 const About = () => {
+  const { t } = useTranslation();
   const partners = [
     { name: "Amadeus", logo: amadeusLogo },
     { name: "Ticketmaster", logo: ticketmasterLogo },
@@ -111,7 +113,7 @@ const About = () => {
           />
         </div>
         <p className="text-xs sm:text-sm text-muted-foreground max-w-4xl mx-auto leading-relaxed px-2">
-          Discover. Book. Create. Earn. — Travel Reinvented with AI, Agent Bidding & Creator Collaborations. Plan faster with AI, let agents bid to save more, or book CoCurated trips built by pros, amplified by creators, and designed to deliver real value.
+          {t('home.hero.title')}. {t('home.hero.subtitle')}
         </p>
       </div>
 

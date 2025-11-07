@@ -34,6 +34,34 @@
       "privacy": "Privacy Policy",
       "agreement": "By using Goldsainte.Ai, you agree to our"
     },
+    "rotatingPlaceholders": {
+      "hotels": "Where to next? Discover handpicked hotels tailored to your taste.",
+      "flights": "Book smarter flights with AI that knows your preferences.",
+      "restaurants": "Find restaurants worth the reservation — curated by locals and AI.",
+      "events": "Unlock exclusive events and local experiences wherever you land.",
+      "excursions": "Join a planned excursion — guided by experts, powered by Goldsainte.",
+      "agents": "Need more than a booking? Match with expert travel agents in minutes."
+    },
+    "winterSun": {
+      "title": "Winter Sun",
+      "subtitle": "Escape to paradise with our handpicked collection of luxury beach resorts...",
+      "cta": "Discover"
+    },
+    "gallery": {
+      "beachEscapes": "Beach Escapes",
+      "beachSubtitle": "Luxury beachfront properties",
+      "cityRetreats": "City Retreats",
+      "citySubtitle": "Urban luxury hotels",
+      "desertOases": "Desert Oases",
+      "desertSubtitle": "Exclusive desert resorts"
+    },
+    "hotelSections": {
+      "europeTitle": "Most popular hotels in Europe",
+      "usTitle": "Most popular hotels in US"
+    },
+    "restaurantSections": {
+      "usTitle": "Fine Dining Across America"
+    },
     "howItWorks": {
       "title": "How it Works",
       "intro": "Discover, plan, and share luxury travel — all in one intelligent platform.",

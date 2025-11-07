@@ -27,12 +27,40 @@
   },
   "home": {
     "hero": {
-      "title": "Découvrir. Réserver. Créer. Gagner — Voyage Réinventé avec l'IA, Enchères d'Agents et Collaborations de Créateurs",
-      "subtitle": "Utilisez l'IA pour planifier rapidement, obtenez des offres d'agents pour économiser plus, ou réservez des voyages CoCurés — conçus par des pros, soutenus par des influenceurs.",
+      "title": "Découvrez. Réservez. Créez. Gagnez — Le voyage réinventé avec l'IA, les enchères d'agents et les collaborations de créateurs",
+      "subtitle": "Utilisez l'IA pour planifier rapidement, faites concourir les agents pour économiser davantage, ou réservez des voyages CoCurés — créés par des pros, soutenus par des influenceurs et conçus pour offrir de la valeur.",
       "whatCanDo": "Ce que Goldsainte.Ai peut faire",
       "terms": "Conditions",
-      "privacy": "Politique de Confidentialité",
+      "privacy": "Politique de confidentialité",
       "agreement": "En utilisant Goldsainte.Ai, vous acceptez nos"
+    },
+    "rotatingPlaceholders": {
+      "hotels": "Où aller ensuite ? Découvrez des hôtels sélectionnés selon vos goûts.",
+      "flights": "Réservez des vols plus intelligents avec une IA qui connaît vos préférences.",
+      "restaurants": "Trouvez des restaurants qui valent la réservation — sélectionnés par des locaux et l'IA.",
+      "events": "Découvrez des événements exclusifs et des expériences locales où que vous alliez.",
+      "excursions": "Rejoignez une excursion planifiée — guidée par des experts, propulsée par Goldsainte.",
+      "agents": "Besoin de plus qu'une réservation ? Connectez-vous avec des agents de voyage experts en quelques minutes."
+    },
+    "winterSun": {
+      "title": "Soleil d'Hiver",
+      "subtitle": "Évadez-vous au paradis avec notre collection de resorts de plage de luxe...",
+      "cta": "Découvrir"
+    },
+    "gallery": {
+      "beachEscapes": "Escapades Plage",
+      "beachSubtitle": "Propriétés de luxe en bord de mer",
+      "cityRetreats": "Retraites Urbaines",
+      "citySubtitle": "Hôtels de luxe urbains",
+      "desertOases": "Oasis du Désert",
+      "desertSubtitle": "Resorts exclusifs du désert"
+    },
+    "hotelSections": {
+      "europeTitle": "Hôtels les plus populaires en Europe",
+      "usTitle": "Hôtels les plus populaires aux États-Unis"
+    },
+    "restaurantSections": {
+      "usTitle": "Haute Gastronomie en Amérique"
     },
     "howItWorks": {
       "title": "Comment ça Marche",

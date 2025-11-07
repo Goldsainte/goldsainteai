@@ -161,12 +161,12 @@ const Index = () => {
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
   const rotatingMessages = [
-    "Where to next? Discover handpicked hotels tailored to your taste.",
-    "Book smarter flights with AI that knows your preferences.",
-    "Find restaurants worth the reservation — curated by locals and AI.",
-    "Unlock exclusive events and local experiences wherever you land.",
-    "Join a planned excursion — guided by experts, powered by Goldsainte.",
-    "Need more than a booking? Match with expert travel agents in minutes."
+    t('home.rotatingPlaceholders.hotels'),
+    t('home.rotatingPlaceholders.flights'),
+    t('home.rotatingPlaceholders.restaurants'),
+    t('home.rotatingPlaceholders.events'),
+    t('home.rotatingPlaceholders.excursions'),
+    t('home.rotatingPlaceholders.agents')
   ];
 
   // Handle service query parameter from Header
@@ -799,10 +799,10 @@ const queries = {
                     height="80"
                   />
                   <h1 className="text-base md:text-lg font-medium text-center text-foreground max-w-xl px-4 leading-relaxed">
-                    Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs
+                    {t('home.hero.title')}
                   </h1>
                   <p className="text-sm md:text-base text-center text-muted-foreground max-w-xl px-4 leading-relaxed">
-                    Use AI to plan fast, get agents bidding to save more, or book CoCurated trips — built by pros, backed by influencers, and designed to deliver value.
+                    {t('home.hero.subtitle')}
                   </p>
                 </div>
 
@@ -1268,11 +1268,11 @@ const queries = {
             <WinterSunHero />
             <ThreeGridGallery />
             <HotelScrollSection 
-              title="Most popular hotels in Europe"
+              title={t('home.hotelSections.europeTitle')}
               hotels={europeHotels}
             />
             <HotelScrollSection 
-              title="Most popular hotels in US"
+              title={t('home.hotelSections.usTitle')}
               hotels={usHotels}
             />
             
@@ -1280,7 +1280,7 @@ const queries = {
             <FineDiningHero />
             
             <RestaurantScrollSection 
-              title="Fine Dining Across America"
+              title={t('home.restaurantSections.usTitle')}
               restaurants={topUSRestaurants}
             />
             <PopularSearchGrid />

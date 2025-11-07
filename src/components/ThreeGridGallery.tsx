@@ -1,30 +1,32 @@
 import { Card } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 import luxuryBeachImage from "@/assets/luxury-beach.jpg";
 import tokyoCanalImage from "@/assets/tokyo-canal-night.jpg";
 import dubaiCityImage from "@/assets/dubai-cityscape.jpg";
 
-const gridItems = [
-  {
-    id: 1,
-    image: luxuryBeachImage,
-    title: "Beach Escapes",
-    subtitle: "Luxury beachfront properties"
-  },
-  {
-    id: 2,
-    image: tokyoCanalImage,
-    title: "City Retreats",
-    subtitle: "Urban luxury hotels"
-  },
-  {
-    id: 3,
-    image: dubaiCityImage,
-    title: "Desert Oases",
-    subtitle: "Exclusive desert resorts"
-  }
-];
-
 export const ThreeGridGallery = () => {
+  const { t } = useTranslation();
+  
+  const gridItems = [
+    {
+      id: 1,
+      image: luxuryBeachImage,
+      title: t('home.gallery.beachEscapes'),
+      subtitle: t('home.gallery.beachSubtitle')
+    },
+    {
+      id: 2,
+      image: tokyoCanalImage,
+      title: t('home.gallery.cityRetreats'),
+      subtitle: t('home.gallery.citySubtitle')
+    },
+    {
+      id: 3,
+      image: dubaiCityImage,
+      title: t('home.gallery.desertOases'),
+      subtitle: t('home.gallery.desertSubtitle')
+    }
+  ];
   return (
     <section className="py-12 sm:py-16 md:py-20">
       <div className="max-w-7xl mx-auto px-4">
