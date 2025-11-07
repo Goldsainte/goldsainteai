@@ -5322,6 +5322,7 @@ export type Database = {
           phone: string | null
           preferences: Json | null
           preferred_currency: string | null
+          preferred_language: string | null
           restriction_expires_at: string | null
           show_account_type: boolean | null
           sms_notifications: boolean | null
@@ -5364,6 +5365,7 @@ export type Database = {
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
+          preferred_language?: string | null
           restriction_expires_at?: string | null
           show_account_type?: boolean | null
           sms_notifications?: boolean | null
@@ -5406,6 +5408,7 @@ export type Database = {
           phone?: string | null
           preferences?: Json | null
           preferred_currency?: string | null
+          preferred_language?: string | null
           restriction_expires_at?: string | null
           show_account_type?: boolean | null
           sms_notifications?: boolean | null
