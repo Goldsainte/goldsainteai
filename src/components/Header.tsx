@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown } from "lucide-react";
+import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown, CreditCard } from "lucide-react";
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -383,6 +383,13 @@ export const Header = () => {
                             <span className="text-sm font-medium">Dashboard</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
+                            onClick={() => navigate('/billing-dashboard')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
+                          >
+                            <CreditCard className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm font-medium">Billing</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
                             onClick={handleCreateClick} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                           >
@@ -656,6 +663,13 @@ export const Header = () => {
                           >
                             <LayoutDashboard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
                             <span className="text-sm font-medium">Dashboard</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => navigate('/billing-dashboard')} 
+                            className="mx-2 px-4 py-4 min-h-[48px] gap-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-secondary/10 hover:translate-x-1 group touch-manipulation"
+                          >
+                            <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-secondary transition-colors duration-300 flex-shrink-0" />
+                            <span className="text-sm font-medium">Billing</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem 
                             onClick={handleCreateClick} 

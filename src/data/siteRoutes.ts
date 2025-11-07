@@ -15,6 +15,7 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/ai-agent-setup', label: 'AI Agent Setup', description: 'Configure your personal AI agent', category: 'core', requiresAuth: true },
   { path: '/profile', label: 'Profile', description: 'Your account profile', category: 'core', requiresAuth: true },
   { path: '/dashboard', label: 'Dashboard', description: 'View bookings, favorites, and preferences', category: 'core', requiresAuth: true },
+  { path: '/billing-dashboard', label: 'Billing', description: 'View billing history and manage payments', category: 'core', requiresAuth: true },
   { path: '/messages', label: 'Messages', description: 'Chat with agents and support', category: 'core', requiresAuth: true },
   
   // Booking & Travel
