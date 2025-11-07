@@ -855,10 +855,10 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3" ref={scrollRef}>
+          <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden" ref={scrollRef}>
             <div className="space-y-3">
               {messages.map((msg, idx) => (
-                <div key={idx}>
+                <div key={idx} className="w-full">
                   <div
                     className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
@@ -872,13 +872,13 @@ export const AIBookingConcierge = () => {
                       </div>
                     )}
                     <div
-                      className={`max-w-[80%] rounded-lg px-3 py-2 ${
+                      className={`max-w-[75%] break-words rounded-lg px-3 py-2 ${
                         msg.role === 'user'
                           ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
                           : 'bg-muted text-foreground'
                       }`}
                     >
-                      <p className="text-[11px] md:text-xs whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                      <p className="text-[11px] md:text-xs whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
                     </div>
                   </div>
                   
