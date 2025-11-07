@@ -111,8 +111,15 @@ export const HelpCenterChat = () => {
           {messages.length === 0 && (
             <div className="text-center text-sm text-muted-foreground py-8">
               <MessageCircle className="h-12 w-12 mx-auto mb-3 text-primary/30" />
-              <p className="mb-2">Hi! I'm your AI Help Assistant.</p>
-              <p>Ask me about navigating the site, bookings, policies, or anything else!</p>
+              <p className="mb-3 font-medium">Hi! I'm your AI Travel Assistant.</p>
+              <div className="text-xs space-y-1.5 text-left max-w-[280px] mx-auto">
+                <p className="text-muted-foreground/80">Ask me about:</p>
+                <p>• Destination recommendations</p>
+                <p>• Trip planning & itineraries</p>
+                <p>• Best times to travel</p>
+                <p>• Budget estimates</p>
+                <p>• Booking questions</p>
+              </div>
             </div>
           )}
           
