@@ -21,6 +21,9 @@ verify_jwt = false
 [functions.clear-seeded-data]
 verify_jwt = false
 
+[functions.clear-search-cache]
+verify_jwt = true
+
 [functions.apple-music-search]
 verify_jwt = false
 

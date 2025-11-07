@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Camera, CheckCircle2, Loader2, Shield } from "lucide-react";
+import { ChevronLeft, Camera, CheckCircle2, Loader2, Shield, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { AccountTypeSelector } from "@/components/AccountTypeSelector";
@@ -44,6 +44,7 @@ const TravelSettings = () => {
   const [saving, setSaving] = useState(false);
   const [checkingVerification, setCheckingVerification] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [clearingCache, setClearingCache] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -214,6 +215,26 @@ const TravelSettings = () => {
     } catch (error: any) {
       console.error('Error creating checkout:', error);
       toast.error(error.message || 'Failed to start verification process');
+    }
+  };
+
+  const handleClearCache = async () => {
+    setClearingCache(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('clear-search-cache');
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success(`Cache cleared! Removed ${data.cleared_entries || 0} cached searches`);
+      } else {
+        throw new Error('Failed to clear cache');
+      }
+    } catch (error: any) {
+      console.error('Error clearing cache:', error);
+      toast.error(error.message || 'Failed to clear search cache');
+    } finally {
+      setClearingCache(false);
     }
   };
 
@@ -443,6 +464,43 @@ const TravelSettings = () => {
                 placeholder="Tell us about yourself..."
                 rows={4}
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Developer Tools */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Troubleshooting</CardTitle>
+            <CardDescription>
+              Tools to help resolve search and performance issues
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>Clear Search Cache</Label>
+              <p className="text-sm text-muted-foreground">
+                If you're experiencing issues with search results (like seeing outdated or no results), 
+                clearing the cache will force fresh searches from the APIs.
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleClearCache}
+                disabled={clearingCache}
+                className="w-full gap-2"
+              >
+                {clearingCache ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Clearing Cache...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-4 w-4" />
+                    Clear Search Cache
+                  </>
+                )}
+              </Button>
             </div>
           </CardContent>
         </Card>
