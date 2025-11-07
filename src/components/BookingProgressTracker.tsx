@@ -1,4 +1,4 @@
-import { MapPin, Calendar, Users, DollarSign, CheckCircle2, Circle, Edit2, Zap } from "lucide-react";
+import { MapPin, Calendar, Users, DollarSign, CheckCircle2, Circle, Edit2, Zap, Palmtree, Building2, Mountain } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -13,20 +13,65 @@ interface BookingInfo {
   budget?: string;
 }
 
+export interface QuickStartTemplate {
+  id: string;
+  name: string;
+  icon: any;
+  description: string;
+  destination: string;
+  dates: string;
+  guests: string;
+  budget: string;
+}
+
 interface BookingProgressTrackerProps {
   bookingInfo: BookingInfo;
   onEdit: (field: keyof BookingInfo, value: string) => void;
-  onQuickStart?: () => void;
+  onQuickStart?: (template: QuickStartTemplate) => void;
 }
 
 export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: BookingProgressTrackerProps) => {
   const [editingField, setEditingField] = useState<keyof BookingInfo | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
 
   const hasDestination = !!bookingInfo.destination;
   const hasDates = !!bookingInfo.dates;
   const hasGuests = !!bookingInfo.guests;
   const hasBudget = !!bookingInfo.budget;
+
+  const templates: QuickStartTemplate[] = [
+    {
+      id: 'beach',
+      name: 'Beach Vacation',
+      icon: Palmtree,
+      description: 'Relaxing tropical getaway',
+      destination: 'Maldives',
+      dates: 'June 10 to June 20, 2025',
+      guests: '2 people',
+      budget: '$5000 per person'
+    },
+    {
+      id: 'city',
+      name: 'City Break',
+      icon: Building2,
+      description: 'Urban exploration and culture',
+      destination: 'Paris',
+      dates: 'March 15 to March 22, 2025',
+      guests: '2 people',
+      budget: '$3000 per person'
+    },
+    {
+      id: 'adventure',
+      name: 'Adventure Trip',
+      icon: Mountain,
+      description: 'Outdoor activities and hiking',
+      destination: 'New Zealand',
+      dates: 'September 5 to September 18, 2025',
+      guests: '4 people',
+      budget: '$4500 per person'
+    }
+  ];
 
   const handleOpenEdit = (field: keyof BookingInfo) => {
     setEditingField(field);
@@ -92,25 +137,86 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: Bo
   // Show Quick Start button if no information collected
   if (completedCount === 0) {
     return onQuickStart ? (
-      <Card className="bg-gradient-to-br from-accent/5 to-primary/5 border-accent/20 mb-3 animate-fade-in">
-        <div className="p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="h-4 w-4 text-accent" />
-            <p className="text-xs font-semibold text-foreground">Quick Start Demo</p>
+      <>
+        <Card className="bg-gradient-to-br from-accent/5 to-primary/5 border-accent/20 mb-3 animate-fade-in">
+          <div className="p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <Zap className="h-4 w-4 text-accent" />
+              <p className="text-xs font-semibold text-foreground">Quick Start Demo</p>
+            </div>
+            <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
+              Try the booking flow with example scenarios
+            </p>
+            <Button
+              onClick={() => setShowTemplateDialog(true)}
+              size="sm"
+              className="w-full bg-gradient-to-r from-accent to-primary hover:opacity-90 transition-opacity"
+            >
+              <Zap className="h-3 w-3 mr-1" />
+              Choose Template
+            </Button>
           </div>
-          <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
-            Try the booking flow with example information to see how it works
-          </p>
-          <Button
-            onClick={onQuickStart}
-            size="sm"
-            className="w-full bg-gradient-to-r from-accent to-primary hover:opacity-90 transition-opacity"
-          >
-            <Zap className="h-3 w-3 mr-1" />
-            Fill Example Info
-          </Button>
-        </div>
-      </Card>
+        </Card>
+
+        <Dialog open={showTemplateDialog} onOpenChange={setShowTemplateDialog}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-accent" />
+                Choose a Quick Start Template
+              </DialogTitle>
+              <DialogDescription>
+                Select a travel scenario to test the booking flow with example information
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 py-4">
+              {templates.map((template) => {
+                const Icon = template.icon;
+                return (
+                  <button
+                    key={template.id}
+                    onClick={() => {
+                      onQuickStart(template);
+                      setShowTemplateDialog(false);
+                    }}
+                    className="group flex items-start gap-4 p-4 rounded-lg border-2 border-border hover:border-primary/50 bg-card hover:bg-accent/5 transition-all hover:scale-[1.02] active:scale-[0.98] text-left"
+                  >
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center group-hover:from-primary/20 group-hover:to-accent/20 transition-colors">
+                      <Icon className="h-6 w-6 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm mb-1 text-foreground group-hover:text-primary transition-colors">
+                        {template.name}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mb-2">
+                        {template.description}
+                      </p>
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px]">
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <MapPin className="h-3 w-3" />
+                          <span>{template.destination}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Users className="h-3 w-3" />
+                          <span>{template.guests}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-muted-foreground col-span-2">
+                          <Calendar className="h-3 w-3" />
+                          <span>{template.dates}</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <DollarSign className="h-3 w-3" />
+                          <span>{template.budget}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     ) : null;
   }
 

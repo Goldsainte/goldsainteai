@@ -24,7 +24,7 @@ import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
 import { VoiceInput } from "./VoiceInput";
-import { BookingProgressTracker } from "./BookingProgressTracker";
+import { BookingProgressTracker, type QuickStartTemplate } from "./BookingProgressTracker";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -155,14 +155,14 @@ export const AIBookingConcierge = () => {
     }
   };
 
-  const handleQuickStart = async () => {
-    // Example booking information
+  const handleQuickStart = async (template: QuickStartTemplate) => {
+    // Build the example info from template
     const exampleInfo = {
       greeting: "Hi! I want to plan a trip",
-      destination: "Paris",
-      dates: "March 15 to March 22, 2025",
-      guests: "2 people",
-      budget: "$3000 per person"
+      destination: template.destination,
+      dates: template.dates,
+      guests: template.guests,
+      budget: template.budget
     };
 
     // Add greeting message
@@ -215,6 +215,11 @@ export const AIBookingConcierge = () => {
       }, 6000);
 
       setIsLoading(false);
+      
+      toast({
+        title: `${template.name} Template Loaded`,
+        description: `Starting demo for ${template.destination}`,
+      });
     } catch (error: any) {
       console.error('[AIBookingConcierge] Quick start error:', error);
       setIsLoading(false);
