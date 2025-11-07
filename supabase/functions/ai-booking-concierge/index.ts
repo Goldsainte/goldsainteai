@@ -775,7 +775,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4o",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages
@@ -969,7 +969,7 @@ ${result.nextSteps?.map((step: string, i: number) => `${i + 1}. ${step}`).join('
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "gpt-4o-mini",
+          model: "gpt-4o",
           messages: [
             { role: "system", content: systemPrompt },
             ...messages,
