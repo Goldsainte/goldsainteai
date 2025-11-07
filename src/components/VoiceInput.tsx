@@ -153,20 +153,30 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en' }: VoiceInp
   }
 
   return (
-    <Button
-      type="button"
-      size="icon"
-      variant={isRecording ? "destructive" : "outline"}
-      onClick={isRecording ? stopRecording : startRecording}
-      disabled={disabled || isProcessing}
-      className="shrink-0 h-12 w-12 md:h-11 md:w-11"
-      title={isRecording ? "Stop recording" : "Start voice input"}
-    >
-      {isRecording ? (
-        <Square className="h-4 w-4" />
-      ) : (
-        <Mic className="h-4 w-4" />
+    <div className="relative">
+      <Button
+        type="button"
+        size="icon"
+        variant={isRecording ? "destructive" : "outline"}
+        onClick={isRecording ? stopRecording : startRecording}
+        disabled={disabled || isProcessing}
+        className="shrink-0 h-12 w-12 md:h-11 md:w-11"
+        title={isRecording ? "Stop recording" : `Voice input (${language.toUpperCase()})`}
+      >
+        {isRecording ? (
+          <Square className="h-4 w-4" />
+        ) : (
+          <Mic className="h-4 w-4" />
+        )}
+      </Button>
+      {!isRecording && (
+        <Badge 
+          variant="secondary" 
+          className="absolute -top-1 -right-1 h-4 px-1 text-[9px] font-mono pointer-events-none"
+        >
+          {language.toUpperCase()}
+        </Badge>
       )}
-    </Button>
+    </div>
   );
 };
