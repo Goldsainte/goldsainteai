@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon } from "lucide-react";
+import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon, Video } from "lucide-react";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { HotelImageGallery } from "./HotelImageGallery";
+import { VirtualTour360 } from "./VirtualTour360";
 import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
 import { encodeData } from "@/lib/utils";
@@ -21,6 +22,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const [expanded, setExpanded] = useState(false);
   const [showDateModal, setShowDateModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [showVirtualTour, setShowVirtualTour] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
@@ -37,6 +39,10 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const imageUrl = allImages[0];
   const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
   const hasMultipleImages = allImages && allImages.length > 1;
+  
+  // Check for 360 virtual tour images
+  const images360 = property.images360 || property.virtualTour || [];
+  const hasVirtualTour = images360.length > 0;
   
   const getCityCode = () => {
     return property.cityCode || "PAR";
@@ -160,6 +166,12 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                     {allImages.length}
                   </div>
                 )}
+                {hasVirtualTour && (
+                  <div className="absolute top-1 left-1 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                    <Video className="h-3 w-3" />
+                    360°
+                  </div>
+                )}
               </>
             ) : (
               <div className="w-full h-full animate-pulse" aria-label="No image available" />
@@ -213,6 +225,17 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
               </div>
             )}
             <div className="flex gap-1">
+              {hasVirtualTour && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-7 px-2 text-xs gap-1"
+                  onClick={() => setShowVirtualTour(true)}
+                >
+                  <Video className="h-3 w-3" />
+                  360°
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="outline"
@@ -296,6 +319,15 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
         open={showGallery}
         onOpenChange={setShowGallery}
       />
+
+      {hasVirtualTour && (
+        <VirtualTour360
+          images360={images360}
+          hotelName={title}
+          open={showVirtualTour}
+          onOpenChange={setShowVirtualTour}
+        />
+      )}
     </>
   );
 };

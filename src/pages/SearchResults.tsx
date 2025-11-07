@@ -246,8 +246,12 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             );
           });
 
-          setResults(cleanedHotels);
-          setFilteredResults(cleanedHotels);
+          // Enrich select hotels with virtual tours for demo
+          const { enrichHotelsWithVirtualTours } = await import('@/lib/virtualTourHelpers');
+          const enrichedHotels = enrichHotelsWithVirtualTours(cleanedHotels);
+
+          setResults(enrichedHotels);
+          setFilteredResults(enrichedHotels);
         } else if (searchType === "flights") {
           // Check if we have the required flight parameters
           if (!origin || !destination || !departureDate) {
