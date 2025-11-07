@@ -1,0 +1,209 @@
+{
+  "header": {
+    "login": "登录",
+    "signup": "免费注册",
+    "signupShort": "注册",
+    "signout": "登出",
+    "dashboard": "仪表板"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "save": "保存",
+    "delete": "删除",
+    "edit": "编辑",
+    "close": "关闭",
+    "search": "搜索",
+    "filter": "过滤",
+    "sort": "排序",
+    "searching": "正在搜索最佳选项...",
+    "and": "和"
+  },
+  "language": {
+    "changed": "语言已更改",
+    "setTo": "界面语言已设置为{{language}}"
+  },
+  "home": {
+    "hero": {
+      "title": "发现。预订。创作。赚钱 — 借助AI、代理竞标和创作者合作重塑旅行",
+      "subtitle": "使用AI快速规划，让代理竞标以节省更多，或预订CoCurated旅行 — 由专业人士打造，由影响者支持，旨在提供价值。",
+      "whatCanDo": "Goldsainte.Ai能为您做什么",
+      "terms": "条款",
+      "privacy": "隐私政策",
+      "agreement": "使用Goldsainte.Ai即表示您同意我们的"
+    },
+    "rotatingPlaceholders": {
+      "hotels": "下一站去哪里？发现为您量身定制的精选酒店。",
+      "flights": "使用了解您偏好的AI预订更智能的航班。",
+      "restaurants": "找到值得预订的餐厅 — 由当地人和AI精选。",
+      "events": "无论您降落在哪里，都能解锁独家活动和当地体验。",
+      "excursions": "加入计划好的远足 — 由专家指导，由Goldsainte提供支持。",
+      "agents": "需要的不仅仅是预订？几分钟内与专业旅行代理匹配。"
+    },
+    "winterSun": {
+      "title": "冬日阳光",
+      "subtitle": "通过我们精心挑选的豪华海滩度假村系列逃离到天堂...",
+      "cta": "发现"
+    },
+    "gallery": {
+      "beachEscapes": "海滩度假",
+      "beachSubtitle": "豪华海滨物业",
+      "cityRetreats": "城市静修",
+      "citySubtitle": "城市豪华酒店",
+      "desertOases": "沙漠绿洲",
+      "desertSubtitle": "独家沙漠度假村"
+    },
+    "hotelSections": {
+      "europeTitle": "欧洲最受欢迎的酒店",
+      "usTitle": "美国最受欢迎的酒店"
+    },
+    "restaurantSections": {
+      "usTitle": "美国各地的精致餐饮"
+    }
+  },
+  "navigation": {
+    "discover": "发现",
+    "journeys": "旅程",
+    "cocuratedJourneys": "CoCurated旅程",
+    "browseCreators": "浏览创作者",
+    "browseAgents": "浏览代理",
+    "marketplace": "市场",
+    "professional": "专业",
+    "becomeAgent": "成为代理",
+    "becomeTransportVendor": "成为交通供应商",
+    "shopAndEarn": "购物和赚钱",
+    "shop": "商店",
+    "affiliateLinks": "联盟链接",
+    "company": "公司",
+    "subscription": "订阅",
+    "about": "关于"
+  },
+  "footer": {
+    "support": "支持",
+    "helpCenter": "帮助中心",
+    "manageTrips": "管理您的旅行",
+    "contactCustomerService": "联系客户服务",
+    "safetyResourceCenter": "安全资源中心",
+    "cancellationRefunds": "取消和退款",
+    "discover": "发现",
+    "journeys": "旅程",
+    "cocuratedJourneys": "CoCurated旅程",
+    "seasonalDeals": "季节和节日优惠",
+    "travelAgentServices": "旅行代理服务",
+    "cocuratedPackages": "CoCurated套餐",
+    "marketplace": "市场",
+    "termsSettings": "条款和设置",
+    "companyInfo": "公司信息",
+    "privacyCookies": "隐私和Cookie",
+    "termsOfService": "服务条款",
+    "accessibilityStatement": "无障碍声明",
+    "communityGuidelines": "社区指南",
+    "disputeResolution": "争议解决",
+    "modernSlaveryStatement": "现代奴隶制声明",
+    "humanRightsStatement": "人权声明",
+    "partners": "合作伙伴",
+    "becomeAgent": "成为旅行代理",
+    "influencerProgram": "影响者计划",
+    "affiliateProgram": "联盟计划",
+    "listYourCompany": "列出您的公司",
+    "about": "关于",
+    "aboutGoldsainte": "关于Goldsainte",
+    "whatWeDo": "我们做什么",
+    "howWeWork": "我们如何工作",
+    "pressCenter": "新闻中心",
+    "investorRelations": "投资者关系",
+    "corporateContact": "企业联系",
+    "followUs": "关注我们：",
+    "description": "Goldsainte AI是Goldsainte Inc.的一部分，是AI驱动的豪华旅行和精选体验的全球领导者。发现。创作。分享。与Goldsainte一起旅行。",
+    "copyright": "版权所有 © 2025 Goldsainte.Ai™。保留所有权利。"
+  },
+  "welcomeModal": {
+    "title": "Goldsainte.Ai能为您做什么",
+    "voiceAI": {
+      "title": "带有\"Hey Goldsainte\"唤醒词的语音AI礼宾。",
+      "description": "只需在网站的任何地方说\"Hey Goldsainte\"即可立即激活我们的先进语音AI。进行关于航班、酒店、餐饮等的自然对话 — 免提操作。"
+    },
+    "personalAI": {
+      "title": "学习您偏好的个人AI代理。",
+      "description": "通过教授它您的旅行风格、预算和偏好来构建您自己的AI旅行代理。它从每次互动中学习，为航班、酒店、餐厅和体验提供越来越个性化的推荐。"
+    },
+    "createShare": {
+      "title": "创作。分享。赚钱。",
+      "description": "一个社交网络平台，供内容创作者分享他们的豪华旅行体验并创建互动旅行计划，使他们能够从内容中获得收入。"
+    },
+    "expertAgents": {
+      "title": "具有里程碑付款的专家代理。",
+      "description": "将复杂的旅行发布到我们的市场，并通过AI与认证代理匹配。按里程碑付款，跟踪进度，并通过完全透明度实时聊天。"
+    },
+    "cocurated": {
+      "title": "CoCurated™ - 协作旅行套餐。",
+      "description": "浏览由顶级创作者和代理创建的独家套餐。固定或灵活日期，安全预订，透明定价 — 全部由最了解目的地的旅行专家策划。"
+    },
+    "creatorDashboard": {
+      "title": "创作者仪表板 - 一站式工具。",
+      "description": "跟踪分析，管理套餐，处理合作伙伴关系，并为商店创建产品。从青铜升级到铂金级别，通过详细的收益跟踪获得更高的佣金奖金。"
+    },
+    "creatorPayouts": {
+      "title": "创作者支付 - 多种收入来源。",
+      "description": "从内容浏览、虚拟礼物、套餐预订（高达40％佣金）、商店销售、合作伙伴关系和联盟营销中赚钱。铂金级会员可多赚20％。安全的Stripe支付，完整的交易历史。"
+    },
+    "groupBookings": {
+      "title": "团体预订和分摊付款。",
+      "description": "轻松组织团体旅行。使用安全的付款链接在旅行者之间分摊成本，跟踪谁已付款，并在付款完成时获得即时通知。"
+    },
+    "itinerary": {
+      "title": "完整的行程管理。",
+      "description": "构建逐日行程，上传旅行文档，同步日历，并轻松与旅行伙伴分享您的计划。"
+    },
+    "communication": {
+      "title": "实时通信中心。",
+      "description": "即时与代理聊天，接收通知，使用快速回复，并将所有旅行对话保存在一个安全的地方。"
+    },
+    "cta": "开始规划您的豪华旅程",
+    "agreement": "使用Goldsainte.Ai即表示您同意我们的条款和隐私政策。请勿输入个人或敏感信息。"
+  },
+  "about": {
+    "founderLetter": {
+      "title": "创始人的信",
+      "p1": "当Goldsainte首次推出时，人们问我们与其他服务有何不同。答案很明确：我们为交通带来了创新、安全和提升的体验。今天，我们已经远远超越了那些根源。",
+      "p2": "我们现在正在构建更大的东西：一个全球AI驱动的旅行生态系统，改变人们探索、规划和分享冒险的方式。",
+      "p3": "在Goldsainte，我们相信旅行不仅仅是物流 — 它是关于创造值得分享的体验，建立社区，并赋予旅行者和创作者繁荣的能力。",
+      "p4": "从我们的开始到今天的AI驱动平台，我们始终代表信任、创新和赋权。旅行的未来不仅是关于你要去哪里 — 而是关于你如何无缝而有意义地到达那里。",
+      "p5": "感谢您成为这次旅程的一部分。最好的冒险还在前面。",
+      "signature": "安德烈·C·鲍威尔",
+      "title2": "首席执行官兼创始人",
+      "company": "Goldsainte, Inc."
+    },
+    "sections": {
+      "whatIs": {
+        "title": "什么是Goldsainte？",
+        "p1": "Goldsainte AI是一个语音激活的AI驱动旅行市场，将自动化与经过验证的人类专业知识相融合，提供完全个性化的端到端旅行规划和预订。通过唤醒词\"Hey, Goldsainte\"，用户可以与会话式礼宾互动，搜索、规划和预订航班、酒店、餐饮、活动和交通 — 完全免提且实时。",
+        "p2": "平台的核心是旅行代理市场，用户可以发布复杂的行程，从认证代理那里获得竞争性投标，并通过基于里程碑的交易安全付款。该系统支持团体预订、分摊付款、完整的行程管理和实时消息传递，使协调即使是最复杂的旅行也变得容易。",
+        "p3": "Goldsainte还支持独特的创作者经济：内容创作者与代理合作共同创建和推广精选的旅行体验，而交通供应商可以加入、推广他们的服务并被包含在创作者或代理主导的套餐中。这个三方生态系统 — AI +代理+创作者 — 使Goldsainte成为第一个在一个智能社交商务环境中统一灵感、规划和预订的平台。"
+      },
+      "features": {
+        "title": "我们提供什么"
+      },
+      "mission": {
+        "title": "我们的使命",
+        "p1": "在Goldsainte，我们相信旅行不仅仅是预订航班或预订酒店 — 它是关于创造难忘的体验，建立有意义的联系，并赋予人们以启发他人的方式分享他们的旅程。",
+        "p2": "我们的使命是通过将尖端的AI技术与全球旅行者、创作者和旅行专家的创造力和热情相结合来重新定义旅行行业。我们致力于使旅行更容易访问、个性化和有价值。",
+        "p3": "无论您是寻找隐藏宝石的独行探险家、建立品牌的内容创作者，还是分享知识的旅行专家，Goldsainte都提供工具、平台和社区来帮助您蓬勃发展。",
+        "p4": "我们的AI驱动生态系统旨在简化旅行规划的复杂性，同时保留发现的魔力。从语音激活的礼宾服务到学习您旅行风格的个性化AI代理，我们正在利用技术使每次旅程更智能、更顺畅、更愉快。",
+        "p5": "最终，我们的使命是改变世界旅行的方式。我们正在创建一个生态系统，技术增强人类体验，创作者受到重视和奖励，每次旅程 — 无论大小 — 都成为值得分享的故事。"
+      },
+      "partners": {
+        "title": "我们的合作伙伴和技术",
+        "description": "Goldsainte利用Amadeus、Ticketmaster、OpenAI、Google Gemini、Shopify和Etsy等行业领导者为您带来精选的实时旅行体验和无缝的市场集成。"
+      },
+      "legal": {
+        "title": "法律",
+        "p1": "Goldsainte Inc.（Goldsainte™背后的公司）在美国特拉华州注册并设立总部（Goldsainte、我们、我们的），从那里在其网站（网站）上提供AI驱动的豪华旅行和预订平台（服务），并由其国际附属集团公司（支持公司）提供支持。支持公司仅提供内部和运营支持。他们不提供服务，也不拥有、运营或管理网站或任何其他网站。",
+        "p2": "对于有关Goldsainte、服务或网站的任何问题，或发送或送达任何文件、通知、信件或其他通信（包括新闻查询），请直接在特拉华州的注册办事处联系Goldsainte Inc.。",
+        "p3": "Goldsainte Inc.不在任何其他地点或办公室保持法律住所，包括其支持公司的办公室。支持公司无权作为Goldsainte Inc.的流程代理或服务代理行事，并且不能通过支持公司进行预订或保留。"
+      }
+    }
+  }
+}

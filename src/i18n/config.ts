@@ -7,6 +7,10 @@ import fr from './locales/fr.json';
 import de from './locales/de.json';
 import it from './locales/it.json';
 import pt from './locales/pt.json';
+import ja from './locales/ja.json';
+import zh from './locales/zh.json';
+import ko from './locales/ko.json';
+import ar from './locales/ar.json';
 
 const resources = {
   en: { translation: en },
@@ -15,6 +19,10 @@ const resources = {
   de: { translation: de },
   it: { translation: it },
   pt: { translation: pt },
+  ja: { translation: ja },
+  zh: { translation: zh },
+  ko: { translation: ko },
+  ar: { translation: ar },
 };
 
 // Get saved language or detect browser language
@@ -25,7 +33,7 @@ const getSavedLanguage = () => {
     
     // Detect browser language
     const browserLang = navigator.language.split('-')[0]; // Get 'en' from 'en-US'
-    const supportedLanguages = ['en', 'es', 'fr', 'de', 'it', 'pt'];
+    const supportedLanguages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ja', 'zh', 'ko', 'ar'];
     
     return supportedLanguages.includes(browserLang) ? browserLang : 'en';
   } catch {

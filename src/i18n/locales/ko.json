@@ -1,0 +1,209 @@
+{
+  "header": {
+    "login": "로그인",
+    "signup": "무료 가입",
+    "signupShort": "가입",
+    "signout": "로그아웃",
+    "dashboard": "대시보드"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "error": "오류",
+    "success": "성공",
+    "cancel": "취소",
+    "save": "저장",
+    "delete": "삭제",
+    "edit": "편집",
+    "close": "닫기",
+    "search": "검색",
+    "filter": "필터",
+    "sort": "정렬",
+    "searching": "최상의 옵션을 검색 중...",
+    "and": "그리고"
+  },
+  "language": {
+    "changed": "언어가 변경되었습니다",
+    "setTo": "인터페이스 언어가 {{language}}로 설정되었습니다"
+  },
+  "home": {
+    "hero": {
+      "title": "발견. 예약. 창작. 수익 — AI, 에이전트 입찰 및 크리에이터 협업으로 재창조된 여행",
+      "subtitle": "AI로 빠르게 계획하고, 에이전트 입찰로 더 많이 절약하거나, CoCurated 여행을 예약 — 전문가가 제작하고 인플루언서가 지원하며 가치를 제공하도록 설계됨.",
+      "whatCanDo": "Goldsainte.Ai가 할 수 있는 것",
+      "terms": "약관",
+      "privacy": "개인정보 보호정책",
+      "agreement": "Goldsainte.Ai를 사용함으로써 다음에 동의합니다"
+    },
+    "rotatingPlaceholders": {
+      "hotels": "다음 목적지는? 당신의 취향에 맞춘 엄선된 호텔 발견.",
+      "flights": "당신의 선호도를 아는 AI로 더 스마트한 항공편 예약.",
+      "restaurants": "예약할 가치가 있는 레스토랑 찾기 — 현지인과 AI가 선별.",
+      "events": "착륙하는 곳마다 독점 이벤트와 현지 경험 잠금 해제.",
+      "excursions": "계획된 소풍에 참여 — 전문가가 안내하고 Goldsainte가 지원.",
+      "agents": "예약 이상이 필요하신가요? 몇 분 안에 전문 여행 에이전트와 매칭."
+    },
+    "winterSun": {
+      "title": "겨울 햇살",
+      "subtitle": "엄선된 고급 해변 리조트 컬렉션으로 낙원으로 탈출...",
+      "cta": "발견하기"
+    },
+    "gallery": {
+      "beachEscapes": "해변 탈출",
+      "beachSubtitle": "고급 해변가 부동산",
+      "cityRetreats": "도시 휴양지",
+      "citySubtitle": "도심 고급 호텔",
+      "desertOases": "사막 오아시스",
+      "desertSubtitle": "독점 사막 리조트"
+    },
+    "hotelSections": {
+      "europeTitle": "유럽에서 가장 인기 있는 호텔",
+      "usTitle": "미국에서 가장 인기 있는 호텔"
+    },
+    "restaurantSections": {
+      "usTitle": "미국 전역의 고급 레스토랑"
+    }
+  },
+  "navigation": {
+    "discover": "발견",
+    "journeys": "여정",
+    "cocuratedJourneys": "CoCurated 여정",
+    "browseCreators": "크리에이터 둘러보기",
+    "browseAgents": "에이전트 둘러보기",
+    "marketplace": "마켓플레이스",
+    "professional": "전문가",
+    "becomeAgent": "에이전트 되기",
+    "becomeTransportVendor": "교통 공급업체 되기",
+    "shopAndEarn": "쇼핑 및 수익",
+    "shop": "상점",
+    "affiliateLinks": "제휴 링크",
+    "company": "회사",
+    "subscription": "구독",
+    "about": "소개"
+  },
+  "footer": {
+    "support": "지원",
+    "helpCenter": "도움말 센터",
+    "manageTrips": "여행 관리",
+    "contactCustomerService": "고객 서비스 문의",
+    "safetyResourceCenter": "안전 리소스 센터",
+    "cancellationRefunds": "취소 및 환불",
+    "discover": "발견",
+    "journeys": "여정",
+    "cocuratedJourneys": "CoCurated 여정",
+    "seasonalDeals": "계절 및 휴일 특가",
+    "travelAgentServices": "여행 에이전트 서비스",
+    "cocuratedPackages": "CoCurated 패키지",
+    "marketplace": "마켓플레이스",
+    "termsSettings": "약관 및 설정",
+    "companyInfo": "회사 정보",
+    "privacyCookies": "개인정보 및 쿠키",
+    "termsOfService": "서비스 약관",
+    "accessibilityStatement": "접근성 성명",
+    "communityGuidelines": "커뮤니티 가이드라인",
+    "disputeResolution": "분쟁 해결",
+    "modernSlaveryStatement": "현대 노예제에 관한 성명",
+    "humanRightsStatement": "인권 성명",
+    "partners": "파트너",
+    "becomeAgent": "여행 에이전트 되기",
+    "influencerProgram": "인플루언서 프로그램",
+    "affiliateProgram": "제휴 프로그램",
+    "listYourCompany": "회사 등록",
+    "about": "소개",
+    "aboutGoldsainte": "Goldsainte 소개",
+    "whatWeDo": "우리가 하는 일",
+    "howWeWork": "우리의 작업 방식",
+    "pressCenter": "보도 센터",
+    "investorRelations": "투자자 관계",
+    "corporateContact": "기업 연락처",
+    "followUs": "팔로우하기：",
+    "description": "Goldsainte AI는 AI 기반 럭셔리 여행 및 큐레이션된 경험의 세계 리더인 Goldsainte Inc.의 일부입니다. 발견. 창작. 공유. Goldsainte와 함께 여행하세요.",
+    "copyright": "저작권 © 2025 Goldsainte.Ai™. 모든 권리 보유."
+  },
+  "welcomeModal": {
+    "title": "Goldsainte.Ai가 당신을 위해 할 수 있는 것",
+    "voiceAI": {
+      "title": "\"Hey Goldsainte\" 웨이크 워드가 있는 음성 AI 컨시어지.",
+      "description": "사이트의 어디에서나 \"Hey Goldsainte\"라고 말하기만 하면 고급 음성 AI를 즉시 활성화할 수 있습니다. 항공편, 호텔, 식사 등에 대해 핸즈프리로 자연스러운 대화를 나누세요."
+    },
+    "personalAI": {
+      "title": "선호도를 학습하는 개인 AI 에이전트.",
+      "description": "여행 스타일, 예산 및 선호도를 가르쳐 자신만의 AI 여행 에이전트를 구축하십시오. 모든 상호 작용에서 학습하여 항공편, 호텔, 레스토랑 및 경험에 대해 점점 더 개인화된 추천을 제공합니다."
+    },
+    "createShare": {
+      "title": "창작. 공유. 수익 창출.",
+      "description": "콘텐츠 크리에이터가 럭셔리 여행 경험을 공유하고 인터랙티브한 여행 계획을 만들어 콘텐츠로부터 수익을 얻을 수 있는 소셜 네트워킹 플랫폼."
+    },
+    "expertAgents": {
+      "title": "마일스톤 지불이 있는 전문 에이전트.",
+      "description": "복잡한 여행을 마켓플레이스에 게시하고 인증된 에이전트와 AI 매칭하세요. 마일스톤으로 지불하고, 진행 상황을 추적하고, 완전한 투명성으로 실시간 채팅하세요."
+    },
+    "cocurated": {
+      "title": "CoCurated™ - 협업 여행 패키지.",
+      "description": "최고의 크리에이터와 에이전트가 만든 독점 패키지를 둘러보세요. 고정 또는 유연한 날짜, 안전한 예약, 투명한 가격 — 모두 목적지를 가장 잘 아는 여행 전문가가 큐레이션합니다."
+    },
+    "creatorDashboard": {
+      "title": "크리에이터 대시보드 - 모든 도구를 한 곳에.",
+      "description": "분석 추적, 패키지 관리, 파트너십 처리 및 상점용 제품 생성. 브론즈에서 플래티넘 등급으로 레벨업하여 상세한 수익 추적으로 더 높은 커미션 보너스를 받으세요."
+    },
+    "creatorPayouts": {
+      "title": "크리에이터 지급 - 다중 수익원.",
+      "description": "콘텐츠 조회수, 가상 선물, 패키지 예약(최대 40% 커미션), 상점 판매, 파트너십 및 제휴 마케팅으로 수익을 올리세요. 플래티넘 등급 회원은 최대 20% 더 많이 벌 수 있습니다. 전체 거래 내역이 있는 안전한 Stripe 지급."
+    },
+    "groupBookings": {
+      "title": "그룹 예약 및 분할 결제.",
+      "description": "그룹 여행을 쉽게 조직하세요. 안전한 결제 링크로 여행자 간 비용을 분할하고, 누가 지불했는지 추적하고, 결제가 완료되면 즉시 알림을 받으세요."
+    },
+    "itinerary": {
+      "title": "완전한 여정 관리.",
+      "description": "일별 여정을 구축하고, 여행 문서를 업로드하고, 캘린더를 동기화하고, 여행 동반자와 계획을 쉽게 공유하세요."
+    },
+    "communication": {
+      "title": "실시간 커뮤니케이션 허브.",
+      "description": "에이전트와 즉시 채팅하고, 알림을 받고, 빠른 답장을 사용하고, 모든 여행 대화를 하나의 안전한 장소에 보관하세요."
+    },
+    "cta": "럭셔리 여정 계획 시작",
+    "agreement": "Goldsainte.Ai를 사용함으로써 귀하는 당사의 약관 및 개인정보 보호정책에 동의하는 것입니다. 개인 정보나 민감한 정보를 입력하지 마십시오."
+  },
+  "about": {
+    "founderLetter": {
+      "title": "창립자의 편지",
+      "p1": "Goldsainte가 처음 출시되었을 때 사람들은 다른 서비스와 어떻게 다른지 물었습니다. 대답은 명확했습니다: 우리는 교통에 혁신, 안전 및 향상된 경험을 가져왔습니다. 오늘날 우리는 그 뿌리를 훨씬 넘어 성장했습니다.",
+      "p2": "우리는 지금 더 큰 것을 구축하고 있습니다: 사람들이 탐험하고, 계획하고, 모험을 공유하는 방식을 변화시키는 글로벌 AI 기반 여행 생태계.",
+      "p3": "Goldsainte에서 우리는 여행이 물류 이상이라고 믿습니다 — 공유할 가치가 있는 경험을 만들고, 커뮤니티를 구축하고, 여행자와 크리에이터 모두가 번영할 수 있도록 권한을 부여하는 것입니다.",
+      "p4": "우리의 시작부터 오늘날의 AI 기반 플랫폼까지 우리는 항상 신뢰, 혁신 및 권한 부여를 대표했습니다. 여행의 미래는 당신이 어디로 가는지가 아니라 얼마나 원활하고 의미 있게 거기에 도달하는지에 관한 것입니다.",
+      "p5": "이 여정의 일부가 되어 주셔서 감사합니다. 최고의 모험은 아직 앞에 있습니다.",
+      "signature": "안드레 C. 파월 주니어",
+      "title2": "CEO 겸 창립자",
+      "company": "Goldsainte, Inc."
+    },
+    "sections": {
+      "whatIs": {
+        "title": "Goldsainte는 무엇인가요?",
+        "p1": "Goldsainte AI는 음성 활성화된 AI 기반 여행 마켓플레이스로, 자동화와 검증된 인간 전문 지식을 융합하여 완전히 맞춤화된 엔드투엔드 여행 계획 및 예약을 제공합니다. \"Hey, Goldsainte\"라는 웨이크 워드로 사용자는 대화형 컨시어지와 상호 작용하여 항공편, 호텔, 식사, 이벤트 및 교통수단을 검색, 계획 및 예약할 수 있습니다 — 완전히 핸즈프리이며 실시간으로.",
+        "p2": "플랫폼의 핵심에는 사용자가 복잡한 여정을 게시하고, 인증된 에이전트로부터 경쟁력 있는 입찰을 받고, 마일스톤 기반 거래를 통해 안전하게 지불할 수 있는 여행 에이전트 마켓플레이스가 있습니다. 시스템은 그룹 예약, 분할 결제, 완전한 여정 관리 및 실시간 메시징을 지원하여 가장 복잡한 여행도 쉽게 조정할 수 있습니다.",
+        "p3": "Goldsainte는 또한 독특한 크리에이터 경제를 지원합니다: 콘텐츠 크리에이터는 에이전트와 협력하여 큐레이션된 여행 경험을 공동 제작하고 홍보하며, 교통 공급업체는 온보딩하고, 서비스를 홍보하고, 크리에이터 또는 에이전트 주도 패키지에 포함될 수 있습니다. 이 삼자 생태계 — AI + 에이전트 + 크리에이터 — 는 Goldsainte를 영감, 계획 및 예약을 하나의 지능형 소셜 커머스 환경 내에서 통합하는 최초의 플랫폼으로 만듭니다."
+      },
+      "features": {
+        "title": "우리가 제공하는 것"
+      },
+      "mission": {
+        "title": "우리의 사명",
+        "p1": "Goldsainte에서 우리는 여행이 단순히 항공편을 예약하거나 호텔을 예약하는 것 이상이라고 믿습니다 — 잊을 수 없는 경험을 만들고, 의미 있는 연결을 구축하고, 사람들이 다른 사람들에게 영감을 주는 방식으로 여정을 공유할 수 있도록 권한을 부여하는 것입니다.",
+        "p2": "우리의 사명은 최첨단 AI 기술을 전 세계 여행자, 크리에이터 및 여행 전문가의 창의성과 열정과 결합하여 여행 산업을 재정의하는 것입니다. 우리는 여행을 더 접근 가능하고 개인화되고 보람 있게 만드는 데 전념하고 있습니다.",
+        "p3": "숨겨진 보석을 찾는 솔로 탐험가, 브랜드를 구축하는 콘텐츠 크리에이터 또는 지식을 공유하는 여행 전문가이든, Goldsainte는 번영하는 데 도움이 되는 도구, 플랫폼 및 커뮤니티를 제공합니다.",
+        "p4": "우리의 AI 기반 생태계는 발견의 마법을 보존하면서 여행 계획의 복잡성을 단순화하도록 설계되었습니다. 음성 활성화 컨시어지 서비스부터 여행 스타일을 학습하는 맞춤형 AI 에이전트까지, 우리는 기술을 활용하여 모든 여정을 더 스마트하고, 더 부드럽고, 더 즐겁게 만들고 있습니다.",
+        "p5": "궁극적으로 우리의 사명은 세계가 여행하는 방식을 변화시키는 것입니다. 우리는 기술이 인간 경험을 향상시키고, 크리에이터가 가치를 인정받고 보상을 받으며, 크기에 관계없이 모든 여정이 공유할 가치가 있는 이야기가 되는 생태계를 만들고 있습니다."
+      },
+      "partners": {
+        "title": "파트너 및 기술",
+        "description": "Goldsainte는 Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify 및 Etsy와 같은 업계 리더를 활용하여 큐레이션되고 실시간 여행 경험 및 원활한 마켓플레이스 통합을 제공합니다."
+      },
+      "legal": {
+        "title": "법률",
+        "p1": "Goldsainte Inc. (Goldsainte™의 배후 회사)는 미국 델라웨어에 등록되어 있으며 본사를 두고 있으며 (Goldsainte, 우리, 당사), 거기에서 웹사이트 (웹사이트)에서 AI 기반 럭셔리 여행 및 예약 플랫폼 (서비스)을 제공하고, 관련 그룹 회사 (지원 회사)에 의해 국제적으로 지원됩니다. 지원 회사는 내부 및 운영 지원만 제공합니다. 서비스를 제공하지 않으며 웹사이트 또는 다른 웹사이트를 소유, 운영 또는 관리하지 않습니다.",
+        "p2": "Goldsainte, 서비스 또는 웹사이트에 관한 질문이 있거나 문서, 통지, 서신 또는 기타 통신 (언론 문의 포함)을 보내거나 전달하려면 델라웨어의 등록 사무소에서 Goldsainte Inc.에 직접 문의하십시오.",
+        "p3": "Goldsainte Inc.는 지원 회사의 사무실을 포함하여 다른 위치나 사무실에 법적 거주지를 유지하지 않습니다. 지원 회사는 Goldsainte Inc.의 프로세스 에이전트 또는 서비스 에이전트로 행동할 권한이 없으며, 지원 회사를 통해 예약이나 예약을 할 수 없습니다."
+      }
+    }
+  }
+}

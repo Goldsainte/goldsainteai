@@ -198,5 +198,92 @@
     "followUs": "Folgen Sie uns:",
     "description": "Goldsainte AI ist Teil von Goldsainte Inc., dem weltweit führenden Anbieter von KI-gestützten Luxusreisen und kuratierten Erlebnissen. Entdecken. Erstellen. Teilen. Reisen Sie mit Goldsainte.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Alle Rechte vorbehalten."
+  },
+  "welcomeModal": {
+    "title": "Was Goldsainte.Ai für Sie tun kann",
+    "voiceAI": {
+      "title": "Sprach-KI-Concierge mit \"Hey Goldsainte\" Aktivierungswort.",
+      "description": "Sagen Sie einfach \"Hey Goldsainte\" von überall auf der Website, um unsere fortschrittliche Sprach-KI sofort zu aktivieren. Führen Sie natürliche Gespräche über Flüge, Hotels, Restaurants und mehr – freihändig."
+    },
+    "personalAI": {
+      "title": "Persönlicher KI-Agent, der Ihre Präferenzen lernt.",
+      "description": "Erstellen Sie Ihren eigenen KI-Reiseagenten, indem Sie ihm Ihren Reisestil, Ihr Budget und Ihre Präferenzen beibringen. Er lernt aus jeder Interaktion, um zunehmend personalisierte Empfehlungen für Flüge, Hotels, Restaurants und Erlebnisse zu liefern."
+    },
+    "createShare": {
+      "title": "Erstellen. Teilen. Geld Verdienen.",
+      "description": "Eine Social-Networking-Plattform für Content-Ersteller, um ihre Luxusreiseerlebnisse zu teilen und interaktive Reisepläne zu erstellen, die es ihnen ermöglichen, Einnahmen aus ihrem Content zu erzielen."
+    },
+    "expertAgents": {
+      "title": "Experten-Agenten mit Meilenstein-Zahlungen.",
+      "description": "Veröffentlichen Sie komplexe Reisen auf unserem Marktplatz und lassen Sie sich von der KI mit zertifizierten Agenten verbinden. Zahlen Sie in Meilensteinen, verfolgen Sie den Fortschritt und chatten Sie in Echtzeit mit voller Transparenz."
+    },
+    "cocurated": {
+      "title": "CoCurated™ - Kollaborative Reisepakete.",
+      "description": "Durchsuchen Sie exklusive Pakete, die von Top-Erstellern und Agenten erstellt wurden. Feste oder flexible Daten, sichere Buchung, transparente Preise – alles kuratiert von Reiseexperten, die die Reiseziele am besten kennen."
+    },
+    "creatorDashboard": {
+      "title": "Creator-Dashboard - Alle Ihre Tools an einem Ort.",
+      "description": "Verfolgen Sie Analysen, verwalten Sie Pakete, handhaben Sie Partnerschaften und erstellen Sie Produkte für den Shop. Steigen Sie durch Bronze bis Platin-Stufen auf für höhere Provisionsboni mit detailliertem Einnahmenverfolgung."
+    },
+    "creatorPayouts": {
+      "title": "Creator-Auszahlungen - Mehrere Einnahmequellen.",
+      "description": "Verdienen Sie durch Content-Ansichten, virtuelle Geschenke, Paketbuchungen (bis zu 40% Provision), Shop-Verkäufe, Partnerschaften und Affiliate-Marketing. Platin-Mitglieder verdienen bis zu 20% mehr. Sichere Stripe-Auszahlungen mit vollständiger Transaktionshistorie."
+    },
+    "groupBookings": {
+      "title": "Gruppenbuchungen & geteilte Zahlungen.",
+      "description": "Organisieren Sie Gruppenreisen mit Leichtigkeit. Teilen Sie Kosten unter Reisenden mit sicheren Zahlungslinks, verfolgen Sie, wer bezahlt hat, und erhalten Sie sofortige Benachrichtigungen, wenn Zahlungen abgeschlossen sind."
+    },
+    "itinerary": {
+      "title": "Vollständige Reiseroutenverwaltung.",
+      "description": "Erstellen Sie Tag-für-Tag-Reiserouten, laden Sie Reisedokumente hoch, synchronisieren Sie Kalender und teilen Sie Ihre Pläne mühelos mit Reisebegleitern."
+    },
+    "communication": {
+      "title": "Echtzeit-Kommunikationszentrale.",
+      "description": "Chatten Sie sofort mit Agenten, erhalten Sie Benachrichtigungen, nutzen Sie Schnellantworten und bewahren Sie alle Ihre Reisegespräche an einem sicheren Ort auf."
+    },
+    "cta": "Beginnen Sie mit der Planung Ihrer Luxusreise",
+    "agreement": "Durch die Nutzung von Goldsainte.Ai stimmen Sie unseren Bedingungen und Datenschutzrichtlinien zu. Geben Sie keine persönlichen oder sensiblen Informationen ein."
+  },
+  "about": {
+    "founderLetter": {
+      "title": "Brief des Gründers",
+      "p1": "Als Goldsainte zum ersten Mal startete, fragten die Leute, wie wir uns von anderen Dienstleistungen unterschieden. Die Antwort war klar: Wir brachten Innovation, Sicherheit und gehobene Erlebnisse in den Transport. Heute sind wir weit über diese Wurzeln hinausgewachsen.",
+      "p2": "Wir bauen jetzt etwas Größeres: ein globales KI-gestütztes Reise-Ökosystem, das die Art und Weise transformiert, wie Menschen erkunden, planen und ihre Abenteuer teilen.",
+      "p3": "Bei Goldsainte glauben wir, dass Reisen mehr als Logistik ist – es geht darum, Erlebnisse zu schaffen, die es wert sind, geteilt zu werden, eine Community aufzubauen und sowohl Reisende als auch Ersteller zu befähigen, zu gedeihen.",
+      "p4": "Von unseren Anfängen bis zur heutigen KI-getriebenen Plattform haben wir immer für Vertrauen, Innovation und Befähigung gestanden. Die Zukunft des Reisens geht nicht nur darum, wohin Sie gehen – es geht darum, wie nahtlos und bedeutungsvoll Sie dorthin gelangen.",
+      "p5": "Danke, dass Sie Teil dieser Reise sind. Die besten Abenteuer liegen noch vor uns.",
+      "signature": "Andre C. Powell Jr.",
+      "title2": "CEO & Gründer",
+      "company": "Goldsainte, Inc."
+    },
+    "sections": {
+      "whatIs": {
+        "title": "Was ist Goldsainte?",
+        "p1": "Goldsainte AI ist ein sprachaktivierter, KI-gestützter Reisemarktplatz, der Automatisierung mit verifizierter menschlicher Expertise verbindet, um vollständig personalisierte End-to-End-Reiseplanung und -buchung zu liefern. Mit dem Aktivierungswort \"Hey, Goldsainte\" können Benutzer einen konversationellen Concierge einsetzen, um Flüge, Hotels, Restaurants, Veranstaltungen und Transport zu suchen, zu planen und zu buchen – völlig freihändig und in Echtzeit.",
+        "p2": "Im Kern der Plattform befindet sich ein Reiseagenten-Marktplatz, auf dem Benutzer komplexe Reiserouten veröffentlichen, wettbewerbsfähige Angebote von zertifizierten Agenten erhalten und sicher durch meilensteinbasierte Transaktionen bezahlen können. Das System unterstützt Gruppenbuchungen, geteilte Zahlungen, vollständige Reiseroutenverwaltung und Echtzeit-Messaging, was die Koordinierung selbst der kompliziertesten Reisen erleichtert.",
+        "p3": "Goldsainte treibt auch eine einzigartige Creator-Wirtschaft an: Content-Ersteller arbeiten mit Agenten zusammen, um kuratierte Reiseerlebnisse zu co-kreieren und zu fördern, während Transportanbieter an Bord kommen, ihre Dienste bewerben und in von Erstellern oder Agenten geleitete Pakete aufgenommen werden können. Dieses Drei-Wege-Ökosystem – KI + Agenten + Ersteller – macht Goldsainte zur ersten Plattform, die Inspiration, Planung und Buchung in einer intelligenten Social-Commerce-Umgebung vereint."
+      },
+      "features": {
+        "title": "Was Wir Bieten"
+      },
+      "mission": {
+        "title": "Unsere Mission",
+        "p1": "Bei Goldsainte glauben wir, dass Reisen mehr ist als nur einen Flug zu buchen oder ein Hotel zu reservieren – es geht darum, unvergessliche Erlebnisse zu schaffen, bedeutungsvolle Verbindungen aufzubauen und Menschen zu befähigen, ihre Reisen auf Weisen zu teilen, die andere inspirieren.",
+        "p2": "Unsere Mission ist es, die Reisebranche neu zu definieren, indem wir modernste KI-Technologie mit der Kreativität und Leidenschaft von Reisenden, Erstellern und Reiseexperten weltweit kombinieren. Wir sind bestrebt, Reisen zugänglicher, personalisierter und lohnender zu machen.",
+        "p3": "Ob Sie ein Solo-Entdecker sind, der nach versteckten Juwelen sucht, ein Content-Ersteller, der Ihre Marke aufbaut, oder ein Reiseexperte, der Ihr Wissen teilt, Goldsainte bietet die Tools, die Plattform und die Community, um Ihnen zu helfen, zu gedeihen.",
+        "p4": "Unser KI-gestütztes Ökosystem ist darauf ausgelegt, die Komplexität der Reiseplanung zu vereinfachen und gleichzeitig die Magie der Entdeckung zu bewahren. Von sprachaktivierten Concierge-Diensten bis hin zu personalisierten KI-Agenten, die Ihren Reisestil lernen, nutzen wir Technologie, um jede Reise intelligenter, reibungsloser und angenehmer zu machen.",
+        "p5": "Letztendlich ist unsere Mission, die Art und Weise zu transformieren, wie die Welt reist. Wir schaffen ein Ökosystem, in dem Technologie die menschliche Erfahrung verbessert, wo Ersteller geschätzt und belohnt werden und wo jede Reise – egal wie groß oder klein – zu einer Geschichte wird, die es wert ist, geteilt zu werden."
+      },
+      "partners": {
+        "title": "Unsere Partner & Technologie",
+        "description": "Goldsainte nutzt Branchenführer wie Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify und Etsy, um Ihnen kuratierte und Echtzeit-Reiseerlebnisse und nahtlose Marktplatzintegrationen zu bringen."
+      },
+      "legal": {
+        "title": "Rechtliches",
+        "p1": "Goldsainte Inc. (das Unternehmen hinter Goldsainte™) ist in Delaware, USA registriert und ansässig (Goldsainte, wir, uns oder unser), von wo aus es seine KI-gestützte Luxusreise- und Buchungsplattform (der Service) auf seiner Website (die Website) bereitstellt und international von seinen verbundenen Gruppenunternehmen (die Support-Unternehmen) unterstützt wird. Die Support-Unternehmen bieten nur interne und operative Unterstützung. Sie erbringen nicht den Service und besitzen, betreiben oder verwalten nicht die Website oder eine andere Website.",
+        "p2": "Für Fragen zu Goldsainte, dem Service oder der Website oder zum Senden oder Zustellen von Dokumenten, Mitteilungen, Korrespondenz oder anderen Kommunikationen – einschließlich Presseanfragen – wenden Sie sich bitte direkt an Goldsainte Inc. unter seiner registrierten Geschäftsstelle in Delaware.",
+        "p3": "Goldsainte Inc. unterhält keinen rechtlichen Wohnsitz an einem anderen Ort oder Büro, einschließlich der Büros seiner Support-Unternehmen. Die Support-Unternehmen sind nicht berechtigt, als Prozessagent oder Dienstagent für Goldsainte Inc. zu handeln, und es können keine Buchungen oder Reservierungen über die Support-Unternehmen vorgenommen werden."
+      }
+    }
   }
 }
