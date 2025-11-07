@@ -1061,6 +1061,7 @@ export const AIBookingConcierge = () => {
                       }
                     }}
                     disabled={isLoading}
+                    language={preferences.general.voiceLanguage}
                   />
                   <Button
                     onClick={handleSend}

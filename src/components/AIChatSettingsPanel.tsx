@@ -14,6 +14,7 @@ export interface ChatPreferences {
     voiceEnabled: boolean;
     wakeWordEnabled: boolean;
     autoSaveConversation: boolean;
+    voiceLanguage: string;
   };
   hotels: {
     filter: 'all' | 'amadeus' | 'curated';
@@ -40,6 +41,7 @@ const DEFAULT_PREFERENCES: ChatPreferences = {
     voiceEnabled: true,
     wakeWordEnabled: true,
     autoSaveConversation: true,
+    voiceLanguage: 'en',
   },
   hotels: {
     filter: 'all',
@@ -161,6 +163,41 @@ export const AIChatSettingsPanel = ({ open, onClose, preferences, onPreferencesC
                     })
                   }
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Voice Transcription Language</Label>
+                <Select
+                  value={localPrefs.general.voiceLanguage}
+                  onValueChange={(value) =>
+                    setLocalPrefs({
+                      ...localPrefs,
+                      general: { ...localPrefs.general, voiceLanguage: value },
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-[300px] bg-background z-50">
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                    <SelectItem value="de">German</SelectItem>
+                    <SelectItem value="it">Italian</SelectItem>
+                    <SelectItem value="pt">Portuguese</SelectItem>
+                    <SelectItem value="ru">Russian</SelectItem>
+                    <SelectItem value="ja">Japanese</SelectItem>
+                    <SelectItem value="ko">Korean</SelectItem>
+                    <SelectItem value="zh">Chinese (Mandarin)</SelectItem>
+                    <SelectItem value="ar">Arabic</SelectItem>
+                    <SelectItem value="hi">Hindi</SelectItem>
+                    <SelectItem value="nl">Dutch</SelectItem>
+                    <SelectItem value="pl">Polish</SelectItem>
+                    <SelectItem value="tr">Turkish</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">Language for voice input transcription</p>
               </div>
             </div>
           </TabsContent>
@@ -451,6 +488,7 @@ export const countNonDefaultPreferences = (preferences: ChatPreferences): number
   if (preferences.general.voiceEnabled !== DEFAULT_PREFERENCES.general.voiceEnabled) count++;
   if (preferences.general.wakeWordEnabled !== DEFAULT_PREFERENCES.general.wakeWordEnabled) count++;
   if (preferences.general.autoSaveConversation !== DEFAULT_PREFERENCES.general.autoSaveConversation) count++;
+  if (preferences.general.voiceLanguage !== DEFAULT_PREFERENCES.general.voiceLanguage) count++;
   
   // Hotel preferences
   if (preferences.hotels.filter !== DEFAULT_PREFERENCES.hotels.filter) count++;

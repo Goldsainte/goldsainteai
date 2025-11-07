@@ -9,9 +9,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
   disabled?: boolean;
+  language?: string;
 }
 
-export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
+export const VoiceInput = ({ onTranscript, disabled, language = 'en' }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcriptPreview, setTranscriptPreview] = useState<string | null>(null);
@@ -72,7 +73,7 @@ export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
         }
 
         const { data, error } = await supabase.functions.invoke('transcribe-voice', {
-          body: { audio: base64Audio }
+          body: { audio: base64Audio, language }
         });
 
         if (error) throw error;
