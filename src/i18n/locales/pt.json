@@ -34,6 +34,14 @@
       "privacy": "Privacidade",
       "agreement": "Ao usar Goldsainte.Ai, você concorda com nossos"
     },
+    "rotatingPlaceholders": {
+      "hotels": "Para onde ir a seguir? Descubra hotéis selecionados sob medida para o seu gosto.",
+      "flights": "Reserve voos mais inteligentes com IA que conhece suas preferências.",
+      "restaurants": "Encontre restaurantes que valem a reserva — curados por locais e IA.",
+      "events": "Desbloqueie eventos exclusivos e experiências locais onde quer que você chegue.",
+      "excursions": "Participe de uma excursão planejada — guiada por especialistas, desenvolvida pela Goldsainte.",
+      "agents": "Precisa de mais do que uma reserva? Encontre agentes de viagem especialistas em minutos."
+    },
     "howItWorks": {
       "title": "Como Funciona",
       "intro": "Descubra, planeje e compartilhe viagens de luxo — tudo em uma plataforma inteligente.",
