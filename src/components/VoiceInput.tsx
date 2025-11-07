@@ -1,8 +1,10 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Mic, Square } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Mic, Square, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
@@ -12,6 +14,7 @@ interface VoiceInputProps {
 export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [transcriptPreview, setTranscriptPreview] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const { toast } = useToast();
@@ -75,10 +78,10 @@ export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
         if (error) throw error;
 
         if (data?.text) {
-          onTranscript(data.text);
+          setTranscriptPreview(data.text);
           toast({
             title: 'Transcription Complete',
-            description: 'Review your message and click send when ready.',
+            description: 'Click the checkmark to use, or X to discard.',
           });
         }
       };
@@ -94,6 +97,60 @@ export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
     }
   };
 
+  const handleConfirm = () => {
+    if (transcriptPreview) {
+      onTranscript(transcriptPreview);
+      setTranscriptPreview(null);
+    }
+  };
+
+  const handleDiscard = () => {
+    setTranscriptPreview(null);
+    toast({
+      title: 'Transcription Discarded',
+      description: 'You can record again.',
+    });
+  };
+
+  if (transcriptPreview) {
+    return (
+      <div className="flex gap-2 items-center">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div className="relative">
+              <Badge variant="secondary" className="max-w-[200px] truncate text-xs">
+                {transcriptPreview}
+              </Badge>
+            </div>
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[300px] break-words">
+            <p className="text-sm">{transcriptPreview}</p>
+          </TooltipContent>
+        </Tooltip>
+        <Button
+          type="button"
+          size="icon"
+          variant="default"
+          onClick={handleConfirm}
+          className="shrink-0 h-12 w-12 md:h-11 md:w-11 bg-green-600 hover:bg-green-700"
+          title="Use this transcription"
+        >
+          <Check className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          size="icon"
+          variant="outline"
+          onClick={handleDiscard}
+          className="shrink-0 h-12 w-12 md:h-11 md:w-11"
+          title="Discard and record again"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <Button
       type="button"
@@ -101,7 +158,8 @@ export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
       variant={isRecording ? "destructive" : "outline"}
       onClick={isRecording ? stopRecording : startRecording}
       disabled={disabled || isProcessing}
-      className="shrink-0"
+      className="shrink-0 h-12 w-12 md:h-11 md:w-11"
+      title={isRecording ? "Stop recording" : "Start voice input"}
     >
       {isRecording ? (
         <Square className="h-4 w-4" />
