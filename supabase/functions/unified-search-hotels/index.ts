@@ -318,9 +318,10 @@ serve(async (req) => {
     const cacheKey = getCacheKey({ location, checkIn, checkOut, guests });
     const cachedResult = await getFromCache(supabaseClient, cacheKey);
     
-    if (cachedResult) {
+    // Only return cached results if they contain hotels
+    if (cachedResult && cachedResult.results && cachedResult.results.length > 0) {
       clearTimeout(timeoutId);
-      console.log('Returning cached hotel results');
+      console.log('Returning cached hotel results:', cachedResult.results.length);
       return new Response(JSON.stringify({ 
         ...cachedResult,
         cached: true 
@@ -328,6 +329,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
       });
+    } else if (cachedResult) {
+      console.log('Cached result was empty, performing fresh search');
     }
 
     const token = await getAmadeusToken();
@@ -507,11 +510,16 @@ serve(async (req) => {
       console.error('Ranking failed, returning unranked results:', error);
     }
     
-    // Cache the result (fire and forget)
-    setCache(supabaseClient, cacheKey, {
-      ...responseData,
-      filter: hotelFilter // Include filter in cached response
-    });
+    // Cache the result only if we have hotels (fire and forget)
+    if (results.length > 0) {
+      setCache(supabaseClient, cacheKey, {
+        ...responseData,
+        filter: hotelFilter // Include filter in cached response
+      });
+      console.log(`Cached ${results.length} hotel results`);
+    } else {
+      console.log('Not caching empty results');
+    }
     
     console.log(`Hotel search completed in ${Date.now() - searchStart}ms with filter: ${hotelFilter}`);
     clearTimeout(timeoutId);

@@ -2279,10 +2279,6 @@ Before calling search_events, you MUST collect these details through conversatio
 - Date or date range from user
 - Valid dates in proper format
 
-**Optional but Helpful for Hotels:**
-4. **Budget Range**: "Do you have a nightly budget in mind?"
-   - If skipped: Use mid-range estimate ($150-250/night) as default filter after showing results
-
 5. **Preferences** (refine after initial results):
    - "Do you prefer a certain star rating or brand?"
    - "Would you like free breakfast, a pool, or pet-friendly options?"
