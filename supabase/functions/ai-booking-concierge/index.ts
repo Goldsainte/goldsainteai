@@ -31,10 +31,10 @@ serve(async (req) => {
 
   try {
     const { messages, stream = false, agentProfile, preferences } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!OPENAI_API_KEY) {
+      throw new Error("OPENAI_API_KEY is not configured");
     }
     
     // Extract preferences or use defaults
@@ -768,14 +768,14 @@ AVOID asking about:
 
 Remember: You're an AI search concierge that helps find perfect travel options and connects customers with the right booking method - either self-service or through certified agents.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "gpt-4o-mini",
         messages: [
           { role: "system", content: systemPrompt },
           ...messages
@@ -962,14 +962,14 @@ ${result.nextSteps?.map((step: string, i: number) => `${i + 1}. ${step}`).join('
       }
       
       // Make second AI call with tool results
-      const finalResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      const finalResponse = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash",
+          model: "gpt-4o-mini",
           messages: [
             { role: "system", content: systemPrompt },
             ...messages,
