@@ -23,6 +23,7 @@ import { TravelPackageCard } from "./TravelPackageCard";
 import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
+import { VoiceInput } from "./VoiceInput";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -1053,10 +1054,24 @@ export const AIBookingConcierge = () => {
                     className="flex-1 text-sm h-12 md:h-11"
                     disabled={isLoading}
                   />
+                  <VoiceInput
+                    onTranscript={(text) => {
+                      if (text.trim()) {
+                        setInput(text);
+                        // Auto-send the transcribed message
+                        setTimeout(() => {
+                          const sendButton = document.querySelector('[data-voice-send]') as HTMLButtonElement;
+                          if (sendButton) sendButton.click();
+                        }, 200);
+                      }
+                    }}
+                    disabled={isLoading}
+                  />
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
                     size="icon"
+                    data-voice-send
                     className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-12 w-12 md:h-11 md:w-11 shrink-0"
                   >
                     <Send className="h-5 w-5" />
