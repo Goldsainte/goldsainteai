@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import veniceSunset from "@/assets/luxury-venice-sunset.jpg";
 import tropicalHideaway from "@/assets/luxury-tropical-hideaway.jpg";
 import resortPool from "@/assets/luxury-resort-pool.jpg";
@@ -56,6 +57,7 @@ const journalEntries: JournalEntry[] = [
 
 export const FromTheJournal = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   return (
     <section className="py-20 md:py-24 bg-white">
@@ -63,10 +65,10 @@ export const FromTheJournal = () => {
         <div className="flex items-end justify-between mb-16 md:mb-20">
           <div>
             <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light mb-4 text-foreground tracking-tight">
-              From the Journal
+              {t('home.journal.title')}
             </h2>
             <p className="text-xl md:text-2xl font-light text-muted-foreground/80">
-              Curated stories from our creator community
+              {t('home.journal.subtitle')}
             </p>
             <div className="w-20 h-1 bg-luxury-gold mt-4"></div>
           </div>
@@ -75,7 +77,7 @@ export const FromTheJournal = () => {
             className="hidden md:flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group"
           >
             <span className="relative">
-              View All Stories
+              {t('home.journal.viewAll')}
               <span className="absolute bottom-0 left-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
@@ -130,7 +132,7 @@ export const FromTheJournal = () => {
             className="inline-flex items-center gap-2 text-foreground/80 hover:text-foreground transition-colors group"
           >
             <span className="relative">
-              View All Stories
+              {t('home.journal.viewAll')}
               <span className="absolute bottom-0 left-0 w-full h-px bg-foreground scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></span>
             </span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />

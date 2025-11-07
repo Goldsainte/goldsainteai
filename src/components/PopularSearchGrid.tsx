@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { useTranslation } from "react-i18next";
 import beachCabinImage from "@/assets/beach-cabin.jpg";
 import beachPicnicImage from "@/assets/beach-picnic.jpg";
 import redFlowersImage from "@/assets/red-flowers-loungers.jpg";
@@ -8,55 +9,57 @@ import tokyoStreetImage from "@/assets/tokyo-street.jpg";
 import dubaiCityImage from "@/assets/dubai-cityscape.jpg";
 import luxuryBeachImage from "@/assets/luxury-beach.jpg";
 
-const popularSearches = [
-  {
-    id: 1,
-    image: beachCabinImage,
-    title: "Beach Resorts",
-  },
-  {
-    id: 2,
-    image: tokyoStreetImage,
-    title: "City Breaks",
-  },
-  {
-    id: 3,
-    image: redFlowersImage,
-    title: "Romantic Getaways",
-  },
-  {
-    id: 4,
-    image: dubaiCityImage,
-    title: "Luxury Hotels",
-  },
-  {
-    id: 5,
-    image: seoulAutumnImage,
-    title: "Cultural Experiences",
-  },
-  {
-    id: 6,
-    image: beachPicnicImage,
-    title: "Wellness Retreats",
-  },
-  {
-    id: 7,
-    image: redKayakImage,
-    title: "Adventure Travel",
-  },
-  {
-    id: 8,
-    image: luxuryBeachImage,
-    title: "Island Escapes",
-  },
-];
-
 export const PopularSearchGrid = () => {
+  const { t } = useTranslation();
+  
+  const popularSearches = [
+    {
+      id: 1,
+      image: beachCabinImage,
+      title: t('home.popularSearches.beachResorts'),
+    },
+    {
+      id: 2,
+      image: tokyoStreetImage,
+      title: t('home.popularSearches.cityBreaks'),
+    },
+    {
+      id: 3,
+      image: redFlowersImage,
+      title: t('home.popularSearches.romanticGetaways'),
+    },
+    {
+      id: 4,
+      image: dubaiCityImage,
+      title: t('home.popularSearches.luxuryHotels'),
+    },
+    {
+      id: 5,
+      image: seoulAutumnImage,
+      title: t('home.popularSearches.culturalExperiences'),
+    },
+    {
+      id: 6,
+      image: beachPicnicImage,
+      title: t('home.popularSearches.wellnessRetreats'),
+    },
+    {
+      id: 7,
+      image: redKayakImage,
+      title: t('home.popularSearches.adventureTravel'),
+    },
+    {
+      id: 8,
+      image: luxuryBeachImage,
+      title: t('home.popularSearches.islandEscapes'),
+    },
+  ];
+
   return (
     <section className="py-12 sm:py-14 md:py-16 lg:py-20 bg-luxury-ivory">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6">
         <h2 className="font-secondary text-2xl sm:text-3xl md:text-4xl mb-6 sm:mb-8 font-light">
-          Popular searches
+          {t('home.popularSearches.title')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
           {popularSearches.map((search) => (

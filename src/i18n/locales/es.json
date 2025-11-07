@@ -70,7 +70,47 @@
         "title": "Reserva Instantánea",
         "description": "Reserva vuelos, hoteles, restaurantes y experiencias al instante con pago seguro.",
         "cta": "Comenzar a Reservar"
+      },
+      "stores": {
+        "title": "Tiendas de Creadores",
+        "description": "Conviértete en creador de viajes. Selecciona tus destinos favoritos, crea colecciones temáticas y gana cuando otros reserven desde tu tienda. Tu gusto, monetizado.",
+        "cta": "Explorar Tiendas de Creadores"
       }
+    },
+    "creatorHero": {
+      "create": "Crear.",
+      "share": "Compartir.",
+      "makeMoney": "Ganar Dinero.",
+      "paragraph1": "Convierte tu pasión por los viajes en ganancias. Comparte contenido impresionante, crece tu audiencia y desbloquea nuevas fuentes de ingresos a través de recompensas por participación, colaboraciones con marcas y paquetes de viajes curados.",
+      "paragraph2": "Gana dinero real mientras tus publicaciones obtienen likes, comentarios y compartidos — o crea y vende experiencias de viaje directamente a tus seguidores.",
+      "paragraph3": "Colabora con las mejores marcas, accede a poderosas herramientas para creadores e inspira a una comunidad global de exploradores. Ya seas un influencer experimentado o recién comiences, aquí es donde tu historia de viajes se convierte en tu negocio."
+    },
+    "winterSun": {
+      "title": "Sol de Invierno",
+      "subtitle": "Escapa al paraíso con nuestra selección de resorts de playa de lujo",
+      "cta": "Explorar Destinos"
+    },
+    "journal": {
+      "title": "Del Diario",
+      "subtitle": "Historias curadas de nuestra comunidad de creadores",
+      "viewAll": "Ver Todas las Historias"
+    },
+    "popularSearches": {
+      "title": "Búsquedas populares",
+      "beachResorts": "Resorts de Playa",
+      "cityBreaks": "Escapadas Urbanas",
+      "romanticGetaways": "Escapadas Románticas",
+      "luxuryHotels": "Hoteles de Lujo",
+      "culturalExperiences": "Experiencias Culturales",
+      "wellnessRetreats": "Retiros de Bienestar",
+      "adventureTravel": "Viajes de Aventura",
+      "islandEscapes": "Escapadas a Islas"
+    },
+    "agentCTA": {
+      "title": "Conviértete en Agente de Viajes",
+      "subtitle": "Únete a nuestra red y gana comisiones en reservas de viajes de lujo",
+      "apply": "Aplicar Ahora",
+      "browse": "Explorar Agentes"
     }
   }
 }

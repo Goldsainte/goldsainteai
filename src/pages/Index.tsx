@@ -1052,16 +1052,16 @@ const queries = {
                         </div>
                         <CardContent className="p-0 space-y-3 sm:space-y-4">
                           <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
-                            Creator Stores
+                            {t('home.features.stores.title')}
                           </h3>
                           <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Become a travel creator. Curate your favorite destinations, build themed collections, and earn when others book from your store. Your taste, monetized.
+                            {t('home.features.stores.description')}
                           </p>
                           <button 
                             className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
                             onClick={() => navigate('/creators')}
                           >
-                            Explore Creator Stores
+                            {t('home.features.stores.cta')}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </CardContent>
@@ -1084,13 +1084,13 @@ const queries = {
                     <div>
                       <div className="space-y-3">
                         <h2 id="creator-section-heading" className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light text-foreground leading-tight">
-                          Create.
+                          {t('home.creatorHero.create')}
                         </h2>
                         <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light text-foreground leading-tight" aria-label="Share">
-                          Share.
+                          {t('home.creatorHero.share')}
                         </h2>
                         <h2 className="font-secondary text-5xl md:text-6xl lg:text-7xl font-light text-luxury-gold leading-tight" aria-label="Make Money">
-                          Make Money.
+                          {t('home.creatorHero.makeMoney')}
                         </h2>
                       </div>
                       <div className="w-24 h-1 bg-luxury-gold mt-6" />
@@ -1098,13 +1098,13 @@ const queries = {
                     
                     <div className="text-lg md:text-xl leading-relaxed text-muted-foreground/90 space-y-6">
                       <p>
-                        Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages.
+                        {t('home.creatorHero.paragraph1')}
                       </p>
                       <p>
-                        Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.
+                        {t('home.creatorHero.paragraph2')}
                       </p>
                       <p>
-                        Collaborate with top brands, access powerful creator tools, and inspire a global community of explorers. Whether you're a seasoned influencer or just getting started, this is where your travel story becomes your business.
+                        {t('home.creatorHero.paragraph3')}
                       </p>
                     </div>
                   </div>
@@ -1310,10 +1310,10 @@ const queries = {
                       </div>
                       <div className="flex-1 text-center md:text-left space-y-2">
                         <h2 className="text-2xl font-bold bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent font-secondary">
-                          Become a Travel Agent
+                          {t('home.agentCTA.title')}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          Join our network and earn commissions on luxury travel bookings
+                          {t('home.agentCTA.subtitle')}
                         </p>
                       </div>
                       <div className="flex flex-col sm:flex-row gap-3">
@@ -1329,7 +1329,7 @@ const queries = {
                           }}
                         >
                           <Briefcase className="h-4 w-4" />
-                          Apply Now
+                          {t('home.agentCTA.apply')}
                         </Button>
                         <Button 
                           size="sm"
@@ -1338,7 +1338,7 @@ const queries = {
                           onClick={() => navigate('/browse-agents')}
                         >
                           <MapPinned className="h-4 w-4" />
-                          Browse Agents
+                          {t('home.agentCTA.browse')}
                         </Button>
                       </div>
                     </div>

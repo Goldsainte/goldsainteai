@@ -70,7 +70,47 @@
         "title": "Instant Booking",
         "description": "Book flights, hotels, restaurants, and experiences instantly with secure checkout. Your complete itinerary is generated automatically.",
         "cta": "Start Booking"
+      },
+      "stores": {
+        "title": "Creator Stores",
+        "description": "Become a travel creator. Curate your favorite destinations, build themed collections, and earn when others book from your store. Your taste, monetized.",
+        "cta": "Explore Creator Stores"
       }
+    },
+    "creatorHero": {
+      "create": "Create.",
+      "share": "Share.",
+      "makeMoney": "Make Money.",
+      "paragraph1": "Turn your passion for travel into profit. Share stunning content, grow your audience, and unlock new revenue streams through engagement rewards, brand collaborations, and curated trip packages.",
+      "paragraph2": "Earn real money as your posts gain likes, comments, and shares — or create and sell travel experiences directly to your followers.",
+      "paragraph3": "Collaborate with top brands, access powerful creator tools, and inspire a global community of explorers. Whether you're a seasoned influencer or just getting started, this is where your travel story becomes your business."
+    },
+    "winterSun": {
+      "title": "Winter Sun",
+      "subtitle": "Escape to paradise with our handpicked collection of luxury beach resorts",
+      "cta": "Explore Destinations"
+    },
+    "journal": {
+      "title": "From the Journal",
+      "subtitle": "Curated stories from our creator community",
+      "viewAll": "View All Stories"
+    },
+    "popularSearches": {
+      "title": "Popular searches",
+      "beachResorts": "Beach Resorts",
+      "cityBreaks": "City Breaks",
+      "romanticGetaways": "Romantic Getaways",
+      "luxuryHotels": "Luxury Hotels",
+      "culturalExperiences": "Cultural Experiences",
+      "wellnessRetreats": "Wellness Retreats",
+      "adventureTravel": "Adventure Travel",
+      "islandEscapes": "Island Escapes"
+    },
+    "agentCTA": {
+      "title": "Become a Travel Agent",
+      "subtitle": "Join our network and earn commissions on luxury travel bookings",
+      "apply": "Apply Now",
+      "browse": "Browse Agents"
     }
   }
 }
