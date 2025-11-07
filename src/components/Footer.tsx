@@ -4,6 +4,7 @@ import verticalLogo from "@/assets/primary-vertical-logo-gold.png";
 import { Button } from "./ui/button";
 import { useState } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
+import { useTranslation } from "react-i18next";
 
 const currencies = [
   { code: "USD", symbol: "$", name: "US Dollar" },
@@ -15,6 +16,7 @@ const currencies = [
 
 export const Footer = () => {
   const [selectedCurrency, setSelectedCurrency] = useState("USD");
+  const { t } = useTranslation();
 
   return (
     <footer className="bg-background border-t border-border mt-16">
@@ -24,74 +26,74 @@ export const Footer = () => {
         <Accordion type="multiple" className="md:hidden mb-8">
           {/* Support */}
           <AccordionItem value="support">
-            <AccordionTrigger className="text-sm font-semibold">Support</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">{t('footer.support')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/help" className="hover:text-primary transition-colors">Help Center</Link></li>
-                <li><Link to="/dashboard" className="hover:text-primary transition-colors">Manage your trips</Link></li>
-                <li><Link to="/messages" className="hover:text-primary transition-colors">Contact Customer Service</Link></li>
-                <li><Link to="/trust-safety" className="hover:text-primary transition-colors">Safety Resource Center</Link></li>
-                <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">Cancellation & Refunds</Link></li>
+                <li><Link to="/help" className="hover:text-primary transition-colors">{t('footer.helpCenter')}</Link></li>
+                <li><Link to="/dashboard" className="hover:text-primary transition-colors">{t('footer.manageTrips')}</Link></li>
+                <li><Link to="/messages" className="hover:text-primary transition-colors">{t('footer.contactCustomerService')}</Link></li>
+                <li><Link to="/trust-safety" className="hover:text-primary transition-colors">{t('footer.safetyResourceCenter')}</Link></li>
+                <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">{t('footer.cancellationRefunds')}</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
 
           {/* Discover */}
           <AccordionItem value="discover">
-            <AccordionTrigger className="text-sm font-semibold">Discover</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">{t('footer.discover')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/journeys" className="hover:text-primary transition-colors">Journeys</Link></li>
-                <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">CoCurated Journeys</Link></li>
-                <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
-                <li><Link to="/browse-agents" className="hover:text-primary transition-colors">Travel Agent Services</Link></li>
-                <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">Co-Curated Packages</Link></li>
-                <li><Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link></li>
+                <li><Link to="/journeys" className="hover:text-primary transition-colors">{t('footer.journeys')}</Link></li>
+                <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">{t('footer.cocuratedJourneys')}</Link></li>
+                <li><Link to="/trending" className="hover:text-primary transition-colors">{t('footer.seasonalDeals')}</Link></li>
+                <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
+                <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
+                <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
 
           {/* Terms and settings */}
           <AccordionItem value="terms">
-            <AccordionTrigger className="text-sm font-semibold">Terms and settings</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">{t('footer.termsSettings')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
-                <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
-                <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-                <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
-                <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">Community Guidelines</Link></li>
-                <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">Dispute resolution</Link></li>
-                <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
-                <li><Link to="/about#human-rights" className="hover:text-primary transition-colors">Human Rights Statement</Link></li>
+                <li><Link to="/about#legal" className="hover:text-primary transition-colors">{t('footer.companyInfo')}</Link></li>
+                <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">{t('footer.privacyCookies')}</Link></li>
+                <li><Link to="/about#terms" className="hover:text-primary transition-colors">{t('footer.termsOfService')}</Link></li>
+                <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">{t('footer.accessibilityStatement')}</Link></li>
+                <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">{t('footer.communityGuidelines')}</Link></li>
+                <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">{t('footer.disputeResolution')}</Link></li>
+                <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">{t('footer.modernSlaveryStatement')}</Link></li>
+                <li><Link to="/about#human-rights" className="hover:text-primary transition-colors">{t('footer.humanRightsStatement')}</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
 
           {/* Partners */}
           <AccordionItem value="partners">
-            <AccordionTrigger className="text-sm font-semibold">Partners</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">{t('footer.partners')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">Become a Travel Agent</Link></li>
-                <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Influencer Program</Link></li>
-                <li><Link to="/shop" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
-                <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">List Your Company</Link></li>
+                <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">{t('footer.becomeAgent')}</Link></li>
+                <li><Link to="/browse-creators" className="hover:text-primary transition-colors">{t('footer.influencerProgram')}</Link></li>
+                <li><Link to="/shop" className="hover:text-primary transition-colors">{t('footer.affiliateProgram')}</Link></li>
+                <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">{t('footer.listYourCompany')}</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
 
           {/* About */}
           <AccordionItem value="about" className="border-b-0">
-            <AccordionTrigger className="text-sm font-semibold">About</AccordionTrigger>
+            <AccordionTrigger className="text-sm font-semibold">{t('footer.about')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
-                <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
-                <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
-                <li><a href="/about#investor-relations" className="hover:text-primary transition-colors">Investor Relations</a></li>
-                <li><Link to="/corporate-contact" className="hover:text-primary transition-colors">Corporate Contact</Link></li>
+                <li><Link to="/about" className="hover:text-primary transition-colors">{t('footer.aboutGoldsainte')}</Link></li>
+                <li><Link to="/what-we-do" className="hover:text-primary transition-colors">{t('footer.whatWeDo')}</Link></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t('footer.howWeWork')}</a></li>
+                <li><a href="#" className="hover:text-primary transition-colors">{t('footer.pressCenter')}</a></li>
+                <li><a href="/about#investor-relations" className="hover:text-primary transition-colors">{t('footer.investorRelations')}</a></li>
+                <li><Link to="/corporate-contact" className="hover:text-primary transition-colors">{t('footer.corporateContact')}</Link></li>
               </ul>
             </AccordionContent>
           </AccordionItem>
@@ -101,65 +103,65 @@ export const Footer = () => {
         <div className="hidden md:grid grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
           {/* Support Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Support</h4>
+            <h4 className="font-semibold mb-4 text-base">{t('footer.support')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/help" className="hover:text-primary transition-colors">Help Center</Link></li>
-              <li><Link to="/dashboard" className="hover:text-primary transition-colors">Manage your trips</Link></li>
-              <li><Link to="/messages" className="hover:text-primary transition-colors">Contact Customer Service</Link></li>
-              <li><Link to="/trust-safety" className="hover:text-primary transition-colors">Safety Resource Center</Link></li>
-              <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">Cancellation & Refunds</Link></li>
+              <li><Link to="/help" className="hover:text-primary transition-colors">{t('footer.helpCenter')}</Link></li>
+              <li><Link to="/dashboard" className="hover:text-primary transition-colors">{t('footer.manageTrips')}</Link></li>
+              <li><Link to="/messages" className="hover:text-primary transition-colors">{t('footer.contactCustomerService')}</Link></li>
+              <li><Link to="/trust-safety" className="hover:text-primary transition-colors">{t('footer.safetyResourceCenter')}</Link></li>
+              <li><Link to="/cancellation-refund-policy" className="hover:text-primary transition-colors">{t('footer.cancellationRefunds')}</Link></li>
             </ul>
           </div>
 
           {/* Discover Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Discover</h4>
+            <h4 className="font-semibold mb-4 text-base">{t('footer.discover')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/journeys" className="hover:text-primary transition-colors">Journeys</Link></li>
-              <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">CoCurated Journeys</Link></li>
-              <li><Link to="/trending" className="hover:text-primary transition-colors">Seasonal & Holiday Deals</Link></li>
-              <li><Link to="/browse-agents" className="hover:text-primary transition-colors">Travel Agent Services</Link></li>
-              <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">Co-Curated Packages</Link></li>
-              <li><Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link></li>
+              <li><Link to="/journeys" className="hover:text-primary transition-colors">{t('footer.journeys')}</Link></li>
+              <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">{t('footer.cocuratedJourneys')}</Link></li>
+              <li><Link to="/trending" className="hover:text-primary transition-colors">{t('footer.seasonalDeals')}</Link></li>
+              <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
+              <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
+              <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
             </ul>
           </div>
 
           {/* Terms & Settings Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Terms and settings</h4>
+            <h4 className="font-semibold mb-4 text-base">{t('footer.termsSettings')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/about#legal" className="hover:text-primary transition-colors">Company Information</Link></li>
-              <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">Privacy & cookies</Link></li>
-              <li><Link to="/about#terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">Accessibility Statement</Link></li>
-              <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">Community Guidelines</Link></li>
-              <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">Dispute resolution</Link></li>
-              <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">Modern Slavery Statement</Link></li>
-              <li><Link to="/about#human-rights" className="hover:text-primary transition-colors">Human Rights Statement</Link></li>
+              <li><Link to="/about#legal" className="hover:text-primary transition-colors">{t('footer.companyInfo')}</Link></li>
+              <li><Link to="/privacy-cookies" className="hover:text-primary transition-colors">{t('footer.privacyCookies')}</Link></li>
+              <li><Link to="/about#terms" className="hover:text-primary transition-colors">{t('footer.termsOfService')}</Link></li>
+              <li><Link to="/about#accessibility" className="hover:text-primary transition-colors">{t('footer.accessibilityStatement')}</Link></li>
+              <li><Link to="/community-guidelines" className="hover:text-primary transition-colors">{t('footer.communityGuidelines')}</Link></li>
+              <li><Link to="/about#dispute-resolution" className="hover:text-primary transition-colors">{t('footer.disputeResolution')}</Link></li>
+              <li><Link to="/about#modern-slavery" className="hover:text-primary transition-colors">{t('footer.modernSlaveryStatement')}</Link></li>
+              <li><Link to="/about#human-rights" className="hover:text-primary transition-colors">{t('footer.humanRightsStatement')}</Link></li>
             </ul>
           </div>
 
           {/* Partners Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">Partners</h4>
+            <h4 className="font-semibold mb-4 text-base">{t('footer.partners')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">Become a Travel Agent</Link></li>
-              <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Influencer Program</Link></li>
-              <li><Link to="/shop" className="hover:text-primary transition-colors">Affiliate Program</Link></li>
-              <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">List Your Company</Link></li>
+              <li><Link to="/agent-onboarding" className="hover:text-primary transition-colors">{t('footer.becomeAgent')}</Link></li>
+              <li><Link to="/browse-creators" className="hover:text-primary transition-colors">{t('footer.influencerProgram')}</Link></li>
+              <li><Link to="/shop" className="hover:text-primary transition-colors">{t('footer.affiliateProgram')}</Link></li>
+              <li><Link to="/transportation-vendor-partners" className="hover:text-primary transition-colors">{t('footer.listYourCompany')}</Link></li>
             </ul>
           </div>
 
           {/* About Column */}
           <div>
-            <h4 className="font-semibold mb-4 text-base">About</h4>
+            <h4 className="font-semibold mb-4 text-base">{t('footer.about')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/about" className="hover:text-primary transition-colors">About Goldsainte</Link></li>
-              <li><Link to="/what-we-do" className="hover:text-primary transition-colors">What We Do</Link></li>
-              <li><a href="#" className="hover:text-primary transition-colors">How We Work</a></li>
-              <li><a href="#" className="hover:text-primary transition-colors">Press Center</a></li>
-              <li><a href="/about#investor-relations" className="hover:text-primary transition-colors">Investor Relations</a></li>
-              <li><Link to="/corporate-contact" className="hover:text-primary transition-colors">Corporate Contact</Link></li>
+              <li><Link to="/about" className="hover:text-primary transition-colors">{t('footer.aboutGoldsainte')}</Link></li>
+              <li><Link to="/what-we-do" className="hover:text-primary transition-colors">{t('footer.whatWeDo')}</Link></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t('footer.howWeWork')}</a></li>
+              <li><a href="#" className="hover:text-primary transition-colors">{t('footer.pressCenter')}</a></li>
+              <li><a href="/about#investor-relations" className="hover:text-primary transition-colors">{t('footer.investorRelations')}</a></li>
+              <li><Link to="/corporate-contact" className="hover:text-primary transition-colors">{t('footer.corporateContact')}</Link></li>
             </ul>
           </div>
         </div>
@@ -184,7 +186,7 @@ export const Footer = () => {
 
           {/* Social Media Links */}
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap justify-center">
-            <span className="text-xs sm:text-sm font-medium w-full sm:w-auto text-center sm:text-left">Follow us:</span>
+            <span className="text-xs sm:text-sm font-medium w-full sm:w-auto text-center sm:text-left">{t('footer.followUs')}</span>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors" aria-label="Facebook">
               <Facebook className="h-5 w-5" />
             </a>
@@ -209,10 +211,10 @@ export const Footer = () => {
             <img src={verticalLogo} alt="Goldsainte" className="h-16 sm:h-20 w-auto" />
             <div className="text-center max-w-3xl px-4">
               <p className="text-xs sm:text-sm text-muted-foreground mb-2">
-                Goldsainte AI is part of Goldsainte Inc., the world leader in AI-powered luxury travel and curated experiences. Discover. Create. Share. Travel with Goldsainte.
+                {t('footer.description')}
               </p>
               <p className="text-xs text-muted-foreground">
-                Copyright © 2025 Goldsainte.Ai™. All rights reserved.
+                {t('footer.copyright')}
               </p>
             </div>
           </div>

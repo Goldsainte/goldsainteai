@@ -251,7 +251,7 @@ export const Header = () => {
                     >
                       {/* Discover Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Discover</p>
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.discover')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
@@ -259,35 +259,35 @@ export const Header = () => {
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Video className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Journeys</span>
+                          <span className="text-sm font-medium">{t('navigation.journeys')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/cocurated-journeys')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Plane className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">CoCurated Journeys</span>
+                          <span className="text-sm font-medium">{t('navigation.cocuratedJourneys')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/browse-creators')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <User className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Browse Creators</span>
+                          <span className="text-sm font-medium">{t('navigation.browseCreators')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/browse-agents')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Browse Agents</span>
+                          <span className="text-sm font-medium">{t('navigation.browseAgents')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/marketplace')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Marketplace</span>
+                          <span className="text-sm font-medium">{t('navigation.marketplace')}</span>
                         </DropdownMenuItem>
                       </div>
                       
@@ -295,7 +295,7 @@ export const Header = () => {
                       
                       {/* Professional Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Professional</p>
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.professional')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
@@ -303,14 +303,14 @@ export const Header = () => {
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Briefcase className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Become an Agent</span>
+                          <span className="text-sm font-medium">{t('navigation.becomeAgent')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/transportation-vendor-partners')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Car className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Become a Transport Vendor</span>
+                          <span className="text-sm font-medium">{t('navigation.becomeTransportVendor')}</span>
                         </DropdownMenuItem>
                       </div>
                       
@@ -318,7 +318,7 @@ export const Header = () => {
                       
                       {/* Shop & Commerce Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Shop & Earn</p>
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.shopAndEarn')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
@@ -326,14 +326,14 @@ export const Header = () => {
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <ShoppingCart className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Shop</span>
+                          <span className="text-sm font-medium">{t('navigation.shop')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/affiliate-manager')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Link2 className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Affiliate Links</span>
+                          <span className="text-sm font-medium">{t('navigation.affiliateLinks')}</span>
                         </DropdownMenuItem>
                       </div>
                       
@@ -341,7 +341,7 @@ export const Header = () => {
                       
                       {/* Company Section */}
                       <div className="px-4 py-3 border-b border-border/50">
-                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">Company</p>
+                        <p className="text-xs font-semibold text-secondary uppercase tracking-[0.15em]">{t('navigation.company')}</p>
                       </div>
                       <div className="py-2">
                         <DropdownMenuItem 
@@ -349,14 +349,14 @@ export const Header = () => {
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Crown className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">Subscription</span>
+                          <span className="text-sm font-medium">{t('navigation.subscription')}</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem 
                           onClick={() => navigate('/about')} 
                           className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 touch-manipulation"
                         >
                           <Info className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                          <span className="text-sm font-medium">About</span>
+                          <span className="text-sm font-medium">{t('navigation.about')}</span>
                         </DropdownMenuItem>
                       </div>
                     </DropdownMenuContent>
