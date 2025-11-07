@@ -6,6 +6,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { AudioWaveform } from './AudioWaveform';
 
 interface VoiceInputProps {
   onTranscript: (text: string) => void;
@@ -36,8 +37,12 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en', onLanguage
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcriptPreview, setTranscriptPreview] = useState<string | null>(null);
+  const [audioLevel, setAudioLevel] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const animationFrameRef = useRef<number>();
   const { toast } = useToast();
 
   const startRecording = async () => {
@@ -46,6 +51,31 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en', onLanguage
       const mediaRecorder = new MediaRecorder(stream);
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
+
+      // Set up audio analysis for waveform
+      const audioContext = new AudioContext();
+      audioContextRef.current = audioContext;
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      analyser.fftSize = 256;
+      analyserRef.current = analyser;
+      source.connect(analyser);
+
+      // Start analyzing audio levels
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      const updateAudioLevel = () => {
+        if (!analyserRef.current) return;
+        
+        analyser.getByteFrequencyData(dataArray);
+        const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+        const normalized = Math.min(average / 128, 1); // Normalize to 0-1
+        setAudioLevel(normalized);
+        
+        if (isRecording) {
+          animationFrameRef.current = requestAnimationFrame(updateAudioLevel);
+        }
+      };
+      updateAudioLevel();
 
       mediaRecorder.ondataavailable = (e) => {
         if (e.data.size > 0) {
@@ -57,6 +87,16 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en', onLanguage
         const audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
         await transcribeAudio(audioBlob);
         stream.getTracks().forEach(track => track.stop());
+        
+        // Clean up audio context
+        if (audioContextRef.current) {
+          audioContextRef.current.close();
+          audioContextRef.current = null;
+        }
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+        setAudioLevel(0);
       };
 
       mediaRecorder.start();
@@ -173,56 +213,66 @@ export const VoiceInput = ({ onTranscript, disabled, language = 'en', onLanguage
   }
 
   return (
-    <div className="relative flex gap-1">
-      <Button
-        type="button"
-        size="icon"
-        variant={isRecording ? "destructive" : "outline"}
-        onClick={isRecording ? stopRecording : startRecording}
-        disabled={disabled || isProcessing}
-        className="shrink-0 h-12 w-12 md:h-11 md:w-11"
-        title={isRecording ? "Stop recording" : `Voice input (${language.toUpperCase()})`}
-      >
-        {isRecording ? (
-          <Square className="h-4 w-4" />
-        ) : (
-          <Mic className="h-4 w-4" />
-        )}
-      </Button>
-      
-      {!isRecording && onLanguageChange && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="button"
-              size="icon"
-              variant="outline"
-              disabled={disabled || isProcessing}
-              className="shrink-0 h-12 w-12 md:h-11 md:w-11 px-1"
-              title="Change language"
-            >
-              <div className="flex flex-col items-center justify-center">
-                <span className="text-[9px] font-mono leading-none">{language.toUpperCase()}</span>
-                <ChevronDown className="h-2.5 w-2.5" />
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="max-h-[300px] overflow-y-auto bg-background z-50">
-            {LANGUAGES.map((lang) => (
-              <DropdownMenuItem
-                key={lang.code}
-                onClick={() => onLanguageChange(lang.code)}
-                className={language === lang.code ? "bg-accent" : ""}
-              >
-                <div className="flex items-center justify-between w-full">
-                  <span>{lang.name}</span>
-                  <span className="text-xs text-muted-foreground ml-2">{lang.code.toUpperCase()}</span>
-                </div>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+    <div className="flex items-center gap-2">
+      {isRecording && (
+        <div className="flex items-center gap-2 px-3 py-1 bg-destructive/10 rounded-lg border border-destructive/20">
+          <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+          <AudioWaveform isRecording={isRecording} audioLevel={audioLevel} />
+          <span className="text-xs text-muted-foreground">Recording...</span>
+        </div>
       )}
+      
+      <div className="relative flex gap-1">
+        <Button
+          type="button"
+          size="icon"
+          variant={isRecording ? "destructive" : "outline"}
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={disabled || isProcessing}
+          className="shrink-0 h-12 w-12 md:h-11 md:w-11"
+          title={isRecording ? "Stop recording" : `Voice input (${language.toUpperCase()})`}
+        >
+          {isRecording ? (
+            <Square className="h-4 w-4" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
+        </Button>
+        
+        {!isRecording && onLanguageChange && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="outline"
+                disabled={disabled || isProcessing}
+                className="shrink-0 h-12 w-12 md:h-11 md:w-11 px-1"
+                title="Change language"
+              >
+                <div className="flex flex-col items-center justify-center">
+                  <span className="text-[9px] font-mono leading-none">{language.toUpperCase()}</span>
+                  <ChevronDown className="h-2.5 w-2.5" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="max-h-[300px] overflow-y-auto bg-background z-50">
+              {LANGUAGES.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.code}
+                  onClick={() => onLanguageChange(lang.code)}
+                  className={language === lang.code ? "bg-accent" : ""}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span>{lang.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">{lang.code.toUpperCase()}</span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+      </div>
     </div>
   );
 };
