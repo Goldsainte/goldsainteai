@@ -166,7 +166,17 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
       }
 
       const offers = await offersRes.json();
-      const available = (offers.data || []).filter((h: any) => h.available && h.offers && h.offers.length > 0);
+      console.log(`Raw offers response for chunk:`, JSON.stringify(offers).substring(0, 500));
+      console.log(`Total offers in chunk: ${offers.data?.length || 0}`);
+      
+      const available = (offers.data || []).filter((h: any) => {
+        const hasOffers = h.offers && h.offers.length > 0;
+        const isAvailable = h.available !== false; // Check if explicitly false
+        console.log(`Hotel ${h.hotel?.name}: available=${h.available}, offers=${h.offers?.length || 0}`);
+        return isAvailable && hasOffers;
+      });
+      
+      console.log(`Available hotels in this chunk: ${available.length}`);
       aggregated.push(...available);
     } catch (e) {
       console.error('Error fetching offers for chunk:', e);
@@ -175,6 +185,16 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
   }
 
   console.log(`Total available hotel offers aggregated: ${aggregated.length}`);
+  
+  // If no hotels found, provide helpful error message
+  if (aggregated.length === 0 && idArray.length > 0) {
+    console.warn(`⚠️ Amadeus API found ${idArray.length} hotels in ${cityCode} but returned 0 offers for ${checkIn} to ${checkOut}`);
+    console.warn('This often happens when:');
+    console.warn('1. Dates are too far in the future (test API typically has 1-3 months availability)');
+    console.warn('2. Dates are in the past');
+    console.warn('3. No availability for those specific dates');
+  }
+  
   return aggregated;
 }
 
