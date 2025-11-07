@@ -30,12 +30,18 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, stream = false, agentProfile, hotelFilter = 'all' } = await req.json();
+    const { messages, stream = false, agentProfile, preferences } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
+    
+    // Extract preferences or use defaults
+    const hotelFilter = preferences?.hotels?.filter || 'all';
+    const hotelSortBy = preferences?.hotels?.sortBy || 'best_value';
+    const flightSortBy = preferences?.flights?.sortBy || 'best_value';
+    const carSortBy = preferences?.cars?.sortBy || 'best_value';
 
     const tools = [
       {
@@ -881,10 +887,17 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             // Add sortBy from tripContext to search calls
             let requestBody = { ...args };
             if (functionName === 'search_flights') {
-              requestBody.sortBy = tripContext.rankingPreferences.flights || 'best_value';
+              requestBody.sortBy = flightSortBy; // Use preference
             } else if (functionName === 'search_hotels') {
-              requestBody.sortBy = tripContext.rankingPreferences.hotels || 'best_value';
+              requestBody.sortBy = hotelSortBy; // Use preference
               requestBody.filter = hotelFilter; // Add hotel filter
+              // Add optional filters from preferences
+              if (preferences?.hotels?.minRating) {
+                requestBody.minRating = preferences.hotels.minRating;
+              }
+              if (preferences?.hotels?.maxPrice) {
+                requestBody.maxPrice = preferences.hotels.maxPrice;
+              }
             } else if (functionName === 'search_cars') {
               // Store car rental context
               if (!tripContext.carRental) tripContext.carRental = {};
@@ -894,7 +907,11 @@ Remember: You're an AI search concierge that helps find perfect travel options a
                 pickupDate: args.pickupDate || tripContext.carRental.pickupDate,
                 returnDate: args.dropoffDate || tripContext.carRental.returnDate
               });
-              requestBody.sortBy = tripContext.rankingPreferences.cars || 'best_value';
+              requestBody.sortBy = carSortBy; // Use preference
+              // Add optional filters from preferences
+              if (preferences?.cars?.carType && preferences.cars.carType !== 'any') {
+                requestBody.carType = preferences.cars.carType;
+              }
             } else if (functionName === 'search_restaurants') {
               requestBody.sortBy = tripContext.rankingPreferences.restaurants || 'best_value';
             }

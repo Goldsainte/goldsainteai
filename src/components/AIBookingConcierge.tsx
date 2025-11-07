@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2, Filter } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -21,6 +21,7 @@ import { CompactActivityCard } from "./CompactActivityCard";
 import { TravelPackageCard } from "./TravelPackageCard";
 import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
+import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences } from "./AIChatSettingsPanel";
 
 interface Message {
   role: 'user' | 'assistant';
@@ -42,10 +43,12 @@ export const AIBookingConcierge = () => {
   const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
   const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
   const [isUberModalOpen, setIsUberModalOpen] = useState(false);
-  const [hotelFilter, setHotelFilter] = useState<'all' | 'amadeus' | 'curated'>(() => {
-    const saved = localStorage.getItem('hotelFilter');
-    return (saved === 'all' || saved === 'amadeus' || saved === 'curated') ? saved : 'all';
+  const [showSettings, setShowSettings] = useState(false);
+  const [preferences, setPreferences] = useState<ChatPreferences>(() => {
+    const saved = localStorage.getItem('aiChatPreferences');
+    return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
   });
+  const hotelFilter = preferences.hotels.filter;
   const pushToTalkTimerRef = useRef<NodeJS.Timeout | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
@@ -253,7 +256,7 @@ export const AIBookingConcierge = () => {
           messages: [...messages, { role: 'user', content: userMessage }],
           stream: false,  // Disable streaming to allow tool execution
           agentProfile: agentProfile,  // Pass agent profile to backend
-          hotelFilter: hotelFilter  // Pass hotel filter preference
+          preferences: preferences  // Pass all user preferences
         }),
       });
 
@@ -350,7 +353,7 @@ export const AIBookingConcierge = () => {
           messages: [...messages, userMessage],
           stream: false,
           agentProfile: agentProfile,
-          hotelFilter: hotelFilter  // Pass hotel filter preference
+          preferences: preferences  // Pass all user preferences
         }),
       });
 
@@ -753,38 +756,16 @@ export const AIBookingConcierge = () => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => {
-                  const filterElement = document.getElementById('hotel-filter-select');
-                  filterElement?.click();
-                }}
+                onClick={() => setShowSettings(true)}
                 className="text-primary-foreground hover:bg-white/10 h-8 w-8"
               >
-                <Filter className="h-4 w-4" />
+                <Settings className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Hotel filter: {hotelFilter === 'all' ? 'All sources' : hotelFilter === 'amadeus' ? 'Real-time only' : 'Curated only'}</p>
+              <p>Chat preferences</p>
             </TooltipContent>
           </Tooltip>
-          <div className="hidden">
-            <Select value={hotelFilter} onValueChange={(value: 'all' | 'amadeus' | 'curated') => {
-              setHotelFilter(value);
-              localStorage.setItem('hotelFilter', value);
-              toast({
-                title: "Hotel Filter Updated",
-                description: `Now showing ${value === 'all' ? 'all hotels' : value === 'amadeus' ? 'real-time availability only' : 'curated recommendations only'}`,
-              });
-            }}>
-              <SelectTrigger id="hotel-filter-select" className="w-32 h-8 text-xs">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Hotels</SelectItem>
-                <SelectItem value="amadeus">Real-time Only</SelectItem>
-                <SelectItem value="curated">Curated Only</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -1064,6 +1045,13 @@ export const AIBookingConcierge = () => {
           dropoffLng={selectedUberProduct.dropoffLng}
         />
       )}
+
+      <AIChatSettingsPanel
+        open={showSettings}
+        onClose={() => setShowSettings(false)}
+        preferences={preferences}
+        onPreferencesChange={setPreferences}
+      />
     </Card>
   );
 };
