@@ -17,10 +17,60 @@
     "close": "Fermer",
     "search": "Rechercher",
     "filter": "Filtrer",
-    "sort": "Trier"
+    "sort": "Trier",
+    "searching": "Recherche des meilleures options...",
+    "and": "et"
   },
   "language": {
     "changed": "Langue Modifiée",
     "setTo": "Langue de l'interface définie sur {{language}}"
+  },
+  "home": {
+    "hero": {
+      "title": "Découvrir. Réserver. Créer. Gagner — Voyage Réinventé avec l'IA, Enchères d'Agents et Collaborations de Créateurs",
+      "subtitle": "Utilisez l'IA pour planifier rapidement, obtenez des offres d'agents pour économiser plus, ou réservez des voyages CoCurés — conçus par des pros, soutenus par des influenceurs.",
+      "whatCanDo": "Ce que Goldsainte.Ai peut faire",
+      "terms": "Conditions",
+      "privacy": "Politique de Confidentialité",
+      "agreement": "En utilisant Goldsainte.Ai, vous acceptez nos"
+    },
+    "howItWorks": {
+      "title": "Comment ça Marche",
+      "intro": "Découvrez, planifiez et partagez des voyages de luxe — le tout sur une plateforme intelligente.",
+      "paragraph1": "Goldsainte allie technologie IA et expertise humaine pour rendre les voyages de luxe sans effort. Commencez en discutant avec votre concierge personnel.",
+      "paragraph2": "Découvrez des collections CoCurées™ conçues par des créateurs de confiance et des agents certifiés.",
+      "paragraph3": "Prêt à planifier ? Publiez votre voyage et laissez des agents experts enchérir pour concevoir votre parcours.",
+      "paragraph4": "Réservez instantanément via Goldsainte — vols, hôtels, restaurants et plus. Connectez-vous, partagez et gagnez en devenant créateur.",
+      "paragraph5": "Tout se passe sur une plateforme élégante — alimentée par l'IA, propulsée par les créateurs.",
+      "tagline": "Découvrir. Planifier. Réserver. Gagner.",
+      "subtitle": "Voyage de luxe, réinventé."
+    },
+    "features": {
+      "voiceAI": {
+        "title": "Recherche Vocale IA",
+        "description": "Dites \"Hey Goldsainte\" et parlez naturellement. Notre IA trouve des hôtels de luxe adaptés à votre style.",
+        "cta": "Essayer l'IA Vocale"
+      },
+      "cocurated": {
+        "title": "Itinéraires CoCurés",
+        "description": "Votre IA crée des plans de voyage complets instantanément. Modifiez ou régénérez en un clic.",
+        "cta": "Explorer les Itinéraires"
+      },
+      "social": {
+        "title": "Réseau Social de Créateurs",
+        "description": "Suivez des créateurs de tendances, agents de luxe et voyageurs.",
+        "cta": "Découvrir les Créateurs"
+      },
+      "agents": {
+        "title": "Support d'Agents Experts",
+        "description": "Publiez votre voyage et laissez des agents de luxe certifiés enchérir pour le planifier.",
+        "cta": "Trouver Votre Agent"
+      },
+      "instant": {
+        "title": "Réservation Instantanée",
+        "description": "Réservez vols, hôtels, restaurants instantanément avec paiement sécurisé.",
+        "cta": "Commencer à Réserver"
+      }
+    }
   }
 }

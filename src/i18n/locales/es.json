@@ -17,10 +17,60 @@
     "close": "Cerrar",
     "search": "Buscar",
     "filter": "Filtrar",
-    "sort": "Ordenar"
+    "sort": "Ordenar",
+    "searching": "Buscando las mejores opciones...",
+    "and": "y"
   },
   "language": {
     "changed": "Idioma Cambiado",
     "setTo": "Idioma de interfaz establecido en {{language}}"
+  },
+  "home": {
+    "hero": {
+      "title": "Descubre. Reserva. Crea. Gana — Viajes Reinventados con IA, Ofertas de Agentes y Colaboraciones de Creadores",
+      "subtitle": "Usa IA para planificar rápido, obtén ofertas de agentes para ahorrar más, o reserva viajes CoCurados — diseñados por profesionales, respaldados por influencers y creados para ofrecer valor.",
+      "whatCanDo": "Lo que Goldsainte.Ai puede hacer",
+      "terms": "Términos",
+      "privacy": "Política de Privacidad",
+      "agreement": "Al usar Goldsainte.Ai, aceptas nuestros"
+    },
+    "howItWorks": {
+      "title": "Cómo Funciona",
+      "intro": "Descubre, planifica y comparte viajes de lujo — todo en una plataforma inteligente.",
+      "paragraph1": "Goldsainte combina tecnología IA con experiencia humana para hacer los viajes de lujo sin esfuerzo. Comienza charlando con tu conserje personal o diciendo \"Hey Goldsainte\". Aprende tu estilo y refina recomendaciones con cada conversación.",
+      "paragraph2": "Descubre colecciones CoCuradas™ diseñadas por creadores de confianza y agentes certificados. Guarda tus favoritos y deja que nuestra IA los convierta en itinerarios hechos a tu medida.",
+      "paragraph3": "¿Listo para planificar? Publica tu viaje y deja que agentes expertos compitan para diseñar tu jornada. Compara propuestas y elige la opción perfecta.",
+      "paragraph4": "Reserva al instante a través de Goldsainte — vuelos, hoteles, restaurantes y más. Luego, conéctate, comparte y gana convirtiéndote en creador. Recomienda destinos y gana dinero.",
+      "paragraph5": "Todo sucede en una plataforma elegante — impulsada por IA, potenciada por creadores y diseñada para quienes viajan bien.",
+      "tagline": "Descubre. Planifica. Reserva. Gana.",
+      "subtitle": "Viajes de lujo, reinventados."
+    },
+    "features": {
+      "voiceAI": {
+        "title": "Búsqueda por Voz IA",
+        "description": "Di \"Hey Goldsainte\" y habla naturalmente. Nuestra IA muestra hoteles de lujo, experiencias y joyas ocultas adaptadas a tu estilo.",
+        "cta": "Probar IA de Voz"
+      },
+      "cocurated": {
+        "title": "Itinerarios CoCurados",
+        "description": "Tu IA crea planes de viaje completos al instante. Edita, refina o regenera con un clic.",
+        "cta": "Explorar Itinerarios"
+      },
+      "social": {
+        "title": "Red Social de Creadores",
+        "description": "Sigue a creadores de tendencias, agentes de lujo y viajeros. Descubre sus colecciones curadas.",
+        "cta": "Descubrir Creadores"
+      },
+      "agents": {
+        "title": "Soporte de Agentes Expertos",
+        "description": "Publica tu viaje y deja que agentes de lujo certificados compitan para planificarlo.",
+        "cta": "Encuentra tu Agente"
+      },
+      "instant": {
+        "title": "Reserva Instantánea",
+        "description": "Reserva vuelos, hoteles, restaurantes y experiencias al instante con pago seguro.",
+        "cta": "Comenzar a Reservar"
+      }
+    }
   }
 }

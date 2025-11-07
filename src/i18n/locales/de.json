@@ -17,10 +17,60 @@
     "close": "Schließen",
     "search": "Suchen",
     "filter": "Filter",
-    "sort": "Sortieren"
+    "sort": "Sortieren",
+    "searching": "Suche nach den besten Optionen...",
+    "and": "und"
   },
   "language": {
     "changed": "Sprache Geändert",
     "setTo": "Sprache der Benutzeroberfläche auf {{language}} gesetzt"
+  },
+  "home": {
+    "hero": {
+      "title": "Entdecken. Buchen. Erstellen. Verdienen — Reisen neu erfunden mit KI, Agenten-Geboten und Creator-Kooperationen",
+      "subtitle": "Nutzen Sie KI für schnelle Planung, lassen Sie Agenten bieten um mehr zu sparen, oder buchen Sie CoCurated-Reisen.",
+      "whatCanDo": "Was Goldsainte.Ai kann",
+      "terms": "Bedingungen",
+      "privacy": "Datenschutz",
+      "agreement": "Durch die Nutzung von Goldsainte.Ai akzeptieren Sie unsere"
+    },
+    "howItWorks": {
+      "title": "Wie es Funktioniert",
+      "intro": "Entdecken, planen und teilen Sie Luxusreisen — alles auf einer intelligenten Plattform.",
+      "paragraph1": "Goldsainte verbindet KI-Technologie mit menschlicher Expertise. Beginnen Sie mit Ihrem persönlichen Concierge.",
+      "paragraph2": "Entdecken Sie CoCurated™-Kollektionen von vertrauenswürdigen Kreatoren und zertifizierten Agenten.",
+      "paragraph3": "Bereit zu planen? Veröffentlichen Sie Ihre Reise und lassen Sie Experten-Agenten bieten.",
+      "paragraph4": "Buchen Sie sofort über Goldsainte — Flüge, Hotels, Restaurants und mehr.",
+      "paragraph5": "Alles geschieht auf einer eleganten Plattform — KI-gesteuert, creator-powered.",
+      "tagline": "Entdecken. Planen. Buchen. Verdienen.",
+      "subtitle": "Luxusreisen, neu erfunden."
+    },
+    "features": {
+      "voiceAI": {
+        "title": "Sprach-KI-Suche",
+        "description": "Sagen Sie \"Hey Goldsainte\" und sprechen Sie natürlich. Unsere KI findet Luxushotels für Ihren Stil.",
+        "cta": "Sprach-KI Testen"
+      },
+      "cocurated": {
+        "title": "CoCurated Reiserouten",
+        "description": "Ihre KI erstellt sofort komplette Reisepläne. Bearbeiten oder neu generieren mit einem Klick.",
+        "cta": "Reiserouten Erkunden"
+      },
+      "social": {
+        "title": "Creator Social Network",
+        "description": "Folgen Sie Trendsettern, Luxusagenten und Reisenden.",
+        "cta": "Creators Entdecken"
+      },
+      "agents": {
+        "title": "Experten-Agenten-Support",
+        "description": "Veröffentlichen Sie Ihre Reise und lassen Sie zertifizierte Luxusagenten bieten.",
+        "cta": "Ihren Agenten Finden"
+      },
+      "instant": {
+        "title": "Sofortbuchung",
+        "description": "Buchen Sie Flüge, Hotels, Restaurants sofort mit sicherer Bezahlung.",
+        "cta": "Jetzt Buchen"
+      }
+    }
   }
 }

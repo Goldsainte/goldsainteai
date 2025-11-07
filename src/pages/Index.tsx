@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { 
+import { useTranslation } from "react-i18next";
+import {
   Plane, 
   Hotel, 
   MapPin, 
@@ -126,6 +127,7 @@ const Index = () => {
   const location = useLocation();
   const { toast } = useToast();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -842,16 +844,16 @@ const queries = {
                     style={{ color: '#0c4d47' }}
                   >
                     <Sparkles className="h-4 w-4" style={{ color: '#0c4d47' }} />
-                    What Goldsainte.Ai can do
+                    {t('home.hero.whatCanDo')}
                   </Button>
                 </div>
 
                 {/* Footer */}
                 <p className="text-sm text-muted-foreground text-center pt-4 px-4 leading-relaxed">
-                  By using Goldsainte.Ai, you agree to our{" "}
-                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">Terms</a>
-                  {" "}and{" "}
-                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">Privacy Policy</a>
+                  {t('home.hero.agreement')}{" "}
+                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">{t('home.hero.terms')}</a>
+                  {" "}{t('common.and')}{" "}
+                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">{t('home.hero.privacy')}</a>
                 </p>
               </div>
             </div>
@@ -862,32 +864,32 @@ const queries = {
                 <div className="text-left space-y-6 px-2">
                   <div>
                     <h2 id="how-it-works-heading" className="font-secondary text-5xl md:text-6xl font-light leading-tight text-primary mb-4">
-                      How it Works
+                      {t('home.howItWorks.title')}
                     </h2>
                     <div className="w-20 h-1 bg-luxury-gold" />
                   </div>
                   <div className="text-lg md:text-xl leading-relaxed text-muted-foreground/90 font-secondary space-y-6">
                     <p>
-                      Discover, plan, and share luxury travel — all in one intelligent platform.
+                      {t('home.howItWorks.intro')}
                     </p>
             <p>
-              Goldsainte blends AI technology with human expertise to make luxury travel effortless. Start by chatting with your personal concierge or saying "Hey Goldsainte." It learns your style — where you love to stay, dine, and explore — refining recommendations with every conversation.
+              {t('home.howItWorks.paragraph1')}
             </p>
             <p>
-              Discover CoCurated™ collections designed by trusted creators and certified agents. Save your favorites, follow tastemakers who inspire you, and let our AI weave everything into itineraries that feel tailor-made.
+              {t('home.howItWorks.paragraph2')}
             </p>
             <p>
-              Ready to plan? Post your trip and let expert agents bid to design your journey. Compare proposals, chat in real time, and choose the perfect fit — all with transparent pricing and milestone payments for peace of mind.
+              {t('home.howItWorks.paragraph3')}
             </p>
             <p>
-              Book instantly through Goldsainte — flights, hotels, dining, and more — with secure checkout and automatic itinerary creation. Then, connect, share, and earn by becoming a creator yourself. Curate destinations, inspire travelers, and make money when others book from your recommendations.
+              {t('home.howItWorks.paragraph4')}
             </p>
             <p>
-              Everything happens in one elegant platform — AI-driven, creator-powered, and designed for those who travel well.
+              {t('home.howItWorks.paragraph5')}
             </p>
             <p>
-              Discover. Plan. Book. Earn.<br />
-              Luxury travel, reinvented.
+              {t('home.howItWorks.tagline')}<br />
+              {t('home.howItWorks.subtitle')}
             </p>
                   </div>
                 </div>
@@ -915,16 +917,16 @@ const queries = {
                         </div>
                         <CardContent className="p-0 space-y-3 sm:space-y-4">
                           <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
-                            Voice AI Search
+                            {t('home.features.voiceAI.title')}
                           </h3>
                           <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Say "Hey Goldsainte" and speak naturally. Our AI instantly surfaces luxury hotels, experiences, and hidden gems tailored to your style.
+                            {t('home.features.voiceAI.description')}
                           </p>
                           <button 
                             className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
                             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                           >
-                            Try Voice AI
+                            {t('home.features.voiceAI.cta')}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </CardContent>
@@ -942,16 +944,16 @@ const queries = {
                         </div>
                         <CardContent className="p-0 space-y-3 sm:space-y-4">
                           <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
-                            CoCurated Itineraries
+                            {t('home.features.cocurated.title')}
                           </h3>
                           <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Your AI builds complete trip plans instantly — pulling from your saved favorites and trusted creator collections. Edit, refine, or regenerate with one click.
+                            {t('home.features.cocurated.description')}
                           </p>
                           <button 
                             className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
                             onClick={() => navigate('/itineraries')}
                           >
-                            Explore Itineraries
+                            {t('home.features.cocurated.cta')}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </CardContent>
@@ -969,16 +971,16 @@ const queries = {
                         </div>
                         <CardContent className="p-0 space-y-3 sm:space-y-4">
                           <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
-                            Creator Social Network
+                            {t('home.features.social.title')}
                           </h3>
                           <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Follow tastemakers, luxury agents, and fellow travelers. Discover their curated collections, save their favorites, and chat directly for insider intel.
+                            {t('home.features.social.description')}
                           </p>
                           <button 
                             className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
                             onClick={() => navigate('/social-feed')}
                           >
-                            Discover Creators
+                            {t('home.features.social.cta')}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </CardContent>
@@ -996,16 +998,16 @@ const queries = {
                         </div>
                         <CardContent className="p-0 space-y-3 sm:space-y-4">
                           <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
-                            Expert Agent Support
+                            {t('home.features.agents.title')}
                           </h3>
                           <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Human travel experts available 24/7 — via chat, voice, or video. They handle complex bookings, negotiate upgrades, and respond instantly when plans change.
+                            {t('home.features.agents.description')}
                           </p>
                           <button 
                             className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
                             onClick={() => navigate('/agents')}
                           >
-                            Meet Our Agents
+                            {t('home.features.agents.cta')}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </CardContent>
@@ -1023,16 +1025,16 @@ const queries = {
                         </div>
                         <CardContent className="p-0 space-y-3 sm:space-y-4">
                           <h3 className="text-xl md:text-2xl font-medium font-secondary leading-tight text-primary">
-                            Instant Booking
+                            {t('home.features.instant.title')}
                           </h3>
                           <p className="text-base text-muted-foreground/90 leading-relaxed">
-                            Book hotels, flights, car rentals, and experiences directly in the platform. Secure checkout, instant confirmation, and encrypted payment — no third-party redirects.
+                            {t('home.features.instant.description')}
                           </p>
                           <button 
                             className="group inline-flex items-center gap-2 text-luxury-gold hover:text-luxury-gold/80 transition-colors font-medium text-base"
                             onClick={() => navigate('/hotels')}
                           >
-                            Start Booking
+                            {t('home.features.instant.cta')}
                             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                           </button>
                         </CardContent>
@@ -1647,7 +1649,7 @@ const queries = {
                     <Card className="p-4 bg-card">
                       <div className="flex items-center gap-2">
                         <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                        <span className="text-sm text-muted-foreground">Searching for the best options...</span>
+                        <span className="text-sm text-muted-foreground">{t('common.searching')}</span>
                       </div>
                     </Card>
                   </div>

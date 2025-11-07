@@ -17,10 +17,60 @@
     "close": "Close",
     "search": "Search",
     "filter": "Filter",
-    "sort": "Sort"
+    "sort": "Sort",
+    "searching": "Searching for the best options...",
+    "and": "and"
   },
   "language": {
     "changed": "Language Changed",
     "setTo": "Interface language set to {{language}}"
+  },
+  "home": {
+    "hero": {
+      "title": "Discover. Book. Create. Earn — Travel Reinvented with AI, Agent Bidding & Creator Collabs",
+      "subtitle": "Use AI to plan fast, get agents bidding to save more, or book CoCurated trips — built by pros, backed by influencers, and designed to deliver value.",
+      "whatCanDo": "What Goldsainte.Ai can do",
+      "terms": "Terms",
+      "privacy": "Privacy Policy",
+      "agreement": "By using Goldsainte.Ai, you agree to our"
+    },
+    "howItWorks": {
+      "title": "How it Works",
+      "intro": "Discover, plan, and share luxury travel — all in one intelligent platform.",
+      "paragraph1": "Goldsainte blends AI technology with human expertise to make luxury travel effortless. Start by chatting with your personal concierge or saying \"Hey Goldsainte.\" It learns your style — where you love to stay, dine, and explore — refining recommendations with every conversation.",
+      "paragraph2": "Discover CoCurated™ collections designed by trusted creators and certified agents. Save your favorites, follow tastemakers who inspire you, and let our AI weave everything into itineraries that feel tailor-made.",
+      "paragraph3": "Ready to plan? Post your trip and let expert agents bid to design your journey. Compare proposals, chat in real time, and choose the perfect fit — all with transparent pricing and milestone payments for peace of mind.",
+      "paragraph4": "Book instantly through Goldsainte — flights, hotels, dining, and more — with secure checkout and automatic itinerary creation. Then, connect, share, and earn by becoming a creator yourself. Curate destinations, inspire travelers, and make money when others book from your recommendations.",
+      "paragraph5": "Everything happens in one elegant platform — AI-driven, creator-powered, and designed for those who travel well.",
+      "tagline": "Discover. Plan. Book. Earn.",
+      "subtitle": "Luxury travel, reinvented."
+    },
+    "features": {
+      "voiceAI": {
+        "title": "Voice AI Search",
+        "description": "Say \"Hey Goldsainte\" and speak naturally. Our AI instantly surfaces luxury hotels, experiences, and hidden gems tailored to your style.",
+        "cta": "Try Voice AI"
+      },
+      "cocurated": {
+        "title": "CoCurated Itineraries",
+        "description": "Your AI builds complete trip plans instantly — pulling from your saved favorites and trusted creator collections. Edit, refine, or regenerate with one click.",
+        "cta": "Explore Itineraries"
+      },
+      "social": {
+        "title": "Creator Social Network",
+        "description": "Follow tastemakers, luxury agents, and fellow travelers. Discover their curated collections, save their favorites, and chat directly for insider intel.",
+        "cta": "Discover Creators"
+      },
+      "agents": {
+        "title": "Expert Agent Support",
+        "description": "Post your trip and let certified luxury agents compete to plan it. Compare proposals, chat in real-time, and choose the perfect match for your journey.",
+        "cta": "Find Your Agent"
+      },
+      "instant": {
+        "title": "Instant Booking",
+        "description": "Book flights, hotels, restaurants, and experiences instantly with secure checkout. Your complete itinerary is generated automatically.",
+        "cta": "Start Booking"
+      }
+    }
   }
 }
