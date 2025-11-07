@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 import { validateHotelDates, validateNumericParam } from "../_shared/dateValidation.ts";
-import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "../_shared/rateLimiter.ts";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -54,7 +55,7 @@ serve(async (req) => {
     // ⚠️ SECURITY: Tiered rate limiting based on authentication status and subscription
     const authHeader = req.headers.get('Authorization');
     let userId: string | undefined;
-    let tier: 'free' | 'premium' | 'enterprise' | 'unauthenticated' = 'unauthenticated';
+    let tier: SubscriptionTier = 'unauthenticated';
     
     if (authHeader) {
       try {
@@ -66,7 +67,6 @@ serve(async (req) => {
         const { data: { user } } = await supabaseClient.auth.getUser(token);
         if (user) {
           userId = user.id;
-          const { getUserTier } = await import('../_shared/rateLimiter.ts');
           tier = await getUserTier(userId);
         }
       } catch (error) {
@@ -75,7 +75,6 @@ serve(async (req) => {
     }
     
     const clientId = getClientIdentifier(req, userId);
-    const { getTieredRateLimit } = await import('../_shared/rateLimiter.ts');
     const limits = getTieredRateLimit(tier, 'amadeus-search-hotels');
     
     const rateLimit = await checkRateLimit({

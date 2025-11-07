@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
 import { validateFlightDates, validateNumericParam } from "../_shared/dateValidation.ts";
-import { checkRateLimit, getClientIdentifier, createRateLimitResponse } from "../_shared/rateLimiter.ts";
+import { checkRateLimit, getClientIdentifier, createRateLimitResponse, getUserTier, getTieredRateLimit, type SubscriptionTier } from "../_shared/rateLimiter.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -44,22 +44,27 @@ serve(async (req) => {
   try {
     const { origin, destination, departureDate, returnDate, adults, travelClass = 'ECONOMY', cabinClass, nonStop = 'false', max = 250, includedAirlineCodes, destinationCity } = await req.json();
     
+    // Initialize Supabase client first
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    
     // ⚠️ SECURITY: Tiered rate limiting based on authentication status and subscription
     const authHeader = req.headers.get('Authorization');
     let userId: string | undefined;
-    let tier: 'free' | 'premium' | 'enterprise' | 'unauthenticated' = 'unauthenticated';
+    let tier: SubscriptionTier = 'unauthenticated';
     
     if (authHeader) {
       try {
         const token = authHeader.replace('Bearer ', '');
-        const supabaseClient = createClient(
+        const tempClient = createClient(
           Deno.env.get('SUPABASE_URL') ?? '',
           Deno.env.get('SUPABASE_ANON_KEY') ?? ''
         );
-        const { data: { user } } = await supabaseClient.auth.getUser(token);
+        const { data: { user } } = await tempClient.auth.getUser(token);
         if (user) {
           userId = user.id;
-          const { getUserTier } = await import('../_shared/rateLimiter.ts');
           tier = await getUserTier(userId);
         }
       } catch (error) {
@@ -68,7 +73,6 @@ serve(async (req) => {
     }
     
     const clientId = getClientIdentifier(req, userId);
-    const { getTieredRateLimit } = await import('../_shared/rateLimiter.ts');
     const limits = getTieredRateLimit(tier, 'amadeus-search-flights');
     
     const rateLimit = await checkRateLimit({
@@ -113,12 +117,6 @@ serve(async (req) => {
     }
     
     console.log('✅ [VALIDATION] All validations passed');
-    
-    // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
     
     // Support both parameter naming conventions
     const originLocationCode = origin;

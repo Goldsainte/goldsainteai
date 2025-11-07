@@ -31,6 +31,7 @@ import Marketplace from "./pages/Marketplace";
 import AgentOnboarding from "./pages/AgentOnboarding";
 import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
+import Admin from "./pages/Admin";
 import AdminInquiries from "./pages/AdminInquiries";
 import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
@@ -223,6 +224,7 @@ function AppContent() {
           <Route path="/agent-trip-requests" element={<RequireAgentTerms><AgentTripRequests /></RequireAgentTerms>} />
           <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
+          <Route path="/admin" element={<Admin />} />
           <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
           <Route path="/admin/seed" element={<AdminSeed />} />
