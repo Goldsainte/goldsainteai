@@ -9037,6 +9037,7 @@ export type Database = {
         }[]
       }
       generate_invoice_number: { Args: never; Returns: string }
+      get_total_users_count: { Args: never; Returns: number }
       get_user_tier: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_tier"]
@@ -9049,6 +9050,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: { Args: never; Returns: boolean }
       is_user_restricted: { Args: { target_user_id: string }; Returns: boolean }
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string; p_user_type: string }
