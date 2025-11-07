@@ -30,15 +30,23 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   }, []);
   
   const title = property.property?.name || property.name || property.title || "Hotel";
-  const imageUrl = property.photos?.[0] || property.property?.photoUrls?.[0] || property.image;
-  const image = getHotelImage(imageUrl, property.hotel_id || title);
+  // HotelBeds returns 'images', other sources use 'photos' or 'photoUrls'
+  const imageUrl = property.images?.[0] || property.photos?.[0] || property.property?.photoUrls?.[0] || property.image;
+  const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
   
   const getCityCode = () => {
     return property.cityCode || "PAR";
   };
   
   const getCleanLocation = () => {
-    if (property.location) return property.location;
+    if (property.location) {
+      // HotelBeds location format
+      if (typeof property.location === 'object') {
+        const { city, country, address } = property.location;
+        return [city, country].filter(Boolean).join(', ') || address || "Location";
+      }
+      return property.location;
+    }
     if (property.address) return property.address;
     if (property.city || property.country) {
       return [property.city, property.country].filter(Boolean).join(', ');
@@ -47,7 +55,11 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   };
   
   const location = getCleanLocation();
-  const rating = Number(property.property?.reviewScore ?? (property.rating ? Number(property.rating) * 2 : 0));
+  // HotelBeds uses 'rating' for star category (1-5), convert to 10-point scale for display
+  // Other sources use reviewScore (already on 10-point scale)
+  const rating = property.property?.reviewScore ?? 
+    (property.reviewScore ? Number(property.reviewScore) : 
+    (property.rating ? Number(property.rating) * 2 : 0));
   const reviews = Number(property.property?.reviewCount ?? property.num_reviews ?? 0);
   
   const getCleanPrice = () => {
@@ -55,6 +67,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     if (property.priceBreakdown?.grossPrice?.value) {
       return property.priceBreakdown.grossPrice.value;
     }
+    // HotelBeds format
     if (property.price) return property.price;
     if (property.estimated_price) return property.estimated_price;
     const label = property.accessibilityLabel || "";

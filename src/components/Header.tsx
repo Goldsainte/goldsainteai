@@ -25,6 +25,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -213,6 +214,7 @@ export const Header = () => {
                 
                 <div className="flex items-center gap-2">
                   {user && <NotificationCenter showLabel={false} />}
+                  <LanguageSelector variant="ghost" size="sm" />
                   
                   {/* Mobile Navigation Menu */}
                   <DropdownMenu>

@@ -285,7 +285,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background z-50" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent
               mode="single"
               selected={departureDate}
@@ -312,7 +312,7 @@ export const EnhancedSearchBar = () => {
                 <span className="truncate">{returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-background z-50" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+            <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
               <CalendarComponent 
                 mode="single" 
                 selected={returnDate} 
@@ -425,7 +425,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background z-50" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={checkInDate} 
@@ -445,7 +445,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={checkOutDate} 
