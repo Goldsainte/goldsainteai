@@ -383,10 +383,13 @@ serve(async (req) => {
             checkOutDate: checkOut
           }],
           available: true,
-          __googlePhotos: [{
+          __isCurated: true, // Flag to identify curated hotels
+          __curatedDescription: hotel.description,
+          __curatedAmenities: hotel.amenities,
+          __googlePhotos: hotel.image_url ? [{
             url: hotel.image_url,
             attribution: "Curated Recommendation"
-          }],
+          }] : [],
           __googleRating: parseFloat(hotel.rating),
           __googleRatingCount: 100 + Math.floor(Math.random() * 400)
         }));
@@ -448,6 +451,7 @@ serve(async (req) => {
         country: info.address?.countryCode || "",
         rating: googleRating,
         num_reviews: googleReviewCount,
+        isCurated: h.__isCurated || false,
         property: {
           name: info.name || "Hotel",
           photoUrls,
@@ -466,8 +470,8 @@ serve(async (req) => {
           baseTotalPrice: { value: total, currency },
         },
         accessibilityLabel: `${info.name}. ${info.address?.cityName || location}. Price ${(perNight * 1.15).toFixed(2)} ${currency} per night`,
-        description: offer.room?.description?.text || "",
-        amenities: info.amenities || [],
+        description: h.__curatedDescription || offer.room?.description?.text || "",
+        amenities: h.__curatedAmenities || info.amenities || [],
         photos: photoUrls,
         reviews,
         amadeusData: {

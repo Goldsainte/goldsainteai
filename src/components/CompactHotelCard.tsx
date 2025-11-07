@@ -209,15 +209,40 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
         {(isMobile || expanded) && (
           <div className="border-t border-border p-3 pt-3 bg-muted/30 animate-accordion-down">
             <div className="text-xs space-y-2">
+              {property.isCurated && (
+                <Badge variant="default" className="mb-2 bg-accent text-accent-foreground">
+                  ⭐ Curated Recommendation
+                </Badge>
+              )}
               <p className="text-muted-foreground line-clamp-3">
                 {property.description || "Enjoy a comfortable stay with modern amenities and excellent service."}
               </p>
               {property.amenities && property.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {property.amenities.slice(0, 5).map((amenity: string, index: number) => (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {property.amenities.slice(0, 6).map((amenity: string, index: number) => (
                     <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
                       {amenity}
                     </Badge>
+                  ))}
+                  {property.amenities.length > 6 && (
+                    <Badge variant="outline" className="text-xs px-2 py-0.5">
+                      +{property.amenities.length - 6} more
+                    </Badge>
+                  )}
+                </div>
+              )}
+              {property.property?.reviews && property.property.reviews.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="font-medium text-xs">Recent Reviews:</p>
+                  {property.property.reviews.slice(0, 2).map((review: any, idx: number) => (
+                    <div key={idx} className="bg-background rounded p-2 space-y-1">
+                      <div className="flex items-center gap-1">
+                        <Star className="h-3 w-3 fill-primary text-primary" />
+                        <span className="font-medium">{review.rating}/5</span>
+                        <span className="text-muted-foreground">· {review.author}</span>
+                      </div>
+                      <p className="text-muted-foreground line-clamp-2">{review.text}</p>
+                    </div>
                   ))}
                 </div>
               )}
