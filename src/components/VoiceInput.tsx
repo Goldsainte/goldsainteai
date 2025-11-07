@@ -77,8 +77,8 @@ export const VoiceInput = ({ onTranscript, disabled }: VoiceInputProps) => {
         if (data?.text) {
           onTranscript(data.text);
           toast({
-            title: 'Voice Input Received',
-            description: 'Your message has been transcribed.',
+            title: 'Transcription Complete',
+            description: 'Review your message and click send when ready.',
           });
         }
       };
