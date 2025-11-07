@@ -9,9 +9,10 @@ interface Attraction {
 
 interface TopAttractionsSectionProps {
   attractions: Attraction[];
+  onAttractionClick?: (category: string) => void;
 }
 
-export const TopAttractionsSection = ({ attractions }: TopAttractionsSectionProps) => {
+export const TopAttractionsSection = ({ attractions, onAttractionClick }: TopAttractionsSectionProps) => {
   const navigate = useNavigate();
 
   if (attractions.length === 0) return null;
@@ -26,9 +27,13 @@ export const TopAttractionsSection = ({ attractions }: TopAttractionsSectionProp
             key={attraction.destination}
             className="p-3 sm:p-4 flex items-center gap-3 sm:gap-4 cursor-pointer border-luxury-gold/20 hover:shadow-lg hover:border-luxury-gold/40 transition-all duration-500 group min-h-[88px]"
             onClick={() => {
-              const searchParams = new URLSearchParams(window.location.search);
-              const currentDest = searchParams.get('destination') || '';
-              navigate(`/cocurated-journeys?destination=${currentDest || 'Paris'}&category=${encodeURIComponent(attraction.destination)}`);
+              if (onAttractionClick) {
+                onAttractionClick(attraction.destination);
+              } else {
+                const searchParams = new URLSearchParams(window.location.search);
+                const currentDest = searchParams.get('destination') || '';
+                navigate(`/cocurated-journeys?destination=${currentDest || 'Paris'}&category=${encodeURIComponent(attraction.destination)}`);
+              }
             }}
           >
             <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden border border-luxury-gold/30">

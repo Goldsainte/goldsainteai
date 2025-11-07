@@ -445,16 +445,40 @@ export default function CoCuratedJourneys() {
               <>
               {/* Top Destinations */}
               {topDestinations.length > 0 && (
-                <TopDestinationsSection destinations={topDestinations} />
+                <TopDestinationsSection 
+                  destinations={topDestinations}
+                  onDestinationClick={async (destination) => {
+                    setSearchQuery(destination);
+                    const location = findLocationCoordinates(destination);
+                    if (location) {
+                      navigate(`/cocurated-journeys?destination=${destination}`);
+                      setCurrentLocation(location);
+                      await fetchToursForLocation(location.latitude, location.longitude, location.name);
+                    } else {
+                      toast.error("Destination not found");
+                    }
+                  }}
+                />
               )}
 
               {/* Top Attractions */}
               {topAttractions.length > 0 && (
-                <TopAttractionsSection attractions={topAttractions.map(attr => ({
-                  destination: attr.name || attr.destination,
-                  imageUrl: attr.image || attr.imageUrl,
-                  packageCount: attr.packageCount
-                }))} />
+                <TopAttractionsSection 
+                  attractions={topAttractions.map(attr => ({
+                    destination: attr.name || attr.destination,
+                    imageUrl: attr.image || attr.imageUrl,
+                    packageCount: attr.packageCount
+                  }))}
+                  onAttractionClick={async (category) => {
+                    navigate(`/cocurated-journeys?category=${encodeURIComponent(category)}`);
+                    await fetchToursForLocation(
+                      currentLocation.latitude, 
+                      currentLocation.longitude, 
+                      currentLocation.name,
+                      [category]
+                    );
+                  }}
+                />
               )}
 
               {/* Top Tours Carousel */}
