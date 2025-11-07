@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Hotel, Star, MapPin, Eye } from "lucide-react";
+import { Hotel, Star, MapPin, Eye, Sparkles } from "lucide-react";
 import { HotelDetailsModal } from "./HotelDetailsModal";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { getHotelImage } from "@/lib/imageHelpers";
@@ -22,6 +22,9 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
   const hotelData = hotel.hotel;
   const offer = hotel.offers?.[0];
   const price = parseFloat(offer?.price?.total || 0);
+  
+  // Check if this is a curated recommendation
+  const isCurated = hotel.id?.startsWith('curated-');
   
   // Get currency symbol based on hotel location
   const hotelCity = hotelData.address?.cityName || hotelData.cityCode;
@@ -79,9 +82,17 @@ export const HotelCard = ({ hotel }: HotelCardProps) => {
               <div className="w-full h-full animate-pulse" aria-label="No image available" />
             );
           })()}
-          <Badge className="absolute top-2 right-2 text-xs md:text-sm" variant="secondary">
-            {currencySymbol}{price.toFixed(2)}
-          </Badge>
+          <div className="absolute top-2 right-2 flex flex-col gap-2 items-end">
+            {isCurated && (
+              <Badge className="text-xs flex items-center gap-1 bg-primary/90 text-primary-foreground hover:bg-primary">
+                <Sparkles className="h-3 w-3" />
+                Curated
+              </Badge>
+            )}
+            <Badge className="text-xs md:text-sm" variant="secondary">
+              {currencySymbol}{price.toFixed(2)}
+            </Badge>
+          </div>
         </div>
         <div className="p-3 md:p-4 space-y-3 flex-1 flex flex-col">
           <div className="flex-1">
