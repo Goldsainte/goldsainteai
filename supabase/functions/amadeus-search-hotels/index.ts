@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { getCurrencyFromLocation } from "../_shared/currencyHelpers.ts";
+import { validateHotelDates, validateNumericParam } from "../_shared/dateValidation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -48,6 +49,35 @@ serve(async (req) => {
 
   try {
     const { cityCode, checkInDate, checkOutDate, adults = 1, cityName } = await req.json();
+    
+    // ⚠️ SECURITY: Server-side date validation
+    console.log('🔒 [VALIDATION] Validating hotel dates:', { checkInDate, checkOutDate });
+    const dateValidation = validateHotelDates(checkInDate, checkOutDate);
+    if (!dateValidation.valid) {
+      console.error('❌ [VALIDATION] Date validation failed:', dateValidation.error);
+      return new Response(JSON.stringify({ 
+        error: dateValidation.error,
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+    
+    // ⚠️ SECURITY: Validate adults parameter
+    const adultsValidation = validateNumericParam(adults, 'adults', 1, 10);
+    if (!adultsValidation.valid) {
+      console.error('❌ [VALIDATION] Adults validation failed:', adultsValidation.error);
+      return new Response(JSON.stringify({ 
+        error: adultsValidation.error,
+        results: []
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+    
+    console.log('✅ [VALIDATION] All validations passed');
     
     // Determine currency from city
     const currency = cityName ? getCurrencyFromLocation(cityName) : getCurrencyFromLocation(cityCode);

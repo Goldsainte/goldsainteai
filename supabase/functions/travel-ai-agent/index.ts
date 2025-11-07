@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { validateHotelDates, validateFlightDates, validateNumericParam } from "../_shared/dateValidation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -364,47 +365,31 @@ async function searchHotels(args: any) {
     let { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
     console.log('🔍 [HOTEL SEARCH] Raw arguments:', args);
     
-    // Validate dates are in the future
-    const today = new Date('2025-10-25'); // Current system date
-    today.setHours(0, 0, 0, 0); // Reset time for fair comparison
-    
-    if (checkIn) {
-      const checkInDate = new Date(checkIn);
-      checkInDate.setHours(0, 0, 0, 0);
-      
-      if (checkInDate < today) {
-        console.error(`❌ [HOTEL SEARCH] Check-in date ${checkIn} is in the past`);
-        return {
-          error: `Check-in date ${checkIn} is in the past. Please provide future dates (November 2025 or later).`,
-          results: [],
-          suggestion: 'Try dates in November 2025 or later'
-        };
-      }
+    // ⚠️ SECURITY: Server-side date validation using shared validation helper
+    console.log('🔒 [VALIDATION] Validating hotel dates:', { checkIn, checkOut });
+    const dateValidation = validateHotelDates(checkIn, checkOut);
+    if (!dateValidation.valid) {
+      console.error('❌ [VALIDATION] Date validation failed:', dateValidation.error);
+      return {
+        error: dateValidation.error,
+        results: [],
+        suggestion: 'Please provide valid dates for your hotel search'
+      };
     }
     
-    if (checkIn && checkOut) {
-      const checkInDate = new Date(checkIn);
-      const checkOutDate = new Date(checkOut);
-      
-      if (checkOutDate <= checkInDate) {
-        console.error(`❌ [HOTEL SEARCH] Check-out ${checkOut} must be after check-in ${checkIn}`);
+    // ⚠️ SECURITY: Validate guests parameter
+    if (guests) {
+      const guestsValidation = validateNumericParam(guests, 'guests', 1, 10);
+      if (!guestsValidation.valid) {
+        console.error('❌ [VALIDATION] Guests validation failed:', guestsValidation.error);
         return {
-          error: 'Check-out date must be after check-in date',
+          error: guestsValidation.error,
           results: []
         };
       }
     }
     
-    // Require dates before searching
-    if (!checkIn || !checkOut) {
-      console.error('❌ [HOTEL SEARCH] Missing required dates');
-      return {
-        error: 'Check-in and check-out dates are required to search hotels. Please provide dates.',
-        results: []
-      };
-    }
-    
-    console.log('✅ [HOTEL SEARCH] Date validation passed:', { checkIn, checkOut });
+    console.log('✅ [VALIDATION] All validations passed');
     console.log('🔍 [HOTEL SEARCH] Calling unified-search-hotels with:', { location, checkIn, checkOut, guests });
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
@@ -737,6 +722,29 @@ async function searchFlights(args: any) {
   try {
     const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false, sortBy = 'best' } = args;
     console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop, sortBy });
+
+    // ⚠️ SECURITY: Server-side date validation using shared validation helper
+    console.log('🔒 [VALIDATION] Validating flight dates:', { departureDate, returnDate });
+    const dateValidation = validateFlightDates(departureDate, returnDate);
+    if (!dateValidation.valid) {
+      console.error('❌ [VALIDATION] Date validation failed:', dateValidation.error);
+      return {
+        error: dateValidation.error,
+        results: []
+      };
+    }
+    
+    // ⚠️ SECURITY: Validate adults parameter
+    const adultsValidation = validateNumericParam(adults, 'adults', 1, 9);
+    if (!adultsValidation.valid) {
+      console.error('❌ [VALIDATION] Adults validation failed:', adultsValidation.error);
+      return {
+        error: adultsValidation.error,
+        results: []
+      };
+    }
+    
+    console.log('✅ [VALIDATION] All validations passed');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
