@@ -227,6 +227,51 @@
     "description": "Goldsainte AI es parte de Goldsainte Inc., líder mundial en viajes de lujo impulsados por IA y experiencias curadas. Descubre. Crea. Comparte. Viaja con Goldsainte.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Todos los derechos reservados."
   },
+  "welcomeModal": {
+    "title": "Qué puede hacer Goldsainte.Ai por ti",
+    "voiceAI": {
+      "title": "Conserje de IA por Voz con palabra de activación \"Hey Goldsainte\".",
+      "description": "Solo di \"Hey Goldsainte\" desde cualquier lugar del sitio para activar instantáneamente nuestra IA de voz avanzada. Ten conversaciones naturales sobre vuelos, hoteles, restaurantes y más, sin usar las manos."
+    },
+    "personalAI": {
+      "title": "Agente de IA personal que aprende tus preferencias.",
+      "description": "Construye tu propio agente de viajes de IA enseñándole tu estilo de viaje, presupuesto y preferencias. Aprende de cada interacción para ofrecer recomendaciones cada vez más personalizadas de vuelos, hoteles, restaurantes y experiencias."
+    },
+    "createShare": {
+      "title": "Crear. Compartir. Ganar Dinero.",
+      "description": "Una plataforma de redes sociales para creadores de contenido para compartir sus experiencias de viaje de lujo y crear planes de viaje interactivos, permitiéndoles obtener ingresos de su contenido."
+    },
+    "expertAgents": {
+      "title": "Agentes expertos con pagos por hitos.",
+      "description": "Publica viajes complejos en nuestro mercado y conecta con agentes certificados mediante IA. Paga por hitos, rastrea el progreso y chatea en tiempo real con total transparencia."
+    },
+    "cocurated": {
+      "title": "CoCurated™ - Paquetes de Viaje Colaborativos.",
+      "description": "Explora paquetes exclusivos creados por los mejores creadores y agentes. Fechas fijas o flexibles, reservas seguras, precios transparentes, todo curado por expertos en viajes que conocen mejor los destinos."
+    },
+    "creatorDashboard": {
+      "title": "Panel de Creador - Todas Tus Herramientas en Un Solo Lugar.",
+      "description": "Rastrea análisis, gestiona paquetes, maneja asociaciones y crea productos para la Tienda. Sube de nivel desde Bronce hasta Platino para bonificaciones de comisión más altas con seguimiento detallado de ganancias."
+    },
+    "creatorPayouts": {
+      "title": "Pagos a Creadores - Múltiples Fuentes de Ingresos.",
+      "description": "Gana por vistas de contenido, regalos virtuales, reservas de paquetes (hasta 40% de comisión), ventas en la Tienda, asociaciones y marketing de afiliados. Los miembros de nivel Platino ganan hasta un 20% más. Pagos seguros de Stripe con historial completo de transacciones."
+    },
+    "groupBookings": {
+      "title": "Reservas grupales y pagos divididos.",
+      "description": "Organiza viajes grupales con facilidad. Divide costos entre viajeros con enlaces de pago seguros, rastrea quién ha pagado y recibe notificaciones instantáneas cuando se completen los pagos."
+    },
+    "itinerary": {
+      "title": "Gestión completa de itinerarios.",
+      "description": "Construye itinerarios día a día, sube documentos de viaje, sincroniza calendarios y comparte tus planes con compañeros de viaje sin esfuerzo."
+    },
+    "communication": {
+      "title": "Centro de comunicación en tiempo real.",
+      "description": "Chatea instantáneamente con agentes, recibe notificaciones, usa respuestas rápidas y mantén todas tus conversaciones de viaje en un solo lugar seguro."
+    },
+    "cta": "Comienza a Planificar Tu Viaje de Lujo",
+    "agreement": "Al usar Goldsainte.Ai, aceptas nuestros Términos y Política de Privacidad. No ingreses información personal o sensible."
+  },
   "about": {
     "founderLetter": {
       "title": "Carta del Fundador",

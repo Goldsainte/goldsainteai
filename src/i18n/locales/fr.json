@@ -227,6 +227,51 @@
     "description": "Goldsainte AI fait partie de Goldsainte Inc., le leader mondial des voyages de luxe alimentés par l'IA et des expériences sélectionnées. Découvrez. Créez. Partagez. Voyagez avec Goldsainte.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Tous droits réservés."
   },
+  "welcomeModal": {
+    "title": "Ce que Goldsainte.Ai peut faire pour vous",
+    "voiceAI": {
+      "title": "Concierge IA Vocal avec mot de réveil \"Hey Goldsainte\".",
+      "description": "Dites simplement \"Hey Goldsainte\" depuis n'importe où sur le site pour activer instantanément notre IA vocale avancée. Ayez des conversations naturelles sur les vols, les hôtels, les restaurants et plus, mains libres."
+    },
+    "personalAI": {
+      "title": "Agent IA personnel qui apprend vos préférences.",
+      "description": "Construisez votre propre agent de voyage IA en lui enseignant votre style de voyage, votre budget et vos préférences. Il apprend de chaque interaction pour fournir des recommandations de plus en plus personnalisées pour les vols, hôtels, restaurants et expériences."
+    },
+    "createShare": {
+      "title": "Créer. Partager. Gagner de l'Argent.",
+      "description": "Une plateforme de réseau social pour les créateurs de contenu pour partager leurs expériences de voyage de luxe et créer des plans de voyage interactifs, leur permettant de gagner un revenu de leur contenu."
+    },
+    "expertAgents": {
+      "title": "Agents experts avec paiements par jalons.",
+      "description": "Publiez des voyages complexes sur notre marché et connectez-vous avec des agents certifiés grâce à l'IA. Payez par jalons, suivez les progrès et chattez en temps réel avec une totale transparence."
+    },
+    "cocurated": {
+      "title": "CoCurated™ - Forfaits de Voyage Collaboratifs.",
+      "description": "Parcourez des forfaits exclusifs créés par les meilleurs créateurs et agents. Dates fixes ou flexibles, réservation sécurisée, prix transparents, le tout organisé par des experts du voyage qui connaissent le mieux les destinations."
+    },
+    "creatorDashboard": {
+      "title": "Tableau de Bord Créateur - Tous Vos Outils en Un Seul Endroit.",
+      "description": "Suivez les analyses, gérez les forfaits, gérez les partenariats et créez des produits pour la Boutique. Montez de niveau de Bronze à Platine pour des bonus de commission plus élevés avec un suivi détaillé des gains."
+    },
+    "creatorPayouts": {
+      "title": "Paiements aux Créateurs - Plusieurs Sources de Revenus.",
+      "description": "Gagnez grâce aux vues de contenu, aux cadeaux virtuels, aux réservations de forfaits (jusqu'à 40% de commission), aux ventes en Boutique, aux partenariats et au marketing d'affiliation. Les membres niveau Platine gagnent jusqu'à 20% de plus. Paiements Stripe sécurisés avec historique complet des transactions."
+    },
+    "groupBookings": {
+      "title": "Réservations de groupe et paiements partagés.",
+      "description": "Organisez des voyages de groupe facilement. Divisez les coûts entre les voyageurs avec des liens de paiement sécurisés, suivez qui a payé et recevez des notifications instantanées lorsque les paiements sont terminés."
+    },
+    "itinerary": {
+      "title": "Gestion complète d'itinéraire.",
+      "description": "Construisez des itinéraires jour par jour, téléchargez des documents de voyage, synchronisez les calendriers et partagez vos plans avec vos compagnons de voyage sans effort."
+    },
+    "communication": {
+      "title": "Centre de communication en temps réel.",
+      "description": "Chattez instantanément avec les agents, recevez des notifications, utilisez des réponses rapides et gardez toutes vos conversations de voyage en un seul endroit sécurisé."
+    },
+    "cta": "Commencez à Planifier Votre Voyage de Luxe",
+    "agreement": "En utilisant Goldsainte.Ai, vous acceptez nos Conditions et Politique de Confidentialité. N'entrez pas d'informations personnelles ou sensibles."
+  },
   "about": {
     "founderLetter": {
       "title": "Lettre du Fondateur",

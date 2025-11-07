@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { MessageCircle, Sparkles, Heart, FileCheck, Briefcase, ArrowRight, Star, Mic, Share2, Users, BarChart3, DollarSign } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -10,6 +11,8 @@ interface WelcomeModalProps {
 }
 
 export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeModalProps) => {
+  const { t } = useTranslation();
+  
   const handleClose = () => {
     localStorage.setItem("goldsainte-welcome-seen", "true");
     onClose();
@@ -29,7 +32,7 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
         <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           <div className="text-center space-y-1 sm:space-y-2">
             <h2 className="text-xl sm:text-2xl font-secondary text-primary">
-              What Goldsainte.Ai can do for you
+              {t('welcomeModal.title')}
             </h2>
           </div>
 
@@ -42,11 +45,10 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
               </div>
               <div className="space-y-0.5">
                 <h3 className="font-semibold text-sm sm:text-base">
-                  Voice AI Concierge with "Hey Goldsainte" wake word.
+                  {t('welcomeModal.voiceAI.title')}
                 </h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Just say "Hey Goldsainte" from anywhere on the site to instantly activate our advanced voice AI. 
-                  Have natural conversations about flights, hotels, dining, and more—hands-free.
+                  {t('welcomeModal.voiceAI.description')}
                 </p>
               </div>
             </div>
@@ -57,10 +59,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Personal AI agent that learns your preferences.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.personalAI.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Build your own AI travel agent by teaching it your travel style, budget, and preferences. 
-                  It learns from every interaction to deliver increasingly personalized recommendations for flights, hotels, restaurants, and experiences.
+                  {t('welcomeModal.personalAI.description')}
                 </p>
               </div>
             </div>
@@ -71,10 +72,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <Share2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Create. Share. Make Money.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.createShare.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  A social networking platform for content creators to share their luxury travel experiences and create interactive trip plans, 
-                  allowing them to earn income from their content.
+                  {t('welcomeModal.createShare.description')}
                 </p>
               </div>
             </div>
@@ -85,10 +85,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <Briefcase className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Expert agents with milestone payments.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.expertAgents.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Post complex trips to our marketplace and get AI-matched with certified agents. 
-                  Pay in milestones, track progress, and chat in real-time with full transparency.
+                  {t('welcomeModal.expertAgents.description')}
                 </p>
               </div>
             </div>
@@ -99,10 +98,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">CoCurated™ - Collaborative Travel Packages.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.cocurated.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Browse exclusive packages created by top creators and agents. Fixed or flexible dates, 
-                  secure booking, transparent pricing—all curated by travel experts who know the destinations best.
+                  {t('welcomeModal.cocurated.description')}
                 </p>
               </div>
             </div>
@@ -113,10 +111,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Creator Dashboard - All Your Tools in One Place.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.creatorDashboard.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Track analytics, manage packages, handle partnerships, and create products for the Shop. 
-                  Level up through Bronze to Platinum tiers for higher commission bonuses with detailed earnings tracking.
+                  {t('welcomeModal.creatorDashboard.description')}
                 </p>
               </div>
             </div>
@@ -127,10 +124,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Creator Payouts - Multiple Revenue Streams.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.creatorPayouts.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Earn from content views, virtual gifts, package bookings (up to 40% commission), Shop sales, partnerships, and affiliate marketing. 
-                  Platinum tier members earn up to 20% more. Secure Stripe payouts with full transaction history.
+                  {t('welcomeModal.creatorPayouts.description')}
                 </p>
               </div>
             </div>
@@ -141,10 +137,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Group bookings & split payments.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.groupBookings.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Organize group trips with ease. Split costs among travelers with secure payment links, 
-                  track who's paid, and get instant notifications when payments complete.
+                  {t('welcomeModal.groupBookings.description')}
                 </p>
               </div>
             </div>
@@ -155,10 +150,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <FileCheck className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Complete itinerary management.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.itinerary.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Build day-by-day itineraries, upload travel docs, sync calendars, 
-                  and share your plans with travel companions effortlessly.
+                  {t('welcomeModal.itinerary.description')}
                 </p>
               </div>
             </div>
@@ -169,10 +163,9 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
                 <MessageCircle className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               </div>
               <div className="space-y-0.5">
-                <h3 className="font-semibold text-sm sm:text-base">Real-time communication hub.</h3>
+                <h3 className="font-semibold text-sm sm:text-base">{t('welcomeModal.communication.title')}</h3>
                 <p className="text-muted-foreground text-[11px] sm:text-xs leading-relaxed">
-                  Chat instantly with agents, get notifications, use quick replies, 
-                  and keep all your travel conversations in one secure place.
+                  {t('welcomeModal.communication.description')}
                 </p>
               </div>
             </div>
@@ -184,13 +177,12 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
             className="w-full h-10 sm:h-11 text-xs sm:text-sm group"
             size="lg"
           >
-            Start Planning Your Luxury Journey
+            {t('welcomeModal.cta')}
             <ArrowRight className="ml-1.5 sm:ml-2 h-3.5 w-3.5 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
           </Button>
 
           <p className="text-[7px] sm:text-[8px] text-center text-muted-foreground leading-[1.2]">
-            By using Goldsainte.Ai, you agree to our Terms and Privacy Policy. 
-            Don't enter personal or sensitive information.
+            {t('welcomeModal.agreement')}
           </p>
         </div>
       </DialogContent>

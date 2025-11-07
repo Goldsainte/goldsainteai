@@ -227,6 +227,51 @@
     "description": "Goldsainte AI is part of Goldsainte Inc., the world leader in AI-powered luxury travel and curated experiences. Discover. Create. Share. Travel with Goldsainte.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. All rights reserved."
   },
+  "welcomeModal": {
+    "title": "What Goldsainte.Ai can do for you",
+    "voiceAI": {
+      "title": "Voice AI Concierge with \"Hey Goldsainte\" wake word.",
+      "description": "Just say \"Hey Goldsainte\" from anywhere on the site to instantly activate our advanced voice AI. Have natural conversations about flights, hotels, dining, and more—hands-free."
+    },
+    "personalAI": {
+      "title": "Personal AI agent that learns your preferences.",
+      "description": "Build your own AI travel agent by teaching it your travel style, budget, and preferences. It learns from every interaction to deliver increasingly personalized recommendations for flights, hotels, restaurants, and experiences."
+    },
+    "createShare": {
+      "title": "Create. Share. Make Money.",
+      "description": "A social networking platform for content creators to share their luxury travel experiences and create interactive trip plans, allowing them to earn income from their content."
+    },
+    "expertAgents": {
+      "title": "Expert agents with milestone payments.",
+      "description": "Post complex trips to our marketplace and get AI-matched with certified agents. Pay in milestones, track progress, and chat in real-time with full transparency."
+    },
+    "cocurated": {
+      "title": "CoCurated™ - Collaborative Travel Packages.",
+      "description": "Browse exclusive packages created by top creators and agents. Fixed or flexible dates, secure booking, transparent pricing—all curated by travel experts who know the destinations best."
+    },
+    "creatorDashboard": {
+      "title": "Creator Dashboard - All Your Tools in One Place.",
+      "description": "Track analytics, manage packages, handle partnerships, and create products for the Shop. Level up through Bronze to Platinum tiers for higher commission bonuses with detailed earnings tracking."
+    },
+    "creatorPayouts": {
+      "title": "Creator Payouts - Multiple Revenue Streams.",
+      "description": "Earn from content views, virtual gifts, package bookings (up to 40% commission), Shop sales, partnerships, and affiliate marketing. Platinum tier members earn up to 20% more. Secure Stripe payouts with full transaction history."
+    },
+    "groupBookings": {
+      "title": "Group bookings & split payments.",
+      "description": "Organize group trips with ease. Split costs among travelers with secure payment links, track who's paid, and get instant notifications when payments complete."
+    },
+    "itinerary": {
+      "title": "Complete itinerary management.",
+      "description": "Build day-by-day itineraries, upload travel docs, sync calendars, and share your plans with travel companions effortlessly."
+    },
+    "communication": {
+      "title": "Real-time communication hub.",
+      "description": "Chat instantly with agents, get notifications, use quick replies, and keep all your travel conversations in one secure place."
+    },
+    "cta": "Start Planning Your Luxury Journey",
+    "agreement": "By using Goldsainte.Ai, you agree to our Terms and Privacy Policy. Don't enter personal or sensitive information."
+  },
   "about": {
     "founderLetter": {
       "title": "Letter from the Founder",
