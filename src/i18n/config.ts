@@ -17,10 +17,17 @@ const resources = {
   pt: { translation: pt },
 };
 
-// Get saved language safely
+// Get saved language or detect browser language
 const getSavedLanguage = () => {
   try {
-    return localStorage.getItem('appLanguage') || 'en';
+    const saved = localStorage.getItem('appLanguage');
+    if (saved) return saved;
+    
+    // Detect browser language
+    const browserLang = navigator.language.split('-')[0]; // Get 'en' from 'en-US'
+    const supportedLanguages = ['en', 'es', 'fr', 'de', 'it', 'pt'];
+    
+    return supportedLanguages.includes(browserLang) ? browserLang : 'en';
   } catch {
     return 'en';
   }
