@@ -51,13 +51,38 @@ serve(async (req) => {
   try {
     const { cityCode, checkInDate, checkOutDate, adults = 1, cityName } = await req.json();
     
-    // ⚠️ SECURITY: Rate limiting - 30 requests per 5 minutes per IP
-    const clientId = getClientIdentifier(req);
+    // ⚠️ SECURITY: Tiered rate limiting based on authentication status and subscription
+    const authHeader = req.headers.get('Authorization');
+    let userId: string | undefined;
+    let tier: 'free' | 'premium' | 'enterprise' | 'unauthenticated' = 'unauthenticated';
+    
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const supabaseClient = createClient(
+          Deno.env.get('SUPABASE_URL') ?? '',
+          Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+        );
+        const { data: { user } } = await supabaseClient.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          const { getUserTier } = await import('../_shared/rateLimiter.ts');
+          tier = await getUserTier(userId);
+        }
+      } catch (error) {
+        console.log('Failed to authenticate user, treating as unauthenticated');
+      }
+    }
+    
+    const clientId = getClientIdentifier(req, userId);
+    const { getTieredRateLimit } = await import('../_shared/rateLimiter.ts');
+    const limits = getTieredRateLimit(tier, 'amadeus-search-hotels');
+    
     const rateLimit = await checkRateLimit({
-      maxRequests: 30,
-      windowMs: 5 * 60 * 1000, // 5 minutes
+      ...limits,
       identifier: clientId,
-      endpoint: 'amadeus-search-hotels'
+      endpoint: 'amadeus-search-hotels',
+      tier
     });
     
     if (!rateLimit.allowed) {

@@ -8012,6 +8012,30 @@ export type Database = {
         }
         Relationships: []
       }
+      user_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          tier: Database["public"]["Enums"]["subscription_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tier?: Database["public"]["Enums"]["subscription_tier"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       vendor_availability: {
         Row: {
           block_reason: string | null
@@ -8953,6 +8977,10 @@ export type Database = {
         }[]
       }
       generate_invoice_number: { Args: never; Returns: string }
+      get_user_tier: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["subscription_tier"]
+      }
       get_user_tier_bonus: { Args: { p_user_id: string }; Returns: number }
       has_role: {
         Args: {
@@ -9054,6 +9082,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user" | "agent" | "brand"
+      subscription_tier: "free" | "premium" | "enterprise"
       supplier_type:
         | "hotel"
         | "activity_provider"
@@ -9190,6 +9219,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user", "agent", "brand"],
+      subscription_tier: ["free", "premium", "enterprise"],
       supplier_type: [
         "hotel",
         "activity_provider",

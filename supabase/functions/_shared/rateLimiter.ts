@@ -5,11 +5,14 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+export type SubscriptionTier = 'free' | 'premium' | 'enterprise' | 'unauthenticated';
+
 export interface RateLimitConfig {
   maxRequests: number;  // Maximum number of requests allowed
   windowMs: number;     // Time window in milliseconds
   identifier: string;   // Unique identifier for the client (IP, user ID, etc.)
   endpoint: string;     // API endpoint being rate limited
+  tier?: SubscriptionTier; // User's subscription tier for tiered limits
 }
 
 export interface RateLimitResult {
@@ -145,6 +148,34 @@ export async function checkRateLimit(
 }
 
 /**
+ * Get user's subscription tier from database
+ */
+export async function getUserTier(userId: string): Promise<SubscriptionTier> {
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { data, error } = await supabaseClient
+      .from('user_subscriptions')
+      .select('tier')
+      .eq('user_id', userId)
+      .single();
+
+    if (error || !data) {
+      console.log('No subscription found for user, defaulting to free');
+      return 'free';
+    }
+
+    return data.tier as SubscriptionTier;
+  } catch (error) {
+    console.error('Error fetching user tier:', error);
+    return 'free';
+  }
+}
+
+/**
  * Get client identifier from request (IP address or user ID)
  */
 export function getClientIdentifier(req: Request, userId?: string): string {
@@ -158,6 +189,29 @@ export function getClientIdentifier(req: Request, userId?: string): string {
   const ip = forwarded?.split(',')[0] || realIp || 'unknown';
   
   return `ip:${ip}`;
+}
+
+/**
+ * Get tiered rate limit configuration
+ * Returns appropriate limits based on user tier
+ */
+export function getTieredRateLimit(
+  tier: SubscriptionTier,
+  endpoint: string
+): { maxRequests: number; windowMs: number } {
+  // Define tiered limits for different endpoints
+  const tierLimits: Record<SubscriptionTier, { maxRequests: number; windowMs: number }> = {
+    unauthenticated: { maxRequests: 10, windowMs: 5 * 60 * 1000 },  // 10 requests per 5 minutes
+    free: { maxRequests: 30, windowMs: 5 * 60 * 1000 },             // 30 requests per 5 minutes
+    premium: { maxRequests: 100, windowMs: 5 * 60 * 1000 },         // 100 requests per 5 minutes
+    enterprise: { maxRequests: 500, windowMs: 5 * 60 * 1000 }       // 500 requests per 5 minutes
+  };
+
+  const limits = tierLimits[tier] || tierLimits.free;
+  
+  console.log(`🎯 [RATE LIMIT] Tier: ${tier}, Limits: ${limits.maxRequests} requests per ${limits.windowMs / 1000}s`);
+  
+  return limits;
 }
 
 /**
