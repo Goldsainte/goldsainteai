@@ -17,10 +17,60 @@
     "close": "Fechar",
     "search": "Pesquisar",
     "filter": "Filtrar",
-    "sort": "Ordenar"
+    "sort": "Ordenar",
+    "searching": "Procurando as melhores opções...",
+    "and": "e"
   },
   "language": {
     "changed": "Idioma Alterado",
     "setTo": "Idioma da interface definido para {{language}}"
+  },
+  "home": {
+    "hero": {
+      "title": "Descubra. Reserve. Crie. Ganhe — Viagens Reinventadas com IA, Lances de Agentes e Colaborações de Criadores",
+      "subtitle": "Use IA para planejar rápido, obtenha lances de agentes para economizar mais, ou reserve viagens CoCuradas.",
+      "whatCanDo": "O que Goldsainte.Ai pode fazer",
+      "terms": "Termos",
+      "privacy": "Privacidade",
+      "agreement": "Ao usar Goldsainte.Ai, você concorda com nossos"
+    },
+    "howItWorks": {
+      "title": "Como Funciona",
+      "intro": "Descubra, planeje e compartilhe viagens de luxo — tudo em uma plataforma inteligente.",
+      "paragraph1": "Goldsainte combina tecnologia IA com expertise humana. Comece conversando com seu concierge pessoal.",
+      "paragraph2": "Descubra coleções CoCuradas™ projetadas por criadores confiáveis e agentes certificados.",
+      "paragraph3": "Pronto para planejar? Publique sua viagem e deixe agentes especialistas fazerem lances.",
+      "paragraph4": "Reserve instantaneamente através do Goldsainte — voos, hotéis, restaurantes e mais.",
+      "paragraph5": "Tudo acontece em uma plataforma elegante — alimentada por IA, potencializada por criadores.",
+      "tagline": "Descubra. Planeje. Reserve. Ganhe.",
+      "subtitle": "Viagens de luxo, reinventadas."
+    },
+    "features": {
+      "voiceAI": {
+        "title": "Pesquisa por Voz IA",
+        "description": "Diga \"Hey Goldsainte\" e fale naturalmente. Nossa IA encontra hotéis de luxo para seu estilo.",
+        "cta": "Experimentar IA de Voz"
+      },
+      "cocurated": {
+        "title": "Itinerários CoCurados",
+        "description": "Sua IA cria planos de viagem completos instantaneamente. Edite ou regenere com um clique.",
+        "cta": "Explorar Itinerários"
+      },
+      "social": {
+        "title": "Rede Social de Criadores",
+        "description": "Siga formadores de opinião, agentes de luxo e viajantes.",
+        "cta": "Descobrir Criadores"
+      },
+      "agents": {
+        "title": "Suporte de Agentes Especialistas",
+        "description": "Publique sua viagem e deixe agentes de luxo certificados fazerem lances para planejá-la.",
+        "cta": "Encontrar Seu Agente"
+      },
+      "instant": {
+        "title": "Reserva Instantânea",
+        "description": "Reserve voos, hotéis, restaurantes instantaneamente com pagamento seguro.",
+        "cta": "Começar a Reservar"
+      }
+    }
   }
 }

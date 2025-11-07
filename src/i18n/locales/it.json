@@ -17,10 +17,60 @@
     "close": "Chiudi",
     "search": "Cerca",
     "filter": "Filtra",
-    "sort": "Ordina"
+    "sort": "Ordina",
+    "searching": "Ricerca delle migliori opzioni...",
+    "and": "e"
   },
   "language": {
     "changed": "Lingua Cambiata",
     "setTo": "Lingua dell'interfaccia impostata su {{language}}"
+  },
+  "home": {
+    "hero": {
+      "title": "Scopri. Prenota. Crea. Guadagna — Viaggi Reinventati con IA, Offerte di Agenti e Collaborazioni con Creator",
+      "subtitle": "Usa l'IA per pianificare velocemente, ottieni offerte da agenti per risparmiare di più, o prenota viaggi CoCurati.",
+      "whatCanDo": "Cosa può fare Goldsainte.Ai",
+      "terms": "Termini",
+      "privacy": "Privacy",
+      "agreement": "Utilizzando Goldsainte.Ai, accetti i nostri"
+    },
+    "howItWorks": {
+      "title": "Come Funziona",
+      "intro": "Scopri, pianifica e condividi viaggi di lusso — tutto su una piattaforma intelligente.",
+      "paragraph1": "Goldsainte combina tecnologia IA con esperienza umana. Inizia chattando con il tuo concierge personale.",
+      "paragraph2": "Scopri collezioni CoCurate™ progettate da creator fidati e agenti certificati.",
+      "paragraph3": "Pronto a pianificare? Pubblica il tuo viaggio e lascia che agenti esperti facciano offerte.",
+      "paragraph4": "Prenota istantaneamente tramite Goldsainte — voli, hotel, ristoranti e altro.",
+      "paragraph5": "Tutto avviene su una piattaforma elegante — alimentata dall'IA, potenziata dai creator.",
+      "tagline": "Scopri. Pianifica. Prenota. Guadagna.",
+      "subtitle": "Viaggi di lusso, reinventati."
+    },
+    "features": {
+      "voiceAI": {
+        "title": "Ricerca Vocale IA",
+        "description": "Di' \"Hey Goldsainte\" e parla naturalmente. La nostra IA trova hotel di lusso per il tuo stile.",
+        "cta": "Prova l'IA Vocale"
+      },
+      "cocurated": {
+        "title": "Itinerari CoCurati",
+        "description": "La tua IA crea piani di viaggio completi istantaneamente. Modifica o rigenera con un clic.",
+        "cta": "Esplora Itinerari"
+      },
+      "social": {
+        "title": "Rete Social di Creator",
+        "description": "Segui trendsetter, agenti di lusso e viaggiatori.",
+        "cta": "Scopri Creator"
+      },
+      "agents": {
+        "title": "Supporto Agenti Esperti",
+        "description": "Pubblica il tuo viaggio e lascia che agenti di lusso certificati facciano offerte per pianificarlo.",
+        "cta": "Trova il Tuo Agente"
+      },
+      "instant": {
+        "title": "Prenotazione Istantanea",
+        "description": "Prenota voli, hotel, ristoranti istantaneamente con pagamento sicuro.",
+        "cta": "Inizia a Prenotare"
+      }
+    }
   }
 }

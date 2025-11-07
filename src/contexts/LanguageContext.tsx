@@ -21,8 +21,12 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
 
   const setLanguage = (newLanguage: string) => {
     setLanguageState(newLanguage);
-    localStorage.setItem('appLanguage', newLanguage);
-    i18n.changeLanguage(newLanguage);
+    try {
+      localStorage.setItem('appLanguage', newLanguage);
+      i18n.changeLanguage(newLanguage);
+    } catch (error) {
+      console.error('Failed to change language:', error);
+    }
   };
 
   return (

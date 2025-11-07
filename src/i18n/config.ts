@@ -17,15 +17,27 @@ const resources = {
   pt: { translation: pt },
 };
 
+// Get saved language safely
+const getSavedLanguage = () => {
+  try {
+    return localStorage.getItem('appLanguage') || 'en';
+  } catch {
+    return 'en';
+  }
+};
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem('appLanguage') || 'en',
+    lng: getSavedLanguage(),
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false,
     },
+  })
+  .catch((error) => {
+    console.error('i18n initialization error:', error);
   });
 
 export default i18n;
