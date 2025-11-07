@@ -226,5 +226,47 @@
     "followUs": "Síguenos:",
     "description": "Goldsainte AI es parte de Goldsainte Inc., líder mundial en viajes de lujo impulsados por IA y experiencias curadas. Descubre. Crea. Comparte. Viaja con Goldsainte.",
     "copyright": "Copyright © 2025 Goldsainte.Ai™. Todos los derechos reservados."
+  },
+  "about": {
+    "founderLetter": {
+      "title": "Carta del Fundador",
+      "p1": "Cuando Goldsainte se lanzó por primera vez, la gente preguntaba en qué nos diferenciábamos de otros servicios. La respuesta era clara: aportamos innovación, seguridad y experiencias elevadas al transporte. Hoy, hemos crecido mucho más allá de esas raíces.",
+      "p2": "Ahora estamos construyendo algo más grande: un ecosistema de viajes global impulsado por IA que transforma cómo las personas exploran, planifican y comparten sus aventuras.",
+      "p3": "En Goldsainte, creemos que viajar es más que logística: se trata de crear experiencias que vale la pena compartir, construir comunidad y empoderar tanto a viajeros como a creadores para prosperar.",
+      "p4": "Desde nuestros inicios hasta la plataforma actual impulsada por IA, siempre hemos defendido la confianza, la innovación y el empoderamiento. El futuro de los viajes no se trata solo de adónde vas, sino de cuán fluida y significativamente llegas allí.",
+      "p5": "Gracias por ser parte de este viaje. Las mejores aventuras aún están por delante.",
+      "signature": "Andre C. Powell Jr.",
+      "title2": "CEO y Fundador",
+      "company": "Goldsainte, Inc."
+    },
+    "sections": {
+      "whatIs": {
+        "title": "¿Qué es Goldsainte?",
+        "p1": "Goldsainte AI es un mercado de viajes activado por voz e impulsado por IA que fusiona la automatización con experiencia humana verificada para ofrecer planificación y reserva de viajes de principio a fin completamente personalizadas. Con la palabra de activación \"Hey, Goldsainte\", los usuarios pueden interactuar con un conserje conversacional para buscar, planificar y reservar vuelos, hoteles, restaurantes, eventos y transporte, completamente manos libres y en tiempo real.",
+        "p2": "En el núcleo de la plataforma hay un mercado de agentes de viajes donde los usuarios pueden publicar itinerarios complejos, recibir ofertas competitivas de agentes certificados y pagar de forma segura a través de transacciones basadas en hitos. El sistema admite reservas grupales, pagos divididos, gestión completa de itinerarios y mensajería en tiempo real, facilitando la coordinación incluso de los viajes más intrincados.",
+        "p3": "Goldsainte también impulsa una economía de creadores única: los creadores de contenido colaboran con agentes para co-crear y promover experiencias de viaje curadas, mientras que los proveedores de transporte pueden incorporarse, promover sus servicios y ser incluidos en paquetes liderados por creadores o agentes. Este ecosistema de tres vías (IA + Agentes + Creadores) hace de Goldsainte la primera plataforma en unificar inspiración, planificación y reserva dentro de un entorno inteligente de comercio social."
+      },
+      "features": {
+        "title": "Lo Que Ofrecemos"
+      },
+      "mission": {
+        "title": "Nuestra Misión",
+        "p1": "En Goldsainte, creemos que viajar es más que simplemente reservar un vuelo o reservar un hotel: se trata de crear experiencias inolvidables, construir conexiones significativas y empoderar a las personas para compartir sus viajes de maneras que inspiren a otros.",
+        "p2": "Nuestra misión es redefinir la industria de viajes combinando tecnología de IA de vanguardia con la creatividad y pasión de viajeros, creadores y expertos en viajes de todo el mundo. Estamos dedicados a hacer los viajes más accesibles, personalizados y gratificantes.",
+        "p3": "Ya seas un explorador solitario buscando gemas ocultas, un creador de contenido construyendo tu marca, o un experto en viajes compartiendo tu conocimiento, Goldsainte proporciona las herramientas, plataforma y comunidad para ayudarte a prosperar.",
+        "p4": "Nuestro ecosistema impulsado por IA está diseñado para simplificar las complejidades de la planificación de viajes mientras preserva la magia del descubrimiento. Desde servicios de conserjería activados por voz hasta agentes de IA personalizados que aprenden tu estilo de viaje, estamos aprovechando la tecnología para hacer cada viaje más inteligente, fluido y agradable.",
+        "p5": "En última instancia, nuestra misión es transformar cómo viaja el mundo. Estamos creando un ecosistema donde la tecnología mejora la experiencia humana, donde los creadores son valorados y recompensados, y donde cada viaje, sin importar cuán grande o pequeño, se convierte en una historia que vale la pena compartir."
+      },
+      "partners": {
+        "title": "Nuestros Socios y Tecnología",
+        "description": "Goldsainte aprovecha líderes de la industria como Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify y Etsy para brindarte experiencias de viaje curadas y en tiempo real e integraciones de mercado sin problemas."
+      },
+      "legal": {
+        "title": "Legal",
+        "p1": "Goldsainte Inc. (la compañía detrás de Goldsainte™) está registrada y tiene su sede en Delaware, EE. UU. (\"Goldsainte\", \"nosotros\", \"nuestro\"), desde donde proporciona su plataforma de reservas y viajes de lujo impulsada por IA (el \"Servicio\") en su sitio web (el \"Sitio web\"), y es apoyada internacionalmente por sus compañías afiliadas (las \"Compañías de Apoyo\"). Las Compañías de Apoyo proporcionan solo apoyo interno y operativo. No prestan el Servicio y no poseen, operan ni gestionan el Sitio web ni ningún otro sitio web.",
+        "p2": "Para cualquier pregunta sobre Goldsainte, el Servicio o el Sitio web, o para enviar o notificar cualquier documento, aviso, correspondencia u otras comunicaciones, incluidas consultas de prensa, comuníquese con Goldsainte Inc. directamente en su oficina registrada en Delaware.",
+        "p3": "Goldsainte Inc. no mantiene un domicilio legal en ninguna otra ubicación u oficina, incluidas las oficinas de sus Compañías de Apoyo. Las Compañías de Apoyo no están autorizadas para actuar como agente de procesos o agente de servicio para Goldsainte Inc., y no se pueden realizar reservas a través de las Compañías de Apoyo."
+      }
+    }
   }
 }

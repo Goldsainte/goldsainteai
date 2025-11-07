@@ -120,7 +120,7 @@ const About = () => {
       {/* Letter from the Founder - Main, Visible Section */}
       <Card className="mb-6 sm:mb-8 border-primary/20 shadow-lg">
         <CardHeader className="pb-4 sm:pb-6">
-          <CardTitle className="text-xl sm:text-2xl md:text-3xl text-center">Letter from the Founder</CardTitle>
+          <CardTitle className="text-xl sm:text-2xl md:text-3xl text-center">{t('about.founderLetter.title')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6">
           <div className="grid md:grid-cols-[180px_1fr] lg:grid-cols-[200px_1fr] gap-6 sm:gap-8">
@@ -138,29 +138,29 @@ const About = () => {
             {/* Letter Content */}
             <div className="space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
               <p className="text-foreground">
-                When Goldsainte first launched, people asked how we were different from other services. The answer was clear: we brought innovation, safety, and elevated experiences to transportation. Today, we've grown far beyond those roots.
+                {t('about.founderLetter.p1')}
               </p>
               
               <p className="text-foreground font-semibold">
-                We're now building something bigger: a global AI-powered travel ecosystem that transforms how people explore, plan, and share their adventures.
+                {t('about.founderLetter.p2')}
               </p>
 
               <p className="text-foreground">
-                At Goldsainte, we believe travel is more than logistics—it's about creating experiences worth sharing, building community, and empowering both travelers and creators to thrive.
+                {t('about.founderLetter.p3')}
               </p>
               
               <p className="text-foreground">
-                From our beginnings to today's AI-driven platform, we've always stood for trust, innovation, and empowerment. The future of travel isn't just about where you go—it's about how seamlessly and meaningfully you get there.
+                {t('about.founderLetter.p4')}
               </p>
               
               <p className="text-foreground italic mt-4">
-                Thank you for being part of this journey. The best adventures are still ahead.
+                {t('about.founderLetter.p5')}
               </p>
               
               <div className="mt-6 text-foreground leading-tight space-y-0">
-                <p className="font-semibold">Andre C. Powell Jr.</p>
-                <p>CEO & Founder</p>
-                <p>Goldsainte, Inc.</p>
+                <p className="font-semibold">{t('about.founderLetter.signature')}</p>
+                <p>{t('about.founderLetter.title2')}</p>
+                <p>{t('about.founderLetter.company')}</p>
               </div>
             </div>
           </div>
@@ -173,7 +173,7 @@ const About = () => {
         {/* What Is Goldsainte */}
         <AccordionItem value="what-is" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
-            What is Goldsainte?
+            {t('about.sections.whatIs.title')}
           </AccordionTrigger>
           <AccordionContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
             <div className="flex justify-center mb-4 sm:mb-6">
@@ -184,13 +184,13 @@ const About = () => {
               />
             </div>
             <p className="text-foreground">
-              Goldsainte AI is a voice-activated, AI-powered travel marketplace that merges automation with verified human expertise to deliver fully personalized, end-to-end trip planning and booking. With the wake word "Hey, Goldsainte," users can engage a conversational concierge to search, plan, and book flights, hotels, dining, events, and transportation—completely hands-free and in real-time.
+              {t('about.sections.whatIs.p1')}
             </p>
             <p className="text-foreground">
-              At the core of the platform is a travel agent marketplace where users can post complex itineraries, receive competitive bids from certified agents, and pay securely through milestone-based transactions. The system supports group bookings, split payments, full itinerary management, and real-time messaging, making it easy to coordinate even the most intricate trips.
+              {t('about.sections.whatIs.p2')}
             </p>
             <p className="text-foreground">
-              Goldsainte also powers a unique creator economy: content creators collaborate with agents to co-create and promote curated travel experiences, while transportation vendors can onboard, promote their services, and be included in creator or agent-led packages. This three-way ecosystem—AI + Agents + Creators—makes Goldsainte the first platform to unify inspiration, planning, and booking within one intelligent, social commerce environment.
+              {t('about.sections.whatIs.p3')}
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -198,7 +198,7 @@ const About = () => {
         {/* What We Offer */}
         <AccordionItem value="features" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
-            What We Offer
+            {t('about.sections.features.title')}
           </AccordionTrigger>
           <AccordionContent className="pt-4 sm:pt-6 space-y-6 sm:space-y-8">
             <div className="flex justify-center mb-4 sm:mb-6">
@@ -238,7 +238,7 @@ const About = () => {
         {/* Our Mission */}
         <AccordionItem value="mission" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
-            Our Mission
+            {t('about.sections.mission.title')}
           </AccordionTrigger>
           <AccordionContent className="pt-3 sm:pt-4 space-y-3 sm:space-y-4 text-sm sm:text-base leading-relaxed">
             <div className="flex justify-center mb-4 sm:mb-6">
@@ -249,19 +249,19 @@ const About = () => {
               />
             </div>
             <p className="text-foreground">
-              At Goldsainte, we believe that travel is more than just booking a flight or reserving a hotel—it's about creating unforgettable experiences, building meaningful connections, and empowering people to share their journeys in ways that inspire others.
+              {t('about.sections.mission.p1')}
             </p>
             <p className="text-foreground">
-              Our mission is to redefine the travel industry by combining cutting-edge AI technology with the creativity and passion of travelers, creators, and travel experts worldwide. We're dedicated to making travel more accessible, personalized, and rewarding.
+              {t('about.sections.mission.p2')}
             </p>
             <p className="text-foreground">
-              Whether you're a solo explorer seeking hidden gems, a content creator building your brand, or a travel expert sharing your knowledge, Goldsainte provides the tools, platform, and community to help you thrive.
+              {t('about.sections.mission.p3')}
             </p>
             <p className="text-foreground">
-              Our AI-powered ecosystem is designed to simplify the complexities of travel planning while preserving the magic of discovery. From voice-activated concierge services to personalized AI agents that learn your travel style, we're leveraging technology to make every journey smarter, smoother, and more enjoyable.
+              {t('about.sections.mission.p4')}
             </p>
             <p className="text-foreground">
-              Ultimately, our mission is to transform how the world travels. We're creating an ecosystem where technology enhances human experience, where creators are valued and rewarded, and where every journey—no matter how big or small—becomes a story worth sharing.
+              {t('about.sections.mission.p5')}
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -269,7 +269,7 @@ const About = () => {
         {/* Partners & Technology */}
         <AccordionItem value="partners" className="border-0 rounded-lg px-4 sm:px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47] py-3 sm:py-4">
-            Our Partners & Technology
+            {t('about.sections.partners.title')}
           </AccordionTrigger>
           <AccordionContent className="pt-4 sm:pt-6">
             <div className="flex justify-center mb-6">
@@ -294,7 +294,7 @@ const About = () => {
               ))}
             </div>
             <p className="text-sm sm:text-base text-muted-foreground text-center">
-              Goldsainte leverages industry leaders like Amadeus, Ticketmaster, OpenAI, Google Gemini, Shopify, and Etsy to bring you curated and real-time travel experiences and seamless marketplace integrations.
+              {t('about.sections.partners.description')}
             </p>
           </AccordionContent>
         </AccordionItem>
@@ -302,7 +302,7 @@ const About = () => {
         {/* Legal */}
         <AccordionItem value="legal" className="border-0 rounded-lg px-6 bg-card shadow-sm hover:bg-[#bfad72] data-[state=open]:hover:!bg-card transition-colors">
           <AccordionTrigger className="text-sm sm:text-base font-medium hover:no-underline text-[#0c4d47]">
-            Legal
+            {t('about.sections.legal.title')}
           </AccordionTrigger>
           <AccordionContent className="pt-4 space-y-4 text-sm sm:text-base leading-relaxed">
             <div className="flex justify-center mb-6">
@@ -313,13 +313,13 @@ const About = () => {
               />
             </div>
             <p className="text-sm sm:text-base text-foreground">
-              Goldsainte Inc. (the company behind Goldsainte™) is registered and based in Delaware, USA ("Goldsainte," "we," "us," or "our"), from where it provides its AI-powered luxury travel and booking platform (the "Service") on its website (the "Website"), and is supported internationally by its affiliated group companies (the "Support Companies"). The Support Companies provide internal and operational support only. They do not render the Service and do not own, operate, or manage the Website or any other website.
+              {t('about.sections.legal.p1')}
             </p>
             <p className="text-sm sm:text-base text-foreground">
-              For any questions regarding Goldsainte, the Service, or the Website, or to send or serve any documents, notices, correspondence, or other communications—including press inquiries—please contact Goldsainte Inc. directly at its registered office in Delaware.
+              {t('about.sections.legal.p2')}
             </p>
             <p className="text-sm sm:text-base text-foreground">
-              Goldsainte Inc. does not maintain a legal domicile at any other location or office, including the offices of its Support Companies. The Support Companies are not authorized to act as a process agent or service agent for Goldsainte Inc., and no bookings or reservations can be made through the Support Companies.
+              {t('about.sections.legal.p3')}
             </p>
           </AccordionContent>
         </AccordionItem>
