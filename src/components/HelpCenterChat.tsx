@@ -76,7 +76,7 @@ export const HelpCenterChat = () => {
       <Button
         onClick={() => setIsOpen(true)}
         size="lg"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-50"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-40"
         aria-label="Open Help Center Chat"
       >
         <MessageCircle className="h-6 w-6" />
@@ -85,7 +85,7 @@ export const HelpCenterChat = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-[380px] h-[600px] bg-background border border-border rounded-lg shadow-2xl flex flex-col z-50">
+    <div className="fixed bottom-6 right-6 w-[380px] h-[600px] bg-background border border-border rounded-lg shadow-2xl flex flex-col z-40">
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-border bg-primary/5">
         <div className="flex items-center gap-2">

@@ -158,7 +158,7 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
   };
 
   return (
-    <Card className="p-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 bg-gradient-to-br from-background to-background/95 border-primary/20 shadow-2xl w-full max-w-[420px]">
+    <Card className="p-6 pb-24 md:pb-6 space-y-4 animate-in fade-in slide-in-from-bottom-4 bg-gradient-to-br from-background to-background/95 border-primary/20 shadow-2xl w-full max-w-[420px]">
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
