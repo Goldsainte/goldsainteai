@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import i18n from '@/i18n/config';
 
 interface LanguageContextType {
   language: string;
@@ -21,6 +22,7 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const setLanguage = (newLanguage: string) => {
     setLanguageState(newLanguage);
     localStorage.setItem('appLanguage', newLanguage);
+    i18n.changeLanguage(newLanguage);
   };
 
   return (

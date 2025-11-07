@@ -1,0 +1,26 @@
+{
+  "header": {
+    "login": "Se connecter",
+    "signup": "S'inscrire gratuitement",
+    "signupShort": "S'inscrire",
+    "signout": "Se déconnecter",
+    "dashboard": "Tableau de bord"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier"
+  },
+  "language": {
+    "changed": "Langue Modifiée",
+    "setTo": "Langue de l'interface définie sur {{language}}"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "header": {
+    "login": "Accedi",
+    "signup": "Iscriviti gratuitamente",
+    "signupShort": "Iscriviti",
+    "signout": "Esci",
+    "dashboard": "Pannello"
+  },
+  "common": {
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "close": "Chiudi",
+    "search": "Cerca",
+    "filter": "Filtra",
+    "sort": "Ordina"
+  },
+  "language": {
+    "changed": "Lingua Cambiata",
+    "setTo": "Lingua dell'interfaccia impostata su {{language}}"
+  }
+}

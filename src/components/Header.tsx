@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
@@ -36,6 +37,7 @@ export const Header = () => {
   const { isAdmin } = useUserRole();
   const isMobile = useIsMobile();
   const { language: currentLanguage, setLanguage: setCurrentLanguage } = useLanguage();
+  const { t } = useTranslation();
   const [usePreferences, setUsePreferences] = useState(true);
   const [searchSheetOpen, setSearchSheetOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
@@ -49,8 +51,8 @@ export const Header = () => {
   const handleLanguageChange = (language: string) => {
     setCurrentLanguage(language);
     toast({
-      title: "Language Changed",
-      description: `Interface language set to ${language.toUpperCase()}`,
+      title: t('language.changed'),
+      description: t('language.setTo', { language: language.toUpperCase() }),
     });
   };
 

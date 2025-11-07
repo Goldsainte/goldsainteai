@@ -2,10 +2,12 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { LogOut, User } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export const SimpleHeader = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 font-secondary">
@@ -28,7 +30,7 @@ export const SimpleHeader = () => {
                 className="rounded-full h-11 px-3 md:px-4"
               >
                 <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline ml-2">Sign out</span>
+                <span className="hidden sm:inline ml-2">{t('header.signout')}</span>
               </Button>
             </>
           ) : (
@@ -38,14 +40,14 @@ export const SimpleHeader = () => {
                 className="rounded-full h-11 px-3 md:px-4 text-sm md:text-base"
                 onClick={() => navigate('/auth')}
               >
-                Log in
+                {t('header.login')}
               </Button>
               <Button 
                 className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 px-3 md:px-4 text-sm md:text-base"
                 onClick={() => navigate('/auth')}
               >
-                <span className="hidden sm:inline">Sign up for free</span>
-                <span className="sm:hidden">Sign up</span>
+                <span className="hidden sm:inline">{t('header.signup')}</span>
+                <span className="sm:hidden">{t('header.signupShort')}</span>
               </Button>
             </>
           )}

@@ -1,0 +1,26 @@
+{
+  "header": {
+    "login": "Log in",
+    "signup": "Sign up for free",
+    "signupShort": "Sign up",
+    "signout": "Sign out",
+    "dashboard": "Dashboard"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  },
+  "language": {
+    "changed": "Language Changed",
+    "setTo": "Interface language set to {{language}}"
+  }
+}

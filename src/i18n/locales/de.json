@@ -1,0 +1,26 @@
+{
+  "header": {
+    "login": "Anmelden",
+    "signup": "Kostenlos registrieren",
+    "signupShort": "Registrieren",
+    "signout": "Abmelden",
+    "dashboard": "Dashboard"
+  },
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "search": "Suchen",
+    "filter": "Filter",
+    "sort": "Sortieren"
+  },
+  "language": {
+    "changed": "Sprache Geändert",
+    "setTo": "Sprache der Benutzeroberfläche auf {{language}} gesetzt"
+  }
+}
