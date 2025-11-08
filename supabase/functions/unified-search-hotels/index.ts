@@ -83,7 +83,7 @@ async function getAmadeusToken() {
   const apiSecret = Deno.env.get("AMADEUS_API_SECRET");
   if (!apiKey || !apiSecret) throw new Error("Amadeus credentials not configured");
 
-  const res = await fetch("https://api.amadeus.com/v1/security/oauth2/token", {
+  const res = await fetch("https://test.api.amadeus.com/v1/security/oauth2/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: `grant_type=client_credentials&client_id=${apiKey}&client_secret=${apiSecret}`,
@@ -117,7 +117,7 @@ async function resolveCityCode(token: string, location: string): Promise<string>
 
   // Try Amadeus Locations API
   const params = new URLSearchParams({ keyword: location, subType: "CITY", "page[limit]": "1" });
-  const r = await fetch(`https://api.amadeus.com/v1/reference-data/locations?${params}`, {
+  const r = await fetch(`https://test.api.amadeus.com/v1/reference-data/locations?${params}`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   if (r.ok) {
@@ -144,7 +144,7 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
   // 1) Get hotel IDs in city
   console.log(`Fetching hotels for city code: ${cityCode}`);
   const listRes = await fetch(
-    `https://api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${encodeURIComponent(cityCode)}`,
+    `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${encodeURIComponent(cityCode)}`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
   
@@ -188,7 +188,7 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
 
     try {
       console.log(`Fetching offers for chunk size ${chunk.length}`);
-      const offersRes = await fetch(`https://api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
+      const offersRes = await fetch(`https://test.api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

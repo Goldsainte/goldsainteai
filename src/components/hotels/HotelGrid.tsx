@@ -7,7 +7,7 @@ interface HotelGridProps {
 
 export const HotelGrid = ({ hotels, searchDates }: HotelGridProps) => {
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 gap-4 max-w-full overflow-hidden">
       {hotels.map((hotel, index) => (
         <CompactHotelCard
           key={hotel.hotel_id || hotel.id || index}

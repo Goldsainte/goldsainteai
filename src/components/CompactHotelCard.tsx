@@ -153,11 +153,11 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
 
   return (
     <>
-      <Card className="group hover:shadow-md transition-all overflow-hidden">
-        <div className="flex gap-3 p-3">
+      <Card className="group hover:shadow-md transition-all overflow-hidden max-w-full">
+        <div className="flex gap-2 sm:gap-3 p-2 sm:p-3 max-w-full">
           {/* Image with locked 4:3 aspect ratio */}
           <div 
-            className="relative w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-muted/80 to-muted/50 cursor-pointer"
+            className="relative w-20 sm:w-28 md:w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-muted/80 to-muted/50 cursor-pointer"
             onClick={() => allImages.length > 0 && setShowGallery(true)}
           >
             {hasValidImage ? (
@@ -233,26 +233,26 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
           </div>
 
           {/* Price & Actions */}
-          <div className="flex flex-col items-end justify-between min-w-[120px] md:min-w-[140px]">
+          <div className="flex flex-col items-end justify-between w-[100px] sm:w-[120px] md:w-[140px] flex-shrink-0">
             {displayPrice > 0 && (
-              <div className="text-right">
-                <div className="text-lg sm:text-xl font-bold">
+              <div className="text-right w-full">
+                <div className="text-base sm:text-lg md:text-xl font-bold truncate">
                   {getCurrencySymbol(currency)}{Math.round(displayPrice)}
                 </div>
-                <div className="text-xs text-muted-foreground">per night</div>
-                <div className="text-xs text-muted-foreground">+taxes & fees</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground">per night</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">+taxes & fees</div>
               </div>
             )}
-            <div className="flex gap-1">
+            <div className="flex flex-wrap gap-1 justify-end w-full">
               {hasVirtualTour && (
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-7 px-2 text-xs gap-1"
+                  className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1"
                   onClick={() => setShowVirtualTour(true)}
                 >
-                  <Video className="h-3 w-3" />
-                  360°
+                  <Video className="h-2.5 sm:h-3 w-2.5 sm:w-3" />
+                  <span className="hidden sm:inline">360°</span>
                 </Button>
               )}
               <Button
@@ -266,7 +266,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
               </Button>
               <Button
                 size="sm"
-                className="h-7 px-3 text-xs"
+                className="h-6 sm:h-7 px-2 sm:px-3 text-[10px] sm:text-xs whitespace-nowrap"
                 onClick={() => setShowDateModal(true)}
               >
                 Reserve
