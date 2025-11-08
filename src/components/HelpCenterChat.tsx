@@ -66,7 +66,8 @@ const scrollRef = useRef<HTMLDivElement>(null);
             checkIn: sp.checkIn,
             checkOut: sp.checkOut,
             guests: String(sp.guests || 2),
-            fromChat: 'true' // Flag to prevent date picker popup
+            from_chat: 'true',
+            suppress_ui: JSON.stringify(['date_picker'])
           });
           navigate(`/search?${qs.toString()}`);
           setIsOpen(false); // Close chat after navigation
