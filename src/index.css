@@ -164,6 +164,27 @@ All colors MUST be HSL.
     p {
       max-width: 100%;
     }
+    
+    /* Prevent zoom on form inputs (iOS) */
+    input, select, textarea {
+      font-size: 16px;
+    }
+    
+    /* Better tap feedback */
+    button:active, a[role="button"]:active {
+      transform: scale(0.97);
+    }
+    
+    /* Smooth scrolling */
+    * {
+      scroll-behavior: smooth;
+    }
+    
+    /* Prevent text selection on buttons */
+    button, a[role="button"] {
+      user-select: none;
+      -webkit-user-select: none;
+    }
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
@@ -256,10 +277,24 @@ All colors MUST be HSL.
     min-width: 44px;
   }
   
+  /* Icon-only buttons should be slightly larger for better tap accuracy */
+  button[class*="icon"]:not([class*="p-0"]) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
   /* Improve tap feedback on mobile */
-  button:not([role="checkbox"]):not([role="radio"]):active, a[role="button"]:active {
+  button:not([role="checkbox"]):not([role="radio"]):active, 
+  a[role="button"]:active {
     transform: scale(0.98);
     transition: transform 0.1s ease;
+  }
+  
+  /* Better focus states for keyboard users */
+  button:focus-visible,
+  a[role="button"]:focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
   }
 
   /* Improve scrolling on mobile */

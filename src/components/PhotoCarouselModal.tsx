@@ -380,7 +380,7 @@ const PhotoCarouselModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-full max-h-full w-screen h-screen p-0 m-0 bg-black border-none [&>button]:hidden md:max-w-[90vw] md:max-h-[90vh] md:h-auto">
+      <DialogContent className="w-full h-full max-w-full p-0 m-0 bg-black border-none [&>button]:hidden md:max-w-[90vw] md:max-h-[90vh] md:h-auto overflow-hidden">
         {/* Mobile Layout (Vertical) */}
         <div className="relative w-full h-full flex flex-col safe-top safe-bottom md:hidden">
           {/* Close button */}

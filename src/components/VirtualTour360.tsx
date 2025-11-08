@@ -216,7 +216,7 @@ export const VirtualTour360 = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-full w-screen h-screen p-0 gap-0 border-0">
+      <DialogContent className="w-full h-full max-w-full p-0 gap-0 border-0 overflow-hidden">
         {/* Canvas */}
         <div ref={containerRef} className="relative w-full h-full bg-black">
           <canvas ref={canvasRef} className="w-full h-full" />
