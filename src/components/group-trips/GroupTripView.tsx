@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useGroupTripRealtime } from '@/hooks/useGroupTripRealtime';
 import { AddSuggestionDialog } from './AddSuggestionDialog';
 import { InviteMembersDialog } from './InviteMembersDialog';
+import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
   tripId: string;
@@ -24,6 +25,7 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
   const [members, setMembers] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [votes, setVotes] = useState<Map<string, any>>(new Map());
+  const previousSuggestionsRef = useRef<any[]>([]);
 
   const fetchTripData = async () => {
     try {
@@ -78,6 +80,7 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       });
 
       setSuggestions(processedSuggestions);
+      checkMilestones(processedSuggestions);
     } catch (error: any) {
       console.error('Error fetching trip data:', error);
       toast({
@@ -87,6 +90,83 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkMilestones = (newSuggestions: any[]) => {
+    if (previousSuggestionsRef.current.length === 0) {
+      previousSuggestionsRef.current = newSuggestions;
+      return;
+    }
+
+    const acceptedMembersCount = members.filter(m => m.status === 'accepted').length;
+
+    newSuggestions.forEach((suggestion) => {
+      const previousSuggestion = previousSuggestionsRef.current.find(s => s.id === suggestion.id);
+      
+      if (!previousSuggestion) return;
+
+      const previousUpvotes = previousSuggestion.upvotes || 0;
+      const currentUpvotes = suggestion.upvotes || 0;
+
+      // Check for 5 upvotes milestone
+      if (previousUpvotes < 5 && currentUpvotes >= 5) {
+        triggerCelebration('popular');
+        toast({
+          title: '🎉 Popular Choice!',
+          description: `"${suggestion.title}" reached 5 upvotes!`,
+        });
+      }
+
+      // Check for unanimous approval (all members voted)
+      if (acceptedMembersCount > 1 && currentUpvotes === acceptedMembersCount && suggestion.downvotes === 0) {
+        if (previousUpvotes !== acceptedMembersCount) {
+          triggerCelebration('unanimous');
+          toast({
+            title: '🌟 Unanimous Approval!',
+            description: `Everyone loves "${suggestion.title}"!`,
+          });
+        }
+      }
+    });
+
+    previousSuggestionsRef.current = newSuggestions;
+  };
+
+  const triggerCelebration = (type: 'popular' | 'unanimous') => {
+    if (type === 'unanimous') {
+      // Golden confetti for unanimous
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FFD700', '#FFA500', '#FF8C00'],
+      });
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ['#FFD700', '#FFA500', '#FF8C00'],
+        });
+      }, 250);
+      setTimeout(() => {
+        confetti({
+          particleCount: 50,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ['#FFD700', '#FFA500', '#FF8C00'],
+        });
+      }, 400);
+    } else {
+      // Colorful confetti for popular
+      confetti({
+        particleCount: 80,
+        spread: 60,
+        origin: { y: 0.6 },
+      });
     }
   };
 
@@ -168,17 +248,28 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
   const isCreator = trip.creator_id === user?.id;
   const isMember = members.some(m => m.user_id === user?.id && m.status === 'accepted');
 
-  const renderSuggestionCard = (suggestion: any) => (
-    <Card key={suggestion.id}>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="text-lg">{suggestion.title}</CardTitle>
-            <CardDescription>{suggestion.description}</CardDescription>
+  const renderSuggestionCard = (suggestion: any) => {
+    const acceptedMembersCount = members.filter(m => m.status === 'accepted').length;
+    const isUnanimous = acceptedMembersCount > 1 && 
+                        suggestion.upvotes === acceptedMembersCount && 
+                        suggestion.downvotes === 0;
+    const isPopular = suggestion.upvotes >= 5;
+
+    return (
+      <Card key={suggestion.id} className={isUnanimous ? 'border-yellow-500 shadow-lg animate-pulse' : isPopular ? 'border-primary shadow-md' : ''}>
+        <CardHeader>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-lg">{suggestion.title}</CardTitle>
+                {isUnanimous && <Badge variant="default" className="bg-yellow-500 text-yellow-950">⭐ Unanimous</Badge>}
+                {isPopular && !isUnanimous && <Badge variant="secondary">🔥 Popular</Badge>}
+              </div>
+              <CardDescription>{suggestion.description}</CardDescription>
+            </div>
+            <Badge>{suggestion.suggestion_type}</Badge>
           </div>
-          <Badge>{suggestion.suggestion_type}</Badge>
-        </div>
-      </CardHeader>
+        </CardHeader>
       <CardContent className="space-y-3">
         {suggestion.location && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -216,7 +307,8 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
