@@ -321,3 +321,15 @@ verify_jwt = true
 [functions.check-api-health]
 verify_jwt = true
 
+[functions.compare-date-flexibility]
+verify_jwt = false
+
+[functions.search-multi-city-flights]
+verify_jwt = false
+
+[functions.get-travel-advisories]
+verify_jwt = false
+
+[functions.lookup-baggage-policy]
+verify_jwt = false
+
