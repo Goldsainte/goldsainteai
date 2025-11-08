@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -15,7 +16,8 @@ export const HelpCenterChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+const scrollRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -54,6 +56,19 @@ export const HelpCenterChat = () => {
           content: sanitizeAssistantContent(data.response)
         };
         setMessages(prev => [...prev, assistantMessage]);
+
+        // If the AI just performed a hotel search successfully, open the results page
+        if (data?.meta?.status === 'OK' && data.meta.search_params) {
+          const sp = data.meta.search_params;
+          const qs = new URLSearchParams({
+            type: 'hotels',
+            location: sp.location,
+            checkIn: sp.checkIn,
+            checkOut: sp.checkOut,
+            guests: String(sp.guests || 2),
+          });
+          navigate(`/search?${qs.toString()}`);
+        }
       }
     } catch (error: any) {
       console.error('Help Center AI error:', error);

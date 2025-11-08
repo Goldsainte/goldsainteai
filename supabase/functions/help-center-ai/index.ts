@@ -42,6 +42,7 @@ When users mention dates in natural language, convert them to YYYY-MM-DD format:
 - "tomorrow" → current date + 1 day
 - "next Friday" → the upcoming Friday
 Always use the CURRENT DATE above as the reference point for calculations.
+If the user hasn't provided dates, default to "next weekend" for the initial hotel search.
 
 ## YOUR EXPERTISE:
 You can assist with:
@@ -157,6 +158,7 @@ serve(async (req) => {
       { role: "system", content: systemPrompt },
       ...messages,
     ];
+    let lastSearchMeta: any = null;
 
     // Tool calling loop - allow up to 5 iterations
     for (let iteration = 0; iteration < 5; iteration++) {
@@ -213,7 +215,7 @@ serve(async (req) => {
         const finalMessage = stripRoutes(finalMessageRaw);
         
         return new Response(
-          JSON.stringify({ response: finalMessage }),
+          JSON.stringify({ response: finalMessage, meta: lastSearchMeta }),
           {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
@@ -271,6 +273,15 @@ serve(async (req) => {
               status: "ERROR",
               message: "Failed to execute hotel search",
               error: error instanceof Error ? error.message : String(error)
+            };
+          }
+
+          // Store meta for client navigation/opening results
+          if (toolResult && (toolResult.status === "OK" || toolResult.status === "NO_RESULTS")) {
+            lastSearchMeta = {
+              status: toolResult.status,
+              count: toolResult.count ?? 0,
+              search_params: args
             };
           }
         } else {
