@@ -71,12 +71,19 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   };
   
   const location = getCleanLocation();
-  // HotelBeds uses 'rating' for star category (1-5), convert to 10-point scale for display
-  // Other sources use reviewScore (already on 10-point scale)
-  const rating = property.property?.reviewScore ?? 
-    (property.reviewScore ? Number(property.reviewScore) : 
-    (property.rating ? Number(property.rating) * 2 : 0));
-  const reviews = Number(property.property?.reviewCount ?? property.num_reviews ?? 0);
+  // Prioritize Google Places rating (scale 1-5, display as-is)
+  const hasGoogleData = property.__hasGoogleData || property.hasGoogleData;
+  const googleRating = property.__googleRating || property.googleRating;
+  const googleReviews = property.__googleReviews || property.googleReviews || [];
+  const googleReviewCount = property.__googleRatingCount || property.googleRatingCount || 0;
+  
+  // Use Google rating if available, otherwise fall back to other sources
+  const rating = googleRating 
+    ? googleRating 
+    : (property.property?.reviewScore ?? 
+      (property.reviewScore ? Number(property.reviewScore) : 
+      (property.rating ? Number(property.rating) * 2 : 0)));
+  const reviews = googleRating ? googleReviewCount : Number(property.property?.reviewCount ?? property.num_reviews ?? 0);
   
   const getCleanPrice = () => {
     // Priority to priceBreakdown (most reliable from tool results)
@@ -94,7 +101,16 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const displayPrice = getCleanPrice();
   const currency = property.currency || "USD";
 
-  const getRatingText = (score: number) => {
+  const getRatingText = (score: number, isGoogle: boolean = false) => {
+    // Google ratings are on 1-5 scale
+    if (isGoogle) {
+      if (score >= 4.5) return "Exceptional";
+      if (score >= 4.0) return "Excellent";
+      if (score >= 3.5) return "Very Good";
+      if (score >= 3.0) return "Good";
+      return "Pleasant";
+    }
+    // Other ratings on 1-10 scale
     if (score >= 9) return "Superb";
     if (score >= 8.5) return "Excellent";
     if (score >= 8) return "Very Good";
@@ -219,14 +235,22 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
               </p>
               
               {rating > 0 && (
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs px-2 py-0.5 font-bold">
-                    {rating.toFixed(1)}
-                  </Badge>
-                  <span className="text-xs font-medium">{getRatingText(rating)}</span>
-                  {reviews > 0 && (
-                    <span className="text-xs text-muted-foreground">({reviews})</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  {hasGoogleData && (
+                    <Badge variant="default" className="text-xs px-2 py-0.5 font-semibold bg-primary/90">
+                      <Star className="h-3 w-3 mr-1 fill-current" />
+                      Google Places
+                    </Badge>
                   )}
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs px-2 py-0.5 font-bold">
+                      {rating.toFixed(1)}{hasGoogleData ? '/5' : '/10'}
+                    </Badge>
+                    <span className="text-xs font-medium">{getRatingText(rating, hasGoogleData)}</span>
+                    {reviews > 0 && (
+                      <span className="text-xs text-muted-foreground">({reviews.toLocaleString()})</span>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -306,7 +330,42 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                   )}
                 </div>
               )}
-              {property.property?.reviews && property.property.reviews.length > 0 && (
+              {googleReviews && googleReviews.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-xs">Google Reviews:</p>
+                    <Badge variant="outline" className="text-xs">
+                      {googleReviewCount.toLocaleString()} reviews
+                    </Badge>
+                  </div>
+                  {googleReviews.slice(0, 3).map((review: any, idx: number) => (
+                    <div key={idx} className="bg-background rounded-md p-2.5 space-y-1.5 border border-border/50">
+                      <div className="flex items-center gap-1.5">
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-3 w-3 ${
+                                i < review.rating
+                                  ? 'fill-primary text-primary'
+                                  : 'fill-muted text-muted'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <span className="font-medium text-xs">{review.author}</span>
+                        {review.relativePublishTime && (
+                          <span className="text-muted-foreground text-xs">· {review.relativePublishTime}</span>
+                        )}
+                      </div>
+                      <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3">
+                        {review.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {!googleReviews?.length && property.property?.reviews && property.property.reviews.length > 0 && (
                 <div className="mt-3 space-y-2">
                   <p className="font-medium text-xs">Recent Reviews:</p>
                   {property.property.reviews.slice(0, 2).map((review: any, idx: number) => (

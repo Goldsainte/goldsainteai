@@ -292,37 +292,47 @@ async function enrichWithGooglePlaces(hotels: any[], cityName: string) {
         
         if (!place || !place.id) return;
 
-        // Fetch detailed place information
-        const detailsResponse = await fetch(`https://places.googleapis.com/v1/${place.id}`, {
-          headers: {
-            'X-Goog-Api-Key': apiKey,
-            'X-Goog-FieldMask': 'displayName,rating,userRatingCount,photos,editorialSummary'
-          }
-        });
+    // Fetch detailed place information including reviews
+    const detailsResponse = await fetch(`https://places.googleapis.com/v1/${place.id}`, {
+      headers: {
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'displayName,rating,userRatingCount,photos,reviews,editorialSummary'
+      }
+    });
 
-        if (!detailsResponse.ok) return;
+    if (!detailsResponse.ok) return;
 
-        const details = await detailsResponse.json();
-        
-        // Extract and add photos
-        const photos = (details.photos || [])
-          .slice(0, 12)
-          .map((photo: any) => ({
-            url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=800&maxWidthPx=1200`,
-            attribution: "Google Places"
-          }));
+    const details = await detailsResponse.json();
+    
+    // Extract and add photos
+    const photos = (details.photos || [])
+      .slice(0, 12)
+      .map((photo: any) => ({
+        url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=800&maxWidthPx=1200`,
+        attribution: "Google Places"
+      }));
 
-        if (photos.length > 0) {
-          hotel.__googlePhotos = photos;
-        }
+    if (photos.length > 0) {
+      hotel.__googlePhotos = photos;
+    }
 
-        // Add rating data
-        if (details.rating) {
-          hotel.__googleRating = details.rating;
-          hotel.__googleRatingCount = details.userRatingCount || 0;
-        }
+    // Add rating data
+    if (details.rating) {
+      hotel.__googleRating = details.rating;
+      hotel.__googleRatingCount = details.userRatingCount || 0;
+    }
 
-        hotel.__hasGoogleData = true;
+    // Add reviews
+    if (details.reviews && details.reviews.length > 0) {
+      hotel.__googleReviews = details.reviews.slice(0, 5).map((review: any) => ({
+        author: review.authorAttribution?.displayName || 'Google User',
+        rating: review.rating || 0,
+        text: review.text?.text || review.originalText?.text || '',
+        relativePublishTime: review.relativePublishTimeDescription || '',
+      }));
+    }
+
+    hotel.__hasGoogleData = true;
         
       } catch (e) {
         console.error(`Error enriching hotel ${hotel.hotel?.name}:`, e);
