@@ -296,3 +296,9 @@ verify_jwt = false
 
 [functions.hotelbeds-search-transfers]
 verify_jwt = false
+
+[functions.get-personalized-recommendations]
+verify_jwt = true
+
+[functions.generate-trip-itinerary]
+verify_jwt = true
