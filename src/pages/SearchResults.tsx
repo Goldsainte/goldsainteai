@@ -17,7 +17,7 @@ import { AdvancedFlightFilters } from "@/components/AdvancedFlightFilters";
 import { HotelSearchWithFilters } from "@/components/hotels";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, SlidersHorizontal, Map, List, ArrowLeft, Trophy, DollarSign, Star, MapPin, Zap } from "lucide-react";
+import { Loader2, SlidersHorizontal, Map, List, ArrowLeft, Trophy, DollarSign, Star, MapPin, Zap, ArrowUp } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -71,6 +71,7 @@ const SearchResults = () => {
   const [selectedDropoffAddress, setSelectedDropoffAddress] = useState<string | undefined>();
   const [uberFallbackMode, setUberFallbackMode] = useState(false);
   const [isSearchBarCompact, setIsSearchBarCompact] = useState(false);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -139,15 +140,20 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
     loadPreferences();
   }, [user]);
 
-  // Scroll detection for compact search bar
+  // Scroll detection for compact search bar and scroll-to-top button
   useEffect(() => {
     const handleScroll = () => {
       setIsSearchBarCompact(window.scrollY > 100);
+      setShowScrollTop(window.scrollY > 300);
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Polling for Uber updates when in transportation or fallback mode
   useEffect(() => {
@@ -1174,6 +1180,17 @@ if (minRating && searchType !== "restaurants") {
           pickupAddress={selectedPickupAddress}
           dropoffAddress={selectedDropoffAddress}
         />
+      )}
+
+      {showScrollTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 rounded-full w-12 h-12 shadow-lg"
+          size="icon"
+          aria-label="Scroll to top"
+        >
+          <ArrowUp className="h-5 w-5" />
+        </Button>
       )}
     </div>
   );
