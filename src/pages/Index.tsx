@@ -717,7 +717,10 @@ const queries = {
         aiMessage.includes('one-way rental or round-trip') ||
         aiMessage.includes('is this a one-way rental')
       ) {
-        if (!tripTypeResolvedRef.current && !showTripTypeSelector) {
+        // Only show selector for flights
+        const isFlightQuestion = aiMessage.includes('flight');
+        
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightQuestion) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }
