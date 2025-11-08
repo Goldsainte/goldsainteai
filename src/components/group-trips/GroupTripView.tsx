@@ -12,6 +12,7 @@ import { useGroupTripRealtime } from '@/hooks/useGroupTripRealtime';
 import { AddSuggestionDialog } from './AddSuggestionDialog';
 import { InviteMembersDialog } from './InviteMembersDialog';
 import { TripChat } from './TripChat';
+import { BudgetTracker } from './BudgetTracker';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -356,7 +357,14 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
         {isCreator && <InviteMembersDialog tripId={tripId} onMembersAdded={fetchTripData} />}
       </div>
 
-      {isMember && <TripChat tripId={tripId} members={members} />}
+      <div className="grid gap-6 md:grid-cols-2">
+        <BudgetTracker 
+          suggestions={suggestions} 
+          members={members}
+          budgetPerPerson={trip.budget_per_person}
+        />
+        {isMember && <TripChat tripId={tripId} members={members} />}
+      </div>
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
