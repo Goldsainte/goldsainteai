@@ -13,6 +13,7 @@ import { AddSuggestionDialog } from './AddSuggestionDialog';
 import { InviteMembersDialog } from './InviteMembersDialog';
 import { TripChat } from './TripChat';
 import { BudgetTracker } from './BudgetTracker';
+import { PersonalExpenseTracker } from './PersonalExpenseTracker';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -27,6 +28,7 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
   const [members, setMembers] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [votes, setVotes] = useState<Map<string, any>>(new Map());
+  const [participants, setParticipants] = useState<any[]>([]);
   const previousSuggestionsRef = useRef<any[]>([]);
 
   const fetchTripData = async () => {
@@ -51,6 +53,15 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
 
       if (membersError) throw membersError;
       setMembers(membersData || []);
+
+      // Fetch participants
+      const { data: participantsData, error: participantsError } = await supabase
+        .from('suggestion_participants')
+        .select('*')
+        .eq('trip_id', tripId);
+
+      if (participantsError) throw participantsError;
+      setParticipants(participantsData || []);
 
       // Fetch suggestions with vote counts
       const { data: suggestionsData, error: suggestionsError } = await supabase
@@ -179,6 +190,29 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
     onVoteChanged: fetchTripData,
   });
 
+  // Subscribe to participant changes
+  useEffect(() => {
+    const channel = supabase
+      .channel('participant-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'suggestion_participants',
+          filter: `trip_id=eq.${tripId}`,
+        },
+        () => {
+          fetchTripData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [tripId]);
+
   useEffect(() => {
     if (tripId) {
       fetchTripData();
@@ -227,6 +261,65 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
     }
   };
 
+  const handleParticipationToggle = async (suggestionId: string, currentStatus: string | null) => {
+    if (!user) return;
+
+    try {
+      if (!currentStatus) {
+        // Add participation
+        const { error } = await supabase
+          .from('suggestion_participants')
+          .insert([{
+            suggestion_id: suggestionId,
+            user_id: user.id,
+            trip_id: tripId,
+            status: 'interested',
+          }] as any);
+
+        if (error) throw error;
+      } else {
+        // Cycle through statuses: interested -> confirmed -> declined -> remove
+        const statusCycle: Record<string, string | null> = {
+          'interested': 'confirmed',
+          'confirmed': 'declined',
+          'declined': null,
+        };
+
+        const nextStatus = statusCycle[currentStatus];
+
+        if (nextStatus === null) {
+          // Remove participation
+          const { error } = await supabase
+            .from('suggestion_participants')
+            .delete()
+            .eq('suggestion_id', suggestionId)
+            .eq('user_id', user.id);
+
+          if (error) throw error;
+        } else {
+          // Update status
+          const { error } = await supabase
+            .from('suggestion_participants')
+            .update({ status: nextStatus } as any)
+            .eq('suggestion_id', suggestionId)
+            .eq('user_id', user.id);
+
+          if (error) throw error;
+        }
+      }
+
+      // Refresh data
+      fetchTripData();
+    } catch (error: any) {
+      console.error('Error updating participation:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to update participation',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (loading) {
     return (
       <Card>
@@ -257,6 +350,32 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
                         suggestion.downvotes === 0;
     const isPopular = suggestion.upvotes >= 5;
 
+    const userParticipation = participants.find(
+      p => p.suggestion_id === suggestion.id && p.user_id === user?.id
+    );
+    const participantCount = participants.filter(
+      p => p.suggestion_id === suggestion.id && p.status !== 'declined'
+    ).length;
+    const splitCost = suggestion.price && participantCount > 0 
+      ? suggestion.price / participantCount 
+      : suggestion.price;
+
+    const participationButtonText = !userParticipation 
+      ? "I'm Interested" 
+      : userParticipation.status === 'interested' 
+      ? 'Confirm' 
+      : userParticipation.status === 'confirmed'
+      ? 'Decline'
+      : 'Removed';
+
+    const participationButtonVariant = !userParticipation 
+      ? 'outline' 
+      : userParticipation.status === 'interested' 
+      ? 'secondary' 
+      : userParticipation.status === 'confirmed'
+      ? 'default'
+      : 'destructive';
+
     return (
       <Card key={suggestion.id} className={isUnanimous ? 'border-yellow-500 shadow-lg animate-pulse' : isPopular ? 'border-primary shadow-md' : ''}>
         <CardHeader>
@@ -283,8 +402,32 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
         {suggestion.price && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <DollarSign className="h-4 w-4" />
-            <span>${suggestion.price.toFixed(2)}</span>
+            <span>
+              ${suggestion.price.toFixed(2)}
+              {participantCount > 0 && (
+                <span className="ml-2 text-xs">
+                  (${splitCost.toFixed(2)}/person with {participantCount} {participantCount === 1 ? 'participant' : 'participants'})
+                </span>
+              )}
+            </span>
           </div>
+        )}
+
+        {suggestion.price && isMember && (
+          <Button
+            size="sm"
+            variant={participationButtonVariant}
+            onClick={() => handleParticipationToggle(suggestion.id, userParticipation?.status || null)}
+            className="w-full"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            {participationButtonText}
+            {userParticipation && userParticipation.status !== 'declined' && (
+              <Badge variant="outline" className="ml-2">
+                ${splitCost.toFixed(2)}
+              </Badge>
+            )}
+          </Button>
         )}
 
         <div className="flex items-center gap-2 pt-2">
@@ -358,13 +501,22 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
+        {isMember && (
+          <PersonalExpenseTracker 
+            suggestions={suggestions}
+            participants={participants}
+            userId={user?.id || ''}
+            budgetPerPerson={trip.budget_per_person}
+          />
+        )}
         <BudgetTracker 
           suggestions={suggestions} 
           members={members}
           budgetPerPerson={trip.budget_per_person}
         />
-        {isMember && <TripChat tripId={tripId} members={members} />}
       </div>
+
+      {isMember && <TripChat tripId={tripId} members={members} />}
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-5">

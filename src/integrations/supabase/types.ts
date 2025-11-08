@@ -6139,6 +6139,48 @@ export type Database = {
           },
         ]
       }
+      suggestion_participants: {
+        Row: {
+          created_at: string
+          id: string
+          status: string
+          suggestion_id: string
+          trip_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string
+          suggestion_id: string
+          trip_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string
+          suggestion_id?: string
+          trip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_participants_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "trip_suggestions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestion_participants_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "group_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_reviews: {
         Row: {
           booking_id: string | null
