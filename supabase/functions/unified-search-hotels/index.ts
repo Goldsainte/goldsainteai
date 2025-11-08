@@ -27,7 +27,7 @@ async function getCuratedHotels(supabase: any, cityCode: string) {
 }
 
 function getCacheKey(params: any): string {
-  return `hotels|${JSON.stringify(params)}`;
+  return `hotels|v2|${JSON.stringify(params)}`;
 }
 
 async function getFromCache(supabase: any, key: string): Promise<any | null> {
@@ -40,7 +40,24 @@ async function getFromCache(supabase: any, key: string): Promise<any | null> {
       .single();
     
     if (error || !data) return null;
-    return data.data;
+    
+    const cachedData = data.data;
+    
+    // Validate cached results have photos (reject old Amadeus-only cache without photos)
+    if (cachedData?.results && cachedData.results.length > 0) {
+      const firstHotel = cachedData.results[0];
+      const hasPhotos = (firstHotel.photos?.length > 0) || 
+                       (firstHotel.property?.photoUrls?.length > 0) ||
+                       (firstHotel.__expediaPhotos?.length > 0) ||
+                       (firstHotel.__googlePhotos?.length > 0);
+      
+      if (!hasPhotos) {
+        console.log('Cache found but missing photos, invalidating and fetching fresh data');
+        return null;
+      }
+    }
+    
+    return cachedData;
   } catch {
     return null;
   }
