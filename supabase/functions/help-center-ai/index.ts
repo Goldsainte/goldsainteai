@@ -1,6 +1,9 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,6 +78,47 @@ When search results are available:
 
 Remember: You're a travel expert helping people plan their dream trips! Focus on inspiring travel experiences and practical advice.`;
 
+const tools = [
+  {
+    type: "function",
+    function: {
+      name: "search_hotels",
+      description: "Search for hotels in a specific location with check-in/check-out dates, guest count, and budget constraints. Returns budget-filtered results only.",
+      parameters: {
+        type: "object",
+        properties: {
+          location: {
+            type: "string",
+            description: "City or destination name (e.g., 'London', 'Paris', 'New York')"
+          },
+          checkIn: {
+            type: "string",
+            description: "Check-in date in YYYY-MM-DD format"
+          },
+          checkOut: {
+            type: "string",
+            description: "Check-out date in YYYY-MM-DD format"
+          },
+          guests: {
+            type: "number",
+            description: "Number of guests"
+          },
+          max_total_price: {
+            type: "number",
+            description: "Maximum price per night in the specified currency"
+          },
+          currency: {
+            type: "string",
+            description: "Currency code (e.g., 'USD', 'EUR', 'GBP')",
+            enum: ["USD", "EUR", "GBP"]
+          }
+        },
+        required: ["location", "checkIn", "checkOut", "guests", "max_total_price", "currency"]
+      }
+    }
+  }
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -87,61 +131,146 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages,
-        ],
-      }),
-    });
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let conversationMessages = [
+      { role: "system", content: systemPrompt },
+      ...messages,
+    ];
 
-    if (!response.ok) {
-      if (response.status === 429) {
+    // Tool calling loop - allow up to 5 iterations
+    for (let iteration = 0; iteration < 5; iteration++) {
+      console.log(`AI call iteration ${iteration + 1}`);
+      
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: conversationMessages,
+          tools: tools,
+          tool_choice: "auto"
+        }),
+      });
+
+      if (!response.ok) {
+        if (response.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+            {
+              status: 429,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+        if (response.status === 402) {
+          return new Response(
+            JSON.stringify({ error: "AI service quota exceeded. Please contact support." }),
+            {
+              status: 402,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        }
+        const errorText = await response.text();
+        console.error("AI Gateway error:", response.status, errorText);
+        throw new Error(`AI Gateway error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const assistantMessage = data.choices?.[0]?.message;
+
+      if (!assistantMessage) {
+        throw new Error("No response from AI");
+      }
+
+      // If no tool calls, return the final response
+      if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
+        const finalMessageRaw = assistantMessage.content || "";
+        const finalMessage = stripRoutes(finalMessageRaw);
+        
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }),
+          JSON.stringify({ response: finalMessage }),
           {
-            status: 429,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
         );
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI service quota exceeded. Please contact support." }),
-          {
-            status: 402,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
+
+      // Add assistant message with tool calls to conversation
+      conversationMessages.push(assistantMessage);
+
+      // Execute each tool call
+      for (const toolCall of assistantMessage.tool_calls) {
+        console.log(`Executing tool: ${toolCall.function.name}`);
+        
+        let toolResult;
+        
+        if (toolCall.function.name === "search_hotels") {
+          const args = JSON.parse(toolCall.function.arguments);
+          console.log("Hotel search args:", args);
+          
+          try {
+            const { data: hotelData, error: hotelError } = await supabase.functions.invoke('unified-search-hotels', {
+              body: {
+                location: args.location,
+                checkIn: args.checkIn,
+                checkOut: args.checkOut,
+                guests: args.guests,
+                max_total_price: args.max_total_price,
+                currency: args.currency,
+                sortBy: 'best_value',
+                filter: 'all'
+              }
+            });
+
+            if (hotelError) {
+              console.error("Hotel search error:", hotelError);
+              toolResult = {
+                status: "ERROR",
+                message: "Failed to search hotels",
+                error: hotelError.message
+              };
+            } else {
+              const results = hotelData?.results || [];
+              console.log(`Found ${results.length} hotels`);
+              
+              toolResult = {
+                status: results.length > 0 ? "OK" : "NO_RESULTS",
+                data: results.slice(0, 20), // Limit to top 20 for context
+                count: results.length,
+                search_params: args
+              };
+            }
+          } catch (error) {
+            console.error("Tool execution error:", error);
+            toolResult = {
+              status: "ERROR",
+              message: "Failed to execute hotel search",
+              error: error instanceof Error ? error.message : String(error)
+            };
           }
-        );
+        } else {
+          toolResult = {
+            status: "ERROR",
+            message: `Unknown tool: ${toolCall.function.name}`
+          };
+        }
+
+        // Add tool result to conversation
+        conversationMessages.push({
+          role: "tool",
+          tool_call_id: toolCall.id,
+          content: JSON.stringify(toolResult)
+        });
       }
-      const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
     }
 
-    const data = await response.json();
-    const assistantMessageRaw = data.choices?.[0]?.message?.content;
-
-    if (!assistantMessageRaw) {
-      throw new Error("No response from AI");
-    }
-
-    // Strip any technical routes from the response
-    const assistantMessage = stripRoutes(assistantMessageRaw);
-
-    return new Response(
-      JSON.stringify({ response: assistantMessage }),
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    // If we exhausted iterations, return error
+    throw new Error("Maximum tool call iterations reached");
+    
   } catch (error) {
     console.error("Help Center AI error:", error);
     return new Response(
