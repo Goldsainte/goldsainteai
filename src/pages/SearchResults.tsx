@@ -14,6 +14,7 @@ import { HotelFilters } from "@/components/HotelFilters";
 import { RestaurantFilters } from "@/components/RestaurantFilters";
 import { AdvancedEventFilters } from "@/components/AdvancedEventFilters";
 import { AdvancedFlightFilters } from "@/components/AdvancedFlightFilters";
+import { HotelSearchWithFilters } from "@/components/hotels";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, SlidersHorizontal, Map, List, ArrowLeft, Trophy, DollarSign, Star, MapPin, Zap } from "lucide-react";
@@ -1008,8 +1009,8 @@ if (minRating && searchType !== "restaurants") {
                   <VendorPromotionFeed displayContext="search" limit={2} />
                 </div>
 
-                {/* Map View at Top for hotels, restaurants, and events */}
-                {(searchType === "hotels" || searchType === "restaurants" || searchType === "events") && (
+                {/* Map View at Top for restaurants and events (hotels handled in HotelSearchWithFilters) */}
+                {(searchType === "restaurants" || searchType === "events") && (
                   <ResultsMapView 
                     location={location || ''} 
                     results={filteredResults}
@@ -1017,17 +1018,33 @@ if (minRating && searchType !== "restaurants") {
                   />
                 )}
 
-                {viewMode === "list" ? (
+                {/* Hotel search with slider-gated filtering and race condition handling */}
+                {searchType === "hotels" && location && checkIn && checkOut ? (
+                  <HotelSearchWithFilters
+                    initialQuery={{
+                      location,
+                      checkIn,
+                      checkOut,
+                      guests: parseInt(guests) || 2,
+                      maxPrice: priceRange[1] || 500,
+                      currency: 'USD',
+                      sortBy: rankingSort
+                    }}
+                    onQueryChange={(query) => {
+                      // Update price range state to keep filters in sync
+                      setPriceRange([priceRange[0], query.maxPrice]);
+                    }}
+                  />
+                ) : searchType === "hotels" ? (
+                  <div className="text-center py-12 text-muted-foreground">
+                    <p>Please enter hotel search details using the search bar above</p>
+                  </div>
+                ) : null}
+
+                {viewMode === "list" && searchType !== "hotels" ? (
                   <div className="space-y-2">
                     {filteredResults.map((result, index) => {
-                      if (searchType === "hotels") {
-                        return (
-                          <CompactHotelCard
-                            key={`${result.hotel_id || result.dest_id || 'hotel'}-${index}`}
-                            property={result}
-                          />
-                        );
-                      } else if (searchType === "flights") {
+                      if (searchType === "flights") {
                         return (
                           <CompactFlightCard
                             key={`${result.id || 'flight'}-${index}`}
