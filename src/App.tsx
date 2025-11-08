@@ -118,6 +118,7 @@ import WhatWeDo from "./pages/WhatWeDo";
 import DisputeResolution from "./pages/DisputeResolution";
 import PrivacyCookies from "./pages/PrivacyCookies";
 import HelpCenter from "./pages/HelpCenter";
+import PriceAlerts from "./pages/PriceAlerts";
 
 const queryClient = new QueryClient();
 
@@ -271,6 +272,7 @@ function AppContent() {
           <Route path="/search" element={<Search />} />
           <Route path="/trending" element={<Trending />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/price-alerts" element={<PriceAlerts />} />
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search-results" element={<SearchResults />} />

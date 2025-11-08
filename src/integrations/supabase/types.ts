@@ -2859,6 +2859,66 @@ export type Database = {
           },
         ]
       }
+      flight_price_alerts: {
+        Row: {
+          adults: number
+          cabin_class: string
+          created_at: string
+          currency: string
+          current_price: number | null
+          departure_date: string
+          destination_code: string
+          id: string
+          is_active: boolean
+          last_checked_at: string | null
+          last_notified_at: string | null
+          notification_frequency: string
+          origin_code: string
+          return_date: string | null
+          target_price: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          adults?: number
+          cabin_class?: string
+          created_at?: string
+          currency?: string
+          current_price?: number | null
+          departure_date: string
+          destination_code: string
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_notified_at?: string | null
+          notification_frequency?: string
+          origin_code: string
+          return_date?: string | null
+          target_price: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          adults?: number
+          cabin_class?: string
+          created_at?: string
+          currency?: string
+          current_price?: number | null
+          departure_date?: string
+          destination_code?: string
+          id?: string
+          is_active?: boolean
+          last_checked_at?: string | null
+          last_notified_at?: string | null
+          notification_frequency?: string
+          origin_code?: string
+          return_date?: string | null
+          target_price?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       gift_transactions: {
         Row: {
           coin_amount: number
@@ -9658,6 +9718,10 @@ export type Database = {
         }[]
       }
       get_total_users_count: { Args: never; Returns: number }
+      get_user_active_alerts_count: {
+        Args: { p_user_id: string }
+        Returns: number
+      }
       get_user_ai_usage_count: { Args: { p_user_id: string }; Returns: number }
       get_user_tier: {
         Args: { _user_id: string }

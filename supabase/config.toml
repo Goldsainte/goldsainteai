@@ -333,3 +333,6 @@ verify_jwt = false
 [functions.lookup-baggage-policy]
 verify_jwt = false
 
+[functions.check-flight-price-alerts]
+verify_jwt = false
+

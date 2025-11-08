@@ -1085,6 +1085,12 @@ if (minRating && searchType !== "restaurants") {
                             key={`${result.id || 'flight'}-${index}`}
                             flight={result}
                             dictionaries={flightDictionaries}
+                            origin={origin}
+                            destination={destination}
+                            departureDate={departureDate}
+                            returnDate={returnDate}
+                            adults={parseInt(adults)}
+                            cabinClass={cabinClass}
                           />
                         );
                       } else if (searchType === "cars") {
