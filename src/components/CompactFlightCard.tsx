@@ -52,15 +52,29 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
   
-  // Validate price data
-  const basePrice = parseFloat(flight.price.total);
-  if (isNaN(basePrice) || basePrice <= 0) {
-    console.warn('Invalid flight price:', flight.price.total);
+  // Validate price data - handle both number and object formats
+  let basePrice: number;
+  let currency: string;
+  
+  if (typeof flight.price === 'number') {
+    // Price is a direct number (e.g., 493.46)
+    basePrice = flight.price;
+    currency = flight.travelerPricings?.[0]?.price?.currency || 'USD';
+  } else if (flight.price && typeof flight.price === 'object') {
+    // Price is an object with total and currency
+    basePrice = parseFloat(flight.price.total || flight.price.base || '0');
+    currency = flight.price.currency || 'USD';
+  } else {
+    console.warn('Invalid flight price format:', flight.price);
     return null;
   }
   
-  const markedUpPrice = (basePrice * 1.15).toFixed(2);
-  const currency = flight.price.currency || 'USD';
+  if (isNaN(basePrice) || basePrice <= 0) {
+    console.warn('Invalid flight price value:', basePrice);
+    return null;
+  }
+  
+  const markedUpPrice = basePrice * 1.15;
 
   const formatTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleTimeString('en-US', { 
@@ -153,7 +167,7 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           {/* Bottom Row: Price and Action Buttons */}
           <div className="flex items-center justify-between gap-2 pt-2 border-t">
             <div>
-              <div className="text-lg font-bold">{formatCurrency(parseFloat(markedUpPrice), currency)}</div>
+              <div className="text-lg font-bold">{formatCurrency(markedUpPrice, currency)}</div>
               <div className="text-[10px] text-muted-foreground">{getCabinClass()}</div>
             </div>
             <div className="flex gap-2">
@@ -207,7 +221,7 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           {/* Price & Actions */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <div className="text-xl font-bold">{formatCurrency(parseFloat(markedUpPrice), currency)}</div>
+              <div className="text-xl font-bold">{formatCurrency(markedUpPrice, currency)}</div>
               <div className="text-xs text-muted-foreground">total</div>
             </div>
             
