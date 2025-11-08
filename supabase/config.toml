@@ -78,6 +78,9 @@ verify_jwt = true
 [functions.get-hotel-details]
 verify_jwt = false
 
+[functions.booking-search-hotels]
+verify_jwt = false
+
 [functions.fetch-restaurants]
 verify_jwt = false
 

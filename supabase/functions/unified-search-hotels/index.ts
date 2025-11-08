@@ -350,21 +350,56 @@ serve(async (req) => {
     const token = await getAmadeusToken();
     const cityCode = await resolveCityCode(token, location);
 
+    let bookingHotels: any[] = [];
     let amadeusHotels: any[] = [];
     let enriched: any[] = [];
     
-    // Fetch Amadeus hotels only if filter allows
+    // Try Booking.com first (has photos + reviews built-in)
     if (hotelFilter === 'all' || hotelFilter === 'amadeus') {
+      try {
+        console.log("Trying Booking.com API first...");
+        const { data: bookingData, error: bookingError } = await supabaseClient.functions.invoke('booking-search-hotels', {
+          body: { 
+            location: cityCode, 
+            checkIn, 
+            checkOut, 
+            adults: Number(guests) || 2,
+            max_total_price,
+            currency
+          }
+        });
+        
+        if (!bookingError && bookingData?.results) {
+          bookingHotels = bookingData.results;
+          console.log(`Booking.com returned ${bookingHotels.length} hotels with photos and reviews`);
+        } else {
+          console.log("Booking.com failed, will try Amadeus:", bookingError?.message);
+        }
+      } catch (e) {
+        console.log("Booking.com error, falling back to Amadeus:", e);
+      }
+    }
+    
+    // Fetch Amadeus hotels as fallback if Booking.com returns insufficient results
+    if ((hotelFilter === 'all' || hotelFilter === 'amadeus') && bookingHotels.length < 5) {
+      console.log(`Booking.com returned ${bookingHotels.length} hotels, fetching Amadeus as supplement...`);
       amadeusHotels = await fetchAmadeusHotels(token, cityCode, checkIn, checkOut, Number(guests) || 2);
       console.log("Amadeus hotels fetched:", amadeusHotels.length);
       enriched = await enrichWithExpedia(amadeusHotels, location, checkIn, checkOut);
+      
+      // Merge Booking.com and Amadeus results, prioritizing Booking.com
+      enriched = [...bookingHotels, ...enriched];
+      console.log(`Combined results: ${bookingHotels.length} from Booking.com + ${amadeusHotels.length} from Amadeus`);
+    } else {
+      enriched = bookingHotels;
+      console.log(`Using ${enriched.length} hotels from Booking.com`);
     }
 
-    // Fetch curated hotels if filter allows or if no Amadeus results
+    // Fetch curated hotels if filter allows or if no results yet
     if (hotelFilter === 'curated' || (hotelFilter === 'all' && enriched.length === 0)) {
       const logMessage = hotelFilter === 'curated' 
         ? `Fetching curated recommendations for ${cityCode} (user filter: curated only)`
-        : `No Amadeus results, fetching curated recommendations for ${cityCode}`;
+        : `No Booking.com or Amadeus results, fetching curated recommendations for ${cityCode}`;
       console.log(logMessage);
       
       const curatedHotels = await getCuratedHotels(supabaseClient, cityCode);
