@@ -15,9 +15,9 @@ serve(async (req) => {
     
     console.log('Booking.com hotel search request:', { location, checkIn, checkOut, adults });
 
-    const apiKey = Deno.env.get('BOOKING_API_KEY');
+    const apiKey = Deno.env.get('RAPIDAPI_KEY');
     if (!apiKey) {
-      throw new Error('BOOKING_API_KEY not configured');
+      throw new Error('RAPIDAPI_KEY not configured');
     }
 
     // Resolve Booking.com destination ID from the provided location (city name or numeric dest_id)
