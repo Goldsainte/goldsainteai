@@ -478,8 +478,14 @@ serve(async (req) => {
       }
     }
 
-    // Filter out test/demo hotels
+    // Filter out test/demo hotels (only for Amadeus hotels - Booking.com already filtered)
     const filteredHotels = enriched.filter((h: any) => {
+      // Skip filtering for Booking.com hotels (already filtered by booking-search-hotels)
+      if (h.source === 'booking.com' || h.hasBookingData) {
+        return true;
+      }
+      
+      // Apply filtering only to Amadeus hotels
       const name = (h.hotel?.name || '').toLowerCase();
       const description = (h.offers?.[0]?.room?.description?.text || '').toLowerCase();
       const lat = h.hotel?.latitude || 0;
