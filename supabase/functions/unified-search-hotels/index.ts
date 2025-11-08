@@ -462,14 +462,14 @@ serve(async (req) => {
     const priceFilteredHotels = filteredHotels.filter((h: any) => {
       const offer = h.offers?.[0] || {};
       const total = offer.price?.total ? parseFloat(offer.price.total) : 0;
-      const offerCurrency = offer.price?.currency || 'USD';
       const perNight = total / nights;
       const perNightWithMarkup = perNight * 1.15; // Apply same 15% markup
       
-      return offerCurrency === currency && perNightWithMarkup <= maxPricePerNight;
+      // Don't filter by currency - accept all currencies and show price as-is
+      return perNightWithMarkup <= maxPricePerNight;
     });
     
-    console.log(`Server-side price filter: ${filteredHotels.length} -> ${priceFilteredHotels.length} hotels within ${maxPricePerNight} ${currency}/night`);
+    console.log(`Server-side price filter: ${filteredHotels.length} -> ${priceFilteredHotels.length} hotels within ${maxPricePerNight}/night (any currency)`);
     
     const results = priceFilteredHotels.map((h: any) => {
       const info = h.hotel || {};
