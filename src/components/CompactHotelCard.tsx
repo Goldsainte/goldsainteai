@@ -34,10 +34,14 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   }, []);
   
   const title = property.property?.name || property.name || property.title || "Hotel";
-  // Use server-provided image_url first (always has fallback), then fall back to legacy fields
+  
+  // Image handling - prioritize available image sources with guaranteed fallback
   const allImages = property.images || property.photos || property.property?.photoUrls || (property.image ? [property.image] : []);
   const imageUrl = property.image_url || allImages[0];
   const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
+  
+  // Guaranteed fallback if no valid image
+  const finalImage = (image && image.trim()) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop';
   const hasMultipleImages = allImages && allImages.length > 1;
   
   // Check for 360 virtual tour images
@@ -149,14 +153,10 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
             onClick={() => allImages.length > 0 && setShowGallery(true)}
           >
             <img
-              src={image}
+              src={finalImage}
               alt={title}
               loading="lazy"
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={(e) => {
-                // Show fallback image on error
-                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop';
-              }}
             />
             {hasMultipleImages && (
               <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">

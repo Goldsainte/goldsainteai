@@ -32,10 +32,12 @@ const addDays = (date: Date, days: number): Date => {
 };
 
 interface EnhancedSearchBarProps {
+  initialSearchType?: string;
   isCompact?: boolean;
+  hideDatePickers?: boolean;
 }
 
-export const EnhancedSearchBar = ({ isCompact = false }: EnhancedSearchBarProps) => {
+export const EnhancedSearchBar = ({ initialSearchType = "hotels", isCompact = false, hideDatePickers = false }: EnhancedSearchBarProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const routeLocation = useLocation();

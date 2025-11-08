@@ -79,6 +79,14 @@ const SearchResults = () => {
   const checkOut = searchParams.get("checkOut") || "";
   const guests = searchParams.get("guests") || "2";
   
+  // Parse AI chat navigation parameters
+  const fromChat = searchParams.get('from_chat') === 'true';
+  const suppressUI = JSON.parse(searchParams.get('suppress_ui') || '[]') as string[];
+  const hideDatePicker = suppressUI.includes('date_picker');
+  const hideBudgetSlider = suppressUI.includes('budget_slider');
+  const chatMaxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : undefined;
+  const chatCurrency = searchParams.get('currency') || 'USD';
+  
 // Flight-specific params
 const origin = searchParams.get("origin") || "";
 const destination = searchParams.get("destination") || "";
@@ -772,7 +780,10 @@ if (minRating && searchType !== "restaurants") {
           "sticky top-0 z-50 bg-background/95 backdrop-blur-sm transition-all duration-300 -mx-4 px-4 mb-4",
           isSearchBarCompact ? "py-2 shadow-md" : "py-4"
         )}>
-          <EnhancedSearchBar isCompact={isSearchBarCompact} />
+          <EnhancedSearchBar 
+            isCompact={isSearchBarCompact}
+            hideDatePickers={fromChat && hideDatePicker}
+          />
         </div>
 
         {loading ? (
@@ -900,6 +911,7 @@ if (minRating && searchType !== "restaurants") {
                           currentMinRating={minRating || undefined}
                           currentPriceRange={priceRange}
                           resultsCount={filteredResults.length}
+                          hidePriceRange={fromChat && hideBudgetSlider}
                         />
                       ) : searchType === "restaurants" ? (
                         <RestaurantFilters
@@ -988,6 +1000,7 @@ if (minRating && searchType !== "restaurants") {
                       currentMinRating={minRating || undefined}
                       currentPriceRange={priceRange}
                       resultsCount={filteredResults.length}
+                      hidePriceRange={fromChat && hideBudgetSlider}
                     />
                   ) : searchType === "restaurants" ? (
                     <RestaurantFilters
@@ -1047,14 +1060,15 @@ if (minRating && searchType !== "restaurants") {
                       checkIn,
                       checkOut,
                       guests: parseInt(guests) || 2,
-                      maxPrice: priceRange[1] || 500,
-                      currency: 'USD',
+                      maxPrice: chatMaxPrice || priceRange[1] || 500,
+                      currency: chatCurrency || 'USD',
                       sortBy: rankingSort
                     }}
                     onQueryChange={(query) => {
                       // Update price range state to keep filters in sync
-                      setPriceRange([priceRange[0], query.maxPrice]);
+                      setPriceRange([priceRange[0], query.maxPrice || 500]);
                     }}
+                    hidePriceFilter={fromChat && hideBudgetSlider}
                   />
                 ) : searchType === "hotels" ? (
                   <div className="text-center py-12 text-muted-foreground">

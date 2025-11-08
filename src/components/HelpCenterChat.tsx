@@ -59,17 +59,19 @@ const scrollRef = useRef<HTMLDivElement>(null);
 
         // If the AI just performed a hotel search successfully, navigate directly to results
         if (data?.meta?.status === 'OK' && data.meta.search_params) {
-          const sp = data.meta.search_params;
-          const qs = new URLSearchParams({
-            type: 'hotels',
-            location: sp.location,
-            checkIn: sp.checkIn,
-            checkOut: sp.checkOut,
-            guests: String(sp.guests || 2),
+          const searchParams = data.meta.search_params;
+          const queryParams = new URLSearchParams({
+            type: searchParams.type || 'hotels',
+            location: searchParams.location || '',
+            checkIn: searchParams.check_in_date || searchParams.checkIn || '',
+            checkOut: searchParams.check_out_date || searchParams.checkOut || '',
+            guests: searchParams.guests?.toString() || '2',
+            ...(searchParams.max_price && { maxPrice: searchParams.max_price.toString() }),
+            ...(searchParams.currency && { currency: searchParams.currency }),
             from_chat: 'true',
-            suppress_ui: JSON.stringify(['date_picker'])
+            suppress_ui: JSON.stringify(['date_picker', 'budget_slider']),
           });
-          navigate(`/search?${qs.toString()}`);
+          navigate(`/search?${queryParams.toString()}`);
           setIsOpen(false); // Close chat after navigation
         }
       }

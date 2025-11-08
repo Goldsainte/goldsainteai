@@ -20,6 +20,7 @@ interface HotelFiltersProps {
   currentMinRating?: number;
   currentPriceRange?: [number, number];
   resultsCount: number;
+  hidePriceRange?: boolean;
 }
 
 export const HotelFilters = ({ 
@@ -32,7 +33,8 @@ export const HotelFilters = ({
   currentSort = 'popularity',
   currentMinRating,
   currentPriceRange = [0, 1000],
-  resultsCount 
+  resultsCount,
+  hidePriceRange = false
 }: HotelFiltersProps) => {
   const [priceRange, setPriceRange] = useState<[number, number]>(currentPriceRange);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
@@ -162,34 +164,36 @@ export const HotelFilters = ({
             </SheetHeader>
             
             <Accordion type="multiple" className="space-y-4 mt-6">
-              {/* Price Range */}
-              <AccordionItem value="price" className="border rounded-lg px-4">
-                <AccordionTrigger className="hover:no-underline">
-                  <div className="flex items-center gap-2">
-                    <DollarSign className="h-4 w-4" />
-                    <span className="font-semibold">Price Range</span>
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent className="pt-4 pb-2">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-muted-foreground">
-                        ${priceRange[0]} - ${priceRange[1]}
-                      </span>
+              {/* Price Range - hide when coming from chat with budget already set */}
+              {!hidePriceRange && (
+                <AccordionItem value="price" className="border rounded-lg px-4">
+                  <AccordionTrigger className="hover:no-underline">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="h-4 w-4" />
+                      <span className="font-semibold">Price Range</span>
                     </div>
-                    <Slider
-                      min={0}
-                      max={1000}
-                      step={50}
-                      value={priceRange}
-                      onValueChange={(value) => {
-                        setPriceRange(value as [number, number]);
-                        onPriceRangeChange?.(value[0], value[1]);
-                      }}
-                    />
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-4 pb-2">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          ${priceRange[0]} - ${priceRange[1]}
+                        </span>
+                      </div>
+                      <Slider
+                        min={0}
+                        max={1000}
+                        step={50}
+                        value={priceRange}
+                        onValueChange={(value) => {
+                          setPriceRange(value as [number, number]);
+                          onPriceRangeChange?.(value[0], value[1]);
+                        }}
+                      />
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              )}
 
               {/* Property Type */}
               <AccordionItem value="property-type" className="border rounded-lg px-4">

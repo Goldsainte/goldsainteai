@@ -20,9 +20,10 @@ interface HotelQuery {
 interface HotelSearchWithFiltersProps {
   initialQuery: HotelQuery;
   onQueryChange?: (query: HotelQuery) => void;
+  hidePriceFilter?: boolean;
 }
 
-export const HotelSearchWithFilters = ({ initialQuery, onQueryChange }: HotelSearchWithFiltersProps) => {
+export const HotelSearchWithFilters = ({ initialQuery, onQueryChange, hidePriceFilter = false }: HotelSearchWithFiltersProps) => {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const [query, setQuery] = useState<HotelQuery>(initialQuery);
@@ -141,14 +142,16 @@ export const HotelSearchWithFilters = ({ initialQuery, onQueryChange }: HotelSea
 
   return (
     <div className="space-y-6">
-      {/* Filters above results */}
-      <HotelPriceFilter
-        maxPrice={query.maxPrice}
-        currency={query.currency}
-        onPriceChange={handlePriceChange}
-        onCurrencyChange={handleCurrencyChange}
-        disabled={loading}
-      />
+      {/* Filters above results - hide when coming from chat */}
+      {!hidePriceFilter && (
+        <HotelPriceFilter
+          maxPrice={query.maxPrice}
+          currency={query.currency}
+          onPriceChange={handlePriceChange}
+          onCurrencyChange={handleCurrencyChange}
+          disabled={loading}
+        />
+      )}
 
       {/* Loading state */}
       {loading && <HotelSkeletonGrid count={8} />}
