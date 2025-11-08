@@ -285,7 +285,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-[100]" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent
               mode="single"
               selected={departureDate}
@@ -312,7 +312,7 @@ export const EnhancedSearchBar = () => {
                 <span className="truncate">{returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
+            <PopoverContent className="w-auto p-0 bg-background z-[100]" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
               <CalendarComponent 
                 mode="single" 
                 selected={returnDate} 
@@ -335,7 +335,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{totalFlightPassengers} Passenger{totalFlightPassengers !== 1 ? "s" : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full max-w-sm bg-background z-50" align="start">
+          <PopoverContent className="w-full max-w-sm bg-background z-[100]" align="start">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -393,7 +393,7 @@ export const EnhancedSearchBar = () => {
           <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
             <SelectValue placeholder="Class" />
           </SelectTrigger>
-          <SelectContent className="bg-background z-50">
+          <SelectContent className="bg-background z-[100]">
             <SelectItem value="ECONOMY">Economy</SelectItem>
             <SelectItem value="PREMIUM_ECONOMY">Premium Economy</SelectItem>
             <SelectItem value="BUSINESS">Business</SelectItem>
@@ -425,7 +425,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-[100]" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={checkInDate} 
@@ -445,7 +445,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0 bg-background z-50" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-[100]" align="center" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={checkOutDate} 
@@ -465,7 +465,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{totalHotelGuests} Guest{totalHotelGuests !== 1 ? "s" : ""}, {rooms} Room{rooms !== 1 ? "s" : ""}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-full max-w-sm" align="start">
+          <PopoverContent className="w-full max-w-sm bg-background z-[100]" align="start">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <p className="font-medium">Rooms</p>
@@ -537,7 +537,7 @@ export const EnhancedSearchBar = () => {
               <span className="truncate">{eventDate ? format(eventDate, "MMM dd, yyyy") : "Event date"}</span>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
+          <PopoverContent className="w-auto p-0 bg-background z-[100]" align="start" onOpenAutoFocus={(e) => e.preventDefault()}>
             <CalendarComponent 
               mode="single" 
               selected={eventDate} 
