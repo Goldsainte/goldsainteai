@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -27,6 +28,7 @@ export const HotelPriceFilter = ({
   onCurrencyChange,
   disabled = false
 }: HotelPriceFilterProps) => {
+  const [localMax, setLocalMax] = useState(maxPrice);
   const currencySymbol = CURRENCIES.find(c => c.code === currency)?.symbol || currency;
   
   // Determine max slider value based on currency
@@ -54,12 +56,13 @@ export const HotelPriceFilter = ({
           <div className="flex items-center justify-between">
             <Label className="text-sm font-medium">Max Price Per Night</Label>
             <span className="text-lg font-semibold text-primary">
-              {currencySymbol}{maxPrice}
+              {currencySymbol}{localMax}
             </span>
           </div>
           <Slider
-            value={[maxPrice]}
-            onValueChange={(values) => onPriceChange(values[0])}
+            value={[localMax]}
+            onValueChange={(values) => setLocalMax(values[0])}
+            onValueCommit={(values) => onPriceChange(values[0])}
             max={maxSliderValue}
             min={10}
             step={currency === 'JPY' ? 100 : 10}
