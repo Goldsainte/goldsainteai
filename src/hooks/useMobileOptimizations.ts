@@ -74,11 +74,22 @@ export const useKeyboardVisibility = (callback: (isVisible: boolean) => void) =>
     const handleResize = () => {
       const currentHeight = window.innerHeight;
       const isKeyboardVisible = currentHeight < initialHeight * 0.75;
+      
+      // Toggle body class for viewport management
+      if (isKeyboardVisible) {
+        document.body.classList.add('keyboard-open');
+      } else {
+        document.body.classList.remove('keyboard-open');
+      }
+      
       callback(isKeyboardVisible);
     };
 
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      document.body.classList.remove('keyboard-open');
+    };
   }, [callback]);
 };
 

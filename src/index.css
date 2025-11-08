@@ -167,7 +167,19 @@ All colors MUST be HSL.
     
     /* Prevent zoom on form inputs (iOS) */
     input, select, textarea {
-      font-size: 16px;
+      font-size: 16px !important;
+    }
+    
+    /* Additional mobile input optimizations */
+    input:focus, select:focus, textarea:focus {
+      font-size: 16px !important;
+    }
+    
+    /* Prevent viewport shifts when keyboard opens */
+    body.keyboard-open {
+      position: fixed;
+      width: 100%;
+      overflow: hidden;
     }
     
     /* Better tap feedback */
