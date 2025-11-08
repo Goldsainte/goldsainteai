@@ -14,9 +14,9 @@ serve(async (req) => {
   }
 
   try {
-    const { location, checkIn, checkOut, guests = 2, rooms = 1 } = await req.json();
+    const { location, checkIn, checkOut, guests = 2, rooms = 1, max_total_price, currency = 'USD' } = await req.json();
     
-    console.log('Expedia hotel search:', { location, checkIn, checkOut, guests, rooms });
+    console.log('Expedia hotel search:', { location, checkIn, checkOut, guests, rooms, max_total_price, currency });
 
     if (!EXPEDIA_API_KEY || !EXPEDIA_API_SECRET) {
       throw new Error("EXPEDIA_API_KEY and EXPEDIA_API_SECRET must be configured");
@@ -120,8 +120,16 @@ serve(async (req) => {
     });
 
     console.log(`Found ${hotels.length} hotels from Expedia`);
+    
+    // Apply server-side price filtering BEFORE returning results
+    const maxPrice = max_total_price ?? Infinity;
+    const filteredByPrice = hotels.filter((hotel: any) => 
+      hotel.currency === currency && hotel.price <= maxPrice
+    );
+    
+    console.log(`Server-side filter: ${hotels.length} -> ${filteredByPrice.length} hotels within ${maxPrice} ${currency}/night`);
 
-    return new Response(JSON.stringify({ hotels }), {
+    return new Response(JSON.stringify({ hotels: filteredByPrice }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });

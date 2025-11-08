@@ -16,6 +16,7 @@ interface HotelSearchParams {
   amenities?: string[];
   priceRange?: string;
   currency?: string;
+  max_total_price?: number;
 }
 
 interface NormalizedHotel {
@@ -186,14 +187,23 @@ async function searchHotelsAmadeus(
   const resolvedHotels = await Promise.all(hotelPromises);
   hotels.push(...resolvedHotels.filter((h): h is NormalizedHotel => h !== null));
 
+  // Apply server-side price filtering BEFORE sorting
+  const currency = params.currency || 'USD';
+  const maxPrice = params.max_total_price ?? Infinity;
+  const filtered = hotels.filter(h => 
+    h.price.currency === currency && h.price.amount <= maxPrice
+  );
+  
+  console.log(`Filtered ${hotels.length} hotels to ${filtered.length} within budget (${maxPrice} ${currency})`);
+
   // Sort by: price ascending, then rating descending
-  hotels.sort((a, b) => {
+  filtered.sort((a, b) => {
     const priceDiff = a.price.amount - b.price.amount;
     if (priceDiff !== 0) return priceDiff;
     return b.rating - a.rating;
   });
 
-  return hotels;
+  return filtered;
 }
 
 serve(async (req) => {

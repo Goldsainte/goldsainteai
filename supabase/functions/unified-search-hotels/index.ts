@@ -294,7 +294,7 @@ serve(async (req) => {
   const timeoutId = setTimeout(() => controller.abort(), 45000); // 45s timeout
   
   try {
-    const { location, checkIn, checkOut, guests = 2, sortBy = 'best_value', filter = 'all' } = await req.json();
+    const { location, checkIn, checkOut, guests = 2, sortBy = 'best_value', filter = 'all', max_total_price, currency = 'USD' } = await req.json();
     if (!location || !checkIn || !checkOut) {
       clearTimeout(timeoutId);
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
@@ -427,7 +427,22 @@ serve(async (req) => {
 
     // Transform result to UI-friendly structure
     const nights = Math.max(1, Math.ceil((new Date(checkOut).getTime() - new Date(checkIn).getTime()) / (1000 * 60 * 60 * 24)));
-    const results = filteredHotels.map((h: any) => {
+    
+    // Apply server-side price filtering BEFORE transformation
+    const maxPricePerNight = max_total_price ?? Infinity;
+    const priceFilteredHotels = filteredHotels.filter((h: any) => {
+      const offer = h.offers?.[0] || {};
+      const total = offer.price?.total ? parseFloat(offer.price.total) : 0;
+      const offerCurrency = offer.price?.currency || 'USD';
+      const perNight = total / nights;
+      const perNightWithMarkup = perNight * 1.15; // Apply same 15% markup
+      
+      return offerCurrency === currency && perNightWithMarkup <= maxPricePerNight;
+    });
+    
+    console.log(`Server-side price filter: ${filteredHotels.length} -> ${priceFilteredHotels.length} hotels within ${maxPricePerNight} ${currency}/night`);
+    
+    const results = priceFilteredHotels.map((h: any) => {
       const info = h.hotel || {};
       const offer = h.offers?.[0] || {};
       const total = offer.price?.total ? parseFloat(offer.price.total) : 0;

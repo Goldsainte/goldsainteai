@@ -50,7 +50,7 @@ serve(async (req) => {
   }
 
   try {
-    const { cityCode, checkInDate, checkOutDate, adults = 1, cityName } = await req.json();
+    const { cityCode, checkInDate, checkOutDate, adults = 1, cityName, max_total_price, currency: requestCurrency } = await req.json();
     
     // ⚠️ SECURITY: Tiered rate limiting based on authentication status and subscription
     const authHeader = req.headers.get('Authorization');
@@ -121,7 +121,7 @@ serve(async (req) => {
     console.log('✅ [VALIDATION] All validations passed');
     
     // Determine currency from city
-    const currency = cityName ? getCurrencyFromLocation(cityName) : getCurrencyFromLocation(cityCode);
+    const currency = requestCurrency || (cityName ? getCurrencyFromLocation(cityName) : getCurrencyFromLocation(cityCode));
     
     console.log('Hotel search request:', { cityCode, checkInDate, checkOutDate, adults, currency });
 
@@ -235,9 +235,21 @@ serve(async (req) => {
     });
 
     console.log('Available hotels after filtering:', availableHotels.length);
+    
+    // Apply server-side price filtering BEFORE returning results
+    const maxPrice = max_total_price ?? Infinity;
+    const filteredByPrice = availableHotels.filter((hotel: any) => {
+      const firstOffer = hotel.offers?.[0];
+      if (!firstOffer) return false;
+      const priceWithMarkup = parseFloat(firstOffer.price?.total || 0);
+      const priceCurrency = firstOffer.price?.currency || currency;
+      return priceCurrency === currency && priceWithMarkup <= maxPrice;
+    });
+    
+    console.log(`Server-side filter: ${availableHotels.length} -> ${filteredByPrice.length} hotels within ${maxPrice} ${currency}`);
 
     return new Response(JSON.stringify({ 
-      results: availableHotels,
+      results: filteredByPrice,
       meta: offersData.meta
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -24,7 +24,7 @@ serve(async (req) => {
   }
 
   try {
-    const { destination, checkIn, checkOut, adults = 2, children = 0, rooms = 1 } = await req.json();
+    const { destination, checkIn, checkOut, adults = 2, children = 0, rooms = 1, max_total_price, currency = 'USD' } = await req.json();
 
     if (!destination || !checkIn || !checkOut) {
       throw new Error('Missing required parameters: destination, checkIn, checkOut');
@@ -109,7 +109,7 @@ serve(async (req) => {
     const rawHotels = data.hotels?.hotels || [];
     console.log(`Processing ${rawHotels.length} hotels from HotelBeds (limiting to 100)`);
     
-    const hotels = rawHotels.slice(0, 100).map((hotel: any) => {
+    const allHotels = rawHotels.slice(0, 100).map((hotel: any) => {
       const minRate = hotel.rooms?.[0]?.rates?.[0];
       return {
         hotelId: hotel.code,
@@ -134,7 +134,13 @@ serve(async (req) => {
       };
     });
 
-    console.log(`Found ${hotels.length} hotels from HotelBeds`);
+    // Apply server-side price filtering BEFORE returning results
+    const maxPrice = max_total_price ?? Infinity;
+    const hotels = allHotels.filter(h => 
+      h.currency === currency && h.price <= maxPrice
+    );
+    
+    console.log(`Server-side filter: ${allHotels.length} -> ${hotels.length} hotels within ${maxPrice} ${currency}/night`);
 
     return new Response(
       JSON.stringify({ hotels, total: hotels.length }),
