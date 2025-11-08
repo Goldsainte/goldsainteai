@@ -584,6 +584,28 @@ serve(async (req) => {
     // Add the rest of the system prompt
     systemPrompt += `
 
+GOLDSAINTE SEARCH TOOLS - MANDATORY RULES:
+For hotels, flights, and events, you MUST:
+1. ALWAYS call the Goldsainte Search tools (search_hotels, search_flights, search_events)
+2. Ask for missing essentials in at most TWO questions, then run the search
+3. NEVER fabricate results - only present data from actual API responses
+4. If zero results, the system automatically retries with broader parameters
+5. If still no results, offer the top three next-best options from suggestions (nearby areas or adjusted dates)
+6. Present results consistently: same fields, same order, same tone every time
+
+RESULT PRESENTATION FORMAT (NEVER DEVIATE):
+Hotels: "name" | location | $price/night | ⭐rating/5 | amenities (max 3) | distance from center
+Flights: airline | $price | departure → arrival | duration | stops
+Events: "name" | date & time | venue | $price | category
+
+BEFORE SEARCHING - ASK IN THIS EXACT ORDER (max 2 questions):
+1. Destination (required)
+2. Dates (required)  
+3. Number of people (required)
+4. Budget per person (REQUIRED - ask before search)
+
+Then immediately announce: "Perfect! Let me search for [type] options. This will take about 30 seconds..."
+
 YOUR CORE CAPABILITIES:
 ✅ Search flights, hotels, restaurants, events
 ✅ Search 2,520+ curated luxury fine dining restaurants across 30 global destinations
@@ -940,14 +962,14 @@ Remember: You're an AI search concierge that helps find perfect travel options a
           const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
           
           const functionMap: Record<string, string> = {
-            'search_flights': 'unified-search-flights',
-            'search_hotels': 'unified-search-hotels',
+            'search_flights': 'search-flights', // Goldsainte Search
+            'search_hotels': 'search-hotels', // Goldsainte Search
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_fine_dining_restaurants': null, // Handled inline with curated data
             'search_cars': 'amadeus-search-cars',
             'search_activities': 'amadeus-search-tours',
             'create_package': 'create-travel-package',
-            'search_events': 'search-events',
+            'search_events': 'search-events', // Goldsainte Search
             'check_visa_requirements': 'check-visa-requirements',
             'request_agent_contact': 'create-agent-inquiry',
             'generate_itinerary': 'generate-trip-itinerary',
@@ -990,17 +1012,38 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             // Add sortBy from tripContext to search calls
             let requestBody = { ...args };
             if (functionName === 'search_flights') {
-              requestBody.sortBy = flightSortBy; // Use preference
+              // Convert to Goldsainte Search format
+              requestBody = {
+                originLocationCode: args.origin?.toUpperCase().substring(0, 3),
+                destinationLocationCode: args.destination?.toUpperCase().substring(0, 3),
+                departureDate: args.departureDate,
+                returnDate: args.returnDate,
+                adults: args.adults || 1,
+                currencyCode: 'USD'
+              };
             } else if (functionName === 'search_hotels') {
-              requestBody.sortBy = hotelSortBy; // Use preference
-              requestBody.filter = hotelFilter; // Add hotel filter
+              // Convert to Goldsainte Search format
+              requestBody = {
+                cityCode: args.location?.toUpperCase().substring(0, 3),
+                checkInDate: args.checkIn,
+                checkOutDate: args.checkOut,
+                adults: args.guests || 2,
+                currency: 'USD'
+              };
               // Add optional filters from preferences
               if (preferences?.hotels?.minRating) {
-                requestBody.minRating = preferences.hotels.minRating;
+                requestBody.ratings = [String(Math.floor(preferences.hotels.minRating))];
               }
               if (preferences?.hotels?.maxPrice) {
-                requestBody.maxPrice = preferences.hotels.maxPrice;
+                requestBody.priceRange = `0-${preferences.hotels.maxPrice}`;
               }
+            } else if (functionName === 'search_events') {
+              // Convert to Goldsainte Search format
+              requestBody = {
+                city: args.location,
+                startDateTime: args.startDate ? `${args.startDate}T00:00:00Z` : undefined,
+                endDateTime: args.endDate ? `${args.endDate}T23:59:59Z` : undefined
+              };
             } else if (functionName === 'search_cars') {
               // Store car rental context
               if (!tripContext.carRental) tripContext.carRental = {};

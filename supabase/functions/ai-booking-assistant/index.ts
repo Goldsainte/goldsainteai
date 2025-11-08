@@ -253,30 +253,43 @@ async function handleToolCall(toolName: string, args: any): Promise<any> {
 
   // HOTELS
   if (toolName === "search_hotels") {
-    const response = await fetch(`${supabaseUrl}/functions/v1/unified-search-hotels`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/search-hotels`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
       body: JSON.stringify({
-        location: args.location,
-        checkIn: args.checkIn,
-        checkOut: args.checkOut,
-        guests: args.adults || 2
+        cityCode: args.location.toUpperCase().substring(0, 3), // Convert city name to IATA code
+        checkInDate: args.checkIn,
+        checkOutDate: args.checkOut,
+        adults: args.adults || 2,
+        currency: 'USD'
       })
     });
 
     if (!response.ok) return { error: 'Failed to search hotels.' };
     const data = await response.json();
     
-    const hotels = data.results?.slice(0, 5).map((hotel: any) => ({
-      id: hotel.id,
-      name: hotel.title,
-      location: hotel.location,
-      pricePerNight: hotel.price,
-      rating: hotel.rating,
-      description: hotel.description?.substring(0, 150)
-    })) || [];
-
-    return { success: true, hotels, message: `Found ${hotels.length} hotels` };
+    if (data.results && data.results.length > 0) {
+      const hotels = data.results.slice(0, 5).map((hotel: any) => ({
+        id: hotel.id,
+        name: hotel.name,
+        location: hotel.location?.address || '',
+        pricePerNight: hotel.price?.amount || 0,
+        currency: hotel.price?.currency || 'USD',
+        rating: hotel.rating || 0,
+        amenities: hotel.amenities?.slice(0, 3) || [],
+        images: hotel.images?.slice(0, 2) || [],
+        distance: hotel.distance ? `${hotel.distance.value} ${hotel.distance.unit}` : null
+      }));
+      return { success: true, hotels, message: `Found ${hotels.length} hotels` };
+    }
+    
+    // Return suggestions if no results
+    return { 
+      success: true, 
+      hotels: [], 
+      suggestions: data.suggestions || [],
+      message: 'No hotels found for these dates. Try adjusting your search criteria.' 
+    };
   }
 
   if (toolName === "book_hotel") {
@@ -307,31 +320,47 @@ async function handleToolCall(toolName: string, args: any): Promise<any> {
 
   // FLIGHTS
   if (toolName === "search_flights") {
-    const response = await fetch(`${supabaseUrl}/functions/v1/unified-search-flights`, {
+    const response = await fetch(`${supabaseUrl}/functions/v1/search-flights`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
       body: JSON.stringify({
-        origin: args.origin,
-        destination: args.destination,
+        originLocationCode: args.origin.toUpperCase().substring(0, 3),
+        destinationLocationCode: args.destination.toUpperCase().substring(0, 3),
         departureDate: args.departureDate,
         returnDate: args.returnDate,
-        adults: args.adults || 1
+        adults: args.adults || 1,
+        currencyCode: 'USD'
       })
     });
 
     if (!response.ok) return { error: 'Failed to search flights.' };
     const data = await response.json();
     
-    const flights = data.results?.slice(0, 5).map((flight: any) => ({
-      id: flight.id,
-      airline: flight.airline,
-      price: flight.price,
-      departure: flight.departure,
-      arrival: flight.arrival,
-      duration: flight.duration
-    })) || [];
-
-    return { success: true, flights, message: `Found ${flights.length} flights` };
+    if (data.results && data.results.length > 0) {
+      const flights = data.results.slice(0, 5).map((flight: any) => {
+        const firstSegment = flight.itineraries?.[0]?.segments?.[0];
+        const lastSegment = flight.itineraries?.[0]?.segments?.[flight.itineraries[0].segments.length - 1];
+        
+        return {
+          id: flight.id,
+          airline: flight.validatingAirlineCodes?.[0] || 'Unknown',
+          price: flight.price?.amount || 0,
+          currency: flight.price?.currency || 'USD',
+          departure: firstSegment?.departure?.at || '',
+          arrival: lastSegment?.arrival?.at || '',
+          duration: flight.itineraries?.[0]?.duration || '',
+          stops: flight.itineraries?.[0]?.segments?.length - 1 || 0
+        };
+      });
+      return { success: true, flights, message: `Found ${flights.length} flights` };
+    }
+    
+    return { 
+      success: true, 
+      flights: [], 
+      suggestions: data.suggestions || [],
+      message: 'No flights found for these dates. Try adjusting your search criteria.' 
+    };
   }
 
   if (toolName === "book_flight") {
@@ -415,25 +444,37 @@ async function handleToolCall(toolName: string, args: any): Promise<any> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
       body: JSON.stringify({
-        location: args.location,
-        startDate: args.startDate,
-        endDate: args.endDate
+        city: args.location,
+        startDateTime: args.startDate ? `${args.startDate}T00:00:00Z` : undefined,
+        endDateTime: args.endDate ? `${args.endDate}T23:59:59Z` : undefined,
+        keyword: args.category
       })
     });
 
     if (!response.ok) return { error: 'Failed to search events.' };
     const data = await response.json();
     
-    const events = data.results?.slice(0, 5).map((event: any) => ({
-      id: event.id,
-      name: event.name,
-      date: event.date,
-      venue: event.venue,
-      price: event.price,
-      category: event.category
-    })) || [];
-
-    return { success: true, events, message: `Found ${events.length} events` };
+    if (data.results && data.results.length > 0) {
+      const events = data.results.slice(0, 5).map((event: any) => ({
+        id: event.id,
+        name: event.name,
+        date: event.dates?.start?.localDate || '',
+        time: event.dates?.start?.localTime || 'TBD',
+        venue: event.venues?.[0]?.name || 'TBD',
+        price: event.priceRanges?.[0]?.min || 0,
+        currency: event.priceRanges?.[0]?.currency || 'USD',
+        category: event.classifications?.[0]?.segment?.name || 'Event',
+        images: event.images?.slice(0, 2) || []
+      }));
+      return { success: true, events, message: `Found ${events.length} events` };
+    }
+    
+    return { 
+      success: true, 
+      events: [], 
+      suggestions: data.suggestions || [],
+      message: 'No events found. Try adjusting your search criteria.' 
+    };
   }
 
   if (toolName === "book_event") {
@@ -583,32 +624,49 @@ serve(async (req) => {
 
     const systemPrompt = `You are a luxury travel booking assistant for Goldsainte AI with full booking capabilities.
 
+GOLDSAINTE SEARCH TOOLS - CRITICAL RULES:
+For hotels, flights, and events, you MUST:
+1. Always call the Goldsainte Search tools (search_hotels, search_flights, search_events)
+2. Ask for missing essentials in at most TWO questions, then run the search
+3. NEVER fabricate results - only present data from actual API responses
+4. If there are no results, the system will retry once with broader parameters automatically
+5. If still no results, offer the top three next-best options (nearby areas or dates) from suggestions
+6. Present results consistently: the same fields, the same order, and the same tone every time
+
+RESULT PRESENTATION (ALWAYS THIS EXACT FORMAT):
+Hotels: name, location, price per night, rating/5, top 3 amenities, distance from center
+Flights: airline, price, departure time → arrival time, duration, stops (non-stop/1 stop/2 stops)
+Events: name, date & time, venue, price, category, ticket availability
+
 CAPABILITIES:
-✈️ FLIGHTS - Search and book flights worldwide
-🏨 HOTELS - Search and book luxury accommodations  
+✈️ FLIGHTS - Search and book flights worldwide using Amadeus data
+🏨 HOTELS - Search and book luxury accommodations with photos and ratings
 🍽️ RESTAURANTS - Find and reserve dining experiences
 🎭 EVENTS - Discover and book tickets for events and activities
 🚗 CARS - Search and book rental vehicles
 
 BOOKING WORKFLOW (applies to all services):
-1. Gather requirements: destination/location, dates, number of people, preferences
-2. Use appropriate search tool (search_hotels, search_flights, etc.)
-3. Present top 3-5 options with key details and prices
-4. When user selects an option, collect required information (name, email, phone)
-5. Confirm ALL details before booking
-6. Use appropriate booking tool (book_hotel, book_flight, etc.)
-7. Provide booking reference and confirmation
+1. Gather requirements: destination/location, dates, number of people
+2. Ask about budget (REQUIRED before search): "What's your approximate budget per person?"
+3. Use appropriate Goldsainte search tool (search_hotels, search_flights, search_events)
+4. Present top 3-5 options consistently with photos when available
+5. When user selects an option, collect required information (name, email, phone)
+6. Confirm ALL details before booking
+7. Use appropriate booking tool (book_hotel, book_flight, etc.)
+8. Provide booking reference and confirmation
 
 IMPORTANT RULES:
 - Always search before booking
 - Never book without explicit user confirmation
 - Always collect complete guest/passenger/driver information
 - Present prices clearly with currency
+- Show hotel photos and ratings from Amadeus
 - Be conversational and luxury-focused
 - Handle one booking type at a time for clarity
+- If zero results, acknowledge suggestions and offer alternatives
 
-Example: "I can search for hotels in Paris from March 15-20. How many guests will be staying?"
-Example: "I found 5 flights from JFK to LAX. The best option is..."
+Example: "I can search for hotels in Paris from March 15-20. What's your budget per person?"
+Example: "I found 5 flights from JFK to LAX with photos and details. The best option is..."
 Example: "Would you like me to book the Ritz Paris for $450/night (March 15-20)? I'll need your full name, email, and phone number."`;
 
       // First API call with tools

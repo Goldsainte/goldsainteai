@@ -64,6 +64,30 @@ async function getAmadeusToken(): Promise<string> {
   return data.access_token;
 }
 
+async function getHotelMedia(token: string, hotelId: string): Promise<string[]> {
+  try {
+    const url = `https://test.api.amadeus.com/v2/shopping/hotel-offers/by-hotel?hotelIds=${hotelId}`;
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) return [];
+    
+    const data = await response.json();
+    const media = data.data?.[0]?.hotel?.media || [];
+    
+    return media
+      .filter((m: any) => m.uri)
+      .map((m: any) => m.uri)
+      .slice(0, 5); // Limit to 5 images
+  } catch (error) {
+    console.error('Error fetching hotel media:', error);
+    return [];
+  }
+}
+
 async function searchHotelsAmadeus(
   token: string,
   params: HotelSearchParams,
@@ -126,14 +150,17 @@ async function searchHotelsAmadeus(
     return [];
   }
 
-  // Normalize results
-  for (const offer of data.data) {
+  // Normalize results and fetch images in parallel
+  const hotelPromises = data.data.map(async (offer: any) => {
     const hotel = offer.hotel;
     const firstOffer = offer.offers?.[0];
     
-    if (!firstOffer) continue;
+    if (!firstOffer) return null;
 
-    hotels.push({
+    // Fetch images for this hotel
+    const images = await getHotelMedia(token, hotel.hotelId);
+
+    return {
       id: hotel.hotelId,
       name: hotel.name,
       location: {
@@ -148,13 +175,16 @@ async function searchHotelsAmadeus(
         currency: firstOffer.price.currency,
       },
       amenities: hotel.amenities || [],
-      images: [],
+      images,
       distance: hotel.distance ? {
         value: parseFloat(hotel.distance.value),
         unit: hotel.distance.unit,
       } : undefined,
-    });
-  }
+    };
+  });
+
+  const resolvedHotels = await Promise.all(hotelPromises);
+  hotels.push(...resolvedHotels.filter((h): h is NormalizedHotel => h !== null));
 
   // Sort by: price ascending, then rating descending
   hotels.sort((a, b) => {
