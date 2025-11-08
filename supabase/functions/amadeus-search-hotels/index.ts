@@ -196,55 +196,11 @@ serve(async (req) => {
     const offersData = await offersResponse.json();
     console.log('Hotel offers found:', offersData.data?.length || 0);
 
-    // Step 3: Fetch hotel details with images for each hotel
-    const hotelsWithDetails = await Promise.allSettled(
-      (offersData.data || []).slice(0, 50).map(async (hotel: any) => {
-        try {
-          const offerId = hotel.offers?.[0]?.id;
-          if (!offerId) return hotel;
-
-          const detailsResponse = await fetchWithTimeout(
-            `https://api.amadeus.com/v3/shopping/hotel-offers/${offerId}`,
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            },
-            8000
-          );
-
-          if (detailsResponse.ok) {
-            const detailsData = await detailsResponse.json();
-            // Merge hotel details (which includes media/images) with original offer
-            return {
-              ...hotel,
-              hotel: {
-                ...hotel.hotel,
-                ...(detailsData.data?.hotel || {}),
-                media: detailsData.data?.hotel?.media || []
-              }
-            };
-          }
-          return hotel;
-        } catch (error) {
-          console.error(`Failed to fetch details for hotel ${hotel.hotel?.hotelId}:`, error);
-          return hotel;
-        }
-      })
-    );
-
-    // Extract successful results and merge with original data
-    const enrichedHotels = hotelsWithDetails
-      .filter(result => result.status === 'fulfilled')
-      .map(result => (result as any).value);
-
-    console.log('Hotels enriched with details:', enrichedHotels.length);
-
     // Apply 15% markup to all prices for consistency
     const MARKUP_PERCENTAGE = 15;
     
-    // Filter to only include hotels with available offers, images, and apply markup
-    const availableHotels = enrichedHotels.filter((hotel: any) => {
+    // Filter to only include hotels with available offers and apply markup
+    const availableHotels = (offersData.data || []).filter((hotel: any) => {
       const name = (hotel.hotel?.name || '').toLowerCase();
       const description = (hotel.offers?.[0]?.room?.description?.text || '').toLowerCase();
       const lat = hotel.hotel?.latitude || 0;
