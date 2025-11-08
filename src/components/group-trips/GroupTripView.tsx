@@ -14,6 +14,7 @@ import { InviteMembersDialog } from './InviteMembersDialog';
 import { TripChat } from './TripChat';
 import { BudgetTracker } from './BudgetTracker';
 import { PersonalExpenseTracker } from './PersonalExpenseTracker';
+import { ExportTripButton } from './ExportTripButton';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -495,9 +496,15 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
         )}
       </Card>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {isMember && <AddSuggestionDialog tripId={tripId} onSuggestionAdded={fetchTripData} />}
         {isCreator && <InviteMembersDialog tripId={tripId} onMembersAdded={fetchTripData} />}
+        <ExportTripButton 
+          trip={trip}
+          suggestions={suggestions}
+          members={members}
+          participants={participants}
+        />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

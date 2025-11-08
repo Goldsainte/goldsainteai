@@ -225,8 +225,8 @@ export const Header = () => {
                 </a>
                 
                 <div className="flex items-center gap-2">
-                  {user && <NotificationCenter showLabel={false} />}
-                  <LanguageSelector 
+                  {user && <NotificationCenter />}
+                  <LanguageSelector
                     variant="ghost" 
                     size="sm" 
                     currentLanguage={currentLanguage}
@@ -496,7 +496,7 @@ export const Header = () => {
                   currentLanguage={currentLanguage}
                   onLanguageChange={handleLanguageChange}
                 />
-                {user && <NotificationCenter showLabel={false} />}
+                {user && <NotificationCenter />}
                 
                 {/* Main Navigation - Desktop */}
                 <DropdownMenu>
