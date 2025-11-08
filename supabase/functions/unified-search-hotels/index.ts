@@ -48,7 +48,6 @@ async function getFromCache(supabase: any, key: string): Promise<any | null> {
       const firstHotel = cachedData.results[0];
       const hasPhotos = (firstHotel.photos?.length > 0) || 
                        (firstHotel.property?.photoUrls?.length > 0) ||
-                       (firstHotel.__expediaPhotos?.length > 0) ||
                        (firstHotel.__googlePhotos?.length > 0);
       
       if (!hasPhotos) {
@@ -232,88 +231,107 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
   return aggregated;
 }
 
-async function enrichWithExpedia(hotels: any[], location: string, checkIn: string, checkOut: string) {
-  const rapidApiKey = Deno.env.get("EXPEDIA_RAPID_API_KEY");
+async function enrichWithGooglePlaces(hotels: any[], cityName: string) {
+  const apiKey = Deno.env.get("GOOGLE_PLACES_API_KEY");
   
-  if (!rapidApiKey) {
-    console.log("Expedia RapidAPI key not configured, skipping photo/review enrichment");
+  if (!apiKey) {
+    console.log("Google Places API key not configured, skipping photo/review enrichment");
     return hotels;
   }
 
-  // Enrich top 20 hotels with Expedia data
+  // Enrich top 20 hotels with Google Places data
   const limit = Math.min(hotels.length, 20);
   const target = hotels.slice(0, limit);
-  console.log(`Enriching ${target.length} hotels with Expedia photos and reviews via RapidAPI...`);
+  console.log(`Enriching ${target.length} hotels with Google Places photos and reviews...`);
 
-  // Get Expedia search results for the location via RapidAPI
-  try {
-    const url = new URL("https://hotels-com-provider.p.rapidapi.com/v2/hotels/search");
-    url.searchParams.append("locale", "en_US");
-    url.searchParams.append("checkin_date", checkIn);
-    url.searchParams.append("checkout_date", checkOut);
-    url.searchParams.append("adults_number", "2");
-    url.searchParams.append("domain", "US");
-    url.searchParams.append("sort_order", "REVIEW");
-    url.searchParams.append("region_id", location);
+  await Promise.all(
+    target.map(async (hotel: any) => {
+      try {
+        const hotelName = hotel.hotel?.name || "";
+        const latitude = hotel.hotel?.latitude;
+        const longitude = hotel.hotel?.longitude;
+        
+        if (!hotelName) return;
 
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: {
-        "X-RapidAPI-Key": rapidApiKey,
-        "X-RapidAPI-Host": "hotels-com-provider.p.rapidapi.com",
-        "Content-Type": "application/json",
-      },
-      signal: AbortSignal.timeout(10000) // 10s timeout
-    });
+        // Build search query
+        const searchQuery = `${hotelName} hotel in ${cityName}`;
+        
+        const requestBody: any = {
+          textQuery: searchQuery,
+          maxResultCount: 1
+        };
 
-    if (!response.ok) {
-      console.log(`Expedia RapidAPI returned ${response.status}, skipping enrichment`);
-      return hotels;
-    }
-
-    const data = await response.json();
-    const expediaHotels = data.properties || data.data || [];
-    console.log(`Found ${expediaHotels.length} Expedia hotels to match against`);
-
-    // Match Amadeus hotels with Expedia data
-    await Promise.all(
-      target.map(async (hotel: any) => {
-        try {
-          const hotelName = (hotel.hotel?.name || "").toLowerCase().replace(/[^a-z0-9]/g, '');
-          
-          // Find matching Expedia hotel
-          const match = expediaHotels.find((exp: any) => {
-            const expName = (exp.name || "").toLowerCase().replace(/[^a-z0-9]/g, '');
-            return expName.includes(hotelName) || hotelName.includes(expName);
-          });
-
-          if (match) {
-            // Add Expedia photos
-            hotel.__expediaPhotos = (match.images || [])
-              .slice(0, 12)
-              .map((img: any) => ({
-                url: img.links?.['1000px']?.href || img.links?.['350px']?.href,
-                attribution: "Expedia"
-              }))
-              .filter((p: any) => p.url);
-
-            // Add Expedia reviews/ratings
-            hotel.__expediaRating = match.guest_rating?.overall || 0;
-            hotel.__expediaRatingCount = match.guest_rating?.count || 0;
-            
-            hotel.__hasExpediaData = true;
-          }
-        } catch (e) {
-          // Silently skip enrichment failures
+        // Use coordinates if available for better accuracy
+        if (latitude && longitude) {
+          requestBody.locationBias = {
+            circle: {
+              center: { latitude, longitude },
+              radius: 1000 // 1km radius
+            }
+          };
         }
-      })
-    );
-    
-    const enrichedCount = hotels.filter(h => h.__hasExpediaData).length;
-    console.log(`Expedia enrichment complete: ${enrichedCount}/${target.length} hotels matched with Expedia data`);
-  } catch (error) {
-    console.error('Error enriching with Expedia:', error);
-  }
+
+        // Search for the hotel
+        const searchResponse = await fetch('https://places.googleapis.com/v1/places:searchText', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': apiKey,
+            'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.userRatingCount,places.photos'
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!searchResponse.ok) {
+          console.error(`Google Places search failed for ${hotelName}: ${searchResponse.status}`);
+          return;
+        }
+
+        const searchData = await searchResponse.json();
+        const place = searchData.places?.[0];
+        
+        if (!place || !place.id) return;
+
+        // Fetch detailed place information
+        const detailsResponse = await fetch(`https://places.googleapis.com/v1/${place.id}`, {
+          headers: {
+            'X-Goog-Api-Key': apiKey,
+            'X-Goog-FieldMask': 'displayName,rating,userRatingCount,photos,editorialSummary'
+          }
+        });
+
+        if (!detailsResponse.ok) return;
+
+        const details = await detailsResponse.json();
+        
+        // Extract and add photos
+        const photos = (details.photos || [])
+          .slice(0, 12)
+          .map((photo: any) => ({
+            url: `https://places.googleapis.com/v1/${photo.name}/media?key=${apiKey}&maxHeightPx=800&maxWidthPx=1200`,
+            attribution: "Google Places"
+          }));
+
+        if (photos.length > 0) {
+          hotel.__googlePhotos = photos;
+        }
+
+        // Add rating data
+        if (details.rating) {
+          hotel.__googleRating = details.rating;
+          hotel.__googleRatingCount = details.userRatingCount || 0;
+        }
+
+        hotel.__hasGoogleData = true;
+        
+      } catch (e) {
+        console.error(`Error enriching hotel ${hotel.hotel?.name}:`, e);
+      }
+    })
+  );
+  
+  const enrichedCount = hotels.filter(h => h.__hasGoogleData).length;
+  console.log(`Google Places enrichment complete: ${enrichedCount}/${target.length} hotels matched with Google data`);
   
   return hotels;
 }
@@ -406,7 +424,7 @@ serve(async (req) => {
       console.log(`Booking.com returned ${bookingHotels.length} hotels, fetching Amadeus as supplement...`);
       amadeusHotels = await fetchAmadeusHotels(token, cityCode, checkIn, checkOut, Number(guests) || 2);
       console.log("Amadeus hotels fetched:", amadeusHotels.length);
-      enriched = await enrichWithExpedia(amadeusHotels, location, checkIn, checkOut);
+      enriched = await enrichWithGooglePlaces(amadeusHotels, location);
       
       // Merge Booking.com and Amadeus results, prioritizing Booking.com
       enriched = [...bookingHotels, ...enriched];
@@ -525,27 +543,21 @@ serve(async (req) => {
       const perNight = total / nights;
       const currency = offer.price?.currency || "USD";
 
-      // Build photo URL list from Expedia (or fallback to Google if available)
-      const expediaPhotoUrls: string[] = (h.__expediaPhotos || [])
-        .slice(0, 12)
-        .map((p: any) => p?.url)
-        .filter(Boolean);
-      
+      // Build photo URL list from Google Places (or fallback to Amadeus media)
       const googlePhotoUrls: string[] = (h.__googlePhotos || [])
         .slice(0, 12)
         .map((p: any) => p?.url)
         .filter((u: any) => typeof u === 'string' && !!u);
+      
       const fallbackMedia: string[] = (info.media?.map((m: any) => m?.uri).filter(Boolean)) || [];
       
-      // Prioritize Expedia photos, fallback to Google, then Amadeus media
-      const photoUrls: string[] = expediaPhotoUrls.length > 0 
-        ? expediaPhotoUrls 
-        : (googlePhotoUrls.length > 0 ? googlePhotoUrls : fallbackMedia);
+      // Prioritize Google Photos, then fallback to Amadeus media
+      const photoUrls: string[] = googlePhotoUrls.length > 0 ? googlePhotoUrls : fallbackMedia;
 
       const reviews = h.__googleReviews || [];
-      // Use Expedia rating if available, otherwise Google rating
-      const rating = h.__expediaRating || h.__googleRating || info.rating || 0;
-      const reviewCount = h.__expediaRatingCount || h.__googleRatingCount || 0;
+      // Use Google Places rating
+      const rating = h.__googleRating || info.rating || 0;
+      const reviewCount = h.__googleRatingCount || 0;
 
       return {
         hotel_id: h.id || info.hotelId,
