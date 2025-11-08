@@ -70,18 +70,21 @@ export default function HotelBooking() {
   const adults = bookingData.adults || bookingData.guests || 2;
   const children = bookingData.children || 0;
 
-// Generate comprehensive image gallery - use real photos from Google Places
+// Generate comprehensive image gallery - use real photos from multiple sources
   const hotelPhotos = bookingData.hotel?.property?.photoUrls || 
+                      bookingData.hotel?.photos ||
+                      bookingData.hotel?.images ||
                       bookingData.property?.photoUrls || 
                       [];
   
   console.log('Hotel photos available:', hotelPhotos.length, hotelPhotos);
   
+  // Always use getHotelImages as fallback to ensure we have images
   const galleryImages = hotelPhotos.length > 0 
     ? hotelPhotos 
     : getHotelImages(
-        [bookingData.hotel?.image, bookingData.hotelImage].filter(Boolean),
-        bookingData.hotel?.hotelId || hotelName,
+        [bookingData.hotel?.image_url, bookingData.hotel?.image, bookingData.hotelImage].filter(Boolean),
+        bookingData.hotel?.hotelId || bookingData.hotel?.hotel_id || hotelName,
         20
       );
 

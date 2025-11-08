@@ -1068,7 +1068,7 @@ if (minRating && searchType !== "restaurants") {
                       // Update price range state to keep filters in sync
                       setPriceRange([priceRange[0], query.maxPrice || 500]);
                     }}
-                    hidePriceFilter={fromChat && hideBudgetSlider}
+                    hidePriceFilter={true}
                   />
                 ) : searchType === "hotels" ? (
                   <div className="text-center py-12 text-muted-foreground">

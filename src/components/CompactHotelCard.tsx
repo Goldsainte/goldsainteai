@@ -115,7 +115,13 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     
     const bookingData = {
       available: true,
-      hotel: property,
+      hotel: {
+        ...property,
+        property: {
+          ...property.property,
+          photoUrls: allImages.filter(Boolean) // Pass all photos to booking page
+        }
+      },
       hotelName: title,
       hotelAddress: location,
       hotelImage: imageUrl,
