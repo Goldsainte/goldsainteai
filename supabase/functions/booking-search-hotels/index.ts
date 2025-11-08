@@ -90,10 +90,20 @@ serve(async (req) => {
           return null;
         }
 
-        // Extract photos
-        const photoUrls = property.photoUrls || 
-                         property.photo_urls ||
-                         (hotel.hotel_photos?.map((p: any) => p.url_max) || []).slice(0, 12);
+        // Extract and normalize photos to ensure HTTPS and valid URLs
+        const rawPhotoUrls = property.photoUrls || 
+                            property.photo_urls ||
+                            (hotel.hotel_photos?.map((p: any) => p.url_max) || []);
+        
+        const photoUrls = Array.from(new Set(
+          rawPhotoUrls
+            .map((url: any) => {
+              if (typeof url !== 'string') return '';
+              // Ensure HTTPS protocol
+              return url.replace(/^http:\/\//i, 'https://');
+            })
+            .filter((url: string) => url && /^https?:\/\//i.test(url))
+        )).slice(0, 12);
 
         // Extract reviews
         const reviewScore = property.reviewScore || 
@@ -154,7 +164,12 @@ serve(async (req) => {
       })
       .filter(Boolean); // Remove nulls from price filtering
 
+    // Calculate average photo count for debugging
+    const totalPhotos = transformedHotels.reduce((sum, h) => sum + (h.photos?.length || 0), 0);
+    const avgPhotos = transformedHotels.length > 0 ? (totalPhotos / transformedHotels.length).toFixed(1) : 0;
+    
     console.log(`Transformed ${transformedHotels.length} hotels from Booking.com with 15% markup applied`);
+    console.log(`Average ${avgPhotos} photos per hotel (${totalPhotos} total photos)`);
 
     return new Response(JSON.stringify({ 
       success: true,

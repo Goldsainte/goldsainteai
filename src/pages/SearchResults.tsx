@@ -224,19 +224,16 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
       try {
         if (searchType === "hotels") {
-          const { getHotelBedsDestinationCode } = await import('@/lib/hotelbedsHelpers');
-          const destinationCode = getHotelBedsDestinationCode(location);
+          console.log('[Hotels] Searching with unified-search-hotels:', { location, checkIn, checkOut, guests });
           
-          console.log('[HotelBeds] Searching hotels:', { location, destinationCode, checkIn, checkOut, guests });
-          
-          const { data, error } = await invokeEdgeFunction('hotelbeds-search-hotels', {
+          const { data, error } = await invokeEdgeFunction('unified-search-hotels', {
             body: {
-              destination: destinationCode,
+              location,
               checkIn,
               checkOut,
-              adults: parseInt(guests),
-              children: 0,
-              rooms: 1
+              guests: parseInt(guests),
+              currency: chatCurrency,
+              ...(chatMaxPrice && { max_total_price: chatMaxPrice })
             },
             timeout: 30000,
             showToastOnError: true,
@@ -254,9 +251,34 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
             throw error;
           }
 
-          const hotelResults = data?.hotels || [];
+          let hotelResults = data?.results || [];
           
-          console.log(`[HotelBeds] Found ${hotelResults.length} hotels`);
+          console.log(`[Hotels] Found ${hotelResults.length} hotels from unified search`);
+          
+          // Fallback to HotelBeds if no results from unified search
+          if (hotelResults.length === 0) {
+            console.log('[Hotels] No results from unified search, trying HotelBeds fallback');
+            const { getHotelBedsDestinationCode } = await import('@/lib/hotelbedsHelpers');
+            const destinationCode = getHotelBedsDestinationCode(location);
+            
+            const { data: fallbackData, error: fallbackError } = await invokeEdgeFunction('hotelbeds-search-hotels', {
+              body: {
+                destination: destinationCode,
+                checkIn,
+                checkOut,
+                adults: parseInt(guests),
+                children: 0,
+                rooms: 1
+              },
+              timeout: 30000,
+              showToastOnError: false,
+            });
+            
+            if (!fallbackError && fallbackData?.hotels) {
+              hotelResults = fallbackData.hotels;
+              console.log(`[Hotels] Fallback returned ${hotelResults.length} hotels`);
+            }
+          }
 
           // Clean out test/dummy hotels
           const cleanedHotels = hotelResults.filter((h: any) => {
