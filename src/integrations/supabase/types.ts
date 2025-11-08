@@ -7392,6 +7392,50 @@ export type Database = {
           },
         ]
       }
+      trip_notifications: {
+        Row: {
+          created_at: string
+          data: Json | null
+          id: string
+          message: string
+          read: boolean
+          title: string
+          trip_id: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message: string
+          read?: boolean
+          title: string
+          trip_id: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json | null
+          id?: string
+          message?: string
+          read?: boolean
+          title?: string
+          trip_id?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_notifications_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "group_trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_photos: {
         Row: {
           agent_id: string | null
@@ -9315,6 +9359,17 @@ export type Database = {
       is_user_restricted: { Args: { target_user_id: string }; Returns: boolean }
       mark_conversation_messages_read: {
         Args: { p_conversation_id: string; p_user_type: string }
+        Returns: undefined
+      }
+      notify_trip_members: {
+        Args: {
+          p_data?: Json
+          p_exclude_user_id?: string
+          p_message: string
+          p_title: string
+          p_trip_id: string
+          p_type: string
+        }
         Returns: undefined
       }
       process_package_resale_commission: {

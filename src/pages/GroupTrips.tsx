@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreateGroupTripDialog } from '@/components/group-trips/CreateGroupTripDialog';
 import { GroupTripView } from '@/components/group-trips/GroupTripView';
+import { NotificationCenter } from '@/components/NotificationCenter';
 
 const GroupTrips = () => {
   const { user } = useAuth();
@@ -75,14 +76,16 @@ const GroupTrips = () => {
   if (tripId) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/group-trips')}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to All Trips
-        </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/group-trips')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to All Trips
+          </Button>
+          <NotificationCenter />
+        </div>
         <GroupTripView tripId={tripId} />
       </div>
     );
@@ -98,7 +101,10 @@ const GroupTrips = () => {
             Plan and vote on trips with friends
           </p>
         </div>
-        <CreateGroupTripDialog onTripCreated={(id) => navigate(`/group-trips/${id}`)} />
+        <div className="flex items-center gap-2">
+          <NotificationCenter />
+          <CreateGroupTripDialog onTripCreated={(id) => navigate(`/group-trips/${id}`)} />
+        </div>
       </div>
 
       {loading ? (
