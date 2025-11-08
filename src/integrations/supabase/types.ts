@@ -1053,6 +1053,108 @@ export type Database = {
           },
         ]
       }
+      ai_usage_logs: {
+        Row: {
+          created_at: string | null
+          endpoint: string
+          error_message: string | null
+          id: string
+          success: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          endpoint: string
+          error_message?: string | null
+          id?: string
+          success?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          endpoint?: string
+          error_message?: string | null
+          id?: string
+          success?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      api_error_logs: {
+        Row: {
+          created_at: string
+          endpoint: string
+          error_details: Json | null
+          error_message: string | null
+          error_type: string
+          http_status: number | null
+          id: string
+          request_params: Json | null
+          resolved_at: string | null
+          service_name: string
+          severity: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          error_details?: Json | null
+          error_message?: string | null
+          error_type: string
+          http_status?: number | null
+          id?: string
+          request_params?: Json | null
+          resolved_at?: string | null
+          service_name: string
+          severity?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          error_details?: Json | null
+          error_message?: string | null
+          error_type?: string
+          http_status?: number | null
+          id?: string
+          request_params?: Json | null
+          resolved_at?: string | null
+          service_name?: string
+          severity?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      api_health_metrics: {
+        Row: {
+          checked_at: string
+          endpoint: string
+          id: string
+          metadata: Json | null
+          response_time_ms: number | null
+          service_name: string
+          success: boolean
+        }
+        Insert: {
+          checked_at?: string
+          endpoint: string
+          id?: string
+          metadata?: Json | null
+          response_time_ms?: number | null
+          service_name: string
+          success: boolean
+        }
+        Update: {
+          checked_at?: string
+          endpoint?: string
+          id?: string
+          metadata?: Json | null
+          response_time_ms?: number | null
+          service_name?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
       apple_music_credentials: {
         Row: {
           created_at: string | null
@@ -5346,6 +5448,9 @@ export type Database = {
         Row: {
           account_status: string | null
           account_type: string | null
+          ai_calls_reset_at: string | null
+          ai_calls_used: number | null
+          ai_subscription_tier: string | null
           auto_share_instagram: boolean | null
           auto_share_tiktok: boolean | null
           avatar_url: string | null
@@ -5389,6 +5494,9 @@ export type Database = {
         Insert: {
           account_status?: string | null
           account_type?: string | null
+          ai_calls_reset_at?: string | null
+          ai_calls_used?: number | null
+          ai_subscription_tier?: string | null
           auto_share_instagram?: boolean | null
           auto_share_tiktok?: boolean | null
           avatar_url?: string | null
@@ -5432,6 +5540,9 @@ export type Database = {
         Update: {
           account_status?: string | null
           account_type?: string | null
+          ai_calls_reset_at?: string | null
+          ai_calls_used?: number | null
+          ai_subscription_tier?: string | null
           auto_share_instagram?: boolean | null
           auto_share_tiktok?: boolean | null
           avatar_url?: string | null
@@ -9357,7 +9468,16 @@ export type Database = {
         }[]
       }
       generate_invoice_number: { Args: never; Returns: string }
+      get_api_error_rate: {
+        Args: { p_minutes_ago?: number; p_service_name: string }
+        Returns: {
+          error_count: number
+          error_rate: number
+          total_requests: number
+        }[]
+      }
       get_total_users_count: { Args: never; Returns: number }
+      get_user_ai_usage_count: { Args: { p_user_id: string }; Returns: number }
       get_user_tier: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["subscription_tier"]
