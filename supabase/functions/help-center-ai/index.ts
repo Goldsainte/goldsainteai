@@ -24,7 +24,24 @@ const stripRoutes = (text: string): string => {
     .trim();
 };
 
+const getTodayDate = () => {
+  const now = new Date();
+  return now.toISOString().split('T')[0];
+};
+
 const systemPrompt = `You are Goldsainte's AI Travel Assistant. You help users with travel-related questions, booking inquiries, destination recommendations, and trip planning.
+
+**CURRENT DATE: ${getTodayDate()}** (Use this for all date calculations)
+
+## DATE INFERENCE:
+When users mention dates in natural language, convert them to YYYY-MM-DD format:
+- "next weekend" → next Saturday and Sunday
+- "this weekend" → upcoming Saturday and Sunday
+- "in 2 weeks" → 14 days from today
+- "next month" → same day next month
+- "tomorrow" → current date + 1 day
+- "next Friday" → the upcoming Friday
+Always use the CURRENT DATE above as the reference point for calculations.
 
 ## YOUR EXPERTISE:
 You can assist with:
