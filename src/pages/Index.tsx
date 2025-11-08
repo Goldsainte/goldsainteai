@@ -484,10 +484,10 @@ const Index = () => {
           aiMessage.includes('would you like a one-way') ||
           aiMessage.includes('one-way rental or round-trip') ||
           aiMessage.includes('is this a one-way rental')) {
-        // Only show selector for flights
-        const isFlightQuestion = aiMessage.includes('flight');
+        // Restrict selector strictly to Flights context
+        const isFlightsContext = activeQuickLink === 'flights';
         
-        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightQuestion) {
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightsContext) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }
@@ -717,11 +717,10 @@ const queries = {
         aiMessage.includes('one-way rental or round-trip') ||
         aiMessage.includes('is this a one-way rental')
       ) {
-        // Only show selector for flights/cars, not hotels
-        const isFlightOrCarQuestion = aiMessage.includes('flight') || aiMessage.includes('rental') || aiMessage.includes('car');
-        const isNotHotelQuestion = !aiMessage.includes('hotel') && !aiMessage.includes('check in') && !aiMessage.includes('check-in');
+        // Restrict selector strictly to Flights context
+        const isFlightsContext = activeQuickLink === 'flights';
         
-        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightOrCarQuestion && isNotHotelQuestion) {
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightsContext) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }
