@@ -257,12 +257,11 @@ export const BookingModal = ({
         }
       });
 
-      const { data: checkoutResult, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
+      const { data: checkoutResult, error: checkoutError } = await supabase.functions.invoke('create-booking-payment', {
         body: {
-          bookingId: bookingResult.booking.id,
-          amount: total,
-          currency,
-          guestEmail: values.email
+          bookingData,
+          totalPrice: total,
+          currency
         }
       });
 
