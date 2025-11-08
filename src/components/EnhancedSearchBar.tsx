@@ -31,7 +31,11 @@ const addDays = (date: Date, days: number): Date => {
   return d;
 };
 
-export const EnhancedSearchBar = () => {
+interface EnhancedSearchBarProps {
+  isCompact?: boolean;
+}
+
+export const EnhancedSearchBar = ({ isCompact = false }: EnhancedSearchBarProps) => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const routeLocation = useLocation();
@@ -223,27 +227,29 @@ export const EnhancedSearchBar = () => {
 
   // Flight Search UI
   const renderFlightSearch = () => (
-    <div className="space-y-4">
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          variant={flightType === "round-trip" ? "default" : "outline"}
-          onClick={() => setFlightType("round-trip")}
-          className="flex-1 h-11 text-sm md:text-base"
-        >
-          Round-trip
-        </Button>
-        <Button
-          type="button"
-          variant={flightType === "one-way" ? "default" : "outline"}
-          onClick={() => setFlightType("one-way")}
-          className="flex-1 h-11 text-sm md:text-base"
-        >
-          One-way
-        </Button>
-      </div>
+    <div className={cn("space-y-4", isCompact && "space-y-2")}>
+      {!isCompact && (
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant={flightType === "round-trip" ? "default" : "outline"}
+            onClick={() => setFlightType("round-trip")}
+            className="flex-1 h-11 text-sm md:text-base"
+          >
+            Round-trip
+          </Button>
+          <Button
+            type="button"
+            variant={flightType === "one-way" ? "default" : "outline"}
+            onClick={() => setFlightType("one-way")}
+            className="flex-1 h-11 text-sm md:text-base"
+          >
+            One-way
+          </Button>
+        </div>
+      )}
 
-      <div className="space-y-3">
+      <div className={cn("space-y-3", isCompact && "space-y-2")}>
         {/* Origin */}
         <div>
           <AirportAutocomplete
@@ -253,17 +259,19 @@ export const EnhancedSearchBar = () => {
           />
         </div>
 
-        {/* Swap button - centered on mobile */}
-        <div className="flex justify-center md:hidden">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleSwapLocations}
-            className="h-10 w-10 rounded-full border border-border hover:bg-accent"
-          >
-            <ArrowLeftRight className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Swap button - centered on mobile - hide when compact */}
+        {!isCompact && (
+          <div className="flex justify-center md:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSwapLocations}
+              className="h-10 w-10 rounded-full border border-border hover:bg-accent"
+            >
+              <ArrowLeftRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
         {/* Destination */}
         <div>
@@ -276,12 +284,12 @@ export const EnhancedSearchBar = () => {
       </div>
 
       {/* Dates - stacked on mobile, side-by-side on desktop */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-3", isCompact && "gap-2")}>
         {/* Departure Date */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !departureDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base", !departureDate && "text-muted-foreground")}>
+              <Calendar className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
               <span className="truncate">{departureDate ? format(departureDate, "MMM dd, yyyy") : "Departure"}</span>
             </Button>
           </PopoverTrigger>
@@ -307,8 +315,8 @@ export const EnhancedSearchBar = () => {
         {flightType === "round-trip" && (
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !returnDate && "text-muted-foreground")}> 
-                <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+              <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base", !returnDate && "text-muted-foreground")}> 
+                <Calendar className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
                 <span className="truncate">{returnDate ? format(returnDate, "MMM dd, yyyy") : "Return"}</span>
               </Button>
             </PopoverTrigger>
@@ -326,12 +334,12 @@ export const EnhancedSearchBar = () => {
         )}
       </div>
 
-      {/* Passengers & Cabin - stacked on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      {/* Passengers & Cabin - stacked on mobile - hide cabin when compact */}
+      <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-3", isCompact && "gap-2")}>
         <Popover open={showPassengerPopover} onOpenChange={setShowPassengerPopover}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base">
-              <Users className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base")}>
+              <Users className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
               <span className="truncate">{totalFlightPassengers} Passenger{totalFlightPassengers !== 1 ? "s" : ""}</span>
             </Button>
           </PopoverTrigger>
@@ -389,24 +397,26 @@ export const EnhancedSearchBar = () => {
         </Popover>
 
         {/* Cabin Class */}
-        <Select value={cabinClass} onValueChange={setCabinClass}>
-          <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
-            <SelectValue placeholder="Class" />
-          </SelectTrigger>
-          <SelectContent className="bg-background z-[100]">
-            <SelectItem value="ECONOMY">Economy</SelectItem>
-            <SelectItem value="PREMIUM_ECONOMY">Premium Economy</SelectItem>
-            <SelectItem value="BUSINESS">Business</SelectItem>
-            <SelectItem value="FIRST">First Class</SelectItem>
-          </SelectContent>
-        </Select>
+        {!isCompact && (
+          <Select value={cabinClass} onValueChange={setCabinClass}>
+            <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
+              <SelectValue placeholder="Class" />
+            </SelectTrigger>
+            <SelectContent className="bg-background z-[100]">
+              <SelectItem value="ECONOMY">Economy</SelectItem>
+              <SelectItem value="PREMIUM_ECONOMY">Premium Economy</SelectItem>
+              <SelectItem value="BUSINESS">Business</SelectItem>
+              <SelectItem value="FIRST">First Class</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );
 
   // Hotel Search UI
   const renderHotelSearch = () => (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", isCompact && "space-y-2")}>
       <div className="relative">
         <CityAutocomplete
           value={hotelLocation}
@@ -416,12 +426,12 @@ export const EnhancedSearchBar = () => {
       </div>
 
       {/* Dates & Guests - all stacked on mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div className={cn("grid grid-cols-1 md:grid-cols-3 gap-3", isCompact && "gap-2")}>
         {/* Check-in */}
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !checkInDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base", !checkInDate && "text-muted-foreground")}>
+              <Calendar className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
               <span className="truncate">{checkInDate ? format(checkInDate, "MMM dd") : "Check-in"}</span>
             </Button>
           </PopoverTrigger>
@@ -440,8 +450,8 @@ export const EnhancedSearchBar = () => {
         {/* Check-out */}
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !checkOutDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base", !checkOutDate && "text-muted-foreground")}>
+              <Calendar className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
               <span className="truncate">{checkOutDate ? format(checkOutDate, "MMM dd") : "Check-out"}</span>
             </Button>
           </PopoverTrigger>
@@ -460,8 +470,8 @@ export const EnhancedSearchBar = () => {
         {/* Guests & Rooms */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base">
-              <Users className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base")}>
+              <Users className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
               <span className="truncate">{totalHotelGuests} Guest{totalHotelGuests !== 1 ? "s" : ""}, {rooms} Room{rooms !== 1 ? "s" : ""}</span>
             </Button>
           </PopoverTrigger>
@@ -520,7 +530,7 @@ export const EnhancedSearchBar = () => {
 
   // Events Search UI
   const renderEventSearch = () => (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", isCompact && "space-y-2")}>
       <div className="relative">
         <CityAutocomplete
           value={eventLocation}
@@ -529,11 +539,11 @@ export const EnhancedSearchBar = () => {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <div className={cn("grid grid-cols-1 md:grid-cols-2 gap-3", isCompact && "gap-2")}>
         <Popover modal={false}>
           <PopoverTrigger asChild>
-            <Button variant="outline" className={cn("h-11 md:h-12 justify-start text-left font-normal text-sm md:text-base", !eventDate && "text-muted-foreground")}>
-              <Calendar className="mr-2 h-4 w-4 flex-shrink-0" />
+            <Button variant="outline" className={cn("justify-start text-left font-normal", isCompact ? "h-9 text-xs" : "h-11 md:h-12 text-sm md:text-base", !eventDate && "text-muted-foreground")}>
+              <Calendar className={cn("mr-2 flex-shrink-0", isCompact ? "h-3 w-3" : "h-4 w-4")} />
               <span className="truncate">{eventDate ? format(eventDate, "MMM dd, yyyy") : "Event date"}</span>
             </Button>
           </PopoverTrigger>
@@ -549,72 +559,99 @@ export const EnhancedSearchBar = () => {
           </PopoverContent>
         </Popover>
 
-        <Select value={eventCategory} onValueChange={setEventCategory}>
-          <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
-            <SelectValue placeholder="All categories" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All categories</SelectItem>
-            <SelectItem value="music">Music</SelectItem>
-            <SelectItem value="sports">Sports</SelectItem>
-            <SelectItem value="arts">Arts & Theater</SelectItem>
-            <SelectItem value="family">Family</SelectItem>
-            <SelectItem value="festivals">Festivals</SelectItem>
-          </SelectContent>
-        </Select>
+        {!isCompact && (
+          <Select value={eventCategory} onValueChange={setEventCategory}>
+            <SelectTrigger className="h-11 md:h-12 text-sm md:text-base">
+              <SelectValue placeholder="All categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
+              <SelectItem value="music">Music</SelectItem>
+              <SelectItem value="sports">Sports</SelectItem>
+              <SelectItem value="arts">Arts & Theater</SelectItem>
+              <SelectItem value="family">Family</SelectItem>
+              <SelectItem value="festivals">Festivals</SelectItem>
+            </SelectContent>
+          </Select>
+        )}
       </div>
     </div>
   );
 
   return (
     <div className="w-full mx-auto md:max-w-6xl">
-      <div className="bg-card border border-border rounded-2xl shadow-lg p-4 md:p-6">
-        {/* Mobile-first instruction */}
-        <div className="mb-4 md:hidden">
-          <p className="text-sm text-muted-foreground text-center">
-            Step 1: Select service type
-          </p>
-        </div>
+      <div className={cn(
+        "bg-card border border-border rounded-2xl shadow-lg transition-all duration-300",
+        isCompact ? "p-3 md:p-4" : "p-4 md:p-6"
+      )}>
+        {/* Mobile-first instruction - hide when compact */}
+        {!isCompact && (
+          <div className="mb-4 md:hidden">
+            <p className="text-sm text-muted-foreground text-center">
+              Step 1: Select service type
+            </p>
+          </div>
+        )}
         
-        <Tabs value={searchType} onValueChange={setSearchType} className="mb-6">
-          <TabsList className="grid w-full grid-cols-3 h-auto bg-muted gap-1 p-1">
+        <Tabs value={searchType} onValueChange={setSearchType} className={cn("transition-all", isCompact ? "mb-3" : "mb-6")}>
+          <TabsList className={cn(
+            "grid w-full grid-cols-3 bg-muted gap-1 p-1 transition-all",
+            isCompact ? "h-auto" : "h-auto"
+          )}>
             <TabsTrigger 
               value="hotels" 
-              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+              className={cn(
+                "flex gap-1 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-all",
+                isCompact ? "flex-row items-center py-2 px-2 min-h-[40px]" : "flex-col py-3 px-2 min-h-[60px] md:min-h-[48px]"
+              )}
             >
-              <Hotel className="h-5 w-5 flex-shrink-0" />
-              <span className="text-xs md:text-sm">Hotels</span>
+              <Hotel className={cn("flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
+              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>Hotels</span>
             </TabsTrigger>
             <TabsTrigger 
               value="flights" 
-              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+              className={cn(
+                "flex gap-1 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-all",
+                isCompact ? "flex-row items-center py-2 px-2 min-h-[40px]" : "flex-col py-3 px-2 min-h-[60px] md:min-h-[48px]"
+              )}
             >
-              <Plane className="h-5 w-5 flex-shrink-0" />
-              <span className="text-xs md:text-sm">Flights</span>
+              <Plane className={cn("flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
+              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>Flights</span>
             </TabsTrigger>
             <TabsTrigger 
               value="events" 
-              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-colors min-h-[60px] md:min-h-[48px]"
+              className={cn(
+                "flex gap-1 data-[state=active]:bg-background hover:bg-[#BFAD72]/20 hover:text-[#BFAD72] transition-all",
+                isCompact ? "flex-row items-center py-2 px-2 min-h-[40px]" : "flex-col py-3 px-2 min-h-[60px] md:min-h-[48px]"
+              )}
             >
-              <Ticket className="h-5 w-5 flex-shrink-0" />
-              <span className="text-xs md:text-sm">Events</span>
+              <Ticket className={cn("flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
+              <span className={cn(isCompact ? "text-xs" : "text-xs md:text-sm")}>Events</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>
 
-        {/* Mobile-first instruction for form */}
-        <div className="mb-4 md:hidden">
-          <p className="text-sm text-muted-foreground text-center">
-            Step 2: Fill in your details
-          </p>
-        </div>
+        {/* Mobile-first instruction for form - hide when compact */}
+        {!isCompact && (
+          <div className="mb-4 md:hidden">
+            <p className="text-sm text-muted-foreground text-center">
+              Step 2: Fill in your details
+            </p>
+          </div>
+        )}
 
         {searchType === "flights" && renderFlightSearch()}
         {searchType === "hotels" && renderHotelSearch()}
         {searchType === "events" && renderEventSearch()}
 
-        <Button className="w-full mt-6 h-12 md:h-14 text-base md:text-lg font-semibold bg-primary hover:bg-primary/90" onClick={handleSearch}>
-          <Search className="h-5 w-5 mr-2 flex-shrink-0" />
+        <Button 
+          className={cn(
+            "w-full font-semibold bg-primary hover:bg-primary/90 transition-all",
+            isCompact ? "mt-3 h-10 text-sm" : "mt-6 h-12 md:h-14 text-base md:text-lg"
+          )} 
+          onClick={handleSearch}
+        >
+          <Search className={cn("mr-2 flex-shrink-0", isCompact ? "h-4 w-4" : "h-5 w-5")} />
           Search {searchType}
         </Button>
       </div>

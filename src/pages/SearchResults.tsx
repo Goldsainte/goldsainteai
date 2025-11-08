@@ -33,6 +33,7 @@ import { invokeEdgeFunction } from "@/lib/edgeFunctionHelpers";
 import { getUserLocation } from "@/lib/locationMapping";
 import { fetchUberFallback } from "@/lib/simpleCarSearchFallback";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
+import { cn } from "@/lib/utils";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -69,6 +70,7 @@ const SearchResults = () => {
   const [selectedPickupAddress, setSelectedPickupAddress] = useState<string | undefined>();
   const [selectedDropoffAddress, setSelectedDropoffAddress] = useState<string | undefined>();
   const [uberFallbackMode, setUberFallbackMode] = useState(false);
+  const [isSearchBarCompact, setIsSearchBarCompact] = useState(false);
 
   const searchType = searchParams.get("type") || "hotels";
   const location = searchParams.get("location") || "";
@@ -136,6 +138,16 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
 
     loadPreferences();
   }, [user]);
+
+  // Scroll detection for compact search bar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsSearchBarCompact(window.scrollY > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Polling for Uber updates when in transportation or fallback mode
   useEffect(() => {
@@ -749,9 +761,12 @@ if (minRating && searchType !== "restaurants") {
           </Button>
         </div>
         
-        {/* Search bar - always visible */}
-        <div className="mb-4">
-          <EnhancedSearchBar />
+        {/* Search bar - sticky with compact mode */}
+        <div className={cn(
+          "sticky top-0 z-50 bg-background/95 backdrop-blur-sm transition-all duration-300 -mx-4 px-4 mb-4",
+          isSearchBarCompact ? "py-2 shadow-md" : "py-4"
+        )}>
+          <EnhancedSearchBar isCompact={isSearchBarCompact} />
         </div>
 
         {loading ? (
