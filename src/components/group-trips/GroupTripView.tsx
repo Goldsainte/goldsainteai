@@ -18,6 +18,7 @@ import { ExportTripButton } from './ExportTripButton';
 import { TripSettings } from './TripSettings';
 import { TripTimeline } from './TripTimeline';
 import { WeatherForecast } from './WeatherForecast';
+import { CurrencyConverter } from './CurrencyConverter';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -546,6 +547,8 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       </div>
 
       <WeatherForecast tripId={tripId} />
+
+      <CurrencyConverter suggestions={suggestions} />
 
       {isMember && <TripChat tripId={tripId} members={members} />}
 
