@@ -271,6 +271,11 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                   ⭐ Curated Recommendation
                 </Badge>
               )}
+              {property.hasExpediaData && (
+                <Badge variant="default" className="mb-2 bg-primary/90 text-primary-foreground">
+                  ✓ Expedia Verified
+                </Badge>
+              )}
               <p className="text-muted-foreground line-clamp-3">
                 {property.description || "Enjoy a comfortable stay with modern amenities and excellent service."}
               </p>
