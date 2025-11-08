@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, MapPin, Users, DollarSign, ThumbsUp, ThumbsDown, Loader2, Plus } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, ThumbsUp, ThumbsDown, Loader2, Plus, Settings } from 'lucide-react';
 import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -15,6 +15,7 @@ import { TripChat } from './TripChat';
 import { BudgetTracker } from './BudgetTracker';
 import { PersonalExpenseTracker } from './PersonalExpenseTracker';
 import { ExportTripButton } from './ExportTripButton';
+import { TripSettings } from './TripSettings';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -30,6 +31,7 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [votes, setVotes] = useState<Map<string, any>>(new Map());
   const [participants, setParticipants] = useState<any[]>([]);
+  const [showSettings, setShowSettings] = useState(false);
   const previousSuggestionsRef = useRef<any[]>([]);
 
   const fetchTripData = async () => {
@@ -343,6 +345,18 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
 
   const isCreator = trip.creator_id === user?.id;
   const isMember = members.some(m => m.user_id === user?.id && m.status === 'accepted');
+  const isAdmin = members.some(m => m.user_id === user?.id && m.status === 'accepted' && m.role === 'admin');
+
+  if (showSettings) {
+    return (
+      <TripSettings
+        trip={trip}
+        members={members}
+        onClose={() => setShowSettings(false)}
+        onUpdate={fetchTripData}
+      />
+    );
+  }
 
   const renderSuggestionCard = (suggestion: any) => {
     const acceptedMembersCount = members.filter(m => m.status === 'accepted').length;
@@ -505,6 +519,12 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
           members={members}
           participants={participants}
         />
+        {isCreator && (
+          <Button variant="outline" onClick={() => setShowSettings(true)}>
+            <Settings className="h-4 w-4 mr-2" />
+            Settings
+          </Button>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">

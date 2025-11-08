@@ -2704,6 +2704,8 @@ export type Database = {
           destination: string
           end_date: string
           id: string
+          notification_settings: Json | null
+          spending_limits: Json | null
           start_date: string
           status: string | null
           title: string
@@ -2717,6 +2719,8 @@ export type Database = {
           destination: string
           end_date: string
           id?: string
+          notification_settings?: Json | null
+          spending_limits?: Json | null
           start_date: string
           status?: string | null
           title: string
@@ -2730,6 +2734,8 @@ export type Database = {
           destination?: string
           end_date?: string
           id?: string
+          notification_settings?: Json | null
+          spending_limits?: Json | null
           start_date?: string
           status?: string | null
           title?: string
