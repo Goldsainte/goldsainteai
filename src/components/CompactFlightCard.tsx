@@ -43,38 +43,40 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
   
   // Add null checks to prevent crashes
   if (!flight || !flight.itineraries || flight.itineraries.length === 0 || 
-      !flight.itineraries[0].segments || flight.itineraries[0].segments.length === 0 ||
-      !flight.price) {
-    console.warn('Invalid flight data:', flight);
+      !flight.itineraries[0].segments || flight.itineraries[0].segments.length === 0) {
+    console.warn('Invalid flight data structure:', flight);
     return null;
   }
   
   const firstSegment = flight.itineraries[0].segments[0];
   const lastSegment = flight.itineraries[0].segments[flight.itineraries[0].segments.length - 1];
   
-  // Validate price data - handle both number and object formats
-  let basePrice: number;
-  let currency: string;
+  // Handle price gracefully - DON'T return null if missing
+  let basePrice: number = 0;
+  let currency: string = 'USD';
+  let hasPriceData: boolean = false;
   
-  if (typeof flight.price === 'number') {
-    // Price is a direct number (e.g., 493.46)
-    basePrice = flight.price;
-    currency = flight.travelerPricings?.[0]?.price?.currency || 'USD';
-  } else if (flight.price && typeof flight.price === 'object') {
-    // Price is an object with total and currency
-    basePrice = parseFloat(flight.price.total || flight.price.base || '0');
-    currency = flight.price.currency || 'USD';
-  } else {
-    console.warn('Invalid flight price format:', flight.price);
-    return null;
+  if (flight.price) {
+    if (typeof flight.price === 'number') {
+      basePrice = flight.price;
+      currency = flight.travelerPricings?.[0]?.price?.currency || 'USD';
+      hasPriceData = true;
+    } else if (typeof flight.price === 'object') {
+      const priceValue = parseFloat(flight.price.total || flight.price.base || '0');
+      if (!isNaN(priceValue) && priceValue > 0) {
+        basePrice = priceValue;
+        currency = flight.price.currency || 'USD';
+        hasPriceData = true;
+      }
+    }
   }
   
-  if (isNaN(basePrice) || basePrice <= 0) {
-    console.warn('Invalid flight price value:', basePrice);
-    return null;
+  if (!hasPriceData) {
+    console.warn('Flight has no valid price data:', flight.id);
+    // Don't return null - continue rendering the card
   }
   
-  const markedUpPrice = basePrice * 1.15;
+  const markedUpPrice = hasPriceData ? basePrice * 1.15 : 0;
 
   const formatTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleTimeString('en-US', { 
@@ -167,8 +169,17 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           {/* Bottom Row: Price and Action Buttons */}
           <div className="flex items-center justify-between gap-2 pt-2 border-t">
             <div>
-              <div className="text-lg font-bold">{formatCurrency(markedUpPrice, currency)}</div>
-              <div className="text-caption text-muted-foreground">{getCabinClass()}</div>
+              {hasPriceData ? (
+                <>
+                  <div className="text-lg font-bold">{formatCurrency(markedUpPrice, currency)}</div>
+                  <div className="text-caption text-muted-foreground">{getCabinClass()}</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-sm font-semibold text-muted-foreground">Price</div>
+                  <div className="text-sm text-muted-foreground">Contact us</div>
+                </>
+              )}
             </div>
             <div className="flex gap-2">
               <Button
@@ -221,8 +232,17 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           {/* Price & Actions */}
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <div className="text-xl font-bold">{formatCurrency(markedUpPrice, currency)}</div>
-              <div className="text-xs text-muted-foreground">total</div>
+              {hasPriceData ? (
+                <>
+                  <div className="text-xl font-bold">{formatCurrency(markedUpPrice, currency)}</div>
+                  <div className="text-xs text-muted-foreground">total</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-sm font-semibold text-muted-foreground">Price</div>
+                  <div className="text-sm text-muted-foreground">Contact us</div>
+                </>
+              )}
             </div>
             
             <div className="flex gap-1">

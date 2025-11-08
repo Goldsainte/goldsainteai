@@ -4,7 +4,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Label } from "@/components/ui/label";
 import { Users, Minus, Plus, CalendarIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -37,6 +36,8 @@ export const DateSelectionModal = ({
   const [checkOutDate, setCheckOutDate] = useState<Date | undefined>();
   const [adults, setAdults] = useState(2);
   const [loading, setLoading] = useState(false);
+  const [showCheckInCal, setShowCheckInCal] = useState(false);
+  const [showCheckOutCal, setShowCheckOutCal] = useState(false);
 
   // Initialize dates from props or URL params - NO defaults
   useEffect(() => {
@@ -130,44 +131,56 @@ export const DateSelectionModal = ({
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Check-in Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {checkInDate ? format(checkInDate, 'PPP') : 'Select check-in date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-[100]">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start text-left font-normal"
+                  onClick={() => setShowCheckInCal(!showCheckInCal)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {checkInDate ? format(checkInDate, 'PPP') : 'Select check-in date'}
+                </Button>
+                {showCheckInCal && (
+                  <div className="border rounded-lg p-2 bg-card shadow-lg">
                     <Calendar
                       mode="single"
                       selected={checkInDate}
-                      onSelect={setCheckInDate}
+                      onSelect={(date) => {
+                        setCheckInDate(date);
+                        setShowCheckInCal(false);
+                      }}
                       disabled={(date) => date < new Date()}
                       initialFocus
+                      className="w-full pointer-events-auto"
                     />
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label>Check-out Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {checkOutDate ? format(checkOutDate, 'PPP') : 'Select check-out date'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background z-[100]">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start text-left font-normal"
+                  onClick={() => setShowCheckOutCal(!showCheckOutCal)}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {checkOutDate ? format(checkOutDate, 'PPP') : 'Select check-out date'}
+                </Button>
+                {showCheckOutCal && (
+                  <div className="border rounded-lg p-2 bg-card shadow-lg">
                     <Calendar
                       mode="single"
                       selected={checkOutDate}
-                      onSelect={setCheckOutDate}
+                      onSelect={(date) => {
+                        setCheckOutDate(date);
+                        setShowCheckOutCal(false);
+                      }}
                       disabled={(date) => !checkInDate || date <= checkInDate}
                       initialFocus
+                      className="w-full pointer-events-auto"
                     />
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                )}
               </div>
 
               {checkInDate && checkOutDate && (

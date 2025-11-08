@@ -1018,7 +1018,7 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden" ref={scrollRef}>
+          <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden w-full max-w-full" ref={scrollRef}>
             <div className="space-y-3">
               {/* Booking Progress Tracker */}
               <BookingProgressTracker 

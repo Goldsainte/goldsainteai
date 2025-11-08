@@ -157,7 +157,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
         <div className="flex gap-3 p-3">
           {/* Image with locked 4:3 aspect ratio */}
           <div 
-            className="relative w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-muted cursor-pointer"
+            className="relative w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-muted/80 to-muted/50 cursor-pointer"
             onClick={() => allImages.length > 0 && setShowGallery(true)}
           >
             {hasValidImage ? (
@@ -166,12 +166,23 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 alt={title}
                 loading="lazy"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                onError={(e) => {
+                  console.error('Hotel image failed to load:', image);
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.style.display = 'none';
+                  const parent = target.parentElement;
+                  if (parent) {
+                    const placeholder = parent.querySelector('.image-placeholder');
+                    if (placeholder) {
+                      placeholder.classList.remove('hidden');
+                    }
+                  }
+                }}
               />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <ImageIcon className="h-8 w-8 text-muted-foreground" />
-              </div>
-            )}
+            ) : null}
+            <div className={`image-placeholder w-full h-full flex items-center justify-center bg-gradient-to-br from-muted/80 to-muted/50 ${hasValidImage ? 'hidden' : ''}`}>
+              <ImageIcon className="h-12 w-12 text-muted-foreground/70" />
+            </div>
             {hasMultipleImages && (
               <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
                 <ImageIcon className="h-3 w-3" />

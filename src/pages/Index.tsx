@@ -784,8 +784,8 @@ const queries = {
   const showChat = messages.length > 0;
 
   return (
-    <main className="min-h-screen flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40 overflow-x-hidden">
-      <div className="w-full flex-1 flex flex-col overflow-x-hidden">
+    <main className="min-h-screen w-full max-w-full flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40 overflow-x-hidden">
+      <div className="w-full max-w-full flex-1 flex flex-col overflow-x-hidden">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
