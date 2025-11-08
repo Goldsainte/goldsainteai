@@ -57,7 +57,7 @@ const scrollRef = useRef<HTMLDivElement>(null);
         };
         setMessages(prev => [...prev, assistantMessage]);
 
-        // If the AI just performed a hotel search successfully, open the results page
+        // If the AI just performed a hotel search successfully, navigate directly to results
         if (data?.meta?.status === 'OK' && data.meta.search_params) {
           const sp = data.meta.search_params;
           const qs = new URLSearchParams({
@@ -66,8 +66,10 @@ const scrollRef = useRef<HTMLDivElement>(null);
             checkIn: sp.checkIn,
             checkOut: sp.checkOut,
             guests: String(sp.guests || 2),
+            fromChat: 'true' // Flag to prevent date picker popup
           });
           navigate(`/search?${qs.toString()}`);
+          setIsOpen(false); // Close chat after navigation
         }
       }
     } catch (error: any) {
