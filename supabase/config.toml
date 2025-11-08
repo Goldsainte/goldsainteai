@@ -302,3 +302,6 @@ verify_jwt = true
 
 [functions.generate-trip-itinerary]
 verify_jwt = true
+
+[functions.send-trip-reminders]
+verify_jwt = false

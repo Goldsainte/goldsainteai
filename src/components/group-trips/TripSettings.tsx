@@ -253,6 +253,27 @@ export const TripSettings = ({ trip, members, onClose, onUpdate }: TripSettingsP
               />
             </div>
           ))}
+          
+          <Separator className="my-4" />
+          
+          <div className="bg-muted/50 p-4 rounded-lg space-y-2">
+            <div className="flex items-center gap-2">
+              <Bell className="h-4 w-4 text-primary" />
+              <span className="font-medium text-sm">Automated Departure Reminders</span>
+              <Badge variant="secondary" className="ml-auto">Active</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Members will automatically receive notifications:
+            </p>
+            <ul className="text-xs text-muted-foreground list-disc list-inside space-y-1 ml-2">
+              <li>7 days before departure</li>
+              <li>3 days before departure</li>
+              <li>1 day before departure</li>
+            </ul>
+            <p className="text-xs text-muted-foreground italic mt-2">
+              Reminders are sent daily at 9:00 AM UTC
+            </p>
+          </div>
         </CardContent>
       </Card>
 
