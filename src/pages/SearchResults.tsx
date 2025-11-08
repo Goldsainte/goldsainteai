@@ -590,7 +590,7 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
     } else {
       filtered = filtered.filter((item) => {
         const price = searchType === "flights"
-          ? Number(item.price?.grandTotal ?? item.price?.total ?? 0)
+          ? (item.numericPrice ?? Number(item.price?.grandTotal ?? item.price?.total ?? item.price ?? 0))
           : searchType === "cars"
             ? Number(item.price?.total ?? 0)
             : (item.price || item.estimated_price || item.priceBreakdown?.grossPrice?.value || 0);
@@ -673,12 +673,12 @@ if (minRating && searchType !== "restaurants") {
       case "price":
         filtered.sort((a, b) => {
           const ap = searchType === "flights"
-            ? Number(a.price?.grandTotal ?? a.price?.total ?? 0)
+            ? (a.numericPrice ?? Number(a.price?.grandTotal ?? a.price?.total ?? a.price ?? 0))
             : searchType === "cars"
               ? Number(a.price?.total ?? 0)
               : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
           const bp = searchType === "flights"
-            ? Number(b.price?.grandTotal ?? b.price?.total ?? 0)
+            ? (b.numericPrice ?? Number(b.price?.grandTotal ?? b.price?.total ?? b.price ?? 0))
             : searchType === "cars"
               ? Number(b.price?.total ?? 0)
               : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);
@@ -688,12 +688,12 @@ if (minRating && searchType !== "restaurants") {
       case "price_desc":
         filtered.sort((a, b) => {
           const ap = searchType === "flights"
-            ? Number(a.price?.grandTotal ?? a.price?.total ?? 0)
+            ? (a.numericPrice ?? Number(a.price?.grandTotal ?? a.price?.total ?? a.price ?? 0))
             : searchType === "cars"
               ? Number(a.price?.total ?? 0)
               : (a.price || a.estimated_price || a.priceBreakdown?.grossPrice?.value || 0);
           const bp = searchType === "flights"
-            ? Number(b.price?.grandTotal ?? b.price?.total ?? 0)
+            ? (b.numericPrice ?? Number(b.price?.grandTotal ?? b.price?.total ?? b.price ?? 0))
             : searchType === "cars"
               ? Number(b.price?.total ?? 0)
               : (b.price || b.estimated_price || b.priceBreakdown?.grossPrice?.value || 0);

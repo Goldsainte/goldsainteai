@@ -216,7 +216,7 @@ serve(async (req) => {
         body: {
           results: markedUpResults.map(f => ({
             ...f,
-            price: parseFloat(f.price.total),
+            numericPrice: parseFloat(f.price.total), // Numeric price for ranking only
             rating: 4.0 // Default for flights
           })),
           sortBy: sortBy

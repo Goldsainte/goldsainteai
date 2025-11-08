@@ -62,9 +62,10 @@ function calculateScore(item: any, criteria: RankingCriteria, maxValues: any): n
   let score = 0;
   const weights = criteria.weights;
 
-  // Price score (lower is better)
-  if (weights.price && item.price && maxValues.price) {
-    const priceScore = 1 - (item.price / maxValues.price);
+  // Price score (lower is better) - support both numeric price and price objects
+  const itemPrice = item.numericPrice ?? (typeof item.price === 'number' ? item.price : 0);
+  if (weights.price && itemPrice && maxValues.price) {
+    const priceScore = 1 - (itemPrice / maxValues.price);
     score += priceScore * weights.price;
   }
 
@@ -109,7 +110,7 @@ function calculateScore(item: any, criteria: RankingCriteria, maxValues: any): n
 
 function findMaxValues(results: any[]): any {
   return {
-    price: Math.max(...results.map(r => r.price || 0)),
+    price: Math.max(...results.map(r => r.numericPrice ?? (typeof r.price === 'number' ? r.price : 0))),
     distance: Math.max(...results.map(r => r.distance || 0)),
     duration: Math.max(...results.map(r => r.duration || 0)),
     reviewCount: Math.max(...results.map(r => r.reviewCount || 0))
@@ -124,9 +125,11 @@ function assignBadges(results: any[], sortBy: string) {
   results[0].recommended = true;
 
   // Cheapest
-  const cheapest = results.reduce((min, item) => 
-    item.price < (min.price || Infinity) ? item : min
-  , results[0]);
+  const cheapest = results.reduce((min, item) => {
+    const itemPrice = item.numericPrice ?? (typeof item.price === 'number' ? item.price : Infinity);
+    const minPrice = min.numericPrice ?? (typeof min.price === 'number' ? min.price : Infinity);
+    return itemPrice < minPrice ? item : min;
+  }, results[0]);
   if (cheapest !== results[0]) {
     cheapest.badge = '💰 Cheapest Option';
   }
@@ -214,7 +217,7 @@ Deno.serve(async (req) => {
     const withBadges = assignBadges(scored, sortBy);
 
     // Calculate meta statistics
-    const prices = results.map(r => r.price).filter(Boolean);
+    const prices = results.map(r => r.numericPrice ?? (typeof r.price === 'number' ? r.price : 0)).filter(Boolean);
     const ratings = results.map(r => r.rating).filter(Boolean);
 
     const meta = {
