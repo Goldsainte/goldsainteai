@@ -7299,6 +7299,10 @@ export type Database = {
       trip_messages: {
         Row: {
           created_at: string
+          file_name: string | null
+          file_size: number | null
+          file_type: string | null
+          file_url: string | null
           id: string
           message: string
           parent_message_id: string | null
@@ -7307,6 +7311,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           message: string
           parent_message_id?: string | null
@@ -7315,6 +7323,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          file_name?: string | null
+          file_size?: number | null
+          file_type?: string | null
+          file_url?: string | null
           id?: string
           message?: string
           parent_message_id?: string | null

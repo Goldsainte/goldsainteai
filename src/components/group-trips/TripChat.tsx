@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Send, Reply, Trash2 } from 'lucide-react';
+import { Send, Reply, Trash2, Paperclip, Download, FileText, Image as ImageIcon, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTripChat } from '@/hooks/useTripChat';
 import { useAuth } from '@/contexts/AuthContext';
 import { Badge } from '@/components/ui/badge';
+import { useToast } from '@/hooks/use-toast';
 
 interface TripChatProps {
   tripId: string;
@@ -17,10 +18,13 @@ interface TripChatProps {
 
 export const TripChat = ({ tripId, members }: TripChatProps) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { messages, loading, sendMessage, deleteMessage } = useTripChat(tripId);
   const [newMessage, setNewMessage] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
@@ -29,19 +33,53 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
     }
   }, [messages]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: 'File too large',
+        description: 'Maximum file size is 10MB',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+  };
+
   const handleSend = async () => {
-    if (!newMessage.trim() || sending) return;
+    if ((!newMessage.trim() && !selectedFile) || sending) return;
 
     setSending(true);
     try {
-      await sendMessage(newMessage, replyingTo || undefined);
+      await sendMessage(newMessage, replyingTo || undefined, selectedFile || undefined);
       setNewMessage('');
       setReplyingTo(null);
+      setSelectedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     } catch (error) {
       // Error handled in hook
     } finally {
       setSending(false);
     }
+  };
+
+  const getFileIcon = (fileType: string | null) => {
+    if (!fileType) return <FileText className="h-4 w-4" />;
+    if (fileType.startsWith('image/')) return <ImageIcon className="h-4 w-4" />;
+    return <FileText className="h-4 w-4" />;
+  };
+
+  const formatFileSize = (bytes: number | null) => {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   const getMemberEmail = (userId: string) => {
@@ -95,6 +133,31 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
               ? 'bg-primary text-primary-foreground' 
               : 'bg-muted'
           }`}>
+            {message.file_url && (
+              <div className="mb-2">
+                {message.file_type?.startsWith('image/') ? (
+                  <img 
+                    src={message.file_url} 
+                    alt={message.file_name || 'Shared image'}
+                    className="max-w-[300px] rounded-lg cursor-pointer"
+                    onClick={() => window.open(message.file_url!, '_blank')}
+                  />
+                ) : (
+                  <a
+                    href={message.file_url}
+                    download={message.file_name}
+                    className="flex items-center gap-2 p-2 rounded bg-background/10 hover:bg-background/20 transition-colors"
+                  >
+                    {getFileIcon(message.file_type)}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{message.file_name}</p>
+                      <p className="text-xs opacity-70">{formatFileSize(message.file_size)}</p>
+                    </div>
+                    <Download className="h-4 w-4 flex-shrink-0" />
+                  </a>
+                )}
+              </div>
+            )}
             <p className="text-sm">{message.message}</p>
           </div>
           
@@ -115,7 +178,7 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
                 size="sm"
                 variant="ghost"
                 className="h-6 text-xs text-destructive"
-                onClick={() => deleteMessage(message.id)}
+                onClick={() => deleteMessage(message.id, message.file_url)}
               >
                 <Trash2 className="h-3 w-3 mr-1" />
                 Delete
@@ -170,8 +233,47 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
               </Button>
             </div>
           )}
+
+          {selectedFile && (
+            <div className="px-3 py-2 rounded-lg bg-muted/50 border border-border text-sm flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                {getFileIcon(selectedFile.type)}
+                <div>
+                  <p className="font-medium">{selectedFile.name}</p>
+                  <p className="text-xs text-muted-foreground">{formatFileSize(selectedFile.size)}</p>
+                </div>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setSelectedFile(null);
+                  if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                  }
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
           
           <div className="flex gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileSelect}
+              accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+            />
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={sending}
+            >
+              <Paperclip className="h-4 w-4" />
+            </Button>
             <Input
               placeholder="Type a message..."
               value={newMessage}
@@ -184,7 +286,7 @@ export const TripChat = ({ tripId, members }: TripChatProps) => {
               }}
               disabled={sending}
             />
-            <Button onClick={handleSend} disabled={!newMessage.trim() || sending}>
+            <Button onClick={handleSend} disabled={(!newMessage.trim() && !selectedFile) || sending}>
               <Send className="h-4 w-4" />
             </Button>
           </div>
