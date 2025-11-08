@@ -7,7 +7,7 @@ const getAmadeusToken = async () => {
   const apiKey = Deno.env.get('AMADEUS_API_KEY');
   const apiSecret = Deno.env.get('AMADEUS_API_SECRET');
   
-  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+  const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -44,7 +44,7 @@ Deno.serve(async (req) => {
       categories.forEach((cat: string) => params.append('categories', cat));
     }
     
-    const amadeusUrl = `https://test.api.amadeus.com/v1/reference-data/locations/pois?${params}`;
+    const amadeusUrl = `https://api.amadeus.com/v1/reference-data/locations/pois?${params}`;
     console.log('Calling Amadeus:', amadeusUrl);
     
     const response = await fetch(amadeusUrl, {

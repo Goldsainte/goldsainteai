@@ -14,7 +14,7 @@ async function getAmadeusToken() {
     throw new Error('Amadeus credentials not configured');
   }
 
-  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+  const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -95,7 +95,7 @@ serve(async (req) => {
         p.append('dropoffLocation', dropoffCode);
       }
       const res = await fetch(
-        `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${p}`,
+        `https://api.amadeus.com/v1/shopping/availability/car-rental-offers?${p}`,
         { headers: { 'Authorization': `Bearer ${token}` } }
       );
       if (!res.ok) {

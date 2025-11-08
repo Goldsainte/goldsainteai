@@ -56,7 +56,7 @@ async function getAmadeusToken(retries = 3): Promise<string> {
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+      const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -104,7 +104,7 @@ async function searchAmadeusFlights(params: any, token: string, retries = 2): Pr
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
       const response = await fetch(
-        `https://test.api.amadeus.com/v2/shopping/flight-offers?${queryParams}`,
+        `https://api.amadeus.com/v2/shopping/flight-offers?${queryParams}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`

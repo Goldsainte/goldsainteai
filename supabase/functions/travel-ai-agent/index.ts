@@ -984,7 +984,7 @@ async function searchCars(args: any) {
     }
 
     // Get Amadeus token
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+    const tokenResponse = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `grant_type=client_credentials&client_id=${amadeusKey}&client_secret=${amadeusSecret}`
@@ -1016,7 +1016,7 @@ async function searchCars(args: any) {
     console.log('Calling Amadeus API with params:', params.toString());
 
     const response = await fetch(
-      `https://test.api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
+      `https://api.amadeus.com/v1/shopping/availability/car-rental-offers?${params}`,
       {
         headers: {
           'Authorization': `Bearer ${access_token}`

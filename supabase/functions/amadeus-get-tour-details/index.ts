@@ -11,7 +11,7 @@ async function getAmadeusToken() {
     throw new Error('Amadeus credentials not configured');
   }
 
-  const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+  const tokenResponse = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     console.log('Fetching tour details for activity:', activityId);
 
     const accessToken = await getAmadeusToken();
-    const url = `https://test.api.amadeus.com/v1/shopping/activities/${activityId}`;
+    const url = `https://api.amadeus.com/v1/shopping/activities/${activityId}`;
 
     console.log('Calling Amadeus API:', url);
 

@@ -69,7 +69,7 @@ serve(async (req) => {
     const amadeusKey = Deno.env.get('AMADEUS_API_KEY');
     const amadeusSecret = Deno.env.get('AMADEUS_API_SECRET');
 
-    const tokenResponse = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+    const tokenResponse = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -98,7 +98,7 @@ serve(async (req) => {
 
     // Delete the flight order (Amadeus cancellation)
     const cancelResponse = await fetch(
-      `https://test.api.amadeus.com/v1/booking/flight-orders/${orderId}`,
+      `https://api.amadeus.com/v1/booking/flight-orders/${orderId}`,
       {
         method: 'DELETE',
         headers: {

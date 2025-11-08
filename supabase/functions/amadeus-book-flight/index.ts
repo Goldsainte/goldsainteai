@@ -16,7 +16,7 @@ async function getAmadeusToken() {
     throw new Error('Amadeus credentials not configured');
   }
 
-  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+  const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -108,7 +108,7 @@ serve(async (req) => {
     console.log('Creating Amadeus flight order...');
     
     const bookingResponse = await fetch(
-      'https://test.api.amadeus.com/v1/booking/flight-orders',
+      'https://api.amadeus.com/v1/booking/flight-orders',
       {
         method: 'POST',
         headers: {

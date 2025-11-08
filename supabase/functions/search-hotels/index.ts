@@ -49,7 +49,7 @@ async function getAmadeusToken(): Promise<string> {
     throw new Error('Amadeus API credentials not configured');
   }
 
-  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+  const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -67,7 +67,7 @@ async function getAmadeusToken(): Promise<string> {
 
 async function getHotelMedia(token: string, hotelId: string): Promise<string[]> {
   try {
-    const url = `https://test.api.amadeus.com/v2/shopping/hotel-offers/by-hotel?hotelIds=${hotelId}`;
+    const url = `https://api.amadeus.com/v2/shopping/hotel-offers/by-hotel?hotelIds=${hotelId}`;
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -94,7 +94,7 @@ async function searchHotelsAmadeus(
   params: HotelSearchParams,
   retryCount = 0
 ): Promise<NormalizedHotel[]> {
-  const url = new URL('https://test.api.amadeus.com/v3/shopping/hotel-offers');
+  const url = new URL('https://api.amadeus.com/v3/shopping/hotel-offers');
   
   url.searchParams.append('cityCode', params.cityCode);
   url.searchParams.append('checkInDate', params.checkInDate);
