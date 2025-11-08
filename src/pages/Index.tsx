@@ -717,10 +717,11 @@ const queries = {
         aiMessage.includes('one-way rental or round-trip') ||
         aiMessage.includes('is this a one-way rental')
       ) {
-        // Only show selector for flights
-        const isFlightQuestion = aiMessage.includes('flight');
+        // Only show selector for flights/cars, not hotels
+        const isFlightOrCarQuestion = aiMessage.includes('flight') || aiMessage.includes('rental') || aiMessage.includes('car');
+        const isNotHotelQuestion = !aiMessage.includes('hotel') && !aiMessage.includes('check in') && !aiMessage.includes('check-in');
         
-        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightQuestion) {
+        if (!tripTypeResolvedRef.current && !showTripTypeSelector && isFlightOrCarQuestion && isNotHotelQuestion) {
           setTimeout(() => setShowTripTypeSelector(true), 500);
         }
       }

@@ -458,7 +458,7 @@ export const Header = () => {
               
               {/* Horizontal scrolling travel categories */}
               <ScrollArea className="w-full whitespace-nowrap">
-                <div className="flex gap-2 pb-2">
+                <div className="flex justify-center gap-2 pb-2">
                   {travelCategories.map((category) => (
                     <Button
                       key={category.service}
