@@ -216,61 +216,46 @@ async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: stri
 }
 
 async function enrichWithExpedia(hotels: any[], location: string, checkIn: string, checkOut: string) {
-  const apiKey = Deno.env.get("EXPEDIA_API_KEY");
-  const apiSecret = Deno.env.get("EXPEDIA_API_SECRET");
+  const rapidApiKey = Deno.env.get("EXPEDIA_RAPID_API_KEY");
   
-  if (!apiKey || !apiSecret) {
-    console.log("Expedia API credentials not configured, skipping photo/review enrichment");
+  if (!rapidApiKey) {
+    console.log("Expedia RapidAPI key not configured, skipping photo/review enrichment");
     return hotels;
   }
 
   // Enrich top 20 hotels with Expedia data
   const limit = Math.min(hotels.length, 20);
   const target = hotels.slice(0, limit);
-  console.log(`Enriching ${target.length} hotels with Expedia photos and reviews...`);
+  console.log(`Enriching ${target.length} hotels with Expedia photos and reviews via RapidAPI...`);
 
-  // Get Expedia search results for the location
+  // Get Expedia search results for the location via RapidAPI
   try {
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const stringToSign = apiKey + apiSecret + timestamp;
-    
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(apiSecret);
-    const messageData = encoder.encode(stringToSign);
-    
-    const cryptoKey = await crypto.subtle.importKey(
-      "raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
-    );
-    
-    const signatureBuffer = await crypto.subtle.sign("HMAC", cryptoKey, messageData);
-    const signatureArray = Array.from(new Uint8Array(signatureBuffer));
-    const signature = signatureArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-    const url = new URL("https://api.ean.com/v3/properties/availability");
-    url.searchParams.append("location", location);
-    url.searchParams.append("checkin", checkIn);
-    url.searchParams.append("checkout", checkOut);
-    url.searchParams.append("occupancy", "2");
-    url.searchParams.append("sales_channel", "website");
-    url.searchParams.append("sales_environment", "hotel_only");
+    const url = new URL("https://hotels-com-provider.p.rapidapi.com/v2/hotels/search");
+    url.searchParams.append("locale", "en_US");
+    url.searchParams.append("checkin_date", checkIn);
+    url.searchParams.append("checkout_date", checkOut);
+    url.searchParams.append("adults_number", "2");
+    url.searchParams.append("domain", "US");
+    url.searchParams.append("sort_order", "REVIEW");
+    url.searchParams.append("region_id", location);
 
     const response = await fetch(url.toString(), {
       method: "GET",
       headers: {
-        "Authorization": `EAN apikey=${apiKey},signature=${signature},timestamp=${timestamp}`,
+        "X-RapidAPI-Key": rapidApiKey,
+        "X-RapidAPI-Host": "hotels-com-provider.p.rapidapi.com",
         "Content-Type": "application/json",
-        "Accept": "application/json",
       },
       signal: AbortSignal.timeout(10000) // 10s timeout
     });
 
     if (!response.ok) {
-      console.log(`Expedia API returned ${response.status}, skipping enrichment`);
+      console.log(`Expedia RapidAPI returned ${response.status}, skipping enrichment`);
       return hotels;
     }
 
     const data = await response.json();
-    const expediaHotels = data.properties || [];
+    const expediaHotels = data.properties || data.data || [];
     console.log(`Found ${expediaHotels.length} Expedia hotels to match against`);
 
     // Match Amadeus hotels with Expedia data
