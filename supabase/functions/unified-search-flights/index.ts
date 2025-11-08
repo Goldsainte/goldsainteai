@@ -47,8 +47,8 @@ async function setCache(supabase: any, key: string, data: any): Promise<void> {
 
 // Get Amadeus access token with retry
 async function getAmadeusToken(retries = 3): Promise<string> {
-  const apiKey = Deno.env.get('AMADEUS_API_KEY');
-  const apiSecret = Deno.env.get('AMADEUS_API_SECRET');
+  const apiKey = Deno.env.get('AMADEUS_API_KEY')?.trim();
+  const apiSecret = Deno.env.get('AMADEUS_API_SECRET')?.trim();
   
   if (!apiKey || !apiSecret) {
     throw new Error('Amadeus credentials not configured');
@@ -56,16 +56,23 @@ async function getAmadeusToken(retries = 3): Promise<string> {
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
+      const form = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: apiKey,
+        client_secret: apiSecret,
+      });
+
       const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: `grant_type=client_credentials&client_id=${apiKey}&client_secret=${apiSecret}`
+        body: form.toString()
       });
 
       if (!response.ok) {
-        throw new Error(`Auth failed: ${response.statusText}`);
+        const errText = await response.text().catch(() => '');
+        throw new Error(`Auth failed: ${response.status} ${response.statusText} - ${errText}`);
       }
 
       const data = await response.json();
