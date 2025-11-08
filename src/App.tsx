@@ -51,6 +51,7 @@ import CommissionDashboard from "./pages/CommissionDashboard";
 import EmailPreview from "./pages/EmailPreview";
 import MyBookings from "./pages/MyBookings";
 import BookingDetails from "./pages/BookingDetails";
+import BookingHistory from "./pages/BookingHistory";
 import ModifyFlight from "./pages/ModifyFlight";
 import Profile from "./pages/Profile";
 import Messages from "./pages/Messages";
@@ -252,6 +253,7 @@ function AppContent() {
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/:collectionId" element={<CollectionDetail />} />
           <Route path="/my-bookings" element={<MyBookingsRedirect />} />
+          <Route path="/booking-history" element={<BookingHistory />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/travel-profile" element={<TravelProfile />} />
           <Route path="/travel-profile/:userId" element={<TravelProfile />} />
