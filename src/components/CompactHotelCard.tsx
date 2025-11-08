@@ -35,13 +35,13 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   
   const title = property.property?.name || property.name || property.title || "Hotel";
   
-  // Image handling - prioritize available image sources with guaranteed fallback
+  // Image handling - prioritize available image sources, NO FALLBACKS
   const allImages = property.images || property.photos || property.property?.photoUrls || (property.image ? [property.image] : []);
   const imageUrl = property.image_url || allImages[0];
   const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
   
-  // Guaranteed fallback if no valid image
-  const finalImage = (image && image.trim()) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop';
+  // No fallback - if no image, show placeholder indicator
+  const hasValidImage = image && image.trim();
   const hasMultipleImages = allImages && allImages.length > 1;
   
   // Check for 360 virtual tour images
@@ -158,12 +158,18 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
             className="relative w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-muted cursor-pointer"
             onClick={() => allImages.length > 0 && setShowGallery(true)}
           >
-            <img
-              src={finalImage}
-              alt={title}
-              loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
+            {hasValidImage ? (
+              <img
+                src={image}
+                alt={title}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-muted">
+                <ImageIcon className="h-8 w-8 text-muted-foreground" />
+              </div>
+            )}
             {hasMultipleImages && (
               <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
                 <ImageIcon className="h-3 w-3" />

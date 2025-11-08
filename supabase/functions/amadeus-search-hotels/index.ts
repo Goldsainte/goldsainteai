@@ -196,22 +196,67 @@ serve(async (req) => {
     const offersData = await offersResponse.json();
     console.log('Hotel offers found:', offersData.data?.length || 0);
 
+    // Step 3: Fetch hotel details with images for each hotel
+    const hotelsWithDetails = await Promise.allSettled(
+      (offersData.data || []).slice(0, 50).map(async (hotel: any) => {
+        try {
+          const offerId = hotel.offers?.[0]?.id;
+          if (!offerId) return hotel;
+
+          const detailsResponse = await fetchWithTimeout(
+            `https://api.amadeus.com/v3/shopping/hotel-offers/${offerId}`,
+            {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            },
+            8000
+          );
+
+          if (detailsResponse.ok) {
+            const detailsData = await detailsResponse.json();
+            // Merge hotel details (which includes media/images) with original offer
+            return {
+              ...hotel,
+              hotel: {
+                ...hotel.hotel,
+                ...(detailsData.data?.hotel || {}),
+                media: detailsData.data?.hotel?.media || []
+              }
+            };
+          }
+          return hotel;
+        } catch (error) {
+          console.error(`Failed to fetch details for hotel ${hotel.hotel?.hotelId}:`, error);
+          return hotel;
+        }
+      })
+    );
+
+    // Extract successful results and merge with original data
+    const enrichedHotels = hotelsWithDetails
+      .filter(result => result.status === 'fulfilled')
+      .map(result => (result as any).value);
+
+    console.log('Hotels enriched with details:', enrichedHotels.length);
+
     // Apply 15% markup to all prices for consistency
     const MARKUP_PERCENTAGE = 15;
     
-    // Filter to only include hotels with available offers and apply markup
-    const availableHotels = (offersData.data || []).filter((hotel: any) => {
+    // Filter to only include hotels with available offers, images, and apply markup
+    const availableHotels = enrichedHotels.filter((hotel: any) => {
       const name = (hotel.hotel?.name || '').toLowerCase();
       const description = (hotel.offers?.[0]?.room?.description?.text || '').toLowerCase();
       const lat = hotel.hotel?.latitude || 0;
       const lon = hotel.hotel?.longitude || 0;
+      const hasImages = hotel.hotel?.media && hotel.hotel.media.length > 0;
       
-      // Exclude test hotels, demo hotels, "do not use" hotels, and fake coordinates
+      // Exclude test hotels, demo hotels, "do not use" hotels, fake coordinates, and hotels without images
       const isTestHotel = /test|demo|do not use|sample|fake/i.test(name) || 
                           /test|demo|do not use|sample|fake/i.test(description) ||
                           (lat === 0 && lon === 0);
       
-      return hotel.available === true && hotel.offers && hotel.offers.length > 0 && !isTestHotel;
+      return hotel.available === true && hotel.offers && hotel.offers.length > 0 && !isTestHotel && hasImages;
     }).map((hotel: any) => {
       // Apply markup to each offer
       const updatedOffers = hotel.offers.map((offer: any) => {
@@ -228,9 +273,16 @@ serve(async (req) => {
         };
       });
       
+      // Extract image URLs from media
+      const images = (hotel.hotel?.media || [])
+        .filter((m: any) => m.uri)
+        .map((m: any) => m.uri);
+
       return {
         ...hotel,
-        offers: updatedOffers
+        offers: updatedOffers,
+        images,
+        image: images[0] || null
       };
     });
 
