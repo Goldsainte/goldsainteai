@@ -20,9 +20,44 @@ serve(async (req) => {
       throw new Error('BOOKING_API_KEY not configured');
     }
 
+    // Resolve Booking.com destination ID from the provided location (city name or numeric dest_id)
+    let destId = '';
+    if (typeof location === 'string' && /^\d+$/.test(location.trim())) {
+      destId = location.trim();
+      console.log('Using provided numeric dest_id for Booking.com:', destId);
+    } else {
+      const destUrl = new URL('https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination');
+      destUrl.searchParams.append('query', String(location || ''));
+      try {
+        const destRes = await fetch(destUrl.toString(), {
+          method: 'GET',
+          headers: {
+            'x-rapidapi-key': apiKey,
+            'x-rapidapi-host': 'booking-com15.p.rapidapi.com'
+          },
+          signal: AbortSignal.timeout(10000)
+        });
+        if (destRes.ok) {
+          const destData = await destRes.json();
+          const items = destData?.data || destData?.result || [];
+          const cityMatch = items.find((i: any) => (i.dest_type || i.search_type || '').toString().toLowerCase().includes('city')) || items[0];
+          destId = cityMatch?.dest_id || cityMatch?.destId || '';
+          console.log('Resolved Booking.com dest_id:', destId, 'for location:', location);
+        } else {
+          console.warn('Destination lookup failed with status', destRes.status);
+        }
+      } catch (e) {
+        console.warn('Destination lookup error:', e);
+      }
+    }
+
+    if (!destId) {
+      console.warn('No Booking.com dest_id could be resolved for location:', location);
+    }
+
     // Search for hotels using Booking.com API
     const searchUrl = new URL('https://booking-com15.p.rapidapi.com/api/v1/hotels/searchHotels');
-    searchUrl.searchParams.append('dest_id', location);
+    searchUrl.searchParams.append('dest_id', destId || String(location || ''));
     searchUrl.searchParams.append('search_type', 'CITY');
     searchUrl.searchParams.append('arrival_date', checkIn);
     searchUrl.searchParams.append('departure_date', checkOut);

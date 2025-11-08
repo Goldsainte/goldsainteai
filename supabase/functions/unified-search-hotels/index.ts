@@ -376,8 +376,9 @@ serve(async (req) => {
       try {
         console.log("Trying Booking.com API first...");
         const { data: bookingData, error: bookingError } = await supabaseClient.functions.invoke('booking-search-hotels', {
+          // Pass the raw location string so the Booking.com function can resolve dest_id
           body: { 
-            location: cityCode, 
+            location, 
             checkIn, 
             checkOut, 
             adults: Number(guests) || 2,
@@ -389,6 +390,9 @@ serve(async (req) => {
         if (!bookingError && bookingData?.results) {
           bookingHotels = bookingData.results;
           console.log(`Booking.com returned ${bookingHotels.length} hotels with photos and reviews`);
+          if (bookingHotels.length === 0) {
+            console.warn('Booking.com returned 0 hotels; check destination resolution in booking-search-hotels for location:', location);
+          }
         } else {
           console.log("Booking.com failed, will try Amadeus:", bookingError?.message);
         }
