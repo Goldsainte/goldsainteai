@@ -240,6 +240,89 @@ const tools = [
         additionalProperties: false
       }
     }
+  },
+  // Date Flexibility
+  {
+    type: "function",
+    function: {
+      name: "compare_date_flexibility",
+      description: "Compare flight prices across different dates (±3 days). Shows price deltas and savings.",
+      parameters: {
+        type: "object",
+        properties: {
+          origin: { type: "string", description: "Origin airport code" },
+          destination: { type: "string", description: "Destination airport code" },
+          preferredDepartDate: { type: "string", description: "Preferred departure date (YYYY-MM-DD)" },
+          preferredReturnDate: { type: "string", description: "Preferred return date (YYYY-MM-DD) - optional" },
+          dayRange: { type: "integer", description: "Number of days to check before/after (default 3)", default: 3 }
+        },
+        required: ["origin", "destination", "preferredDepartDate"],
+        additionalProperties: false
+      }
+    }
+  },
+  // Multi-City
+  {
+    type: "function",
+    function: {
+      name: "search_multi_city_flights",
+      description: "Search multi-city flights with multiple segments (e.g., NYC→Paris→Rome→NYC).",
+      parameters: {
+        type: "object",
+        properties: {
+          segments: {
+            type: "array",
+            description: "Array of flight segments",
+            items: {
+              type: "object",
+              properties: {
+                origin: { type: "string", description: "Origin airport code" },
+                destination: { type: "string", description: "Destination airport code" },
+                date: { type: "string", description: "Departure date (YYYY-MM-DD)" }
+              },
+              required: ["origin", "destination", "date"]
+            }
+          },
+          travelClass: { type: "string", description: "Travel class (ECONOMY, BUSINESS, FIRST)", default: "ECONOMY" }
+        },
+        required: ["segments"],
+        additionalProperties: false
+      }
+    }
+  },
+  // Travel Advisories
+  {
+    type: "function",
+    function: {
+      name: "get_travel_advisories",
+      description: "Get current U.S. State Department travel advisories for a destination.",
+      parameters: {
+        type: "object",
+        properties: {
+          destination: { type: "string", description: "Country or city name" }
+        },
+        required: ["destination"],
+        additionalProperties: false
+      }
+    }
+  },
+  // Baggage Policy
+  {
+    type: "function",
+    function: {
+      name: "lookup_baggage_policy",
+      description: "Look up airline baggage policies and change/cancel fees.",
+      parameters: {
+        type: "object",
+        properties: {
+          airlineCode: { type: "string", description: "2-letter airline code (e.g., AA, DL, UA)" },
+          fareClass: { type: "string", description: "Fare class (e.g., basic, main, premium)" },
+          queryType: { type: "string", description: "Query type: 'baggage', 'change_cancel', or 'both'", default: "both" }
+        },
+        required: ["airlineCode"],
+        additionalProperties: false
+      }
+    }
   }
 ];
 
@@ -554,6 +637,119 @@ async function handleToolCall(toolName: string, args: any): Promise<any> {
     return { success: true, bookingReference, message: `Car rental booked! Confirmation: ${bookingReference}` };
   }
 
+  // DATE FLEXIBILITY
+  if (toolName === "compare_date_flexibility") {
+    const response = await fetch(`${supabaseUrl}/functions/v1/compare-date-flexibility`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+      body: JSON.stringify({
+        origin: args.origin,
+        destination: args.destination,
+        preferredDepartDate: args.preferredDepartDate,
+        preferredReturnDate: args.preferredReturnDate,
+        dayRange: args.dayRange || 3
+      })
+    });
+
+    if (!response.ok) return { error: 'Failed to compare date flexibility.' };
+    const data = await response.json();
+    
+    return { 
+      success: true, 
+      comparison: data.comparison,
+      cheapestOption: data.cheapestOption,
+      summary: data.summary,
+      message: `Found ${data.totalOptionsFound} date options. Save up to $${data.cheapestOption.savings.toFixed(2)} by flying on ${data.cheapestOption.departDate}`
+    };
+  }
+
+  // MULTI-CITY
+  if (toolName === "search_multi_city_flights") {
+    const response = await fetch(`${supabaseUrl}/functions/v1/search-multi-city-flights`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+      body: JSON.stringify({
+        segments: args.segments,
+        travelClass: args.travelClass || 'ECONOMY'
+      })
+    });
+
+    if (!response.ok) return { error: 'Failed to search multi-city flights.' };
+    const data = await response.json();
+    
+    if (data.flights && data.flights.length > 0) {
+      const topFlights = data.flights.slice(0, 5).map((flight: any) => ({
+        id: flight.id,
+        price: flight.price?.total,
+        currency: flight.price?.currency,
+        totalDuration: flight.metadata?.totalDurationFormatted,
+        stops: flight.metadata?.totalStops,
+        segments: flight.itineraries
+      }));
+      
+      return { 
+        success: true, 
+        flights: topFlights,
+        cheapest: data.cheapest,
+        message: `Found ${data.totalOptions} multi-city options. Best price: ${data.summary.priceRange?.currency} ${data.summary.priceRange?.min}`
+      };
+    }
+    
+    return { success: true, flights: [], message: 'No multi-city flights found for these segments.' };
+  }
+
+  // TRAVEL ADVISORIES
+  if (toolName === "get_travel_advisories") {
+    const response = await fetch(`${supabaseUrl}/functions/v1/get-travel-advisories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+      body: JSON.stringify({ destination: args.destination })
+    });
+
+    if (!response.ok) return { error: 'Failed to get travel advisories.' };
+    const data = await response.json();
+    
+    return { 
+      success: true, 
+      advisory: {
+        destination: data.destination,
+        level: data.level,
+        levelName: data.levelName,
+        summary: data.summary,
+        safetyTips: data.safetyTips,
+        source: data.source
+      },
+      message: `Travel Advisory for ${data.destination}: Level ${data.level} - ${data.levelName}`
+    };
+  }
+
+  // BAGGAGE POLICY
+  if (toolName === "lookup_baggage_policy") {
+    const response = await fetch(`${supabaseUrl}/functions/v1/lookup-baggage-policy`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
+      body: JSON.stringify({
+        airlineCode: args.airlineCode,
+        fareClass: args.fareClass,
+        queryType: args.queryType || 'both'
+      })
+    });
+
+    if (!response.ok) return { error: 'Failed to lookup baggage policy.' };
+    const data = await response.json();
+    
+    return { 
+      success: true, 
+      airline: data.airline,
+      policy: {
+        carryOn: data.carryOn,
+        checked: data.checked,
+        changeCancelPolicy: data.changeCancelPolicy
+      },
+      message: `${data.airline} baggage policy retrieved`
+    };
+  }
+
   return { error: 'Unknown tool' };
 }
 
@@ -640,10 +836,25 @@ Events: name, date & time, venue, price, category, ticket availability
 
 CAPABILITIES:
 ✈️ FLIGHTS - Search and book flights worldwide using Amadeus data
+   • Simple round-trip & one-way flights
+   • Multi-city flights with multiple segments
+   • Date flexibility comparison (±3 days with price deltas)
 🏨 HOTELS - Search and book luxury accommodations with photos and ratings
 🍽️ RESTAURANTS - Find and reserve dining experiences
 🎭 EVENTS - Discover and book tickets for events and activities
 🚗 CARS - Search and book rental vehicles
+📋 BAGGAGE POLICIES - Look up airline baggage allowances and change/cancel fees
+🌍 TRAVEL ADVISORIES - Get current U.S. State Department safety advisories
+
+ADVANCED FLIGHT FEATURES:
+• DATE FLEXIBILITY: When users ask "around March 10" or want to save money, use compare_date_flexibility to show ±3 day options with price deltas
+  Example: "NYC→MIA around March 10" → Compare March 7-13 and show cheapest dates
+• MULTI-CITY: For complex itineraries like "NYC→Paris→Rome→NYC", use search_multi_city_flights
+  Example: Segments [{origin: JFK, dest: CDG, date: 2025-05-01}, {origin: CDG, dest: FCO, date: 2025-05-10}, ...]
+• BAGGAGE: When users ask about carry-on/checked bags or change fees, use lookup_baggage_policy
+  Example: "AA basic economy baggage" → Show carry-on rules, checked fees, change penalties
+• SAFETY: For destination safety concerns, use get_travel_advisories
+  Example: "Is Istanbul safe?" → Show State Dept advisory level, safety tips
 
 BOOKING WORKFLOW (applies to all services):
 1. Gather requirements: destination/location, dates, number of people
@@ -664,10 +875,13 @@ IMPORTANT RULES:
 - Be conversational and luxury-focused
 - Handle one booking type at a time for clarity
 - If zero results, acknowledge suggestions and offer alternatives
+- Proactively suggest date flexibility when prices are high
+- Mention baggage policies for economy/basic fares
 
 Example: "I can search for hotels in Paris from March 15-20. What's your budget per person?"
-Example: "I found 5 flights from JFK to LAX with photos and details. The best option is..."
-Example: "Would you like me to book the Ritz Paris for $450/night (March 15-20)? I'll need your full name, email, and phone number."`;
+Example: "Want to save money? I can check flights ±3 days around your dates to find better prices."
+Example: "Would you like me to book the Ritz Paris for $450/night (March 15-20)? I'll need your full name, email, and phone number."
+Example: "Flying Basic Economy? Let me check AA's baggage policy for you - carry-on may not be included."`;
 
       // First API call with tools
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
