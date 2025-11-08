@@ -34,6 +34,7 @@ import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import Admin from "./pages/Admin";
 import AdminInquiries from "./pages/AdminInquiries";
+import AdminCancellations from "./pages/AdminCancellations";
 import Subscription from "./pages/Subscription";
 import AISubscription from "./pages/AISubscription";
 import BillingDashboard from "./pages/BillingDashboard";
@@ -235,6 +236,7 @@ function AppContent() {
           <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/cancellations" element={<AdminCancellations />} />
           <Route path="/subscription" element={<Subscription />} />
           <Route path="/ai-subscription" element={<AISubscription />} />
           <Route path="/billing-dashboard" element={<BillingDashboard />} />
