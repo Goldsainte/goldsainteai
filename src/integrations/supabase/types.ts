@@ -7603,10 +7603,13 @@ export type Database = {
       trip_suggestions: {
         Row: {
           created_at: string
+          day_number: number | null
           description: string | null
+          display_order: number | null
           id: string
           location: string | null
           price: number | null
+          scheduled_date: string | null
           status: string | null
           suggested_by: string
           suggestion_data: Json | null
@@ -7616,10 +7619,13 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          day_number?: number | null
           description?: string | null
+          display_order?: number | null
           id?: string
           location?: string | null
           price?: number | null
+          scheduled_date?: string | null
           status?: string | null
           suggested_by: string
           suggestion_data?: Json | null
@@ -7629,10 +7635,13 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          day_number?: number | null
           description?: string | null
+          display_order?: number | null
           id?: string
           location?: string | null
           price?: number | null
+          scheduled_date?: string | null
           status?: string | null
           suggested_by?: string
           suggestion_data?: Json | null

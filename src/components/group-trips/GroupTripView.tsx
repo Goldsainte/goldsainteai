@@ -16,6 +16,7 @@ import { BudgetTracker } from './BudgetTracker';
 import { PersonalExpenseTracker } from './PersonalExpenseTracker';
 import { ExportTripButton } from './ExportTripButton';
 import { TripSettings } from './TripSettings';
+import { TripTimeline } from './TripTimeline';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -511,7 +512,7 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       </Card>
 
       <div className="flex gap-2 flex-wrap">
-        {isMember && <AddSuggestionDialog tripId={tripId} onSuggestionAdded={fetchTripData} />}
+        {isMember && <AddSuggestionDialog tripId={tripId} tripStartDate={trip.start_date} onSuggestionAdded={fetchTripData} />}
         {isCreator && <InviteMembersDialog tripId={tripId} onMembersAdded={fetchTripData} />}
         <ExportTripButton 
           trip={trip}
@@ -546,8 +547,9 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       {isMember && <TripChat tripId={tripId} members={members} />}
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="timeline">Timeline</TabsTrigger>
           <TabsTrigger value="hotel">Hotels</TabsTrigger>
           <TabsTrigger value="activity">Activities</TabsTrigger>
           <TabsTrigger value="restaurant">Restaurants</TabsTrigger>
@@ -566,6 +568,16 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
           ) : (
             suggestions.map(renderSuggestionCard)
           )}
+        </TabsContent>
+
+        <TabsContent value="timeline" className="mt-4">
+          <TripTimeline
+            trip={trip}
+            suggestions={suggestions}
+            members={members}
+            participants={participants}
+            onUpdate={fetchTripData}
+          />
         </TabsContent>
         
         {['hotel', 'activity', 'restaurant', 'flight'].map((type) => (

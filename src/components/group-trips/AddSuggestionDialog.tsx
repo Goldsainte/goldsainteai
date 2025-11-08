@@ -20,10 +20,11 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface AddSuggestionDialogProps {
   tripId: string;
+  tripStartDate?: string;
   onSuggestionAdded?: () => void;
 }
 
-export const AddSuggestionDialog = ({ tripId, onSuggestionAdded }: AddSuggestionDialogProps) => {
+export const AddSuggestionDialog = ({ tripId, tripStartDate, onSuggestionAdded }: AddSuggestionDialogProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -34,6 +35,7 @@ export const AddSuggestionDialog = ({ tripId, onSuggestionAdded }: AddSuggestion
     description: '',
     location: '',
     price: '',
+    scheduledDate: '',
   });
 
   const handleAdd = async () => {
@@ -51,6 +53,15 @@ export const AddSuggestionDialog = ({ tripId, onSuggestionAdded }: AddSuggestion
     setLoading(true);
 
     try {
+      // Calculate day_number if date is provided
+      let dayNumber = null;
+      if (formData.scheduledDate && tripStartDate) {
+        dayNumber = Math.floor(
+          (new Date(formData.scheduledDate).getTime() - new Date(tripStartDate).getTime()) / 
+          (1000 * 60 * 60 * 24)
+        ) + 1;
+      }
+
       const { error } = await supabase
         .from('trip_suggestions')
         .insert({
@@ -61,6 +72,8 @@ export const AddSuggestionDialog = ({ tripId, onSuggestionAdded }: AddSuggestion
           description: formData.description,
           location: formData.location || null,
           price: formData.price ? parseFloat(formData.price) : null,
+          scheduled_date: formData.scheduledDate || null,
+          day_number: dayNumber,
           status: 'pending',
         });
 
@@ -78,6 +91,7 @@ export const AddSuggestionDialog = ({ tripId, onSuggestionAdded }: AddSuggestion
         description: '',
         location: '',
         price: '',
+        scheduledDate: '',
       });
 
       if (onSuggestionAdded) {
@@ -157,6 +171,16 @@ export const AddSuggestionDialog = ({ tripId, onSuggestionAdded }: AddSuggestion
               placeholder="150"
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="scheduledDate">Scheduled Date (Optional)</Label>
+            <Input
+              id="scheduledDate"
+              type="date"
+              value={formData.scheduledDate}
+              onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
             />
           </div>
 
