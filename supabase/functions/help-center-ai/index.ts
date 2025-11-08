@@ -1,9 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
+import { checkAndTrackAIUsage } from '../_shared/aiUsageTracker.ts';
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
+const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -153,6 +155,42 @@ serve(async (req) => {
 
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // Get user from auth header
+    const authHeader = req.headers.get("Authorization");
+    let userId: string | null = null;
+    
+    if (authHeader) {
+      const token = authHeader.replace("Bearer ", "");
+      const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data: { user } } = await supabaseClient.auth.getUser(token);
+      userId = user?.id || null;
+    }
+
+    // Check AI usage limits
+    const usageCheck = await checkAndTrackAIUsage(
+      userId,
+      'help-center-ai',
+      SUPABASE_URL,
+      SUPABASE_SERVICE_KEY
+    );
+
+    if (!usageCheck.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "AI usage limit exceeded",
+          tier: usageCheck.tier,
+          used: usageCheck.used,
+          limit: usageCheck.limit,
+          resetDate: usageCheck.resetDate,
+          needsUpgrade: true
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

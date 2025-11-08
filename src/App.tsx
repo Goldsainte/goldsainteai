@@ -35,6 +35,7 @@ import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import Admin from "./pages/Admin";
 import AdminInquiries from "./pages/AdminInquiries";
 import Subscription from "./pages/Subscription";
+import AISubscription from "./pages/AISubscription";
 import BillingDashboard from "./pages/BillingDashboard";
 import AgentProfile from "./pages/AgentProfile";
 import BrowseAgents from "./pages/BrowseAgents";
@@ -234,6 +235,7 @@ function AppContent() {
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/subscription" element={<Subscription />} />
+          <Route path="/ai-subscription" element={<AISubscription />} />
           <Route path="/billing-dashboard" element={<BillingDashboard />} />
           <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />

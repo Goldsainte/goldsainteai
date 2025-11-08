@@ -311,3 +311,13 @@ verify_jwt = true
 
 [functions.get-exchange-rates]
 verify_jwt = true
+
+[functions.check-ai-usage]
+verify_jwt = true
+
+[functions.create-ai-subscription-checkout]
+verify_jwt = true
+
+[functions.check-api-health]
+verify_jwt = true
+
