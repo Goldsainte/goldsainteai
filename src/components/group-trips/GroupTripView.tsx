@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useGroupTripRealtime } from '@/hooks/useGroupTripRealtime';
 import { AddSuggestionDialog } from './AddSuggestionDialog';
 import { InviteMembersDialog } from './InviteMembersDialog';
+import { TripChat } from './TripChat';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -354,6 +355,8 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
         {isMember && <AddSuggestionDialog tripId={tripId} onSuggestionAdded={fetchTripData} />}
         {isCreator && <InviteMembersDialog tripId={tripId} onMembersAdded={fetchTripData} />}
       </div>
+
+      {isMember && <TripChat tripId={tripId} members={members} />}
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
