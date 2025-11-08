@@ -944,7 +944,7 @@ export const AIBookingConcierge = () => {
                   className="text-primary-foreground hover:bg-white/10 h-8 w-8 relative"
                 >
                   <Settings className="h-4 w-4" />
-                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-lg pointer-events-none">
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-micro font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-lg pointer-events-none">
                     {customPrefsCount}
                   </span>
                 </Button>
@@ -1048,7 +1048,7 @@ export const AIBookingConcierge = () => {
                           : 'bg-muted text-foreground'
                       }`}
                     >
-                      <p className="text-[11px] md:text-xs whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
+                      <p className="text-xs sm:text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
                     </div>
                   </div>
                   

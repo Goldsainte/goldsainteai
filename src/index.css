@@ -65,14 +65,18 @@ All colors MUST be HSL.
     --gradient-gold: linear-gradient(135deg, hsl(46 38% 60%), hsl(46 45% 65%));
     --gradient-hero: linear-gradient(135deg, hsl(174 73% 17%) 0%, hsl(174 60% 25%) 100%);
     
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 hsl(215 25% 15% / 0.05);
-    --shadow-md: 0 4px 6px -1px hsl(215 25% 15% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(215 25% 15% / 0.1);
-    --shadow-xl: 0 20px 25px -5px hsl(215 25% 15% / 0.1);
+    /* Shadows - mobile optimized */
+    --shadow-sm: 0 1px 3px 0 hsl(215 25% 15% / 0.08);
+    --shadow-md: 0 4px 8px -1px hsl(215 25% 15% / 0.12);
+    --shadow-lg: 0 10px 20px -3px hsl(215 25% 15% / 0.15);
+    --shadow-xl: 0 20px 30px -5px hsl(215 25% 15% / 0.18);
     
     /* Transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Mobile-optimized spacing */
+    --spacing-section: 3rem; /* 48px */
+    --spacing-card: 1rem; /* 16px */
   }
 
   .dark {
@@ -131,8 +135,8 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground font-secondary;
-    /* Industry standard body text: 14-16px mobile, 16-18px desktop */
-    font-size: 14px;
+    /* Mobile-first body text: 15px mobile for better readability */
+    font-size: 15px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -145,7 +149,7 @@ All colors MUST be HSL.
   @media (min-width: 640px) {
     body {
       font-size: 16px;
-      line-height: 1.6;
+      line-height: 1.65;
     }
   }
   
@@ -154,6 +158,11 @@ All colors MUST be HSL.
     /* Better spacing on mobile */
     p + p {
       margin-top: 1rem;
+    }
+    
+    /* Ensure readable line length on mobile */
+    p {
+      max-width: 100%;
     }
   }
 
@@ -168,22 +177,25 @@ All colors MUST be HSL.
     scrollbar-width: none;  /* Firefox */
   }
 
-  /* Heading defaults */
+  /* Heading defaults - improved mobile sizing */
   h1, h2, h3, h4, h5, h6 {
     @apply font-secondary;
+    line-height: 1.2;
   }
 
-  /* Industry standard typography - mobile first */
+  /* Industry standard typography - mobile first with better readability */
   h1 {
-    @apply text-[28px] sm:text-4xl md:text-5xl;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl;
+    line-height: 1.1;
   }
 
   h2 {
-    @apply text-2xl sm:text-3xl md:text-4xl;
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl;
+    line-height: 1.15;
   }
 
   h3 {
-    @apply text-xl sm:text-2xl md:text-3xl;
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
   }
 
   h4 {
@@ -198,7 +210,7 @@ All colors MUST be HSL.
     @apply text-sm sm:text-base md:text-lg;
   }
   
-  /* Body text - 14-16px mobile, 16-18px desktop */
+  /* Body text - optimized for readability */
   p {
     @apply text-sm sm:text-base leading-relaxed;
   }
@@ -208,9 +220,28 @@ All colors MUST be HSL.
     @apply text-xs sm:text-sm;
   }
 
-  /* Caption text */
+  /* Caption text - responsive micro text */
   .text-caption {
-    @apply text-xs;
+    @apply text-[11px] sm:text-xs;
+  }
+  
+  /* Micro text - minimum readable size for mobile */
+  .text-micro {
+    @apply text-[10px] sm:text-xs;
+  }
+  
+  /* Label text - for form labels and metadata */
+  .text-label {
+    @apply text-xs sm:text-sm font-medium;
+  }
+  
+  /* Responsive spacing utilities for cards */
+  .card-padding {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+  
+  .card-gap {
+    @apply gap-3 sm:gap-4 md:gap-6;
   }
 
   /* Touch-friendly interactive elements */

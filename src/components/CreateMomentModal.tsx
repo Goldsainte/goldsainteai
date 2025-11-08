@@ -248,7 +248,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                   <p className="text-xs sm:text-sm text-muted-foreground">
                     Tap to upload an image or video
                   </p>
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                  <p className="text-caption sm:text-xs text-muted-foreground mt-1">
                     Max size: 50MB
                   </p>
                 </label>
@@ -332,7 +332,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                           document.addEventListener('touchend', end);
                         }}
                       >
-                        <div className="bg-black/70 text-white text-[10px] sm:text-xs rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg">
+                        <div className="bg-black/70 text-white text-caption sm:text-xs rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg">
                           {interaction.type === 'countdown' ? (interaction.data.label || 'Countdown')
                             : interaction.type === 'poll' ? (interaction.data.question || 'Poll')
                             : interaction.type === 'question' ? (interaction.data.text || 'Question')
@@ -493,7 +493,7 @@ export const CreateMomentModal = ({ open, onOpenChange }: CreateMomentModalProps
                     document.addEventListener('touchend', end);
                   }}
                 >
-                  <div className="bg-black/70 text-white text-[10px] sm:text-xs rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg">
+                  <div className="bg-black/70 text-white text-caption sm:text-xs rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 shadow-lg">
                     {interaction.type === 'countdown' ? (interaction.data.label || 'Countdown')
                       : interaction.type === 'poll' ? (interaction.data.question || 'Poll')
                       : interaction.type === 'question' ? (interaction.data.text || 'Question')

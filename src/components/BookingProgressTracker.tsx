@@ -144,7 +144,7 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: Bo
               <Zap className="h-4 w-4 text-accent" />
               <p className="text-xs font-semibold text-foreground">Quick Start Demo</p>
             </div>
-            <p className="text-[10px] text-muted-foreground mb-3 leading-relaxed">
+            <p className="text-caption text-muted-foreground mb-3 leading-relaxed">
               Try the booking flow with example scenarios
             </p>
             <Button
@@ -191,7 +191,7 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: Bo
                       <p className="text-xs text-muted-foreground mb-2">
                         {template.description}
                       </p>
-                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px]">
+                      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-caption">
                         <div className="flex items-center gap-1 text-muted-foreground">
                           <MapPin className="h-3 w-3" />
                           <span>{template.destination}</span>
@@ -226,7 +226,7 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: Bo
         <div className="p-3 space-y-2">
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-semibold text-foreground">Booking Information</p>
-            <span className="text-[10px] text-muted-foreground">
+            <span className="text-caption text-muted-foreground">
               {completedCount}/{totalCount} collected
             </span>
           </div>
@@ -252,10 +252,10 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: Bo
                     }`} 
                   />
                   <div className="flex-1 min-w-0 text-left">
-                    <p className="text-[10px] font-medium text-muted-foreground mb-0.5">
+                    <p className="text-caption font-medium text-muted-foreground mb-0.5">
                       {item.label}
                     </p>
-                    <p className={`text-[11px] font-semibold truncate ${
+                    <p className={`text-xs sm:text-sm font-semibold truncate ${
                       item.completed ? 'text-foreground' : 'text-muted-foreground/50'
                     }`}>
                       {item.value || 'Not set'}
@@ -277,7 +277,7 @@ export const BookingProgressTracker = ({ bookingInfo, onEdit, onQuickStart }: Bo
           {completedCount === totalCount && (
             <div className="flex items-center gap-1 justify-center pt-1 animate-fade-in">
               <CheckCircle2 className="h-3 w-3 text-green-600" />
-              <p className="text-[10px] text-green-600 font-medium">All information collected!</p>
+              <p className="text-caption text-green-600 font-medium">All information collected!</p>
             </div>
           )}
         </div>

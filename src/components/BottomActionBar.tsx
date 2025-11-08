@@ -44,14 +44,14 @@ export const BottomActionBar = ({ actions, className, showLabels = false }: Bott
                     {action.badge !== undefined && action.badge > 0 && (
                       <Badge 
                         variant="destructive" 
-                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-[10px]"
+                        className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center text-micro"
                       >
                         {action.badge}
                       </Badge>
                     )}
                   </Button>
                   {showLabels && (
-                    <span className="text-[10px] text-muted-foreground">{action.label}</span>
+                    <span className="text-caption text-muted-foreground">{action.label}</span>
                   )}
                 </div>
               </TooltipTrigger>

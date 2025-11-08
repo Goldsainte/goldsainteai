@@ -132,7 +132,7 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
                 </div>
                 <span className="font-bold text-base">{lastSegment.arrival.iataCode}</span>
               </div>
-              <div className="text-[10px] text-muted-foreground truncate">
+              <div className="text-caption text-muted-foreground truncate">
                 {getAirlineName(firstSegment.carrierCode)}
               </div>
             </div>
@@ -150,17 +150,17 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           <div className="flex items-center justify-between text-xs">
             <div>
               <div className="font-medium">{formatTime(firstSegment.departure.at)}</div>
-              <div className="text-[10px] text-muted-foreground">Depart</div>
+              <div className="text-caption text-muted-foreground">Depart</div>
             </div>
             <div className="text-center flex-1">
-              <div className="text-[10px] text-muted-foreground">{getDuration(flight.itineraries[0].duration)}</div>
-              <div className="text-[10px] text-muted-foreground">
+              <div className="text-caption text-muted-foreground">{getDuration(flight.itineraries[0].duration)}</div>
+              <div className="text-caption text-muted-foreground">
                 {flight.itineraries[0].segments.length === 1 ? 'Direct' : `${flight.itineraries[0].segments.length - 1} stop`}
               </div>
             </div>
             <div className="text-right">
               <div className="font-medium">{formatTime(lastSegment.arrival.at)}</div>
-              <div className="text-[10px] text-muted-foreground">Arrive</div>
+              <div className="text-caption text-muted-foreground">Arrive</div>
             </div>
           </div>
 
@@ -168,7 +168,7 @@ export const CompactFlightCard = ({ flight, dictionaries }: CompactFlightCardPro
           <div className="flex items-center justify-between gap-2 pt-2 border-t">
             <div>
               <div className="text-lg font-bold">{formatCurrency(markedUpPrice, currency)}</div>
-              <div className="text-[10px] text-muted-foreground">{getCabinClass()}</div>
+              <div className="text-caption text-muted-foreground">{getCabinClass()}</div>
             </div>
             <div className="flex gap-2">
               <Button
