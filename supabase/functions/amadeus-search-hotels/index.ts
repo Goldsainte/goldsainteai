@@ -18,8 +18,8 @@ async function getAmadeusToken() {
     throw new Error('Amadeus credentials not configured');
   }
 
-  // Use TEST environment for Amadeus
-  const response = await fetch('https://test.api.amadeus.com/v1/security/oauth2/token', {
+  // Use PRODUCTION environment for Amadeus
+  const response = await fetch('https://api.amadeus.com/v1/security/oauth2/token', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -135,7 +135,7 @@ serve(async (req) => {
     });
 
     const hotelListResponse = await fetchWithTimeout(
-      `https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?${hotelListParams}`,
+      `https://api.amadeus.com/v1/reference-data/locations/hotels/by-city?${hotelListParams}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
@@ -179,7 +179,7 @@ serve(async (req) => {
     });
 
     const offersResponse = await fetchWithTimeout(
-      `https://test.api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
+      `https://api.amadeus.com/v3/shopping/hotel-offers?${offerParams}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`
