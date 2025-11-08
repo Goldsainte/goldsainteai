@@ -34,9 +34,9 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   }, []);
   
   const title = property.property?.name || property.name || property.title || "Hotel";
-  // HotelBeds returns 'images', other sources use 'photos' or 'photoUrls'
+  // Use server-provided image_url first (always has fallback), then fall back to legacy fields
   const allImages = property.images || property.photos || property.property?.photoUrls || (property.image ? [property.image] : []);
-  const imageUrl = allImages[0];
+  const imageUrl = property.image_url || allImages[0];
   const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
   const hasMultipleImages = allImages && allImages.length > 1;
   
@@ -143,38 +143,32 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     <>
       <Card className="group hover:shadow-md transition-all overflow-hidden">
         <div className="flex gap-3 p-3">
-          {/* Image */}
+          {/* Image with locked 4:3 aspect ratio */}
           <div 
-            className="relative w-32 h-24 flex-shrink-0 rounded-md overflow-hidden bg-muted cursor-pointer"
+            className="relative w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-muted cursor-pointer"
             onClick={() => allImages.length > 0 && setShowGallery(true)}
           >
-            {image ? (
-              <>
-                <img
-                  src={image}
-                  alt={title}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    // Hide broken image so muted background shows instead
-                    (e.currentTarget as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                {hasMultipleImages && (
-                  <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
-                    <ImageIcon className="h-3 w-3" />
-                    {allImages.length}
-                  </div>
-                )}
-                {hasVirtualTour && (
-                  <div className="absolute top-1 left-1 bg-primary/90 text-primary-foreground text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
-                    <Video className="h-3 w-3" />
-                    360°
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="w-full h-full animate-pulse" aria-label="No image available" />
+            <img
+              src={image}
+              alt={title}
+              loading="lazy"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                // Show fallback image on error
+                (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop';
+              }}
+            />
+            {hasMultipleImages && (
+              <div className="absolute bottom-1 right-1 bg-black/70 text-white text-xs px-2 py-1 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <ImageIcon className="h-3 w-3" />
+                {allImages.length}
+              </div>
+            )}
+            {hasVirtualTour && (
+              <div className="absolute top-1 left-1 bg-primary/90 text-primary-foreground text-xs px-2 py-0.5 rounded-full flex items-center gap-1 backdrop-blur-sm">
+                <Video className="h-3 w-3" />
+                360°
+              </div>
             )}
           </div>
 

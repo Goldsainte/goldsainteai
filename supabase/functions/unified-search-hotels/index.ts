@@ -470,6 +470,7 @@ serve(async (req) => {
         rating: googleRating,
         num_reviews: googleReviewCount,
         isCurated: h.__isCurated || false,
+        image_url: photoUrls[0] || `https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop`, // Always return an image
         property: {
           name: info.name || "Hotel",
           photoUrls,
