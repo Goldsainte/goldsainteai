@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useGroupTripRealtime } from '@/hooks/useGroupTripRealtime';
 import { AddSuggestionDialog } from './AddSuggestionDialog';
 import { InviteMembersDialog } from './InviteMembersDialog';
 
@@ -23,12 +24,6 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
   const [members, setMembers] = useState<any[]>([]);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [votes, setVotes] = useState<Map<string, any>>(new Map());
-
-  useEffect(() => {
-    if (tripId) {
-      fetchTripData();
-    }
-  }, [tripId]);
 
   const fetchTripData = async () => {
     try {
@@ -94,6 +89,19 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
       setLoading(false);
     }
   };
+
+  // Set up realtime subscriptions
+  useGroupTripRealtime({
+    tripId,
+    onSuggestionAdded: fetchTripData,
+    onVoteChanged: fetchTripData,
+  });
+
+  useEffect(() => {
+    if (tripId) {
+      fetchTripData();
+    }
+  }, [tripId]);
 
   const handleVote = async (suggestionId: string, voteType: 'upvote' | 'downvote') => {
     if (!user) return;
