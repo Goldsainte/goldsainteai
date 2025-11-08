@@ -17,6 +17,7 @@ import { PersonalExpenseTracker } from './PersonalExpenseTracker';
 import { ExportTripButton } from './ExportTripButton';
 import { TripSettings } from './TripSettings';
 import { TripTimeline } from './TripTimeline';
+import { WeatherForecast } from './WeatherForecast';
 import confetti from 'canvas-confetti';
 
 interface GroupTripViewProps {
@@ -543,6 +544,8 @@ export const GroupTripView = ({ tripId }: GroupTripViewProps) => {
           budgetPerPerson={trip.budget_per_person}
         />
       </div>
+
+      <WeatherForecast tripId={tripId} />
 
       {isMember && <TripChat tripId={tripId} members={members} />}
 

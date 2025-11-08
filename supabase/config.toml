@@ -305,3 +305,6 @@ verify_jwt = true
 
 [functions.send-trip-reminders]
 verify_jwt = false
+
+[functions.get-weather-forecast]
+verify_jwt = true
