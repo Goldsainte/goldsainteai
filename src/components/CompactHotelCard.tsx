@@ -36,12 +36,14 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const title = property.property?.name || property.name || property.title || "Hotel";
   
   // Image handling - prioritize available image sources, NO FALLBACKS
-  const allImages = property.images || property.photos || property.property?.photoUrls || (property.image ? [property.image] : []);
+  // Filter out empty strings and invalid values from images array
+  const rawImages = property.images || property.photos || property.property?.photoUrls || (property.image ? [property.image] : []);
+  const allImages = rawImages.filter((img: any) => img && typeof img === 'string' && img.trim().length > 0);
   const imageUrl = property.image_url || allImages[0];
   const image = getHotelImage(imageUrl, property.hotel_id || property.hotelId || title);
   
   // No fallback - if no image, show placeholder indicator
-  const hasValidImage = image && image.trim();
+  const hasValidImage = image && image.trim().length > 0;
   const hasMultipleImages = allImages && allImages.length > 1;
   
   // Check for 360 virtual tour images
