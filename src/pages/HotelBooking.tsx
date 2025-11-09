@@ -243,7 +243,7 @@ export default function HotelBooking() {
               <div className="space-y-4">
                 {availableRooms.map((room) => (
                   <Card key={room.id} className="overflow-hidden hover:shadow-lg transition-all">
-                    <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr] gap-6 p-6 min-w-0">
+                    <div className="grid grid-cols-1 sm:grid-cols-[200px_1fr] md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr] gap-6 p-6 min-w-0">
                       {/* Room Image */}
                       <div className="aspect-[4/3] relative overflow-hidden rounded-lg bg-muted flex-shrink-0">
                         {room.image ? (
@@ -305,7 +305,7 @@ export default function HotelBooking() {
                         </div>
 
                         {/* Price and Reserve Button */}
-                        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pt-4 border-t mt-4">
+                        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 sm:gap-4 w-full pt-4 border-t mt-4">
                           <div className="min-w-0">
                             <div className="text-sm text-muted-foreground mb-1">
                               {nights} night{nights > 1 ? 's' : ''} total

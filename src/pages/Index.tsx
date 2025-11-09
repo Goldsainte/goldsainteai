@@ -784,7 +784,7 @@ const queries = {
   const showChat = messages.length > 0;
 
   return (
-    <main className="min-h-screen w-full max-w-full flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40 overflow-x-hidden">
+    <main className="min-h-screen w-full max-w-full flex flex-col flex-1 items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 xl:px-40 overflow-x-hidden box-border">
       <div className="w-full max-w-full flex-1 flex flex-col overflow-x-hidden">
         {!showChat ? (
           // Initial search view - ChatGPT style centered
@@ -898,16 +898,16 @@ const queries = {
                 </div>
 
                 {/* Horizontal scrolling feature cards */}
-                <div className="relative w-full -mx-4 sm:-mx-6">
+                <div className="relative w-full overflow-hidden">
                   <div 
-                    className="overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x pb-2"
+                    className="overflow-x-auto scrollbar-hide snap-x snap-mandatory touch-pan-x pb-2 -mx-4 sm:-mx-6 px-4 sm:px-6"
                     style={{ 
                       scrollbarWidth: 'none',
                       msOverflowStyle: 'none',
                       WebkitOverflowScrolling: 'touch'
                     }}
                   >
-                    <div className="flex gap-6 md:gap-8 px-4 sm:px-6 min-w-max">
+                    <div className="flex gap-6 md:gap-8 min-w-max">
                       {/* Card 1: Voice AI Search */}
                       <Card className="group relative overflow-hidden snap-start w-[280px] sm:w-[300px] md:w-[340px] flex-shrink-0 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 bg-white border-luxury-cream/30 p-6 md:p-8">
                         <div className="relative h-44 sm:h-48 md:h-52 mb-4 sm:mb-5 md:mb-6 rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50">
