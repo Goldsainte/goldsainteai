@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { format } from "date-fns";
-import { Calendar as CalendarIcon, X } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { format, addMonths, subMonths } from "date-fns";
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { DateRange } from "react-day-picker";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,74 @@ export function MobileDatePicker({
 }: MobileDatePickerProps) {
   const [open, setOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  
+  // Swipe gesture state
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isSwipping, setIsSwipping] = useState(false);
+  const calendarRef = useRef<HTMLDivElement>(null);
+
+  // Reset currentMonth when opening
+  useEffect(() => {
+    if (open) {
+      const initialMonth = (mode === "range" ? dateRange?.from : singleDate) || new Date();
+      setCurrentMonth(initialMonth);
+    }
+  }, [open, dateRange?.from, singleDate, mode]);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsSwipping(true);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (touchStart === null) return;
+    
+    const currentTouch = e.targetTouches[0].clientX;
+    const diff = currentTouch - touchStart;
+    
+    // Apply resistance at boundaries
+    const resistance = 0.4;
+    setSwipeOffset(diff * resistance);
+    setTouchEnd(currentTouch);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) {
+      setIsSwipping(false);
+      setSwipeOffset(0);
+      return;
+    }
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      // Swipe left - go to next month
+      setCurrentMonth(prev => addMonths(prev, 1));
+    } else if (isRightSwipe) {
+      // Swipe right - go to previous month (but not before today)
+      setCurrentMonth(prev => {
+        const prevMonth = subMonths(prev, 1);
+        const today = new Date();
+        today.setDate(1); // Compare month start
+        return prevMonth >= today ? prevMonth : prev;
+      });
+    }
+
+    // Reset swipe state
+    setIsSwipping(false);
+    setSwipeOffset(0);
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
 
   // Quick date shortcuts for mobile
   const getQuickDateRanges = () => {
@@ -159,36 +227,88 @@ export function MobileDatePicker({
               </div>
             )}
 
-            <div className="flex justify-center">
-              {mode === "range" ? (
-                <Calendar
-                  mode="range"
-                  selected={dateRange}
-                  onSelect={onDateRangeChange}
-                  numberOfMonths={1}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  className="pointer-events-auto touch-manipulation scale-110 origin-top"
-                  classNames={{
-                    day: "h-11 w-11 text-base",
-                    day_selected: "bg-primary text-primary-foreground hover:bg-primary/90",
-                    day_today: "bg-accent/50 text-accent-foreground",
-                  }}
-                />
-              ) : (
-                <Calendar
-                  mode="single"
-                  selected={singleDate}
-                  onSelect={onSingleDateChange}
-                  numberOfMonths={1}
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                  className="pointer-events-auto touch-manipulation scale-110 origin-top"
-                  classNames={{
-                    day: "h-11 w-11 text-base",
-                    day_selected: "bg-primary text-primary-foreground hover:bg-primary/90",
-                    day_today: "bg-accent/50 text-accent-foreground",
-                  }}
-                />
-              )}
+            {/* Month navigation with swipe hint */}
+            <div className="flex items-center justify-between px-2 mb-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentMonth(prev => {
+                  const prevMonth = subMonths(prev, 1);
+                  const today = new Date();
+                  today.setDate(1);
+                  return prevMonth >= today ? prevMonth : prev;
+                })}
+                className="touch-manipulation"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              
+              <div className="text-center">
+                <p className="text-sm font-semibold">{format(currentMonth, "MMMM yyyy")}</p>
+                <p className="text-xs text-muted-foreground">Swipe to change month</p>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setCurrentMonth(prev => addMonths(prev, 1))}
+                className="touch-manipulation"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
+
+            {/* Calendar with swipe support */}
+            <div 
+              ref={calendarRef}
+              className="relative overflow-hidden"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
+            >
+              <div 
+                className={cn(
+                  "flex justify-center transition-transform",
+                  isSwipping ? "duration-0" : "duration-300 ease-out"
+                )}
+                style={{
+                  transform: `translateX(${swipeOffset}px)`,
+                }}
+              >
+                {mode === "range" ? (
+                  <Calendar
+                    mode="range"
+                    selected={dateRange}
+                    onSelect={onDateRangeChange}
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    numberOfMonths={1}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    className="pointer-events-auto touch-manipulation scale-110 origin-top"
+                    classNames={{
+                      day: "h-11 w-11 text-base",
+                      day_selected: "bg-primary text-primary-foreground hover:bg-primary/90",
+                      day_today: "bg-accent/50 text-accent-foreground",
+                    }}
+                  />
+                ) : (
+                  <Calendar
+                    mode="single"
+                    selected={singleDate}
+                    onSelect={onSingleDateChange}
+                    month={currentMonth}
+                    onMonthChange={setCurrentMonth}
+                    numberOfMonths={1}
+                    disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                    className="pointer-events-auto touch-manipulation scale-110 origin-top"
+                    classNames={{
+                      day: "h-11 w-11 text-base",
+                      day_selected: "bg-primary text-primary-foreground hover:bg-primary/90",
+                      day_today: "bg-accent/50 text-accent-foreground",
+                    }}
+                  />
+                )}
+              </div>
             </div>
           </div>
 
