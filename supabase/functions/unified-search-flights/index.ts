@@ -171,10 +171,10 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
     
-    // Determine currency from destination
-    const currencyCode = params.destinationCity 
-      ? getCurrencyFromLocation(params.destinationCity) 
-      : (params.currencyCode || 'USD');
+    // Determine currency - default to USD unless explicitly provided
+    // Don't use airport codes for currency detection as they can be misinterpreted
+    // (e.g., CLT = Charlotte, not Chile)
+    const currencyCode = params.currencyCode || 'USD';
     
     const searchParams = {
       ...params,

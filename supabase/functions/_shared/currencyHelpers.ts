@@ -107,14 +107,17 @@ export function getCurrencyFromLocation(location: string): string {
     return countryCurrencyMap[country] || 'USD';
   }
   
-  // Try partial match
-  const countryKey = Object.keys(countryCurrencyMap).find(key => 
-    normalized.toLowerCase().includes(key.toLowerCase()) ||
-    key.toLowerCase().includes(normalized.toLowerCase())
-  );
-  
-  if (countryKey) {
-    return countryCurrencyMap[countryKey];
+  // Try partial match - but only for longer strings to avoid false matches
+  // (e.g., "CLT" should not match "CL" for Chile)
+  if (normalized.length > 3) {
+    const countryKey = Object.keys(countryCurrencyMap).find(key => 
+      normalized.toLowerCase().includes(key.toLowerCase()) ||
+      key.toLowerCase().includes(normalized.toLowerCase())
+    );
+    
+    if (countryKey) {
+      return countryCurrencyMap[countryKey];
+    }
   }
   
   return 'USD';
