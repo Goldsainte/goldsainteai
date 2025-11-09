@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Calendar } from "@/components/ui/calendar";
+import { MobileDatePicker } from "./MobileDatePicker";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar as CalendarIcon, X } from "lucide-react";
@@ -196,27 +196,27 @@ export const ChatDatePicker = ({ type, onDatesSelected, onCancel, suggestedDate 
         </div>
       ) : (
         <>
-          {tripType === "one-way" ? (
-            <Calendar
-              mode="single"
-              selected={singleDate}
-              onSelect={handleSingleDateSelect}
-              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              defaultMonth={getDefaultMonth()}
-              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg mx-auto"
-            />
-          ) : (
-            <Calendar
-              mode="range"
-              selected={dateRange}
-              onSelect={handleDateSelect}
-              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              defaultMonth={getDefaultMonth()}
-              className="rounded-md border border-primary/10 pointer-events-auto shadow-lg mx-auto"
-            />
-          )}
+          <div className="py-2">
+            {tripType === "one-way" ? (
+              <MobileDatePicker
+                mode="single"
+                singleDate={singleDate}
+                onSingleDateChange={handleSingleDateSelect}
+                placeholder="Select departure date"
+                className="border-primary/10 shadow-lg"
+              />
+            ) : (
+              <MobileDatePicker
+                mode="range"
+                dateRange={dateRange}
+                onDateRangeChange={handleDateSelect}
+                placeholder={type === "hotel" ? "Check-in - Check-out" : "Departure - Return"}
+                className="border-primary/10 shadow-lg"
+              />
+            )}
+          </div>
 
-          <div className="flex gap-2 pt-4">
+          <div className="flex gap-2 pt-2">
             {type === "flight" && tripType && (
               <Button
                 variant="outline"
