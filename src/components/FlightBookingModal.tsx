@@ -1,16 +1,12 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { ExternalLink, Users, Plane } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { SeatMapSelector } from "./SeatMapSelector";
-import { BaggageSelector } from "./BaggageSelector";
 import { BookingPolicyBanner } from "./BookingPolicyBanner";
+import { generateExpediaFlightUrl, openExpediaBooking } from "@/lib/expediaRedirect";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface FlightBookingModalProps {
   open: boolean;
@@ -21,323 +17,45 @@ interface FlightBookingModalProps {
 
 export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }: FlightBookingModalProps) => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1);
-  const [showAutofillPrompt, setShowAutofillPrompt] = useState(false);
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const [selectedSeats, setSelectedSeats] = useState<any[]>([]);
-  const [selectedBaggage, setSelectedBaggage] = useState<any[]>([]);
   
   const numberOfTravelers = parseInt(flight.travelerPricings?.length || 1);
-  const [passengers, setPassengers] = useState(
-    Array.from({ length: numberOfTravelers }, () => ({
-      title: "MR",
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      dateOfBirth: "",
-      gender: "MALE",
-      nationality: "",
-      passportNumber: "",
-      passportExpiry: "",
-      passportCountry: "",
-      knownTravelerNumber: "",
-      frequentFlyerNumber: ""
-    }))
-  );
-
-  const [contactInfo, setContactInfo] = useState({
-    email: "",
-    phone: "",
-    countryCode: "+1",
-    address: "",
-    city: "",
-    state: "",
-    postalCode: "",
-    country: "US"
-  });
-
   const basePrice = parseFloat(flight.price.total);
   const markedUpPrice = basePrice * 1.15;
 
-  const updatePassenger = (index: number, field: string, value: string) => {
-    const updated = [...passengers];
-    updated[index] = { ...updated[index], [field]: value };
-    setPassengers(updated);
-  };
-
-  // Load user profile and preferences when modal opens
-  useEffect(() => {
-    const loadUserData = async () => {
-      if (!open) return;
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      // Fetch profile
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-      // Fetch preferences
-      const { data: preferences } = await supabase
-        .from('user_booking_preferences')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-
-      if (profile || preferences) {
-        setUserProfile({ profile, preferences, session });
-        setShowAutofillPrompt(true);
-      }
-    };
-
-    loadUserData();
-  }, [open]);
-
-  const handleAutofill = () => {
-    if (!userProfile) return;
-
-    const { profile, preferences, session } = userProfile;
-    const updated = [...passengers];
-    
-    let filledFields = [];
-    
-    // Autofill first passenger with user data
-    const newPassenger = { ...updated[0] };
-    
-    if (profile?.first_name) {
-      newPassenger.firstName = profile.first_name;
-      filledFields.push('first name');
-    }
-    
-    if (profile?.last_name) {
-      newPassenger.lastName = profile.last_name;
-      filledFields.push('last name');
-    }
-    
-    if (preferences?.date_of_birth) {
-      newPassenger.dateOfBirth = preferences.date_of_birth;
-      filledFields.push('date of birth');
-    }
-    
-    if (preferences?.gender) {
-      newPassenger.gender = preferences.gender;
-      filledFields.push('gender');
-    }
-    
-    if (preferences?.nationality) {
-      newPassenger.nationality = preferences.nationality;
-      filledFields.push('nationality');
-    }
-    
-    if (preferences?.passport_number) {
-      newPassenger.passportNumber = preferences.passport_number;
-      filledFields.push('passport number');
-    }
-    
-    if (preferences?.passport_expiry) {
-      newPassenger.passportExpiry = preferences.passport_expiry;
-      filledFields.push('passport expiry');
-    }
-    
-    if (preferences?.passport_issuing_country) {
-      newPassenger.passportCountry = preferences.passport_issuing_country;
-      filledFields.push('passport country');
-    }
-    
-    updated[0] = newPassenger;
-    setPassengers(updated);
-
-    // Autofill contact info
-    const newContactInfo = { ...contactInfo };
-    
-    if (session?.user?.email) {
-      newContactInfo.email = session.user.email;
-      filledFields.push('email');
-    }
-    
-    if (profile?.phone) {
-      newContactInfo.phone = profile.phone;
-      filledFields.push('phone');
-    }
-    
-    if (preferences?.home_address) {
-      newContactInfo.address = preferences.home_address;
-      filledFields.push('address');
-    }
-    
-    if (preferences?.home_city) {
-      newContactInfo.city = preferences.home_city;
-      filledFields.push('city');
-    }
-    
-    if (preferences?.home_state) {
-      newContactInfo.state = preferences.home_state;
-      filledFields.push('state');
-    }
-    
-    if (preferences?.home_postal_code) {
-      newContactInfo.postalCode = preferences.home_postal_code;
-      filledFields.push('postal code');
-    }
-    
-    if (profile?.country || preferences?.nationality) {
-      newContactInfo.country = profile?.country || preferences?.nationality;
-      filledFields.push('country');
-    }
-    
-    setContactInfo(newContactInfo);
-    setShowAutofillPrompt(false);
-    
-    if (filledFields.length > 0) {
-      toast.success(`Autofilled: ${filledFields.join(', ')}`);
-    } else {
-      toast.info("No profile information available to autofill. Please complete your profile in settings.");
-    }
-  };
-
-  const handleBooking = async () => {
-    setLoading(true);
+  const handleExpediaRedirect = () => {
     try {
-      // Check if user is authenticated
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        const returnTo = window.location.pathname + window.location.search;
-        // Redirect immediately to login for reliability on all devices
-        navigate(`/auth?returnTo=${encodeURIComponent(returnTo)}`);
-        toast.error("Please log in to continue", {
-          action: {
-            label: "Open Login",
-            onClick: () => navigate(`/auth?returnTo=${encodeURIComponent(returnTo)}`)
-          }
-        });
-        setLoading(false);
-        return;
-      }
-
-      // Determine if flight is international by checking airport countries
       const originSegment = flight.itineraries?.[0]?.segments?.[0];
       const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-      
-      // Use the country code from the flight data if available
-      const originCountry = originSegment?.departure?.address?.countryCode;
-      const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-      
-      // Only require passport if we can confirm it's international
-      const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
+      const returnItinerary = flight.itineraries?.[1];
 
-      // Validate passenger info
-      for (let i = 0; i < passengers.length; i++) {
-        const p = passengers[i];
-        
-        // Trim all string values to handle whitespace
-        const trimmedTitle = p.title?.trim();
-        const trimmedFirstName = p.firstName?.trim();
-        const trimmedLastName = p.lastName?.trim();
-        const trimmedDOB = p.dateOfBirth?.trim();
-        const trimmedGender = p.gender?.trim();
-        const trimmedNationality = p.nationality?.trim();
-        
-        if (!trimmedTitle || !trimmedFirstName || !trimmedLastName || !trimmedDOB || !trimmedGender || !trimmedNationality) {
-          toast.error(`Please complete all required fields for passenger ${i + 1}`);
-          setLoading(false);
-          return;
-        }
-        
-        // Only require passport for confirmed international flights
-        if (isInternational) {
-          const trimmedPassportNumber = p.passportNumber?.trim();
-          const trimmedPassportExpiry = p.passportExpiry?.trim();
-          const trimmedPassportCountry = p.passportCountry?.trim();
-          
-          if (!trimmedPassportNumber || !trimmedPassportExpiry || !trimmedPassportCountry) {
-            toast.error(`Passport information is required for international flights (Passenger ${i + 1})`);
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
-      if (!contactInfo.email || !contactInfo.phone || !contactInfo.address || !contactInfo.city || !contactInfo.postalCode || !contactInfo.country) {
-        toast.error("Please complete all required contact and address fields");
-        setLoading(false);
-        return;
-      }
-
-      // Call booking function
-      // Calculate total with baggage fees
-      const baggageTotal = selectedBaggage.reduce((total, b) => {
-        const includedChecked = flight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.includedCheckedBags?.quantity || 0;
-        const extraChecked = Math.max(0, b.checked - includedChecked);
-        return total + (extraChecked * 35); // $35 per checked bag
-      }, 0);
-
-      const seatTotal = selectedSeats.reduce((total, s) => total + (s.price || 0), 0);
-
-      // Create pending booking record first (before payment)
-      const pendingBookingResponse = await supabase
-        .from('bookings')
-        .insert({
-          user_id: session.user.id,
-          booking_type: 'flight',
-          status: 'pending',
-          base_cost: basePrice,
-          markup_amount: basePrice * 0.15,
-          markup_percentage: 15,
-          total_price: markedUpPrice + baggageTotal + seatTotal,
-          currency: flight.price.currency,
-          booking_data: {
-            flight_offer: flight,
-            passengers: passengers,
-            contact: contactInfo,
-            selected_seats: selectedSeats,
-            selected_baggage: selectedBaggage,
-            fees: {
-              baggage: baggageTotal,
-              seats: seatTotal
-            }
-          }
-        })
-        .select()
-        .single();
-
-      if (pendingBookingResponse.error) {
-        throw new Error('Failed to create booking record');
-      }
-
-      const bookingId = pendingBookingResponse.data.id;
-
-      // Create Stripe checkout session
-      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          bookingId: bookingId,
-          amount: markedUpPrice + baggageTotal + seatTotal,
-          currency: flight.price.currency,
-          guestEmail: contactInfo.email
-        }
+      const expediaUrl = generateExpediaFlightUrl({
+        origin: originSegment?.departure?.iataCode || '',
+        destination: destinationSegment?.arrival?.iataCode || '',
+        departureDate: originSegment?.departure?.at?.split('T')[0] || '',
+        returnDate: returnItinerary?.segments?.[0]?.departure?.at?.split('T')[0],
+        adults: numberOfTravelers,
+        tripType: returnItinerary ? 'round-trip' : 'one-way',
       });
 
-      if (checkoutError || !checkoutData?.url) {
-        throw new Error(checkoutError?.message || 'Failed to create payment session');
-      }
-
-      // Open payment in new tab (works in iframes)
-      const paymentWindow = window.open(checkoutData.url, '_blank', 'noopener,noreferrer');
+      openExpediaBooking(expediaUrl);
       
-      // If popup was blocked, show error
-      if (!paymentWindow) {
-        toast.error('Please allow popups to complete payment');
-      }
-
-    } catch (error: any) {
-      console.error('Booking error:', error);
-      toast.error(error.message || "Failed to book flight. Please try again.");
-    } finally {
-      setLoading(false);
+      toast.success("Opening Expedia", {
+        description: "Your flight search details have been pre-filled.",
+      });
+      
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error generating Expedia URL:', error);
+      toast.error("Failed to generate booking link. Please try again.");
     }
+  };
+
+  const handleAgentContact = () => {
+    navigate('/marketplace');
+    onOpenChange(false);
+    toast.success("Agent Marketplace", {
+      description: "Browse our certified travel agents who can handle your booking.",
+    });
   };
 
   return (
@@ -345,515 +63,80 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
       <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-2xl sm:w-auto max-h-[85vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
         <DialogHeader className="pb-4">
           <DialogTitle className="text-xl sm:text-2xl font-secondary">Complete Your Flight Booking</DialogTitle>
+          <DialogDescription>Choose how you'd like to proceed with your reservation</DialogDescription>
         </DialogHeader>
 
         <BookingPolicyBanner bookingType="flight" />
 
-        {/* Autofill Prompt */}
-        {showAutofillPrompt && (
-          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-4">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h4 className="font-semibold mb-1">Use your saved information?</h4>
-                <p className="text-sm text-muted-foreground">
-                  We found your profile information. Would you like to autofill the first passenger details?
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => setShowAutofillPrompt(false)}
-                >
-                  No thanks
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleAutofill}
-                >
-                  Yes, autofill
-                </Button>
-              </div>
-            </div>
-          </div>
-        )}
-
         <div className="space-y-6">
           {/* Flight Summary */}
-          <div className="p-4 bg-muted rounded-lg">
-            <h3 className="font-semibold mb-2">Flight Details</h3>
-            <p className="text-sm">
-              {flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode} → {flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode}
-            </p>
-            <p className="text-sm text-muted-foreground">{numberOfTravelers} traveler(s)</p>
-            <p className="text-lg font-bold mt-2">
-              Total: {flight.price.currency} {markedUpPrice.toFixed(2)}
-            </p>
-          </div>
-
-          {/* Step Indicator */}
-          <div className="flex items-center justify-between space-x-1 sm:space-x-2 overflow-x-auto pb-2 pr-safe scrollbar-hide">
-            <div className={`flex items-center flex-shrink-0 ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
-              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Passengers</span>
+          <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+            <div className="flex items-center gap-2 mb-3">
+              <Plane className="h-5 w-5 text-primary" />
+              <h3 className="font-semibold">Flight Details</h3>
             </div>
-            <div className="w-4 sm:w-8 h-px bg-border flex-shrink-0" />
-            <div className={`flex items-center flex-shrink-0 ${step >= 2 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 2 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>2</div>
-              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Seats</span>
-            </div>
-            <div className="w-4 sm:w-8 h-px bg-border flex-shrink-0" />
-            <div className={`flex items-center flex-shrink-0 ${step >= 3 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 3 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>3</div>
-              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Baggage</span>
-            </div>
-            <div className="w-4 sm:w-8 h-px bg-border flex-shrink-0" />
-            <div className={`flex items-center flex-shrink-0 ${step >= 4 ? 'text-primary' : 'text-muted-foreground'}`}>
-              <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 4 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>4</div>
-              <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Payment</span>
+            <div className="text-sm space-y-1">
+              <p>
+                <strong>Route:</strong> {flight.itineraries?.[0]?.segments?.[0]?.departure?.iataCode} → {flight.itineraries?.[0]?.segments?.slice(-1)[0]?.arrival?.iataCode}
+              </p>
+              <p>
+                <strong>Travelers:</strong> {numberOfTravelers}
+              </p>
+              {flight.itineraries?.[1] && (
+                <p className="text-muted-foreground">Round-trip flight</p>
+              )}
+              <p className="text-lg font-bold text-primary mt-2">
+                Estimated: {flight.price.currency} {markedUpPrice.toFixed(2)}
+              </p>
             </div>
           </div>
 
-          {/* Step 1: Passenger Information */}
-          {step === 1 && (
-            <div className="space-y-4 sm:space-y-6 min-w-0 pb-safe">
-              {passengers.map((passenger, index) => (
-                <div key={index} className="p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-4 min-w-0">
-                  <h4 className="font-semibold text-sm sm:text-base">Passenger {index + 1}</h4>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                    <div className="min-w-0">
-                      <Label htmlFor={`title-${index}`}>Title *</Label>
-                      <Select
-                        value={passenger.title}
-                        onValueChange={(value) => updatePassenger(index, 'title', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="MR">Mr</SelectItem>
-                          <SelectItem value="MRS">Mrs</SelectItem>
-                          <SelectItem value="MS">Ms</SelectItem>
-                          <SelectItem value="DR">Dr</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="min-w-0">
-                      <Label htmlFor={`firstName-${index}`}>First Name *</Label>
-                      <Input
-                        id={`firstName-${index}`}
-                        value={passenger.firstName}
-                        onChange={(e) => updatePassenger(index, 'firstName', e.target.value)}
-                        placeholder="As on passport"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <Label htmlFor={`middleName-${index}`}>Middle Name</Label>
-                      <Input
-                        id={`middleName-${index}`}
-                        value={passenger.middleName}
-                        onChange={(e) => updatePassenger(index, 'middleName', e.target.value)}
-                        placeholder="Optional"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <Label htmlFor={`lastName-${index}`}>Last Name *</Label>
-                      <Input
-                        id={`lastName-${index}`}
-                        value={passenger.lastName}
-                        onChange={(e) => updatePassenger(index, 'lastName', e.target.value)}
-                        placeholder="As on passport"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                    <div className="min-w-0">
-                      <Label htmlFor={`dob-${index}`}>Date of Birth *</Label>
-                      <Input
-                        id={`dob-${index}`}
-                        type="date"
-                        value={passenger.dateOfBirth}
-                        onChange={(e) => updatePassenger(index, 'dateOfBirth', e.target.value)}
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <Label htmlFor={`gender-${index}`}>Gender *</Label>
-                      <Select
-                        value={passenger.gender}
-                        onValueChange={(value) => updatePassenger(index, 'gender', value)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="MALE">Male</SelectItem>
-                          <SelectItem value="FEMALE">Female</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="min-w-0 sm:col-span-2">
-                      <Label htmlFor={`nationality-${index}`}>Nationality *</Label>
-                      <Input
-                        id={`nationality-${index}`}
-                        value={passenger.nationality}
-                        onChange={(e) => updatePassenger(index, 'nationality', e.target.value)}
-                        placeholder="US"
-                        maxLength={2}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-4">
-                    <h5 className="text-sm font-semibold mb-3">
-                      Passport Information 
-                      {(() => {
-                        const originSegment = flight.itineraries?.[0]?.segments?.[0];
-                        const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-                        const originCountry = originSegment?.departure?.address?.countryCode;
-                        const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-                        const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
-                        return isInternational ? " (Required for International Flights)" : " (Optional for Domestic Flights)";
-                      })()}
-                    </h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                      <div className="min-w-0">
-                        <Label htmlFor={`passport-${index}`}>
-                          Passport Number
-                          {(() => {
-                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
-                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-                            const originCountry = originSegment?.departure?.address?.countryCode;
-                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
-                            return isInternational ? " *" : "";
-                          })()}
-                        </Label>
-                        <Input
-                          id={`passport-${index}`}
-                          value={passenger.passportNumber}
-                          onChange={(e) => updatePassenger(index, 'passportNumber', e.target.value)}
-                          placeholder={(() => {
-                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
-                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-                            const originCountry = originSegment?.departure?.address?.countryCode;
-                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
-                            return isInternational ? "Required" : "Optional";
-                          })()}
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <Label htmlFor={`passportExpiry-${index}`}>
-                          Expiry Date
-                          {(() => {
-                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
-                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-                            const originCountry = originSegment?.departure?.address?.countryCode;
-                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
-                            return isInternational ? " *" : "";
-                          })()}
-                        </Label>
-                        <Input
-                          id={`passportExpiry-${index}`}
-                          type="date"
-                          value={passenger.passportExpiry}
-                          onChange={(e) => updatePassenger(index, 'passportExpiry', e.target.value)}
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="min-w-0 sm:col-span-2">
-                        <Label htmlFor={`passportCountry-${index}`}>
-                          Issuing Country
-                          {(() => {
-                            const originSegment = flight.itineraries?.[0]?.segments?.[0];
-                            const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-                            const originCountry = originSegment?.departure?.address?.countryCode;
-                            const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-                            const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
-                            return isInternational ? " *" : "";
-                          })()}
-                        </Label>
-                        <Input
-                          id={`passportCountry-${index}`}
-                          value={passenger.passportCountry}
-                          onChange={(e) => updatePassenger(index, 'passportCountry', e.target.value)}
-                          placeholder="US"
-                          maxLength={2}
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="border-t pt-4">
-                    <h5 className="text-sm font-semibold mb-3">Optional Information</h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                      <div className="min-w-0">
-                        <Label htmlFor={`ktn-${index}`}>Known Traveler Number / TSA PreCheck</Label>
-                        <Input
-                          id={`ktn-${index}`}
-                          value={passenger.knownTravelerNumber}
-                          onChange={(e) => updatePassenger(index, 'knownTravelerNumber', e.target.value)}
-                          placeholder="Optional"
-                          className="w-full"
-                        />
-                      </div>
-                      <div className="min-w-0">
-                        <Label htmlFor={`ffn-${index}`}>Frequent Flyer Number</Label>
-                        <Input
-                          id={`ffn-${index}`}
-                          value={passenger.frequentFlyerNumber}
-                          onChange={(e) => updatePassenger(index, 'frequentFlyerNumber', e.target.value)}
-                          placeholder="Optional"
-                          className="w-full"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-
+          {/* Option 1: Book on Expedia */}
+          <Alert className="border-primary/20">
+            <ExternalLink className="h-4 w-4" />
+            <AlertDescription className="space-y-3 mt-2">
+              <div>
+                <p className="font-semibold text-foreground mb-1">Option 1: Book on Expedia</p>
+                <p className="text-sm text-muted-foreground">
+                  We'll take you to Expedia with your flight search details pre-filled. Complete your booking securely on their platform.
+                </p>
+              </div>
               <Button 
-                onClick={() => {
-                  // Validate passenger info before proceeding (consistent with handleBooking)
-                  const originSegment = flight.itineraries?.[0]?.segments?.[0];
-                  const destinationSegment = flight.itineraries?.[0]?.segments?.slice(-1)[0];
-                  const originCountry = originSegment?.departure?.address?.countryCode;
-                  const destinationCountry = destinationSegment?.arrival?.address?.countryCode;
-                  const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
-
-                  for (let i = 0; i < passengers.length; i++) {
-                    const p = passengers[i];
-
-                    const title = p.title?.trim();
-                    const firstName = p.firstName?.trim();
-                    const lastName = p.lastName?.trim();
-                    const dateOfBirth = p.dateOfBirth?.trim();
-                    const gender = p.gender?.trim();
-                    const nationality = p.nationality?.trim();
-
-                    if (!title) { toast.error(`Passenger ${i + 1}: Title is required`); return; }
-                    if (!firstName) { toast.error(`Passenger ${i + 1}: First name is required`); return; }
-                    if (!lastName) { toast.error(`Passenger ${i + 1}: Last name is required`); return; }
-                    if (!dateOfBirth) { toast.error(`Passenger ${i + 1}: Date of birth is required`); return; }
-                    if (!gender) { toast.error(`Passenger ${i + 1}: Gender is required`); return; }
-                    if (!nationality) { toast.error(`Passenger ${i + 1}: Nationality is required`); return; }
-
-                    if (isInternational) {
-                      const passportNumber = p.passportNumber?.trim();
-                      const passportExpiry = p.passportExpiry?.trim();
-                      const passportCountry = p.passportCountry?.trim();
-                      if (!passportNumber || !passportExpiry || !passportCountry) {
-                        toast.error(`Passport details are required for international flights (Passenger ${i + 1})`);
-                        return;
-                      }
-                    }
-                  }
-                  setStep(2);
-                }} 
+                onClick={handleExpediaRedirect} 
                 className="w-full"
+                size="lg"
               >
-                Continue to Seat Selection
+                <ExternalLink className="mr-2 h-4 w-4" />
+                Continue to Expedia
               </Button>
-            </div>
-          )}
+            </AlertDescription>
+          </Alert>
 
-          {/* Step 2: Seat Selection */}
-          {step === 2 && (
-            <div className="space-y-4">
-              <SeatMapSelector
-                flight={flight}
-                passengers={numberOfTravelers}
-                onSeatsSelected={(seats) => {
-                  setSelectedSeats(seats);
-                  setStep(3);
-                }}
-                selectedSeats={selectedSeats}
-              />
-              <Button variant="outline" onClick={() => setStep(1)} className="w-full">
-                Back to Passenger Details
+          {/* Option 2: Connect with Agent */}
+          <Alert className="border-accent/20">
+            <Users className="h-4 w-4" />
+            <AlertDescription className="space-y-3 mt-2">
+              <div>
+                <p className="font-semibold text-foreground mb-1">Option 2: Connect with a Travel Agent</p>
+                <p className="text-sm text-muted-foreground">
+                  Let one of our certified Goldsainte travel agents handle your flight booking and provide personalized service throughout your journey.
+                </p>
+              </div>
+              <Button 
+                onClick={handleAgentContact} 
+                variant="outline"
+                className="w-full"
+                size="lg"
+              >
+                <Users className="mr-2 h-4 w-4" />
+                Browse Travel Agents
               </Button>
-            </div>
-          )}
+            </AlertDescription>
+          </Alert>
+        </div>
 
-          {/* Step 3: Baggage Selection */}
-          {step === 3 && (
-            <div className="space-y-4">
-              <BaggageSelector
-                flight={flight}
-                passengers={numberOfTravelers}
-                onBaggageSelected={(baggage) => {
-                  setSelectedBaggage(baggage);
-                  setStep(4);
-                }}
-                selectedBaggage={selectedBaggage}
-              />
-              <Button variant="outline" onClick={() => setStep(2)} className="w-full">
-                Back to Seat Selection
-              </Button>
-            </div>
-          )}
-
-          {/* Step 4: Contact & Payment Information */}
-          {step === 4 && (
-            <div className="space-y-4">
-              <h4 className="font-semibold">Contact Information</h4>
-              <p className="text-sm text-muted-foreground">All fields marked with * are required</p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                <div className="min-w-0">
-                  <Label htmlFor="email">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={contactInfo.email}
-                    onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
-                    placeholder="john@example.com"
-                    className="w-full"
-                  />
-                </div>
-
-                <div className="min-w-0">
-                  <Label htmlFor="phone">Phone Number *</Label>
-                  <div className="flex gap-2">
-                    <Select
-                      value={contactInfo.countryCode}
-                      onValueChange={(value) => setContactInfo({ ...contactInfo, countryCode: value })}
-                    >
-                      <SelectTrigger className="w-24">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="+1">+1 (US)</SelectItem>
-                        <SelectItem value="+44">+44 (UK)</SelectItem>
-                        <SelectItem value="+971">+971 (AE)</SelectItem>
-                        <SelectItem value="+81">+81 (JP)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={contactInfo.phone}
-                      onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })}
-                      placeholder="1234567890"
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="border-t pt-4">
-                <h4 className="font-semibold mb-3">Billing Address</h4>
-                
-                <div className="space-y-4 min-w-0">
-                  <div className="min-w-0">
-                    <Label htmlFor="address">Street Address *</Label>
-                    <Input
-                      id="address"
-                      value={contactInfo.address}
-                      onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
-                      placeholder="123 Main Street"
-                      className="w-full"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                    <div className="min-w-0">
-                      <Label htmlFor="city">City *</Label>
-                      <Input
-                        id="city"
-                        value={contactInfo.city}
-                        onChange={(e) => setContactInfo({ ...contactInfo, city: e.target.value })}
-                        placeholder="New York"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <Label htmlFor="state">State / Province</Label>
-                      <Input
-                        id="state"
-                        value={contactInfo.state}
-                        onChange={(e) => setContactInfo({ ...contactInfo, state: e.target.value })}
-                        placeholder="NY"
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
-                    <div className="min-w-0">
-                      <Label htmlFor="postalCode">Postal / Zip Code *</Label>
-                      <Input
-                        id="postalCode"
-                        value={contactInfo.postalCode}
-                        onChange={(e) => setContactInfo({ ...contactInfo, postalCode: e.target.value })}
-                        placeholder="10001"
-                        className="w-full"
-                      />
-                    </div>
-                    <div className="min-w-0">
-                      <Label htmlFor="country">Country *</Label>
-                      <Input
-                        id="country"
-                        value={contactInfo.country}
-                        onChange={(e) => setContactInfo({ ...contactInfo, country: e.target.value })}
-                        placeholder="US"
-                        maxLength={2}
-                        className="w-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
-                  Back to Baggage
-                </Button>
-                <Button 
-                  onClick={() => {
-                    // Validate contact info before booking
-                    if (!contactInfo.email || !contactInfo.phone || !contactInfo.address || !contactInfo.city || !contactInfo.postalCode || !contactInfo.country) {
-                      toast.error("Please complete all required contact and address fields");
-                      return;
-                    }
-                    handleBooking();
-                  }} 
-                  disabled={loading} 
-                  className="flex-1"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Booking...
-                    </>
-                  ) : (
-                    (() => {
-                      const baggageFees = selectedBaggage.reduce((total, b) => {
-                        const includedChecked = flight.travelerPricings?.[0]?.fareDetailsBySegment?.[0]?.includedCheckedBags?.quantity || 0;
-                        const extraChecked = Math.max(0, b.checked - includedChecked);
-                        return total + (extraChecked * 35);
-                      }, 0);
-                      const seatFees = selectedSeats.reduce((total, s) => total + (s.price || 0), 0);
-                      const total = markedUpPrice + baggageFees + seatFees;
-                      return `Book for ${flight.price.currency} ${total.toFixed(2)}`;
-                    })()
-                  )}
-                </Button>
-              </div>
-            </div>
-          )}
-          
-          {/* Mobile spacer to prevent bottom nav overlap */}
-          <div className="h-16 md:hidden" aria-hidden="true" />
+        <div className="text-xs text-muted-foreground text-center pt-4 border-t">
+          Goldsainte connects you with the best booking options. We don't process payments directly.
         </div>
       </DialogContent>
     </Dialog>

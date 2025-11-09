@@ -30,9 +30,6 @@ verify_jwt = false
 [functions.amadeus-get-seatmap]
 verify_jwt = false
 
-[functions.amadeus-book-hotel]
-verify_jwt = false
-
 [functions.search-hotels]
 verify_jwt = false
 
@@ -57,23 +54,14 @@ verify_jwt = false
 [functions.unified-search-flights]
 verify_jwt = false
 
-[functions.amadeus-book-flight]
-verify_jwt = true
-
 [functions.amadeus-search-cars]
 verify_jwt = false
 
 [functions.amadeus-get-tour-details]
 verify_jwt = false
 
-[functions.create-booking]
-verify_jwt = false
-
 [functions.create-checkout]
 verify_jwt = false
-
-[functions.verify-payment]
-verify_jwt = true
 
 [functions.get-hotel-details]
 verify_jwt = false
@@ -112,9 +100,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.expedia-search-hotels]
-verify_jwt = false
-
-[functions.expedia-book-hotel]
 verify_jwt = false
 
 [functions.expedia-get-availability]
