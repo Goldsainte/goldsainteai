@@ -58,7 +58,9 @@ Always use the CURRENT DATE above as the reference point for calculations.
 You can assist with:
 - **Destination Recommendations**: Suggest places based on interests, budget, season, and travel style
 - **Travel Planning**: Help with itinerary planning, best times to visit, travel tips
-- **Accommodation Advice**: Hotel recommendations, what to look for in accommodations
+- **Hotel Search**: Find accommodations based on location, dates, budget, and guest count
+- **Flight Search**: Find flights between cities with flexible date and cabin class options
+- **Event Search**: Discover concerts, sports, theater, and other events in any city
 - **Budget Planning**: Estimate costs, find deals, understand what's included
 - **Booking Help**: Guide through the booking process, explain policies
 - **Travel Logistics**: Visa requirements, weather, transportation, packing tips
@@ -86,17 +88,28 @@ You can assist with:
 
 ## HANDLING SEARCH RESULTS:
 **CRITICAL RULES - MUST FOLLOW**:
-1. NEVER say "I found hotels" or "I have options" BEFORE calling the search_hotels tool
+1. NEVER say "I found X" or "I have options" BEFORE calling the search tool
 2. NEVER make assumptions about availability - always search first, speak second
-3. When users ask about hotels, IMMEDIATELY call search_hotels with their criteria
+3. When users ask to search, IMMEDIATELY call the appropriate tool with their criteria
 4. ONLY comment on results AFTER receiving the actual tool response
 
-**After receiving tool results**:
+**After receiving hotel search results**:
 - **If status: "OK" & data.length > 0**: 
   "Here are [count] hotels in [location] under [currency][amount]/night on [dates]. [Mention top option]. Want to see more or adjust filters?"
-  
 - **If status: "NO_RESULTS"**: 
-  "I couldn't find hotels in [location] under [currency][amount]/night for [dates]. Typical prices are [range]. Try +[amount] budget, different dates, or wider area?"
+  "I couldn't find hotels in [location] under [currency][amount]/night for [dates]. Try +[amount] budget, different dates, or wider area?"
+
+**After receiving flight search results**:
+- **If results found**: 
+  "Here are [count] flights from [origin] to [destination] on [dates]. [Mention cheapest option]. Want different dates or cabin class?"
+- **If no results**: 
+  "No flights found from [origin] to [destination] on [dates]. Try nearby airports, different dates, or check dates are valid?"
+
+**After receiving event search results**:
+- **If results found**: 
+  "Here are [count] events in [location] [mention dates if specified]. [Mention top event]. Want more options or different dates?"
+- **If no results**: 
+  "No events found in [location] for those dates. Try broader dates, nearby cities, or different keywords?"
 
 **NEVER say "I found options" then later say "I can't find any" - this contradicts yourself and confuses users.**
 
@@ -146,6 +159,73 @@ const tools = [
           }
         },
         required: ["location", "checkIn", "checkOut", "guests", "max_total_price", "currency"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_flights",
+      description: "Search for flights between two cities with departure/return dates and cabin class. Returns available flight options.",
+      parameters: {
+        type: "object",
+        properties: {
+          origin: {
+            type: "string",
+            description: "Origin airport code (e.g., 'JFK', 'LAX', 'LHR')"
+          },
+          destination: {
+            type: "string",
+            description: "Destination airport code (e.g., 'CDG', 'NRT', 'SYD')"
+          },
+          departureDate: {
+            type: "string",
+            description: "Departure date in YYYY-MM-DD format"
+          },
+          returnDate: {
+            type: "string",
+            description: "Return date in YYYY-MM-DD format (optional for one-way)"
+          },
+          adults: {
+            type: "number",
+            description: "Number of adult passengers"
+          },
+          cabinClass: {
+            type: "string",
+            description: "Cabin class preference",
+            enum: ["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"]
+          }
+        },
+        required: ["origin", "destination", "departureDate", "adults"]
+      }
+    }
+  },
+  {
+    type: "function",
+    function: {
+      name: "search_events",
+      description: "Search for events (concerts, sports, theater, etc.) in a specific city or location with optional date filtering.",
+      parameters: {
+        type: "object",
+        properties: {
+          city: {
+            type: "string",
+            description: "City name (e.g., 'New York', 'London', 'Tokyo')"
+          },
+          keyword: {
+            type: "string",
+            description: "Event keyword or type (e.g., 'concert', 'sports', 'theater', artist name)"
+          },
+          startDateTime: {
+            type: "string",
+            description: "Start date in YYYY-MM-DD format or YYYY-MM-DDTHH:MM:SSZ"
+          },
+          endDateTime: {
+            type: "string",
+            description: "End date in YYYY-MM-DD format or YYYY-MM-DDTHH:MM:SSZ"
+          }
+        },
+        required: ["city"]
       }
     }
   }
@@ -310,7 +390,8 @@ serve(async (req) => {
                 status: results.length > 0 ? "OK" : "NO_RESULTS",
                 data: results.slice(0, 20), // Limit to top 20 for context
                 count: results.length,
-                search_params: args
+                search_params: args,
+                search_type: 'hotels'
               };
             }
           } catch (error) {
@@ -327,7 +408,112 @@ serve(async (req) => {
             lastSearchMeta = {
               status: toolResult.status,
               count: toolResult.count ?? 0,
-              search_params: args
+              search_params: args,
+              search_type: 'hotels'
+            };
+          }
+        } else if (toolCall.function.name === "search_flights") {
+          const args = JSON.parse(toolCall.function.arguments);
+          console.log("Flight search args:", args);
+          
+          try {
+            const { data: flightData, error: flightError } = await supabase.functions.invoke('unified-search-flights', {
+              body: {
+                origin: args.origin,
+                destination: args.destination,
+                departureDate: args.departureDate,
+                returnDate: args.returnDate,
+                adults: args.adults,
+                cabinClass: args.cabinClass || 'ECONOMY'
+              }
+            });
+
+            if (flightError) {
+              console.error("Flight search error:", flightError);
+              toolResult = {
+                status: "ERROR",
+                message: "Failed to search flights",
+                error: flightError.message
+              };
+            } else {
+              const results = flightData?.results || [];
+              console.log(`Found ${results.length} flights`);
+              
+              toolResult = {
+                status: results.length > 0 ? "OK" : "NO_RESULTS",
+                data: results.slice(0, 20), // Limit to top 20 for context
+                count: results.length,
+                search_params: args,
+                search_type: 'flights'
+              };
+            }
+          } catch (error) {
+            console.error("Tool execution error:", error);
+            toolResult = {
+              status: "ERROR",
+              message: "Failed to execute flight search",
+              error: error instanceof Error ? error.message : String(error)
+            };
+          }
+
+          // Store meta for client navigation/opening results
+          if (toolResult && (toolResult.status === "OK" || toolResult.status === "NO_RESULTS")) {
+            lastSearchMeta = {
+              status: toolResult.status,
+              count: toolResult.count ?? 0,
+              search_params: args,
+              search_type: 'flights'
+            };
+          }
+        } else if (toolCall.function.name === "search_events") {
+          const args = JSON.parse(toolCall.function.arguments);
+          console.log("Event search args:", args);
+          
+          try {
+            const { data: eventData, error: eventError } = await supabase.functions.invoke('search-events', {
+              body: {
+                city: args.city,
+                keyword: args.keyword,
+                startDateTime: args.startDateTime,
+                endDateTime: args.endDateTime
+              }
+            });
+
+            if (eventError) {
+              console.error("Event search error:", eventError);
+              toolResult = {
+                status: "ERROR",
+                message: "Failed to search events",
+                error: eventError.message
+              };
+            } else {
+              const results = eventData?.results || [];
+              console.log(`Found ${results.length} events`);
+              
+              toolResult = {
+                status: results.length > 0 ? "OK" : "NO_RESULTS",
+                data: results.slice(0, 20), // Limit to top 20 for context
+                count: results.length,
+                search_params: args,
+                search_type: 'events'
+              };
+            }
+          } catch (error) {
+            console.error("Tool execution error:", error);
+            toolResult = {
+              status: "ERROR",
+              message: "Failed to execute event search",
+              error: error instanceof Error ? error.message : String(error)
+            };
+          }
+
+          // Store meta for client navigation/opening results
+          if (toolResult && (toolResult.status === "OK" || toolResult.status === "NO_RESULTS")) {
+            lastSearchMeta = {
+              status: toolResult.status,
+              count: toolResult.count ?? 0,
+              search_params: args,
+              search_type: 'events'
             };
           }
         } else {
