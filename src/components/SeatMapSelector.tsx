@@ -122,35 +122,38 @@ export const SeatMapSelector = ({ flight, passengers, onSeatsSelected, selectedS
           <div key={deckIndex} className="border rounded-lg p-4">
             <h4 className="font-semibold mb-4">Deck {deckIndex + 1}</h4>
             
-            <div className="space-y-2">
-              {deck.seats?.deckConfiguration?.rows?.map((row: any, rowIndex: number) => (
-                <div key={rowIndex} className="flex items-center gap-2">
-                  <span className="text-sm w-8 text-muted-foreground">{row.rowNumber}</span>
-                  <div className="flex gap-2 flex-1 justify-center">
-                    {row.seats?.map((seat: any, seatIndex: number) => {
-                      const seatId = `${deckIndex}-${rowIndex}-${seatIndex}`;
-                      const isSelected = tempSelectedSeats.some(s => s.id === seatId);
-                      const isAvailable = seat.travelerPricing?.[0]?.seatAvailabilityStatus === 'AVAILABLE';
-                      
-                      return (
-                        <button
-                          key={seatIndex}
-                          onClick={() => handleSeatClick(seat, deckIndex, rowIndex, seatIndex)}
-                          disabled={!isAvailable}
-                          className={`
-                            w-10 h-10 rounded text-xs font-medium transition-colors
-                            ${isSelected ? 'bg-primary text-primary-foreground' : ''}
-                            ${isAvailable && !isSelected ? 'bg-muted hover:bg-muted/80 border' : ''}
-                            ${!isAvailable ? 'bg-destructive/20 cursor-not-allowed' : 'cursor-pointer'}
-                          `}
-                        >
-                          {seat.number || '—'}
-                        </button>
-                      );
-                    })}
+            {/* Horizontal scroll container for seat rows on mobile */}
+            <div className="overflow-x-auto -mx-2 px-2 scrollbar-hide">
+              <div className="inline-flex flex-col min-w-max space-y-2">
+                {deck.seats?.deckConfiguration?.rows?.map((row: any, rowIndex: number) => (
+                  <div key={rowIndex} className="flex items-center gap-2">
+                    <span className="text-sm w-8 text-muted-foreground">{row.rowNumber}</span>
+                    <div className="flex gap-2 flex-1 justify-center">
+                      {row.seats?.map((seat: any, seatIndex: number) => {
+                        const seatId = `${deckIndex}-${rowIndex}-${seatIndex}`;
+                        const isSelected = tempSelectedSeats.some(s => s.id === seatId);
+                        const isAvailable = seat.travelerPricing?.[0]?.seatAvailabilityStatus === 'AVAILABLE';
+                        
+                        return (
+                          <button
+                            key={seatIndex}
+                            onClick={() => handleSeatClick(seat, deckIndex, rowIndex, seatIndex)}
+                            disabled={!isAvailable}
+                            className={`
+                              w-10 h-10 rounded text-xs font-medium transition-colors
+                              ${isSelected ? 'bg-primary text-primary-foreground' : ''}
+                              ${isAvailable && !isSelected ? 'bg-muted hover:bg-muted/80 border' : ''}
+                              ${!isAvailable ? 'bg-destructive/20 cursor-not-allowed' : 'cursor-pointer'}
+                            `}
+                          >
+                            {seat.number || '—'}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Legend */}

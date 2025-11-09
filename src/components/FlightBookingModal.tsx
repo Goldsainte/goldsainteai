@@ -416,7 +416,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
           {/* Step 1: Passenger Information */}
           {step === 1 && (
-            <div className="space-y-4 sm:space-y-6 min-w-0">
+            <div className="space-y-4 sm:space-y-6 min-w-0 pb-safe">
               {passengers.map((passenger, index) => (
                 <div key={index} className="p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-4 min-w-0">
                   <h4 className="font-semibold text-sm sm:text-base">Passenger {index + 1}</h4>

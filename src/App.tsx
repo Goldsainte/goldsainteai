@@ -353,7 +353,9 @@ function App() {
           <ScrollToTop />
           <AuthProvider>
             <LanguageProvider>
-              <AppContent />
+              <div className="viewport-guard">
+                <AppContent />
+              </div>
             </LanguageProvider>
           </AuthProvider>
         </BrowserRouter>

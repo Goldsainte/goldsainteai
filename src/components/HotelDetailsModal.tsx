@@ -212,14 +212,14 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
         <BookingPolicyBanner bookingType="hotel" />
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="rooms">Rooms</TabsTrigger>
-            <TabsTrigger value="amenities">Amenities</TabsTrigger>
-            <TabsTrigger value="location">Location</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({allReviews.length})</TabsTrigger>
-            <TabsTrigger value="photos">Photos</TabsTrigger>
-          </TabsList>
+        <TabsList className="grid w-full grid-cols-6 overflow-x-auto scrollbar-hide">
+          <TabsTrigger value="overview" className="whitespace-nowrap">Overview</TabsTrigger>
+          <TabsTrigger value="rooms" className="whitespace-nowrap">Rooms</TabsTrigger>
+          <TabsTrigger value="amenities" className="whitespace-nowrap">Amenities</TabsTrigger>
+          <TabsTrigger value="location" className="whitespace-nowrap">Location</TabsTrigger>
+          <TabsTrigger value="reviews" className="whitespace-nowrap">Reviews ({allReviews.length})</TabsTrigger>
+          <TabsTrigger value="photos" className="whitespace-nowrap">Photos</TabsTrigger>
+        </TabsList>
 
           <TabsContent value="overview" className="space-y-6 mt-4">
             {/* Hotel Description */}
@@ -379,8 +379,8 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                   selectedRoomId === room.id ? 'border-primary bg-primary/5' : ''
                 }`}
               >
-                <div className="flex gap-4">
-                  <div className="w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="flex gap-4 min-w-0">
+                  <div className="w-32 sm:w-48 h-32 rounded-lg overflow-hidden flex-shrink-0">
                     <img 
                       src={room.images[0] || hotelPhotos[0]}
                       alt={`${room.name} - room photo`}
@@ -389,7 +389,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     />
                   </div>
                   
-                  <div className="flex-1 space-y-3">
+                  <div className="flex-1 space-y-3 min-w-0">
                     <div className="flex justify-between items-start">
                       <div>
                         <h3 className="font-semibold text-lg">{room.name}</h3>

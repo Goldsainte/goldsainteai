@@ -135,8 +135,23 @@ All colors MUST be HSL.
   
   /* Global overflow prevention for mobile */
   html, body {
-    max-width: 100vw;
-    overflow-x: hidden;
+    width: 100%;
+    max-width: 100svw;
+    overflow-x: clip;
+  }
+
+  /* Global viewport guard utility */
+  .viewport-guard {
+    width: 100%;
+    max-width: 100svw;
+    overflow-x: clip;
+  }
+
+  /* Mobile dialog safe sizing */
+  .mobile-dialog {
+    width: min(95svw, 720px);
+    max-width: min(95svw, 720px);
+    max-height: calc(100dvh - 24px);
   }
 
   body {
