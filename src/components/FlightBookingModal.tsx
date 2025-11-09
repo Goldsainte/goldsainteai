@@ -342,7 +342,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-2xl sm:w-auto max-h-[85vh] sm:max-h-[90vh] overflow-y-auto overflow-x-hidden p-4 sm:p-6">
         <DialogHeader className="pb-4">
           <DialogTitle className="text-xl sm:text-2xl font-secondary">Complete Your Flight Booking</DialogTitle>
         </DialogHeader>
@@ -392,7 +392,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
           </div>
 
           {/* Step Indicator */}
-          <div className="flex items-center justify-between space-x-1 sm:space-x-2 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex items-center justify-between space-x-1 sm:space-x-2 overflow-x-auto pb-2 pr-safe scrollbar-hide">
             <div className={`flex items-center flex-shrink-0 ${step >= 1 ? 'text-primary' : 'text-muted-foreground'}`}>
               <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm ${step >= 1 ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>1</div>
               <span className="ml-1 sm:ml-2 text-xs sm:text-sm whitespace-nowrap">Passengers</span>
@@ -416,12 +416,12 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
           {/* Step 1: Passenger Information */}
           {step === 1 && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="space-y-4 sm:space-y-6 min-w-0">
               {passengers.map((passenger, index) => (
-                <div key={index} className="p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-4">
+                <div key={index} className="p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-4 min-w-0">
                   <h4 className="font-semibold text-sm sm:text-base">Passenger {index + 1}</h4>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
                     <div>
                       <Label htmlFor={`title-${index}`}>Title *</Label>
                       <Select
@@ -836,6 +836,9 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
               </div>
             </div>
           )}
+          
+          {/* Mobile spacer to prevent bottom nav overlap */}
+          <div className="h-16 md:hidden" aria-hidden="true" />
         </div>
       </DialogContent>
     </Dialog>

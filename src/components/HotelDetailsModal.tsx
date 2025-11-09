@@ -191,7 +191,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-[95vw] sm:max-w-5xl sm:w-auto max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <DialogHeader>
           <div className="space-y-2">
             <DialogTitle className="text-2xl font-secondary">{hotelName}</DialogTitle>
@@ -987,6 +987,9 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
             )}
           </TabsContent>
         </Tabs>
+        
+        {/* Mobile spacer to prevent bottom nav overlap */}
+        <div className="h-16 md:hidden" aria-hidden="true" />
       </DialogContent>
     </Dialog>
   );

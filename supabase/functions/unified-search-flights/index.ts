@@ -72,7 +72,22 @@ async function getAmadeusToken(retries = 3): Promise<string> {
 
       if (!response.ok) {
         const errText = await response.text().catch(() => '');
-        throw new Error(`Auth failed: ${response.status} ${response.statusText} - ${errText}`);
+        console.error('Amadeus token error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errText
+        });
+        
+        // Try to parse error details from Amadeus
+        let errorDetails = errText;
+        try {
+          const parsed = JSON.parse(errText);
+          errorDetails = parsed.error_description || parsed.error || errText;
+        } catch (e) {
+          // Use raw error body if not JSON
+        }
+        
+        throw new Error(`Auth failed: ${response.status} ${response.statusText} - ${errorDetails}`);
       }
 
       const data = await response.json();
@@ -183,7 +198,24 @@ serve(async (req) => {
 
     // Get token and search with performance logging
     const searchStart = Date.now();
-    const token = await getAmadeusToken();
+    let token: string;
+    try {
+      token = await getAmadeusToken();
+    } catch (tokenError: any) {
+      console.error('Failed to get Amadeus token:', tokenError);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Authentication failed',
+          message: 'Unable to authenticate with flight search service. Please check API credentials.',
+          details: tokenError.message
+        }),
+        { 
+          status: 503,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      );
+    }
+    
     const flightData = await searchAmadeusFlights(searchParams, token);
     
     console.log(`Flights found: ${flightData.results.length} in ${Date.now() - searchStart}ms`);
