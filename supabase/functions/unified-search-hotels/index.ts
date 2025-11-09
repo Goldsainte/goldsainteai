@@ -356,6 +356,10 @@ serve(async (req) => {
   
   try {
     const { location, checkIn, checkOut, guests = 2, sortBy = 'best_value', filter = 'all', max_total_price, currency = 'USD' } = await req.json();
+    
+    console.log("=== UNIFIED HOTEL SEARCH STARTED ===");
+    console.log("Request params:", { location, checkIn, checkOut, guests, filter, sortBy, max_total_price, currency });
+    
     if (!location || !checkIn || !checkOut) {
       clearTimeout(timeoutId);
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
@@ -364,14 +368,14 @@ serve(async (req) => {
     // Validate filter parameter
     const validFilters = ['all', 'amadeus', 'curated'];
     const hotelFilter = validFilters.includes(filter) ? filter : 'all';
+    
+    console.log(`Using filter: ${hotelFilter}`);
 
     // Initialize Supabase client for ranking
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-
-    console.log("Unified hotel search:", { location, checkIn, checkOut, guests });
     
     const searchStart = Date.now();
 
@@ -401,10 +405,12 @@ serve(async (req) => {
     let amadeusHotels: any[] = [];
     let enriched: any[] = [];
     
-    // Try Expedia first (has photos + reviews built-in)
-    if (hotelFilter === 'all' || hotelFilter === 'amadeus') {
+    // Try Expedia for 'all' searches (has photos + reviews built-in)
+    if (hotelFilter === 'all') {
       try {
-        console.log("Trying Expedia Rapid API first...");
+        console.log("🔍 Calling Expedia Rapid API...");
+        const expediaStart = Date.now();
+        
         const { data: expediaData, error: expediaError } = await supabaseClient.functions.invoke('expedia-search-hotels', {
           body: { 
             location, 
@@ -417,18 +423,27 @@ serve(async (req) => {
           }
         });
         
-        if (!expediaError && expediaData?.hotels) {
-          expediaHotels = expediaData.hotels;
-          console.log(`Expedia returned ${expediaHotels.length} hotels with photos and reviews`);
-          if (expediaHotels.length === 0) {
-            console.warn('Expedia returned 0 hotels for location:', location);
-          }
+        console.log(`Expedia API call completed in ${Date.now() - expediaStart}ms`);
+        
+        if (expediaError) {
+          console.error("❌ Expedia API error:", expediaError);
+          console.error("Error details:", JSON.stringify(expediaError, null, 2));
+        } else if (!expediaData) {
+          console.error("❌ Expedia returned no data");
+        } else if (!expediaData.hotels) {
+          console.error("❌ Expedia data missing 'hotels' field:", expediaData);
         } else {
-          console.log("Expedia failed, will try Amadeus:", expediaError?.message);
+          expediaHotels = expediaData.hotels;
+          console.log(`✅ Expedia returned ${expediaHotels.length} hotels with photos and reviews`);
+          if (expediaHotels.length === 0) {
+            console.warn('⚠️ Expedia returned 0 hotels for location:', location);
+          }
         }
       } catch (e) {
-        console.log("Expedia error, falling back to Amadeus:", e);
+        console.error("❌ Expedia exception:", e);
       }
+    } else {
+      console.log(`Skipping Expedia (filter: ${hotelFilter})`);
     }
     
     // Fetch Amadeus hotels as fallback if Expedia returns insufficient results
