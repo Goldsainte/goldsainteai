@@ -124,17 +124,28 @@ serve(async (req) => {
         type: "function",
         function: {
           name: "search_flights",
-          description: "Search for flights between two cities. Returns flight options with prices, airlines, and schedules.",
+          description: "⚠️ CRITICAL: Ask user for trip type (round trip/one-way) BEFORE calling this. Search for flights between two cities. Returns flight options with prices, airlines, and schedules.",
           parameters: {
             type: "object",
             properties: {
               origin: { type: "string", description: "Departure city or airport code (e.g., 'New York' or 'JFK')" },
               destination: { type: "string", description: "Arrival city or airport code (e.g., 'Paris' or 'CDG')" },
-              departureDate: { type: "string", description: "Departure date in YYYY-MM-DD format" },
-              returnDate: { type: "string", description: "Return date in YYYY-MM-DD format (optional for one-way)" },
+              tripType: {
+                type: "string",
+                enum: ["round-trip", "one-way"],
+                description: "⚠️ REQUIRED - Type of trip. MUST ask user explicitly: 'Is this a round trip or one-way flight?'"
+              },
+              departureDate: { 
+                type: "string", 
+                description: "⚠️ REQUIRED - Departure date in YYYY-MM-DD format. YOU MUST ASK USER FOR THIS." 
+              },
+              returnDate: { 
+                type: "string", 
+                description: "⚠️ REQUIRED for round-trip flights - Return date in YYYY-MM-DD format. If tripType is 'round-trip', this field is MANDATORY." 
+              },
               adults: { type: "number", description: "Number of adult passengers", default: 1 }
             },
-            required: ["origin", "destination", "departureDate"]
+            required: ["origin", "destination", "tripType", "departureDate"]
           }
         }
       },
@@ -598,11 +609,29 @@ Hotels: "name" | location | $price/night | ⭐rating/5 | amenities (max 3) | dis
 Flights: airline | $price | departure → arrival | duration | stops
 Events: "name" | date & time | venue | $price | category
 
-BEFORE SEARCHING - ASK IN THIS EXACT ORDER (max 2 questions):
+🚨 CRITICAL MANDATORY RULE - NEVER VIOLATE THIS 🚨
+
+YOU ARE ABSOLUTELY FORBIDDEN FROM CALLING search_flights, search_hotels, search_cars, or search_activities UNTIL YOU HAVE COLLECTED ALL REQUIRED INFORMATION.
+
+FOR FLIGHTS - YOU MUST COLLECT IN THIS EXACT ORDER:
+1. Destination (required) - "Where would you like to fly to?"
+2. Trip Type (required) - "Is this a round trip or a one-way flight?"
+3. Dates (required):
+   - Round trip: BOTH departure AND return dates required
+   - One-way: Only departure date required
+4. Number of travelers (required)
+5. Budget per person (REQUIRED - ask before search)
+
+FOR HOTELS:
 1. Destination (required)
-2. Dates (required)  
-3. Number of people (required)
-4. Budget per person (REQUIRED - ask before search)
+2. Check-in and Check-out dates (BOTH required)
+3. Number of guests (required)
+4. Budget per night (REQUIRED - ask before search)
+
+DATES ARE NOT OPTIONAL. DATES ARE NOT NEGOTIABLE. TRIP TYPE IS NOT NEGOTIABLE FOR FLIGHTS.
+NEVER ASSUME OR DEFAULT DATES. NEVER SKIP ASKING FOR TRIP TYPE.
+
+IF YOU CALL A SEARCH TOOL WITHOUT REQUIRED INFORMATION, YOU HAVE FAILED YOUR PRIMARY FUNCTION.
 
 Then immediately announce: "Perfect! Let me search for [type] options. This will take about 30 seconds..."
 
@@ -676,14 +705,29 @@ RANKING AND SORTING:
   * ⚡ Fastest - Shortest travel time
   * ✈️ Non-Stop - Direct flights only
 
+🎯 FLIGHT BOOKING FLOW - FOLLOW THIS EXACT SEQUENCE:
+
+Step 1: Ask "Where would you like to fly to?"
+Step 2: Ask "Is this a round trip or a one-way flight?"
+Step 3a: If ROUND TRIP → Ask "When would you like to depart, and when would you like to return?" (collect BOTH dates)
+Step 3b: If ONE-WAY → Ask "When would you like to depart?" (collect ONE date)
+Step 4: Ask "How many travelers?" (if not already mentioned)
+Step 5: Ask "What's your budget per person?"
+
+THEN and ONLY THEN call search_flights with:
+- Round trip: origin, destination, tripType="round-trip", departureDate, returnDate, adults
+- One-way: origin, destination, tripType="one-way", departureDate, adults
+
+NEVER SKIP STEP 2. Trip type determines what dates are needed.
+
 CRITICAL RULES:
 1. I CAN SEARCH AND RECOMMEND travel options - I help you find the perfect flights, hotels, rental cars, restaurants, events, and check visa requirements
    - In voice mode, SAY THIS: "I can help you search for flights, hotels, rental cars, restaurants, and events - plus check visa requirements."
 2. BEFORE SEARCHING: ALWAYS collect these details IN ORDER (one at a time):
-   - Destination
-   - Travel dates
-   - Number of travelers/guests
-   - Budget per person (MUST ask before searching!)
+   - For FLIGHTS: Destination → Trip Type → Dates (based on trip type) → Travelers → Budget
+   - For HOTELS: Destination → Check-in & Check-out dates → Guests → Budget
+   - For CARS/ACTIVITIES: Location → Pickup/Start date → Return/End date → Budget
+   - Budget per person/night (MUST ask before searching!)
    - Any preferences
 3. WHEN USERS CHANGE THEIR MIND: Use the update_trip_context tool immediately
    - Examples: "Actually, make it July instead" → update_trip_context
@@ -954,6 +998,153 @@ Remember: You're an AI search concierge that helps find perfect travel options a
           arguments: args,
           timestamp: new Date().toISOString()
         });
+        
+        // ⚠️ VALIDATION: Server-side validation for flights
+        if (functionName === 'search_flights') {
+          console.log('🔍 [FLIGHT VALIDATION] Tool call:', functionName);
+          console.log('🔍 [FLIGHT VALIDATION] Trip Type:', args.tripType);
+          console.log('🔍 [FLIGHT VALIDATION] Departure Date:', args.departureDate);
+          console.log('🔍 [FLIGHT VALIDATION] Return Date:', args.returnDate);
+          
+          // Validate trip type is present
+          if (!args.tripType || !["round-trip", "one-way"].includes(args.tripType)) {
+            const errorResult = {
+              error: "VALIDATION_ERROR",
+              message: "You MUST ask the user if this is a round trip or one-way flight before searching. Valid values: 'round-trip' or 'one-way'.",
+              required_fields: {
+                tripType: "MISSING - Ask user: 'Is this a round trip or one-way flight?'"
+              }
+            };
+            console.error('❌ [VALIDATION] Trip type missing or invalid:', args.tripType);
+            toolResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify(errorResult),
+            });
+            continue;
+          }
+          
+          // Validate departure date is present
+          if (!args.departureDate || args.departureDate.trim() === "") {
+            const errorResult = {
+              error: "VALIDATION_ERROR",
+              message: "Cannot search flights without departure date. You must ask the user for the departure date before searching.",
+              required_fields: {
+                departureDate: "MISSING - Must be in YYYY-MM-DD format"
+              }
+            };
+            console.error('❌ [VALIDATION] Departure date missing');
+            toolResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify(errorResult),
+            });
+            continue;
+          }
+          
+          // Validate departure date format
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(args.departureDate)) {
+            const errorResult = {
+              error: "VALIDATION_ERROR",
+              message: `Invalid departure date format: ${args.departureDate}. Dates must be in YYYY-MM-DD format. Ask the user to provide a valid date.`
+            };
+            console.error('❌ [VALIDATION] Invalid departure date format:', args.departureDate);
+            toolResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify(errorResult),
+            });
+            continue;
+          }
+          
+          // For round trips, validate return date is present and valid
+          if (args.tripType === "round-trip") {
+            console.log('🔍 [FLIGHT VALIDATION] Expected Return Date: REQUIRED (round-trip)');
+            
+            if (!args.returnDate || args.returnDate.trim() === "") {
+              const errorResult = {
+                error: "VALIDATION_ERROR",
+                message: "For round-trip flights, you MUST collect BOTH departure and return dates. Ask the user for the return date.",
+                required_fields: {
+                  returnDate: "MISSING - Required for round-trip flights in YYYY-MM-DD format"
+                }
+              };
+              console.error('❌ [VALIDATION] Return date missing for round-trip');
+              toolResults.push({
+                tool_call_id: toolCall.id,
+                role: "tool",
+                name: functionName,
+                content: JSON.stringify(errorResult),
+              });
+              continue;
+            }
+            
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(args.returnDate)) {
+              const errorResult = {
+                error: "VALIDATION_ERROR",
+                message: `Invalid return date format: ${args.returnDate}. Dates must be in YYYY-MM-DD format.`
+              };
+              console.error('❌ [VALIDATION] Invalid return date format:', args.returnDate);
+              toolResults.push({
+                tool_call_id: toolCall.id,
+                role: "tool",
+                name: functionName,
+                content: JSON.stringify(errorResult),
+              });
+              continue;
+            }
+            
+            // Validate return date is after departure date
+            if (new Date(args.returnDate) <= new Date(args.departureDate)) {
+              const errorResult = {
+                error: "VALIDATION_ERROR",
+                message: "Return date must be after departure date. Ask the user for a valid return date."
+              };
+              console.error('❌ [VALIDATION] Return date is not after departure date');
+              toolResults.push({
+                tool_call_id: toolCall.id,
+                role: "tool",
+                name: functionName,
+                content: JSON.stringify(errorResult),
+              });
+              continue;
+            }
+          } else {
+            console.log('🔍 [FLIGHT VALIDATION] Expected Return Date: NOT REQUIRED (one-way)');
+            // For one-way flights, ensure returnDate is not provided or is ignored
+            if (args.returnDate) {
+              console.log(`⚠️ User specified one-way flight but returnDate provided. Ignoring returnDate.`);
+              delete args.returnDate;
+            }
+          }
+          
+          console.log('✅ [VALIDATION] All flight validations passed');
+        }
+        
+        // ⚠️ VALIDATION: Server-side validation for hotels
+        if (functionName === 'search_hotels') {
+          if (!args.checkIn || !args.checkOut) {
+            const errorResult = {
+              error: "VALIDATION_ERROR",
+              message: "Cannot search hotels without check-in and check-out dates. You must ask the user for travel dates before searching.",
+              required_fields: {
+                checkIn: !args.checkIn ? "MISSING" : "OK",
+                checkOut: !args.checkOut ? "MISSING" : "OK"
+              }
+            };
+            console.error('❌ [VALIDATION] Hotel dates missing');
+            toolResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify(errorResult),
+            });
+            continue;
+          }
+        }
         
         // Call the appropriate Supabase edge function
         let result;
