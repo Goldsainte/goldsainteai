@@ -546,6 +546,32 @@ serve(async (req) => {
             required: ["fromCountry", "toCountry"]
           }
         }
+      },
+      {
+        type: "function",
+        function: {
+          name: "generate_booking_link",
+          description: "Generate an Expedia booking link with pre-filled search details. Use after user selects a hotel/flight and wants to proceed with booking.",
+          parameters: {
+            type: "object",
+            properties: {
+              type: { 
+                type: "string", 
+                enum: ["hotel", "flight"],
+                description: "Type of booking link to generate"
+              },
+              destination: { type: "string", description: "Destination city or airport code" },
+              checkIn: { type: "string", description: "Check-in date (YYYY-MM-DD) - for hotels" },
+              checkOut: { type: "string", description: "Check-out date (YYYY-MM-DD) - for hotels" },
+              departureDate: { type: "string", description: "Departure date (YYYY-MM-DD) - for flights" },
+              returnDate: { type: "string", description: "Return date (YYYY-MM-DD) - for round-trip flights" },
+              adults: { type: "number", description: "Number of adults" },
+              origin: { type: "string", description: "Origin city or airport code - for flights" },
+              hotelName: { type: "string", description: "Hotel name (optional, for context)" }
+            },
+            required: ["type", "destination", "adults"]
+          }
+        }
       }
     ];
 
@@ -743,16 +769,27 @@ CRITICAL RULES:
    - ALWAYS highlight the 🏆 Best Value option first
    - Mention 💰 Cheapest and ⭐ Highest Rated alternatives
    - Ask user preference after showing options
-3. BEFORE calling any search tool, ALWAYS tell the user: "Great! Let me search for [flights/hotels/restaurants/events] for you. This will take about 30 seconds - I'll be right back with your options!"
+6. BEFORE calling any search tool, ALWAYS tell the user: "Great! Let me search for [flights/hotels/restaurants/events] for you. This will take about 30 seconds - I'll be right back with your options!"
    - This is CRITICAL in voice mode so users know you're still working
-4. When showing search results, describe TOP 2-3 options in detail: name, location, price, rating, amenities
-5. After showing options, ask: "Which option looks best to you?" then STOP and WAIT for response
+7. When showing search results, describe TOP 2-3 options in detail: name, location, price, rating, amenities
+8. After showing options, ask: "Which option looks best to you?" then STOP and WAIT for response
    - DO NOT continue with more questions or actions until user responds
-6. After user shows interest in an option, ALWAYS present these three choices:
-   a) "Would you like to continue booking yourself using our search function?"
-   b) "Would you like me to send your information to a Goldsainte certified agent who can handle everything?"
-   c) "Would you like to explore more options first?"
-7. If user chooses agent contact, use the request_agent_contact tool to save their information
+
+**BOOKING HANDOFF - OUR CORE BUSINESS MODEL:**
+After user selects an option they like, present TWO clear choices:
+
+a) "I can take you to Expedia to complete your booking securely" → Use generate_booking_link tool
+b) "Or I can connect you with a Goldsainte certified agent who will handle everything for you" → Use request_agent_contact tool
+
+IMPORTANT: We do NOT handle bookings directly. Our value is:
+- AI-powered search and recommendations (fast, comprehensive)
+- Expert travel agent marketplace (personalized, premium service)
+- Booking happens either on Expedia or through our certified agents
+
+When generating booking link:
+- Use generate_booking_link tool with all collected details
+- Present as: "I'll take you to Expedia where you can complete your booking securely with all your details pre-filled: [link]"
+- Explain: "Your search details will be pre-filled to save you time."
 8. Keep responses concise and natural - avoid long lists
 9. WAIT FOR USER RESPONSE - Never ask a question and then immediately continue talking or taking actions
 10. NEVER offer to create booking links or complete bookings directly
@@ -1167,7 +1204,8 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             'get_uber_estimate': 'uber-get-products',
             'request_uber_ride': 'uber-request-ride',
             'update_trip_context': null, // Handled inline
-            'set_ranking_preference': null // Handled inline
+            'set_ranking_preference': null, // Handled inline
+            'generate_booking_link': null // Handled inline - redirect to Expedia
           };
           
           const edgeFunctionName = functionMap[functionName];
@@ -1186,6 +1224,49 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               success: true, 
               message: `Results will now be sorted by ${args.sortBy} for ${args.resultType}`,
               currentPreferences: tripContext.rankingPreferences
+            };
+          } else if (functionName === 'generate_booking_link') {
+            // Generate Expedia redirect URL with pre-filled details
+            console.log('🔗 [BOOKING LINK] Generating Expedia redirect:', args);
+            
+            let bookingLink = '';
+            
+            if (args.type === 'hotel') {
+              const checkInDate = args.checkIn ? new Date(args.checkIn) : new Date();
+              const checkOutDate = args.checkOut ? new Date(args.checkOut) : new Date(checkInDate.getTime() + 86400000);
+              
+              const expediaUrl = new URL('https://www.expedia.com/Hotel-Search');
+              expediaUrl.searchParams.set('destination', args.destination);
+              expediaUrl.searchParams.set('startDate', checkInDate.toISOString().split('T')[0]);
+              expediaUrl.searchParams.set('endDate', checkOutDate.toISOString().split('T')[0]);
+              expediaUrl.searchParams.set('rooms', '1');
+              expediaUrl.searchParams.set('adults', args.adults?.toString() || '2');
+              
+              bookingLink = expediaUrl.toString();
+            } else if (args.type === 'flight') {
+              const departDate = args.departureDate ? new Date(args.departureDate) : new Date();
+              
+              const expediaUrl = new URL('https://www.expedia.com/Flights');
+              if (args.origin) expediaUrl.searchParams.set('flight-type', args.returnDate ? 'on' : 'one');
+              if (args.origin) expediaUrl.searchParams.set('leg1', `from:${args.origin},to:${args.destination},departure:${departDate.toISOString().split('T')[0]}TANYT`);
+              if (args.returnDate) {
+                const returnDateObj = new Date(args.returnDate);
+                expediaUrl.searchParams.set('leg2', `from:${args.destination},to:${args.origin},departure:${returnDateObj.toISOString().split('T')[0]}TANYT`);
+              }
+              expediaUrl.searchParams.set('passengers', `adults:${args.adults || 1},children:0,seniors:0,infantinlap:Y`);
+              
+              bookingLink = expediaUrl.toString();
+            }
+            
+            console.log('✅ [BOOKING LINK] Generated:', bookingLink);
+            
+            result = {
+              success: true,
+              bookingLink,
+              type: args.type,
+              destination: args.destination,
+              hotelName: args.hotelName,
+              message: `Ready to book! I'll redirect you to Expedia to complete your reservation with all details pre-filled.`
             };
           } else if (functionName === 'search_fine_dining_restaurants') {
             // For now, return a message directing users to the fine dining page
