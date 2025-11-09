@@ -479,7 +479,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Bed className="h-5 w-5 text-primary" />
                     Room Features
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Air Conditioning</span>
@@ -523,7 +523,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Bath className="h-5 w-5 text-primary" />
                     Bathroom
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Private Bathroom</span>
@@ -559,7 +559,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Phone className="h-5 w-5 text-primary" />
                     Services & Facilities
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>24-hour Front Desk</span>
@@ -603,7 +603,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Utensils className="h-5 w-5 text-primary" />
                     Dining & Entertainment
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>On-site Restaurant</span>
@@ -639,7 +639,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Dumbbell className="h-5 w-5 text-primary" />
                     Recreation
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Fitness Center</span>
@@ -675,7 +675,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Wifi className="h-5 w-5 text-primary" />
                     Connectivity
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Free WiFi (all areas)</span>
@@ -703,7 +703,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <ParkingCircle className="h-5 w-5 text-primary" />
                     Parking & Transportation
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Free On-site Parking</span>
@@ -731,7 +731,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Accessibility className="h-5 w-5 text-primary" />
                     Accessibility
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Wheelchair Accessible</span>
@@ -759,7 +759,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
                     <Baby className="h-5 w-5 text-primary" />
                     Family Friendly
                   </h4>
-                  <div className="grid grid-cols-2 gap-3 pl-7">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 min-w-0 pl-7">
                     <div className="flex items-center gap-2 text-sm">
                       <Check className="h-4 w-4 text-primary" />
                       <span>Cribs Available</span>

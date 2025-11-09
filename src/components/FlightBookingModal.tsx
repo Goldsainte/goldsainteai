@@ -421,8 +421,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                 <div key={index} className="p-3 sm:p-4 border rounded-lg space-y-3 sm:space-y-4 min-w-0">
                   <h4 className="font-semibold text-sm sm:text-base">Passenger {index + 1}</h4>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 min-w-0">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                    <div className="min-w-0">
                       <Label htmlFor={`title-${index}`}>Title *</Label>
                       <Select
                         value={passenger.title}
@@ -439,16 +439,17 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor={`firstName-${index}`}>First Name *</Label>
                       <Input
                         id={`firstName-${index}`}
                         value={passenger.firstName}
                         onChange={(e) => updatePassenger(index, 'firstName', e.target.value)}
                         placeholder="As on passport"
+                        className="w-full"
                       />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor={`middleName-${index}`}>Middle Name</Label>
                       <Input
                         id={`middleName-${index}`}
@@ -457,28 +458,30 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         placeholder="Optional"
                       />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor={`lastName-${index}`}>Last Name *</Label>
                       <Input
                         id={`lastName-${index}`}
                         value={passenger.lastName}
                         onChange={(e) => updatePassenger(index, 'lastName', e.target.value)}
                         placeholder="As on passport"
+                        className="w-full"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                    <div className="min-w-0">
                       <Label htmlFor={`dob-${index}`}>Date of Birth *</Label>
                       <Input
                         id={`dob-${index}`}
                         type="date"
                         value={passenger.dateOfBirth}
                         onChange={(e) => updatePassenger(index, 'dateOfBirth', e.target.value)}
+                        className="w-full"
                       />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor={`gender-${index}`}>Gender *</Label>
                       <Select
                         value={passenger.gender}
@@ -493,7 +496,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
+                    <div className="min-w-0 sm:col-span-2">
                       <Label htmlFor={`nationality-${index}`}>Nationality *</Label>
                       <Input
                         id={`nationality-${index}`}
@@ -501,6 +504,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         onChange={(e) => updatePassenger(index, 'nationality', e.target.value)}
                         placeholder="US"
                         maxLength={2}
+                        className="w-full"
                       />
                     </div>
                   </div>
@@ -517,8 +521,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         return isInternational ? " (Required for International Flights)" : " (Optional for Domestic Flights)";
                       })()}
                     </h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                      <div className="min-w-0">
                         <Label htmlFor={`passport-${index}`}>
                           Passport Number
                           {(() => {
@@ -542,9 +546,10 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                             const isInternational = originCountry && destinationCountry && originCountry !== destinationCountry;
                             return isInternational ? "Required" : "Optional";
                           })()}
+                          className="w-full"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor={`passportExpiry-${index}`}>
                           Expiry Date
                           {(() => {
@@ -561,9 +566,10 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                           type="date"
                           value={passenger.passportExpiry}
                           onChange={(e) => updatePassenger(index, 'passportExpiry', e.target.value)}
+                          className="w-full"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0 sm:col-span-2">
                         <Label htmlFor={`passportCountry-${index}`}>
                           Issuing Country
                           {(() => {
@@ -581,6 +587,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                           onChange={(e) => updatePassenger(index, 'passportCountry', e.target.value)}
                           placeholder="US"
                           maxLength={2}
+                          className="w-full"
                         />
                       </div>
                     </div>
@@ -588,23 +595,25 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
 
                   <div className="border-t pt-4">
                     <h5 className="text-sm font-semibold mb-3">Optional Information</h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                      <div className="min-w-0">
                         <Label htmlFor={`ktn-${index}`}>Known Traveler Number / TSA PreCheck</Label>
                         <Input
                           id={`ktn-${index}`}
                           value={passenger.knownTravelerNumber}
                           onChange={(e) => updatePassenger(index, 'knownTravelerNumber', e.target.value)}
                           placeholder="Optional"
+                          className="w-full"
                         />
                       </div>
-                      <div>
+                      <div className="min-w-0">
                         <Label htmlFor={`ffn-${index}`}>Frequent Flyer Number</Label>
                         <Input
                           id={`ffn-${index}`}
                           value={passenger.frequentFlyerNumber}
                           onChange={(e) => updatePassenger(index, 'frequentFlyerNumber', e.target.value)}
                           placeholder="Optional"
+                          className="w-full"
                         />
                       </div>
                     </div>
@@ -699,8 +708,8 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
               <h4 className="font-semibold">Contact Information</h4>
               <p className="text-sm text-muted-foreground">All fields marked with * are required</p>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                <div className="min-w-0">
                   <Label htmlFor="email">Email *</Label>
                   <Input
                     id="email"
@@ -708,10 +717,11 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                     value={contactInfo.email}
                     onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })}
                     placeholder="john@example.com"
+                    className="w-full"
                   />
                 </div>
 
-                <div>
+                <div className="min-w-0">
                   <Label htmlFor="phone">Phone Number *</Label>
                   <div className="flex gap-2">
                     <Select
@@ -743,49 +753,53 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
               <div className="border-t pt-4">
                 <h4 className="font-semibold mb-3">Billing Address</h4>
                 
-                <div className="space-y-4">
-                  <div>
+                <div className="space-y-4 min-w-0">
+                  <div className="min-w-0">
                     <Label htmlFor="address">Street Address *</Label>
                     <Input
                       id="address"
                       value={contactInfo.address}
                       onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })}
                       placeholder="123 Main Street"
+                      className="w-full"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                    <div className="min-w-0">
                       <Label htmlFor="city">City *</Label>
                       <Input
                         id="city"
                         value={contactInfo.city}
                         onChange={(e) => setContactInfo({ ...contactInfo, city: e.target.value })}
                         placeholder="New York"
+                        className="w-full"
                       />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor="state">State / Province</Label>
                       <Input
                         id="state"
                         value={contactInfo.state}
                         onChange={(e) => setContactInfo({ ...contactInfo, state: e.target.value })}
                         placeholder="NY"
+                        className="w-full"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 min-w-0">
+                    <div className="min-w-0">
                       <Label htmlFor="postalCode">Postal / Zip Code *</Label>
                       <Input
                         id="postalCode"
                         value={contactInfo.postalCode}
                         onChange={(e) => setContactInfo({ ...contactInfo, postalCode: e.target.value })}
                         placeholder="10001"
+                        className="w-full"
                       />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <Label htmlFor="country">Country *</Label>
                       <Input
                         id="country"
@@ -793,6 +807,7 @@ export const FlightBookingModal = ({ open, onOpenChange, flight, dictionaries }:
                         onChange={(e) => setContactInfo({ ...contactInfo, country: e.target.value })}
                         placeholder="US"
                         maxLength={2}
+                        className="w-full"
                       />
                     </div>
                   </div>
