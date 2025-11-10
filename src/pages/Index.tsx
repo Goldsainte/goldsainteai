@@ -810,32 +810,37 @@ const queries = {
                 </div>
 
                 {/* Main Search with rotating placeholder */}
-                <div className="relative pt-2 md:pt-3 px-2 md:px-0" data-tour="ai-search">
-                  <label htmlFor="ai-search-input" className="sr-only">Search for travel experiences</label>
-                  <Input
-                    id="ai-search-input"
-                    placeholder={rotatingMessages[currentMessageIndex]}
-                    className="w-full h-14 md:h-16 px-4 pr-14 md:px-5 md:pr-16 text-sm md:text-base rounded-3xl border-2 border-[#BFAD72] shadow-sm focus-visible:ring-2 focus-visible:ring-[#BFAD72] focus-visible:ring-offset-2 placeholder:text-xs sm:placeholder:text-sm md:placeholder:text-base placeholder:text-muted-foreground/60 placeholder:transition-opacity placeholder:duration-500 touch-manipulation"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    disabled={isLoading}
-                    aria-label="Search for travel experiences, hotels, flights, and more"
-                  />
-                  <Button
-                    onClick={() => handleSearch()}
-                    size="icon"
-                    variant="ghost"
-                    className="absolute right-3 md:right-3 top-1/2 -translate-y-1/2 h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-muted touch-manipulation min-h-[44px] min-w-[44px]"
-                    disabled={isLoading}
-                    aria-label="Submit search"
+                <div className="w-full flex justify-center px-4" data-tour="ai-search">
+                  <div
+                    className="relative"
+                    style={{ width: 'clamp(320px, 60vw, 960px)' }}
                   >
-                    {isLoading ? (
-                      <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" aria-hidden="true" />
-                    ) : (
-                      <Send className="h-5 w-5 md:h-6 md:w-6" aria-hidden="true" />
-                    )}
-                  </Button>
+                    <label htmlFor="ai-search-input" className="sr-only">Search for travel experiences</label>
+                    <Input
+                      id="ai-search-input"
+                      type="search"
+                      placeholder={rotatingMessages[currentMessageIndex]}
+                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      disabled={isLoading}
+                      aria-label="Search for travel experiences, hotels, flights, and more"
+                    />
+                    <Button
+                      onClick={() => handleSearch()}
+                      type="submit"
+                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-[#0E4B44] text-white flex items-center justify-center hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E4B44] touch-manipulation disabled:opacity-50"
+                      disabled={isLoading}
+                      aria-label="Submit search"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Send className="h-5 w-5" aria-hidden="true" />
+                      )}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* What Goldsainte.Ai Can Do Button (Original style) */}
