@@ -27,9 +27,6 @@ verify_jwt = true
 [functions.apple-music-search]
 verify_jwt = false
 
-[functions.amadeus-get-seatmap]
-verify_jwt = false
-
 [functions.search-hotels]
 verify_jwt = false
 
@@ -48,25 +45,19 @@ verify_jwt = false
 [functions.notify-agents-new-job]
 verify_jwt = false
 
-[functions.amadeus-search-flights]
-verify_jwt = false
-
 [functions.unified-search-flights]
 verify_jwt = false
 
-[functions.amadeus-search-cars]
+[functions.unified-search-hotels]
 verify_jwt = false
 
-[functions.amadeus-get-tour-details]
+[functions.booking-com-rapid-search]
 verify_jwt = false
 
 [functions.create-checkout]
 verify_jwt = false
 
 [functions.get-hotel-details]
-verify_jwt = false
-
-[functions.booking-search-hotels]
 verify_jwt = false
 
 [functions.fetch-restaurants]
@@ -97,12 +88,6 @@ verify_jwt = true
 verify_jwt = false
 
 [functions.send-confirmation-email]
-verify_jwt = false
-
-[functions.expedia-search-hotels]
-verify_jwt = false
-
-[functions.expedia-get-availability]
 verify_jwt = false
 
 [functions.stripe-connect-onboarding]
@@ -242,9 +227,6 @@ verify_jwt = true
 
 [functions.start-transport-vendor-onboarding]
 verify_jwt = true
-
-[functions.amadeus-search-tours]
-verify_jwt = false
 
 [functions.help-center-ai]
 verify_jwt = false

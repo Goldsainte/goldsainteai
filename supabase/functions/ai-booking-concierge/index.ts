@@ -1190,8 +1190,8 @@ Remember: You're an AI search concierge that helps find perfect travel options a
           const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
           
           const functionMap: Record<string, string> = {
-            'search_flights': 'search-flights', // Goldsainte Search
-            'search_hotels': 'search-hotels', // Goldsainte Search
+            'search_flights': 'unified-search-flights', // Goldsainte Search
+            'search_hotels': 'unified-search-hotels', // Goldsainte Search
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_fine_dining_restaurants': null, // Handled inline with curated data
             'search_cars': 'amadeus-search-cars',
