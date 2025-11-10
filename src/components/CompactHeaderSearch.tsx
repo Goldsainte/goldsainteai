@@ -45,6 +45,7 @@ const CompactHeaderSearch = () => {
   const iframeTimeoutRef = useRef<NodeJS.Timeout>();
   const containerRef = useRef<HTMLDivElement>(null);
   const errorListenerRef = useRef<((event: SecurityPolicyViolationEvent) => void) | null>(null);
+  const mountedRef = useRef(false);
 
   const logError = (type: ErrorType, message: string, details?: any) => {
     const errorObj: WidgetError = { type, message, timestamp: Date.now() };
@@ -366,6 +367,73 @@ const CompactHeaderSearch = () => {
     setShowFallback(true);
   };
 
+  const destroyExpediaWidget = () => {
+    const expedia = getExpediaGlobal();
+    if (expedia && (expedia.obj as any).destroy) {
+      console.log("[ExpediaWidget] Destroying widget instance");
+      (expedia.obj as any).destroy();
+    }
+    
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+    }
+    if (iframeTimeoutRef.current) {
+      clearTimeout(iframeTimeoutRef.current);
+    }
+    if (errorListenerRef.current) {
+      document.removeEventListener('securitypolicyviolation', errorListenerRef.current as any);
+      errorListenerRef.current = null;
+    }
+  };
+
+  const handleExpediaRedirect = (url: string) => {
+    console.log("[ExpediaWidget] Preparing Expedia redirect");
+    sessionStorage.setItem('expediaRedirect', '1');
+    destroyExpediaWidget();
+    setOpen(false);
+    window.location.href = url;
+  };
+
+  // Check if returning from Expedia and prevent auto-open
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    const cameFromExpedia =
+      document.referrer.includes('expedia.com') ||
+      sessionStorage.getItem('expediaRedirect') === '1';
+
+    if (cameFromExpedia) {
+      console.log("[ExpediaWidget] Returned from Expedia, suppressing auto-init");
+      sessionStorage.removeItem('expediaRedirect');
+      setOpen(false);
+      destroyExpediaWidget();
+      mountedRef.current = true;
+      return;
+    }
+    
+    mountedRef.current = true;
+  }, []);
+
+  // Handle browser back/forward cache restoration
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const handlePageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) {
+        console.log("[ExpediaWidget] Page restored from bfcache, resetting state");
+        destroyExpediaWidget();
+        setOpen(false);
+        setWidgetReady(false);
+        setIframeActive(false);
+        setShowFallback(false);
+        setError(null);
+      }
+    };
+
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
+  }, []);
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -436,14 +504,13 @@ const CompactHeaderSearch = () => {
               <p className="text-sm text-muted-foreground">
                 You can still search directly on Expedia:
               </p>
-              <Button asChild size="lg">
-                <a
-                  href="https://www.expedia.com/?pwaLob=wizard-hotel-pwa-v2&camref=1101l5ujJR&pubref=goldsainte%20ai"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open Expedia Search
-                </a>
+              <Button 
+                size="lg"
+                onClick={() => handleExpediaRedirect(
+                  "https://www.expedia.com/?pwaLob=wizard-hotel-pwa-v2&camref=1101l5ujJR&pubref=goldsainte%20ai"
+                )}
+              >
+                Open Expedia Search
               </Button>
               {error && (
                 <p className="text-xs text-muted-foreground/60 mt-4">
