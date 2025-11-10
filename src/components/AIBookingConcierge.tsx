@@ -1086,19 +1086,19 @@ export const AIBookingConcierge = () => {
                     // Display hotel search results
                     if (result.results && Array.isArray(result.results) && result.results.length > 0) {
                       return (
-                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
-                          <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.results.length)} hotel options:</p>
-                          {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
-                            <CompactHotelCard 
-                              key={hotelIdx} 
-                              property={hotel}
-                              searchDates={{
-                                checkIn: result.searchParams?.checkInDate || result.checkInDate || '',
-                                checkOut: result.searchParams?.checkOutDate || result.checkOutDate || ''
-                              }}
-                            />
-                          ))}
-                        </div>
+                          <div key={resultIdx} className="mt-2 ml-8 space-y-2">
+                            <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.results.length)} hotel options:</p>
+                            {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
+                              <CompactHotelCard 
+                                key={hotelIdx} 
+                                property={hotel}
+                                searchDates={{
+                                  checkIn: result.checkIn || '',
+                                  checkOut: result.checkOut || ''
+                                }}
+                              />
+                            ))}
+                          </div>
                       );
                     }
                     

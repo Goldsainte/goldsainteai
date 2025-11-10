@@ -30,7 +30,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { SimplePropertyCard } from "@/components/SimplePropertyCard";
+import { CompactHotelCard } from "@/components/CompactHotelCard";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { RestaurantCard } from "@/components/RestaurantCard";
 import { FlightCard } from "@/components/FlightCard";
@@ -1428,10 +1428,13 @@ const queries = {
                             />
                             <div className="space-y-4">
                               {result.results.map((hotel: any, hotelIdx: number) => (
-                                <SimplePropertyCard
+                                <CompactHotelCard
                                   key={hotel.hotel_id || hotelIdx}
                                   property={hotel}
-                                  type="hotels"
+                                  searchDates={{
+                                    checkIn: result.checkIn || '',
+                                    checkOut: result.checkOut || ''
+                                  }}
                                 />
                               ))}
                             </div>

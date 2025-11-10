@@ -1079,6 +1079,10 @@ if (minRating && searchType !== "restaurants") {
                           <CompactHotelCard
                             key={`${result.hotel_id || result.dest_id || 'pkg'}-${index}`}
                             property={result}
+                            searchDates={{
+                              checkIn: checkIn,
+                              checkOut: checkOut
+                            }}
                           />
                         );
                       }
