@@ -394,84 +394,11 @@ const dropoffCode = dropoff ? dropoff.split(" - ")[0].trim() : pickupCode;
           const { getDestinationFromAirportCode } = await import('@/lib/hotelbedsHelpers');
           
           if (pickup && pickupDateCar && returnDateCar) {
-            // Car rental search via Amadeus
-            console.log('[Car Search] Calling amadeus with:', { 
-              pickupCode, 
-              dropoffCode, 
-              pickupDateCar, 
-              returnDateCar 
-            });
-            try {
-              const { data, error } = await invokeEdgeFunction('amadeus-search-cars', {
-                body: {
-                  pickupLocation: pickupCode,
-                  pickupDate: pickupDateCar,
-                  dropoffDate: returnDateCar,
-                  dropoffLocation: dropoffCode || pickupCode,
-                  currencyCode: 'USD'
-                },
-                timeout: 25000,
-                showToastOnError: false,
-              });
-              console.log('[Car Search] Response:', { data, error });
-              
-              if (error) {
-                console.warn('Car rental search error:', error);
-                setResults([]);
-                setFilteredResults([]);
-                setError(error.message || 'No car rentals available for this location. Try a major airport like JFK, LAX, or LHR.');
-                return;
-              }
-              
-              const carResults = data.results || [];
-              
-              // Also fetch transfers from HotelBeds in parallel
-              console.log('[Transfers] Fetching HotelBeds transfers');
-              const fromCode = getDestinationFromAirportCode(pickupCode);
-              const toCode = getDestinationFromAirportCode(dropoffCode || pickupCode);
-              
-              const { data: transferData } = await invokeEdgeFunction('hotelbeds-search-transfers', {
-                body: {
-                  from: fromCode,
-                  to: toCode,
-                  date: pickupDateCar,
-                  time: '10:00',
-                  passengers: parseInt(guests) || 2,
-                  vehicleType: 'SEDAN'
-                },
-                timeout: 25000,
-                showToastOnError: false,
-              }).catch(() => ({ data: { transfers: [] } }));
-              
-              const transfers = transferData?.transfers || [];
-              console.log(`[Transfers] Found ${transfers.length} transfer options`);
-              
-              // Combine car rentals and transfers, marking each type
-              const combinedResults = [
-                ...carResults.map((c: any) => ({ ...c, resultType: 'rental' })),
-                ...transfers.map((t: any) => ({ ...t, resultType: 'transfer' }))
-              ];
-              
-              // Show helpful message if no results
-              if (combinedResults.length === 0) {
-                const helpMessage = 'No car rentals or transfers found. Try different dates or major airports like LAX, JFK, LHR, CDG, or DXB.';
-                console.log('[Car Search] No results:', helpMessage);
-                toast({
-                  title: "No Cars Available",
-                  description: helpMessage,
-                  duration: 6000,
-                });
-                setError(helpMessage);
-              }
-              
-              setResults(combinedResults);
-              setFilteredResults(combinedResults);
-            } catch (err) {
-              console.error('Car search failed:', err);
-              setResults([]);
-              setFilteredResults([]);
-              setError('Unable to search for car rentals. The test API may not have data for this airport.');
-            }
+            // Car rental search - API integration removed
+            console.log('[Car Search] Car rental API integration removed');
+            setError('Car rental search is temporarily unavailable. Please check back later.');
+            setResults([]);
+            setFilteredResults([]);
           } else if (location && !pickup) {
             // Location-only search: show Uber instant rides
             console.log('[Car Search] Location-only, fetching Uber');

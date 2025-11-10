@@ -401,17 +401,16 @@ serve(async (req) => {
     const token = await getAmadeusToken();
     const cityCode = await resolveCityCode(token, location);
 
-    let expediaHotels: any[] = [];
-    let amadeusHotels: any[] = [];
+    let bookingHotels: any[] = [];
     let enriched: any[] = [];
     
-    // Try Expedia for 'all' searches (has photos + reviews built-in)
+    // Try Booking.com Rapid API for 'all' searches (has photos + reviews built-in)
     if (hotelFilter === 'all') {
       try {
-        console.log("🔍 Calling Expedia Rapid API...");
-        const expediaStart = Date.now();
+        console.log("🔍 Calling Booking.com Rapid API...");
+        const bookingStart = Date.now();
         
-        const { data: expediaData, error: expediaError } = await supabaseClient.functions.invoke('expedia-search-hotels', {
+        const { data: bookingData, error: bookingError } = await supabaseClient.functions.invoke('booking-com-rapid-search', {
           body: { 
             location, 
             checkIn, 
@@ -423,43 +422,31 @@ serve(async (req) => {
           }
         });
         
-        console.log(`Expedia API call completed in ${Date.now() - expediaStart}ms`);
+        console.log(`Booking.com API call completed in ${Date.now() - bookingStart}ms`);
         
-        if (expediaError) {
-          console.error("❌ Expedia API error:", expediaError);
-          console.error("Error details:", JSON.stringify(expediaError, null, 2));
-        } else if (!expediaData) {
-          console.error("❌ Expedia returned no data");
-        } else if (!expediaData.hotels) {
-          console.error("❌ Expedia data missing 'hotels' field:", expediaData);
+        if (bookingError) {
+          console.error("❌ Booking.com API error:", bookingError);
+          console.error("Error details:", JSON.stringify(bookingError, null, 2));
+        } else if (!bookingData) {
+          console.error("❌ Booking.com returned no data");
+        } else if (!bookingData.hotels) {
+          console.error("❌ Booking.com data missing 'hotels' field:", bookingData);
         } else {
-          expediaHotels = expediaData.hotels;
-          console.log(`✅ Expedia returned ${expediaHotels.length} hotels with photos and reviews`);
-          if (expediaHotels.length === 0) {
-            console.warn('⚠️ Expedia returned 0 hotels for location:', location);
+          bookingHotels = bookingData.hotels;
+          console.log(`✅ Booking.com returned ${bookingHotels.length} hotels with photos and reviews`);
+          if (bookingHotels.length === 0) {
+            console.warn('⚠️ Booking.com returned 0 hotels for location:', location);
           }
         }
       } catch (e) {
-        console.error("❌ Expedia exception:", e);
+        console.error("❌ Booking.com exception:", e);
       }
     } else {
-      console.log(`Skipping Expedia (filter: ${hotelFilter})`);
+      console.log(`Skipping Booking.com (filter: ${hotelFilter})`);
     }
     
-    // Fetch Amadeus hotels as fallback if Expedia returns insufficient results
-    if ((hotelFilter === 'all' || hotelFilter === 'amadeus') && expediaHotels.length < 5) {
-      console.log(`Expedia returned ${expediaHotels.length} hotels, fetching Amadeus as supplement...`);
-      amadeusHotels = await fetchAmadeusHotels(token, cityCode, checkIn, checkOut, Number(guests) || 2);
-      console.log("Amadeus hotels fetched:", amadeusHotels.length);
-      enriched = await enrichWithGooglePlaces(amadeusHotels, location);
-      
-      // Merge Expedia and Amadeus results, prioritizing Expedia
-      enriched = [...expediaHotels, ...enriched];
-      console.log(`Combined results: ${expediaHotels.length} from Expedia + ${amadeusHotels.length} from Amadeus`);
-    } else {
-      enriched = expediaHotels;
-      console.log(`Using ${enriched.length} hotels from Expedia`);
-    }
+    enriched = bookingHotels;
+    console.log(`Using ${enriched.length} hotels from Booking.com`);
 
     // Fetch curated hotels if filter allows or if no results yet
     if (hotelFilter === 'curated' || (hotelFilter === 'all' && enriched.length === 0)) {
@@ -523,16 +510,16 @@ serve(async (req) => {
       }
     }
 
-    // Filter out test/demo hotels (only for Amadeus hotels - Expedia already filtered)
+    // Filter out test/demo hotels
     const filteredHotels = enriched.filter((h: any) => {
-      // Skip filtering for Expedia hotels (already filtered by expedia-search-hotels)
-      if (h.expediaData || h.image) {
+      // Booking.com hotels are already clean, skip filtering
+      if (h.__source === 'booking.com') {
         return true;
       }
       
-      // Apply filtering only to Amadeus hotels
-      const name = (h.hotel?.name || '').toLowerCase();
-      const description = (h.offers?.[0]?.room?.description?.text || '').toLowerCase();
+      // Apply filtering to curated hotels
+      const name = (h.hotel?.name || h.name || '').toLowerCase();
+      const description = (h.description || '').toLowerCase();
       const lat = h.hotel?.latitude || 0;
       const lon = h.hotel?.longitude || 0;
       
@@ -552,14 +539,16 @@ serve(async (req) => {
     // Apply server-side price filtering BEFORE transformation
     const maxPricePerNight = max_total_price ?? Infinity;
     const priceFilteredHotels = filteredHotels.filter((h: any) => {
-      const isExpediaHotel = h.expediaData || h.image;
+      const isBookingHotel = h.__source === 'booking.com';
       
-      if (isExpediaHotel) {
-        // Expedia hotels: price already has 15% markup
-        const perNight = h.price || 0;
+      if (isBookingHotel) {
+        // Booking.com hotels: price already has 15% markup
+        const offer = h.offers?.[0] || {};
+        const total = offer.price?.total || 0;
+        const perNight = total / nights;
         return perNight <= maxPricePerNight;
       } else {
-        // Amadeus hotels: need to apply markup for comparison
+        // Curated hotels: need to apply markup for comparison
         const offer = h.offers?.[0] || {};
         const total = offer.price?.total ? parseFloat(offer.price.total) : 0;
         const perNight = total / nights;
@@ -571,11 +560,11 @@ serve(async (req) => {
     console.log(`Server-side price filter: ${filteredHotels.length} -> ${priceFilteredHotels.length} hotels within ${maxPricePerNight}/night (any currency)`);
     
     const results = priceFilteredHotels.map((h: any) => {
-      // Check if this is an Expedia hotel (has direct fields like 'name', 'image', 'price')
-      const isExpediaHotel = h.expediaData || h.image;
+      // Check if this is a Booking.com hotel
+      const isBookingHotel = h.__source === 'booking.com';
       
-      // For Expedia hotels, use direct fields; for Amadeus, use nested structure
-      const info = isExpediaHotel ? h : (h.hotel || {});
+      // For Booking.com hotels, use direct fields; for curated, use nested structure
+      const info = isBookingHotel ? h : (h.hotel || {});
       const offer = h.offers?.[0] || {};
       
       // Calculate pricing
@@ -583,83 +572,86 @@ serve(async (req) => {
       let total: number;
       let currency: string;
       
-      if (isExpediaHotel) {
-        // Expedia hotels already have price per night with 15% markup applied
-        perNight = h.price || 0; // Already has markup
-        total = perNight * nights;
-        currency = h.currency || "USD";
+      if (isBookingHotel) {
+        // Booking.com hotels already have price per night with 15% markup applied
+        total = offer.price?.total || 0;
+        perNight = total / nights;
+        currency = offer.price?.currency || "USD";
       } else {
-        // Amadeus hotels have offer structure
+        // Curated hotels have offer structure
         total = offer.price?.total ? parseFloat(offer.price.total) : 0;
         perNight = total / nights;
         currency = offer.price?.currency || "USD";
       }
 
-      // Build photo URL list - prioritize Expedia, then Google Places, then Amadeus
+      // Build photo URL list - prioritize Booking.com photos, then curated photos
       let photoUrls: string[] = [];
       
-      if (isExpediaHotel && h.image) {
-        // Expedia hotel - use image from Expedia
-        photoUrls = [h.image];
-      } else {
-        // Amadeus hotel - use Google Photos or Amadeus media
-        const googlePhotoUrls: string[] = (h.__googlePhotos || [])
+      if (isBookingHotel && h.photos && h.photos.length > 0) {
+        // Booking.com hotel - use photos from Booking.com
+        photoUrls = h.photos.map((p: any) => p.url).filter(Boolean);
+      } else if (h.__googlePhotos && h.__googlePhotos.length > 0) {
+        // Curated hotel - use curated photos
+        const curatedPhotoUrls: string[] = (h.__googlePhotos || [])
           .slice(0, 12)
           .map((p: any) => p?.url)
           .filter((u: any) => typeof u === 'string' && !!u);
         
+        photoUrls = curatedPhotoUrls;
+      } else {
+        // Fallback to media or image_url
         const fallbackMedia: string[] = (info.media?.map((m: any) => m?.uri).filter(Boolean)) || [];
-        
-        photoUrls = googlePhotoUrls.length > 0 ? googlePhotoUrls : fallbackMedia;
+        if (h.image_url) {
+          photoUrls = [h.image_url];
+        } else {
+          photoUrls = fallbackMedia;
+        }
       }
 
       // Get reviews and ratings
       const reviews = h.__googleReviews || [];
-      const rating = isExpediaHotel ? (h.reviewScore || h.rating || 0) : (h.__googleRating || info.rating || 0);
-      const reviewCount = isExpediaHotel ? (h.reviewCount || 0) : (h.__googleRatingCount || 0);
+      const rating = isBookingHotel ? (h.rating || 0) : (h.__googleRating || info.rating || 0);
+      const reviewCount = isBookingHotel ? (h.reviewCount || 0) : (h.__googleRatingCount || 0);
 
       return {
-        hotel_id: isExpediaHotel ? h.id : (h.id || info.hotelId),
-        name: isExpediaHotel ? h.name : (info.name || "Hotel"),
-        address: isExpediaHotel ? h.address : (info.address?.lines?.[0] || ""),
-        city: isExpediaHotel ? h.city : (info.address?.cityName || location),
-        country: isExpediaHotel ? "" : (info.address?.countryCode || ""),
+        hotel_id: isBookingHotel ? h.id : (h.id || info.hotelId),
+        name: isBookingHotel ? h.name : (info.name || "Hotel"),
+        address: isBookingHotel ? h.address : (info.address?.lines?.[0] || ""),
+        city: isBookingHotel ? (h.hotel?.cityCode || location) : (info.address?.cityName || location),
+        country: isBookingHotel ? "" : (info.address?.countryCode || ""),
         rating,
         num_reviews: reviewCount,
         isCurated: h.__isCurated || false,
-        hasExpediaData: isExpediaHotel,
+        hasBookingData: isBookingHotel,
         image_url: photoUrls[0] || `https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop`,
         property: {
-          name: isExpediaHotel ? h.name : (info.name || "Hotel"),
+          name: isBookingHotel ? h.name : (info.name || "Hotel"),
           photoUrls,
           reviews,
           reviewScore: rating,
           reviewCount,
-          externalUrls: { amadeus: h.self || "", default: h.self || "" },
+          externalUrls: { booking: h.__bookingUrl || "", default: h.__bookingUrl || "" },
         },
-        location: isExpediaHotel ? h.city : (info.address?.cityName || location),
-        price: isExpediaHotel ? perNight : (perNight * 1.15), // Expedia already has markup, Amadeus needs it
-        basePrice: isExpediaHotel ? (h.basePrice || perNight / 1.15) : perNight, // Original price without markup
+        location: isBookingHotel ? (h.hotel?.cityCode || location) : (info.address?.cityName || location),
+        price: isBookingHotel ? perNight : (perNight * 1.15), // Booking.com already has markup, curated needs it
+        basePrice: isBookingHotel ? (perNight / 1.15) : perNight, // Original price without markup
         priceBreakdown: {
-          grossPrice: { value: isExpediaHotel ? perNight : (perNight * 1.15), currency },
-          totalPrice: { value: isExpediaHotel ? total : (total * 1.15), currency },
-          baseGrossPrice: { value: isExpediaHotel ? (h.basePrice || perNight / 1.15) : perNight, currency },
-          baseTotalPrice: { value: isExpediaHotel ? (h.basePrice * nights || total / 1.15) : total, currency },
+          grossPrice: { value: isBookingHotel ? perNight : (perNight * 1.15), currency },
+          totalPrice: { value: isBookingHotel ? total : (total * 1.15), currency },
+          baseGrossPrice: { value: isBookingHotel ? (perNight / 1.15) : perNight, currency },
+          baseTotalPrice: { value: isBookingHotel ? (total / 1.15) : total, currency },
         },
-        accessibilityLabel: `${isExpediaHotel ? h.name : info.name}. ${isExpediaHotel ? h.city : info.address?.cityName || location}. Price ${(isExpediaHotel ? perNight : perNight * 1.15).toFixed(2)} ${currency} per night`,
-        description: h.__curatedDescription || (isExpediaHotel ? "" : offer.room?.description?.text) || "",
-        amenities: h.__curatedAmenities || (isExpediaHotel ? h.amenities : info.amenities) || [],
+        accessibilityLabel: `${isBookingHotel ? h.name : info.name}. ${isBookingHotel ? (h.hotel?.cityCode || location) : info.address?.cityName || location}. Price ${(isBookingHotel ? perNight : perNight * 1.15).toFixed(2)} ${currency} per night`,
+        description: h.__curatedDescription || h.description || (offer.room?.description || "") || "",
+        amenities: h.__curatedAmenities || h.amenities || info.amenities || [],
         photos: photoUrls,
         reviews,
-        amadeusData: isExpediaHotel ? null : {
-          offerId: offer.id,
-          hotelId: h.id || info.hotelId,
-          checkInDate: offer.checkInDate,
-          checkOutDate: offer.checkOutDate,
+        bookingData: isBookingHotel ? {
+          hotelId: h.id,
+          bookingUrl: h.__bookingUrl,
           totalPrice: total,
-          basePrice: total, // Original price for booking
-        },
-        expediaData: isExpediaHotel ? h.expediaData : null,
+          basePrice: total / 1.15, // Original price for booking
+        } : null,
       };
     });
 
