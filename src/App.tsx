@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import HotelBooking from "./pages/HotelBooking";
+import HotelDetails from "./pages/HotelDetails";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
@@ -276,6 +277,7 @@ function AppContent() {
           <Route path="/booking-details/:bookingId" element={<BookingDetails />} />
           <Route path="/modify-flight/:bookingId" element={<ModifyFlight />} />
           <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/hotel/:id" element={<HotelDetails />} />
           <Route path="/hotel-booking" element={<HotelBooking />} />
           <Route path="/booking-confirmation" element={<BookingConfirmation />} />
           <Route path="/my-jobs" element={<MyJobs />} />

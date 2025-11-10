@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -291,21 +291,25 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     return `https://www.booking.com/hotel/xx/xx-${hotelId}.html?checkin=${checkIn}&checkout=${checkOut}&group_adults=2&aid=${affiliateId}`;
   };
 
+  // Build detail page URL with search params
+  const hotelId = property.hotel_id || property.hotelId || property.property?.id || property.id;
+  const detailsUrl = `/hotel/${hotelId}?checkIn=${searchDates?.checkIn || ''}&checkOut=${searchDates?.checkOut || ''}&guests=2&currency=${currency}`;
+
   return (
     <>
       <Card className="group hover:shadow-md transition-all overflow-hidden max-w-full">
         <div className="flex gap-2 sm:gap-3 p-2 sm:p-3 max-w-full">
-          {/* Image with locked 4:3 aspect ratio */}
-          <div 
-            className="relative w-20 sm:w-28 md:w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-muted/80 to-muted/50 cursor-pointer"
-            onClick={() => allImages.length > 0 && setShowGallery(true)}
+          {/* Image with locked 4:3 aspect ratio - Link to details */}
+          <Link 
+            to={detailsUrl}
+            className="relative w-20 sm:w-28 md:w-32 aspect-[4/3] flex-shrink-0 rounded-md overflow-hidden bg-gradient-to-br from-muted/80 to-muted/50 group/img"
           >
             {hasValidImage ? (
               <img
                 src={image}
                 alt={title}
                 loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
                 onError={(e) => {
                   console.error('Hotel image failed to load:', image);
                   const target = e.currentTarget as HTMLImageElement;
@@ -320,6 +324,10 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 }}
               />
             ) : null}
+            <div className="absolute inset-0 bg-black/0 group-hover/img:bg-black/10 transition-colors" />
+            <div className="absolute top-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/img:opacity-100 transition-opacity">
+              View Details
+            </div>
             <div className={`image-placeholder w-full h-full flex items-center justify-center bg-gradient-to-br from-muted/80 to-muted/50 ${hasValidImage ? 'hidden' : ''}`}>
               <ImageIcon className="h-12 w-12 text-muted-foreground/70" />
             </div>
@@ -335,15 +343,17 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 360°
               </div>
             )}
-          </div>
+          </Link>
 
           {/* Content */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
               <div className="flex items-start justify-between gap-2 mb-1">
-                <h3 className="font-secondary font-semibold text-sm leading-tight whitespace-normal break-words line-clamp-4 sm:line-clamp-3 md:line-clamp-2 lg:line-clamp-1 group-hover:text-primary transition-colors">
-                  {title}
-                </h3>
+                <Link to={detailsUrl} className="flex-1 min-w-0">
+                  <h3 className="font-secondary font-semibold text-sm leading-tight whitespace-normal break-words line-clamp-4 sm:line-clamp-3 md:line-clamp-2 lg:line-clamp-1 group-hover:text-primary transition-colors">
+                    {title}
+                  </h3>
+                </Link>
                 <Button
                   variant="ghost"
                   size="icon"
