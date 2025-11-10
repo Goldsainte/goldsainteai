@@ -34,41 +34,80 @@ export const CompactHeaderSearch = () => {
     return null;
   };
 
-  // Dynamically load script if not found
+  // Dynamically load script if not found (with local fallback)
   const loadScript = () => {
     if (scriptLoading) return;
-    
-    const existingScript = document.querySelector('.eg-widgets-script');
+
+    const attachListeners = (el: HTMLScriptElement) => {
+      if ((el as any)._egListenersAttached) return;
+      (el as any)._egListenersAttached = true;
+
+      el.addEventListener('load', () => {
+        console.log('[ExpediaWidget] Script loaded:', el.src);
+        setScriptLoading(false);
+        const expedia = getExpediaGlobal();
+        if (expedia) {
+          console.log('[ExpediaWidget] Global detected after load:', expedia.method);
+          setWidgetReady(true);
+        }
+      });
+
+      el.addEventListener('error', () => {
+        console.error('[ExpediaWidget] Script failed to load:', el.src);
+        setScriptLoading(false);
+        // If remote failed, try local fallback once
+        const isRemote = el.src.includes('creator.expediagroup.com');
+        const existingLocal = document.querySelector('script.eg-widgets-script[data-source="local"]') as HTMLScriptElement | null;
+        if (isRemote && !existingLocal) {
+          console.warn('[ExpediaWidget] Falling back to local script copy');
+          injectScript('/vendor/expedia/eg-widgets.js', 'local');
+        } else {
+          setShowFallback(true);
+        }
+      });
+    };
+
+    const injectScript = (src: string, source: 'remote' | 'local') => {
+      console.log('[ExpediaWidget] Injecting script dynamically:', src);
+      setScriptLoading(true);
+      const script = document.createElement('script');
+      script.className = 'eg-widgets-script';
+      script.setAttribute('data-source', source);
+      script.src = src;
+      script.defer = true;
+      script.crossOrigin = 'anonymous';
+      script.referrerPolicy = 'no-referrer-when-downgrade';
+      attachListeners(script);
+      document.head.appendChild(script);
+    };
+
+    const existingScript = document.querySelector('script.eg-widgets-script') as HTMLScriptElement | null;
     if (existingScript) {
-      console.log('[ExpediaWidget] Script tag exists, waiting for load...');
+      console.log('[ExpediaWidget] Script tag exists (src):', existingScript.src);
+      attachListeners(existingScript);
+      const expedia = getExpediaGlobal();
+      if (expedia) {
+        console.log('[ExpediaWidget] Global already present:', expedia.method);
+        setWidgetReady(true);
+        return;
+      }
+      // If existing is remote and blocked, also try injecting local in parallel after 1s
+      if (existingScript.src.includes('creator.expediagroup.com')) {
+        setTimeout(() => {
+          if (!getExpediaGlobal()) {
+            const existingLocal = document.querySelector('script.eg-widgets-script[data-source="local"]');
+            if (!existingLocal) {
+              console.warn('[ExpediaWidget] No global yet – attempting local fallback injection');
+              injectScript('/vendor/expedia/eg-widgets.js', 'local');
+            }
+          }
+        }, 1000);
+      }
       return;
     }
 
-    console.log('[ExpediaWidget] Injecting script dynamically...');
-    setScriptLoading(true);
-    
-    const script = document.createElement('script');
-    script.className = 'eg-widgets-script';
-    script.src = 'https://creator.expediagroup.com/products/widgets/assets/eg-widgets.js';
-    script.defer = true;
-    
-    script.onload = () => {
-      console.log('[ExpediaWidget] Script loaded successfully');
-      setScriptLoading(false);
-      const expedia = getExpediaGlobal();
-      if (expedia) {
-        console.log('[ExpediaWidget] Global detected:', expedia.method);
-        setWidgetReady(true);
-      }
-    };
-    
-    script.onerror = () => {
-      console.error('[ExpediaWidget] Script failed to load');
-      setScriptLoading(false);
-      setShowFallback(true);
-    };
-    
-    document.head.appendChild(script);
+    // No script present – try remote, then local on error
+    injectScript('https://creator.expediagroup.com/products/widgets/assets/eg-widgets.js', 'remote');
   };
 
   // Check if Expedia widget script is loaded
