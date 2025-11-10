@@ -446,9 +446,9 @@ const CompactHeaderSearch = () => {
           <Search className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0E4B44]" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[92vw] sm:w-auto max-w-[720px] max-h-[90vh] overflow-auto p-4 sm:p-6 flex flex-col justify-start">
+      <DialogContent className="w-[min(70vw,760px)] max-w-[92vw] min-w-[320px] max-h-[88vh] overflow-auto p-4 sm:p-6 rounded-2xl flex flex-col justify-start">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold">
+          <DialogTitle className="text-[18px] sm:text-[20px] font-semibold">
             Search Hotels & Flights
           </DialogTitle>
           <DialogDescription>
@@ -456,8 +456,8 @@ const CompactHeaderSearch = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="max-w-[560px] w-full mx-auto">
-          <div ref={containerRef} className="w-full" style={{ minHeight: !widgetReady && !iframeActive && !showFallback ? "400px" : "auto" }}>
+        <div className="max-w-[640px] w-full mx-auto">
+          <div ref={containerRef} className="w-full" style={{ minHeight: !widgetReady && !iframeActive && !showFallback ? "320px" : "auto" }}>
           {!widgetReady && !iframeActive && !showFallback && (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
