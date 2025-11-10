@@ -438,12 +438,12 @@ const CompactHeaderSearch = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
-          size="sm"
-          className="gap-2 text-sm font-medium hover:bg-accent"
+          className="relative h-[52px] sm:h-14 lg:h-16 rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur pl-4 sm:pl-5 pr-12 sm:pr-14 text-base sm:text-[17px] text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44]/30 focus-visible:ring-offset-2 transition-all"
+          style={{ width: 'clamp(280px, 40vw, 400px)' }}
+          aria-label="Search hotels and flights"
         >
-          <Search className="h-4 w-4" />
-          <span className="hidden sm:inline">Search</span>
+          <span>Search hotels & flights...</span>
+          <Search className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#0E4B44]" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
