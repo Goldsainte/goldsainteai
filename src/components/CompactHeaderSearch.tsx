@@ -501,6 +501,7 @@ const CompactHeaderSearch = () => {
             />
           )}
 
+
           {showFallback && (
             <div className="text-center py-12 space-y-4">
               <p className="text-muted-foreground">
@@ -533,3 +534,4 @@ const CompactHeaderSearch = () => {
 };
 
 export { CompactHeaderSearch };
+
