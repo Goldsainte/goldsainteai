@@ -99,6 +99,24 @@ serve(async (req) => {
 
     const rawHotels = hotelsData?.data?.hotels || [];
     console.log(`📊 Raw hotels count: ${rawHotels.length}`);
+    
+    // Deep inspection of first result
+    if (rawHotels.length > 0) {
+      console.log("🔍 Sample hotel keys:", Object.keys(rawHotels[0] || {}));
+      console.log("🔍 Sample property keys:", Object.keys(rawHotels[0]?.property || {}));
+      console.log("🔍 Sample price fields:", {
+        min_total_price: rawHotels[0]?.min_total_price,
+        priceBreakdown: rawHotels[0]?.priceBreakdown,
+        composite_price_breakdown: rawHotels[0]?.composite_price_breakdown
+      });
+      console.log("🔍 Sample photo fields:", {
+        propertyPhotoUrls: rawHotels[0]?.property?.photoUrls,
+        photoUrls: rawHotels[0]?.photoUrls,
+        max_photo_url: rawHotels[0]?.max_photo_url,
+        main_photo_url: rawHotels[0]?.main_photo_url,
+        photoMainUrl: rawHotels[0]?.photoMainUrl
+      });
+    }
 
     if (rawHotels.length === 0) {
       return new Response(
@@ -117,46 +135,86 @@ serve(async (req) => {
         return true;
       })
       .map((hotel: any) => {
-        const mainPhoto = hotel.property?.photoUrls?.[0] || hotel.max_photo_url || "";
-        const allPhotos = (hotel.property?.photoUrls || []).map((url: string) => ({
-          url,
-          attribution: "Booking.com"
-        }));
+        // Robust name fallback chain
+        const name = hotel.property?.name ??
+          hotel.hotel_name_trans ??
+          hotel.hotel_name ??
+          hotel.wishlistName ??
+          hotel.name ??
+          "Hotel";
+
+        // Rating and reviews
+        const rating = hotel.property?.reviewScore ?? hotel.reviewScore ?? 0;
+        const reviewCount = hotel.property?.reviewCount ?? hotel.reviewCount ?? 0;
+
+        // Collect photos from multiple known fields
+        const photoStrings: string[] = []
+          .concat(Array.isArray(hotel.property?.photoUrls) ? hotel.property.photoUrls : [])
+          .concat(Array.isArray(hotel.photoUrls) ? hotel.photoUrls : [])
+          .concat(hotel.max_photo_url ? [hotel.max_photo_url] : [])
+          .concat(hotel.main_photo_url ? [hotel.main_photo_url] : [])
+          .concat(hotel.photoMainUrl ? [hotel.photoMainUrl] : []);
+        
+        const uniquePhotos = [...new Set(photoStrings.filter(Boolean))];
+        const allPhotos = uniquePhotos.map(url => ({ url, attribution: "Booking.com" }));
+        const mainPhoto = uniquePhotos[0] || "";
+
+        // Price and currency with resilient fallbacks
+        const total = hotel.min_total_price ??
+          hotel.priceBreakdown?.grossPrice?.value ??
+          hotel.composite_price_breakdown?.gross_amount?.value ??
+          hotel.composite_price_breakdown?.all_inclusive_amount?.value ??
+          0;
+        
+        const curr = hotel.priceBreakdown?.grossPrice?.currency ??
+          hotel.composite_price_breakdown?.gross_amount?.currency ??
+          currency;
+
+        // Clean address fallback
+        const address = hotel.property?.address ??
+          hotel.address ??
+          hotel.cityName ??
+          "";
+
+        // Booking URL
+        const bookingUrl = hotel.url || 
+          hotel.property?.url || 
+          (hotel.hotel_id ? `https://www.booking.com/hotel/${hotel.hotel_id}.html` : "");
 
         return {
           id: hotel.hotel_id,
-          name: hotel.property?.name || hotel.hotel_name || "Hotel",
+          name,
           hotel: {
             hotelId: hotel.hotel_id,
-            name: hotel.property?.name || hotel.hotel_name,
+            name,
             latitude: hotel.property?.latitude,
             longitude: hotel.property?.longitude,
             cityCode: destId,
           },
-          rating: hotel.property?.reviewScore || 0,
-          reviewCount: hotel.property?.reviewCount || 0,
-          address: hotel.accessibilityLabel || "",
-          description: hotel.property?.name || "",
+          rating,
+          reviewCount,
+          address,
+          description: name,
           amenities: hotel.property?.amenities || [],
           photos: allPhotos,
           image_url: mainPhoto,
           offers: [
             {
               price: {
-                total: hotel.min_total_price || hotel.priceBreakdown?.grossPrice?.value || 0,
-                currency: hotel.priceBreakdown?.grossPrice?.currency || currency,
+                total,
+                currency: curr,
               },
               policies: {
                 cancellation: hotel.property?.policies?.cancellation || "Check with hotel"
               },
               room: {
                 type: "Room",
-                description: hotel.property?.name || "",
+                description: name,
               },
             },
           ],
           __source: "booking.com",
-          __bookingUrl: `https://www.booking.com/hotel/${hotel.hotel_id}.html`,
+          __bookingUrl: bookingUrl,
         };
       });
 

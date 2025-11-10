@@ -470,8 +470,8 @@ serve(async (req) => {
       let photoUrls: string[] = [];
       
       if (isBookingHotel && h.photos && h.photos.length > 0) {
-        // Booking.com hotel - use photos from Booking.com
-        photoUrls = h.photos.map((p: any) => p.url).filter(Boolean);
+        // Booking.com hotel - use photos from Booking.com (handle both strings and objects)
+        photoUrls = h.photos.map((p: any) => (typeof p === "string" ? p : p?.url)).filter(Boolean);
       } else if (h.__googlePhotos && h.__googlePhotos.length > 0) {
         // Curated hotel - use curated photos
         const curatedPhotoUrls: string[] = (h.__googlePhotos || [])
