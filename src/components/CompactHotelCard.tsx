@@ -136,35 +136,12 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   };
 
   const handleAvailabilityConfirmed = ({ checkIn, checkOut, adults }: { checkIn: string; checkOut: string; adults: number }) => {
-    // Use provided dates OR fall back to searchDates from AI context
+    // Navigate to the new hotel details page with search params
     const finalCheckIn = checkIn || searchDates?.checkIn || format(addDays(new Date(), 1), 'yyyy-MM-dd');
     const finalCheckOut = checkOut || searchDates?.checkOut || format(addDays(new Date(), 3), 'yyyy-MM-dd');
-    const nights = Math.ceil((new Date(finalCheckOut).getTime() - new Date(finalCheckIn).getTime()) / (1000 * 60 * 60 * 24));
     
-    const bookingData = {
-      available: true,
-      hotel: {
-        ...property,
-        property: {
-          ...property.property,
-          photoUrls: allImages.filter(Boolean) // Pass all photos to booking page
-        }
-      },
-      hotelName: title,
-      hotelAddress: location,
-      hotelImage: imageUrl,
-      checkIn: finalCheckIn,
-      checkOut: finalCheckOut,
-      adults,
-      guests: adults,
-      rooms: 1,
-      nights,
-      totalPrice: displayPrice,
-      perNightPrice: displayPrice,
-      currency: currency,
-    };
-    
-    navigate(`/hotel-booking?data=${encodeData(bookingData)}`);
+    const hotelId = property.hotel_id || property.hotelId || property.property?.id || property.id;
+    navigate(`/hotel/${hotelId}?checkIn=${finalCheckIn}&checkOut=${finalCheckOut}&guests=${adults}&currency=${currency}`);
   };
 
   const favoriteId = isFavorite('hotel', property);
@@ -482,18 +459,6 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
             
             {hotelDetails && (
               <div className="p-4 space-y-6 max-h-[600px] overflow-y-auto">
-                {/* DEBUG: Show available data fields */}
-                {process.env.NODE_ENV === 'development' && (
-                  <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-xs">
-                    <p className="font-semibold mb-2">🔧 Debug: Available fields in hotelDetails</p>
-                    <div className="space-y-1 text-yellow-800 dark:text-yellow-200">
-                      <p>Keys: {Object.keys(hotelDetails).join(', ')}</p>
-                      <p>Has photos: {JSON.stringify(!!hotelDetails.photos || !!hotelDetails.images || !!hotelDetails.property?.photoUrls)}</p>
-                      <p>Has reviews: {JSON.stringify(!!hotelDetails.reviews || !!hotelDetails.guest_reviews || !!hotelDetails.property?.reviews)}</p>
-                      <p>Data structure: {JSON.stringify(hotelDetails, null, 2).slice(0, 500)}...</p>
-                    </div>
-                  </div>
-                )}
                 {/* SECTION 1: Full Description */}
                 {hotelDetails.description && (
                   <div className="space-y-2">
