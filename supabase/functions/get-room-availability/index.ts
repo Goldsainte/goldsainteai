@@ -11,38 +11,41 @@ serve(async (req) => {
   }
 
   try {
-    const { hotelId, checkIn, checkOut, guests, rooms, currency } = await req.json();
+    const { hotelId, checkIn, checkOut, guests, rooms, currency, locale } = await req.json();
     
-    console.log('🛏️ Get room availability request:', { 
+    console.log('🛏️ [get-room-availability] Request:', { 
       hotelId, 
       checkIn, 
       checkOut, 
       guests,
       rooms,
-      currency 
+      currency,
+      locale
     });
+
+    if (!checkIn || !checkOut) {
+      throw new Error('checkIn and checkOut dates are required');
+    }
 
     const apiKey = Deno.env.get('BOOKING_API_KEY') || Deno.env.get('BOOKING_COM_RAPID_API_KEY');
     if (!apiKey) {
-      throw new Error('Booking API key not configured');
+      throw new Error('BOOKING_API_KEY not configured');
     }
 
-    // Build query params for room availability
-    const queryParams = new URLSearchParams({
-      hotel_id: hotelId.toString(),
+    const params = new URLSearchParams({
+      hotel_id: String(hotelId),
       arrival_date: checkIn,
       departure_date: checkOut,
-      adults: guests?.toString() || '2',
-      room_qty: rooms?.toString() || '1',
+      adults: String(guests || 2),
+      room_qty: String(rooms || 1),
       currency_code: currency || 'USD',
-      languagecode: 'en-us'
+      languagecode: locale || 'en-us'
     });
 
-    console.log('🔍 Fetching room availability:', queryParams.toString());
+    console.log('🔍 [get-room-availability] Fetching from RAPID API...');
 
-    // Attempt to get room availability from Booking.com API
     const availabilityResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/getHotelAvailability?${queryParams}`,
+      `https://booking-com15.p.rapidapi.com/api/v1/hotels/getHotelAvailability?${params}`,
       {
         method: 'GET',
         headers: {
@@ -52,24 +55,16 @@ serve(async (req) => {
       }
     );
 
-    if (!availabilityResponse.ok) {
-      console.warn('⚠️ Room availability endpoint returned:', availabilityResponse.status);
-      
-      // If availability endpoint doesn't exist, return booking link instead
-      const bookingUrl = buildBookingUrl({
-        hotelId,
-        checkIn,
-        checkOut,
-        guests,
-        rooms,
-        currency
-      });
+    const bookingUrl = buildBookingUrl({ hotelId, checkIn, checkOut, guests, rooms, currency });
 
+    if (!availabilityResponse.ok) {
+      console.warn('⚠️ [get-room-availability] API returned:', availabilityResponse.status);
+      
       return new Response(JSON.stringify({ 
         success: true,
         availabilityNotSupported: true,
         bookingUrl,
-        message: 'Direct availability not supported. Use booking link to view rooms and prices.'
+        message: 'Room availability not available through API. Use booking link to view rooms.'
       }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
@@ -77,57 +72,88 @@ serve(async (req) => {
     }
 
     const availabilityData = await availabilityResponse.json();
-    
-    console.log('✅ Room availability retrieved');
+    console.log('✅ [get-room-availability] Retrieved successfully');
 
-    // Parse and structure room data
-    const rooms = availabilityData.data?.rooms || availabilityData.rooms || [];
-    const structuredRooms = rooms.map((room: any) => ({
-      roomId: room.room_id || room.id,
-      name: room.room_name || room.name,
-      description: room.description,
-      maxOccupancy: room.max_occupancy,
-      photos: room.photos || room.room_photos || [],
-      facilities: room.facilities || room.amenities || [],
-      bedConfiguration: room.bed_configurations,
-      price: {
-        total: room.price?.total || room.min_total_price,
-        currency: room.price?.currency || currency,
-        taxesIncluded: room.price?.taxes_included,
-        breakdown: room.price?.breakdown
-      },
-      cancellationPolicy: room.cancellation_policy,
-      mealPlan: room.meal_plan,
-      refundable: room.refundable,
-      availableRooms: room.available_rooms || room.nr_rooms_left
-    }));
+    // Structure room offers
+    const rawRooms = availabilityData.data?.rooms || availabilityData.rooms || [];
+    const offers = rawRooms.map((room: any) => {
+      const nightlyPrices = room.nightly_prices || [];
+      const total = room.price?.total || room.min_total_price || 0;
+      
+      return {
+        roomTypeId: String(room.room_id || room.id),
+        ratePlanId: String(room.rate_plan_id || room.id),
+        name: room.room_name || room.name,
+        description: room.description || '',
+        maxOccupancy: room.max_occupancy || guests,
+        photos: (room.photos || room.room_photos || []).map((p: any) => ({
+          url: typeof p === 'string' ? p : (p.url || p.url_max300)
+        })),
+        amenities: (room.facilities || room.amenities || []).map((a: any) => ({
+          label: typeof a === 'string' ? a : a.name
+        })),
+        bedTypes: room.bed_configurations || room.bed_types || [],
+        mealPlan: room.meal_plan || room.board_type,
+        refundable: room.refundable || false,
+        cancellationPolicy: room.cancellation_policy || 'Standard cancellation policy applies',
+        nightlyPrices: nightlyPrices.map((np: any) => ({
+          date: np.date,
+          amount: np.price || np.amount
+        })),
+        total: {
+          currency: room.price?.currency || currency || 'USD',
+          amount: total,
+          taxesAndFees: room.price?.taxes_and_fees || 0,
+          displayText: `${currency || 'USD'} ${total.toFixed(2)}`
+        },
+        remaining: room.available_rooms || room.nr_rooms_left
+      };
+    });
 
     return new Response(JSON.stringify({ 
       success: true,
-      rooms: structuredRooms,
-      bookingUrl: buildBookingUrl({ hotelId, checkIn, checkOut, guests, rooms, currency })
+      offers,
+      bookingUrl
     }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { 
+        ...corsHeaders, 
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=300' // Cache for 5 min
+      },
       status: 200,
     });
 
   } catch (error) {
-    console.error('❌ Error in get-room-availability:', error);
+    console.error('❌ [get-room-availability] Error:', error);
     
-    // Fallback: return booking URL
-    const { hotelId, checkIn, checkOut, guests, rooms, currency } = await req.json();
-    const bookingUrl = buildBookingUrl({ hotelId, checkIn, checkOut, guests, rooms, currency });
-    
-    return new Response(JSON.stringify({ 
-      success: true,
-      error: error.message,
-      fallbackMode: true,
-      bookingUrl,
-      message: 'Could not fetch availability. Use booking link to view rooms and complete booking.'
-    }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+    try {
+      const body = await req.json();
+      const bookingUrl = buildBookingUrl(body);
+      
+      return new Response(JSON.stringify({ 
+        success: true,
+        fallbackMode: true,
+        bookingUrl,
+        error: {
+          code: 'FETCH_FAILED',
+          message: error instanceof Error ? error.message : 'Unknown error'
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      });
+    } catch {
+      return new Response(JSON.stringify({ 
+        success: false,
+        error: {
+          code: 'FETCH_FAILED',
+          message: error instanceof Error ? error.message : 'Unknown error'
+        }
+      }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
   }
 });
 
