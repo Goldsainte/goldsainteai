@@ -89,7 +89,7 @@ export const CompactHeaderSearch = () => {
               data-lobs="stays,flights" 
               data-network="pz" 
               data-camref="1101l5ujJR" 
-              data-pubref=""
+              data-pubref="goldsainte ai"
               style={{ minHeight: widgetReady ? '400px' : '0' }}
             />
           </div>
