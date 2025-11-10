@@ -140,14 +140,18 @@ export const SearchBar = () => {
         </Tabs>
 
         <div className="space-y-3">
-          <div className="relative">
-            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" />
-            <Input
-              placeholder={searchType === "flights" ? "From where?" : "Where to?"}
-              className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-            />
+          <div className="w-full flex justify-center">
+            <div className="relative w-full" style={{ maxWidth: 'clamp(320px, 100%, 960px)' }}>
+              <MapPin className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
+              <Input
+                type="search"
+                placeholder={searchType === "flights" ? "From where?" : "Where to?"}
+                className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-12 sm:pl-[3.25rem] pr-4 sm:pr-5 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                aria-label={searchType === "flights" ? "Departure location" : "Destination"}
+              />
+            </div>
           </div>
 
           {searchType === "hotels" && (
@@ -159,66 +163,75 @@ export const SearchBar = () => {
                 />
               </div>
 
-              <div className="relative">
-                <label htmlFor="guests" className="sr-only">Number of guests</label>
-                <Users className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
-                <Input
-                  id="guests"
-                  type="text"
-                  placeholder="1 Guest, 1 Room"
-                  className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
-                  value={guests ? `${guests} Guest${parseInt(guests) > 1 ? 's' : ''}, 1 Room` : ""}
-                  onChange={(e) => {
-                    const match = e.target.value.match(/\d+/);
-                    if (match) setGuests(match[0]);
-                  }}
-                  aria-label="Number of guests and rooms"
-                />
+              <div className="w-full flex justify-center">
+                <div className="relative w-full" style={{ maxWidth: 'clamp(320px, 100%, 960px)' }}>
+                  <label htmlFor="guests" className="sr-only">Number of guests</label>
+                  <Users className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
+                  <Input
+                    id="guests"
+                    type="text"
+                    placeholder="1 Guest, 1 Room"
+                    className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-12 sm:pl-[3.25rem] pr-4 sm:pr-5 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                    value={guests ? `${guests} Guest${parseInt(guests) > 1 ? 's' : ''}, 1 Room` : ""}
+                    onChange={(e) => {
+                      const match = e.target.value.match(/\d+/);
+                      if (match) setGuests(match[0]);
+                    }}
+                    aria-label="Number of guests and rooms"
+                  />
+                </div>
               </div>
             </>
           )}
 
           {searchType === "flights" && (
-            <div className="relative">
-              <label htmlFor="departure-date" className="sr-only">Departure date</label>
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
-              <Input
-                id="departure-date"
-                type="date"
-                placeholder="Departure date"
-                className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
-                value={singleDate}
-                onChange={(e) => setSingleDate(e.target.value)}
-                aria-label="Departure date"
-              />
+            <div className="w-full flex justify-center">
+              <div className="relative w-full" style={{ maxWidth: 'clamp(320px, 100%, 960px)' }}>
+                <label htmlFor="departure-date" className="sr-only">Departure date</label>
+                <Calendar className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
+                <Input
+                  id="departure-date"
+                  type="date"
+                  placeholder="Departure date"
+                  className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-12 sm:pl-[3.25rem] pr-4 sm:pr-5 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                  value={singleDate}
+                  onChange={(e) => setSingleDate(e.target.value)}
+                  aria-label="Departure date"
+                />
+              </div>
             </div>
           )}
 
           {searchType === "events" && (
-            <div className="relative">
-              <label htmlFor="event-date" className="sr-only">Event date</label>
-              <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
-              <Input
-                id="event-date"
-                type="date"
-                placeholder="Event date"
-                className="pl-12 h-14 border-muted bg-muted/30 text-base rounded-xl"
-                value={singleDate}
-                onChange={(e) => setSingleDate(e.target.value)}
-                aria-label="Event date"
-              />
+            <div className="w-full flex justify-center">
+              <div className="relative w-full" style={{ maxWidth: 'clamp(320px, 100%, 960px)' }}>
+                <label htmlFor="event-date" className="sr-only">Event date</label>
+                <Calendar className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground pointer-events-none z-10" aria-hidden="true" />
+                <Input
+                  id="event-date"
+                  type="date"
+                  placeholder="Event date"
+                  className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-12 sm:pl-[3.25rem] pr-4 sm:pr-5 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                  value={singleDate}
+                  onChange={(e) => setSingleDate(e.target.value)}
+                  aria-label="Event date"
+                />
+              </div>
             </div>
           )}
         </div>
 
-        <Button 
-          className="w-full mt-4 h-14 bg-primary text-primary-foreground hover:bg-primary/90 text-base font-semibold rounded-xl min-h-[48px] shadow-lg"
-          onClick={handleSearch}
-          aria-label={`${getSearchButtonText()}`}
-        >
-          <Search className="h-5 w-5 mr-2" aria-hidden="true" />
-          {getSearchButtonText()}
-        </Button>
+        <div className="w-full flex justify-center">
+          <Button 
+            className="w-full mt-4 h-[52px] sm:h-14 lg:h-16 bg-[#0E4B44] text-white hover:opacity-95 text-base sm:text-[17px] lg:text-lg font-semibold rounded-full shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E4B44] touch-manipulation"
+            style={{ maxWidth: 'clamp(320px, 100%, 960px)' }}
+            onClick={handleSearch}
+            aria-label={`${getSearchButtonText()}`}
+          >
+            <Search className="h-5 w-5 mr-2" aria-hidden="true" />
+            {getSearchButtonText()}
+          </Button>
+        </div>
       </div>
     </div>
   );
