@@ -1,11 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Search } from "lucide-react";
-import { EnhancedSearchBar } from "@/components/EnhancedSearchBar";
+
+// Type declaration for Expedia widget
+declare global {
+  interface Window {
+    EG?: {
+      initWidgets: () => void;
+    };
+  }
+}
 
 export const CompactHeaderSearch = () => {
   const [open, setOpen] = useState(false);
+
+  // Initialize Expedia widget when dialog opens
+  useEffect(() => {
+    if (open && window.EG && typeof window.EG.initWidgets === 'function') {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        window.EG.initWidgets();
+      }, 100);
+    }
+  }, [open]);
 
   return (
     <>
@@ -20,11 +38,21 @@ export const CompactHeaderSearch = () => {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Search</DialogTitle>
+            <DialogTitle>Search Hotels & Flights</DialogTitle>
           </DialogHeader>
-          <EnhancedSearchBar />
+          <div className="w-full min-h-[500px]">
+            <div 
+              className="eg-widget" 
+              data-widget="search" 
+              data-program="us-expedia" 
+              data-lobs="stays,flights" 
+              data-network="pz" 
+              data-camref="1101l5ujJR" 
+              data-pubref=""
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </>
