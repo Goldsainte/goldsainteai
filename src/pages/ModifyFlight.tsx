@@ -86,26 +86,8 @@ export default function ModifyFlight() {
     try {
       setSearching(true);
       
-      const { data, error } = await supabase.functions.invoke('amadeus-search-flights', {
-        body: {
-          origin: (booking.booking_data as any).origin,
-          destination: (booking.booking_data as any).destination,
-          departureDate: format(departureDate, 'yyyy-MM-dd'),
-          adults: parseInt(adults),
-          cabinClass: cabinClass.toUpperCase(),
-          max: 10,
-        },
-      });
-
-      if (error) throw error;
-      
-      if (data?.flights && data.flights.length > 0) {
-        setSearchResults(data.flights);
-        toast.success(`Found ${data.flights.length} alternative flights`);
-      } else {
-        toast.info('No alternative flights found');
-        setSearchResults([]);
-      }
+      toast.error('Flight search is temporarily unavailable');
+      setSearchResults([]);
     } catch (error: any) {
       console.error('Error searching flights:', error);
       toast.error('Failed to search for alternative flights');
@@ -120,28 +102,7 @@ export default function ModifyFlight() {
     try {
       setModifying(true);
 
-      const { data, error } = await supabase.functions.invoke('amadeus-modify-flight', {
-        body: {
-          bookingId,
-          currentBookingData: booking.booking_data,
-          newFlightData: newFlight,
-        },
-      });
-
-      if (error) throw error;
-
-      const fareDiff = data.fareDifference || 0;
-      const changeFee = data.changeFee || 0;
-      const total = fareDiff + changeFee;
-
-      if (total > 0) {
-        toast.success(`Flight modified! Additional charge: $${total.toFixed(2)}`);
-      } else if (total < 0) {
-        toast.success(`Flight modified! Credit issued: $${Math.abs(total).toFixed(2)}`);
-      } else {
-        toast.success('Flight modified successfully!');
-      }
-
+      toast.error('Flight modification is temporarily unavailable');
       navigate(`/booking-details/${bookingId}`);
     } catch (error: any) {
       console.error('Error modifying flight:', error);

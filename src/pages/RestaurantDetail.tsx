@@ -4,40 +4,18 @@ import { ArrowLeft, MapPin, Star, ExternalLink, Phone, Globe, Clock, Utensils, C
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { fetchAmadeusRestaurantDetails, GooglePlacesRestaurant, getPhotoUrl } from "@/lib/amadeusRestaurantHelpers";
+// Restaurant details functionality temporarily unavailable
 
 export default function RestaurantDetail() {
   const { restaurantId } = useParams();
   const navigate = useNavigate();
-  const [restaurant, setRestaurant] = useState<GooglePlacesRestaurant | null>(null);
+  const [restaurant, setRestaurant] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadRestaurant = async () => {
-      if (!restaurantId) return;
-      
-      console.debug(`🍽️ Loading restaurant details for place_id: ${restaurantId}`);
-      setLoading(true);
-      
-      try {
-        const data = await fetchAmadeusRestaurantDetails(restaurantId);
-        
-        if (data) {
-          console.debug(`✅ Loaded restaurant: ${data.name}`);
-          setRestaurant(data);
-        } else {
-          console.error('❌ Failed to load restaurant details - API returned null');
-          setRestaurant(null);
-        }
-      } catch (error) {
-        console.error('❌ Error loading restaurant details:', error);
-        setRestaurant(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadRestaurant();
+    console.log('Restaurant details functionality temporarily unavailable');
+    setRestaurant(null);
+    setLoading(false);
   }, [restaurantId]);
 
   if (loading) {
@@ -83,9 +61,7 @@ export default function RestaurantDetail() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] overflow-hidden">
         <img 
-          src={restaurant.photos?.[0]?.photo_reference 
-            ? getPhotoUrl(restaurant.photos[0].photo_reference, 1200) 
-            : "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80"}
+          src={restaurant.photos?.[0] || "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1200&q=80"}
           alt={restaurant.name}
           className="w-full h-full object-cover"
         />

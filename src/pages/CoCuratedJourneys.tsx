@@ -16,14 +16,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { Globe, Briefcase } from "lucide-react";
 import { 
-  fetchAmadeusToursForLocation, 
-  transformAmadeusToPackage,
-  groupByDestination,
-  groupByCategory,
-  AmadeusActivity,
-  TransformedPackage
-} from "@/lib/amadeusHelpers";
-import { 
   fetchAgentPackages, 
   groupAgentPackagesByDestination, 
   groupAgentPackagesByType,
@@ -41,14 +33,12 @@ export default function CoCuratedJourneys() {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get("destination") || "");
-  const [packages, setPackages] = useState<(TransformedPackage | TransformedAgentPackage)[]>([]);
+  const [packages, setPackages] = useState<TransformedAgentPackage[]>([]);
   const [topDestinations, setTopDestinations] = useState<any[]>([]);
   const [topAttractions, setTopAttractions] = useState<any[]>([]);
   const [topTours, setTopTours] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [dataSource, setDataSource] = useState<'amadeus' | 'agent'>('amadeus');
-  const [currentLocation, setCurrentLocation] = useState({ latitude: 48.8566, longitude: 2.3522, name: 'Paris' });
   
   const [packageFilters, setPackageFilters] = useState<PackageFilterState>({
     priceRange: [0, 10000],
@@ -63,46 +53,13 @@ export default function CoCuratedJourneys() {
 
   useEffect(() => {
     const initializeData = async () => {
-      const destParam = searchParams.get('destination');
-      const categoryParam = searchParams.get('category');
-      
-      // Sync search query with URL params
-      setSearchQuery(destParam || "");
-      
-      if (dataSource === 'amadeus') {
-        toast.info("Showing Amadeus Tours - Real-time availability from thousands of tour operators");
-        if (destParam) {
-          // URL has destination, fetch that
-          const location = findLocationCoordinates(destParam);
-          if (location) {
-            setCurrentLocation(location);
-            await fetchToursForLocation(
-              location.latitude, 
-              location.longitude, 
-              location.name,
-              categoryParam ? [categoryParam] : undefined
-            );
-          } else {
-            toast.error("Destination not found");
-            const userLoc = await getUserLocation();
-            setCurrentLocation(userLoc);
-            await fetchToursForLocation(userLoc.latitude, userLoc.longitude, userLoc.name);
-          }
-        } else {
-          // No destination in URL, use user location
-          const location = await getUserLocation();
-          setCurrentLocation(location);
-          await fetchToursForLocation(location.latitude, location.longitude, location.name);
-        }
-      } else {
-        toast.info("Showing CoCurated by Agents - Expertly designed packages by certified travel professionals");
-        await fetchAgentPackagesData();
-      }
+      toast.info("Showing CoCurated by Agents - Expertly designed packages by certified travel professionals");
+      await fetchAgentPackagesData();
       setLoading(false);
     };
 
     initializeData();
-  }, [dataSource, searchParams]);
+  }, [searchParams]);
 
   const fetchAgentPackagesData = async () => {
     setLoading(true);
@@ -134,99 +91,6 @@ export default function CoCuratedJourneys() {
     }
   };
 
-  const fetchToursForLocation = async (
-    latitude: number, 
-    longitude: number, 
-    destinationName: string, 
-    categories?: string[]
-  ) => {
-    setLoading(true);
-    try {
-      const activities = await fetchAmadeusToursForLocation(latitude, longitude, 20, categories);
-      
-      if (activities.length === 0) {
-        // No results even after retry - fallback to Paris and show curated lists
-        console.log('No tours found, fetching from default city (Paris)...');
-        const parisActivities = await fetchAmadeusToursForLocation(
-          curatedDefaultCity.latitude,
-          curatedDefaultCity.longitude,
-          20
-        );
-        
-        if (parisActivities.length > 0) {
-          const parisPackages = parisActivities.map(activity => 
-            transformAmadeusToPackage(activity, curatedDefaultCity.name)
-          );
-          setPackages(parisPackages);
-          
-          const parisToursCarousel = parisActivities.slice(0, 10).map(tour => ({
-            id: tour.id,
-            packageName: tour.name,
-            destination: curatedDefaultCity.name,
-            coverImage: tour.pictures?.[0] || '/placeholder.svg',
-            retailPrice: parseFloat(tour.price.amount),
-            currency: tour.price.currencyCode,
-            rating: tour.rating ? parseFloat(tour.rating) : undefined,
-            totalReviews: tour.numberOfRatings,
-            agencyName: 'Via Amadeus',
-            likelyToSellOut: !!tour.bookingLink
-          }));
-          setTopTours(parisToursCarousel);
-        } else {
-          setPackages([]);
-          setTopTours([]);
-        }
-        
-        // Always show curated destinations and attractions for visual richness
-        setTopDestinations(curatedTopDestinations);
-        setTopAttractions(curatedTopAttractions);
-        
-        if (typeof window !== 'undefined' && window.innerWidth >= 640) {
-          toast.info(`Showing popular options. Click a destination above to explore!`);
-        }
-        return;
-      }
-
-      // Transform activities to packages
-      const transformedPackages = activities.map(activity => 
-        transformAmadeusToPackage(activity, destinationName)
-      );
-      setPackages(transformedPackages);
-
-      // Generate top destinations
-      const destinations = groupByDestination(activities, destinationName);
-      setTopDestinations(destinations.length > 0 ? destinations : curatedTopDestinations);
-
-      // Generate top attractions by category
-      const attractions = groupByCategory(activities);
-      setTopAttractions(attractions.length > 0 ? attractions : curatedTopAttractions);
-
-      // Set top tours (first 10 activities)
-      const toursForCarousel = activities.slice(0, 10).map(tour => ({
-        id: tour.id,
-        packageName: tour.name,
-        destination: destinationName,
-        coverImage: tour.pictures?.[0] || '/placeholder.svg',
-        retailPrice: parseFloat(tour.price.amount),
-        currency: tour.price.currencyCode,
-        rating: tour.rating ? parseFloat(tour.rating) : undefined,
-        totalReviews: tour.numberOfRatings,
-        agencyName: 'Via Amadeus',
-        likelyToSellOut: !!tour.bookingLink
-      }));
-      setTopTours(toursForCarousel);
-
-      console.log(`Loaded ${activities.length} tours for ${destinationName}`);
-    } catch (error) {
-      console.error('Error fetching tours:', error);
-      toast.error("Failed to load tours");
-      // Fallback to curated on error
-      setTopDestinations(curatedTopDestinations);
-      setTopAttractions(curatedTopAttractions);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
@@ -234,23 +98,12 @@ export default function CoCuratedJourneys() {
       return;
     }
 
-    if (dataSource === 'agent') {
-      // For agent packages, just filter locally
-      const filtered = packages.filter(pkg => 
-        pkg.packageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        pkg.destination.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setPackages(filtered);
-      return;
-    }
-
-    const location = findLocationCoordinates(searchQuery);
-    if (location) {
-      setCurrentLocation(location);
-      await fetchToursForLocation(location.latitude, location.longitude, location.name);
-    } else {
-      toast.error("Destination not found. Try: Paris, Rome, London, etc.");
-    }
+    // Filter agent packages locally
+    const filtered = packages.filter(pkg => 
+      pkg.packageName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pkg.destination.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setPackages(filtered);
   };
 
   const handleClearSearch = async () => {
@@ -269,15 +122,7 @@ export default function CoCuratedJourneys() {
       dateRange: {},
     });
     
-    // Fetch fresh data based on current location or user location
-    if (dataSource === 'amadeus') {
-      const location = await getUserLocation();
-      setCurrentLocation(location);
-      await fetchToursForLocation(location.latitude, location.longitude, location.name);
-    } else {
-      await fetchAgentPackagesData();
-    }
-    
+    await fetchAgentPackagesData();
     toast.success("Search cleared");
   };
 
@@ -332,14 +177,16 @@ export default function CoCuratedJourneys() {
       navigate('/auth');
       return;
     }
-    toast.info('Promotions are not available for Amadeus packages');
+    toast.info('Promotions are not available');
   };
 
   const getPromotionStatus = (packageId: string) => {
-    return false; // Promotions disabled for Amadeus packages
+    return false;
   };
 
-  const uniqueDestinations = [currentLocation.name];
+  const uniqueDestinations = topDestinations.map(dest => 
+    dest.destination || dest.name
+  ).filter((dest, index, self) => self.indexOf(dest) === index);
 
   // Get unique destinations from top destinations for filtering
   const topDestinationCities = topDestinations.map(dest => 
@@ -421,8 +268,6 @@ export default function CoCuratedJourneys() {
           onSearchChange={setSearchQuery}
           onSearch={handleSearch}
           onOpenFilters={() => setFiltersOpen(true)}
-          dataSource={dataSource}
-          onDataSourceChange={setDataSource}
           onQuickFilterClick={handleQuickFilter}
           onClearSearch={handleClearSearch}
         />
@@ -452,14 +297,7 @@ export default function CoCuratedJourneys() {
                   destinations={topDestinations}
                   onDestinationClick={async (destination) => {
                     setSearchQuery(destination);
-                    const location = findLocationCoordinates(destination);
-                    if (location) {
-                      navigate(`/cocurated-journeys?destination=${destination}`);
-                      setCurrentLocation(location);
-                      await fetchToursForLocation(location.latitude, location.longitude, location.name);
-                    } else {
-                      toast.error("Destination not found");
-                    }
+                    navigate(`/cocurated-journeys?destination=${destination}`);
                   }}
                 />
               )}
@@ -474,12 +312,6 @@ export default function CoCuratedJourneys() {
                   }))}
                   onAttractionClick={async (category) => {
                     navigate(`/cocurated-journeys?category=${encodeURIComponent(category)}`);
-                    await fetchToursForLocation(
-                      currentLocation.latitude, 
-                      currentLocation.longitude, 
-                      currentLocation.name,
-                      [category]
-                    );
                   }}
                 />
               )}
@@ -489,21 +321,13 @@ export default function CoCuratedJourneys() {
                 <section className="mb-16">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-20 h-1 bg-luxury-gold" />
-                    {dataSource === 'agent' && (
-                      <span className="px-3 py-1 bg-luxury-gold/20 text-luxury-emerald text-xs font-semibold rounded-full border border-luxury-gold/40 flex items-center gap-2">
-                        <Briefcase className="h-3 w-3" />
-                        Agent Curated
-                      </span>
-                    )}
-                    {dataSource === 'amadeus' && (
-                      <span className="px-3 py-1 bg-blue-500/20 text-blue-700 text-xs font-semibold rounded-full border border-blue-500/40 flex items-center gap-2">
-                        <Globe className="h-3 w-3" />
-                        Via Amadeus
-                      </span>
-                    )}
+                    <span className="px-3 py-1 bg-luxury-gold/20 text-luxury-emerald text-xs font-semibold rounded-full border border-luxury-gold/40 flex items-center gap-2">
+                      <Briefcase className="h-3 w-3" />
+                      Agent Curated
+                    </span>
                   </div>
                   <h2 className="font-secondary text-3xl md:text-4xl text-luxury-emerald mb-8">
-                    {dataSource === 'amadeus' ? `Top Tours in ${currentLocation.name}` : 'Featured CoCurated Packages'}
+                    Featured CoCurated Packages
                   </h2>
                   <TopToursCarousel tours={topTours} />
                 </section>
@@ -515,21 +339,13 @@ export default function CoCuratedJourneys() {
                   <div>
                     <div className="flex items-center gap-4 mb-4">
                       <div className="w-20 h-1 bg-luxury-gold" />
-                      {dataSource === 'agent' && (
-                        <span className="px-3 py-1 bg-luxury-gold/20 text-luxury-emerald text-xs font-semibold rounded-full border border-luxury-gold/40 flex items-center gap-2">
-                          <Briefcase className="h-3 w-3" />
-                          Agent Curated
-                        </span>
-                      )}
-                      {dataSource === 'amadeus' && (
-                        <span className="px-3 py-1 bg-blue-500/20 text-blue-700 text-xs font-semibold rounded-full border border-blue-500/40 flex items-center gap-2">
-                          <Globe className="h-3 w-3" />
-                          Via Amadeus
-                        </span>
-                      )}
+                      <span className="px-3 py-1 bg-luxury-gold/20 text-luxury-emerald text-xs font-semibold rounded-full border border-luxury-gold/40 flex items-center gap-2">
+                        <Briefcase className="h-3 w-3" />
+                        Agent Curated
+                      </span>
                     </div>
                     <h2 className="font-secondary text-xl sm:text-2xl md:text-3xl text-luxury-emerald">
-                      {dataSource === 'amadeus' ? 'All Amadeus Tours' : 'All CoCurated Packages'}
+                      All CoCurated Packages
                     </h2>
                     <p className="text-xs sm:text-sm text-luxury-emerald/60 mt-2">
                       {selectedDestinationFilter === 'all' 
@@ -568,7 +384,6 @@ export default function CoCuratedJourneys() {
                       agencyName={pkg.agencyName}
                       durationDays={1}
                       isPromoting={false}
-                      source={dataSource}
                       onViewDetails={() => navigate(`/cocurated-package/${pkg.id}`)}
                       onRequestPromotion={() => requestPromotion(pkg.id)}
                     />

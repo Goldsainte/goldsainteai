@@ -34,25 +34,8 @@ export const SeatMapSelector = ({ flight, passengers, onSeatsSelected, selectedS
   const fetchSeatMap = async () => {
     setLoading(true);
     try {
-      console.log('Fetching seat map for flight:', flight.id);
-      const { data, error } = await supabase.functions.invoke('amadeus-get-seatmap', {
-        body: { flightOffer: flight }
-      });
-
-      console.log('Seat map response:', data);
-      if (error) {
-        console.error('Seat map API error:', error);
-        throw error;
-      }
-      
-      if (data?.message) {
-        console.log('Seat map message:', data.message);
-      }
-      
-      setSeatMap(data?.seatmap || []);
-    } catch (error: any) {
-      console.error('Seat map error:', error);
-      toast.error("Unable to load seat map. You can skip this step.");
+      console.log('Seat map functionality temporarily unavailable');
+      toast.info("Seat selection is currently unavailable");
       setSeatMap([]);
     } finally {
       setLoading(false);

@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { MapPin, Users, DollarSign, Tag, Star, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Header } from "@/components/Header";
-import { fetchAmadeusTourDetails, AmadeusActivity } from "@/lib/amadeusHelpers";
+// Tour details functionality temporarily unavailable
 import DOMPurify from "dompurify";
 
 export default function CoCuratedPackage() {
@@ -19,7 +19,7 @@ export default function CoCuratedPackage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [packageData, setPackageData] = useState<AmadeusActivity | null>(null);
+  const [packageData, setPackageData] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [travelers, setTravelers] = useState(1);
   const [promoCode, setPromoCode] = useState("");
@@ -40,16 +40,7 @@ export default function CoCuratedPackage() {
     if (!packageId) return;
     
     try {
-      const activity = await fetchAmadeusTourDetails(packageId);
-      if (activity) {
-        setPackageData(activity);
-      } else {
-        toast.error("Package not found");
-        navigate('/cocurated-journeys');
-      }
-    } catch (error) {
-      console.error('Error fetching package:', error);
-      toast.error("Failed to load package details");
+      toast.error("Tour packages temporarily unavailable");
       navigate('/cocurated-journeys');
     } finally {
       setLoading(false);

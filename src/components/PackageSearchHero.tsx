@@ -14,8 +14,6 @@ interface PackageSearchHeroProps {
   onSearchChange: (value: string) => void;
   onSearch: () => void;
   onOpenFilters: () => void;
-  dataSource: 'amadeus' | 'agent';
-  onDataSourceChange: (source: 'amadeus' | 'agent') => void;
   onQuickFilterClick?: (filterType: string) => void;
   onClearSearch?: () => void;
 }
@@ -25,8 +23,6 @@ export const PackageSearchHero = ({
   onSearchChange,
   onSearch,
   onOpenFilters,
-  dataSource,
-  onDataSourceChange,
   onQuickFilterClick,
   onClearSearch,
 }: PackageSearchHeroProps) => {
@@ -52,34 +48,6 @@ export const PackageSearchHero = ({
           Handpicked luxury travel experiences curated for the discerning explorer
         </p>
 
-        {/* Data Source Toggle */}
-        <div className="flex justify-center mb-6">
-          <ToggleGroup 
-            type="single" 
-            value={dataSource} 
-            onValueChange={(value) => value && onDataSourceChange(value as 'amadeus' | 'agent')}
-            className="bg-white/10 backdrop-blur-sm rounded-lg p-1 border-2 border-luxury-gold/30"
-          >
-            <ToggleGroupItem 
-              value="amadeus" 
-              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald data-[state=on]:shadow-lg data-[state=on]:scale-105 text-white h-9 px-3 text-xs sm:h-10 sm:px-5 sm:text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300 relative"
-            >
-              <span className="relative z-10">Amadeus Tours</span>
-              {dataSource === 'amadeus' && (
-                <span className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded" />
-              )}
-            </ToggleGroupItem>
-            <ToggleGroupItem 
-              value="agent" 
-              className="data-[state=on]:bg-white data-[state=on]:text-luxury-emerald data-[state=on]:shadow-lg data-[state=on]:scale-105 text-white h-9 px-3 text-xs sm:h-10 sm:px-5 sm:text-sm hover:bg-luxury-gold/90 hover:text-luxury-emerald transition-all duration-300 relative"
-            >
-              <span className="relative z-10">CoCurated by Agents</span>
-              {dataSource === 'agent' && (
-                <span className="absolute inset-0 bg-gradient-to-r from-luxury-gold/20 to-luxury-gold/30 rounded" />
-              )}
-            </ToggleGroupItem>
-          </ToggleGroup>
-        </div>
         
         {/* Search Bar - Viator Style */}
         <div className="bg-white rounded-2xl shadow-2xl max-w-4xl mx-auto overflow-hidden">

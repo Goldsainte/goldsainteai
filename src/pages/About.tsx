@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/accordion";
 import { useTranslation } from "react-i18next";
 import founderImage from "@/assets/founder.jpg";
-import amadeusLogo from "@/assets/Amadeus_CRS_Logo.svg";
 import ticketmasterLogo from "@/assets/TicketMaster_wordmark.svg";
 import openaiLogo from "@/assets/OpenAI_Logo.svg";
 import geminiLogo from "@/assets/Google_Gemini_logo_2025.svg";
@@ -25,7 +24,6 @@ import {
 const About = () => {
   const { t } = useTranslation();
   const partners = [
-    { name: "Amadeus", logo: amadeusLogo },
     { name: "Ticketmaster", logo: ticketmasterLogo },
     { name: "OpenAI", logo: openaiLogo },
     { name: "Google Gemini", logo: geminiLogo },

@@ -15,7 +15,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { getCurrencySymbol } from "@/lib/currencyHelpers";
 import { useNavigate } from "react-router-dom";
 import { BookingPolicyBanner } from "./BookingPolicyBanner";
-import { generateExpediaHotelUrl, openExpediaBooking } from "@/lib/expediaRedirect";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const bookingFormSchema = z.object({
@@ -96,43 +95,13 @@ export const BookingModal = ({
   
   const currencySymbol = getCurrencySymbol(currency);
 
-  const handleExpediaRedirect = () => {
-    if (bookingType !== 'hotel') {
-      toast({
-        title: "Not available",
-        description: "Expedia redirect is currently only available for hotels",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      const expediaUrl = generateExpediaHotelUrl({
-        destination: bookingData.destination || bookingData.address?.cityName || bookingData.name,
-        checkIn: bookingData.checkIn || bookingData.checkInDate,
-        checkOut: bookingData.checkOut || bookingData.checkOutDate,
-        adults: bookingData.adults || bookingData.guests || 2,
-        children: bookingData.children || 0,
-        rooms: 1,
-        hotelName: bookingData.name,
-      });
-
-      openExpediaBooking(expediaUrl);
-      
-      toast({
-        title: "Opening Expedia",
-        description: "Your booking details have been pre-filled. Complete your reservation on Expedia.",
-      });
-      
-      onClose();
-    } catch (error) {
-      console.error('Error generating Expedia URL:', error);
-      toast({
-        title: "Error",
-        description: "Failed to generate booking link. Please try again.",
-        variant: "destructive",
-      });
-    }
+  const handleDirectBooking = () => {
+    toast({
+      title: "Direct booking unavailable",
+      description: "Please use our Agent Marketplace to complete your booking",
+      variant: "default",
+    });
+    handleAgentContact();
   };
 
   const handleAgentContact = () => {
@@ -174,33 +143,12 @@ export const BookingModal = ({
 
           <Separator />
 
-          {/* Option 1: Book on Expedia */}
+          {/* Connect with Agent */}
           <Alert className="border-primary/20">
-            <ExternalLink className="h-4 w-4" />
-            <AlertDescription className="space-y-3 mt-2">
-              <div>
-                <p className="font-semibold text-foreground mb-1">Option 1: Book on Expedia</p>
-                <p className="text-sm text-muted-foreground">
-                  We'll take you to Expedia with your search details pre-filled. Complete your booking securely on their platform.
-                </p>
-              </div>
-              <Button 
-                onClick={handleExpediaRedirect} 
-                className="w-full"
-                size="lg"
-              >
-                <ExternalLink className="mr-2 h-4 w-4" />
-                Continue to Expedia
-              </Button>
-            </AlertDescription>
-          </Alert>
-
-          {/* Option 2: Connect with Agent */}
-          <Alert className="border-accent/20">
             <Users className="h-4 w-4" />
             <AlertDescription className="space-y-3 mt-2">
               <div>
-                <p className="font-semibold text-foreground mb-1">Option 2: Connect with a Travel Agent</p>
+                <p className="font-semibold text-foreground mb-1">Connect with a Travel Agent</p>
                 <p className="text-sm text-muted-foreground">
                   Let one of our certified Goldsainte travel agents handle everything for you. They'll manage your booking and provide personalized service.
                 </p>
