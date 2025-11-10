@@ -38,9 +38,12 @@ const CompactHeaderSearch = () => {
   const [showFallback, setShowFallback] = useState(false);
   const [scriptLoading, setScriptLoading] = useState(false);
   const [error, setError] = useState<WidgetError | null>(null);
+  const [containerVisible, setContainerVisible] = useState(false);
   const initAttemptedRef = useRef(false);
+  const retryCountRef = useRef(0);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
   const iframeTimeoutRef = useRef<NodeJS.Timeout>();
+  const containerRef = useRef<HTMLDivElement>(null);
   const errorListenerRef = useRef<((event: SecurityPolicyViolationEvent) => void) | null>(null);
 
   const logError = (type: ErrorType, message: string, details?: any) => {
@@ -54,8 +57,17 @@ const CompactHeaderSearch = () => {
         error_type: type,
         error_message: message,
         user_agent: navigator.userAgent,
+        script_loaded: widgetReady,
+        container_visible: containerVisible,
+        retry_count: retryCountRef.current,
       });
     }
+  };
+
+  const checkContainerVisibility = (): boolean => {
+    if (!containerRef.current) return false;
+    const rect = containerRef.current.getBoundingClientRect();
+    return rect.width > 0 && rect.height > 0;
   };
 
   const detectAdBlocker = async (): Promise<boolean> => {
@@ -162,7 +174,22 @@ const CompactHeaderSearch = () => {
   useEffect(() => {
     if (!open || !widgetReady || initAttemptedRef.current) return;
 
-    console.log("[ExpediaWidget] Initializing widget");
+    // Check container visibility before init
+    const visible = checkContainerVisibility();
+    if (!visible) {
+      console.log("[ExpediaWidget] Container not visible yet, waiting...");
+      const checkInterval = setInterval(() => {
+        if (checkContainerVisibility()) {
+          setContainerVisible(true);
+          clearInterval(checkInterval);
+        }
+      }, 100);
+      
+      setTimeout(() => clearInterval(checkInterval), 5000);
+      return;
+    }
+
+    console.log("[ExpediaWidget] Initializing widget (attempt", retryCountRef.current + 1, ")");
     initAttemptedRef.current = true;
 
     const initWidget = () => {
@@ -185,16 +212,37 @@ const CompactHeaderSearch = () => {
           setTimeout(() => {
             const widget = document.querySelector(".eg-widget");
             if (!widget || !widget.children.length) {
-              console.log("[ExpediaWidget] Widget didn't render, retrying...");
-              retryTimeoutRef.current = setTimeout(() => {
-                if (expedia.method === "initWidgets") {
-                  expedia.obj.initWidgets?.();
-                } else {
-                  expedia.obj.init?.();
-                }
-              }, 500);
+              console.log("[ExpediaWidget] Widget didn't render");
+              
+              // Retry logic with exponential backoff
+              if (retryCountRef.current < 2) {
+                const backoffDelay = 800 * Math.pow(2, retryCountRef.current);
+                retryCountRef.current += 1;
+                console.log(`[ExpediaWidget] Retrying in ${backoffDelay}ms (attempt ${retryCountRef.current + 1}/3)`);
+                
+                retryTimeoutRef.current = setTimeout(() => {
+                  initAttemptedRef.current = false;
+                  if (expedia.method === "initWidgets") {
+                    expedia.obj.initWidgets?.();
+                  } else {
+                    expedia.obj.init?.();
+                  }
+                }, backoffDelay);
+              } else {
+                logError('init_failed', 'Widget failed to render after 3 attempts');
+                setShowFallback(true);
+              }
             } else {
-              console.log("[ExpediaWidget] Widget rendered");
+              console.log("[ExpediaWidget] Widget rendered successfully");
+              retryCountRef.current = 0;
+              
+              // Log success telemetry
+              if (typeof window !== 'undefined' && (window as any).gtag) {
+                (window as any).gtag('event', 'expedia_widget_success', {
+                  load_method: 'script',
+                  retry_count: retryCountRef.current,
+                });
+              }
             }
           }, 100);
         }, 0);
@@ -208,26 +256,38 @@ const CompactHeaderSearch = () => {
         clearTimeout(retryTimeoutRef.current);
       }
     };
-  }, [open, widgetReady]);
+  }, [open, widgetReady, containerVisible]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     if (!open) {
       initAttemptedRef.current = false;
+      retryCountRef.current = 0;
       setWidgetReady(false);
       setIframeActive(false);
       setShowFallback(false);
       setError(null);
+      setContainerVisible(false);
       
       if (iframeTimeoutRef.current) {
         clearTimeout(iframeTimeoutRef.current);
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
       }
       
       // Remove CSP error listener
       if (errorListenerRef.current) {
         document.removeEventListener('securitypolicyviolation', errorListenerRef.current as any);
         errorListenerRef.current = null;
+      }
+      
+      // Call destroy if available
+      const expedia = getExpediaGlobal();
+      if (expedia && (expedia.obj as any).destroy) {
+        console.log("[ExpediaWidget] Destroying widget instance");
+        (expedia.obj as any).destroy();
       }
       return;
     }
@@ -261,12 +321,19 @@ const CompactHeaderSearch = () => {
 
     loadScript();
 
+    // Check container visibility
+    setTimeout(() => {
+      const visible = checkContainerVisibility();
+      console.log("[ExpediaWidget] Container visible:", visible);
+      setContainerVisible(visible);
+    }, 100);
+
     const fallbackTimer = setTimeout(() => {
       if (!widgetReady && !iframeActive) {
-        logError('timeout', 'Widget initialization timeout (10s)');
+        logError('timeout', 'Widget initialization timeout (20s)');
         setShowFallback(true);
       }
-    }, 10000);
+    }, 20000);
 
     return () => {
       clearTimeout(fallbackTimer);
@@ -321,7 +388,7 @@ const CompactHeaderSearch = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="w-full" style={{ minHeight: "600px" }}>
+        <div ref={containerRef} className="w-full" style={{ minHeight: "520px" }}>
           {!widgetReady && !iframeActive && !showFallback && (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -336,7 +403,7 @@ const CompactHeaderSearch = () => {
               data-network="pz"
               data-camref="1101l5ujJR"
               data-pubref="goldsainte ai"
-              style={{ width: "100%", minHeight: "600px" }}
+              style={{ width: "100%", minHeight: "520px" }}
             />
           )}
 
