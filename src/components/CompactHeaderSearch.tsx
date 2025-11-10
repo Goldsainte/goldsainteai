@@ -1,9 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Search, ExternalLink } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
-// Type declaration for Expedia widget - support multiple global variants
 declare global {
   interface Window {
     EG?: {
@@ -17,256 +23,251 @@ declare global {
   }
 }
 
-export const CompactHeaderSearch = () => {
+const CompactHeaderSearch = () => {
   const [open, setOpen] = useState(false);
   const [widgetReady, setWidgetReady] = useState(false);
+  const [iframeActive, setIframeActive] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
   const [scriptLoading, setScriptLoading] = useState(false);
   const initAttemptedRef = useRef(false);
   const retryTimeoutRef = useRef<NodeJS.Timeout>();
+  const iframeTimeoutRef = useRef<NodeJS.Timeout>();
 
-  // Detect if Expedia global is available (support multiple variants)
   const getExpediaGlobal = () => {
-    if (window.EG?.initWidgets) return { global: window.EG, method: 'initWidgets' };
-    if (window.EG?.init) return { global: window.EG, method: 'init' };
-    if (window.eg?.initWidgets) return { global: window.eg, method: 'initWidgets' };
-    if (window.eg?.init) return { global: window.eg, method: 'init' };
+    if (window.EG?.initWidgets) return { obj: window.EG, method: "initWidgets" };
+    if (window.EG?.init) return { obj: window.EG, method: "init" };
+    if (window.eg?.initWidgets) return { obj: window.eg, method: "initWidgets" };
+    if (window.eg?.init) return { obj: window.eg, method: "init" };
     return null;
   };
 
-  // Dynamically load script if not found (with local fallback)
-  const loadScript = () => {
-    if (scriptLoading) return;
-
-    const attachListeners = (el: HTMLScriptElement) => {
-      if ((el as any)._egListenersAttached) return;
-      (el as any)._egListenersAttached = true;
-
-      el.addEventListener('load', () => {
-        console.log('[ExpediaWidget] Script loaded:', el.src);
-        setScriptLoading(false);
-        const expedia = getExpediaGlobal();
-        if (expedia) {
-          console.log('[ExpediaWidget] Global detected after load:', expedia.method);
-          setWidgetReady(true);
-        }
-      });
-
-      el.addEventListener('error', () => {
-        console.error('[ExpediaWidget] Script failed to load:', el.src);
-        setScriptLoading(false);
-        // If remote failed, try local fallback once
-        const isRemote = el.src.includes('creator.expediagroup.com');
-        const existingLocal = document.querySelector('script.eg-widgets-script[data-source="local"]') as HTMLScriptElement | null;
-        if (isRemote && !existingLocal) {
-          console.warn('[ExpediaWidget] Falling back to local script copy');
-          injectScript('/vendor/expedia/eg-widgets.js', 'local');
-        } else {
-          setShowFallback(true);
-        }
-      });
-    };
-
-    const injectScript = (src: string, source: 'remote' | 'local') => {
-      console.log('[ExpediaWidget] Injecting script dynamically:', src);
-      setScriptLoading(true);
-      const script = document.createElement('script');
-      script.className = 'eg-widgets-script';
-      script.setAttribute('data-source', source);
-      script.src = src;
-      script.defer = true;
-      script.crossOrigin = 'anonymous';
-      script.referrerPolicy = 'no-referrer-when-downgrade';
-      attachListeners(script);
-      document.head.appendChild(script);
-    };
-
-    const existingScript = document.querySelector('script.eg-widgets-script') as HTMLScriptElement | null;
-    if (existingScript) {
-      console.log('[ExpediaWidget] Script tag exists (src):', existingScript.src);
-      attachListeners(existingScript);
-      const expedia = getExpediaGlobal();
-      if (expedia) {
-        console.log('[ExpediaWidget] Global already present:', expedia.method);
-        setWidgetReady(true);
-        return;
-      }
-      // If existing is remote and blocked, also try injecting local in parallel after 1s
-      if (existingScript.src.includes('creator.expediagroup.com')) {
-        setTimeout(() => {
-          if (!getExpediaGlobal()) {
-            const existingLocal = document.querySelector('script.eg-widgets-script[data-source="local"]');
-            if (!existingLocal) {
-              console.warn('[ExpediaWidget] No global yet – attempting local fallback injection');
-              injectScript('/vendor/expedia/eg-widgets.js', 'local');
-            }
-          }
-        }, 1000);
-      }
-      return;
-    }
-
-    // No script present – try remote, then local on error
-    injectScript('https://creator.expediagroup.com/products/widgets/assets/eg-widgets.js', 'remote');
+  const getIframeUrl = () => {
+    const baseUrl = "https://creator.expediagroup.com/products/widgets/search-widget";
+    const params = new URLSearchParams({
+      program: "us-expedia",
+      lobs: "stays,flights",
+      network: "pz",
+      camref: "1101l5ujJR",
+      pubref: "goldsainte ai",
+      instance: Math.random().toString(36).substring(2, 15),
+    });
+    return `${baseUrl}?${params.toString()}`;
   };
 
-  // Check if Expedia widget script is loaded
-  useEffect(() => {
-    console.log('[ExpediaWidget] Starting detection...');
+  const loadScript = () => {
+    if (scriptLoading) return;
     
-    const checkWidget = setInterval(() => {
-      const expedia = getExpediaGlobal();
-      if (expedia) {
-        console.log('[ExpediaWidget] Global detected:', expedia.method);
-        setWidgetReady(true);
-        clearInterval(checkWidget);
-      }
-    }, 100);
-
-    // After 3 seconds, try loading script if not found
-    const loadTimeout = setTimeout(() => {
-      if (!getExpediaGlobal()) {
-        console.log('[ExpediaWidget] Global not found after 3s, attempting script load...');
-        loadScript();
-      }
-    }, 3000);
-
-    // After 10 seconds, show fallback
-    const fallbackTimeout = setTimeout(() => {
-      if (!widgetReady) {
-        console.warn('[ExpediaWidget] Timeout - showing fallback');
-        setShowFallback(true);
-      }
-      clearInterval(checkWidget);
-    }, 10000);
-
-    return () => {
-      clearInterval(checkWidget);
-      clearTimeout(loadTimeout);
-      clearTimeout(fallbackTimeout);
-    };
-  }, [widgetReady]);
-
-  // Initialize widget when dialog opens and script is ready
-  useEffect(() => {
-    if (!open) {
-      initAttemptedRef.current = false;
-      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+    const existingScript = document.querySelector('script[src*="eg-widgets.js"]');
+    if (existingScript) {
+      console.log("[ExpediaWidget] Script already in DOM");
       return;
     }
 
-    if (open && widgetReady && !initAttemptedRef.current) {
-      initAttemptedRef.current = true;
+    console.log("[ExpediaWidget] Injecting official remote script");
+    setScriptLoading(true);
+
+    const script = document.createElement("script");
+    script.src = "https://creator.expediagroup.com/products/widgets/assets/eg-widgets.js";
+    script.async = true;
+
+    script.onload = () => {
+      console.log("[ExpediaWidget] Script loaded successfully");
+      setScriptLoading(false);
       
-      // Use requestAnimationFrame + setTimeout to ensure DOM is ready
+      const expedia = getExpediaGlobal();
+      if (expedia) {
+        console.log(`[ExpediaWidget] EG global detected (${expedia.method})`);
+        setWidgetReady(true);
+      } else {
+        console.log("[ExpediaWidget] Script loaded but EG global not found yet");
+      }
+    };
+
+    script.onerror = () => {
+      console.log("[ExpediaWidget] Script blocked – switching to iframe fallback");
+      setScriptLoading(false);
+      setIframeActive(true);
+      
+      iframeTimeoutRef.current = setTimeout(() => {
+        console.log("[ExpediaWidget] Iframe timed out – showing CTA");
+        setIframeActive(false);
+        setShowFallback(true);
+      }, 8000);
+    };
+
+    document.head.appendChild(script);
+  };
+
+  useEffect(() => {
+    if (!open || !widgetReady || initAttemptedRef.current) return;
+
+    console.log("[ExpediaWidget] Initializing widget");
+    initAttemptedRef.current = true;
+
+    const initWidget = () => {
+      const expedia = getExpediaGlobal();
+      if (!expedia) {
+        console.log("[ExpediaWidget] EG global not found for init");
+        return;
+      }
+
+      console.log(`[ExpediaWidget] Calling ${expedia.method}()`);
+      
       requestAnimationFrame(() => {
         setTimeout(() => {
-          const expedia = getExpediaGlobal();
-          if (expedia) {
-            try {
-              console.log('[ExpediaWidget] Initializing with', expedia.method);
-              (expedia.global as any)[expedia.method]();
-              console.log('[ExpediaWidget] Init called successfully');
-              
-              // Retry once more after 500ms to ensure it rendered
+          if (expedia.method === "initWidgets") {
+            expedia.obj.initWidgets?.();
+          } else {
+            expedia.obj.init?.();
+          }
+
+          setTimeout(() => {
+            const widget = document.querySelector(".eg-widget");
+            if (!widget || !widget.children.length) {
+              console.log("[ExpediaWidget] Widget didn't render, retrying...");
               retryTimeoutRef.current = setTimeout(() => {
-                const container = document.getElementById('expedia-search-widget');
-                if (container && container.children.length === 0) {
-                  console.log('[ExpediaWidget] Retry init - no children rendered');
-                  try {
-                    (expedia.global as any)[expedia.method]();
-                  } catch (err) {
-                    console.error('[ExpediaWidget] Retry init failed:', err);
-                  }
+                if (expedia.method === "initWidgets") {
+                  expedia.obj.initWidgets?.();
+                } else {
+                  expedia.obj.init?.();
                 }
               }, 500);
-            } catch (error) {
-              console.error('[ExpediaWidget] Init failed:', error);
+            } else {
+              console.log("[ExpediaWidget] Widget rendered");
             }
-          }
+          }, 100);
         }, 0);
       });
-    }
+    };
+
+    initWidget();
 
     return () => {
-      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current);
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
     };
   }, [open, widgetReady]);
 
-  return (
-    <>
-      <Button
-        variant="outline"
-        className="flex items-center gap-2 px-3 h-10 rounded-full border-2 border-secondary shadow-sm hover:shadow-md hover:bg-[#BFAD72] hover:border-[#bfad72] transition-all bg-background w-full max-w-[280px] md:max-w-3xl group"
-        aria-label="Open search"
-        onClick={() => setOpen(true)}
-      >
-        <Search className="h-4 w-4 text-secondary group-hover:text-white transition-colors" />
-        <span className="text-sm font-medium group-hover:text-white transition-colors">Search</span>
-      </Button>
+  useEffect(() => {
+    if (!open) {
+      initAttemptedRef.current = false;
+      setWidgetReady(false);
+      setIframeActive(false);
+      setShowFallback(false);
+      if (iframeTimeoutRef.current) {
+        clearTimeout(iframeTimeoutRef.current);
+      }
+      return;
+    }
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Search Hotels & Flights</DialogTitle>
-            <DialogDescription>
-              Search and book hotels and flights with our partner Expedia
-            </DialogDescription>
-          </DialogHeader>
-          <div className="w-full min-h-[600px] p-4">
-            {!widgetReady && !showFallback && (
-              <div className="flex items-center justify-center h-[500px]">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                  <p className="text-muted-foreground">Loading search widget...</p>
-                  {scriptLoading && (
-                    <p className="text-xs text-muted-foreground mt-2">Connecting to Expedia...</p>
-                  )}
-                </div>
-              </div>
-            )}
-            
-            {showFallback && (
-              <div className="flex flex-col items-center justify-center h-[500px] gap-4">
-                <div className="text-center max-w-md">
-                  <p className="text-muted-foreground mb-2">
-                    The search widget couldn't load. It might be blocked by an ad or content blocker.
-                  </p>
-                  <p className="text-sm text-muted-foreground mb-6">
-                    You can still search directly on Expedia:
-                  </p>
-                  <Button
-                    onClick={() => {
-                      const expediaUrl = `https://www.expedia.com/?camref=1101l5ujJR&pubref=goldsainte%20ai`;
-                      window.open(expediaUrl, '_blank', 'noopener,noreferrer');
-                    }}
-                    className="gap-2"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    Open Expedia Search
-                  </Button>
-                </div>
-              </div>
-            )}
-            
-            <div 
-              id="expedia-search-widget"
-              className="eg-widget w-full" 
-              data-widget="search" 
-              data-program="us-expedia" 
-              data-lobs="stays,flights" 
-              data-network="pz" 
-              data-camref="1101l5ujJR" 
+    console.log("[ExpediaWidget] Dialog opened");
+    
+    const expedia = getExpediaGlobal();
+    if (expedia) {
+      console.log(`[ExpediaWidget] EG global already available (${expedia.method})`);
+      setWidgetReady(true);
+      return;
+    }
+
+    loadScript();
+
+    const fallbackTimer = setTimeout(() => {
+      if (!widgetReady && !iframeActive) {
+        console.log("[ExpediaWidget] Timeout – showing CTA");
+        setShowFallback(true);
+      }
+    }, 10000);
+
+    return () => {
+      clearTimeout(fallbackTimer);
+    };
+  }, [open]);
+
+  const handleIframeLoad = () => {
+    console.log("[ExpediaWidget] Iframe loaded");
+    if (iframeTimeoutRef.current) {
+      clearTimeout(iframeTimeoutRef.current);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 text-sm font-medium hover:bg-accent"
+        >
+          <Search className="h-4 w-4" />
+          <span className="hidden sm:inline">Search</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-semibold">
+            Search Hotels & Flights
+          </DialogTitle>
+          <DialogDescription>
+            Find and book your next trip with our travel search powered by Expedia
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="w-full" style={{ minHeight: "600px" }}>
+          {!widgetReady && !iframeActive && !showFallback && (
+            <div className="flex items-center justify-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          )}
+
+          {widgetReady && !iframeActive && (
+            <div
+              className="eg-widget"
+              data-lobs="stays,flights"
+              data-program="us-expedia"
+              data-network="pz"
+              data-camref="1101l5ujJR"
               data-pubref="goldsainte ai"
-              style={{ 
-                minHeight: widgetReady ? '600px' : '0',
-                width: '100%',
-                display: widgetReady && !showFallback ? 'block' : 'none'
-              }}
+              style={{ width: "100%", minHeight: "600px" }}
             />
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+          )}
+
+          {iframeActive && !showFallback && (
+            <iframe
+              src={getIframeUrl()}
+              style={{
+                width: "100%",
+                minHeight: "700px",
+                border: "none",
+              }}
+              title="Expedia Search Widget"
+              onLoad={handleIframeLoad}
+            />
+          )}
+
+          {showFallback && (
+            <div className="text-center py-12 space-y-4">
+              <p className="text-muted-foreground">
+                The search widget couldn't load. It might be blocked by an ad or content blocker.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                You can still search directly on Expedia:
+              </p>
+              <Button asChild size="lg">
+                <a
+                  href="https://www.expedia.com/?pwaLob=wizard-hotel-pwa-v2&camref=1101l5ujJR&pubref=goldsainte%20ai"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open Expedia Search
+                </a>
+              </Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
+
+export default CompactHeaderSearch;
