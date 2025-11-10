@@ -20,7 +20,7 @@ interface CompactHotelCardProps {
 
 export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProps) => {
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true); // Always expanded by default
   const [showDateModal, setShowDateModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
   const [showVirtualTour, setShowVirtualTour] = useState(false);
@@ -35,6 +35,12 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+  
+  // Auto-fetch hotel details on mount
+  useEffect(() => {
+    fetchHotelDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const title = property.property?.name || property.name || property.title || "Hotel";
@@ -202,9 +208,25 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const handleExpand = () => {
     const newExpanded = !expanded;
     setExpanded(newExpanded);
-    if (newExpanded && !hotelDetails && !loadingDetails) {
-      fetchHotelDetails();
+  };
+  
+  // Generate Expedia affiliate link
+  const getExpediaBookingLink = () => {
+    const hotelId = property.hotel_id || property.hotelId || property.property?.id || '';
+    const checkIn = searchDates?.checkIn || format(addDays(new Date(), 1), 'yyyy-MM-dd');
+    const checkOut = searchDates?.checkOut || format(addDays(new Date(), 3), 'yyyy-MM-dd');
+    const adults = 2; // Default to 2 adults
+    
+    // Expedia affiliate link structure
+    // Replace AFFILIATE_ID with your actual Expedia affiliate ID
+    const affiliateId = 'goldsainte001'; // Your affiliate ID here
+    
+    if (!hotelId) {
+      // Fallback to search by hotel name if no ID
+      return `https://www.expedia.com/Hotel-Search?destination=${encodeURIComponent(title)}&startDate=${checkIn}&endDate=${checkOut}&rooms=1&adults=${adults}&affcid=${affiliateId}`;
     }
+    
+    return `https://www.expedia.com/h${hotelId}.Hotel-Information?chkin=${checkIn}&chkout=${checkOut}&rm1=a${adults}&affcid=${affiliateId}`;
   };
 
   return (
@@ -307,34 +329,46 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">+taxes & fees</div>
               </div>
             )}
-            <div className="flex flex-wrap gap-1 justify-end w-full">
-              {hasVirtualTour && (
+            <div className="flex flex-col gap-1 justify-end w-full">
+              <div className="flex flex-wrap gap-1 justify-end">
+                {hasVirtualTour && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1"
+                    onClick={() => setShowVirtualTour(true)}
+                  >
+                    <Video className="h-2.5 sm:h-3 w-2.5 sm:w-3" />
+                    <span className="hidden sm:inline">360°</span>
+                  </Button>
+                )}
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-6 sm:h-7 px-1.5 sm:px-2 text-[10px] sm:text-xs gap-0.5 sm:gap-1"
-                  onClick={() => setShowVirtualTour(true)}
+                  className="hidden md:flex h-7 px-2 text-xs"
+                  onClick={handleExpand}
                 >
-                  <Video className="h-2.5 sm:h-3 w-2.5 sm:w-3" />
-                  <span className="hidden sm:inline">360°</span>
+                  {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  {expanded ? 'Less' : 'More'}
                 </Button>
-              )}
-              <Button
-                size="sm"
-                variant="outline"
-                className="hidden md:flex h-7 px-2 text-xs"
-                onClick={handleExpand}
-              >
-                {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                {expanded ? 'Less' : 'More'}
-              </Button>
-              <Button
-                size="sm"
-                className="h-6 sm:h-7 px-2 sm:px-3 text-[10px] sm:text-xs whitespace-nowrap"
-                onClick={() => setShowDateModal(true)}
-              >
-                Reserve
-              </Button>
+              </div>
+              <div className="flex flex-col gap-1 w-full">
+                <Button
+                  size="sm"
+                  className="h-7 px-2 sm:px-3 text-[10px] sm:text-xs whitespace-nowrap w-full"
+                  onClick={() => window.open(getExpediaBookingLink(), '_blank')}
+                >
+                  Book Now
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-6 sm:h-7 px-2 sm:px-3 text-[10px] sm:text-xs whitespace-nowrap w-full"
+                  onClick={() => setShowDateModal(true)}
+                >
+                  Check Dates
+                </Button>
+              </div>
             </div>
           </div>
         </div>
