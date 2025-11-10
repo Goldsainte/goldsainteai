@@ -128,7 +128,7 @@ const tools = [
     type: "function",
     function: {
       name: "search_hotels",
-      description: "Search for hotels in a specific location with check-in/check-out dates, guest count, and budget constraints. Returns budget-filtered results only.",
+      description: "Search for hotels in a specific location with check-in/check-out dates, guest count, and optional budget constraints. Returns hotel results.",
       parameters: {
         type: "object",
         properties: {
@@ -146,19 +146,19 @@ const tools = [
           },
           guests: {
             type: "number",
-            description: "Number of guests"
+            description: "Number of guests (defaults to 2 if not provided)"
           },
           max_total_price: {
             type: "number",
-            description: "Maximum price per night in the specified currency"
+            description: "OPTIONAL: Maximum price per night in the specified currency. Only use if user explicitly mentions a budget."
           },
           currency: {
             type: "string",
-            description: "Currency code (e.g., 'USD', 'EUR', 'GBP')",
+            description: "Currency code (e.g., 'USD', 'EUR', 'GBP'). Defaults to USD if not specified.",
             enum: ["USD", "EUR", "GBP"]
           }
         },
-        required: ["location", "checkIn", "checkOut", "guests", "max_total_price", "currency"]
+        required: ["location", "checkIn", "checkOut"]
       }
     }
   },
@@ -340,6 +340,12 @@ serve(async (req) => {
         const finalMessageRaw = assistantMessage.content || "";
         const finalMessage = stripRoutes(finalMessageRaw);
         
+        console.log("🎯 [HELP CENTER] Returning final response:", {
+          messageLength: finalMessage.length,
+          hasLastSearchMeta: !!lastSearchMeta,
+          metaDetails: lastSearchMeta
+        });
+        
         return new Response(
           JSON.stringify({ response: finalMessage, meta: lastSearchMeta }),
           {
@@ -361,18 +367,23 @@ serve(async (req) => {
           const args = JSON.parse(toolCall.function.arguments);
           console.log("Hotel search args:", args);
           
+          // Provide defaults for optional parameters
+          const searchParams = {
+            location: args.location,
+            checkIn: args.checkIn,
+            checkOut: args.checkOut,
+            guests: args.guests || 2,
+            sortBy: 'best_value',
+            filter: 'all',
+            ...(args.max_total_price && { max_total_price: args.max_total_price }),
+            currency: args.currency || 'USD'
+          };
+          
+          console.log("Final search params:", searchParams);
+          
           try {
             const { data: hotelData, error: hotelError } = await supabase.functions.invoke('unified-search-hotels', {
-              body: {
-                location: args.location,
-                checkIn: args.checkIn,
-                checkOut: args.checkOut,
-                guests: args.guests,
-                max_total_price: args.max_total_price,
-                currency: args.currency,
-                sortBy: 'best_value',
-                filter: 'all'
-              }
+              body: searchParams
             });
 
             if (hotelError) {

@@ -419,7 +419,17 @@ async function searchHotels(args: any) {
     const data = await response.json();
     let hotels = data.results || [];
     
-    console.log(`Unified search returned ${hotels.length} hotels`);
+    console.log('🏨 [HOTEL SEARCH] Raw response from unified-search-hotels:', {
+      hasResults: !!data.results,
+      resultsLength: data.results?.length || 0,
+      dataKeys: Object.keys(data),
+      firstHotelSample: hotels[0] ? {
+        name: hotels[0].name,
+        price: hotels[0].price,
+        hasPhotos: !!hotels[0].photos?.length
+      } : null
+    });
+    console.log(`✅ [HOTEL SEARCH] Unified search returned ${hotels.length} hotels`);
 
     // Apply filters
     if (typeof minRating === 'number') {
@@ -435,12 +445,12 @@ async function searchHotels(args: any) {
       hotels.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
     }
 
-    console.log(`After filters: ${hotels.length} hotels`);
+    console.log(`✅ [HOTEL SEARCH] After filters: ${hotels.length} hotels`);
     
     // LIMIT hotels to 15 max to prevent token overflow
     hotels = hotels.slice(0, 15);
 
-    return {
+    const searchResult = {
       type: 'hotels',
       location: { name: location, dest_id: location },
       results: hotels,
@@ -449,6 +459,18 @@ async function searchHotels(args: any) {
       guests,
       filters: { sortBy, minRating, maxPrice }
     };
+    
+    console.log('🎯 [HOTEL SEARCH] Returning search result:', {
+      type: searchResult.type,
+      resultsCount: searchResult.results.length,
+      location: searchResult.location.name,
+      sampleHotel: searchResult.results[0] ? {
+        name: searchResult.results[0].name,
+        price: searchResult.results[0].price
+      } : null
+    });
+
+    return searchResult;
   } catch (error) {
     console.error('Error in searchHotels:', error);
     return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
@@ -2716,10 +2738,22 @@ Always show results first with minimal text, ask questions later. Be conversatio
         }))
       ];
 
-      console.log('Sending tool results back to AI for final response...');
-      console.log('Tool results count:', toolResults.length);
+      console.log('📤 [FINAL RESPONSE] Sending tool results back to AI...');
+      console.log('📊 [FINAL RESPONSE] Tool results count:', toolResults.length);
+      
+      // Log each tool result summary
+      toolResults.forEach((tr, idx) => {
+        const result = tr.result.forUser || tr.result;
+        console.log(`📦 [TOOL RESULT ${idx + 1}] ${tr.function_name}:`, {
+          hasResults: !!result.results,
+          resultsLength: result.results?.length || 0,
+          resultType: result.type,
+          hasError: !!result.error
+        });
+      });
+      
       const messageSize = JSON.stringify(finalMessages).length;
-      console.log('Total message size:', messageSize);
+      console.log('📏 [FINAL RESPONSE] Total message size:', messageSize);
       
       // If message is too large, log a warning
       if (messageSize > 500000) {
@@ -2754,13 +2788,25 @@ Always show results first with minimal text, ask questions later. Be conversatio
         }
 
         const finalData = await finalResponse.json();
-        console.log('Final AI response received successfully');
+        console.log('✅ [FINAL RESPONSE] AI response received successfully');
         const finalMessage = finalData.choices[0].message.content;
+        
+        const userToolResults = toolResults.map(tr => tr.result.forUser || tr.result);
+        
+        console.log('📨 [RESPONSE TO CLIENT] Sending response with:', {
+          messageLength: finalMessage.length,
+          toolResultsCount: userToolResults.length,
+          toolResultsSummary: userToolResults.map(r => ({
+            type: r.type,
+            hasResults: !!r.results,
+            resultsCount: r.results?.length || 0
+          }))
+        });
 
         return new Response(JSON.stringify({
           message: finalMessage,
           // Return full data to user (forUser if available, otherwise full result)
-          toolResults: toolResults.map(tr => tr.result.forUser || tr.result),
+          toolResults: userToolResults,
           conversationHistory: [...conversationHistory, 
             { role: 'user', content: message },
             { role: 'assistant', content: finalMessage }
