@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon, Video } from "lucide-react";
+import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon, Video, Phone, Mail, Globe, Loader2 } from "lucide-react";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { HotelImageGallery } from "./HotelImageGallery";
 import { VirtualTour360 } from "./VirtualTour360";
@@ -11,6 +11,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { getHotelImage } from "@/lib/imageHelpers";
 import { encodeData } from "@/lib/utils";
 import { format, addDays } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CompactHotelCardProps {
   property: any;
@@ -24,6 +25,9 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const [showGallery, setShowGallery] = useState(false);
   const [showVirtualTour, setShowVirtualTour] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [hotelDetails, setHotelDetails] = useState<any>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [detailsError, setDetailsError] = useState<string | null>(null);
   const { addFavorite, removeFavorite, isFavorite } = useFavorites();
   
   useEffect(() => {
@@ -167,6 +171,42 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     }
   };
 
+  const fetchHotelDetails = async () => {
+    if (hotelDetails || loadingDetails) return;
+    
+    setLoadingDetails(true);
+    setDetailsError(null);
+    
+    try {
+      console.log('🔍 Fetching full hotel details...');
+      const { data, error } = await supabase.functions.invoke('get-hotel-details', {
+        body: {
+          hotelId: property.hotel_id || property.hotelId || property.property?.id,
+          arrival_date: searchDates?.checkIn,
+          departure_date: searchDates?.checkOut,
+          currency: currency || 'USD'
+        }
+      });
+      
+      if (error) throw error;
+      console.log('✅ Full hotel details loaded:', data);
+      setHotelDetails(data.data);
+    } catch (error) {
+      console.error('❌ Failed to load hotel details:', error);
+      setDetailsError('Could not load additional details');
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const handleExpand = () => {
+    const newExpanded = !expanded;
+    setExpanded(newExpanded);
+    if (newExpanded && !hotelDetails && !loadingDetails) {
+      fetchHotelDetails();
+    }
+  };
+
   return (
     <>
       <Card className="group hover:shadow-md transition-all overflow-hidden max-w-full">
@@ -283,7 +323,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 size="sm"
                 variant="outline"
                 className="hidden md:flex h-7 px-2 text-xs"
-                onClick={() => setExpanded(!expanded)}
+                onClick={handleExpand}
               >
                 {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                 {expanded ? 'Less' : 'More'}
@@ -301,86 +341,274 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
 
         {/* Expanded Details - Always show on mobile, conditional on desktop */}
         {(isMobile || expanded) && (
-          <div className="border-t border-border p-3 pt-3 bg-muted/30 animate-accordion-down">
-            <div className="text-xs space-y-2">
-              {property.isCurated && (
-                <Badge variant="default" className="mb-2 bg-accent text-accent-foreground">
-                  ⭐ Curated Recommendation
-                </Badge>
-              )}
-              {property.hasExpediaData && (
-                <Badge variant="default" className="mb-2 bg-primary/90 text-primary-foreground">
-                  ✓ Expedia Verified
-                </Badge>
-              )}
-              <p className="text-muted-foreground line-clamp-3">
-                {property.description || "Enjoy a comfortable stay with modern amenities and excellent service."}
-              </p>
-              {property.amenities && property.amenities.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {property.amenities.slice(0, 6).map((amenity: string, index: number) => (
-                    <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
-                      {amenity}
-                    </Badge>
-                  ))}
-                  {property.amenities.length > 6 && (
-                    <Badge variant="outline" className="text-xs px-2 py-0.5">
-                      +{property.amenities.length - 6} more
+          <div className="border-t border-border bg-muted/30 animate-accordion-down">
+            {loadingDetails && (
+              <div className="p-6 text-center">
+                <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2 text-primary" />
+                <p className="text-sm text-muted-foreground">Loading complete hotel details...</p>
+              </div>
+            )}
+            
+            {detailsError && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border-l-4 border-destructive">
+                {detailsError}
+              </div>
+            )}
+            
+            {hotelDetails && (
+              <div className="p-4 space-y-6 max-h-[600px] overflow-y-auto">
+                {/* SECTION 1: Full Description */}
+                {hotelDetails.description && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm flex items-center gap-2 text-foreground">
+                      📖 About This Property
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {hotelDetails.description}
+                    </p>
+                  </div>
+                )}
+                
+                {/* SECTION 2: Full Address & Location */}
+                {(hotelDetails.address || hotelDetails.distance_from_center) && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm flex items-center gap-2 text-foreground">
+                      <MapPin className="h-4 w-4" />
+                      Location & Address
+                    </h4>
+                    {hotelDetails.address && (
+                      <div className="text-xs text-muted-foreground space-y-1">
+                        {hotelDetails.address.street && <p>{hotelDetails.address.street}</p>}
+                        {(hotelDetails.address.city || hotelDetails.address.postal_code) && (
+                          <p>{hotelDetails.address.city}{hotelDetails.address.postal_code ? `, ${hotelDetails.address.postal_code}` : ''}</p>
+                        )}
+                        {hotelDetails.address.country && <p>{hotelDetails.address.country}</p>}
+                      </div>
+                    )}
+                    {hotelDetails.distance_from_center && (
+                      <p className="text-xs text-muted-foreground">
+                        📍 {hotelDetails.distance_from_center} from city center
+                      </p>
+                    )}
+                  </div>
+                )}
+                
+                {/* SECTION 3: ALL Amenities */}
+                {(hotelDetails.amenities?.length > 0 || property.amenities?.length > 0) && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">✨ All Amenities</h4>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(hotelDetails.amenities || property.amenities || []).map((amenity: any, idx: number) => (
+                        <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="text-primary">✓</span>
+                          <span>{typeof amenity === 'string' ? amenity : amenity.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* SECTION 4: Room Types */}
+                {hotelDetails.room_types?.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">🛏️ Available Room Types</h4>
+                    <div className="space-y-2">
+                      {hotelDetails.room_types.map((room: any, idx: number) => (
+                        <div key={idx} className="bg-background rounded-md p-3 border border-border">
+                          <p className="font-medium text-xs text-foreground">{room.name}</p>
+                          {room.bed_type && <p className="text-xs text-muted-foreground">{room.bed_type}</p>}
+                          {room.max_occupancy && (
+                            <p className="text-xs text-muted-foreground">
+                              Max: {room.max_occupancy} guests
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* SECTION 5: Facilities */}
+                {hotelDetails.facilities?.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">🏢 Facilities & Services</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {hotelDetails.facilities.map((facility: any, idx: number) => (
+                        <Badge key={idx} variant="secondary" className="text-xs">
+                          {typeof facility === 'string' ? facility : facility.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* SECTION 6: Policies */}
+                {(hotelDetails.check_in_time || hotelDetails.check_out_time || hotelDetails.cancellation_policy || 
+                  hotelDetails.pet_policy || hotelDetails.parking_info) && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">📋 Hotel Policies</h4>
+                    <div className="space-y-1.5 text-xs text-muted-foreground">
+                      {hotelDetails.check_in_time && <p>🕐 Check-in: {hotelDetails.check_in_time}</p>}
+                      {hotelDetails.check_out_time && <p>🕐 Check-out: {hotelDetails.check_out_time}</p>}
+                      {hotelDetails.cancellation_policy && <p>📋 Cancellation: {hotelDetails.cancellation_policy}</p>}
+                      {hotelDetails.pet_policy && <p>🐕 Pets: {hotelDetails.pet_policy}</p>}
+                      {hotelDetails.parking_info && <p>🚗 Parking: {hotelDetails.parking_info}</p>}
+                    </div>
+                  </div>
+                )}
+                
+                {/* SECTION 7: ALL Guest Reviews */}
+                {hotelDetails.reviews?.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">
+                      ⭐ Guest Reviews ({hotelDetails.reviews.length})
+                    </h4>
+                    <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+                      {hotelDetails.reviews.map((review: any, idx: number) => (
+                        <div key={idx} className="bg-background rounded-md p-3 border border-border space-y-2">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="flex">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    className={`h-3 w-3 ${
+                                      i < (review.rating || 0)
+                                        ? 'fill-primary text-primary'
+                                        : 'fill-muted text-muted'
+                                    }`}
+                                  />
+                                ))}
+                              </div>
+                              <span className="font-medium text-xs">{review.author || 'Guest'}</span>
+                            </div>
+                            {review.date && (
+                              <span className="text-xs text-muted-foreground">{review.date}</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            {review.text}
+                          </p>
+                          {review.pros && (
+                            <p className="text-xs text-green-600">👍 {review.pros}</p>
+                          )}
+                          {review.cons && (
+                            <p className="text-xs text-red-600">👎 {review.cons}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* SECTION 8: Property Highlights */}
+                {hotelDetails.highlights?.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">💡 Property Highlights</h4>
+                    <ul className="space-y-1">
+                      {hotelDetails.highlights.map((highlight: string, idx: number) => (
+                        <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                          <span className="text-primary mt-0.5">•</span>
+                          <span>{highlight}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* SECTION 9: Spoken Languages */}
+                {hotelDetails.spoken_languages?.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">🗣️ Languages Spoken</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {hotelDetails.spoken_languages.map((lang: string, idx: number) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {lang}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {/* SECTION 10: Contact Information */}
+                {(hotelDetails.phone || hotelDetails.email || hotelDetails.website) && (
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-sm text-foreground">📞 Contact Information</h4>
+                    <div className="space-y-1.5 text-xs">
+                      {hotelDetails.phone && (
+                        <p className="flex items-center gap-2 text-muted-foreground">
+                          <Phone className="h-3 w-3" /> {hotelDetails.phone}
+                        </p>
+                      )}
+                      {hotelDetails.email && (
+                        <p className="flex items-center gap-2 text-muted-foreground">
+                          <Mail className="h-3 w-3" /> {hotelDetails.email}
+                        </p>
+                      )}
+                      {hotelDetails.website && (
+                        <p className="flex items-center gap-2">
+                          <Globe className="h-3 w-3 text-muted-foreground" />
+                          <a 
+                            href={hotelDetails.website} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="text-primary hover:underline"
+                          >
+                            Visit Website
+                          </a>
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {/* View All Photos Button */}
+                {allImages.length > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setShowGallery(true)}
+                  >
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    View All {allImages.length} Photos
+                  </Button>
+                )}
+              </div>
+            )}
+            
+            {/* Fallback: Show basic info if details haven't loaded yet */}
+            {!hotelDetails && !loadingDetails && (
+              <div className="p-4 space-y-3">
+                <div className="text-xs space-y-2">
+                  {property.isCurated && (
+                    <Badge variant="default" className="mb-2 bg-accent text-accent-foreground">
+                      ⭐ Curated Recommendation
                     </Badge>
                   )}
-                </div>
-              )}
-              {googleReviews && googleReviews.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  <div className="flex items-center gap-2">
-                    <p className="font-medium text-xs">Google Reviews:</p>
-                    <Badge variant="outline" className="text-xs">
-                      {googleReviewCount.toLocaleString()} reviews
-                    </Badge>
-                  </div>
-                  {googleReviews.slice(0, 3).map((review: any, idx: number) => (
-                    <div key={idx} className="bg-background rounded-md p-2.5 space-y-1.5 border border-border/50">
-                      <div className="flex items-center gap-1.5">
-                        <div className="flex">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3 w-3 ${
-                                i < review.rating
-                                  ? 'fill-primary text-primary'
-                                  : 'fill-muted text-muted'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="font-medium text-xs">{review.author}</span>
-                        {review.relativePublishTime && (
-                          <span className="text-muted-foreground text-xs">· {review.relativePublishTime}</span>
-                        )}
-                      </div>
-                      <p className="text-muted-foreground text-xs leading-relaxed line-clamp-3">
-                        {review.text}
-                      </p>
+                  <p className="text-muted-foreground line-clamp-3">
+                    {property.description || "Enjoy a comfortable stay with modern amenities."}
+                  </p>
+                  {property.amenities?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {property.amenities.slice(0, 6).map((amenity: string, index: number) => (
+                        <Badge key={index} variant="outline" className="text-xs px-2 py-0.5">
+                          {amenity}
+                        </Badge>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  <Button
+                    variant="link"
+                    size="sm"
+                    className="text-xs p-0 h-auto text-primary hover:text-primary/80"
+                    onClick={fetchHotelDetails}
+                  >
+                    Load Full Details →
+                  </Button>
                 </div>
-              )}
-              {!googleReviews?.length && property.property?.reviews && property.property.reviews.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  <p className="font-medium text-xs">Recent Reviews:</p>
-                  {property.property.reviews.slice(0, 2).map((review: any, idx: number) => (
-                    <div key={idx} className="bg-background rounded p-2 space-y-1">
-                      <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-primary text-primary" />
-                        <span className="font-medium">{review.rating}/5</span>
-                        <span className="text-muted-foreground">· {review.author}</span>
-                      </div>
-                      <p className="text-muted-foreground line-clamp-2">{review.text}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </Card>
