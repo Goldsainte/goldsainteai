@@ -331,8 +331,14 @@ const CompactHeaderSearch = () => {
 
     const fallbackTimer = setTimeout(() => {
       if (!widgetReady && !iframeActive) {
-        logError('timeout', 'Widget initialization timeout (20s)');
-        setShowFallback(true);
+        console.log("[ExpediaWidget] 20s init timeout - switching to iframe fallback");
+        setIframeActive(true);
+        // Start a secondary timeout to show CTA if iframe also fails
+        iframeTimeoutRef.current = setTimeout(() => {
+          logError('timeout', 'Iframe fallback timeout (8s)');
+          setIframeActive(false);
+          setShowFallback(true);
+        }, 8000);
       }
     }, 20000);
 
@@ -457,12 +463,10 @@ const CompactHeaderSearch = () => {
         </DialogHeader>
 
         <div className="max-w-[640px] w-full mx-auto">
-          <div ref={containerRef} className="w-full" style={{ 
+          <div ref={containerRef} className="w-full overflow-visible" style={{ 
             minHeight: !widgetReady && !iframeActive && !showFallback 
               ? "320px"
-              : (widgetReady || iframeActive) 
-                ? "480px"
-                : "auto"
+              : "auto"
           }}>
           {!widgetReady && !iframeActive && !showFallback && (
             <div className="flex items-center justify-center py-20">
@@ -486,6 +490,7 @@ const CompactHeaderSearch = () => {
             <iframe
               src={getIframeUrl()}
               style={{
+                height: "560px",
                 width: "100%",
                 border: "none",
               }}
@@ -518,18 +523,4 @@ const CompactHeaderSearch = () => {
               >
                 Open Expedia Search
               </Button>
-              {error && (
-                <p className="text-xs text-muted-foreground/60 mt-4">
-                  Error: {error.type} - {error.message}
-                </p>
-              )}
-            </div>
-          )}
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
 export { CompactHeaderSearch };
