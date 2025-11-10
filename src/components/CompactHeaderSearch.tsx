@@ -438,15 +438,15 @@ const CompactHeaderSearch = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="relative h-[52px] sm:h-14 lg:h-16 rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur pl-4 sm:pl-5 pr-12 sm:pr-14 text-base sm:text-[17px] text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44]/30 focus-visible:ring-offset-2 transition-all"
-          style={{ width: 'clamp(280px, 40vw, 400px)' }}
+          className="relative h-10 sm:h-11 lg:h-12 rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur pl-3 sm:pl-4 pr-10 sm:pr-12 text-[14px] sm:text-[15px] lg:text-[16px] text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44]/30 focus-visible:ring-offset-2 transition-all"
+          style={{ width: 'clamp(220px, 28vw, 520px)' }}
           aria-label="Search hotels and flights"
         >
           <span>Search hotels & flights...</span>
-          <Search className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-[#0E4B44]" />
+          <Search className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0E4B44]" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[92vw] sm:w-auto max-w-[720px] max-h-[85vh] overflow-auto p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             Search Hotels & Flights
@@ -456,7 +456,8 @@ const CompactHeaderSearch = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div ref={containerRef} className="w-full" style={{ minHeight: "520px" }}>
+        <div className="max-w-[560px] w-full mx-auto">
+          <div ref={containerRef} className="w-full" style={{ minHeight: "520px" }}>
           {!widgetReady && !iframeActive && !showFallback && (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -519,6 +520,7 @@ const CompactHeaderSearch = () => {
               )}
             </div>
           )}
+          </div>
         </div>
       </DialogContent>
     </Dialog>
