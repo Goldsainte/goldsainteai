@@ -20,9 +20,9 @@ serve(async (req) => {
       currency 
     });
 
-    const apiKey = Deno.env.get('BOOKING_API_KEY');
+    const apiKey = Deno.env.get('BOOKING_API_KEY') || Deno.env.get('BOOKING_COM_RAPID_API_KEY');
     if (!apiKey) {
-      throw new Error('BOOKING_API_KEY not configured');
+      throw new Error('Booking API key not configured. Set BOOKING_API_KEY or BOOKING_COM_RAPID_API_KEY.');
     }
 
     const currencyCode = currency || 'USD';
