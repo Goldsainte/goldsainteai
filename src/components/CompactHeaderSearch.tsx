@@ -457,7 +457,13 @@ const CompactHeaderSearch = () => {
         </DialogHeader>
 
         <div className="max-w-[640px] w-full mx-auto">
-          <div ref={containerRef} className="w-full" style={{ minHeight: !widgetReady && !iframeActive && !showFallback ? "320px" : "auto" }}>
+          <div ref={containerRef} className="w-full" style={{ 
+            minHeight: !widgetReady && !iframeActive && !showFallback 
+              ? "320px"
+              : (widgetReady || iframeActive) 
+                ? "480px"
+                : "auto"
+          }}>
           {!widgetReady && !iframeActive && !showFallback && (
             <div className="flex items-center justify-center py-20">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
