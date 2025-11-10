@@ -270,4 +270,4 @@ const CompactHeaderSearch = () => {
   );
 };
 
-export default CompactHeaderSearch;
+export { CompactHeaderSearch };
