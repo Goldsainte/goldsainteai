@@ -8,6 +8,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0c4d47" />
+    
+    <!-- CSP for Expedia widget -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://creator.expediagroup.com https://www.expedia.com https://widgets.expedia.com https://*.expediagroup.com;
+      frame-src 'self' https://creator.expediagroup.com https://www.expedia.com https://widgets.expedia.com https://*.expediagroup.com;
+      connect-src 'self' https://creator.expediagroup.com https://www.expedia.com https://*.expediagroup.com wss://*.supabase.co https://*.supabase.co https://nominatim.openstreetmap.org https://api.mapbox.com;
+      img-src 'self' data: blob: https: https://creator.expediagroup.com https://www.expedia.com https://*.expediagroup.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://creator.expediagroup.com https://*.expediagroup.com;
+      font-src 'self' data: https://fonts.gstatic.com;
+      object-src 'none';
+      base-uri 'self';
+      form-action 'self' https://www.expedia.com https://*.expediagroup.com;
+    ">
+    
     <title>Goldsainte - Build Your Perfect Trip</title>
     <meta name="description" content="Discover exceptional hotels, resorts, and accommodations worldwide with Goldsainte. Book your perfect stay with exclusive deals and premium service." />
     <meta name="author" content="Goldsainte" />
