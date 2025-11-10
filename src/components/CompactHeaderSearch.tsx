@@ -14,16 +14,46 @@ declare global {
 
 export const CompactHeaderSearch = () => {
   const [open, setOpen] = useState(false);
+  const [widgetReady, setWidgetReady] = useState(false);
 
-  // Initialize Expedia widget when dialog opens
+  // Check if Expedia widget script is loaded
   useEffect(() => {
-    if (open && window.EG && typeof window.EG.initWidgets === 'function') {
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        window.EG.initWidgets();
-      }, 100);
+    const checkWidget = setInterval(() => {
+      if (window.EG && typeof window.EG.initWidgets === 'function') {
+        setWidgetReady(true);
+        clearInterval(checkWidget);
+      }
+    }, 100);
+
+    // Cleanup after 10 seconds
+    const timeout = setTimeout(() => {
+      clearInterval(checkWidget);
+    }, 10000);
+
+    return () => {
+      clearInterval(checkWidget);
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  // Initialize widget when dialog opens and script is ready
+  useEffect(() => {
+    if (open && widgetReady) {
+      // Give the DOM time to render
+      const timer = setTimeout(() => {
+        if (window.EG && typeof window.EG.initWidgets === 'function') {
+          try {
+            window.EG.initWidgets();
+            console.log('Expedia widget initialized');
+          } catch (error) {
+            console.error('Failed to initialize Expedia widget:', error);
+          }
+        }
+      }, 300);
+      
+      return () => clearTimeout(timer);
     }
-  }, [open]);
+  }, [open, widgetReady]);
 
   return (
     <>
@@ -38,12 +68,21 @@ export const CompactHeaderSearch = () => {
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Search Hotels & Flights</DialogTitle>
           </DialogHeader>
-          <div className="w-full min-h-[500px]">
+          <div className="w-full min-h-[500px] p-4">
+            {!widgetReady && (
+              <div className="flex items-center justify-center h-[400px]">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+                  <p className="text-muted-foreground">Loading search widget...</p>
+                </div>
+              </div>
+            )}
             <div 
+              id="expedia-search-widget"
               className="eg-widget" 
               data-widget="search" 
               data-program="us-expedia" 
@@ -51,6 +90,7 @@ export const CompactHeaderSearch = () => {
               data-network="pz" 
               data-camref="1101l5ujJR" 
               data-pubref=""
+              style={{ minHeight: widgetReady ? '400px' : '0' }}
             />
           </div>
         </DialogContent>
