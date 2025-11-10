@@ -2745,7 +2745,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
       toolResults.forEach((tr, idx) => {
         const result = tr.result.forUser || tr.result;
         console.log(`📦 [TOOL RESULT ${idx + 1}] ${tr.function_name}:`, {
-          hasResults: !!result.results,
+          hasResults: Array.isArray(result.results) && result.results.length > 0,
           resultsLength: result.results?.length || 0,
           resultType: result.type,
           hasError: !!result.error
@@ -2798,7 +2798,7 @@ Always show results first with minimal text, ask questions later. Be conversatio
           toolResultsCount: userToolResults.length,
           toolResultsSummary: userToolResults.map(r => ({
             type: r.type,
-            hasResults: !!r.results,
+            hasResults: Array.isArray(r.results) && r.results.length > 0,
             resultsCount: r.results?.length || 0
           }))
         });
