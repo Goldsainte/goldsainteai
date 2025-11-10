@@ -24,7 +24,7 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="max-w-[95vw] sm:max-w-lg p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+      <DialogContent className="max-w-[95svw] sm:max-w-lg min-w-0 p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
         <DialogHeader>
           <DialogTitle className="sr-only">Welcome to Goldsainte.Ai</DialogTitle>
           <DialogDescription className="sr-only">Overview of capabilities</DialogDescription>

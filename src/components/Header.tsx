@@ -484,14 +484,14 @@ export const Header = () => {
             </div>
           ) : (
             /* Desktop Layout */
-            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20">
+            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2 sm:gap-3 md:gap-4 h-14 sm:h-16 md:h-20 min-w-0">
               {/* Logo - Left */}
               <a href="/" className="flex items-center hover:opacity-90 transition-opacity flex-shrink-0 min-h-[44px]">
                 <img src={logoWordmark} alt="Goldsainte Logo" className="h-6 sm:h-7 md:h-8 w-auto" />
               </a>
 
               {/* Compact Search Bar - Center */}
-              <div className="flex justify-center" data-tour="traditional-search">
+              <div className="flex justify-center min-w-0" data-tour="traditional-search">
                 <CompactHeaderSearch />
               </div>
 

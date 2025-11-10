@@ -10,10 +10,20 @@ All colors MUST be HSL.
 
 @layer base {
   /* Mobile responsiveness - prevent horizontal overflow on iPhone */
-  html, body {
-    width: 100%;
-    overflow-x: hidden;
-  }
+/* Viewport guard - prevent horizontal overflow globally */
+html, body, #root, #main-content {
+  width: 100%;
+  max-width: 100svw;
+  overflow-x: clip;
+  box-sizing: border-box;
+}
+
+.viewport-guard {
+  width: 100%;
+  max-width: 100svw;
+  overflow-x: clip;
+  box-sizing: border-box;
+}
   
   * {
     box-sizing: border-box;
@@ -592,6 +602,14 @@ All colors MUST be HSL.
     .flex {
       max-width: 100%;
       overflow-x: hidden;
+      min-width: 0;
+    }
+    
+    /* Ensure images don't overflow */
+    img, video, canvas, svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
     }
   }
 }

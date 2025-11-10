@@ -452,7 +452,7 @@ const CompactHeaderSearch = () => {
           <Search className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0E4B44]" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[min(70vw,760px)] max-w-[92vw] min-w-[320px] max-h-[88vh] overflow-auto p-4 sm:p-6 rounded-2xl flex flex-col justify-start">
+      <DialogContent className="w-[min(95svw,760px)] max-w-[95svw] sm:max-w-[760px] min-w-0 max-h-[88vh] overflow-auto p-4 sm:p-6 rounded-2xl flex flex-col justify-start">
         <DialogHeader>
           <DialogTitle className="text-[18px] sm:text-[20px] font-semibold">
             Search Hotels & Flights
@@ -463,7 +463,7 @@ const CompactHeaderSearch = () => {
         </DialogHeader>
 
         <div className="max-w-[640px] w-full mx-auto">
-          <div ref={containerRef} className="w-full overflow-visible" style={{ 
+          <div ref={containerRef} className="w-full overflow-visible min-w-0" style={{
             minHeight: !widgetReady && !iframeActive && !showFallback 
               ? "320px"
               : "auto"

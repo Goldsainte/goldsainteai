@@ -211,7 +211,7 @@ function AppContent() {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border">
+    <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard">
       <SkipNavigation />
       <WelcomeModal open={showWelcomeModal} onClose={handleCloseWelcome} isFirstVisit={true} />
       <OnboardingTour />
