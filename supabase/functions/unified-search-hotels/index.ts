@@ -79,28 +79,13 @@ async function setCache(supabase: any, key: string, data: any): Promise<void> {
   }
 }
 
-async function getAmadeusToken() {
-  const apiKey = Deno.env.get("AMADEUS_API_KEY");
-  const apiSecret = Deno.env.get("AMADEUS_API_SECRET");
-  if (!apiKey || !apiSecret) throw new Error("Amadeus credentials not configured");
-
-  const res = await fetch("https://api.amadeus.com/v1/security/oauth2/token", {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `grant_type=client_credentials&client_id=${apiKey}&client_secret=${apiSecret}`,
-  });
-  if (!res.ok) throw new Error(`Amadeus auth failed: ${res.status}`);
-  const data = await res.json();
-  return data.access_token as string;
-}
-
-async function resolveCityCode(token: string, location: string): Promise<string> {
+// Simple city code mapping without Amadeus API
+function getCityCode(location: string): string {
   const raw = (location || "").trim().toLowerCase();
   const base = raw.split(",")[0];
 
-  // First handle well-known neighborhoods/boroughs that should map to metro codes
+  // NYC boroughs and neighborhoods
   const boroughs: Record<string, string> = {
-    // New York City boroughs and popular areas
     "manhattan": "NYC",
     "brooklyn": "NYC",
     "queens": "NYC",
@@ -114,123 +99,20 @@ async function resolveCityCode(token: string, location: string): Promise<string>
     "chelsea": "NYC",
     "harlem": "NYC",
   };
+  
   if (boroughs[base]) return boroughs[base];
 
-  // Try Amadeus Locations API
-  const params = new URLSearchParams({ keyword: location, subType: "CITY", "page[limit]": "1" });
-  const r = await fetch(`https://api.amadeus.com/v1/reference-data/locations?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (r.ok) {
-    const j = await r.json();
-    const code = j?.data?.[0]?.iataCode;
-    if (typeof code === "string" && code.length === 3) return code;
-  }
-  // Fallback mapping for common cities
-  const map: Record<string, string> = {
+  // City mapping
+  const cityMap: Record<string, string> = {
     "new york": "NYC", "los angeles": "LAX", "san francisco": "SFO", "washington": "WAS",
     "chicago": "CHI", "miami": "MIA", "seattle": "SEA", "atlanta": "ATL", "dallas": "DFW",
     "houston": "HOU", "phoenix": "PHX", "denver": "DEN", "orlando": "ORL", "detroit": "DTW",
     "minneapolis": "MSP", "portland": "PDX", "san diego": "SAN", "austin": "AUS", "nashville": "BNA",
     "charlotte": "CLT", "boston": "BOS", "las vegas": "LAS",
-    "paris": "PAR", "london": "LON", "tokyo": "TYO",
-    // Japan specific city fallbacks
-    "kyoto": "UKY", "osaka": "OSA",
+    "paris": "PAR", "london": "LON", "tokyo": "TYO", "kyoto": "UKY", "osaka": "OSA",
   };
-  const cityName = base;
-  return map[cityName] || (cityName.replace(/\s+/g, "").slice(0, 3).toUpperCase() || "NYC");
-}
-
-async function fetchAmadeusHotels(token: string, cityCode: string, checkIn: string, checkOut: string, adults: number) {
-  // 1) Get hotel IDs in city
-  console.log(`Fetching hotels for city code: ${cityCode}`);
-  const listRes = await fetch(
-    `https://api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${encodeURIComponent(cityCode)}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
   
-  if (!listRes.ok) {
-    const errorText = await listRes.text();
-    console.error(`Hotel list failed: ${listRes.status}`, errorText);
-    throw new Error(`Hotel list failed: ${listRes.status}`);
-  }
-  
-  const list = await listRes.json();
-  const idArray: string[] = (list.data || []).map((h: any) => h.hotelId).filter(Boolean);
-  console.log(`Found ${idArray.length} hotels in city`);
-  
-  if (!idArray.length) {
-    console.warn("No hotel IDs found for city code:", cityCode);
-    return [] as any[];
-  }
-
-  // 2) Fetch offers in chunks to avoid URL length/400 errors
-  const MAX_IDS = 100; // cap total ids to keep URLs reasonable
-  const CHUNK_SIZE = 25; // safe chunk size for query string
-  const toProcess = idArray.slice(0, MAX_IDS);
-
-  const chunks: string[][] = [];
-  for (let i = 0; i < toProcess.length; i += CHUNK_SIZE) {
-    chunks.push(toProcess.slice(i, i + CHUNK_SIZE));
-  }
-
-  const aggregated: any[] = [];
-
-  for (const chunk of chunks) {
-    const params = new URLSearchParams({
-      hotelIds: chunk.join(','),
-      checkInDate: checkIn,
-      checkOutDate: checkOut,
-      adults: String(Math.max(1, Number(adults) || 1)),
-      currency: "USD",
-      roomQuantity: "1",
-      bestRateOnly: "true",
-    });
-
-    try {
-      console.log(`Fetching offers for chunk size ${chunk.length}`);
-      const offersRes = await fetch(`https://api.amadeus.com/v3/shopping/hotel-offers?${params}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (!offersRes.ok) {
-        const errorText = await offersRes.text();
-        console.error(`Hotel offers failed (status ${offersRes.status}) for chunk:`, errorText);
-        // On error, skip this chunk and continue
-        continue;
-      }
-
-      const offers = await offersRes.json();
-      console.log(`Raw offers response for chunk:`, JSON.stringify(offers).substring(0, 500));
-      console.log(`Total offers in chunk: ${offers.data?.length || 0}`);
-      
-      const available = (offers.data || []).filter((h: any) => {
-        const hasOffers = h.offers && h.offers.length > 0;
-        const isAvailable = h.available !== false; // Check if explicitly false
-        console.log(`Hotel ${h.hotel?.name}: available=${h.available}, offers=${h.offers?.length || 0}`);
-        return isAvailable && hasOffers;
-      });
-      
-      console.log(`Available hotels in this chunk: ${available.length}`);
-      aggregated.push(...available);
-    } catch (e) {
-      console.error('Error fetching offers for chunk:', e);
-      // Skip failed chunk
-    }
-  }
-
-  console.log(`Total available hotel offers aggregated: ${aggregated.length}`);
-  
-  // If no hotels found, provide helpful error message
-  if (aggregated.length === 0 && idArray.length > 0) {
-    console.warn(`⚠️ Amadeus API found ${idArray.length} hotels in ${cityCode} but returned 0 offers for ${checkIn} to ${checkOut}`);
-    console.warn('This often happens when:');
-    console.warn('1. Dates are too far in the future (test API typically has 1-3 months availability)');
-    console.warn('2. Dates are in the past');
-    console.warn('3. No availability for those specific dates');
-  }
-  
-  return aggregated;
+  return cityMap[base] || base.replace(/\s+/g, "").slice(0, 3).toUpperCase() || "NYC";
 }
 
 async function enrichWithGooglePlaces(hotels: any[], cityName: string) {
@@ -365,8 +247,8 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing location/checkIn/checkOut" }), { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 });
     }
     
-    // Validate filter parameter
-    const validFilters = ['all', 'amadeus', 'curated'];
+    // Validate filter parameter (removed 'amadeus' option)
+    const validFilters = ['all', 'curated'];
     const hotelFilter = validFilters.includes(filter) ? filter : 'all';
     
     console.log(`Using filter: ${hotelFilter}`);
@@ -398,8 +280,8 @@ serve(async (req) => {
       console.log('Cached result was empty, performing fresh search');
     }
 
-    const token = await getAmadeusToken();
-    const cityCode = await resolveCityCode(token, location);
+    const cityCode = getCityCode(location);
+    console.log(`Resolved city code: ${cityCode} for location: ${location}`);
 
     let bookingHotels: any[] = [];
     let enriched: any[] = [];
@@ -452,7 +334,7 @@ serve(async (req) => {
     if (hotelFilter === 'curated' || (hotelFilter === 'all' && enriched.length === 0)) {
       const logMessage = hotelFilter === 'curated' 
         ? `Fetching curated recommendations for ${cityCode} (user filter: curated only)`
-        : `No Booking.com or Amadeus results, fetching curated recommendations for ${cityCode}`;
+        : `No Booking.com results, fetching curated recommendations for ${cityCode}`;
       console.log(logMessage);
       
       const curatedHotels = await getCuratedHotels(supabaseClient, cityCode);
@@ -499,10 +381,10 @@ serve(async (req) => {
           __googleRatingCount: 100 + Math.floor(Math.random() * 400)
         }));
         
-        // If filter is 'all', merge curated with existing Amadeus results
+        // If filter is 'all', merge curated with existing Booking.com results
         if (hotelFilter === 'all') {
           enriched = [...enriched, ...curatedResults];
-          console.log(`Merged ${curatedResults.length} curated recommendations with ${enriched.length - curatedResults.length} Amadeus results`);
+          console.log(`Merged ${curatedResults.length} curated recommendations with ${enriched.length - curatedResults.length} Booking.com results`);
         } else {
           enriched = curatedResults;
           console.log(`Using ${enriched.length} curated hotel recommendations from database`);
