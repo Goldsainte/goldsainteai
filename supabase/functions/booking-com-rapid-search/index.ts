@@ -28,32 +28,92 @@ serve(async (req) => {
       throw new Error("Booking.com Rapid API key not configured");
     }
 
-    // Step 1: Search for destination ID
-    console.log(`🔍 Searching for destination: ${location}`);
-    const searchResponse = await fetch(
-      `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(location)}`,
-      {
-        headers: {
-          "X-RapidAPI-Key": rapidApiKey,
-          "X-RapidAPI-Host": "booking-com15.p.rapidapi.com",
-        },
-      }
-    );
+    // Known destination IDs for popular cities (fallback)
+    const knownDestinations: Record<string, { dest_id: string; name: string; dest_type: string }> = {
+      'miami': { dest_id: '-1982068', name: 'Miami, Florida', dest_type: 'city' },
+      'new york': { dest_id: '-2601889', name: 'New York City', dest_type: 'city' },
+      'los angeles': { dest_id: '-1236594', name: 'Los Angeles, California', dest_type: 'city' },
+      'chicago': { dest_id: '-2092174', name: 'Chicago, Illinois', dest_type: 'city' },
+      'las vegas': { dest_id: '-1975964', name: 'Las Vegas, Nevada', dest_type: 'city' },
+      'orlando': { dest_id: '-1982068', name: 'Orlando, Florida', dest_type: 'city' },
+      'san francisco': { dest_id: '-1989021', name: 'San Francisco, California', dest_type: 'city' },
+      'seattle': { dest_id: '-1982419', name: 'Seattle, Washington', dest_type: 'city' },
+      'boston': { dest_id: '-2039060', name: 'Boston, Massachusetts', dest_type: 'city' },
+      'atlanta': { dest_id: '-2047963', name: 'Atlanta, Georgia', dest_type: 'city' },
+      'london': { dest_id: '-2601889', name: 'London, UK', dest_type: 'city' },
+      'paris': { dest_id: '-1456928', name: 'Paris, France', dest_type: 'city' },
+      'tokyo': { dest_id: '-246227', name: 'Tokyo, Japan', dest_type: 'city' },
+      'dubai': { dest_id: '-782831', name: 'Dubai, UAE', dest_type: 'city' },
+      'barcelona': { dest_id: '-372490', name: 'Barcelona, Spain', dest_type: 'city' },
+      'rome': { dest_id: '-126693', name: 'Rome, Italy', dest_type: 'city' },
+    };
 
-    if (!searchResponse.ok) {
-      const errorText = await searchResponse.text();
-      console.error("Destination search failed:", errorText);
-      throw new Error(`Destination search failed: ${searchResponse.status}`);
+    // Step 1: Search for destination ID with multiple query variations
+    console.log(`🔍 Searching for destination: ${location}`);
+    
+    const locationKey = location.toLowerCase().trim();
+    let destination = null;
+
+    // Try location query variations
+    const queryVariations = [
+      location,
+      `${location}, United States`,
+      `${location}, USA`,
+      location.replace(/,.*$/, '').trim(), // Just city name without state/country
+    ];
+
+    for (const query of queryVariations) {
+      console.log(`📍 Trying search query: "${query}"`);
+      
+      try {
+        const searchResponse = await fetch(
+          `https://booking-com15.p.rapidapi.com/api/v1/hotels/searchDestination?query=${encodeURIComponent(query)}`,
+          {
+            headers: {
+              "X-RapidAPI-Key": rapidApiKey,
+              "X-RapidAPI-Host": "booking-com15.p.rapidapi.com",
+            },
+          }
+        );
+
+        if (!searchResponse.ok) {
+          console.warn(`⚠️ Query "${query}" failed with status ${searchResponse.status}`);
+          continue;
+        }
+
+        const searchData = await searchResponse.json();
+        console.log(`📊 Response for "${query}":`, JSON.stringify(searchData).substring(0, 300));
+
+        // Check if API returned error message instead of data
+        if (searchData.status === false || searchData.message?.includes('Server down')) {
+          console.warn(`⚠️ API error for "${query}": ${searchData.message}`);
+          continue;
+        }
+
+        if (searchData?.data?.length > 0) {
+          destination = searchData.data[0];
+          console.log(`✅ Found destination with query "${query}": ${destination.name} (ID: ${destination.dest_id})`);
+          break;
+        }
+      } catch (error) {
+        console.warn(`⚠️ Error trying query "${query}":`, error.message);
+        continue;
+      }
     }
 
-    const searchData = await searchResponse.json();
-    console.log("Search results:", JSON.stringify(searchData).substring(0, 500));
+    // Fallback to known destinations
+    if (!destination && knownDestinations[locationKey]) {
+      console.log(`💡 Using known destination ID for "${locationKey}"`);
+      destination = knownDestinations[locationKey];
+    }
 
-    const destination = searchData?.data?.[0];
     if (!destination) {
-      console.warn("No destination found for:", location);
+      console.error(`❌ No destination found for "${location}" after all attempts`);
       return new Response(
-        JSON.stringify({ hotels: [], message: `No destination found for "${location}"` }),
+        JSON.stringify({ 
+          hotels: [], 
+          message: `No destination found for "${location}". Please try a different location or be more specific (e.g., "Miami, FL")` 
+        }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
       );
     }
