@@ -180,14 +180,22 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   const fetchHotelDetails = async () => {
     if (hotelDetails || loadingDetails) return;
     
+    const hotelId = property.hotel_id || property.hotelId || property.property?.id || property.id;
+    
+    if (!hotelId) {
+      console.warn('⚠️ No hotel ID available for detailed fetch');
+      setDetailsError('Hotel ID not available');
+      return;
+    }
+    
     setLoadingDetails(true);
     setDetailsError(null);
     
     try {
-      console.log('🔍 Fetching full hotel details...');
+      console.log('📍 Fetching details for hotel ID:', hotelId);
       const { data, error } = await supabase.functions.invoke('get-hotel-details', {
         body: {
-          hotelId: property.hotel_id || property.hotelId || property.property?.id,
+          hotelId: hotelId,
           arrival_date: searchDates?.checkIn,
           departure_date: searchDates?.checkOut,
           currency: currency || 'USD'
@@ -210,23 +218,22 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     setExpanded(newExpanded);
   };
   
-  // Generate Expedia affiliate link
-  const getExpediaBookingLink = () => {
-    const hotelId = property.hotel_id || property.hotelId || property.property?.id || '';
+  // Generate Booking.com affiliate link
+  const getBookingLink = () => {
+    const hotelId = property.hotel_id || property.hotelId || property.property?.id || property.id;
     const checkIn = searchDates?.checkIn || format(addDays(new Date(), 1), 'yyyy-MM-dd');
     const checkOut = searchDates?.checkOut || format(addDays(new Date(), 3), 'yyyy-MM-dd');
-    const adults = 2; // Default to 2 adults
     
-    // Expedia affiliate link structure
-    // Replace AFFILIATE_ID with your actual Expedia affiliate ID
-    const affiliateId = 'goldsainte001'; // Your affiliate ID here
+    // Booking.com affiliate link structure
+    const affiliateId = 'goldsainte001'; // Your Booking.com affiliate ID
     
     if (!hotelId) {
-      // Fallback to search by hotel name if no ID
-      return `https://www.expedia.com/Hotel-Search?destination=${encodeURIComponent(title)}&startDate=${checkIn}&endDate=${checkOut}&rooms=1&adults=${adults}&affcid=${affiliateId}`;
+      // Fallback to search by destination if no hotel ID
+      return `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(location)}&checkin=${checkIn}&checkout=${checkOut}&group_adults=2&aid=${affiliateId}`;
     }
     
-    return `https://www.expedia.com/h${hotelId}.Hotel-Information?chkin=${checkIn}&chkout=${checkOut}&rm1=a${adults}&affcid=${affiliateId}`;
+    // Direct hotel link with affiliate tracking
+    return `https://www.booking.com/hotel/xx/xx-${hotelId}.html?checkin=${checkIn}&checkout=${checkOut}&group_adults=2&aid=${affiliateId}`;
   };
 
   return (
@@ -356,7 +363,7 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 <Button
                   size="sm"
                   className="h-7 px-2 sm:px-3 text-[10px] sm:text-xs whitespace-nowrap w-full"
-                  onClick={() => window.open(getExpediaBookingLink(), '_blank')}
+                  onClick={() => window.open(getBookingLink(), '_blank')}
                 >
                   Book Now
                 </Button>
@@ -428,14 +435,18 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 )}
                 
                 {/* SECTION 3: ALL Amenities */}
-                {(hotelDetails.amenities?.length > 0 || property.amenities?.length > 0) && (
+                {((hotelDetails?.amenities?.length > 0) || (hotelDetails?.facilities?.length > 0) || (property.amenities?.length > 0)) && (
                   <div className="space-y-2">
-                    <h4 className="font-semibold text-sm text-foreground">✨ All Amenities</h4>
+                    <h4 className="font-semibold text-sm text-foreground">✨ All Amenities & Facilities</h4>
                     <div className="grid grid-cols-2 gap-2">
-                      {(hotelDetails.amenities || property.amenities || []).map((amenity: any, idx: number) => (
+                      {[
+                        ...(hotelDetails?.amenities || []),
+                        ...(hotelDetails?.facilities || []),
+                        ...(property.amenities || [])
+                      ].map((amenity: any, idx: number) => (
                         <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="text-primary">✓</span>
-                          <span>{typeof amenity === 'string' ? amenity : amenity.name}</span>
+                          <span>{typeof amenity === 'string' ? amenity : amenity.name || amenity.facility_name}</span>
                         </div>
                       ))}
                     </div>
@@ -443,17 +454,19 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 )}
                 
                 {/* SECTION 4: Room Types */}
-                {hotelDetails.room_types?.length > 0 && (
+                {(hotelDetails?.room_types?.length > 0 || hotelDetails?.rooms?.length > 0) && (
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm text-foreground">🛏️ Available Room Types</h4>
                     <div className="space-y-2">
-                      {hotelDetails.room_types.map((room: any, idx: number) => (
+                      {(hotelDetails.room_types || hotelDetails.rooms || []).map((room: any, idx: number) => (
                         <div key={idx} className="bg-background rounded-md p-3 border border-border">
-                          <p className="font-medium text-xs text-foreground">{room.name}</p>
-                          {room.bed_type && <p className="text-xs text-muted-foreground">{room.bed_type}</p>}
-                          {room.max_occupancy && (
+                          <p className="font-medium text-xs text-foreground">{room.name || room.room_name}</p>
+                          {(room.bed_type || room.bed_configuration) && (
+                            <p className="text-xs text-muted-foreground">{room.bed_type || room.bed_configuration}</p>
+                          )}
+                          {(room.max_occupancy || room.max_persons) && (
                             <p className="text-xs text-muted-foreground">
-                              Max: {room.max_occupancy} guests
+                              Max: {room.max_occupancy || room.max_persons} guests
                             </p>
                           )}
                         </div>
@@ -492,13 +505,13 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                 )}
                 
                 {/* SECTION 7: ALL Guest Reviews */}
-                {hotelDetails.reviews?.length > 0 && (
+                {(hotelDetails?.reviews?.length > 0 || hotelDetails?.guest_reviews?.length > 0 || googleReviews?.length > 0) && (
                   <div className="space-y-2">
                     <h4 className="font-semibold text-sm text-foreground">
-                      ⭐ Guest Reviews ({hotelDetails.reviews.length})
+                      ⭐ Guest Reviews ({(hotelDetails?.reviews || hotelDetails?.guest_reviews || googleReviews || []).length})
                     </h4>
                     <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-                      {hotelDetails.reviews.map((review: any, idx: number) => (
+                      {(hotelDetails?.reviews || hotelDetails?.guest_reviews || googleReviews || []).map((review: any, idx: number) => (
                         <div key={idx} className="bg-background rounded-md p-3 border border-border space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -514,14 +527,14 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                                   />
                                 ))}
                               </div>
-                              <span className="font-medium text-xs">{review.author || 'Guest'}</span>
+                              <span className="font-medium text-xs">{review.author || review.author_name || 'Guest'}</span>
                             </div>
-                            {review.date && (
-                              <span className="text-xs text-muted-foreground">{review.date}</span>
+                            {(review.date || review.time) && (
+                              <span className="text-xs text-muted-foreground">{review.date || review.time}</span>
                             )}
                           </div>
                           <p className="text-xs text-muted-foreground leading-relaxed">
-                            {review.text}
+                            {review.text || review.review_text}
                           </p>
                           {review.pros && (
                             <p className="text-xs text-green-600">👍 {review.pros}</p>
