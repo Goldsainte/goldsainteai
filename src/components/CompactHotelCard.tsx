@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon, Video, Phone, Mail, Globe, Loader2 } from "lucide-react";
+import { MapPin, Star, Heart, ChevronDown, ChevronUp, Image as ImageIcon, Video, Phone, Mail, Globe, Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { DateSelectionModal } from "./DateSelectionModal";
 import { HotelImageGallery } from "./HotelImageGallery";
 import { VirtualTour360 } from "./VirtualTour360";
@@ -178,13 +178,43 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
   };
 
   const fetchHotelDetails = async () => {
-    if (hotelDetails || loadingDetails) return;
+    console.log('🔍 [FETCH] Starting fetchHotelDetails');
+    console.log('📋 [FETCH] Current state:', { 
+      hasDetails: !!hotelDetails, 
+      isLoading: loadingDetails,
+      propertyKeys: Object.keys(property)
+    });
     
-    const hotelId = property.hotel_id || property.hotelId || property.property?.id || property.id;
+    if (hotelDetails) {
+      console.log('⏭️ [FETCH] Already have details, skipping');
+      return;
+    }
+    
+    if (loadingDetails) {
+      console.log('⏭️ [FETCH] Already loading, skipping');
+      return;
+    }
+    
+    // Try ALL possible ID fields
+    const possibleIds = [
+      property.hotel_id,
+      property.hotelId,
+      property.id,
+      property.property?.hotelId,
+      property.property?.id,
+      property.hotel?.hotelId,
+      property.hotel?.id
+    ];
+    
+    const hotelId = possibleIds.find(id => id);
+    
+    console.log('🏨 [FETCH] Hotel ID candidates:', possibleIds);
+    console.log('🎯 [FETCH] Selected hotel ID:', hotelId);
     
     if (!hotelId) {
-      console.warn('⚠️ No hotel ID available for detailed fetch');
-      setDetailsError('Hotel ID not available');
+      console.error('❌ [FETCH] NO HOTEL ID FOUND IN ANY FIELD');
+      console.log('📦 [FETCH] Full property object:', property);
+      setDetailsError('Cannot load details: Hotel ID missing');
       return;
     }
     
@@ -192,7 +222,13 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
     setDetailsError(null);
     
     try {
-      console.log('📍 Fetching details for hotel ID:', hotelId);
+      console.log('📡 [FETCH] Calling edge function with:', {
+        hotelId,
+        arrival_date: searchDates?.checkIn,
+        departure_date: searchDates?.checkOut,
+        currency
+      });
+      
       const { data, error } = await supabase.functions.invoke('get-hotel-details', {
         body: {
           hotelId: hotelId,
@@ -202,12 +238,31 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
         }
       });
       
-      if (error) throw error;
-      console.log('✅ Full hotel details loaded:', data);
-      setHotelDetails(data.data);
+      console.log('📥 [FETCH] Edge function response:', { hasData: !!data, hasError: !!error });
+      
+      if (error) {
+        console.error('❌ [FETCH] Edge function error:', error);
+        throw error;
+      }
+      
+      console.log('✅ [FETCH] Raw data received:', data);
+      console.log('🔍 [FETCH] Data structure:', {
+        keys: Object.keys(data || {}),
+        hasDataField: !!data?.data,
+        dataKeys: data?.data ? Object.keys(data.data) : []
+      });
+      
+      const detailsData = data?.data || data;
+      console.log('💾 [FETCH] Saving to state:', {
+        hasData: !!detailsData,
+        keys: Object.keys(detailsData || {})
+      });
+      
+      setHotelDetails(detailsData);
+      console.log('🏁 [FETCH] fetchHotelDetails complete');
     } catch (error) {
-      console.error('❌ Failed to load hotel details:', error);
-      setDetailsError('Could not load additional details');
+      console.error('❌ [FETCH] Exception:', error);
+      setDetailsError(`Failed to load details: ${error.message || 'Unknown error'}`);
     } finally {
       setLoadingDetails(false);
     }
@@ -391,13 +446,44 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
             )}
             
             {detailsError && (
-              <div className="p-3 text-sm text-destructive bg-destructive/10 border-l-4 border-destructive">
-                {detailsError}
+              <div className="p-4 space-y-3 bg-destructive/10 border-l-4 border-destructive">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm text-destructive">Could not load full details</p>
+                    <p className="text-xs text-destructive/80 mt-1">{detailsError}</p>
+                  </div>
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    console.log('🔄 [RETRY] User clicked retry');
+                    setDetailsError(null);
+                    fetchHotelDetails();
+                  }}
+                >
+                  <RefreshCw className="h-3 w-3 mr-2" />
+                  Try Again
+                </Button>
               </div>
             )}
             
             {hotelDetails && (
               <div className="p-4 space-y-6 max-h-[600px] overflow-y-auto">
+                {/* DEBUG: Show available data fields */}
+                {process.env.NODE_ENV === 'development' && (
+                  <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded text-xs">
+                    <p className="font-semibold mb-2">🔧 Debug: Available fields in hotelDetails</p>
+                    <div className="space-y-1 text-yellow-800 dark:text-yellow-200">
+                      <p>Keys: {Object.keys(hotelDetails).join(', ')}</p>
+                      <p>Has photos: {JSON.stringify(!!hotelDetails.photos || !!hotelDetails.images || !!hotelDetails.property?.photoUrls)}</p>
+                      <p>Has reviews: {JSON.stringify(!!hotelDetails.reviews || !!hotelDetails.guest_reviews || !!hotelDetails.property?.reviews)}</p>
+                      <p>Data structure: {JSON.stringify(hotelDetails, null, 2).slice(0, 500)}...</p>
+                    </div>
+                  </div>
+                )}
                 {/* SECTION 1: Full Description */}
                 {hotelDetails.description && (
                   <div className="space-y-2">
@@ -504,14 +590,34 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                   </div>
                 )}
                 
-                {/* SECTION 7: ALL Guest Reviews */}
-                {(hotelDetails?.reviews?.length > 0 || hotelDetails?.guest_reviews?.length > 0 || googleReviews?.length > 0) && (
-                  <div className="space-y-2">
-                    <h4 className="font-semibold text-sm text-foreground">
-                      ⭐ Guest Reviews ({(hotelDetails?.reviews || hotelDetails?.guest_reviews || googleReviews || []).length})
-                    </h4>
-                    <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
-                      {(hotelDetails?.reviews || hotelDetails?.guest_reviews || googleReviews || []).map((review: any, idx: number) => (
+                {/* SECTION 7: ALL Guest Reviews - Check multiple field names */}
+                {(() => {
+                  const allReviews = [
+                    ...(hotelDetails?.reviews || []),
+                    ...(hotelDetails?.guest_reviews || []),
+                    ...(hotelDetails?.property?.reviews || []),
+                    ...(hotelDetails?.user_reviews || []),
+                    ...(googleReviews || [])
+                  ].filter(Boolean);
+                  
+                  console.log('📊 [REVIEWS] Found reviews:', {
+                    total: allReviews.length,
+                    sources: {
+                      reviews: hotelDetails?.reviews?.length || 0,
+                      guest_reviews: hotelDetails?.guest_reviews?.length || 0,
+                      property_reviews: hotelDetails?.property?.reviews?.length || 0,
+                      user_reviews: hotelDetails?.user_reviews?.length || 0,
+                      google: googleReviews?.length || 0
+                    }
+                  });
+                  
+                  return allReviews.length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm text-foreground">
+                        ⭐ Guest Reviews ({allReviews.length})
+                      </h4>
+                      <div className="space-y-3 max-h-80 overflow-y-auto pr-2">
+                        {allReviews.map((review: any, idx: number) => (
                         <div key={idx} className="bg-background rounded-md p-3 border border-border space-y-2">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -542,11 +648,12 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                           {review.cons && (
                             <p className="text-xs text-red-600">👎 {review.cons}</p>
                           )}
-                        </div>
-                      ))}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  );
+                })()}
                 
                 {/* SECTION 8: Property Highlights */}
                 {hotelDetails.highlights?.length > 0 && (
@@ -609,18 +716,53 @@ export const CompactHotelCard = ({ property, searchDates }: CompactHotelCardProp
                   </div>
                 )}
                 
-                {/* View All Photos Button */}
-                {allImages.length > 0 && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setShowGallery(true)}
-                  >
-                    <ImageIcon className="h-4 w-4 mr-2" />
-                    View All {allImages.length} Photos
-                  </Button>
-                )}
+                {/* SECTION 11: ALL Photos - Check multiple field names */}
+                {(() => {
+                  const detailsPhotos = hotelDetails?.photos || hotelDetails?.images || hotelDetails?.property?.photoUrls || hotelDetails?.photo_urls || [];
+                  const allPhotosForGallery = [...allImages, ...detailsPhotos].filter(Boolean);
+                  
+                  console.log('📸 [PHOTOS] Found photos:', {
+                    fromProperty: allImages.length,
+                    fromDetails: detailsPhotos.length,
+                    total: allPhotosForGallery.length,
+                    sources: {
+                      photos: !!hotelDetails?.photos,
+                      images: !!hotelDetails?.images,
+                      property_photoUrls: !!hotelDetails?.property?.photoUrls,
+                      photo_urls: !!hotelDetails?.photo_urls
+                    }
+                  });
+                  
+                  return allPhotosForGallery.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="font-semibold text-sm text-foreground">
+                        📸 All Photos ({allPhotosForGallery.length})
+                      </h4>
+                      <div className="grid grid-cols-3 gap-2">
+                        {allPhotosForGallery.slice(0, 6).map((photo, idx) => (
+                          <img 
+                            key={idx} 
+                            src={typeof photo === 'string' ? photo : photo.url_max300 || photo.url || photo} 
+                            alt={`Hotel photo ${idx + 1}`}
+                            className="aspect-[4/3] object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={() => setShowGallery(true)}
+                          />
+                        ))}
+                      </div>
+                      {allPhotosForGallery.length > 6 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full"
+                          onClick={() => setShowGallery(true)}
+                        >
+                          <ImageIcon className="h-4 w-4 mr-2" />
+                          View All {allPhotosForGallery.length} Photos
+                        </Button>
+                      )}
+                    </div>
+                  );
+                })()}
               </div>
             )}
             
