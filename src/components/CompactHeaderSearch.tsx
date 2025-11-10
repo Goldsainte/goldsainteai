@@ -523,4 +523,13 @@ const CompactHeaderSearch = () => {
               >
                 Open Expedia Search
               </Button>
+            </div>
+          )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export { CompactHeaderSearch };
