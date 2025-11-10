@@ -472,7 +472,7 @@ const CompactHeaderSearch = () => {
               data-network="pz"
               data-camref="1101l5ujJR"
               data-pubref="goldsainte ai"
-              style={{ width: "100%", minHeight: "520px" }}
+              style={{ width: "100%" }}
             />
           )}
 
@@ -481,7 +481,6 @@ const CompactHeaderSearch = () => {
               src={getIframeUrl()}
               style={{
                 width: "100%",
-                minHeight: "700px",
                 border: "none",
               }}
               title="Expedia Search Widget"
