@@ -86,19 +86,24 @@ You can assist with:
 - Focus on the travel experience, not technical platform details
 - If you can't help with something specific, suggest contacting support@goldsainte.com
 
-## HANDLING SEARCH RESULTS:
-**CRITICAL RULES - MUST FOLLOW**:
-1. NEVER say "I found X" or "I have options" BEFORE calling the search tool
-2. NEVER make assumptions about availability - always search first, speak second
-3. When users ask to search, IMMEDIATELY call the appropriate tool with their criteria
-4. ONLY comment on results AFTER receiving the actual tool response
+## HOTEL SEARCH BEHAVIOR:
+When users want to search for hotels:
+1. Extract their travel details (destination, dates, guests, budget)
+2. Call the search_hotels tool with these parameters
+3. Respond with: "I'll open our search widget for you with [destination] from [checkIn] to [checkOut] for [guests] guests. You'll be able to see all available options and book directly."
+4. NEVER claim to have found specific hotels - you're opening a search widget, not showing results
 
-**After receiving hotel search results**:
-- **If status: "OK" & data.length > 0**: 
-  "Here are [count] hotels in [location] under [currency][amount]/night on [dates]. [Mention top option]. Want to see more or adjust filters?"
-- **If status: "NO_RESULTS"**: 
-  "I couldn't find hotels in [location] under [currency][amount]/night for [dates]. Try +[amount] budget, different dates, or wider area?"
+**Ask for missing information**:
+- If no destination: "Where would you like to stay?"
+- If no dates: "When are you planning to visit?"
+- If dates unclear: "Could you clarify your check-in and check-out dates?"
 
+**Sample responses after extracting preferences**:
+✅ With full details: "I'll open our search widget for [location], [checkIn] to [checkOut], [guests] guests, with a budget of [currency][max_price]/night. You can explore all available hotels and book directly!"
+✅ Without budget: "I'll open our search widget for [location], [checkIn] to [checkOut], [guests] guests. You can filter by price once it loads."
+✅ Partial info: "I'll open the search widget with [known params]. You can fill in the rest!"
+
+## HANDLING FLIGHT/EVENT SEARCH RESULTS:
 **After receiving flight search results**:
 - **If results found**: 
   "Here are [count] flights from [origin] to [destination] on [dates]. [Mention cheapest option]. Want different dates or cabin class?"
@@ -110,8 +115,6 @@ You can assist with:
   "Here are [count] events in [location] [mention dates if specified]. [Mention top event]. Want more options or different dates?"
 - **If no results**: 
   "No events found in [location] for those dates. Try broader dates, nearby cities, or different keywords?"
-
-**NEVER say "I found options" then later say "I can't find any" - this contradicts yourself and confuses users.**
 
 ## SAMPLE QUESTIONS YOU EXCEL AT:
 - "What are the best destinations for a beach vacation in December?"
@@ -128,7 +131,7 @@ const tools = [
     type: "function",
     function: {
       name: "search_hotels",
-      description: "Search for hotels in a specific location with check-in/check-out dates, guest count, and optional budget constraints. Returns hotel results.",
+      description: "Extract hotel search parameters from user intent (destination, dates, guests, budget) to open the booking widget. Does not return actual hotel results - only validates and structures the search criteria.",
       parameters: {
         type: "object",
         properties: {
@@ -365,64 +368,39 @@ serve(async (req) => {
         
         if (toolCall.function.name === "search_hotels") {
           const args = JSON.parse(toolCall.function.arguments);
-          console.log("Hotel search args:", args);
           
-          // Provide defaults for optional parameters
+          // Just validate and structure the parameters - no API call
           const searchParams = {
             location: args.location,
             checkIn: args.checkIn,
             checkOut: args.checkOut,
             guests: args.guests || 2,
-            sortBy: 'best_value',
-            filter: 'all',
             ...(args.max_total_price && { max_total_price: args.max_total_price }),
             currency: args.currency || 'USD'
           };
           
-          console.log("Final search params:", searchParams);
+          console.log('🎯 [HOTEL INTENT] Extracted travel preferences:', {
+            destination: searchParams.location,
+            dates: `${searchParams.checkIn} to ${searchParams.checkOut}`,
+            guests: searchParams.guests,
+            budget: searchParams.max_total_price ? `${searchParams.currency}${searchParams.max_total_price}` : 'not specified',
+            timestamp: new Date().toISOString()
+          });
           
-          try {
-            const { data: hotelData, error: hotelError } = await supabase.functions.invoke('unified-search-hotels', {
-              body: searchParams
-            });
-
-            if (hotelError) {
-              console.error("Hotel search error:", hotelError);
-              toolResult = {
-                status: "ERROR",
-                message: "Failed to search hotels",
-                error: hotelError.message
-              };
-            } else {
-              const results = hotelData?.results || [];
-              console.log(`Found ${results.length} hotels`);
-              
-              toolResult = {
-                status: results.length > 0 ? "OK" : "NO_RESULTS",
-                data: results.slice(0, 20), // Limit to top 20 for context
-                count: results.length,
-                search_params: args,
-                search_type: 'hotels'
-              };
-            }
-          } catch (error) {
-            console.error("Tool execution error:", error);
-            toolResult = {
-              status: "ERROR",
-              message: "Failed to execute hotel search",
-              error: error instanceof Error ? error.message : String(error)
-            };
-          }
-
-          // Store meta for client navigation/opening results
-          if (toolResult && (toolResult.status === "OK" || toolResult.status === "NO_RESULTS")) {
-            lastSearchMeta = {
-              status: toolResult.status,
-              count: toolResult.count ?? 0,
-              search_params: args,
-              search_type: 'hotels'
-            };
-          }
+          // Return structured parameters without calling any API
+          toolResult = {
+            status: "OK",
+            message: "Travel preferences extracted. Opening search widget...",
+            search_params: searchParams,
+            search_type: 'hotels'
+          };
+          
+          // Store meta for client to open Expedia modal
+          lastSearchMeta = {
+            status: "OK",
+            search_params: searchParams,
+            search_type: 'hotels'
+          };
         } else if (toolCall.function.name === "search_flights") {
           const args = JSON.parse(toolCall.function.arguments);
           console.log("Flight search args:", args);
