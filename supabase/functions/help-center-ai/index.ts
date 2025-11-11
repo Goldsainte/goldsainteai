@@ -378,40 +378,52 @@ serve(async (req) => {
       if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
         let finalText = stripRoutes(assistantMessage.content || "I apologize, but I'm having trouble processing your request right now.");
         
-        // Detect booking intent and route accordingly
-        const lastUserMessage = messages[messages.length - 1]?.content || '';
-        const detectedIntent = detectBookingIntent(lastUserMessage);
+        // Check if we've already made a booking decision in this conversation
+        const hasExistingBookingDecision = messages.some(msg => 
+          msg.role === 'assistant' && 
+          msg.content && (
+            msg.content.includes('Would you like a Goldsainte Certified Travel Agent') ||
+            msg.content.includes('Opening Expedia search') ||
+            msg.content.includes('Great! Let me gather a few details')
+          )
+        );
         
-        console.log('🎯 [TELEMETRY] booking_intent_detected', { 
-          intent: detectedIntent, 
-          userMessage: lastUserMessage.substring(0, 100) 
-        });
-        
-        if (lastSearchMeta && (lastSearchMeta.search_type === 'hotels' || lastSearchMeta.search_type === 'flights') && lastSearchMeta.search_params) {
+        // Only run intent detection on the FIRST booking request, not follow-ups
+        if (lastSearchMeta && (lastSearchMeta.search_type === 'hotels' || lastSearchMeta.search_type === 'flights') && lastSearchMeta.search_params && !hasExistingBookingDecision) {
+          const lastUserMessage = messages[messages.length - 1]?.content || '';
+          const detectedIntent = detectBookingIntent(lastUserMessage);
+          
+          console.log('🎯 [BOOKING ROUTING] Intent detected:', detectedIntent, 'for type:', lastSearchMeta.search_type);
+          
           // If user explicitly said they want self-service, skip choice and open widget
           if (detectedIntent === 'self_service') {
             lastSearchMeta.ui = { 
-              openWidgetInline: true, // Skip choice, go straight to Expedia widget
+              openWidgetInline: true,
               showChoicePrompt: false 
             };
             finalText = `Opening Expedia search for you...`;
+            console.log('🎯 [TELEMETRY] booking_intent_detected=self_service, opening_widget_directly');
           } 
           // If user explicitly said they want agent, skip choice and start intake
           else if (detectedIntent === 'agent') {
             lastSearchMeta.ui = { 
-              showAgentIntake: true, // Skip choice, go straight to intake
+              showAgentIntake: true,
               showChoicePrompt: false 
             };
             finalText = `Great! Let me gather a few details so I can match you with the perfect Goldsainte agent.`;
+            console.log('🎯 [TELEMETRY] booking_intent_detected=agent, starting_intake_directly');
           }
           // Otherwise show choice with agent preselected (canonical message)
           else {
             lastSearchMeta.ui = { 
               showChoicePrompt: true,
-              defaultChoice: 'agent' // UI hint to preselect agent
+              defaultChoice: 'agent'
             };
             finalText = `I can help you get this booked. Would you like a Goldsainte Certified Travel Agent to curate the trip for you, or would you prefer to book it yourself via Expedia?`;
+            console.log('🎯 [TELEMETRY] booking_intent_detected=unknown, showing_choice_with_agent_default');
           }
+        } else if (hasExistingBookingDecision) {
+          console.log('🎯 [BOOKING ROUTING] Skipping intent detection - booking decision already made in conversation');
         }
         
         console.log("🎯 [HELP CENTER] Returning final response:", {
