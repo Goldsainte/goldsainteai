@@ -5,6 +5,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { useExpediaModal } from '@/contexts/ExpediaModalContext';
+import { FEATURE_FLAGS } from '@/config/features';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,8 +18,9 @@ export const HelpCenterChat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { openModal: openExpediaModal } = useExpediaModal();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -57,22 +60,39 @@ const scrollRef = useRef<HTMLDivElement>(null);
         };
         setMessages(prev => [...prev, assistantMessage]);
 
-        // If the AI just performed a hotel search successfully, navigate directly to results
+        // If the AI detected a hotel search intent, open Expedia modal or show Booking.com list
         if (data?.meta?.status === 'OK' && data.meta.search_params) {
           const searchParams = data.meta.search_params;
-          const queryParams = new URLSearchParams({
-            type: searchParams.type || 'hotels',
-            location: searchParams.location || '',
-            checkIn: searchParams.check_in_date || searchParams.checkIn || '',
-            checkOut: searchParams.check_out_date || searchParams.checkOut || '',
-            guests: searchParams.guests?.toString() || '2',
-            ...(searchParams.max_price && { maxPrice: searchParams.max_price.toString() }),
-            ...(searchParams.currency && { currency: searchParams.currency }),
-            from_chat: 'true',
-            suppress_ui: JSON.stringify(['date_picker', 'budget_slider']),
-          });
-          navigate(`/search?${queryParams.toString()}`);
-          setIsOpen(false); // Close chat after navigation
+          
+          // Check viewport width for mobile-first behavior
+          const isMobile = typeof window !== 'undefined' && window.innerWidth <= FEATURE_FLAGS.MOBILE_BREAKPOINT;
+          
+          if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_MODAL || isMobile) {
+            // Open Expedia modal with prefill
+            openExpediaModal({
+              destination: searchParams.location || '',
+              checkIn: searchParams.check_in_date || searchParams.checkIn || '',
+              checkOut: searchParams.check_out_date || searchParams.checkOut || '',
+              adults: parseInt(searchParams.guests?.toString() || '2'),
+              children: 0,
+            });
+            setIsOpen(false); // Close chat after opening modal
+          } else if (FEATURE_FLAGS.USE_CHAT_BOOKING_LIST) {
+            // Legacy behavior: navigate to Booking.com search results
+            const queryParams = new URLSearchParams({
+              type: searchParams.type || 'hotels',
+              location: searchParams.location || '',
+              checkIn: searchParams.check_in_date || searchParams.checkIn || '',
+              checkOut: searchParams.check_out_date || searchParams.checkOut || '',
+              guests: searchParams.guests?.toString() || '2',
+              ...(searchParams.max_price && { maxPrice: searchParams.max_price.toString() }),
+              ...(searchParams.currency && { currency: searchParams.currency }),
+              from_chat: 'true',
+              suppress_ui: JSON.stringify(['date_picker', 'budget_slider']),
+            });
+            navigate(`/search?${queryParams.toString()}`);
+            setIsOpen(false);
+          }
         }
       }
     } catch (error: any) {

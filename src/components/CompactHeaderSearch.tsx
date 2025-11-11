@@ -31,8 +31,26 @@ interface WidgetError {
   timestamp: number;
 }
 
-const CompactHeaderSearch = () => {
-  const [open, setOpen] = useState(false);
+export interface CompactHeaderSearchProps {
+  externalOpen?: boolean;
+  onExternalOpenChange?: (open: boolean) => void;
+  prefill?: {
+    destination?: string;
+    checkIn?: string;
+    checkOut?: string;
+    adults?: number;
+    children?: number;
+  };
+}
+
+const CompactHeaderSearch = ({ 
+  externalOpen, 
+  onExternalOpenChange,
+  prefill 
+}: CompactHeaderSearchProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = externalOpen !== undefined ? externalOpen : internalOpen;
+  const setOpen = onExternalOpenChange || setInternalOpen;
   const [widgetReady, setWidgetReady] = useState(false);
   const [iframeActive, setIframeActive] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
@@ -105,6 +123,14 @@ const CompactHeaderSearch = () => {
       pubref: "goldsainte ai",
       instance: Math.random().toString(36).substring(2, 15),
     });
+    
+    // Add prefill parameters if available
+    if (prefill?.destination) params.set('destination', prefill.destination);
+    if (prefill?.checkIn) params.set('startDate', prefill.checkIn);
+    if (prefill?.checkOut) params.set('endDate', prefill.checkOut);
+    if (prefill?.adults) params.set('adults', prefill.adults.toString());
+    if (prefill?.children) params.set('children', prefill.children.toString());
+    
     return `${baseUrl}?${params.toString()}`;
   };
 
@@ -239,9 +265,10 @@ const CompactHeaderSearch = () => {
               
               // Log success telemetry
               if (typeof window !== 'undefined' && (window as any).gtag) {
-                (window as any).gtag('event', 'expedia_widget_success', {
+                (window as any).gtag('event', 'widget_init_success', {
                   load_method: 'script',
                   retry_count: retryCountRef.current,
+                  has_prefill: !!prefill,
                 });
               }
             }
@@ -293,7 +320,18 @@ const CompactHeaderSearch = () => {
       return;
     }
 
-    console.log("[ExpediaWidget] Dialog opened");
+    console.log("[ExpediaWidget] Dialog opened", prefill ? 'with prefill' : 'without prefill');
+    
+    // Log prefill telemetry
+    if (prefill && (window as any).gtag) {
+      (window as any).gtag('event', 'widget_prefill_applied', {
+        has_destination: !!prefill.destination,
+        has_check_in: !!prefill.checkIn,
+        has_check_out: !!prefill.checkOut,
+        has_adults: !!prefill.adults,
+        has_children: !!prefill.children,
+      });
+    }
     
     // Add CSP violation listener
     const cspListener = (e: SecurityPolicyViolationEvent) => {
@@ -358,8 +396,9 @@ const CompactHeaderSearch = () => {
     }
     // Log success telemetry
     if (typeof window !== 'undefined' && (window as any).gtag) {
-      (window as any).gtag('event', 'expedia_widget_success', {
+      (window as any).gtag('event', 'widget_init_success', {
         load_method: 'iframe',
+        has_prefill: !!prefill,
       });
     }
   };
@@ -394,6 +433,14 @@ const CompactHeaderSearch = () => {
 
   const handleExpediaRedirect = (url: string) => {
     console.log("[ExpediaWidget] Preparing Expedia redirect");
+    
+    // Telemetry
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'expedia_redirect_click', {
+        from_prefill: !!prefill,
+      });
+    }
+    
     sessionStorage.setItem('expediaRedirect', '1');
     destroyExpediaWidget();
     setOpen(false);
@@ -414,6 +461,11 @@ const CompactHeaderSearch = () => {
       setOpen(false);
       destroyExpediaWidget();
       mountedRef.current = true;
+      
+      // Telemetry
+      if (typeof window !== 'undefined' && (window as any).gtag) {
+        (window as any).gtag('event', 'return_from_expedia');
+      }
       return;
     }
     
@@ -482,6 +534,11 @@ const CompactHeaderSearch = () => {
               data-network="pz"
               data-camref="1101l5ujJR"
               data-pubref="goldsainte ai"
+              {...(prefill?.destination && { 'data-destination': prefill.destination })}
+              {...(prefill?.checkIn && { 'data-checkin': prefill.checkIn })}
+              {...(prefill?.checkOut && { 'data-checkout': prefill.checkOut })}
+              {...(prefill?.adults && { 'data-adults': prefill.adults.toString() })}
+              {...(prefill?.children && { 'data-children': prefill.children.toString() })}
               style={{ width: "100%" }}
             />
           )}

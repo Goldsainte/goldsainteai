@@ -8,6 +8,7 @@ import { Footer } from "@/components/Footer";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -355,9 +356,11 @@ function App() {
           <ScrollToTop />
           <AuthProvider>
             <LanguageProvider>
-              <div className="viewport-guard">
-                <AppContent />
-              </div>
+              <ExpediaModalProvider>
+                <div className="viewport-guard">
+                  <AppContent />
+                </div>
+              </ExpediaModalProvider>
             </LanguageProvider>
           </AuthProvider>
         </BrowserRouter>

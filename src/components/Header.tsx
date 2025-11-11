@@ -19,7 +19,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
-import { CompactHeaderSearch } from "@/components/CompactHeaderSearch";
+import { ExpediaModalTrigger } from "@/components/ExpediaModalTrigger";
 import { NotificationCenter } from "@/components/NotificationCenter";
 import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
@@ -492,7 +492,7 @@ export const Header = () => {
 
               {/* Compact Search Bar - Center */}
               <div className="flex justify-center min-w-0" data-tour="traditional-search">
-                <CompactHeaderSearch />
+                <ExpediaModalTrigger />
               </div>
 
               {/* Right side actions */}
