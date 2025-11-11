@@ -41,11 +41,23 @@ export const HelpCenterChat = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const lastQuestionIdRef = useRef<string | null>(null);
+  const [showQuestionPreview, setShowQuestionPreview] = useState(false);
   const navigate = useNavigate();
 
+  // Auto-scroll to bottom when messages change
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  // Track last assistant question
+  useEffect(() => {
+    const lastAssistantMsg = [...messages].reverse().find(m => m.role === 'assistant');
+    if (lastAssistantMsg) {
+      lastQuestionIdRef.current = `msg-${messages.indexOf(lastAssistantMsg)}`;
     }
   }, [messages]);
 
@@ -284,6 +296,30 @@ export const HelpCenterChat = () => {
     handleSendMessage(dateText);
   };
 
+  // Auto-scroll to last question when composer focuses
+  const handleComposerFocus = () => {
+    setShowQuestionPreview(true);
+    if (lastQuestionIdRef.current && scrollRef.current) {
+      const questionElement = document.getElementById(lastQuestionIdRef.current);
+      if (questionElement) {
+        questionElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  };
+
+  const handleComposerBlur = () => {
+    setTimeout(() => setShowQuestionPreview(false), 200);
+  };
+
+  const scrollToLastQuestion = () => {
+    if (lastQuestionIdRef.current) {
+      const questionElement = document.getElementById(lastQuestionIdRef.current);
+      if (questionElement) {
+        questionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
+
   const renderMessageContent = (msg: Message, index: number) => {
     return (
       <>
@@ -331,7 +367,7 @@ export const HelpCenterChat = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-[min(92vw,380px)] h-[min(85vh,600px)] bg-background border border-border rounded-lg shadow-2xl flex flex-col z-40">
+    <div className="fixed bottom-6 right-6 w-[min(92vw,380px)] h-[min(85vh,600px)] bg-background border border-border rounded-lg shadow-2xl flex flex-col z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* Header */}
       <header className="flex items-center justify-between p-3 sm:p-4 border-b border-border bg-primary/5" role="banner">
         <div className="flex items-center gap-2 min-w-0">
@@ -352,8 +388,8 @@ export const HelpCenterChat = () => {
         </Button>
       </header>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 p-3 sm:p-4" ref={scrollRef} role="log" aria-live="polite" aria-atomic="false">
+      {/* Messages - with padding for sticky composer */}
+      <ScrollArea className="flex-1 p-3 sm:p-4 pb-0" ref={scrollRef} role="log" aria-live="polite" aria-atomic="false">
         <div className="space-y-3 sm:space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-sm text-muted-foreground py-8" role="status">
@@ -375,6 +411,7 @@ export const HelpCenterChat = () => {
           {messages.map((msg, idx) => (
             <div
               key={idx}
+              id={`msg-${idx}`}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'user' ? (
@@ -388,6 +425,9 @@ export const HelpCenterChat = () => {
               )}
             </div>
           ))}
+          
+          {/* Spacer for sticky input */}
+          <div className="h-[140px]" aria-hidden="true" />
 
           {isLoading && (
             <div className="flex justify-start">
@@ -399,36 +439,54 @@ export const HelpCenterChat = () => {
         </div>
       </ScrollArea>
 
-      {/* Input */}
-      <div className="p-3 sm:p-4 border-t border-border" role="form" aria-label="Send message to AI assistant">
-        <div className="flex gap-2">
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            placeholder="Type your question..."
-            className="min-h-[60px] max-h-[120px] resize-none text-[15px] focus-visible:ring-2 focus-visible:ring-[#0E4B44]"
-            disabled={isLoading}
-            aria-label="Type your travel question here"
-          />
-          <Button
-            onClick={handleSend}
-            disabled={!input.trim() || isLoading}
-            size="icon"
-            className="shrink-0 min-h-[48px] min-w-[48px]"
-            aria-label="Send message to AI assistant"
+      {/* Sticky Input Composer */}
+      <div className="absolute bottom-0 left-0 right-0 bg-background border-t border-border" role="form" aria-label="Send message to AI assistant">
+        {/* Reply Preview Chip */}
+        {showQuestionPreview && lastQuestionIdRef.current && messages.length > 0 && (
+          <button
+            onClick={scrollToLastQuestion}
+            className="absolute -top-9 left-1/2 -translate-x-1/2 text-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur px-3 py-1.5 rounded-full shadow-lg border border-border hover:bg-white dark:hover:bg-gray-800 transition-colors z-10"
+            aria-label="Show last question"
           >
-            <Send className="h-4 w-4" />
-          </Button>
+            <span className="line-clamp-1 max-w-[250px]">
+              {messages[messages.length - 1]?.role === 'assistant' ? messages[messages.length - 1].content.slice(0, 40) + '...' : 'Jump to question'}
+            </span>
+          </button>
+        )}
+        
+        <div className="p-3 sm:p-4">
+          <div className="flex gap-2">
+            <Textarea
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onFocus={handleComposerFocus}
+              onBlur={handleComposerBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder="Type your question..."
+              className="min-h-[60px] max-h-[120px] resize-none text-[15px] focus-visible:ring-2 focus-visible:ring-[#0E4B44]"
+              disabled={isLoading}
+              aria-label="Type your travel question here"
+            />
+            <Button
+              onClick={handleSend}
+              disabled={!input.trim() || isLoading}
+              size="icon"
+              className="shrink-0 min-h-[48px] min-w-[48px]"
+              aria-label="Send message to AI assistant"
+            >
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
+          <p className="text-[11px] sm:text-[12px] text-muted-foreground mt-2">
+            Press Enter to send, Shift+Enter for new line
+          </p>
         </div>
-        <p className="text-[11px] sm:text-[12px] text-muted-foreground mt-2">
-          Press Enter to send, Shift+Enter for new line
-        </p>
       </div>
     </div>
   );
