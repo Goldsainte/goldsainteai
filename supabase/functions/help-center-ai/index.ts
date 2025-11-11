@@ -49,24 +49,62 @@ const detectBookingIntent = (userMessage: string): 'self_service' | 'agent' | 'u
   return 'unknown';
 };
 
-const systemPrompt = `You are Goldsainte's travel concierge. Your job is to:
-1. Gather trip requirements
+const systemPrompt = `You are Goldsainte's travel concierge. Your PRIMARY job is:
+1. Gather ALL required trip requirements through structured questions
 2. Recommend "Match me with a Goldsainte agent" as the preferred option
 3. Create an Agent Marketplace request with the collected data
 
 Only if the user clearly says they want to book it themselves, render the Expedia widget (inline) for self-service.
 
-**CRITICAL RULES:**
-- NEVER call Booking.com or claim you "found X hotels"
-- Always ask the booking-choice question first
-- Prefer the agent path by default
-- If the user is ambiguous, steer to the agent option
-- If they explicitly insist on self-service, use Expedia widget only
+**CURRENT DATE: ${getTodayDate()}** (Use this for all date calculations)
+
+## CRITICAL - FLIGHT BOOKING INTAKE FLOW:
+
+**NEVER INVENT OR ASSUME FLIGHT DETAILS** - You must gather information in this exact order:
+
+When a user says "I need a flight to [destination]":
+
+**Step 1: Origin** (if not provided)
+- Ask: "Where will you be flying from? Please provide the city or airport code."
+- WAIT for user response
+- NEVER assume or default the origin
+
+**Step 2: Destination** (if not provided) 
+- Ask: "What is your destination city or airport?"
+- WAIT for user response
+
+**Step 3: Travel Dates** (ALWAYS required)
+- Ask: "What are your departure and return dates? (Or let me know if this is a one-way trip)"
+- WAIT for user response
+- NEVER use placeholder dates like "flexible" or "to be determined"
+
+**Step 4: Number of Travelers**
+- Ask: "How many people will be traveling?"
+- WAIT for user response
+
+**Step 5: Preferences** (optional but helpful)
+- Ask: "Do you have a preferred airline, cabin class (economy/business/first), or specific budget in mind?"
+- WAIT for user response
+
+**ONLY AFTER** you have:
+✓ Origin airport/city
+✓ Destination airport/city  
+✓ Departure date (specific date, not "flexible")
+✓ Return date (or confirmed one-way)
+✓ Number of travelers
+
+Then you MUST summarize the complete request:
+"I have your flight request from [origin] to [destination], departing [date] and returning [date] for [X] travelers. Would you like a Goldsainte Certified Travel Agent to curate this trip for you, or would you prefer to book it yourself via Expedia?"
+
+**VALIDATION RULES:**
+- NEVER call the search_flights tool until you have ALL required fields
+- NEVER fabricate airports, dates, or passenger counts
+- If user provides vague info ("next month", "sometime in summer"), ask for SPECIFIC dates
+- If user says "CLT to London", you have origin and destination - STILL ask for dates and travelers
+- Count the questions asked - minimum 3 follow-ups required before booking options
 
 ## YOUR ROLE:
 You are a travel concierge whose PRIMARY goal is to match users with Goldsainte Certified Travel Agents who curate end-to-end trips. Self-service booking is a secondary option offered ONLY when explicitly requested.
-
-**CURRENT DATE: ${getTodayDate()}** (Use this for all date calculations)
 
 ## DATE REQUIREMENTS - CRITICAL:
 **YOU MUST ALWAYS ASK FOR DATES BEFORE SEARCHING**
@@ -167,25 +205,25 @@ const tools = [
     type: "function",
     function: {
       name: "search_hotels",
-      description: "Extract hotel search parameters from user intent (destination, dates, guests, budget) to open the booking widget. Does not return actual hotel results - only validates and structures the search criteria.",
+      description: "CRITICAL: Only call this tool when you have EXPLICITLY received ALL required information from the user. NEVER assume, default, or fabricate any values. This tool extracts hotel search parameters to open the booking widget - it does NOT return hotel results. You MUST ask follow-up questions if any required field is missing.",
       parameters: {
         type: "object",
         properties: {
           location: {
             type: "string",
-            description: "City or destination name (e.g., 'London', 'Paris', 'New York')"
+            description: "City or destination name EXPLICITLY provided by user (e.g., 'London', 'Paris', 'New York'). NEVER assume or default this value."
           },
           checkIn: {
             type: "string",
-            description: "Check-in date in YYYY-MM-DD format"
+            description: "SPECIFIC check-in date EXPLICITLY provided by user in YYYY-MM-DD format. NEVER use placeholders like 'flexible' or 'TBD'. If user hasn't provided a specific date, DO NOT call this tool."
           },
           checkOut: {
             type: "string",
-            description: "Check-out date in YYYY-MM-DD format"
+            description: "SPECIFIC check-out date EXPLICITLY provided by user in YYYY-MM-DD format. NEVER use placeholders."
           },
           guests: {
             type: "number",
-            description: "Number of guests (defaults to 2 if not provided)"
+            description: "EXACT number of guests EXPLICITLY stated by user. If not provided, ask the user - do NOT default to 2."
           },
           max_total_price: {
             type: "number",
@@ -197,7 +235,7 @@ const tools = [
             enum: ["USD", "EUR", "GBP"]
           }
         },
-        required: ["location", "checkIn", "checkOut"]
+        required: ["location", "checkIn", "checkOut", "guests"]
       }
     }
   },
@@ -205,33 +243,33 @@ const tools = [
     type: "function",
     function: {
       name: "search_flights",
-      description: "Extract flight search parameters (origin, destination, dates, travelers) to open the booking widget. Does not return actual flight results.",
+      description: "CRITICAL: Only call this tool when you have EXPLICITLY received ALL required information from the user. NEVER assume, default, or fabricate any values. This tool extracts flight search parameters to open the booking widget - it does NOT return flight results. You MUST ask follow-up questions if any required field is missing.",
       parameters: {
         type: "object",
         properties: {
           origin: {
             type: "string",
-            description: "Origin airport code (e.g., 'JFK', 'LAX', 'LHR')"
+            description: "Origin airport code or city name EXPLICITLY provided by user (e.g., 'JFK', 'Charlotte', 'LAX'). NEVER assume or default this value."
           },
           destination: {
             type: "string",
-            description: "Destination airport code (e.g., 'CDG', 'NRT', 'SYD')"
+            description: "Destination airport code or city name EXPLICITLY provided by user (e.g., 'LHR', 'London', 'CDG'). NEVER assume or default this value."
           },
           departureDate: {
             type: "string",
-            description: "Departure date in YYYY-MM-DD format"
+            description: "SPECIFIC departure date EXPLICITLY provided by user in YYYY-MM-DD format. NEVER use placeholders like 'flexible' or 'TBD'. If user hasn't provided a specific date, DO NOT call this tool."
           },
           returnDate: {
             type: "string",
-            description: "Return date in YYYY-MM-DD format (optional for one-way)"
+            description: "SPECIFIC return date EXPLICITLY provided by user in YYYY-MM-DD format, or null for one-way flights. NEVER use placeholders."
           },
           adults: {
             type: "number",
-            description: "Number of adult passengers"
+            description: "EXACT number of adult passengers EXPLICITLY stated by user. NEVER default to 1 or any other number - if not provided, ask the user."
           },
           cabinClass: {
             type: "string",
-            description: "Cabin class preference",
+            description: "Cabin class preference if EXPLICITLY mentioned by user. If not mentioned, omit this field.",
             enum: ["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"]
           }
         },
@@ -452,85 +490,151 @@ serve(async (req) => {
         if (toolCall.function.name === "search_hotels") {
           const args = JSON.parse(toolCall.function.arguments);
           
-          // Just validate and structure the parameters - no API call
-          const searchParams = {
-            location: args.location,
-            checkIn: args.checkIn,
-            checkOut: args.checkOut,
-            guests: args.guests || 2,
-            ...(args.max_total_price && { max_total_price: args.max_total_price }),
-            currency: args.currency || 'USD'
-          };
+          // CRITICAL: Validate ALL required fields are present and valid
+          const missingFields: string[] = [];
           
-          console.log('🎯 [HOTEL INTENT] Extracted travel preferences:', {
-            destination: searchParams.location,
-            dates: `${searchParams.checkIn} to ${searchParams.checkOut}`,
-            guests: searchParams.guests,
-            budget: searchParams.max_total_price ? `${searchParams.currency}${searchParams.max_total_price}` : 'not specified',
+          if (!args.location || args.location.toLowerCase().includes('flexible') || args.location.toLowerCase().includes('tbd')) {
+            missingFields.push('location');
+          }
+          if (!args.checkIn || args.checkIn.toLowerCase().includes('flexible') || args.checkIn.toLowerCase().includes('tbd') || !/^\d{4}-\d{2}-\d{2}$/.test(args.checkIn)) {
+            missingFields.push('checkIn');
+          }
+          if (!args.checkOut || args.checkOut.toLowerCase().includes('flexible') || args.checkOut.toLowerCase().includes('tbd') || !/^\d{4}-\d{2}-\d{2}$/.test(args.checkOut)) {
+            missingFields.push('checkOut');
+          }
+          if (!args.guests || args.guests < 1) {
+            missingFields.push('guests');
+          }
+          
+          console.log('🎯 [HOTEL VALIDATION]', {
+            received: args,
+            missingFields,
             timestamp: new Date().toISOString()
           });
           
-          // Return structured parameters without calling any API
-          toolResult = {
-            status: "OK",
-            message: "Travel preferences extracted. Preparing booking options...",
-            search_params: searchParams,
-            search_type: 'hotels',
-            ui: { showChoicePrompt: true }
-          };
+          // If ANY required fields are missing, return validation error
+          if (missingFields.length > 0) {
+            console.log('🎯 [TELEMETRY] hotel_intent_detected=true, hotel_intake_completed=false, missing_fields=', missingFields);
+            
+            toolResult = {
+              status: "VALIDATION_ERROR",
+              error: "MISSING_REQUIRED_FIELDS",
+              message: `Cannot proceed with hotel search. Missing required information: ${missingFields.join(', ')}. Please ask the user for these specific details.`,
+              missing_fields: missingFields,
+              search_type: 'hotels'
+            };
+            
+            lastSearchMeta = {
+              status: "VALIDATION_ERROR",
+              missing_fields: missingFields,
+              search_type: 'hotels'
+            };
+          } else {
+            // All required fields present
+            const searchParams = {
+              location: args.location,
+              checkIn: args.checkIn,
+              checkOut: args.checkOut,
+              guests: args.guests,
+              ...(args.max_total_price && { max_total_price: args.max_total_price }),
+              currency: args.currency || 'USD'
+            };
+            
+            console.log('🎯 [TELEMETRY] hotel_intent_detected=true, hotel_intake_completed=true, missing_fields=[]');
+            console.log('🎯 [HOTEL INTENT] Complete hotel request:', {
+              ...searchParams,
+              timestamp: new Date().toISOString()
+            });
+            
+            // Return structured parameters without calling any API
+            toolResult = {
+              status: "OK",
+              message: `Hotel preferences extracted successfully. Summarize the request: "${searchParams.location}, checking in ${searchParams.checkIn}, checking out ${searchParams.checkOut}, ${searchParams.guests} guest(s)." Then present booking options.`,
+              search_params: searchParams,
+              search_type: 'hotels',
+              ui: { showChoicePrompt: true }
+            };
+            
+            // Store meta for client to show choice prompt
+            lastSearchMeta = {
+              status: "OK",
+              search_params: searchParams,
+              search_type: 'hotels',
+              ui: { showChoicePrompt: true }
+            };
+          }
           
-          // Store meta for client to show choice prompt
-          lastSearchMeta = {
-            status: "OK",
-            search_params: searchParams,
-            search_type: 'hotels',
-            ui: { showChoicePrompt: true }
-          };
+          // Add tool result to conversation
+          conversationMessages.push({
+            role: "tool",
+            tool_call_id: toolCall.id,
+            content: JSON.stringify(toolResult)
+          });
+          
         } else if (toolCall.function.name === "search_flights") {
           const args = JSON.parse(toolCall.function.arguments);
           
-          // Check if dates are missing
-          if (!args.departureDate) {
-            console.log('🎯 [HELP-CENTER FLIGHT] Missing dates, showing date picker');
+          // CRITICAL: Validate ALL required fields are present and valid
+          const missingFields: string[] = [];
+          const validationErrors: string[] = [];
+          
+          if (!args.origin || args.origin.toLowerCase().includes('flexible') || args.origin.toLowerCase().includes('tbd')) {
+            missingFields.push('origin');
+          }
+          if (!args.destination || args.destination.toLowerCase().includes('flexible') || args.destination.toLowerCase().includes('tbd')) {
+            missingFields.push('destination');
+          }
+          if (!args.departureDate || args.departureDate.toLowerCase().includes('flexible') || args.departureDate.toLowerCase().includes('tbd') || !/^\d{4}-\d{2}-\d{2}$/.test(args.departureDate)) {
+            missingFields.push('departureDate');
+          }
+          if (!args.adults || args.adults < 1) {
+            missingFields.push('adults');
+          }
+          
+          console.log('🎯 [FLIGHT VALIDATION]', {
+            received: args,
+            missingFields,
+            validationErrors,
+            timestamp: new Date().toISOString()
+          });
+          
+          // If ANY required fields are missing, return validation error
+          if (missingFields.length > 0) {
+            console.log('🎯 [TELEMETRY] flight_intent_detected=true, flight_intake_completed=false, missing_fields=', missingFields);
             
             toolResult = {
-              status: "NEED_DATES",
-              message: "I'll help you search for flights. Please select your travel dates.",
-              search_params: {
-                origin: args.origin || null,
-                destination: args.destination || null,
-                dates: {
-                  depart: args.departureDate || null,
-                  return: args.returnDate || null
-                },
-                adults: args.adults || 1,
-                mode: args.returnDate === null ? 'oneWay' : 'roundTrip'
-              },
-              search_type: 'flights',
-              ui: { showDatePicker: true }
+              status: "VALIDATION_ERROR",
+              error: "MISSING_REQUIRED_FIELDS",
+              message: `Cannot proceed with flight search. Missing required information: ${missingFields.join(', ')}. Please ask the user for these specific details.`,
+              missing_fields: missingFields,
+              search_type: 'flights'
             };
             
-            lastSearchMeta = toolResult;
-          } else if (!args.origin || !args.destination) {
-            toolResult = {
-              error: "VALIDATION_ERROR",
-              message: "Missing required flight parameters (origin or destination)"
+            lastSearchMeta = {
+              status: "VALIDATION_ERROR",
+              missing_fields: missingFields,
+              search_type: 'flights'
             };
           } else {
+            // All required fields present - proceed with intent extraction
             const searchParams = {
               origin: args.origin,
               destination: args.destination,
               departureDate: args.departureDate,
               returnDate: args.returnDate || null,
-              adults: args.adults || 1,
-              travelClass: args.travelClass || 'ECONOMY'
+              adults: args.adults,
+              cabinClass: args.cabinClass || 'ECONOMY'
             };
             
-            console.log('🎯 [HELP-CENTER FLIGHT INTENT]', searchParams);
+            console.log('🎯 [TELEMETRY] flight_intent_detected=true, flight_intake_completed=true, missing_fields=[]');
+            console.log('🎯 [FLIGHT INTENT] Complete flight request:', {
+              ...searchParams,
+              timestamp: new Date().toISOString()
+            });
             
             toolResult = {
               status: "OK",
-              message: "Flight preferences extracted. Preparing booking options...",
+              message: `Flight preferences extracted successfully. Summarize the request: "${searchParams.origin} to ${searchParams.destination}, departing ${searchParams.departureDate}${searchParams.returnDate ? ` returning ${searchParams.returnDate}` : ' (one-way)'}, ${searchParams.adults} traveler(s)." Then present booking options.`,
               search_params: searchParams,
               search_type: 'flights',
               ui: { showChoicePrompt: true }
