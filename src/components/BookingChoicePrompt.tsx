@@ -32,27 +32,28 @@ export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: Booking
   };
 
   return (
-    <Card className="p-4 bg-card border-border">
-      <div className="space-y-4">
+    <Card className="p-3 sm:p-4 bg-card border-border" role="region" aria-labelledby="booking-choice-title">
+      <div className="space-y-3 sm:space-y-4">
         <div className="flex items-start gap-3">
-          {tripType === 'flights' && <Plane className="w-5 h-5 text-primary mt-1" />}
-          {tripType === 'hotels' && <Hotel className="w-5 h-5 text-primary mt-1" />}
-          <div className="flex-1">
-            <p className="text-sm text-foreground leading-relaxed">
+          {tripType === 'flights' && <Plane className="w-5 h-5 text-primary mt-1 flex-shrink-0" aria-hidden="true" />}
+          {tripType === 'hotels' && <Hotel className="w-5 h-5 text-primary mt-1 flex-shrink-0" aria-hidden="true" />}
+          <div className="flex-1 min-w-0">
+            <p id="booking-choice-title" className="text-[14px] sm:text-[15px] text-foreground leading-relaxed">
               {getMessage()}
             </p>
           </div>
         </div>
         
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 sm:gap-3">
           {/* PRIMARY BUTTON - Agent path (appears FIRST) */}
           <Button
             onClick={() => {
               console.log('🎯 [TELEMETRY] booking_choice=agent');
               onChoice('agent');
             }}
-            className="w-full justify-start"
-            variant="default" // PRIMARY styling
+            className="w-full justify-start min-h-[48px] text-[14px] sm:text-[15px]"
+            variant="default"
+            aria-label="Get matched with a Goldsainte certified travel agent for personalized service"
           >
             Match me with a Goldsainte agent
           </Button>
@@ -63,8 +64,9 @@ export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: Booking
               console.log('🎯 [TELEMETRY] booking_choice=self_service');
               onChoice('self_service');
             }}
-            className="w-full justify-start"
-            variant="outline" // SECONDARY styling
+            className="w-full justify-start min-h-[48px] text-[14px] sm:text-[15px]"
+            variant="outline"
+            aria-label="Book yourself using the Expedia search widget"
           >
             Book it myself (via Expedia)
           </Button>

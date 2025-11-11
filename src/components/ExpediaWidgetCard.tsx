@@ -209,31 +209,35 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
   };
 
   return (
-    <div className="w-full max-w-[640px] mx-auto my-4 rounded-lg border border-border bg-card overflow-hidden">
+    <div className="w-full max-w-[640px] mx-auto my-3 sm:my-4 rounded-lg border border-border bg-card overflow-hidden" role="region" aria-label="Expedia hotel and flight search widget">
       {/* Header */}
-      <div className="px-4 py-2 bg-muted/30 border-b border-border flex items-center justify-between">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <header className="px-3 sm:px-4 py-2 bg-muted/30 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2 text-[12px] sm:text-[13px] text-muted-foreground min-w-0">
           <span className="font-medium">Powered by Expedia</span>
           {payload.destination && (
-            <span className="text-foreground">• {payload.destination}</span>
+            <span className="text-foreground truncate">• {payload.destination}</span>
           )}
         </div>
         {widgetState === 'ready' && (
-          <div className="text-xs text-muted-foreground">
+          <div className="text-[11px] sm:text-[12px] text-muted-foreground flex-shrink-0">
             {payload.checkIn && payload.checkOut && (
-              <span>{payload.checkIn} → {payload.checkOut}</span>
+              <span className="hidden sm:inline">{payload.checkIn} → {payload.checkOut}</span>
             )}
           </div>
         )}
-      </div>
+      </header>
 
       {/* Widget Container */}
       {showReopen ? (
-        <div className="p-8 text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
+        <div className="p-6 sm:p-8 text-center space-y-4">
+          <p className="text-[14px] sm:text-[15px] text-muted-foreground">
             Ready to search again?
           </p>
-          <Button onClick={handleReopen} className="gap-2">
+          <Button 
+            onClick={handleReopen} 
+            className="gap-2 min-h-[48px]"
+            aria-label="Reopen Expedia search widget"
+          >
             <RotateCw className="h-4 w-4" />
             Reopen Search
           </Button>
@@ -244,21 +248,28 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
             ref={containerRef} 
             className="w-full"
             style={{ minHeight: widgetState === 'loading' ? '320px' : widgetState === 'ready' ? '480px' : 'auto' }}
+            role="application"
+            aria-label="Search widget loading"
           >
             {widgetState === 'loading' && (
-              <div className="flex items-center justify-center p-12">
+              <div className="flex items-center justify-center p-8 sm:p-12" role="status" aria-live="polite">
                 <div className="space-y-3 text-center">
-                  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-                  <p className="text-sm text-muted-foreground">Loading search widget...</p>
+                  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent" aria-hidden="true"></div>
+                  <p className="text-[13px] sm:text-[14px] text-muted-foreground">Loading search widget...</p>
                 </div>
               </div>
             )}
             {widgetState === 'error' && (
-              <div className="p-8 text-center space-y-4">
-                <p className="text-sm text-muted-foreground">
+              <div className="p-6 sm:p-8 text-center space-y-4" role="alert">
+                <p className="text-[14px] sm:text-[15px] text-muted-foreground">
                   The search widget couldn't load. It might be blocked by an ad or content blocker.
                 </p>
-                <Button onClick={handleOpenExpedia} variant="outline" className="gap-2">
+                <Button 
+                  onClick={handleOpenExpedia} 
+                  variant="outline" 
+                  className="gap-2 min-h-[48px]"
+                  aria-label="Open Expedia website in new tab as fallback"
+                >
                   <ExternalLink className="h-4 w-4" />
                   Open Expedia Search
                 </Button>

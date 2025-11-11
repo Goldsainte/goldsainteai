@@ -269,24 +269,50 @@ export const AgentIntakeForm = ({ tripType, initialData, onComplete }: AgentInta
     const Icon = currentStep.icon;
 
     return (
-      <Card className="w-full max-w-2xl mx-auto">
+      <Card className="w-full max-w-2xl mx-auto" role="form" aria-labelledby="intake-form-title">
         <CardHeader>
           <div className="flex items-center gap-2 mb-2">
-            <Icon className="w-5 h-5 text-primary" />
-            <CardTitle>{currentStep.title}</CardTitle>
+            <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
+            <CardTitle id="intake-form-title" className="text-[18px] sm:text-[20px]">{currentStep.title}</CardTitle>
           </div>
-          <CardDescription>Step {step} of {totalSteps}</CardDescription>
-          <Progress value={(step / totalSteps) * 100} className="mt-4" />
+          <CardDescription>
+            Step {step} of {totalSteps}
+          </CardDescription>
+          <Progress value={(step / totalSteps) * 100} className="mt-4" aria-label={`Progress: step ${step} of ${totalSteps}`} />
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             {currentStep.render()}
             <div className="flex justify-between gap-4 pt-4">
-              <Button type="button" variant="outline" onClick={handleBack} disabled={step === 1}>Back</Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleBack} 
+                disabled={step === 1}
+                className="min-h-[44px] min-w-[100px]"
+                aria-label="Go to previous step"
+              >
+                Back
+              </Button>
               {step === totalSteps ? (
-                <Button type="button" onClick={handleSubmit} disabled={!formData.fullName || !formData.email || !formData.phone}>Submit Request</Button>
+                <Button 
+                  type="button" 
+                  onClick={handleSubmit} 
+                  disabled={!formData.fullName || !formData.email || !formData.phone}
+                  className="min-h-[44px] min-w-[140px]"
+                  aria-label="Submit booking request to Goldsainte agent"
+                >
+                  Submit Request
+                </Button>
               ) : (
-                <Button type="button" onClick={handleNext}>Next</Button>
+                <Button 
+                  type="button" 
+                  onClick={handleNext}
+                  className="min-h-[44px] min-w-[100px]"
+                  aria-label="Go to next step"
+                >
+                  Next
+                </Button>
               )}
             </div>
           </div>

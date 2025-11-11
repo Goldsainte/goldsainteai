@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ const CompactHeaderSearch = ({
   onExternalOpenChange,
   prefill 
 }: CompactHeaderSearchProps = {}) => {
+  const { t } = useTranslation();
   const [internalOpen, setInternalOpen] = useState(false);
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = onExternalOpenChange || setInternalOpen;
@@ -496,21 +498,26 @@ const CompactHeaderSearch = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="relative h-10 sm:h-11 lg:h-12 rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur pl-3 sm:pl-4 pr-10 sm:pr-12 text-[14px] sm:text-[15px] lg:text-[16px] text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44]/30 focus-visible:ring-offset-2 transition-all"
+          className="relative rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44] focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] pl-3 sm:pl-4 pr-10 sm:pr-12"
           style={{ width: 'clamp(220px, 28vw, 520px)' }}
-          aria-label="Search hotels and flights"
+          aria-label="Open hotel and flight search"
         >
-          <span>Search hotels & flights...</span>
-          <Search className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 h-4 w-4 text-[#0E4B44]" />
+          <span className="truncate text-[14px] sm:text-[15px] lg:text-[16px] leading-none">
+            {t('header.searchHotelsFlights')}
+          </span>
+          <Search className="absolute right-3 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="w-[min(95svw,760px)] max-w-[95svw] sm:max-w-[760px] min-w-0 max-h-[88vh] overflow-auto p-4 sm:p-6 rounded-2xl flex flex-col justify-start">
+      <DialogContent 
+        className="w-[min(95svw,760px)] max-w-[95svw] sm:max-w-[760px] min-w-0 max-h-[88vh] overflow-y-auto p-4 sm:p-6"
+        aria-describedby="expedia-widget-description"
+      >
         <DialogHeader>
-          <DialogTitle className="text-[18px] sm:text-[20px] font-semibold">
+          <DialogTitle className="text-[18px] sm:text-[20px] leading-tight">
             Search Hotels & Flights
           </DialogTitle>
-          <DialogDescription>
-            Find and book your next trip with our travel search powered by Expedia
+          <DialogDescription id="expedia-widget-description" className="text-sm text-muted-foreground">
+            Search and book hotels and flights powered by Expedia
           </DialogDescription>
         </DialogHeader>
 

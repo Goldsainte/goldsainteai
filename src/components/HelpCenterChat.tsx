@@ -322,8 +322,8 @@ export const HelpCenterChat = () => {
       <Button
         onClick={() => setIsOpen(true)}
         size="lg"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-40"
-        aria-label="Open Help Center Chat"
+        className="fixed bottom-6 right-6 h-14 w-14 min-h-[56px] min-w-[56px] rounded-full shadow-lg z-40 touch-manipulation"
+        aria-label="Open Help Center Chat to ask travel questions"
       >
         <MessageCircle className="h-6 w-6" />
       </Button>
@@ -331,40 +331,43 @@ export const HelpCenterChat = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-[380px] h-[600px] bg-background border border-border rounded-lg shadow-2xl flex flex-col z-40">
+    <div className="fixed bottom-6 right-6 w-[min(92vw,380px)] h-[min(85vh,600px)] bg-background border border-border rounded-lg shadow-2xl flex flex-col z-40">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-primary/5">
-        <div className="flex items-center gap-2">
-          <MessageCircle className="h-5 w-5 text-primary" />
-          <div>
-            <h3 className="font-semibold text-sm">Help Center AI</h3>
-            <p className="text-xs text-muted-foreground">Ask me anything</p>
+      <header className="flex items-center justify-between p-3 sm:p-4 border-b border-border bg-primary/5" role="banner">
+        <div className="flex items-center gap-2 min-w-0">
+          <MessageCircle className="h-5 w-5 text-primary flex-shrink-0" aria-hidden="true" />
+          <div className="min-w-0">
+            <h3 className="font-semibold text-[14px] sm:text-[15px] truncate">Help Center AI</h3>
+            <p className="text-[12px] sm:text-[13px] text-muted-foreground truncate">Ask me anything</p>
           </div>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => setIsOpen(false)}
-          aria-label="Close chat"
+          className="min-h-[44px] min-w-[44px] flex-shrink-0"
+          aria-label="Close help center chat"
         >
           <X className="h-4 w-4" />
         </Button>
-      </div>
+      </header>
 
       {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollRef}>
-        <div className="space-y-4">
+      <ScrollArea className="flex-1 p-3 sm:p-4" ref={scrollRef} role="log" aria-live="polite" aria-atomic="false">
+        <div className="space-y-3 sm:space-y-4">
           {messages.length === 0 && (
-            <div className="text-center text-sm text-muted-foreground py-8">
-              <MessageCircle className="h-12 w-12 mx-auto mb-3 text-primary/30" />
-              <p className="mb-3 font-medium">Hi! I'm your AI Travel Assistant.</p>
-              <div className="text-xs space-y-1.5 text-left max-w-[280px] mx-auto">
+            <div className="text-center text-sm text-muted-foreground py-8" role="status">
+              <MessageCircle className="h-12 w-12 mx-auto mb-3 text-primary/30" aria-hidden="true" />
+              <p className="mb-3 font-medium text-[15px]">Hi! I'm your AI Travel Assistant.</p>
+              <div className="text-[13px] sm:text-[14px] space-y-1.5 text-left max-w-[280px] mx-auto">
                 <p className="text-muted-foreground/80">Ask me about:</p>
-                <p>• Destination recommendations</p>
-                <p>• Trip planning & itineraries</p>
-                <p>• Best times to travel</p>
-                <p>• Budget estimates</p>
-                <p>• Booking questions</p>
+                <ul className="space-y-1" role="list">
+                  <li>• Destination recommendations</li>
+                  <li>• Trip planning & itineraries</li>
+                  <li>• Best times to travel</li>
+                  <li>• Budget estimates</li>
+                  <li>• Booking questions</li>
+                </ul>
               </div>
             </div>
           )}
@@ -375,11 +378,11 @@ export const HelpCenterChat = () => {
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               {msg.role === 'user' ? (
-                <div className="max-w-[85%] rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground">
+                <div className="max-w-[85%] rounded-lg px-3 py-2.5 text-[14px] sm:text-[15px] bg-primary text-primary-foreground leading-relaxed">
                   {msg.content}
                 </div>
               ) : (
-                <div className={`${msg.widgetData || msg.choicePrompt || msg.agentIntake ? 'w-full' : 'max-w-[85%]'} rounded-lg ${!msg.widgetData && !msg.choicePrompt && !msg.agentIntake ? 'px-3 py-2 bg-muted' : ''} text-sm`}>
+                <div className={`${msg.widgetData || msg.choicePrompt || msg.agentIntake ? 'w-full' : 'max-w-[85%]'} rounded-lg ${!msg.widgetData && !msg.choicePrompt && !msg.agentIntake ? 'px-3 py-2.5 bg-muted' : ''} text-[14px] sm:text-[15px] leading-relaxed`}>
                   {renderMessageContent(msg, idx)}
                 </div>
               )}
@@ -388,8 +391,8 @@ export const HelpCenterChat = () => {
 
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-muted rounded-lg px-3 py-2">
-                <Loader2 className="h-4 w-4 animate-spin text-primary" />
+              <div className="bg-muted rounded-lg px-3 py-2.5" role="status" aria-live="polite">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" aria-label="AI is thinking" />
               </div>
             </div>
           )}
@@ -397,7 +400,7 @@ export const HelpCenterChat = () => {
       </ScrollArea>
 
       {/* Input */}
-      <div className="p-4 border-t border-border">
+      <div className="p-3 sm:p-4 border-t border-border" role="form" aria-label="Send message to AI assistant">
         <div className="flex gap-2">
           <Textarea
             value={input}
@@ -409,19 +412,21 @@ export const HelpCenterChat = () => {
               }
             }}
             placeholder="Type your question..."
-            className="min-h-[60px] max-h-[120px] resize-none"
+            className="min-h-[60px] max-h-[120px] resize-none text-[15px] focus-visible:ring-2 focus-visible:ring-[#0E4B44]"
             disabled={isLoading}
+            aria-label="Type your travel question here"
           />
           <Button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
             size="icon"
-            className="shrink-0"
+            className="shrink-0 min-h-[48px] min-w-[48px]"
+            aria-label="Send message to AI assistant"
           >
             <Send className="h-4 w-4" />
           </Button>
         </div>
-        <p className="text-xs text-muted-foreground mt-2">
+        <p className="text-[11px] sm:text-[12px] text-muted-foreground mt-2">
           Press Enter to send, Shift+Enter for new line
         </p>
       </div>
