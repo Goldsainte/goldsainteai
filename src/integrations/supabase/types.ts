@@ -8768,6 +8768,60 @@ export type Database = {
         }
         Relationships: []
       }
+      user_travel_preferences: {
+        Row: {
+          accessibility_needs: string[] | null
+          booking_preferences: Json | null
+          budget_preference: string | null
+          conversation_context: Json | null
+          created_at: string
+          dietary_restrictions: string[] | null
+          id: string
+          last_updated_at: string
+          preferred_accommodation_types: string[] | null
+          preferred_airlines: string[] | null
+          preferred_destinations: string[] | null
+          travel_companions: string | null
+          travel_style: string[] | null
+          trip_frequency: string | null
+          user_id: string
+        }
+        Insert: {
+          accessibility_needs?: string[] | null
+          booking_preferences?: Json | null
+          budget_preference?: string | null
+          conversation_context?: Json | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          last_updated_at?: string
+          preferred_accommodation_types?: string[] | null
+          preferred_airlines?: string[] | null
+          preferred_destinations?: string[] | null
+          travel_companions?: string | null
+          travel_style?: string[] | null
+          trip_frequency?: string | null
+          user_id: string
+        }
+        Update: {
+          accessibility_needs?: string[] | null
+          booking_preferences?: Json | null
+          budget_preference?: string | null
+          conversation_context?: Json | null
+          created_at?: string
+          dietary_restrictions?: string[] | null
+          id?: string
+          last_updated_at?: string
+          preferred_accommodation_types?: string[] | null
+          preferred_airlines?: string[] | null
+          preferred_destinations?: string[] | null
+          travel_companions?: string | null
+          travel_style?: string[] | null
+          trip_frequency?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       vendor_availability: {
         Row: {
           block_reason: string | null
@@ -9553,6 +9607,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      webhook_events: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          event_id: string
+          event_type: string
+          id: string
+          payload: Json
+          processed_at: string
+          processing_status: string
+          provider: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          event_id: string
+          event_type: string
+          id?: string
+          payload: Json
+          processed_at?: string
+          processing_status?: string
+          provider?: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          event_id?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          processed_at?: string
+          processing_status?: string
+          provider?: string
+        }
+        Relationships: []
       }
     }
     Views: {
