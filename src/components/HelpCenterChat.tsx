@@ -73,8 +73,14 @@ export const HelpCenterChat = () => {
       if (error) throw error;
 
       if (data?.response) {
-        // PRIORITY 1: Check if we should show booking choice prompt FIRST
-        if (data.meta?.ui?.showChoicePrompt) {
+        // PRIORITY 1: Check if we should show booking choice prompt FIRST (defensive fallback)
+        // Force the choice prompt for hotel/flight intents unless backend explicitly opts into auto widget
+        const shouldShowChoice = (
+          data.meta?.ui?.showChoicePrompt === true ||
+          ((data.meta?.search_type === 'hotels' || data.meta?.search_type === 'flights') && data.meta?.ui?.openWidgetInline !== true)
+        );
+
+        if (shouldShowChoice) {
           console.log('🎯 [TELEMETRY] booking_choice_rendered', {
             tripType: data.meta.search_type,
             hasParams: !!data.meta.search_params
@@ -104,7 +110,7 @@ export const HelpCenterChat = () => {
           setMessages(prev => [...prev, assistantMessage]);
         }
         // PRIORITY 3: Check if we should render inline widget (ONLY if no choice prompt)
-        else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params && !data.meta?.ui?.showChoicePrompt) {
+        else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params && data.meta?.ui?.openWidgetInline === true) {
           console.log('🎯 Rendering inline Expedia widget with params:', data.meta.search_params);
           console.log('🎯 [TELEMETRY] chat_expedia_widget_inserted');
           
