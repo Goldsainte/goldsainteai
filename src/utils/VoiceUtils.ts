@@ -141,7 +141,9 @@ export class RealtimeVoiceChat {
       });
 
       if (!sdpResponse.ok) {
-        throw new Error(`Failed to connect: ${sdpResponse.statusText}`);
+        const errorText = await sdpResponse.text();
+        console.error(`❌ OpenAI SDP handshake failed: ${sdpResponse.status}`, errorText);
+        throw new Error(`OpenAI connection failed (${sdpResponse.status}): ${sdpResponse.statusText}. Check model name and API access.`);
       }
 
       const answer = {

@@ -439,7 +439,7 @@ export const AIBookingConcierge = () => {
   const toggleVoiceMode = async () => {
     if (!voiceMode) {
       try {
-        console.log('📞 Starting voice mode...');
+        console.log('📞 [Step 1/6] Starting voice mode...');
         setVoiceStatus('connecting');
 
         // Pause wake word while in active voice call to avoid mic conflicts
@@ -448,22 +448,51 @@ export const AIBookingConcierge = () => {
           wakeWordDetectorRef.current.stop();
           setWakeWordActive(false);
         }
+
+        // Step 1: Proactively request microphone permission
+        console.log('🎤 [Step 2/6] Requesting microphone permission...');
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          // Stop tracks immediately - we just wanted to check permission
+          stream.getTracks().forEach(track => track.stop());
+          console.log('✅ Microphone permission granted');
+        } catch (permError: any) {
+          console.error('❌ Microphone permission denied:', permError);
+          let errorMsg = "Microphone access denied";
+          if (permError.name === 'NotAllowedError') {
+            errorMsg = "Microphone access denied. Please allow microphone access in your browser settings.";
+          } else if (permError.name === 'NotFoundError') {
+            errorMsg = "No microphone found. Please connect a microphone and try again.";
+          } else if (permError.name === 'NotReadableError') {
+            errorMsg = "Microphone is being used by another application. Please close other apps and try again.";
+          }
+          toast({
+            title: "Microphone Error",
+            description: errorMsg,
+            variant: "destructive",
+          });
+          startWakeWordDetection();
+          return;
+        }
         
         const getSessionToken = async () => {
+          console.log('🔑 [Step 3/6] Fetching session token...');
           try {
             const { data, error } = await supabase.functions.invoke('realtime-voice-session', {
               body: { agentProfile }
             });
             if (error) {
-              console.error('Session token error:', error);
+              console.error('❌ Session token error:', error);
               throw new Error('Failed to connect to voice service. Please try again.');
             }
             if (!data?.client_secret?.value) {
+              console.error('❌ Invalid session token received');
               throw new Error('Invalid session token received');
             }
+            console.log('✅ Session token obtained');
             return data.client_secret.value;
           } catch (err) {
-            console.error('Token fetch error:', err);
+            console.error('❌ Token fetch error:', err);
             throw new Error('Unable to connect to voice service');
           }
         };
@@ -471,13 +500,12 @@ export const AIBookingConcierge = () => {
         let currentAssistantMessage = '';
         let isAssistantSpeaking = false;
 
+        console.log('🔌 [Step 4/6] Creating voice chat connection...');
         voiceChatRef.current = new RealtimeVoiceChat(
           (message) => {
-            console.log('Voice message:', message);
+            console.log('📨 Voice message:', message.type);
             
             if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
-              // AI is responding - stop processing state
-              console.log('AI is responding, stopping processing state');
               setIsProcessing(false);
               
               if (message.type === 'response.audio_transcript.delta') {
@@ -497,13 +525,12 @@ export const AIBookingConcierge = () => {
                 saveConversationData();
               }
             } else if (message.type === 'response.audio_transcript.done') {
-              console.log('AI finished speaking');
+              console.log('✅ AI finished speaking');
               isAssistantSpeaking = false;
               setIsProcessing(false);
               saveConversationData();
             } else if (message.type === 'conversation.item.input_audio_transcription.completed') {
-              // User finished speaking - start processing state
-              console.log('User finished speaking, starting processing state');
+              console.log('👤 User finished speaking:', message.transcript);
               setIsProcessing(true);
               setMessages(prev => [...prev, { role: 'user', content: message.transcript }]);
               saveConversationData();
@@ -524,18 +551,15 @@ export const AIBookingConcierge = () => {
                 (transcript.match(/\b(lax|jfk|sfo|ord|atl|dfw|den|las|sea|mia|airport)\b/i));
               
               if (hasUberIntent && hasLocationInfo) {
-                // Try to parse locations more reliably
                 let fromLocation = '';
                 let toLocation = '';
                 
-                // Pattern 1: "from X to Y"
                 const fromToMatch = transcript.match(/from\s+([^,.]+?)\s+to\s+([^,.]+?)(?:\.|$|,)/i);
                 if (fromToMatch) {
                   fromLocation = fromToMatch[1].trim();
                   toLocation = fromToMatch[2].trim();
                 }
                 
-                // Pattern 2: "to X from Y"
                 if (!fromLocation) {
                   const toFromMatch = transcript.match(/to\s+([^,.]+?)\s+from\s+([^,.]+?)(?:\.|$|,)/i);
                   if (toFromMatch) {
@@ -544,7 +568,6 @@ export const AIBookingConcierge = () => {
                   }
                 }
                 
-                // Pattern 3: "get me to X" (assume current location as pickup)
                 if (!fromLocation && !toLocation) {
                   const getMatch = transcript.match(/(?:get|take)\s+me\s+to\s+([^,.]+?)(?:\.|$|,)/i);
                   if (getMatch) {
@@ -560,7 +583,6 @@ export const AIBookingConcierge = () => {
                     duration: 3000
                   });
                   
-                  // Send to TEXT backend which has Uber tools
                   setTimeout(() => {
                     const uberRequest = fromLocation && toLocation 
                       ? `Get Uber price estimates from ${fromLocation} to ${toLocation} and show me the options.`
@@ -571,31 +593,44 @@ export const AIBookingConcierge = () => {
                 }
               }
             } else if (message.type === 'input_audio_buffer.speech_stopped') {
-              // User stopped speaking - start processing
-              console.log('Speech stopped, starting processing state');
+              console.log('🛑 Speech stopped');
               setIsProcessing(true);
             } else if (message.type === 'response.created') {
-              // AI is starting to respond - might help catch the processing state earlier
-              console.log('Response created, AI is thinking');
+              console.log('🤔 AI is thinking');
               setIsProcessing(true);
             }
           },
-          (status) => setVoiceStatus(status as any)
+          (status) => {
+            console.log('📡 Connection status:', status);
+            setVoiceStatus(status as any);
+          }
         );
 
+        console.log('🔗 [Step 5/6] Connecting to OpenAI Realtime API...');
         await voiceChatRef.current.init(getSessionToken);
+        console.log('✅ OpenAI connection established');
+
+        // Step 6: Start hold music IMMEDIATELY after successful connection (within user gesture)
+        console.log('🎵 [Step 6/6] Starting hold music...');
+        initHoldMusic();
+        try {
+          await holdMusicRef.current?.play();
+          console.log('✅ Hold music playing');
+        } catch (playError) {
+          console.warn('⚠️ Hold music autoplay blocked:', playError);
+        }
+        
         setVoiceMode(true);
-        console.log('✅ Voice mode activated successfully');
+        console.log('✅ Voice mode fully activated');
         
         toast({
           title: "Voice Mode Active",
-          description: "Speak naturally - no need to say 'Hey Goldsainte'",
+          description: "Speak naturally - the AI is listening",
         });
       } catch (error: any) {
-        console.error('Voice error:', error);
+        console.error('❌ Voice activation error:', error);
         setVoiceStatus('error');
         
-        // Provide specific error messages
         let errorMessage = "Failed to start voice mode";
         if (error?.message) {
           errorMessage = error.message;
@@ -613,7 +648,6 @@ export const AIBookingConcierge = () => {
           variant: "destructive",
         });
         
-        // Resume wake word detection if voice mode fails
         startWakeWordDetection();
       }
     } else {
@@ -622,11 +656,9 @@ export const AIBookingConcierge = () => {
       setVoiceMode(false);
       setVoiceStatus('disconnected');
       setIsProcessing(false);
-      // Stop hold music
       if (holdMusicRef.current) {
         holdMusicRef.current.stop();
       }
-      // Resume wake word listening after call ends
       console.log('▶️ Resuming wake word detection');
       startWakeWordDetection();
     }
@@ -634,6 +666,18 @@ export const AIBookingConcierge = () => {
 
   const startWakeWordDetection = async () => {
     try {
+      // Check if SpeechRecognition is available (not on iOS Safari)
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        console.warn('⚠️ Wake word not supported on this browser (iOS Safari)');
+        toast({
+          title: "Wake Word Not Supported",
+          description: "Tap the microphone button to start voice mode",
+          duration: 5000,
+        });
+        return;
+      }
+
       console.log('🎤 Starting wake word detection...');
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
         console.log('🎉 Wake word "Hey Goldsainte" detected! Activating voice mode...');
