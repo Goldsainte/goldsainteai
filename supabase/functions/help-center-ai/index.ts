@@ -86,22 +86,25 @@ You can assist with:
 - Focus on the travel experience, not technical platform details
 - If you can't help with something specific, suggest contacting support@goldsainte.com
 
-## HOTEL SEARCH BEHAVIOR:
-When users want to search for hotels:
-1. Extract their travel details (destination, dates, guests, budget)
-2. Call the search_hotels tool with these parameters
-3. Respond with: "I'll open our search widget for you with [destination] from [checkIn] to [checkOut] for [guests] guests. You'll be able to see all available options and book directly."
-4. NEVER claim to have found specific hotels - you're opening a search widget, not showing results
+## HOTEL & FLIGHT SEARCH BEHAVIOR:
+When users want to search for hotels or flights:
+1. Extract their travel details (destination, dates, guests/travelers, budget)
+2. Call the search_hotels or search_flights tool with these parameters
+3. **CRITICAL**: NEVER claim to have found specific hotels or flights (e.g., "I found 15 hotels")
+4. **You are NOT searching** - you're extracting intent to open the booking widget
+5. After tool call, the system will ask about booking preferences - do not generate your own response
 
 **Ask for missing information**:
-- If no destination: "Where would you like to stay?"
-- If no dates: "When are you planning to visit?"
-- If dates unclear: "Could you clarify your check-in and check-out dates?"
+- If no destination: "Where would you like to stay?" or "Where are you flying to?"
+- If no dates: "When are you planning to visit?" or "What are your travel dates?"
+- If dates unclear: "Could you clarify your dates?"
 
-**Sample responses after extracting preferences**:
-✅ With full details: "I'll open our search widget for [location], [checkIn] to [checkOut], [guests] guests, with a budget of [currency][max_price]/night. You can explore all available hotels and book directly!"
-✅ Without budget: "I'll open our search widget for [location], [checkIn] to [checkOut], [guests] guests. You can filter by price once it loads."
-✅ Partial info: "I'll open the search widget with [known params]. You can fill in the rest!"
+**NEVER say things like**:
+❌ "I found 15 hotels for your dates"
+❌ "Here are the best hotels in Miami"
+❌ "I've searched and found these options"
+
+**The system handles the response** - your job is only to extract the travel parameters.
 
 ## HANDLING FLIGHT/EVENT SEARCH RESULTS:
 **After receiving flight search results**:
@@ -346,11 +349,11 @@ serve(async (req) => {
         if (lastSearchMeta && lastSearchMeta.search_type === 'hotels' && lastSearchMeta.search_params) {
           const { location, checkIn, checkOut, guests } = lastSearchMeta.search_params;
           const guestCount = Number(guests) || 2;
-          finalText = `I'll open our booking widget for ${location}, ${checkIn} → ${checkOut} for ${guestCount} guest${guestCount !== 1 ? 's' : ''} so you can browse and book.`;
+          finalText = `**How would you like to handle this booking?**\n\nYou can book in two ways:\n\n1. **Work with a Goldsainte Certified Travel Agent** for personalized support, exclusive perks, and seamless trip coordination.\n\n2. **Or, book it yourself** through our affiliate partner Expedia for a quick, self-service option.`;
         } else if (lastSearchMeta && lastSearchMeta.search_type === 'flights' && lastSearchMeta.search_params) {
           const { origin, destination, departureDate, returnDate, adults = 1 } = lastSearchMeta.search_params;
           const returnText = returnDate ? `, returning ${returnDate}` : '';
-          finalText = `I'll open our booking widget for flights from ${origin} to ${destination} on ${departureDate}${returnText} for ${adults} traveler${adults !== 1 ? 's' : ''}.`;
+          finalText = `**How would you like to handle this booking?**\n\nYou can book in two ways:\n\n1. **Work with a Goldsainte Certified Travel Agent** for personalized support, exclusive perks, and seamless trip coordination.\n\n2. **Or, book it yourself** through our affiliate partner Expedia for a quick, self-service option.`;
         }
         
         console.log("🎯 [HELP CENTER] Returning final response:", {
