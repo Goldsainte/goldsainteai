@@ -225,14 +225,6 @@ export const Header = () => {
                 </a>
                 
                 <div className="flex items-center gap-2">
-                  {user && <NotificationCenter />}
-                  <LanguageSelector
-                    variant="ghost" 
-                    size="sm" 
-                    currentLanguage={currentLanguage}
-                    onLanguageChange={handleLanguageChange}
-                  />
-                  
                   {/* Mobile Navigation Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -432,6 +424,19 @@ export const Header = () => {
                           
                           <DropdownMenuSeparator className="bg-border/50" />
                           
+                          {/* Language Selector */}
+                          <div className="mx-2 px-4 py-3">
+                            <p className="text-xs font-medium text-muted-foreground mb-2">Language</p>
+                            <LanguageSelector
+                              variant="outline" 
+                              size="sm" 
+                              currentLanguage={currentLanguage}
+                              onLanguageChange={handleLanguageChange}
+                            />
+                          </div>
+                          
+                          <DropdownMenuSeparator className="bg-border/50" />
+                          
                           <DropdownMenuItem 
                             onClick={signOut} 
                             className="mx-2 px-4 py-4 min-h-[48px] gap-4 cursor-pointer rounded-lg hover:bg-secondary/10 text-destructive touch-manipulation"
@@ -497,12 +502,6 @@ export const Header = () => {
 
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                <LanguageSelector 
-                  variant="ghost" 
-                  size="sm"
-                  currentLanguage={currentLanguage}
-                  onLanguageChange={handleLanguageChange}
-                />
                 {user && <NotificationCenter />}
                 
                 {/* Main Navigation - Desktop */}
@@ -780,6 +779,19 @@ export const Header = () => {
                           <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
                             Apply saved preferences to searches
                           </p>
+                        </div>
+                        
+                        <DropdownMenuSeparator className="bg-border/50" />
+                        
+                        {/* Language Selector */}
+                        <div className="px-4 py-4">
+                          <p className="text-xs font-medium text-muted-foreground mb-2">Language</p>
+                          <LanguageSelector
+                            variant="outline" 
+                            size="sm" 
+                            currentLanguage={currentLanguage}
+                            onLanguageChange={handleLanguageChange}
+                          />
                         </div>
                         
                         <DropdownMenuSeparator className="bg-border/50" />
