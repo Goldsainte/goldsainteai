@@ -169,7 +169,7 @@ const tools = [
     type: "function",
     function: {
       name: "search_flights",
-      description: "Search for flights between two cities with departure/return dates and cabin class. Returns available flight options.",
+      description: "Extract flight search parameters (origin, destination, dates, travelers) to open the booking widget. Does not return actual flight results.",
       parameters: {
         type: "object",
         properties: {
@@ -340,17 +340,27 @@ serve(async (req) => {
 
       // If no tool calls, return the final response
       if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
-        const finalMessageRaw = assistantMessage.content || "";
-        const finalMessage = stripRoutes(finalMessageRaw);
+        let finalText = stripRoutes(assistantMessage.content || "I apologize, but I'm having trouble processing your request right now.");
+        
+        // Force canonical message when opening Expedia widget
+        if (lastSearchMeta && lastSearchMeta.search_type === 'hotels' && lastSearchMeta.search_params) {
+          const { location, checkIn, checkOut, guests } = lastSearchMeta.search_params;
+          const guestCount = Number(guests) || 2;
+          finalText = `I'll open our booking widget for ${location}, ${checkIn} → ${checkOut} for ${guestCount} guest${guestCount !== 1 ? 's' : ''} so you can browse and book.`;
+        } else if (lastSearchMeta && lastSearchMeta.search_type === 'flights' && lastSearchMeta.search_params) {
+          const { origin, destination, departureDate, returnDate, adults = 1 } = lastSearchMeta.search_params;
+          const returnText = returnDate ? `, returning ${returnDate}` : '';
+          finalText = `I'll open our booking widget for flights from ${origin} to ${destination} on ${departureDate}${returnText} for ${adults} traveler${adults !== 1 ? 's' : ''}.`;
+        }
         
         console.log("🎯 [HELP CENTER] Returning final response:", {
-          messageLength: finalMessage.length,
+          messageLength: finalText.length,
           hasLastSearchMeta: !!lastSearchMeta,
           metaDetails: lastSearchMeta
         });
         
         return new Response(
-          JSON.stringify({ response: finalMessage, meta: lastSearchMeta }),
+          JSON.stringify({ response: finalText, meta: lastSearchMeta }),
           {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           }
@@ -405,48 +415,42 @@ serve(async (req) => {
           const args = JSON.parse(toolCall.function.arguments);
           
           if (!args.origin || !args.destination || !args.departureDate) {
-            toolCallResults.push({
-              tool_call_id: toolCall.id,
-              role: "tool",
-              name: "search_flights",
-              content: JSON.stringify({
-                error: "VALIDATION_ERROR",
-                message: "Missing required flight parameters"
-              })
-            });
-            continue;
+            toolResult = {
+              error: "VALIDATION_ERROR",
+              message: "Missing required flight parameters"
+            };
+          } else {
+            const searchParams = {
+              origin: args.origin,
+              destination: args.destination,
+              departureDate: args.departureDate,
+              returnDate: args.returnDate || null,
+              adults: args.adults || 1,
+              travelClass: args.travelClass || 'ECONOMY'
+            };
+            
+            console.log('🎯 [HELP-CENTER FLIGHT INTENT]', searchParams);
+            
+            toolResult = {
+              status: "OK",
+              message: "Flight preferences extracted. Opening search widget...",
+              search_params: searchParams,
+              search_type: 'flights'
+            };
+            
+            lastSearchMeta = {
+              status: "OK",
+              search_params: searchParams,
+              search_type: 'flights'
+            };
           }
           
-          const searchParams = {
-            origin: args.origin,
-            destination: args.destination,
-            departureDate: args.departureDate,
-            returnDate: args.returnDate || null,
-            adults: args.adults || 1,
-            travelClass: args.travelClass || 'ECONOMY'
-          };
-          
-          console.log('🎯 [HELP-CENTER FLIGHT INTENT]', searchParams);
-          
-          const flightIntentResult = {
-            status: "OK",
-            message: "Flight preferences extracted. Opening search widget...",
-            search_params: searchParams,
-            search_type: 'flights'
-          };
-          
-          toolCallResults.push({
-            tool_call_id: toolCall.id,
+          // Add tool result to conversation
+          conversationMessages.push({
             role: "tool",
-            name: "search_flights",
-            content: JSON.stringify(flightIntentResult)
+            tool_call_id: toolCall.id,
+            content: JSON.stringify(toolResult)
           });
-          
-          lastSearchMeta = {
-            status: "OK",
-            search_params: searchParams,
-            search_type: 'flights'
-          };
           
         } else if (toolCall.function.name === "search_events") {
           const args = JSON.parse(toolCall.function.arguments);

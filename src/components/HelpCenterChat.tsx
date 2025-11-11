@@ -60,39 +60,29 @@ export const HelpCenterChat = () => {
         };
         setMessages(prev => [...prev, assistantMessage]);
 
-        // If the AI detected a hotel search intent, open Expedia modal or show Booking.com list
-        if (data?.meta?.status === 'OK' && data.meta.search_params) {
-          const searchParams = data.meta.search_params;
+        // Check if we should open Expedia modal (feature flag enabled and search params present)
+        if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_MODAL && data.meta?.status === 'OK' && data.meta?.search_params) {
+          console.log('🎯 Opening Expedia modal with params:', data.meta.search_params);
           
-          // Check viewport width for mobile-first behavior
-          const isMobile = typeof window !== 'undefined' && window.innerWidth <= FEATURE_FLAGS.MOBILE_BREAKPOINT;
-          
-          if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_MODAL || isMobile) {
-            // Open Expedia modal with prefill
+          if (data.meta.search_type === 'hotels') {
             openExpediaModal({
-              destination: searchParams.location || '',
-              checkIn: searchParams.check_in_date || searchParams.checkIn || '',
-              checkOut: searchParams.check_out_date || searchParams.checkOut || '',
-              adults: parseInt(searchParams.guests?.toString() || '2'),
+              destination: data.meta.search_params.location || '',
+              checkIn: data.meta.search_params.checkIn || '',
+              checkOut: data.meta.search_params.checkOut || '',
+              adults: Number(data.meta.search_params.guests || 2),
               children: 0,
             });
-            setIsOpen(false); // Close chat after opening modal
-          } else if (FEATURE_FLAGS.USE_CHAT_BOOKING_LIST) {
-            // Legacy behavior: navigate to Booking.com search results
-            const queryParams = new URLSearchParams({
-              type: searchParams.type || 'hotels',
-              location: searchParams.location || '',
-              checkIn: searchParams.check_in_date || searchParams.checkIn || '',
-              checkOut: searchParams.check_out_date || searchParams.checkOut || '',
-              guests: searchParams.guests?.toString() || '2',
-              ...(searchParams.max_price && { maxPrice: searchParams.max_price.toString() }),
-              ...(searchParams.currency && { currency: searchParams.currency }),
-              from_chat: 'true',
-              suppress_ui: JSON.stringify(['date_picker', 'budget_slider']),
+          } else if (data.meta.search_type === 'flights') {
+            openExpediaModal({
+              destination: data.meta.search_params.destination || '',
+              checkIn: data.meta.search_params.departureDate || '',
+              checkOut: data.meta.search_params.returnDate || '',
+              adults: Number(data.meta.search_params.adults || 1),
             });
-            navigate(`/search?${queryParams.toString()}`);
-            setIsOpen(false);
           }
+          
+          // Close chat after opening modal
+          setTimeout(() => setIsOpen(false), 300);
         }
       }
     } catch (error: any) {
