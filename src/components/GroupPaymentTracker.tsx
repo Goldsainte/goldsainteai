@@ -59,7 +59,7 @@ export const GroupPaymentTracker = ({ bookingId }: { bookingId: string }) => {
 
   const fetchBookingData = async () => {
     try {
-      const { data: bookingData, error: bookingError } = await supabase
+      const { data: bookingData, error: bookingError } = await (supabase as any)
         .from("group_bookings")
         .select("*")
         .eq("id", bookingId)
@@ -68,7 +68,7 @@ export const GroupPaymentTracker = ({ bookingId }: { bookingId: string }) => {
       if (bookingError) throw bookingError;
       setBooking(bookingData);
 
-      const { data: participantsData, error: participantsError } = await supabase
+      const { data: participantsData, error: participantsError } = await (supabase as any)
         .from("group_participants")
         .select("*")
         .eq("booking_id", bookingId)

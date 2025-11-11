@@ -20,8 +20,7 @@ export const NotificationCenter = () => {
     unreadCount,
     markAsRead,
     markAllAsRead,
-    deleteNotification,
-  } = useNotifications(user?.id);
+  } = useNotifications();
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -114,7 +113,7 @@ export const NotificationCenter = () => {
                         )}
                       </div>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {notification.message}
+                        {notification.body}
                       </p>
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-muted-foreground">
@@ -122,17 +121,6 @@ export const NotificationCenter = () => {
                             addSuffix: true,
                           })}
                         </span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-6 px-2 text-xs"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteNotification(notification.id);
-                          }}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
                       </div>
                     </div>
                   </div>

@@ -54,8 +54,8 @@ export function PerformanceMonitor() {
     return () => observer.disconnect();
   }, []);
 
-  const getScoreColor = (metric: string, value: number | null): string => {
-    if (value === null) return "muted";
+  const getScoreColor = (metric: string, value: number | null): "default" | "secondary" | "destructive" | "outline" => {
+    if (value === null) return "outline";
     
     switch (metric) {
       case "lcp":
@@ -69,7 +69,7 @@ export function PerformanceMonitor() {
       case "ttfb":
         return value <= 800 ? "default" : value <= 1800 ? "secondary" : "destructive";
       default:
-        return "muted";
+        return "outline";
     }
   };
 

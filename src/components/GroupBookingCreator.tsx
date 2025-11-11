@@ -83,8 +83,8 @@ export const GroupBookingCreator = () => {
       }
 
       // Create group booking
-      const { data: booking, error: bookingError } = await supabase
-        .from<any>('group_bookings' as any)
+      const { data: booking, error: bookingError } = await (supabase as any)
+        .from('group_bookings')
         .insert({
           title: data.title,
           description: data.description,
@@ -103,7 +103,7 @@ export const GroupBookingCreator = () => {
       if (bookingError) throw bookingError;
 
       // Add participants
-      const { error: participantsError } = await supabase
+      const { error: participantsError } = await (supabase as any)
         .from("group_participants")
         .insert(
           validParticipants.map(p => ({
