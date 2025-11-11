@@ -73,9 +73,12 @@ export const HelpCenterChat = () => {
       if (error) throw error;
 
       if (data?.response) {
-        // Check if we should show booking choice prompt
+        // PRIORITY 1: Check if we should show booking choice prompt FIRST
         if (data.meta?.ui?.showChoicePrompt) {
-          console.log('🎯 [TELEMETRY] booking_choice_rendered');
+          console.log('🎯 [TELEMETRY] booking_choice_rendered', {
+            tripType: data.meta.search_type,
+            hasParams: !!data.meta.search_params
+          });
           const assistantMessage: Message = {
             role: 'assistant',
             content: sanitizeAssistantContent(data.response),
@@ -86,7 +89,7 @@ export const HelpCenterChat = () => {
           };
           setMessages(prev => [...prev, assistantMessage]);
         }
-        // Check if we should show date picker
+        // PRIORITY 2: Check if we should show date picker
         else if (data.meta?.ui?.showDatePicker) {
           console.log('🎯 Rendering inline date picker');
           const assistantMessage: Message = {
@@ -100,8 +103,8 @@ export const HelpCenterChat = () => {
           };
           setMessages(prev => [...prev, assistantMessage]);
         }
-        // Check if we should render inline widget
-        else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params) {
+        // PRIORITY 3: Check if we should render inline widget (ONLY if no choice prompt)
+        else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params && !data.meta?.ui?.showChoicePrompt) {
           console.log('🎯 Rendering inline Expedia widget with params:', data.meta.search_params);
           console.log('🎯 [TELEMETRY] chat_expedia_widget_inserted');
           
@@ -266,6 +269,7 @@ export const HelpCenterChat = () => {
         {msg.choicePrompt && (
           <BookingChoicePrompt
             tripType={msg.choicePrompt.tripType}
+            prefillData={msg.choicePrompt.prefillData}
             onChoice={(choice) => handleBookingChoice(index, choice, msg.choicePrompt!.tripType, msg.choicePrompt!.prefillData)}
           />
         )}

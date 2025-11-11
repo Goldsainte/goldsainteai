@@ -5,9 +5,31 @@ import { Plane, Hotel } from 'lucide-react';
 interface BookingChoicePromptProps {
   tripType: 'hotels' | 'flights' | 'hotel+flight';
   onChoice: (choice: 'self_service' | 'agent') => void;
+  prefillData?: {
+    location?: string;
+    destination?: string;
+    origin?: string;
+    checkIn?: string;
+    checkOut?: string;
+    departureDate?: string;
+    returnDate?: string;
+  };
 }
 
-export const BookingChoicePrompt = ({ tripType, onChoice }: BookingChoicePromptProps) => {
+export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: BookingChoicePromptProps) => {
+  const destination = prefillData?.location || prefillData?.destination || '';
+  const origin = prefillData?.origin || '';
+  
+  const getMessage = () => {
+    if (tripType === 'hotels' && destination) {
+      return `I can help you book hotels in ${destination}! Would you like to handle this yourself through our quick booking widget, or work with a Goldsainte Certified Travel Agent for personalized support and exclusive perks?`;
+    } else if (tripType === 'flights' && destination) {
+      const route = origin ? `from ${origin} to ${destination}` : `to ${destination}`;
+      return `I can help you book flights ${route}! Would you like to search and book yourself, or have a Goldsainte Certified Travel Agent handle all the details?`;
+    }
+    return "How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.";
+  };
+
   return (
     <Card className="p-4 bg-card border-border">
       <div className="space-y-4">
@@ -16,7 +38,7 @@ export const BookingChoicePrompt = ({ tripType, onChoice }: BookingChoicePromptP
           {tripType === 'hotels' && <Hotel className="w-5 h-5 text-primary mt-1" />}
           <div className="flex-1">
             <p className="text-sm text-foreground leading-relaxed">
-              How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.
+              {getMessage()}
             </p>
           </div>
         </div>
