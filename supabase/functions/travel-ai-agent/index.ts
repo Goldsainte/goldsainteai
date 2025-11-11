@@ -361,10 +361,11 @@ function parseDates(input: string): { checkIn?: string; checkOut?: string } {
 
 // Helper functions for tool execution
 async function searchHotels(args: any) {
-  // Use unified hotel search for consistency with Search page
+  // Extract hotel search intent only - DO NOT call any hotel APIs
+  // The Expedia widget will handle the actual search
   try {
-    let { location, checkIn, checkOut, guests = 2, sortBy, minRating, maxPrice } = args;
-    console.log('🔍 [HOTEL SEARCH] Raw arguments:', args);
+    let { location, checkIn, checkOut, guests = 2, max_total_price, currency = 'USD' } = args;
+    console.log('🔍 [HOTEL INTENT] Extracting travel preferences:', args);
     
     // ⚠️ SECURITY: Server-side date validation using shared validation helper
     console.log('🔒 [VALIDATION] Validating hotel dates:', { checkIn, checkOut });
@@ -373,8 +374,8 @@ async function searchHotels(args: any) {
       console.error('❌ [VALIDATION] Date validation failed:', dateValidation.error);
       return {
         error: dateValidation.error,
-        results: [],
-        suggestion: 'Please provide valid dates for your hotel search'
+        suggestion: 'Please provide valid dates for your hotel search',
+        status: 'ERROR'
       };
     }
     
@@ -385,95 +386,38 @@ async function searchHotels(args: any) {
         console.error('❌ [VALIDATION] Guests validation failed:', guestsValidation.error);
         return {
           error: guestsValidation.error,
-          results: []
+          status: 'ERROR'
         };
       }
     }
     
     console.log('✅ [VALIDATION] All validations passed');
-    console.log('🔍 [HOTEL SEARCH] Calling unified-search-hotels with:', { location, checkIn, checkOut, guests });
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
     
-    const response = await fetch(`${supabaseUrl}/functions/v1/unified-search-hotels`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        location,
-        checkIn,
-        checkOut,
-        guests: guests || 2
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Unified hotel search error:', response.status, errorText);
-      return { error: `Could not find hotels in "${location}". Please try a different location.`, results: [] };
-    }
-
-    const data = await response.json();
-    let hotels = data.results || [];
-    
-    console.log('🏨 [HOTEL SEARCH] Raw response from unified-search-hotels:', {
-      hasResults: !!data.results,
-      resultsLength: data.results?.length || 0,
-      dataKeys: Object.keys(data),
-      firstHotelSample: hotels[0] ? {
-        name: hotels[0].name,
-        price: hotels[0].price,
-        hasPhotos: !!hotels[0].photos?.length
-      } : null
-    });
-    console.log(`✅ [HOTEL SEARCH] Unified search returned ${hotels.length} hotels`);
-
-    // Apply filters
-    if (typeof minRating === 'number') {
-      const minRatingNormalized = minRating > 5 ? minRating / 2 : minRating;
-      hotels = hotels.filter((h: any) => (h.rating || 0) >= minRatingNormalized);
-    }
-    if (typeof maxPrice === 'number') {
-      hotels = hotels.filter((h: any) => (h.price || 0) <= maxPrice);
-    }
-    if (sortBy === 'price') {
-      hotels.sort((a: any, b: any) => (a.price || 0) - (b.price || 0));
-    } else if (sortBy === 'review_score') {
-      hotels.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0));
-    }
-
-    console.log(`✅ [HOTEL SEARCH] After filters: ${hotels.length} hotels`);
-    
-    // LIMIT hotels to 15 max to prevent token overflow
-    hotels = hotels.slice(0, 15);
-
-    const searchResult = {
-      type: 'hotels',
-      location: { name: location, dest_id: location },
-      results: hotels,
+    // Just structure and return the search parameters - no API calls
+    const searchParams = {
+      location,
       checkIn,
       checkOut,
-      guests,
-      filters: { sortBy, minRating, maxPrice }
+      guests: guests || 2,
+      ...(max_total_price && { max_total_price }),
+      currency: currency || 'USD'
     };
     
-    console.log('🎯 [HOTEL SEARCH] Returning search result:', {
-      type: searchResult.type,
-      resultsCount: searchResult.results.length,
-      location: searchResult.location.name,
-      sampleHotel: searchResult.results[0] ? {
-        name: searchResult.results[0].name,
-        price: searchResult.results[0].price
-      } : null
-    });
-
-    return searchResult;
+    console.log('🎯 [HOTEL INTENT] Travel preferences extracted:', searchParams);
+    
+    // Return structured parameters for Expedia widget
+    return {
+      status: "OK",
+      message: "Travel preferences extracted. Opening search widget...",
+      search_params: searchParams,
+      search_type: 'hotels'
+    };
   } catch (error) {
     console.error('Error in searchHotels:', error);
-    return { error: error instanceof Error ? error.message : 'Unknown error', results: [] };
+    return { 
+      error: error instanceof Error ? error.message : 'Unknown error',
+      status: 'ERROR'
+    };
   }
 }
 
