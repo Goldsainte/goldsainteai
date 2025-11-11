@@ -1382,18 +1382,21 @@ The user has saved preferences but has chosen to search without strict filtering
         }
         
         if (toolResult && !toolResult.error) {
-          const resultCount = toolResult.results?.length || 0;
-          const finalMessage = resultCount > 0 
-            ? `I found ${resultCount} excellent ${currentState.type === 'hotel' ? 'hotels' : 'flights'} for you! Check them out below.\n\nWould you like to book this yourself, or would you prefer to be matched with a Goldsainte certified travel agent who can handle all the details?`
-            : "I couldn't find any available options for those criteria. Try different dates or location?";
+          // Return canonical booking choice message - never claim to have found results
+          const canonicalMessage = "How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.";
           
           return new Response(JSON.stringify({
-            message: finalMessage,
-            toolResults: [toolResult.forUser || toolResult],
+            message: canonicalMessage,
+            meta: {
+              status: "OK",
+              search_type: currentState.type === 'hotel' ? 'hotels' : 'flights',
+              search_params: toolResult.search_params || currentState.slots,
+              ui: { showChoicePrompt: true }
+            },
             conversationHistory: [
               ...conversationHistory,
               { role: 'user', content: message },
-              { role: 'assistant', content: finalMessage, conversationState: currentState }
+              { role: 'assistant', content: canonicalMessage, conversationState: currentState }
             ]
           }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -1743,7 +1746,7 @@ The user has saved preferences but has chosen to search without strict filtering
         type: "function",
         function: {
           name: "search_hotels",
-          description: "Search for hotels in a specific location. IMPORTANT: You must have location, check-in date (YYYY-MM-DD), and check-out date (YYYY-MM-DD) before calling this tool. Ask the user for these details if not provided. You can also filter by price, rating, amenities, and sort by different criteria.",
+          description: "⚠️ CRITICAL: This tool extracts hotel search parameters ONLY - it does NOT return actual hotel results. It validates travel details (location, check-in, check-out, guests) and returns structured parameters to open the Expedia booking widget. NEVER claim to have found hotels. After calling this tool, the system will present booking options to the user.",
           parameters: {
             type: "object",
             properties: {
@@ -1790,7 +1793,7 @@ The user has saved preferences but has chosen to search without strict filtering
         type: "function",
         function: {
           name: "search_flights",
-          description: "Search for flights between two cities. CRITICAL: You MUST ask the user for the departure date before calling this tool. NEVER use default dates or infer dates. Use this when users ask about flights, airfare, or flying from one place to another. You can specify one-way or round-trip, cabin class, and whether direct flights only.",
+          description: "⚠️ CRITICAL: This tool extracts flight search parameters ONLY - it does NOT return actual flight results. It validates travel details (origin, destination, dates, passengers) and returns structured parameters to open the Expedia booking widget. NEVER claim to have found flights. After calling this tool, the system will present booking options to the user.",
           parameters: {
             type: "object",
             properties: {

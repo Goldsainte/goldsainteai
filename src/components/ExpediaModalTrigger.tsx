@@ -6,12 +6,12 @@ import { CompactHeaderSearch } from './CompactHeaderSearch';
  * Place this component once at the app level to enable modal control from anywhere
  */
 export const ExpediaModalTrigger = () => {
-  const { isOpen, prefill, closeModal } = useExpediaModal();
+  const { isOpen, prefill, openModal, closeModal } = useExpediaModal();
 
   return (
     <CompactHeaderSearch
       externalOpen={isOpen}
-      onExternalOpenChange={closeModal}
+      onExternalOpenChange={(next) => next ? openModal(prefill || undefined) : closeModal()}
       prefill={prefill || undefined}
     />
   );
