@@ -1,0 +1,88 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      { auth: { persistSession: false } }
+    );
+
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+    
+    if (userError || !user) {
+      throw new Error('Unauthorized');
+    }
+
+    const payload = await req.json();
+    const { tripType, hotelRequest, flightRequest, lead } = payload;
+
+    console.log('Creating marketplace lead:', { userId: user.id, tripType });
+
+    // Create marketplace job
+    const { data: job, error: jobError } = await supabaseClient
+      .from('marketplace_jobs')
+      .insert({
+        user_id: user.id,
+        title: `${tripType} Booking Request`,
+        description: `Trip type: ${tripType}\n\nHotel: ${hotelRequest ? JSON.stringify(hotelRequest, null, 2) : 'N/A'}\n\nFlight: ${flightRequest ? JSON.stringify(flightRequest, null, 2) : 'N/A'}`,
+        booking_type: tripType === 'hotel' ? 'hotel' : tripType === 'flight' ? 'flight' : 'package',
+        destination: hotelRequest?.destination || flightRequest?.destination || 'TBD',
+        budget_min: hotelRequest?.budgetPerNight || flightRequest?.budgetTotal || 0,
+        budget_max: (hotelRequest?.budgetPerNight || flightRequest?.budgetTotal || 0) * 1.5,
+        currency: hotelRequest?.currency || flightRequest?.currency || 'USD',
+        status: 'open',
+        expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      })
+      .select()
+      .single();
+
+    if (jobError) {
+      console.error('Error creating job:', jobError);
+      throw jobError;
+    }
+
+    // Log activity
+    await supabaseClient.from('activity_logs').insert({
+      user_id: user.id,
+      action: 'marketplace_lead_created',
+      entity_type: 'marketplace_job',
+      entity_id: job.id,
+      details: { source: 'ai_chat', tripType },
+    });
+
+    console.log('✅ Marketplace lead created:', job.id);
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        leadId: job.id,
+        caseId: `MKT-${job.id.slice(0, 8).toUpperCase()}`,
+        message: 'Your request has been submitted to our Goldsainte Certified Travel Agents. You should receive responses within 24 hours.',
+      }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error in create-marketplace-lead:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});

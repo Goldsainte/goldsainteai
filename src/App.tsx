@@ -35,6 +35,7 @@ import AgentOnboarding from "./pages/AgentOnboarding";
 import AgentDashboard from "./pages/AgentDashboard";
 import AdminAgentApprovals from "./pages/AdminAgentApprovals";
 import Admin from "./pages/Admin";
+import SystemHealth from "./pages/SystemHealth";
 import AdminInquiries from "./pages/AdminInquiries";
 import AdminCancellations from "./pages/AdminCancellations";
 import AdminCancellationAnalytics from "./pages/AdminCancellationAnalytics";
@@ -240,6 +241,7 @@ function AppContent() {
           <Route path="/agent-performance" element={<RequireAgentTerms><AgentPerformanceDashboard /></RequireAgentTerms>} />
           <Route path="/admin/agent-approvals" element={<AdminAgentApprovals />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/system-health" element={<SystemHealth />} />
           <Route path="/admin/cancellations" element={<AdminCancellations />} />
           <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
           <Route path="/subscription" element={<Subscription />} />
