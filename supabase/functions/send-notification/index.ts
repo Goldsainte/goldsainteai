@@ -1,66 +1,68 @@
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendNotification, NotificationPayload, NotificationChannel } from "../_shared/notificationService.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface NotificationRequest {
+interface SendNotificationRequest {
   userId: string;
-  type: string;
   title: string;
-  message: string;
-  metadata?: Record<string, any>;
-  link?: string;
+  body: string;
+  type: 'booking' | 'payment' | 'message' | 'milestone' | 'system';
+  priority?: 'low' | 'medium' | 'high' | 'urgent';
+  actionUrl?: string;
+  data?: Record<string, any>;
+  channels?: Partial<NotificationChannel>;
 }
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { userId, type, title, message, metadata, link }: NotificationRequest = await req.json();
+    const requestData = await req.json() as SendNotificationRequest;
 
-    if (!userId || !type || !title || !message) {
-      throw new Error('Missing required fields: userId, type, title, message');
-    }
+    const payload: NotificationPayload = {
+      userId: requestData.userId,
+      title: requestData.title,
+      body: requestData.body,
+      type: requestData.type,
+      priority: requestData.priority || 'medium',
+      actionUrl: requestData.actionUrl,
+      data: requestData.data,
+    };
 
-    // Insert notification into database
-    const { data, error } = await supabaseClient
-      .from('notifications')
-      .insert({
-        user_id: userId,
-        notification_type: type,
-        title,
-        message,
-        metadata: metadata || {},
-        link: link || null,
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating notification:', error);
-      throw error;
-    }
-
-    console.log(`Notification sent to user ${userId}: ${type}`);
-
-    return new Response(
-      JSON.stringify({ success: true, notification: data }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
+    const result = await sendNotification(
+      supabaseClient,
+      payload,
+      requestData.channels
     );
-  } catch (error: any) {
-    console.error('Error in send-notification:', error);
+
+    console.log(`[NOTIFICATION] Sent to user ${requestData.userId} via ${result.channels.join(', ')}`);
+
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({
+        success: result.success,
+        channels: result.channels,
+        errors: result.errors.length > 0 ? result.errors : undefined,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (error) {
+    console.error("Error sending notification:", error);
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    return new Response(
+      JSON.stringify({ error: errorMessage }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
     );
   }
 });

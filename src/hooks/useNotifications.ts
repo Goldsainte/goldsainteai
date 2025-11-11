@@ -5,170 +5,186 @@ import { useToast } from '@/hooks/use-toast';
 interface Notification {
   id: string;
   user_id: string;
-  trip_id: string;
-  type: string;
   title: string;
-  message: string;
-  data: any;
+  body: string;
+  type: 'booking' | 'payment' | 'message' | 'milestone' | 'system';
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  action_url?: string;
+  data?: Record<string, any>;
   read: boolean;
+  read_at?: string;
   created_at: string;
 }
 
-export const useNotifications = (userId: string | undefined) => {
+export function useNotifications() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchNotifications = async () => {
-    if (!userId) return;
-
+  // Fetch notifications
+  const fetchNotifications = async (unreadOnly = false) => {
     try {
-      const { data, error } = await supabase
-        .from('trip_notifications')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(50);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-      if (error) throw error;
-      
-      setNotifications(data || []);
-      setUnreadCount((data || []).filter(n => !n.read).length);
-    } catch (error: any) {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?${new URLSearchParams({
+          unread: unreadOnly.toString(),
+        })}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch notifications');
+
+      const result = await response.json();
+      setNotifications(result.notifications || []);
+    } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (userId) {
-      fetchNotifications();
+  // Fetch unread count
+  const fetchUnreadCount = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?action=count`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to fetch unread count');
+
+      const result = await response.json();
+      setUnreadCount(result.count || 0);
+    } catch (error) {
+      console.error('Error fetching unread count:', error);
     }
-  }, [userId]);
+  };
 
-  // Real-time subscription
-  useEffect(() => {
-    if (!userId) return;
-
-    const channel = supabase
-      .channel('user-notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'trip_notifications',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const newNotification = payload.new as Notification;
-          setNotifications((prev) => [newNotification, ...prev]);
-          setUnreadCount((prev) => prev + 1);
-          
-          // Show toast notification
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-          });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'trip_notifications',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const updated = payload.new as Notification;
-          setNotifications((prev) =>
-            prev.map((n) => (n.id === updated.id ? updated : n))
-          );
-          if (updated.read) {
-            setUnreadCount((prev) => Math.max(0, prev - 1));
-          }
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'trip_notifications',
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const deleted = payload.old as Notification;
-          setNotifications((prev) => prev.filter((n) => n.id !== deleted.id));
-          if (!deleted.read) {
-            setUnreadCount((prev) => Math.max(0, prev - 1));
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [userId]);
-
+  // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     try {
-      const { error } = await supabase
-        .from('trip_notifications')
-        .update({ read: true } as any)
-        .eq('id', notificationId);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-      if (error) throw error;
-    } catch (error: any) {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?${new URLSearchParams({
+          action: 'markRead',
+          id: notificationId,
+        })}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to mark as read');
+
+      // Update local state
+      setNotifications(prev =>
+        prev.map(n => (n.id === notificationId ? { ...n, read: true } : n))
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (error) {
       console.error('Error marking notification as read:', error);
     }
   };
 
+  // Mark all as read
   const markAllAsRead = async () => {
-    if (!userId) return;
-
     try {
-      const { error } = await supabase
-        .from('trip_notifications')
-        .update({ read: true } as any)
-        .eq('user_id', userId)
-        .eq('read', false);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
 
-      if (error) throw error;
-    } catch (error: any) {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?action=markAllRead`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to mark all as read');
+
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setUnreadCount(0);
+    } catch (error) {
       console.error('Error marking all as read:', error);
     }
   };
 
-  const deleteNotification = async (notificationId: string) => {
-    try {
-      const { error } = await supabase
-        .from('trip_notifications')
-        .delete()
-        .eq('id', notificationId);
+  // Subscribe to real-time notifications
+  useEffect(() => {
+    const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          await fetchNotifications();
+          await fetchUnreadCount();
 
-      if (error) throw error;
-    } catch (error: any) {
-      console.error('Error deleting notification:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to delete notification',
-        variant: 'destructive',
-      });
-    }
-  };
+          // Subscribe to new notifications
+          const channel = supabase
+            .channel('notifications')
+            .on(
+              'postgres_changes',
+              {
+                event: 'INSERT',
+                schema: 'public',
+                table: 'notifications',
+                filter: `user_id=eq.${session.user.id}`,
+              },
+              (payload) => {
+                const newNotification = payload.new as Notification;
+                setNotifications(prev => [newNotification, ...prev]);
+                setUnreadCount(prev => prev + 1);
+
+                // Show toast for high priority notifications
+                if (newNotification.priority === 'high' || newNotification.priority === 'urgent') {
+                  toast({
+                    title: newNotification.title,
+                    description: newNotification.body,
+                  });
+                }
+              }
+            )
+            .subscribe();
+
+          return () => {
+            channel.unsubscribe();
+          };
+        } else if (event === 'SIGNED_OUT') {
+          setNotifications([]);
+          setUnreadCount(0);
+        }
+      }
+    );
+
+    return () => {
+      authSubscription.unsubscribe();
+    };
+  }, []);
 
   return {
     notifications,
-    loading,
     unreadCount,
+    isLoading,
+    fetchNotifications,
+    fetchUnreadCount,
     markAsRead,
     markAllAsRead,
-    deleteNotification,
-    refetch: fetchNotifications,
   };
-};
+}
