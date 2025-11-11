@@ -299,7 +299,7 @@ export const HelpCenterChat = () => {
         {msg.agentIntake && (
           <AgentIntakeForm
             tripType={msg.agentIntake.tripType}
-            prefillData={msg.agentIntake.prefillData}
+            initialData={msg.agentIntake.prefillData}
             onComplete={(leadId) => handleAgentIntakeComplete(index, leadId)}
           />
         )}
