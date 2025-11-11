@@ -4,8 +4,9 @@
 
 export const FEATURE_FLAGS = {
   // Chat booking behavior
-  USE_CHAT_BOOKING_LIST: false, // Show Booking.com hotel list from chat
-  USE_EXPEDIA_WIDGET_MODAL: true, // Open Expedia widget modal from chat (default)
+  USE_CHAT_BOOKING_LIST: false, // Disabled - using Expedia widget instead
+  USE_EXPEDIA_WIDGET_MODAL: false, // Disabled - using inline widget instead
+  USE_EXPEDIA_WIDGET_INLINE: true, // Enabled - inline widget in chat
   
   // Mobile breakpoint for forcing modal behavior
   MOBILE_BREAKPOINT: 768, // px

@@ -5,12 +5,17 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useExpediaModal } from '@/contexts/ExpediaModalContext';
+import { ExpediaWidgetCard } from '@/components/ExpediaWidgetCard';
 import { FEATURE_FLAGS } from '@/config/features';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  widgetData?: {
+    type: 'hotel_intent' | 'flight_intent';
+    provider: 'expedia';
+    payload: any;
+  };
 }
 
 export const HelpCenterChat = () => {
@@ -20,7 +25,6 @@ export const HelpCenterChat = () => {
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const { openModal: openExpediaModal } = useExpediaModal();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -54,35 +58,54 @@ export const HelpCenterChat = () => {
       if (error) throw error;
 
       if (data?.response) {
-        const assistantMessage: Message = {
-          role: 'assistant',
-          content: sanitizeAssistantContent(data.response)
-        };
-        setMessages(prev => [...prev, assistantMessage]);
-
-        // Check if we should open Expedia modal (feature flag enabled and search params present)
-        if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_MODAL && data.meta?.status === 'OK' && data.meta?.search_params) {
-          console.log('🎯 Opening Expedia modal with params:', data.meta.search_params);
+        // Check if we should render inline widget
+        if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params) {
+          console.log('🎯 Rendering inline Expedia widget with params:', data.meta.search_params);
+          console.log('🎯 [TELEMETRY] chat_expedia_widget_inserted');
           
+          let widgetPayload;
           if (data.meta.search_type === 'hotels') {
-            openExpediaModal({
-              destination: data.meta.search_params.location || '',
-              checkIn: data.meta.search_params.checkIn || '',
-              checkOut: data.meta.search_params.checkOut || '',
-              adults: Number(data.meta.search_params.guests || 2),
-              children: 0,
-            });
+            widgetPayload = {
+              type: 'hotel_intent' as const,
+              provider: 'expedia' as const,
+              payload: {
+                destination: data.meta.search_params.location || '',
+                checkIn: data.meta.search_params.checkIn || '',
+                checkOut: data.meta.search_params.checkOut || '',
+                adults: Number(data.meta.search_params.guests || 2),
+                children: 0,
+                currency: data.meta.search_params.currency || 'USD',
+                locale: 'en-US'
+              }
+            };
           } else if (data.meta.search_type === 'flights') {
-            openExpediaModal({
-              destination: data.meta.search_params.destination || '',
-              checkIn: data.meta.search_params.departureDate || '',
-              checkOut: data.meta.search_params.returnDate || '',
-              adults: Number(data.meta.search_params.adults || 1),
-            });
+            widgetPayload = {
+              type: 'flight_intent' as const,
+              provider: 'expedia' as const,
+              payload: {
+                destination: data.meta.search_params.destination || '',
+                checkIn: data.meta.search_params.departureDate || '',
+                checkOut: data.meta.search_params.returnDate || '',
+                adults: Number(data.meta.search_params.adults || 1),
+                currency: 'USD',
+                locale: 'en-US'
+              }
+            };
           }
           
-          // Close chat after opening modal
-          setTimeout(() => setIsOpen(false), 300);
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: sanitizeAssistantContent(data.response),
+            widgetData: widgetPayload
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+        } else {
+          // Regular text message without widget
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: sanitizeAssistantContent(data.response)
+          };
+          setMessages(prev => [...prev, assistantMessage]);
         }
       }
     } catch (error: any) {
@@ -97,8 +120,15 @@ export const HelpCenterChat = () => {
     }
   };
 
-  const renderMessageContent = (content: string) => {
-    return <span>{content}</span>;
+  const renderMessageContent = (msg: Message) => {
+    return (
+      <>
+        {msg.content && <div className="mb-2">{msg.content}</div>}
+        {msg.widgetData && (
+          <ExpediaWidgetCard payload={msg.widgetData.payload} />
+        )}
+      </>
+    );
   };
 
   if (!isOpen) {
@@ -158,15 +188,15 @@ export const HelpCenterChat = () => {
               key={idx}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div
-                className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${
-                  msg.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
-                }`}
-              >
-                {msg.role === 'assistant' ? renderMessageContent(msg.content) : msg.content}
-              </div>
+              {msg.role === 'user' ? (
+                <div className="max-w-[85%] rounded-lg px-3 py-2 text-sm bg-primary text-primary-foreground">
+                  {msg.content}
+                </div>
+              ) : (
+                <div className={`${msg.widgetData ? 'w-full' : 'max-w-[85%]'} rounded-lg ${!msg.widgetData ? 'px-3 py-2 bg-muted' : ''} text-sm`}>
+                  {renderMessageContent(msg)}
+                </div>
+              )}
             </div>
           ))}
 
