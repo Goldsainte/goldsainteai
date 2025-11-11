@@ -25,24 +25,11 @@ export function useNotifications() {
   // Fetch notifications
   const fetchNotifications = async (unreadOnly = false) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?${new URLSearchParams({
-          unread: unreadOnly.toString(),
-        })}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch notifications');
-
-      const result = await response.json();
-      setNotifications(result.notifications || []);
+      const { data, error } = await supabase.functions.invoke('get-notifications', {
+        body: { action: 'list', unread: unreadOnly },
+      });
+      if (error) throw error;
+      setNotifications((data as any)?.notifications || []);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -53,22 +40,11 @@ export function useNotifications() {
   // Fetch unread count
   const fetchUnreadCount = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?action=count`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch unread count');
-
-      const result = await response.json();
-      setUnreadCount(result.count || 0);
+      const { data, error } = await supabase.functions.invoke('get-notifications', {
+        body: { action: 'count' },
+      });
+      if (error) throw error;
+      setUnreadCount((data as any)?.count || 0);
     } catch (error) {
       console.error('Error fetching unread count:', error);
     }
@@ -77,22 +53,10 @@ export function useNotifications() {
   // Mark notification as read
   const markAsRead = async (notificationId: string) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?${new URLSearchParams({
-          action: 'markRead',
-          id: notificationId,
-        })}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to mark as read');
+      const { error } = await supabase.functions.invoke('get-notifications', {
+        body: { action: 'markRead', id: notificationId },
+      });
+      if (error) throw error;
 
       // Update local state
       setNotifications(prev =>
@@ -107,19 +71,10 @@ export function useNotifications() {
   // Mark all as read
   const markAllAsRead = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-notifications?action=markAllRead`,
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
-          },
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to mark all as read');
+      const { error } = await supabase.functions.invoke('get-notifications', {
+        body: { action: 'markAllRead' },
+      });
+      if (error) throw error;
 
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
@@ -130,6 +85,7 @@ export function useNotifications() {
 
   // Subscribe to real-time notifications
   useEffect(() => {
+    let channel: any = null;
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === 'SIGNED_IN' && session) {
@@ -137,7 +93,7 @@ export function useNotifications() {
           await fetchUnreadCount();
 
           // Subscribe to new notifications
-          const channel = supabase
+          channel = supabase
             .channel('notifications')
             .on(
               'postgres_changes',
@@ -162,19 +118,20 @@ export function useNotifications() {
               }
             )
             .subscribe();
-
-          return () => {
-            channel.unsubscribe();
-          };
         } else if (event === 'SIGNED_OUT') {
           setNotifications([]);
           setUnreadCount(0);
+          if (channel) {
+            channel.unsubscribe();
+            channel = null;
+          }
         }
       }
     );
 
     return () => {
       authSubscription.unsubscribe();
+      if (channel) channel.unsubscribe();
     };
   }, []);
 

@@ -84,7 +84,7 @@ export const GroupBookingCreator = () => {
 
       // Create group booking
       const { data: booking, error: bookingError } = await supabase
-        .from("group_bookings")
+        .from<any>('group_bookings' as any)
         .insert({
           title: data.title,
           description: data.description,

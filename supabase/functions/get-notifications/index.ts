@@ -33,8 +33,13 @@ serve(async (req) => {
     }
 
     const url = new URL(req.url);
-    const action = url.searchParams.get("action");
-    const notificationId = url.searchParams.get("id");
+    const isPost = req.method === "POST";
+    let body: any = null;
+    if (isPost) {
+      try { body = await req.json(); } catch {}
+    }
+    const action = (isPost ? body?.action : null) ?? url.searchParams.get("action") ?? "list";
+    const notificationId = (isPost ? body?.id : null) ?? url.searchParams.get("id");
 
     // Handle different actions
     if (action === "count") {
@@ -62,9 +67,9 @@ serve(async (req) => {
     }
 
     // Default: Get all notifications with pagination
-    const limit = parseInt(url.searchParams.get("limit") || "20");
-    const offset = parseInt(url.searchParams.get("offset") || "0");
-    const unreadOnly = url.searchParams.get("unread") === "true";
+    const limit = parseInt(((isPost ? body?.limit : null) ?? url.searchParams.get("limit") ?? "20").toString());
+    const offset = parseInt(((isPost ? body?.offset : null) ?? url.searchParams.get("offset") ?? "0").toString());
+    const unreadOnly = ((isPost ? body?.unread : null) ?? url.searchParams.get("unread")) === true || url.searchParams.get("unread") === "true";
 
     let query = supabaseClient
       .from("notifications")
