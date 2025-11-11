@@ -16,7 +16,7 @@ export const BookingChoicePrompt = ({ tripType, onChoice }: BookingChoicePromptP
           {tripType === 'hotels' && <Hotel className="w-5 h-5 text-primary mt-1" />}
           <div className="flex-1">
             <p className="text-sm text-foreground leading-relaxed">
-              I found several options for you! Would you like to book this yourself, or would you prefer to be matched with a Goldsainte Certified Travel Agent who can handle all the details and add personalized touches to your trip?
+              How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.
             </p>
           </div>
         </div>

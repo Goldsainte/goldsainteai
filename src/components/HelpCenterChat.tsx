@@ -76,14 +76,9 @@ export const HelpCenterChat = () => {
         // Check if we should show booking choice prompt
         if (data.meta?.ui?.showChoicePrompt) {
           console.log('🎯 [TELEMETRY] booking_choice_rendered');
-          const isHotelFlow = data.meta.search_type === 'hotels';
-          const destination = data.meta.search_params?.location || '';
-          const contentText = isHotelFlow && destination
-            ? `I found several hotels for you in ${destination}! Would you like to book this yourself, or would you prefer to be matched with a Goldsainte Certified Travel Agent who can handle all the details and add personalized touches to your trip?`
-            : sanitizeAssistantContent(data.response);
           const assistantMessage: Message = {
             role: 'assistant',
-            content: contentText,
+            content: sanitizeAssistantContent(data.response),
             choicePrompt: {
               tripType: data.meta.search_type,
               prefillData: data.meta.search_params

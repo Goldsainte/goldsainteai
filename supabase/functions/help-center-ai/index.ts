@@ -347,7 +347,7 @@ serve(async (req) => {
         
         // Force canonical message when showing choice prompt
         if (lastSearchMeta && (lastSearchMeta.search_type === 'hotels' || lastSearchMeta.search_type === 'flights') && lastSearchMeta.search_params) {
-          finalText = `I found several options for you! Let me help you proceed with booking.`;
+          finalText = `How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.`;
         }
         
         console.log("🎯 [HELP CENTER] Returning final response:", {
