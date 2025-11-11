@@ -334,44 +334,37 @@ async function handleToolCall(toolName: string, args: any): Promise<any> {
   
   console.log(`Executing tool: ${toolName}`, args);
 
-  // HOTELS
+  // HOTELS - Intent extraction only
   if (toolName === "search_hotels") {
-    const response = await fetch(`${supabaseUrl}/functions/v1/search-hotels`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
-      body: JSON.stringify({
-        cityCode: args.location.toUpperCase().substring(0, 3), // Convert city name to IATA code
-        checkInDate: args.checkIn,
-        checkOutDate: args.checkOut,
-        adults: args.adults || 2,
-        currency: 'USD'
-      })
-    });
+    const { location, checkIn, checkOut, adults } = args;
 
-    if (!response.ok) return { error: 'Failed to search hotels.' };
-    const data = await response.json();
-    
-    if (data.results && data.results.length > 0) {
-      const hotels = data.results.slice(0, 5).map((hotel: any) => ({
-        id: hotel.id,
-        name: hotel.name,
-        location: hotel.location?.address || '',
-        pricePerNight: hotel.price?.amount || 0,
-        currency: hotel.price?.currency || 'USD',
-        rating: hotel.rating || 0,
-        amenities: hotel.amenities?.slice(0, 3) || [],
-        images: hotel.images?.slice(0, 2) || [],
-        distance: hotel.distance ? `${hotel.distance.value} ${hotel.distance.unit}` : null
-      }));
-      return { success: true, hotels, message: `Found ${hotels.length} hotels` };
+    if (!location || !checkIn || !checkOut) {
+      return { 
+        status: "ERROR", 
+        message: "Missing required fields", 
+        missing: { 
+          location: !location, 
+          checkIn: !checkIn, 
+          checkOut: !checkOut 
+        } 
+      };
     }
-    
-    // Return suggestions if no results
-    return { 
-      success: true, 
-      hotels: [], 
-      suggestions: data.suggestions || [],
-      message: 'No hotels found for these dates. Try adjusting your search criteria.' 
+
+    const searchParams = {
+      location,
+      checkIn,
+      checkOut,
+      guests: adults || 2,
+      currency: 'USD'
+    };
+
+    console.log('🎯 [ASSISTANT HOTEL INTENT]', searchParams);
+
+    return {
+      status: "OK",
+      message: "Travel preferences extracted. Opening search widget...",
+      search_params: searchParams,
+      search_type: "hotels"
     };
   }
 

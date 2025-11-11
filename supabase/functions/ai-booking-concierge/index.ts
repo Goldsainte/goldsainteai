@@ -1191,7 +1191,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
           
           const functionMap: Record<string, string> = {
             'search_flights': 'unified-search-flights', // Goldsainte Search
-            'search_hotels': 'unified-search-hotels', // Goldsainte Search
+            'search_hotels': null, // Intent extraction only - opens Expedia widget
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_fine_dining_restaurants': null, // Handled inline with curated data
             'search_cars': 'amadeus-search-cars',
@@ -1210,8 +1210,53 @@ Remember: You're an AI search concierge that helps find perfect travel options a
           
           const edgeFunctionName = functionMap[functionName];
           
-          // Handle update_trip_context inline
-          if (functionName === 'update_trip_context') {
+          // Handle search_hotels inline - intent extraction only
+          if (functionName === 'search_hotels') {
+            const { location, checkIn, checkOut, guests, max_total_price, currency } = args;
+            
+            if (!location || !checkIn || !checkOut) {
+              const errorResult = {
+                error: "VALIDATION_ERROR",
+                message: "Missing required fields for hotel search",
+                missing: {
+                  location: !location,
+                  checkIn: !checkIn,
+                  checkOut: !checkOut
+                }
+              };
+              toolResults.push({
+                tool_call_id: toolCall.id,
+                role: "tool",
+                name: functionName,
+                content: JSON.stringify(errorResult),
+              });
+              continue;
+            }
+
+            const searchParams = {
+              location,
+              checkIn,
+              checkOut,
+              guests: guests || 2,
+              ...(max_total_price && { max_total_price }),
+              currency: currency || 'USD',
+            };
+
+            console.log('🎯 [CONCIERGE HOTEL INTENT]', searchParams);
+
+            toolResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify({
+                status: "OK",
+                message: "Travel preferences extracted. Opening search widget...",
+                search_params: searchParams,
+                search_type: "hotels"
+              })
+            });
+            continue;
+          } else if (functionName === 'update_trip_context') {
             result = { 
               success: true, 
               message: "Trip details updated successfully",
