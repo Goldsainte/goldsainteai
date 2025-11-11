@@ -698,12 +698,17 @@ export const AIBookingConcierge = () => {
   useEffect(() => {
     // Start wake word detection when widget is opened (user interaction)
     if (isOpen && !wakeWordDetectorRef.current) {
+      console.log('🎤 Concierge opened, starting wake word detection');
       startWakeWordDetection();
     }
 
     return () => {
+      console.log('🧹 Concierge cleanup - stopping voice and wake word');
       voiceChatRef.current?.disconnect();
-      wakeWordDetectorRef.current?.stop();
+      if (wakeWordDetectorRef.current) {
+        wakeWordDetectorRef.current.stop();
+        wakeWordDetectorRef.current = null; // Reset ref so it can restart
+      }
       if (pushToTalkTimerRef.current) {
         clearTimeout(pushToTalkTimerRef.current);
       }
