@@ -502,7 +502,7 @@ const CompactHeaderSearch = ({
           style={{ width: 'clamp(220px, 28vw, 520px)' }}
           aria-label="Open hotel and flight search"
         >
-          <span className="truncate text-[14px] sm:text-[15px] lg:text-[16px] leading-none">
+          <span className="truncate text-[7px] sm:text-[15px] lg:text-[16px] leading-none">
             {t('header.searchHotelsFlights')}
           </span>
           <Search className="absolute right-3 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
