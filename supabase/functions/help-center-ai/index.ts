@@ -345,15 +345,9 @@ serve(async (req) => {
       if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
         let finalText = stripRoutes(assistantMessage.content || "I apologize, but I'm having trouble processing your request right now.");
         
-        // Force canonical message when opening Expedia widget
-        if (lastSearchMeta && lastSearchMeta.search_type === 'hotels' && lastSearchMeta.search_params) {
-          const { location, checkIn, checkOut, guests } = lastSearchMeta.search_params;
-          const guestCount = Number(guests) || 2;
-          finalText = `**How would you like to handle this booking?**\n\nYou can book in two ways:\n\n1. **Work with a Goldsainte Certified Travel Agent** for personalized support, exclusive perks, and seamless trip coordination.\n\n2. **Or, book it yourself** through our affiliate partner Expedia for a quick, self-service option.`;
-        } else if (lastSearchMeta && lastSearchMeta.search_type === 'flights' && lastSearchMeta.search_params) {
-          const { origin, destination, departureDate, returnDate, adults = 1 } = lastSearchMeta.search_params;
-          const returnText = returnDate ? `, returning ${returnDate}` : '';
-          finalText = `**How would you like to handle this booking?**\n\nYou can book in two ways:\n\n1. **Work with a Goldsainte Certified Travel Agent** for personalized support, exclusive perks, and seamless trip coordination.\n\n2. **Or, book it yourself** through our affiliate partner Expedia for a quick, self-service option.`;
+        // Force canonical message when showing choice prompt
+        if (lastSearchMeta && (lastSearchMeta.search_type === 'hotels' || lastSearchMeta.search_type === 'flights') && lastSearchMeta.search_params) {
+          finalText = `I found several options for you! Let me help you proceed with booking.`;
         }
         
         console.log("🎯 [HELP CENTER] Returning final response:", {
@@ -403,16 +397,18 @@ serve(async (req) => {
           // Return structured parameters without calling any API
           toolResult = {
             status: "OK",
-            message: "Travel preferences extracted. Opening search widget...",
+            message: "Travel preferences extracted. Preparing booking options...",
             search_params: searchParams,
-            search_type: 'hotels'
+            search_type: 'hotels',
+            ui: { showChoicePrompt: true }
           };
           
-          // Store meta for client to open Expedia modal
+          // Store meta for client to show choice prompt
           lastSearchMeta = {
             status: "OK",
             search_params: searchParams,
-            search_type: 'hotels'
+            search_type: 'hotels',
+            ui: { showChoicePrompt: true }
           };
         } else if (toolCall.function.name === "search_flights") {
           const args = JSON.parse(toolCall.function.arguments);
@@ -458,15 +454,17 @@ serve(async (req) => {
             
             toolResult = {
               status: "OK",
-              message: "Flight preferences extracted. Opening search widget...",
+              message: "Flight preferences extracted. Preparing booking options...",
               search_params: searchParams,
-              search_type: 'flights'
+              search_type: 'flights',
+              ui: { showChoicePrompt: true }
             };
             
             lastSearchMeta = {
               status: "OK",
               search_params: searchParams,
-              search_type: 'flights'
+              search_type: 'flights',
+              ui: { showChoicePrompt: true }
             };
           }
           

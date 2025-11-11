@@ -7,6 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { ExpediaWidgetCard } from '@/components/ExpediaWidgetCard';
 import { FlightDatePickerCard } from '@/components/FlightDatePickerCard';
+import { BookingChoicePrompt } from '@/components/BookingChoicePrompt';
+import { AgentIntakeForm } from '@/components/AgentIntakeForm';
 import { FEATURE_FLAGS } from '@/config/features';
 
 interface Message {
@@ -21,6 +23,14 @@ interface Message {
     type: 'flight_dates';
     prefill?: { depart?: string; return?: string };
     mode?: 'roundTrip' | 'oneWay';
+  };
+  choicePrompt?: {
+    tripType: 'hotels' | 'flights' | 'hotel+flight';
+    prefillData: any;
+  };
+  agentIntake?: {
+    tripType: 'hotels' | 'flights' | 'hotel+flight';
+    prefillData: any;
   };
 }
 
@@ -63,8 +73,21 @@ export const HelpCenterChat = () => {
       if (error) throw error;
 
       if (data?.response) {
+        // Check if we should show booking choice prompt
+        if (data.meta?.ui?.showChoicePrompt) {
+          console.log('🎯 [TELEMETRY] booking_choice_rendered');
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: sanitizeAssistantContent(data.response),
+            choicePrompt: {
+              tripType: data.meta.search_type,
+              prefillData: data.meta.search_params
+            }
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+        }
         // Check if we should show date picker
-        if (data.meta?.ui?.showDatePicker) {
+        else if (data.meta?.ui?.showDatePicker) {
           console.log('🎯 Rendering inline date picker');
           const assistantMessage: Message = {
             role: 'assistant',
@@ -145,6 +168,88 @@ export const HelpCenterChat = () => {
     setInput('');
   };
 
+  const handleBookingChoice = (messageIndex: number, choice: 'self_service' | 'agent', tripType: 'hotels' | 'flights' | 'hotel+flight', prefillData: any) => {
+    if (choice === 'self_service') {
+      console.log('🎯 [TELEMETRY] expedia_widget_opened');
+      console.log('🎯 [TELEMETRY] widget_prefill_applied');
+      
+      // Replace the choice prompt with Expedia widget
+      setMessages(prev => prev.map((msg, idx) => {
+        if (idx === messageIndex) {
+          let widgetPayload;
+          if (tripType === 'hotels') {
+            widgetPayload = {
+              type: 'hotel_intent' as const,
+              provider: 'expedia' as const,
+              payload: {
+                destination: prefillData.location || '',
+                checkIn: prefillData.checkIn || '',
+                checkOut: prefillData.checkOut || '',
+                adults: Number(prefillData.guests || 2),
+                children: 0,
+                currency: prefillData.currency || 'USD',
+                locale: 'en-US'
+              }
+            };
+          } else if (tripType === 'flights') {
+            widgetPayload = {
+              type: 'flight_intent' as const,
+              provider: 'expedia' as const,
+              payload: {
+                destination: prefillData.destination || '',
+                checkIn: prefillData.departureDate || '',
+                checkOut: prefillData.returnDate || '',
+                adults: Number(prefillData.adults || 1),
+                currency: 'USD',
+                locale: 'en-US'
+              }
+            };
+          }
+          
+          return {
+            ...msg,
+            choicePrompt: undefined,
+            widgetData: widgetPayload
+          };
+        }
+        return msg;
+      }));
+    } else {
+      console.log('🎯 [TELEMETRY] agent_intake_started');
+      
+      // Replace choice prompt with agent intake form
+      setMessages(prev => prev.map((msg, idx) => {
+        if (idx === messageIndex) {
+          return {
+            ...msg,
+            choicePrompt: undefined,
+            agentIntake: {
+              tripType,
+              prefillData
+            }
+          };
+        }
+        return msg;
+      }));
+    }
+  };
+
+  const handleAgentIntakeComplete = (messageIndex: number, leadId: string) => {
+    // Replace intake form with confirmation message
+    const confirmationText = `✓ Your request has been submitted! Case ID: ${leadId}\n\nA Goldsainte Certified Travel Agent will reach out within 24 hours to help plan your perfect trip.`;
+    
+    setMessages(prev => prev.map((msg, idx) => {
+      if (idx === messageIndex) {
+        return {
+          ...msg,
+          agentIntake: undefined,
+          content: msg.content + '\n\n' + confirmationText
+        };
+      }
+      return msg;
+    }));
+  };
+
   const handleDatePickerConfirm = (dates: { depart: string; return?: string }, mode: 'roundTrip' | 'oneWay') => {
     const dateText = mode === 'oneWay'
       ? `Depart: ${dates.depart} (one-way)`
@@ -154,10 +259,23 @@ export const HelpCenterChat = () => {
     handleSendMessage(dateText);
   };
 
-  const renderMessageContent = (msg: Message) => {
+  const renderMessageContent = (msg: Message, index: number) => {
     return (
       <>
-        {msg.content && <div className="mb-2">{msg.content}</div>}
+        {msg.content && <div className="mb-2 whitespace-pre-wrap text-sm leading-relaxed">{msg.content}</div>}
+        {msg.choicePrompt && (
+          <BookingChoicePrompt
+            tripType={msg.choicePrompt.tripType}
+            onChoice={(choice) => handleBookingChoice(index, choice, msg.choicePrompt!.tripType, msg.choicePrompt!.prefillData)}
+          />
+        )}
+        {msg.agentIntake && (
+          <AgentIntakeForm
+            tripType={msg.agentIntake.tripType}
+            prefillData={msg.agentIntake.prefillData}
+            onComplete={(leadId) => handleAgentIntakeComplete(index, leadId)}
+          />
+        )}
         {msg.datePickerData && (
           <FlightDatePickerCard
             prefill={msg.datePickerData.prefill}
@@ -234,8 +352,8 @@ export const HelpCenterChat = () => {
                   {msg.content}
                 </div>
               ) : (
-                <div className={`${msg.widgetData ? 'w-full' : 'max-w-[85%]'} rounded-lg ${!msg.widgetData ? 'px-3 py-2 bg-muted' : ''} text-sm`}>
-                  {renderMessageContent(msg)}
+                <div className={`${msg.widgetData || msg.choicePrompt || msg.agentIntake ? 'w-full' : 'max-w-[85%]'} rounded-lg ${!msg.widgetData && !msg.choicePrompt && !msg.agentIntake ? 'px-3 py-2 bg-muted' : ''} text-sm`}>
+                  {renderMessageContent(msg, idx)}
                 </div>
               )}
             </div>
