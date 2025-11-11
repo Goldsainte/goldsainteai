@@ -614,14 +614,25 @@ export const AIBookingConcierge = () => {
         console.log('🎵 [Step 6/6] Starting hold music...');
         initHoldMusic();
         try {
-          await holdMusicRef.current?.play();
-          console.log('✅ Hold music playing');
+          const playPromise = holdMusicRef.current?.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+            console.log('✅ Hold music playing successfully');
+            console.log('📊 [TELEMETRY] hold_music_started', { timestamp: new Date().toISOString() });
+          }
         } catch (playError) {
           console.warn('⚠️ Hold music autoplay blocked:', playError);
+          console.log('📊 [TELEMETRY] hold_music_blocked', { error: playError instanceof Error ? playError.message : 'Autoplay blocked', timestamp: new Date().toISOString() });
+          toast({
+            title: "Audio Permission Needed",
+            description: "Click anywhere to enable hold music",
+            variant: "default",
+          });
         }
         
         setVoiceMode(true);
         console.log('✅ Voice mode fully activated');
+        console.log('📊 [TELEMETRY] voice_mode_activated', { timestamp: new Date().toISOString() });
         
         toast({
           title: "Voice Mode Active",
@@ -629,6 +640,11 @@ export const AIBookingConcierge = () => {
         });
       } catch (error: any) {
         console.error('❌ Voice activation error:', error);
+        console.log('📊 [TELEMETRY] voice_activation_error', { 
+          error: error?.message || 'Unknown error', 
+          errorName: error?.name,
+          timestamp: new Date().toISOString() 
+        });
         setVoiceStatus('error');
         
         let errorMessage = "Failed to start voice mode";
@@ -648,10 +664,13 @@ export const AIBookingConcierge = () => {
           variant: "destructive",
         });
         
+        // Resume wake word detection after error
+        console.log('🔄 Resuming wake word detection after voice error');
         startWakeWordDetection();
       }
     } else {
       console.log('📴 Ending voice mode...');
+      console.log('📊 [TELEMETRY] voice_mode_deactivated', { timestamp: new Date().toISOString() });
       voiceChatRef.current?.disconnect();
       setVoiceMode(false);
       setVoiceStatus('disconnected');
@@ -681,13 +700,25 @@ export const AIBookingConcierge = () => {
       console.log('🎤 Starting wake word detection...');
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
         console.log('🎉 Wake word "Hey Goldsainte" detected! Activating voice mode...');
+        console.log('📊 [TELEMETRY] wake_word_detected', { timestamp: new Date().toISOString() });
+        
+        // Open widget if not already open
+        if (!isOpen) {
+          console.log('🪟 Opening widget after wake word detection');
+          setIsOpen(true);
+        }
+        
+        // Activate voice mode if not already active
         if (!voiceMode) {
+          console.log('🎤 Activating voice mode after wake word detection');
           toggleVoiceMode();
         }
       });
 
       const started = await wakeWordDetectorRef.current.start();
-      console.log('Wake word detection started:', started);
+      console.log('✅ Wake word detection started:', started);
+      console.log('📊 [TELEMETRY] wake_word_started', { success: started, timestamp: new Date().toISOString() });
+      
       if (started) {
         setWakeWordActive(true);
         toast({
@@ -697,6 +728,7 @@ export const AIBookingConcierge = () => {
       }
     } catch (error) {
       console.error('❌ Wake word error:', error);
+      console.log('📊 [TELEMETRY] wake_word_error', { error: error instanceof Error ? error.message : 'Unknown error', timestamp: new Date().toISOString() });
       toast({
         title: "Wake Word Unavailable",
         description: "Please use the microphone button instead",
@@ -739,25 +771,23 @@ export const AIBookingConcierge = () => {
     }, 500);
   };
 
+  // Start wake word detection globally on component mount (not tied to widget open state)
   useEffect(() => {
-    // Start wake word detection when widget is opened (user interaction)
-    if (isOpen && !wakeWordDetectorRef.current) {
-      console.log('🎤 Concierge opened, starting wake word detection');
-      startWakeWordDetection();
-    }
+    console.log('🎤 [GLOBAL] Starting wake word detection on mount');
+    startWakeWordDetection();
 
     return () => {
-      console.log('🧹 Concierge cleanup - stopping voice and wake word');
+      console.log('🧹 [GLOBAL] Component unmounting - stopping voice and wake word');
       voiceChatRef.current?.disconnect();
       if (wakeWordDetectorRef.current) {
         wakeWordDetectorRef.current.stop();
-        wakeWordDetectorRef.current = null; // Reset ref so it can restart
+        wakeWordDetectorRef.current = null;
       }
       if (pushToTalkTimerRef.current) {
         clearTimeout(pushToTalkTimerRef.current);
       }
     };
-  }, [isOpen]);
+  }, []); // Empty deps - run once on mount, cleanup on unmount
 
   if (!isOpen) {
     return (
