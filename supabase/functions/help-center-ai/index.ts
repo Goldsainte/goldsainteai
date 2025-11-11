@@ -31,7 +31,40 @@ const getTodayDate = () => {
   return now.toISOString().split('T')[0];
 };
 
-const systemPrompt = `You are Goldsainte's AI Travel Assistant. You help users with travel-related questions, booking inquiries, destination recommendations, and trip planning.
+// Detect explicit self-service vs agent intent from user message
+const detectBookingIntent = (userMessage: string): 'self_service' | 'agent' | 'unknown' => {
+  const text = userMessage.toLowerCase();
+  
+  // Explicit self-service patterns
+  if (/\b(book (it )?myself|i'?ll do it|self[- ]?service|expedia|i want to book|do it myself|book on my own)\b/.test(text)) {
+    return 'self_service';
+  }
+  
+  // Explicit agent patterns
+  if (/\b(agent|concierge|human help|handle it for me|curate|plan it for me|can someone|certified agent|travel agent)\b/.test(text)) {
+    return 'agent';
+  }
+  
+  // Default to unknown (UI will present choice with agent preselected)
+  return 'unknown';
+};
+
+const systemPrompt = `You are Goldsainte's travel concierge. Your job is to:
+1. Gather trip requirements
+2. Recommend "Match me with a Goldsainte agent" as the preferred option
+3. Create an Agent Marketplace request with the collected data
+
+Only if the user clearly says they want to book it themselves, render the Expedia widget (inline) for self-service.
+
+**CRITICAL RULES:**
+- NEVER call Booking.com or claim you "found X hotels"
+- Always ask the booking-choice question first
+- Prefer the agent path by default
+- If the user is ambiguous, steer to the agent option
+- If they explicitly insist on self-service, use Expedia widget only
+
+## YOUR ROLE:
+You are a travel concierge whose PRIMARY goal is to match users with Goldsainte Certified Travel Agents who curate end-to-end trips. Self-service booking is a secondary option offered ONLY when explicitly requested.
 
 **CURRENT DATE: ${getTodayDate()}** (Use this for all date calculations)
 
@@ -345,9 +378,40 @@ serve(async (req) => {
       if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
         let finalText = stripRoutes(assistantMessage.content || "I apologize, but I'm having trouble processing your request right now.");
         
-        // Force canonical message when showing choice prompt
+        // Detect booking intent and route accordingly
+        const lastUserMessage = messages[messages.length - 1]?.content || '';
+        const detectedIntent = detectBookingIntent(lastUserMessage);
+        
+        console.log('🎯 [TELEMETRY] booking_intent_detected', { 
+          intent: detectedIntent, 
+          userMessage: lastUserMessage.substring(0, 100) 
+        });
+        
         if (lastSearchMeta && (lastSearchMeta.search_type === 'hotels' || lastSearchMeta.search_type === 'flights') && lastSearchMeta.search_params) {
-          finalText = `How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.`;
+          // If user explicitly said they want self-service, skip choice and open widget
+          if (detectedIntent === 'self_service') {
+            lastSearchMeta.ui = { 
+              openWidgetInline: true, // Skip choice, go straight to Expedia widget
+              showChoicePrompt: false 
+            };
+            finalText = `Opening Expedia search for you...`;
+          } 
+          // If user explicitly said they want agent, skip choice and start intake
+          else if (detectedIntent === 'agent') {
+            lastSearchMeta.ui = { 
+              showAgentIntake: true, // Skip choice, go straight to intake
+              showChoicePrompt: false 
+            };
+            finalText = `Great! Let me gather a few details so I can match you with the perfect Goldsainte agent.`;
+          }
+          // Otherwise show choice with agent preselected (canonical message)
+          else {
+            lastSearchMeta.ui = { 
+              showChoicePrompt: true,
+              defaultChoice: 'agent' // UI hint to preselect agent
+            };
+            finalText = `I can help you get this booked. Would you like a Goldsainte Certified Travel Agent to curate the trip for you, or would you prefer to book it yourself via Expedia?`;
+          }
         }
         
         console.log("🎯 [HELP CENTER] Returning final response:", {

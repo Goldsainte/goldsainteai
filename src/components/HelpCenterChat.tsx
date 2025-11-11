@@ -27,6 +27,7 @@ interface Message {
   choicePrompt?: {
     tripType: 'hotels' | 'flights' | 'hotel+flight';
     prefillData: any;
+    defaultChoice?: 'self_service' | 'agent';
   };
   agentIntake?: {
     tripType: 'hotels' | 'flights' | 'hotel+flight';
@@ -73,11 +74,12 @@ export const HelpCenterChat = () => {
       if (error) throw error;
 
       if (data?.response) {
-        // PRIORITY 1: Check if we should show booking choice prompt FIRST (defensive fallback)
-        // Force the choice prompt for hotel/flight intents unless backend explicitly opts into auto widget
+        // PRIORITY 1: Check if we should show booking choice prompt FIRST
         const shouldShowChoice = (
           data.meta?.ui?.showChoicePrompt === true ||
-          ((data.meta?.search_type === 'hotels' || data.meta?.search_type === 'flights') && data.meta?.ui?.openWidgetInline !== true)
+          ((data.meta?.search_type === 'hotels' || data.meta?.search_type === 'flights') && 
+           data.meta?.ui?.openWidgetInline !== true && 
+           data.meta?.ui?.showAgentIntake !== true) // Don't show choice if direct agent intake
         );
 
         if (shouldShowChoice) {
@@ -90,12 +92,26 @@ export const HelpCenterChat = () => {
             content: sanitizeAssistantContent(data.response),
             choicePrompt: {
               tripType: data.meta.search_type,
+              prefillData: data.meta.search_params,
+              defaultChoice: data.meta.ui?.defaultChoice || 'agent' // Pass default to component
+            }
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+        }
+        // PRIORITY 2: Check if we should go straight to agent intake
+        else if (data.meta?.ui?.showAgentIntake) {
+          console.log('🎯 [TELEMETRY] agent_intake_started (auto)');
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: sanitizeAssistantContent(data.response),
+            agentIntake: {
+              tripType: data.meta.search_type,
               prefillData: data.meta.search_params
             }
           };
           setMessages(prev => [...prev, assistantMessage]);
         }
-        // PRIORITY 2: Check if we should show date picker
+        // PRIORITY 3: Check if we should show date picker
         else if (data.meta?.ui?.showDatePicker) {
           console.log('🎯 Rendering inline date picker');
           const assistantMessage: Message = {
@@ -109,7 +125,7 @@ export const HelpCenterChat = () => {
           };
           setMessages(prev => [...prev, assistantMessage]);
         }
-        // PRIORITY 3: Check if we should render inline widget (ONLY if no choice prompt)
+        // PRIORITY 4: Check if we should render inline widget (ONLY if explicit self-service)
         else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params && data.meta?.ui?.openWidgetInline === true) {
           console.log('🎯 Rendering inline Expedia widget with params:', data.meta.search_params);
           console.log('🎯 [TELEMETRY] chat_expedia_widget_inserted');
@@ -276,6 +292,7 @@ export const HelpCenterChat = () => {
           <BookingChoicePrompt
             tripType={msg.choicePrompt.tripType}
             prefillData={msg.choicePrompt.prefillData}
+            defaultChoice={msg.choicePrompt.defaultChoice}
             onChoice={(choice) => handleBookingChoice(index, choice, msg.choicePrompt!.tripType, msg.choicePrompt!.prefillData)}
           />
         )}

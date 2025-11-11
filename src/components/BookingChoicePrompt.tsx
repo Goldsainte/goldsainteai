@@ -5,6 +5,7 @@ import { Plane, Hotel } from 'lucide-react';
 interface BookingChoicePromptProps {
   tripType: 'hotels' | 'flights' | 'hotel+flight';
   onChoice: (choice: 'self_service' | 'agent') => void;
+  defaultChoice?: 'self_service' | 'agent'; // NEW - hint for recommended option
   prefillData?: {
     location?: string;
     destination?: string;
@@ -22,12 +23,12 @@ export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: Booking
   
   const getMessage = () => {
     if (tripType === 'hotels' && destination) {
-      return `I can help you book hotels in ${destination}! Would you like to handle this yourself through our quick booking widget, or work with a Goldsainte Certified Travel Agent for personalized support and exclusive perks?`;
+      return `I can help you get hotels booked in ${destination}. Would you like a Goldsainte Certified Travel Agent to curate the trip for you, or would you prefer to book it yourself via Expedia?`;
     } else if (tripType === 'flights' && destination) {
       const route = origin ? `from ${origin} to ${destination}` : `to ${destination}`;
-      return `I can help you book flights ${route}! Would you like to search and book yourself, or have a Goldsainte Certified Travel Agent handle all the details?`;
+      return `I can help you get flights booked ${route}. Would you like a Goldsainte Certified Travel Agent to handle all the details, or would you prefer to book it yourself via Expedia?`;
     }
-    return "How would you like to handle this booking? You can book in two ways: (1) Work with a Goldsainte Certified Travel Agent for personalized support, exclusive perks, and seamless trip coordination, or (2) Book it yourself through our affiliate partner Expedia for a quick, self-service option.";
+    return "I can help you get this booked. Would you like a Goldsainte Certified Travel Agent to curate the trip for you, or would you prefer to book it yourself via Expedia?";
   };
 
   return (
@@ -44,26 +45,28 @@ export const BookingChoicePrompt = ({ tripType, onChoice, prefillData }: Booking
         </div>
         
         <div className="flex flex-col gap-2">
-          <Button
-            onClick={() => {
-              console.log('🎯 [TELEMETRY] booking_choice=self_service');
-              onChoice('self_service');
-            }}
-            className="w-full justify-start"
-            variant="default"
-          >
-            Book it myself (via Expedia)
-          </Button>
-          
+          {/* PRIMARY BUTTON - Agent path (appears FIRST) */}
           <Button
             onClick={() => {
               console.log('🎯 [TELEMETRY] booking_choice=agent');
               onChoice('agent');
             }}
             className="w-full justify-start"
-            variant="outline"
+            variant="default" // PRIMARY styling
           >
             Match me with a Goldsainte agent
+          </Button>
+          
+          {/* SECONDARY BUTTON - Self-service */}
+          <Button
+            onClick={() => {
+              console.log('🎯 [TELEMETRY] booking_choice=self_service');
+              onChoice('self_service');
+            }}
+            className="w-full justify-start"
+            variant="outline" // SECONDARY styling
+          >
+            Book it myself (via Expedia)
           </Button>
         </div>
       </div>
