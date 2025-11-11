@@ -45,25 +45,13 @@ export function ItineraryShareDialog({
         return;
       }
 
-      // Find user by email
-      const { data: profiles, error: profileError } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("email", email.trim())
-        .single();
-
-      if (profileError || !profiles) {
-        toast.error("User not found with that email");
-        return;
-      }
-
-      // Create share record
+      // Create share record directly with email
       const { error: shareError } = await supabase
         .from("itinerary_shares")
         .insert({
           itinerary_id: itineraryId,
-          shared_with_user_id: profiles.id,
-          permission,
+          shared_with_email: email.trim(),
+          permission_level: permission,
           shared_by_user_id: user.id,
         });
 
