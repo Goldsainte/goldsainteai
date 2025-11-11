@@ -417,10 +417,32 @@ serve(async (req) => {
         } else if (toolCall.function.name === "search_flights") {
           const args = JSON.parse(toolCall.function.arguments);
           
-          if (!args.origin || !args.destination || !args.departureDate) {
+          // Check if dates are missing
+          if (!args.departureDate) {
+            console.log('🎯 [HELP-CENTER FLIGHT] Missing dates, showing date picker');
+            
+            toolResult = {
+              status: "NEED_DATES",
+              message: "I'll help you search for flights. Please select your travel dates.",
+              search_params: {
+                origin: args.origin || null,
+                destination: args.destination || null,
+                dates: {
+                  depart: args.departureDate || null,
+                  return: args.returnDate || null
+                },
+                adults: args.adults || 1,
+                mode: args.returnDate === null ? 'oneWay' : 'roundTrip'
+              },
+              search_type: 'flights',
+              ui: { showDatePicker: true }
+            };
+            
+            lastSearchMeta = toolResult;
+          } else if (!args.origin || !args.destination) {
             toolResult = {
               error: "VALIDATION_ERROR",
-              message: "Missing required flight parameters"
+              message: "Missing required flight parameters (origin or destination)"
             };
           } else {
             const searchParams = {

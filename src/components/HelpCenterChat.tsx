@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { ExpediaWidgetCard } from '@/components/ExpediaWidgetCard';
+import { FlightDatePickerCard } from '@/components/FlightDatePickerCard';
 import { FEATURE_FLAGS } from '@/config/features';
 
 interface Message {
@@ -15,6 +16,11 @@ interface Message {
     type: 'hotel_intent' | 'flight_intent';
     provider: 'expedia';
     payload: any;
+  };
+  datePickerData?: {
+    type: 'flight_dates';
+    prefill?: { depart?: string; return?: string };
+    mode?: 'roundTrip' | 'oneWay';
   };
 }
 
@@ -42,12 +48,11 @@ export const HelpCenterChat = () => {
       .trim();
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSendMessage = async (messageText: string) => {
+    if (!messageText || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: input.trim() };
+    const userMessage: Message = { role: 'user', content: messageText };
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
     setIsLoading(true);
 
     try {
@@ -58,8 +63,22 @@ export const HelpCenterChat = () => {
       if (error) throw error;
 
       if (data?.response) {
+        // Check if we should show date picker
+        if (data.meta?.ui?.showDatePicker) {
+          console.log('🎯 Rendering inline date picker');
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: sanitizeAssistantContent(data.response),
+            datePickerData: {
+              type: 'flight_dates',
+              prefill: data.meta.search_params?.dates,
+              mode: data.meta.search_params?.mode || 'roundTrip'
+            }
+          };
+          setMessages(prev => [...prev, assistantMessage]);
+        }
         // Check if we should render inline widget
-        if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params) {
+        else if (FEATURE_FLAGS.USE_EXPEDIA_WIDGET_INLINE && data.meta?.status === 'OK' && data.meta?.search_params) {
           console.log('🎯 Rendering inline Expedia widget with params:', data.meta.search_params);
           console.log('🎯 [TELEMETRY] chat_expedia_widget_inserted');
           
@@ -120,10 +139,32 @@ export const HelpCenterChat = () => {
     }
   };
 
+  const handleSend = () => {
+    if (!input.trim()) return;
+    handleSendMessage(input.trim());
+    setInput('');
+  };
+
+  const handleDatePickerConfirm = (dates: { depart: string; return?: string }, mode: 'roundTrip' | 'oneWay') => {
+    const dateText = mode === 'oneWay'
+      ? `Depart: ${dates.depart} (one-way)`
+      : `Depart: ${dates.depart}, Return: ${dates.return}`;
+    
+    // Send dates to backend
+    handleSendMessage(dateText);
+  };
+
   const renderMessageContent = (msg: Message) => {
     return (
       <>
         {msg.content && <div className="mb-2">{msg.content}</div>}
+        {msg.datePickerData && (
+          <FlightDatePickerCard
+            prefill={msg.datePickerData.prefill}
+            mode={msg.datePickerData.mode}
+            onConfirm={handleDatePickerConfirm}
+          />
+        )}
         {msg.widgetData && (
           <ExpediaWidgetCard payload={msg.widgetData.payload} />
         )}
