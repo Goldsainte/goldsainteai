@@ -241,7 +241,7 @@ export const AIBookingConcierge = () => {
         // Set default greeting even without user
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm your Goldsainte AI Concierge.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+          content: `Hello! I'm your Goldsainte AI Concierge. I can help you search for flights, hotels, rental cars, restaurants, events, and more. What are you looking for today?`
         }]);
         return;
       }
@@ -287,7 +287,7 @@ export const AIBookingConcierge = () => {
         console.log('Setting initial greeting with agent:', agentName);
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, restaurants, events, book Uber rides, and check visa requirements. Ready to plan your trip?`
+          content: `Hello! I'm ${agentName}. I can help you search for flights, hotels, restaurants, events, book Uber rides, and check visa requirements. What are you looking for today?`
         }]);
       }
     };
@@ -383,11 +383,11 @@ export const AIBookingConcierge = () => {
   const clearConversation = () => {
     localStorage.removeItem('aiConciergeConversation');
     
-    // Reset to initial greeting with detailed instructions
+    // Reset to initial greeting
     const agentName = "Madison";
     setMessages([{
       role: 'assistant',
-      content: `Hello! I'm ${agentName}.\n\n🎙️ To get started:\n1. Tap the microphone to start voice mode\n2. Or say "Hey Goldsainte" to activate hands-free\n3. Or type your travel request below\n\nI can help you search for flights, hotels, rental cars, restaurants, events - plus check visa requirements. Ready to plan your trip?`
+      content: `Hello! I'm ${agentName}. I can help you search for flights, hotels, rental cars, restaurants, events, and more. What are you looking for today?`
     }]);
 
     toast({
@@ -1020,13 +1020,6 @@ export const AIBookingConcierge = () => {
         <>
           <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden w-full max-w-full" ref={scrollRef}>
             <div className="space-y-3">
-              {/* Booking Progress Tracker */}
-              <BookingProgressTracker 
-                bookingInfo={bookingInfo}
-                onEdit={handleEditBookingInfo}
-                onQuickStart={handleQuickStart}
-              />
-              
               {messages.map((msg, idx) => (
                 <div key={idx} className="w-full">
                   <div
