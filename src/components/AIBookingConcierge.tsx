@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Settings } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,8 +22,6 @@ import { TravelPackageCard } from "./TravelPackageCard";
 import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
-import { VoiceInput } from "./VoiceInput";
-import { BookingProgressTracker, type QuickStartTemplate } from "./BookingProgressTracker";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
@@ -75,164 +72,6 @@ export const AIBookingConcierge = () => {
   const navigate = useNavigate();
 
   console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
-
-  // Extract booking information from conversation
-  const extractBookingInfo = () => {
-    const conversationText = messages.map(m => m.content).join(' ').toLowerCase();
-    
-    // Extract destination (look for common patterns)
-    let destination = undefined;
-    const destMatch = conversationText.match(/(?:to|going to|visit|travel to|in)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/i);
-    if (destMatch) destination = destMatch[1];
-    
-    // Extract dates (look for date patterns)
-    let dates = undefined;
-    const datePatterns = [
-      /(\d{4}-\d{2}-\d{2})\s*(?:to|through|-)\s*(\d{4}-\d{2}-\d{2})/i,
-      /(?:from|departing)?\s*([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?)\s*(?:to|through|-)\s*([A-Za-z]+\s+\d{1,2}(?:st|nd|rd|th)?)/i,
-    ];
-    for (const pattern of datePatterns) {
-      const match = conversationText.match(pattern);
-      if (match) {
-        dates = `${match[1]} - ${match[2]}`;
-        break;
-      }
-    }
-    
-    // Extract number of guests/travelers
-    let guests = undefined;
-    const guestPatterns = [
-      /(\d+)\s+(?:people|guests?|travelers?|persons?|adults?)/i,
-      /(?:for|party of)\s+(\d+)/i,
-    ];
-    for (const pattern of guestPatterns) {
-      const match = conversationText.match(pattern);
-      if (match) {
-        guests = parseInt(match[1]);
-        break;
-      }
-    }
-    
-    // Extract budget
-    let budget = undefined;
-    const budgetPatterns = [
-      /budget\s*(?:of|is|around)?\s*\$?([\d,]+)\s*(?:per person|each|pp)?/i,
-      /\$?([\d,]+)\s*(?:budget|per person|pp)/i,
-    ];
-    for (const pattern of budgetPatterns) {
-      const match = conversationText.match(pattern);
-      if (match) {
-        budget = `$${match[1]}`;
-        break;
-      }
-    }
-    
-    return { destination, dates, guests, budget };
-  };
-
-  const bookingInfo = extractBookingInfo();
-
-  const handleEditBookingInfo = (field: keyof typeof bookingInfo, value: string) => {
-    let message = "";
-    
-    switch (field) {
-      case 'destination':
-        message = `Actually, I want to change the destination to ${value}`;
-        break;
-      case 'dates':
-        message = `I need to update the travel dates to ${value}`;
-        break;
-      case 'guests':
-        message = `Change the number of travelers to ${value}`;
-        break;
-      case 'budget':
-        message = `Update my budget to ${value}`;
-        break;
-    }
-    
-    if (message) {
-      // Send the update as a user message
-      setMessages(prev => [...prev, { role: 'user', content: message }]);
-      sendProgrammaticMessage(message);
-    }
-  };
-
-  const handleQuickStart = async (template: QuickStartTemplate) => {
-    // Build the example info from template
-    const exampleInfo = {
-      greeting: "Hi! I want to plan a trip",
-      destination: template.destination,
-      dates: template.dates,
-      guests: template.guests,
-      budget: template.budget
-    };
-
-    // Add greeting message
-    const greetingMsg = { role: 'user' as const, content: exampleInfo.greeting };
-    setMessages(prev => [...prev, greetingMsg]);
-    
-    // Send greeting and wait for response
-    try {
-      setIsLoading(true);
-      const response = await supabase.functions.invoke('ai-booking-concierge', {
-        body: { 
-          messages: [...messages, greetingMsg],
-          agentProfile,
-          preferences,
-          language
-        }
-      });
-
-      if (response.error) throw response.error;
-
-      const assistantMsg = { 
-        role: 'assistant' as const, 
-        content: response.data.content,
-        toolResults: response.data.toolResults 
-      };
-      setMessages(prev => [...prev, assistantMsg]);
-
-      // Now add the example info in sequence with delays
-      setTimeout(() => {
-        const destMsg = { role: 'user' as const, content: exampleInfo.destination };
-        setMessages(prev => [...prev, destMsg]);
-        sendProgrammaticMessage(exampleInfo.destination);
-      }, 1500);
-
-      setTimeout(() => {
-        const datesMsg = { role: 'user' as const, content: exampleInfo.dates };
-        setMessages(prev => [...prev, datesMsg]);
-        sendProgrammaticMessage(exampleInfo.dates);
-      }, 3000);
-
-      setTimeout(() => {
-        const guestsMsg = { role: 'user' as const, content: exampleInfo.guests };
-        setMessages(prev => [...prev, guestsMsg]);
-        sendProgrammaticMessage(exampleInfo.guests);
-      }, 4500);
-
-      setTimeout(() => {
-        const budgetMsg = { role: 'user' as const, content: exampleInfo.budget };
-        setMessages(prev => [...prev, budgetMsg]);
-        sendProgrammaticMessage(exampleInfo.budget);
-      }, 6000);
-
-      setIsLoading(false);
-      
-      toast({
-        title: `${template.name} Template Loaded`,
-        description: `Starting demo for ${template.destination}`,
-      });
-    } catch (error: any) {
-      console.error('[AIBookingConcierge] Quick start error:', error);
-      setIsLoading(false);
-      toast({
-        title: "Error",
-        description: "Failed to start demo. Please try again.",
-        variant: "destructive",
-      });
-    }
-  };
 
   // Load user's AI agent profile and restore conversation
   useEffect(() => {
@@ -926,69 +765,6 @@ export const AIBookingConcierge = () => {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          {customPrefsCount > 0 ? (
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    // Only open settings if clicking the icon directly, not the popover
-                    if (e.currentTarget === e.target || e.currentTarget.contains(e.target as Node)) {
-                      const isPopoverOpen = e.currentTarget.getAttribute('data-state') === 'open';
-                      if (!isPopoverOpen) {
-                        setShowSettings(true);
-                      }
-                    }
-                  }}
-                  className="text-primary-foreground hover:bg-white/10 h-8 w-8 relative"
-                >
-                  <Settings className="h-4 w-4" />
-                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-micro font-bold rounded-full h-4 w-4 flex items-center justify-center shadow-lg pointer-events-none">
-                    {customPrefsCount}
-                  </span>
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent side="bottom" className="w-64 p-3">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">{customPrefsCount} Custom Setting{customPrefsCount !== 1 ? 's' : ''}</p>
-                  <p className="text-xs text-muted-foreground">You have {customPrefsCount} preference{customPrefsCount !== 1 ? 's' : ''} different from defaults.</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleQuickReset}
-                    className="w-full"
-                  >
-                    Reset to Defaults
-                  </Button>
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => setShowSettings(true)}
-                    className="w-full"
-                  >
-                    Open Settings
-                  </Button>
-                </div>
-              </PopoverContent>
-            </Popover>
-          ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowSettings(true)}
-                  className="text-primary-foreground hover:bg-white/10 h-8 w-8"
-                >
-                  <Settings className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Chat preferences</p>
-              </TooltipContent>
-            </Tooltip>
-          )}
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -1206,7 +982,7 @@ export const AIBookingConcierge = () => {
 
           {/* Input Area */}
           <div className="p-4 md:p-3 border-t border-border bg-background">
-            <div className="flex gap-2 mb-3">
+            <div className="flex gap-2">
               {!voiceMode && (
                 <>
                   <Input
@@ -1216,23 +992,6 @@ export const AIBookingConcierge = () => {
                     placeholder="Type your travel request..."
                     className="flex-1 h-12 md:h-11"
                     disabled={isLoading}
-                  />
-                  <VoiceInput
-                    onTranscript={(text) => {
-                      if (text.trim()) {
-                        setInput(text);
-                      }
-                    }}
-                    disabled={isLoading}
-                    language={preferences.general.voiceLanguage}
-                    onLanguageChange={(newLang) => {
-                      const newPrefs = {
-                        ...preferences,
-                        general: { ...preferences.general, voiceLanguage: newLang }
-                      };
-                      setPreferences(newPrefs);
-                      localStorage.setItem('aiChatPreferences', JSON.stringify(newPrefs));
-                    }}
                   />
                   <Button
                     onClick={handleSend}
@@ -1263,12 +1022,6 @@ export const AIBookingConcierge = () => {
                 {voiceMode ? <MicOff className="h-6 w-6 md:h-5 md:w-5" /> : <Mic className="h-6 w-6 md:h-5 md:w-5" />}
               </Button>
             </div>
-            {/* Helper text */}
-            <p className="text-[11px] leading-tight text-muted-foreground text-center px-2">
-              {voiceMode 
-                ? "Voice mode active — speak naturally or tap to end"
-                : "Tap the microphone to start voice mode, or type below"}
-             </p>
           </div>
         </>
       )}
