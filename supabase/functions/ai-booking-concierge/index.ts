@@ -1189,8 +1189,53 @@ Remember: You're an AI search concierge that helps find perfect travel options a
           const supabaseUrl = Deno.env.get('SUPABASE_URL');
           const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
           
+          // Inline handler for search_flights - extract intent only, don't call API
+          if (functionName === 'search_flights') {
+            const { origin, destination, departureDate, returnDate, adults, travelClass } = args;
+            
+            if (!origin || !destination || !departureDate) {
+              const errorResult = {
+                error: "VALIDATION_ERROR",
+                message: "Missing required flight parameters",
+                missing: { origin: !origin, destination: !destination, departureDate: !departureDate }
+              };
+              toolResults.push({
+                tool_call_id: toolCall.id,
+                role: "tool",
+                name: functionName,
+                content: JSON.stringify(errorResult)
+              });
+              continue;
+            }
+            
+            const searchParams = {
+              origin,
+              destination,
+              departureDate,
+              returnDate: returnDate || null,
+              adults: adults || 1,
+              travelClass: travelClass || 'ECONOMY'
+            };
+            
+            console.log('🎯 [CONCIERGE FLIGHT INTENT]', searchParams);
+            
+            toolResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: functionName,
+              content: JSON.stringify({
+                status: "OK",
+                message: "Flight preferences extracted. Opening search widget...",
+                search_params: searchParams,
+                search_type: "flights"
+              })
+            });
+            
+            continue; // Skip functionMap routing
+          }
+          
           const functionMap: Record<string, string> = {
-            'search_flights': 'unified-search-flights', // Goldsainte Search
+            'search_flights': null, // Intent extraction only - opens Expedia widget
             'search_hotels': null, // Intent extraction only - opens Expedia widget
             'search_restaurants': 'tripadvisor-search-restaurants',
             'search_fine_dining_restaurants': null, // Handled inline with curated data

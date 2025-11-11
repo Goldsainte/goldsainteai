@@ -46,6 +46,7 @@ import { VisaServiceModal } from "@/components/VisaServiceModal";
 import { BookingModal } from "@/components/BookingModal";
 import { CarCard } from "@/components/CarCard";
 import { FineDiningHero } from "@/components/FineDiningHero";
+import { useExpediaModal } from '@/contexts/ExpediaModalContext';
 
 
 
@@ -128,6 +129,7 @@ const Index = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { openModal: openExpediaModal } = useExpediaModal();
   const [searchQuery, setSearchQuery] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -362,17 +364,58 @@ const Index = () => {
       // Filter and attach search results to the assistant message
       let filteredResults: SearchResult[] = [];
       if (data.toolResults && data.toolResults.length > 0) {
+        // Check for hotel intent (intent extraction only, no actual results)
+        const hotelIntent = data.toolResults.find((r: any) => 
+          r.search_type === 'hotels' && r.status === 'OK' && r.search_params && !r.results
+        );
+        
+        // Check for flight intent (intent extraction only, no actual results)
+        const flightIntent = data.toolResults.find((r: any) => 
+          r.search_type === 'flights' && r.status === 'OK' && r.search_params && !r.results
+        );
+        
+        // Open Expedia modal with prefilled data if we have hotel or flight intent
+        if (hotelIntent) {
+          openExpediaModal({
+            destination: hotelIntent.search_params.location || '',
+            checkIn: hotelIntent.search_params.checkIn || '',
+            checkOut: hotelIntent.search_params.checkOut || '',
+            adults: parseInt(hotelIntent.search_params.guests?.toString() || '2'),
+            children: 0,
+          });
+        } else if (flightIntent) {
+          openExpediaModal({
+            destination: flightIntent.search_params.destination || '',
+            checkIn: flightIntent.search_params.departureDate || '',
+            checkOut: flightIntent.search_params.returnDate || '',
+            adults: parseInt(flightIntent.search_params.adults?.toString() || '1'),
+            children: 0,
+          });
+        }
+        
+        // Filter out intent-only results (no actual hotel/flight data) from rendering
         filteredResults = data.toolResults.filter((r: any) => {
+          // Exclude intent-only responses (have status OK, search_params, but no results array)
+          if (r.status === 'OK' && r.search_params && !r.results) {
+            return false;
+          }
+          
+          // Include package results that have content
           if (r?.type === 'package') {
             const total = (r.flights?.length || 0) + (r.hotels?.length || 0) + (r.cars?.length || 0);
             return total > 0;
           }
+          
+          // Include results with actual data
           if (Array.isArray(r?.results)) {
             return r.results.length > 0;
           }
+          
+          // Include visa results
           if (r?.type === 'visa') {
             return !!(r.information || r.requirement);
           }
+          
           return false;
         });
       }

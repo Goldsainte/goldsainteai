@@ -403,57 +403,51 @@ serve(async (req) => {
           };
         } else if (toolCall.function.name === "search_flights") {
           const args = JSON.parse(toolCall.function.arguments);
-          console.log("Flight search args:", args);
           
-          try {
-            const { data: flightData, error: flightError } = await supabase.functions.invoke('unified-search-flights', {
-              body: {
-                origin: args.origin,
-                destination: args.destination,
-                departureDate: args.departureDate,
-                returnDate: args.returnDate,
-                adults: args.adults,
-                cabinClass: args.cabinClass || 'ECONOMY'
-              }
+          if (!args.origin || !args.destination || !args.departureDate) {
+            toolCallResults.push({
+              tool_call_id: toolCall.id,
+              role: "tool",
+              name: "search_flights",
+              content: JSON.stringify({
+                error: "VALIDATION_ERROR",
+                message: "Missing required flight parameters"
+              })
             });
-
-            if (flightError) {
-              console.error("Flight search error:", flightError);
-              toolResult = {
-                status: "ERROR",
-                message: "Failed to search flights",
-                error: flightError.message
-              };
-            } else {
-              const results = flightData?.results || [];
-              console.log(`Found ${results.length} flights`);
-              
-              toolResult = {
-                status: results.length > 0 ? "OK" : "NO_RESULTS",
-                data: results.slice(0, 20), // Limit to top 20 for context
-                count: results.length,
-                search_params: args,
-                search_type: 'flights'
-              };
-            }
-          } catch (error) {
-            console.error("Tool execution error:", error);
-            toolResult = {
-              status: "ERROR",
-              message: "Failed to execute flight search",
-              error: error instanceof Error ? error.message : String(error)
-            };
+            continue;
           }
-
-          // Store meta for client navigation/opening results
-          if (toolResult && (toolResult.status === "OK" || toolResult.status === "NO_RESULTS")) {
-            lastSearchMeta = {
-              status: toolResult.status,
-              count: toolResult.count ?? 0,
-              search_params: args,
-              search_type: 'flights'
-            };
-          }
+          
+          const searchParams = {
+            origin: args.origin,
+            destination: args.destination,
+            departureDate: args.departureDate,
+            returnDate: args.returnDate || null,
+            adults: args.adults || 1,
+            travelClass: args.travelClass || 'ECONOMY'
+          };
+          
+          console.log('🎯 [HELP-CENTER FLIGHT INTENT]', searchParams);
+          
+          const flightIntentResult = {
+            status: "OK",
+            message: "Flight preferences extracted. Opening search widget...",
+            search_params: searchParams,
+            search_type: 'flights'
+          };
+          
+          toolCallResults.push({
+            tool_call_id: toolCall.id,
+            role: "tool",
+            name: "search_flights",
+            content: JSON.stringify(flightIntentResult)
+          });
+          
+          lastSearchMeta = {
+            status: "OK",
+            search_params: searchParams,
+            search_type: 'flights'
+          };
+          
         } else if (toolCall.function.name === "search_events") {
           const args = JSON.parse(toolCall.function.arguments);
           console.log("Event search args:", args);

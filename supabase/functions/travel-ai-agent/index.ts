@@ -743,8 +743,16 @@ async function searchRestaurants(args: any) {
 
 async function searchFlights(args: any) {
   try {
-    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY', nonStop = false, sortBy = 'best' } = args;
-    console.log('searchFlights called with:', { origin, destination, departureDate, returnDate, adults, travelClass, nonStop, sortBy });
+    const { origin, destination, departureDate, returnDate, adults = 1, travelClass = 'ECONOMY' } = args;
+    
+    // Validate required fields
+    if (!origin || !destination || !departureDate) {
+      return {
+        error: "VALIDATION_ERROR",
+        message: "Missing required flight parameters",
+        missing: { origin: !origin, destination: !destination, departureDate: !departureDate }
+      };
+    }
 
     // ⚠️ SECURITY: Server-side date validation using shared validation helper
     console.log('🔒 [VALIDATION] Validating flight dates:', { departureDate, returnDate });
@@ -767,168 +775,24 @@ async function searchFlights(args: any) {
       };
     }
     
-    console.log('✅ [VALIDATION] All validations passed');
-
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY');
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return { error: 'Supabase configuration missing', results: [] };
-    }
-
-    // Convert city names to airport codes if needed (improved lookup)
-    const getAirportCode = (location: string) => {
-      // If already looks like an airport code (3 letters), use it
-      if (/^[A-Z]{3}$/i.test(location.trim())) {
-        return location.toUpperCase();
-      }
-
-      // Comprehensive city to code mapping
-      const cityToCode: Record<string, string> = {
-        // US Cities
-        'new york': 'NYC', 'los angeles': 'LAX', 'san francisco': 'SFO',
-        'washington': 'WAS', 'chicago': 'CHI', 'miami': 'MIA',
-        'seattle': 'SEA', 'atlanta': 'ATL', 'dallas': 'DFW',
-        'houston': 'HOU', 'phoenix': 'PHX', 'denver': 'DEN',
-        'orlando': 'MCO', 'detroit': 'DTW', 'minneapolis': 'MSP',
-        'portland': 'PDX', 'san diego': 'SAN', 'austin': 'AUS',
-        'nashville': 'BNA', 'salt lake city': 'SLC', 'charlotte': 'CLT',
-        'boston': 'BOS', 'las vegas': 'LAS', 'philadelphia': 'PHL',
-        // Global Cities
-        'paris': 'PAR', 'london': 'LON', 'tokyo': 'TYO',
-        'dubai': 'DXB', 'singapore': 'SIN', 'hong kong': 'HKG',
-        'frankfurt': 'FRA', 'amsterdam': 'AMS', 'madrid': 'MAD',
-        'barcelona': 'BCN', 'rome': 'FCO', 'milan': 'MXP',
-        // Japan (closest major airports for city names)
-        'kyoto': 'KIX', 'osaka': 'KIX', 'nara': 'KIX', 'kobe': 'UKB', 'nagoya': 'NGO',
-        // Switzerland
-        'zurich': 'ZRH', 'geneva': 'GVA', 'basel': 'BSL',
-        'bern': 'ZRH', 'lausanne': 'GVA', 'lucerne': 'ZRH',
-        'interlaken': 'ZRH', 'zermatt': 'GVA', 'st moritz': 'ZRH',
-        'st. moritz': 'ZRH', 'lugano': 'LUG', 'davos': 'ZRH',
-        'grindelwald': 'ZRH', 'montreux': 'GVA'
-      };
-      
-      const lowerLocation = location.toLowerCase().trim();
-      
-      // Check exact match first
-      if (cityToCode[lowerLocation]) {
-        return cityToCode[lowerLocation];
-      }
-      
-      // Check if location contains any city name (for phrases like "ski destination in Zermatt")
-      for (const [city, code] of Object.entries(cityToCode)) {
-        if (lowerLocation.includes(city)) {
-          console.log(`Mapped "${location}" to ${code} via city name "${city}"`);
-          return code;
-        }
-      }
-      
-      // If no match found, try to use first 3 letters but log a warning
-      console.warn(`No airport mapping found for "${location}", using fallback code`);
-      return location.toUpperCase().slice(0, 3);
-    };
-
-    const originCode = getAirportCode(origin);
-    const destinationCode = getAirportCode(destination);
-
-    console.log('Airport codes:', { originCode, destinationCode });
-
-    // Call unified flight search
-    const flightResponse = await fetch(
-      `${supabaseUrl}/functions/v1/unified-search-flights`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`
-        },
-        body: JSON.stringify({
-          origin: originCode,
-          destination: destinationCode,
-          departureDate,
-          returnDate,
-          adults,
-          travelClass,
-          nonStop: nonStop ? 'true' : 'false',
-          destinationCity: destination
-        })
-      }
-    );
-
-    if (!flightResponse.ok) {
-      console.error('Flight search failed:', flightResponse.status);
-      return { 
-        error: `Could not find flights from ${origin} to ${destination}. Try different dates or cities.`,
-        results: [] 
-      };
-    }
-
-    const flightData = await flightResponse.json();
-    console.log('Flights found:', flightData.results?.length || 0);
-
-    // Sort flights based on sortBy parameter and LIMIT to 15 results max
-    let sortedFlights = flightData.results || [];
+    console.log('✅ [VALIDATION] All flight validations passed');
     
-    if (sortBy && sortedFlights.length > 0) {
-      switch (sortBy) {
-        case 'price':
-          sortedFlights.sort((a: any, b: any) => {
-            const priceA = parseFloat(a.price.total);
-            const priceB = parseFloat(b.price.total);
-            return priceA - priceB;
-          });
-          break;
-          
-        case 'duration':
-          sortedFlights.sort((a: any, b: any) => {
-            const getDurationMinutes = (duration: string) => {
-              const hours = duration.match(/(\d+)H/)?.[1] || '0';
-              const minutes = duration.match(/(\d+)M/)?.[1] || '0';
-              return parseInt(hours) * 60 + parseInt(minutes);
-            };
-            const durationA = getDurationMinutes(a.itineraries[0].duration);
-            const durationB = getDurationMinutes(b.itineraries[0].duration);
-            return durationA - durationB;
-          });
-          break;
-          
-        case 'departure_early':
-          sortedFlights.sort((a: any, b: any) => {
-            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
-            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
-            return timeA - timeB;
-          });
-          break;
-          
-        case 'departure_late':
-          sortedFlights.sort((a: any, b: any) => {
-            const timeA = new Date(a.itineraries[0].segments[0].departure.at).getTime();
-            const timeB = new Date(b.itineraries[0].segments[0].departure.at).getTime();
-            return timeB - timeA;
-          });
-          break;
-          
-        case 'best':
-        default:
-          // Keep default sorting
-          break;
-      }
-    }
-    
-    // LIMIT results to prevent token overflow
-    sortedFlights = sortedFlights.slice(0, 15);
-
-    return {
-      type: 'flights',
-      origin: { code: originCode, name: origin },
-      destination: { code: destinationCode, name: destination },
+    const searchParams = {
+      origin,
+      destination,
       departureDate,
-      returnDate,
-      results: sortedFlights,
-      dictionaries: flightData.dictionaries,
-      meta: flightData.meta,
-      filters: { sortBy }
+      returnDate: returnDate || null,
+      adults: adults || 1,
+      travelClass: travelClass || 'ECONOMY'
+    };
+    
+    console.log('🎯 [TRAVEL-AI FLIGHT INTENT] Extracted flight preferences:', searchParams);
+    
+    return {
+      status: "OK",
+      message: "Flight preferences extracted. Opening search widget...",
+      search_params: searchParams,
+      search_type: "flights"
     };
 
   } catch (error) {

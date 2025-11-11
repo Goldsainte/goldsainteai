@@ -394,48 +394,33 @@ async function handleToolCall(toolName: string, args: any): Promise<any> {
     return { success: true, bookingReference, message: `Hotel booked! Confirmation: ${bookingReference}` };
   }
 
-  // FLIGHTS
+  // FLIGHTS - Extract intent only, open Expedia widget
   if (toolName === "search_flights") {
-    const response = await fetch(`${supabaseUrl}/functions/v1/search-flights`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${supabaseKey}` },
-      body: JSON.stringify({
-        originLocationCode: args.origin.toUpperCase().substring(0, 3),
-        destinationLocationCode: args.destination.toUpperCase().substring(0, 3),
-        departureDate: args.departureDate,
-        returnDate: args.returnDate,
-        adults: args.adults || 1,
-        currencyCode: 'USD'
-      })
-    });
-
-    if (!response.ok) return { error: 'Failed to search flights.' };
-    const data = await response.json();
+    const { origin, destination, departureDate, returnDate, adults } = args;
     
-    if (data.results && data.results.length > 0) {
-      const flights = data.results.slice(0, 5).map((flight: any) => {
-        const firstSegment = flight.itineraries?.[0]?.segments?.[0];
-        const lastSegment = flight.itineraries?.[0]?.segments?.[flight.itineraries[0].segments.length - 1];
-        
-        return {
-          id: flight.id,
-          airline: flight.validatingAirlineCodes?.[0] || 'Unknown',
-          price: flight.price?.amount || 0,
-          currency: flight.price?.currency || 'USD',
-          departure: firstSegment?.departure?.at || '',
-          arrival: lastSegment?.arrival?.at || '',
-          duration: flight.itineraries?.[0]?.duration || '',
-          stops: flight.itineraries?.[0]?.segments?.length - 1 || 0
-        };
-      });
-      return { success: true, flights, message: `Found ${flights.length} flights` };
+    if (!origin || !destination || !departureDate) {
+      return {
+        status: "ERROR",
+        message: "Missing required flight parameters",
+        missing: { origin: !origin, destination: !destination, departureDate: !departureDate }
+      };
     }
     
-    return { 
-      success: true, 
-      flights: [], 
-      suggestions: data.suggestions || [],
-      message: 'No flights found for these dates. Try adjusting your search criteria.' 
+    const searchParams = {
+      origin,
+      destination,
+      departureDate,
+      returnDate: returnDate || null,
+      adults: adults || 1
+    };
+    
+    console.log('🎯 [ASSISTANT FLIGHT INTENT]', searchParams);
+    
+    return {
+      status: "OK",
+      message: "Flight preferences extracted. Opening search widget...",
+      search_params: searchParams,
+      search_type: "flights"
     };
   }
 
