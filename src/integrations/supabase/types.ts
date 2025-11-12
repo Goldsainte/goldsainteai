@@ -5960,6 +5960,7 @@ export type Database = {
           stripe_account_id: string | null
           stripe_account_status: string | null
           stripe_charges_enabled: boolean | null
+          stripe_customer_id: string | null
           stripe_onboarding_completed: boolean | null
           stripe_payouts_enabled: boolean | null
           tax_id: string | null
@@ -6006,6 +6007,7 @@ export type Database = {
           stripe_account_id?: string | null
           stripe_account_status?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_customer_id?: string | null
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
@@ -6052,6 +6054,7 @@ export type Database = {
           stripe_account_id?: string | null
           stripe_account_status?: string | null
           stripe_charges_enabled?: boolean | null
+          stripe_customer_id?: string | null
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
