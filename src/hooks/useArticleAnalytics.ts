@@ -2,37 +2,40 @@ import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AnalyticsParams {
-  articleSlug: string;
-  category?: string;
-  authorId?: string;
-  isSponsored?: boolean;
+  articleId: string;
 }
 
-export function useArticleAnalytics({
-  articleSlug,
-  category,
-  authorId,
-  isSponsored,
-}: AnalyticsParams) {
+function getOrCreateSessionId() {
+  let sid = sessionStorage.getItem("journal_sid");
+  if (!sid) {
+    sid = crypto.randomUUID();
+    sessionStorage.setItem("journal_sid", sid);
+  }
+  return sid;
+}
+
+export function useArticleAnalytics({ articleId }: AnalyticsParams) {
   const startTimeRef = useRef<number>(Date.now());
   const scrollDepthRef = useRef<number>(0);
   const hasTrackedViewRef = useRef<boolean>(false);
+  const sessionIdRef = useRef<string>(getOrCreateSessionId());
 
   useEffect(() => {
+    if (!articleId) return;
+
     // Track page view
     const trackView = async () => {
       if (hasTrackedViewRef.current) return;
       hasTrackedViewRef.current = true;
 
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        
         await supabase.from("journal_analytics" as any).insert({
-          article_slug: articleSlug,
-          event_type: "view",
-          category,
-          author_id: authorId,
-          is_sponsored: isSponsored,
+          article_id: articleId,
+          user_id: user?.id ?? null,
+          session_id: sessionIdRef.current,
           referrer: document.referrer || null,
-          user_agent: navigator.userAgent,
         } as any);
       } catch (error) {
         console.error("Error tracking view:", error);
@@ -69,15 +72,11 @@ export function useArticleAnalytics({
           await supabase
             .from("journal_analytics" as any)
             .update({
-              duration_seconds: duration,
-              scroll_depth: scrollDepthRef.current,
+              view_duration_seconds: duration,
+              scroll_depth_percent: scrollDepthRef.current,
             } as any)
-            .eq("article_slug", articleSlug)
-            .eq("event_type", "view")
-            .order("created_at", { ascending: false })
-            .limit(1);
-          
-          console.log("Analytics updated:", { duration, scrollDepth: scrollDepthRef.current });
+            .eq("session_id", sessionIdRef.current)
+            .eq("article_id", articleId);
         } catch (error) {
           console.error("Error updating analytics:", error);
         }
@@ -85,5 +84,5 @@ export function useArticleAnalytics({
       
       updateAnalytics();
     };
-  }, [articleSlug, category, authorId, isSponsored]);
+  }, [articleId]);
 }

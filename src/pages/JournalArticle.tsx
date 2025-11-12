@@ -29,7 +29,7 @@ interface Article {
   is_sponsored: boolean;
   sponsor_name?: string;
   sponsor_logo_url?: string;
-  sponsor_cta_url?: string;
+  sponsor_link_url?: string;
   creator: {
     id: string;
     name: string;
@@ -59,10 +59,7 @@ export default function JournalArticle() {
 
   // Track analytics
   useArticleAnalytics({
-    articleSlug: slug || "",
-    category: article?.categories?.[0],
-    authorId: article?.creator?.id,
-    isSponsored: article?.is_sponsored,
+    articleId: article?.id || "",
   });
 
   useEffect(() => {
@@ -91,9 +88,9 @@ export default function JournalArticle() {
           meta_description,
           og_image_url,
           is_sponsored,
-          sponsor_name,
-          sponsor_logo_url,
-          sponsor_cta_url,
+      sponsor_name,
+      sponsor_logo_url,
+      sponsor_link_url,
           creator:journal_creators(id, name, avatar_url, bio, social_links)
         `)
         .eq("slug", slug)
@@ -321,7 +318,7 @@ export default function JournalArticle() {
           <SponsorRibbon
             sponsorName={article.sponsor_name}
             sponsorLogo={article.sponsor_logo_url}
-            sponsorUrl={article.sponsor_cta_url}
+            sponsorUrl={article.sponsor_link_url}
           />
         )}
 

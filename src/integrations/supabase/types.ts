@@ -3470,6 +3470,243 @@ export type Database = {
           },
         ]
       }
+      journal_analytics: {
+        Row: {
+          article_id: string
+          created_at: string | null
+          id: string
+          referrer: string | null
+          scroll_depth_percent: number | null
+          session_id: string | null
+          user_id: string | null
+          view_duration_seconds: number | null
+        }
+        Insert: {
+          article_id: string
+          created_at?: string | null
+          id?: string
+          referrer?: string | null
+          scroll_depth_percent?: number | null
+          session_id?: string | null
+          user_id?: string | null
+          view_duration_seconds?: number | null
+        }
+        Update: {
+          article_id?: string
+          created_at?: string | null
+          id?: string
+          referrer?: string | null
+          scroll_depth_percent?: number | null
+          session_id?: string | null
+          user_id?: string | null
+          view_duration_seconds?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_analytics_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "journal_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_article_blocks: {
+        Row: {
+          article_id: string
+          block_order: number
+          block_type: string
+          content: Json
+          created_at: string | null
+          id: string
+        }
+        Insert: {
+          article_id: string
+          block_order: number
+          block_type: string
+          content: Json
+          created_at?: string | null
+          id?: string
+        }
+        Update: {
+          article_id?: string
+          block_order?: number
+          block_type?: string
+          content?: Json
+          created_at?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_article_blocks_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "journal_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_articles: {
+        Row: {
+          categories: string[] | null
+          created_at: string | null
+          creator_id: string | null
+          dek: string | null
+          hero_image_alt: string | null
+          hero_image_credit: string | null
+          hero_image_url: string
+          id: string
+          is_sponsored: boolean | null
+          location_tags: string[] | null
+          meta_description: string | null
+          meta_title: string | null
+          og_image_url: string | null
+          publish_date: string | null
+          read_time_minutes: number | null
+          slug: string
+          sponsor_disclosure_text: string | null
+          sponsor_link_url: string | null
+          sponsor_logo_url: string | null
+          sponsor_name: string | null
+          status: string | null
+          title: string
+          updated_at: string | null
+          view_count: number | null
+        }
+        Insert: {
+          categories?: string[] | null
+          created_at?: string | null
+          creator_id?: string | null
+          dek?: string | null
+          hero_image_alt?: string | null
+          hero_image_credit?: string | null
+          hero_image_url: string
+          id?: string
+          is_sponsored?: boolean | null
+          location_tags?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          publish_date?: string | null
+          read_time_minutes?: number | null
+          slug: string
+          sponsor_disclosure_text?: string | null
+          sponsor_link_url?: string | null
+          sponsor_logo_url?: string | null
+          sponsor_name?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Update: {
+          categories?: string[] | null
+          created_at?: string | null
+          creator_id?: string | null
+          dek?: string | null
+          hero_image_alt?: string | null
+          hero_image_credit?: string | null
+          hero_image_url?: string
+          id?: string
+          is_sponsored?: boolean | null
+          location_tags?: string[] | null
+          meta_description?: string | null
+          meta_title?: string | null
+          og_image_url?: string | null
+          publish_date?: string | null
+          read_time_minutes?: number | null
+          slug?: string
+          sponsor_disclosure_text?: string | null
+          sponsor_link_url?: string | null
+          sponsor_logo_url?: string | null
+          sponsor_name?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string | null
+          view_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_articles_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "journal_creators"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      journal_creators: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string | null
+          id: string
+          name: string
+          slug: string
+          social_links: Json | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          slug: string
+          social_links?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          social_links?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      journal_related_articles: {
+        Row: {
+          article_id: string
+          display_order: number | null
+          id: string
+          related_article_id: string
+        }
+        Insert: {
+          article_id: string
+          display_order?: number | null
+          id?: string
+          related_article_id: string
+        }
+        Update: {
+          article_id?: string
+          display_order?: number | null
+          id?: string
+          related_article_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "journal_related_articles_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "journal_articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "journal_related_articles_related_article_id_fkey"
+            columns: ["related_article_id"]
+            isOneToOne: false
+            referencedRelation: "journal_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       live_shopping_events: {
         Row: {
           actual_end: string | null
