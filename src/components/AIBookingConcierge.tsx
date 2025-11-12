@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Radio } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Radio, Volume2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -16,6 +16,7 @@ import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
 import { WakeWordDetector } from "@/utils/WakeWordDetector";
 import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
 import { HoldMusicController } from "@/utils/HoldMusicController";
+import { BackgroundMusicController } from "@/utils/BackgroundMusicController";
 import { CompactFlightCard } from "./CompactFlightCard";
 import { CompactHotelCard } from "./CompactHotelCard";
 import { CompactCarCard } from "./CompactCarCard";
@@ -25,6 +26,9 @@ import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
 import { VoiceDiagnosticsPanel } from "./VoiceDiagnosticsPanel";
+import { WelcomeCard } from "./concierge/WelcomeCard";
+import { VoiceStatusChip } from "./concierge/VoiceStatusChip";
+import { VoiceStatusMessage } from "./concierge/VoiceStatusMessage";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
@@ -51,6 +55,8 @@ export const AIBookingConcierge = () => {
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [showAutoplayPrompt, setShowAutoplayPrompt] = useState(false);
   const [showUnmute, setShowUnmute] = useState(false);
+  const [showBgMusicPrompt, setShowBgMusicPrompt] = useState(false);
+  const [showWelcomeCard, setShowWelcomeCard] = useState(true);
   const [preferences, setPreferences] = useState<ChatPreferences>(() => {
     const saved = localStorage.getItem('aiChatPreferences');
     return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
@@ -72,6 +78,7 @@ export const AIBookingConcierge = () => {
   const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
   const musicControllerRef = useRef<HoldMusicController | null>(null);
+  const bgMusicRef = useRef<BackgroundMusicController | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -201,6 +208,32 @@ export const AIBookingConcierge = () => {
     }
   }, []);
 
+  // Initialize background music controller
+  useEffect(() => {
+    const bgMusicUrl = import.meta.env.VITE_BG_MUSIC_URL || 
+      "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
+    
+    bgMusicRef.current = new BackgroundMusicController(bgMusicUrl);
+    bgMusicRef.current.arm();
+
+    const handleBgMusicGesture = () => setShowBgMusicPrompt(true);
+    window.addEventListener("bgmusic-needs-gesture", handleBgMusicGesture);
+
+    return () => {
+      window.removeEventListener("bgmusic-needs-gesture", handleBgMusicGesture);
+      bgMusicRef.current?.stop();
+    };
+  }, []);
+
+  // Start background music when widget opens
+  useEffect(() => {
+    if (isOpen && bgMusicRef.current) {
+      bgMusicRef.current.start();
+    } else if (!isOpen && bgMusicRef.current) {
+      bgMusicRef.current.stop();
+    }
+  }, [isOpen]);
+
   // Play/stop hold music based on voice status
   useEffect(() => {
     const music = musicControllerRef.current;
@@ -284,6 +317,9 @@ export const AIBookingConcierge = () => {
 
     const userMessage = input.trim();
     console.log('[AIBookingConcierge] Sending message:', userMessage);
+    
+    // Dismiss welcome card on first interaction
+    setShowWelcomeCard(false);
     
     setInput("");
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -481,9 +517,15 @@ export const AIBookingConcierge = () => {
         console.log('📞 [Step 1/6] Starting voice mode...');
         setVoiceStatus('connecting');
 
-        // Arm hold music on user gesture
+        // Dismiss welcome card on voice interaction
+        setShowWelcomeCard(false);
+
+        // Arm hold music and background music on user gesture
         if (musicControllerRef.current) {
           await musicControllerRef.current.arm();
+        }
+        if (bgMusicRef.current) {
+          await bgMusicRef.current.arm();
         }
 
         // Pause wake word while in active voice call to avoid mic conflicts
@@ -998,36 +1040,25 @@ export const AIBookingConcierge = () => {
     >
       {/* Header */}
       <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3">
           <div className="relative">
             <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
-            {wakeWordActive && !voiceMode && (
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-            )}
           </div>
           <div>
             <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
-            <p className="text-xs text-primary-foreground/80">
-              {wakeWordActive && !voiceMode ? "Listening for 'Hey Goldsainte'" : "Powered by Goldsainte"}
-            </p>
+            <p className="text-xs text-primary-foreground/80">Powered by Goldsainte</p>
           </div>
         </div>
-        <div className="flex items-center gap-1">
-          {!wakeWordPrimed && speechSupported && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={enableWakeWordPipeline}
-              className="text-xs mr-1"
-            >
-              Enable Wake Word
-            </Button>
-          )}
-          {!speechSupported && (
-            <Badge variant="outline" className="text-xs mr-1">
-              Tap mic to talk
-            </Badge>
-          )}
+        <div className="flex items-center gap-1.5">
+          <VoiceStatusChip
+            state={
+              voiceMode || wakeWordActive ? 'listening' : 
+              wakeWordPrimed ? 'idle' : 
+              'muted'
+            }
+            onClick={enableWakeWordPipeline}
+            className="text-primary-foreground border-primary-foreground/20"
+          />
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -1059,6 +1090,22 @@ export const AIBookingConcierge = () => {
         <>
           <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden w-full max-w-full" ref={scrollRef}>
             <div className="space-y-3">
+              {/* Welcome Card - Shows before first interaction */}
+              {showWelcomeCard && messages.length <= 1 && (
+                <WelcomeCard onDismiss={() => setShowWelcomeCard(false)} />
+              )}
+
+              {/* Voice Status Message */}
+              {wakeWordActive && !voiceMode && (
+                <VoiceStatusMessage status="wake-active" />
+              )}
+              {voiceMode && isProcessing && (
+                <VoiceStatusMessage status="responding" />
+              )}
+              {voiceMode && !isProcessing && (
+                <VoiceStatusMessage status="listening" />
+              )}
+
               {messages.map((msg, idx) => (
                 <div key={idx} className="w-full">
                   <div
@@ -1245,6 +1292,33 @@ export const AIBookingConcierge = () => {
 
           {/* Input Area */}
           <div className="p-4 md:p-3 border-t border-border bg-background">
+            {showUnmute && (
+              <Button
+                onClick={() => {
+                  musicControllerRef.current?.play();
+                  setShowUnmute(false);
+                }}
+                variant="outline"
+                size="sm"
+                className="w-full mb-2"
+              >
+                🔈 Tap to enable hold music
+              </Button>
+            )}
+            {showBgMusicPrompt && (
+              <Button
+                onClick={() => {
+                  bgMusicRef.current?.start();
+                  setShowBgMusicPrompt(false);
+                }}
+                variant="outline"
+                size="sm"
+                className="w-full mb-2 gap-2"
+              >
+                <Volume2 className="w-4 h-4" />
+                Tap to enable background music
+              </Button>
+            )}
             <div className="flex gap-2">
               {!voiceMode && (
                 <>
