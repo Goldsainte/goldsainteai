@@ -35,11 +35,28 @@ serve(async (req) => {
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
 
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
+    // Try to get cached customer ID from profile
+    const { data: profileData } = await supabaseClient
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
     
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    let customerId = profileData?.stripe_customer_id;
+    
+    // If no cached ID, look up by email and cache it
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        
+        // Cache the customer ID
+        await supabaseClient
+          .from('profiles')
+          .update({ stripe_customer_id: customerId })
+          .eq('id', user.id);
+      }
     }
 
     const origin = req.headers.get("origin") || "http://localhost:3000";

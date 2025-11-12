@@ -50,12 +50,55 @@ serve(async (req) => {
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey);
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
-    if (customers.data.length === 0) {
-      logStep("No customer found, updating to free tier");
+    // Try to get cached customer ID from profile
+    const { data: profileData } = await supabaseClient
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
+    
+    let customerId = profileData?.stripe_customer_id;
+    
+    // If no cached ID, look up by email and cache it
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
       
-      // Update user_subscriptions to free tier
+      if (customers.data.length === 0) {
+        logStep("No customer found, updating to free tier");
+        
+        await supabaseClient
+          .from('user_subscriptions')
+          .upsert({ 
+            user_id: user.id, 
+            tier: 'free'
+          });
+        
+        return new Response(JSON.stringify({ 
+          subscribed: false,
+          tier: 'free',
+          product_id: null,
+          subscription_end: null 
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      
+      customerId = customers.data[0].id;
+      
+      // Cache the customer ID
+      await supabaseClient
+        .from('profiles')
+        .update({ stripe_customer_id: customerId })
+        .eq('id', user.id);
+      
+      logStep("Cached Stripe customer ID", { customerId });
+    }
+    
+    if (!customerId) {
+      logStep("No Stripe customer found after lookup");
+      
       await supabaseClient
         .from('user_subscriptions')
         .upsert({ 
@@ -73,9 +116,8 @@ serve(async (req) => {
         status: 200,
       });
     }
-
-    const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
+    
+    logStep("Using Stripe customer", { customerId });
 
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,

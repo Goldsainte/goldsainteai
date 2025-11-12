@@ -26,13 +26,30 @@ serve(async (req) => {
 
     const { returnUrl } = await req.json();
 
-  const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
 
-    // Check for existing customer
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
-    let customerId;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
+    // Try to get cached customer ID from profile
+    const { data: profileData } = await supabaseClient
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
+    
+    let customerId = profileData?.stripe_customer_id;
+    
+    // If no cached ID, look up by email and cache it
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      
+      if (customers.data.length > 0) {
+        customerId = customers.data[0].id;
+        
+        // Cache the customer ID
+        await supabaseClient
+          .from('profiles')
+          .update({ stripe_customer_id: customerId })
+          .eq('id', user.id);
+      }
     }
 
     // Create checkout session for verification subscription

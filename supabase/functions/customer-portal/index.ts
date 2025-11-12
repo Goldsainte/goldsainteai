@@ -59,20 +59,42 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(stripeKey);
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
-    let customerId: string;
-    if (customers.data.length === 0) {
-      // Create customer if doesn't exist
-      const customer = await stripe.customers.create({
-        email: user.email,
-        metadata: { user_id: user.id }
-      });
-      customerId = customer.id;
-      logStep("Created new Stripe customer", { customerId });
+    // Try to get cached customer ID from profile
+    const { data: profileData } = await supabaseClient
+      .from('profiles')
+      .select('stripe_customer_id')
+      .eq('id', user.id)
+      .single();
+    
+    let customerId = profileData?.stripe_customer_id;
+    
+    // If no cached ID, look up by email and cache it
+    if (!customerId) {
+      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      
+      if (customers.data.length === 0) {
+        // Create customer if doesn't exist
+        const customer = await stripe.customers.create({
+          email: user.email,
+          metadata: { user_id: user.id }
+        });
+        customerId = customer.id;
+        logStep("Created new Stripe customer", { customerId });
+      } else {
+        customerId = customers.data[0].id;
+        logStep("Found existing Stripe customer", { customerId });
+      }
+      
+      // Cache the customer ID
+      await supabaseClient
+        .from('profiles')
+        .update({ stripe_customer_id: customerId })
+        .eq('id', user.id);
+      
+      logStep("Cached Stripe customer ID", { customerId });
     } else {
-      customerId = customers.data[0].id;
-      logStep("Found existing Stripe customer", { customerId });
+      logStep("Using cached customer ID", { customerId });
     }
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
