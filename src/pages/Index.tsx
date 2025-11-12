@@ -861,17 +861,19 @@ const queries = {
                     {/* Custom rotating placeholder with cross-fade */}
                     {!searchQuery && (
                       <div 
-                        className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none overflow-hidden min-w-0 pr-16 sm:pr-20"
+                        className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none overflow-hidden min-w-0 pr-16 sm:pr-20 z-10"
                         style={{ maxWidth: 'calc(100% - 5rem)' }}
                       >
-                        <div className="relative h-6">
+                        <div className="relative" style={{ minHeight: '1.5rem' }}>
                           {rotatingMessages.map((message, index) => (
                             <span
                               key={index}
-                              className={`absolute inset-0 truncate transition-opacity duration-400 text-gray-500`}
+                              className="absolute top-0 left-0 truncate transition-opacity duration-400 text-gray-500 whitespace-nowrap"
                               style={{
                                 fontSize: 'clamp(14px, 1.1vw, 16px)',
+                                lineHeight: '1.5rem',
                                 opacity: currentMessageIndex === index ? 1 : 0,
+                                maxWidth: '100%',
                               }}
                             >
                               {message}
