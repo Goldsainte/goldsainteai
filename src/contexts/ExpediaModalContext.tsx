@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 export interface ExpediaPrefill {
   destination?: string;
@@ -42,6 +42,17 @@ export const ExpediaModalProvider: React.FC<{ children: React.ReactNode }> = ({ 
     // Clear prefill after a delay to allow animation to complete
     setTimeout(() => setPrefill(null), 300);
   }, []);
+
+  // Listen for custom events from global click handler
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      const { destination } = e.detail || {};
+      openModal(destination ? { destination } : undefined);
+    };
+    
+    window.addEventListener('openExpediaModal' as any, handler);
+    return () => window.removeEventListener('openExpediaModal' as any, handler);
+  }, [openModal]);
 
   return (
     <ExpediaModalContext.Provider value={{ isOpen, prefill, openModal, closeModal }}>

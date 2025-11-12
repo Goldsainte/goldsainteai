@@ -9,7 +9,8 @@ import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
-import { ExpediaModalTrigger } from "@/components/ExpediaModalTrigger";
+import { ExpediaModalPortal } from "@/components/ExpediaModalPortal";
+import { initExpediaModalHandler } from "@/utils/expediaModalHandler";
 import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
@@ -133,6 +134,12 @@ function AppContent() {
   usePresence(); // Initialize presence tracking
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
+  // Initialize global Expedia modal handler
+  useEffect(() => {
+    const cleanup = initExpediaModalHandler();
+    return cleanup;
+  }, []);
+
   // Force return to Home when the welcome modal is dismissed (first visit UX)
   useEffect(() => {
     const handler = () => navigate('/');
@@ -218,7 +225,7 @@ function AppContent() {
       <SkipNavigation />
       <WelcomeModal open={showWelcomeModal} onClose={handleCloseWelcome} isFirstVisit={true} />
       <OnboardingTour />
-      <ExpediaModalTrigger />
+      <ExpediaModalPortal />
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Routes>

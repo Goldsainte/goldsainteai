@@ -474,7 +474,7 @@ html, body, #root, #main-content {
     @apply text-[11px] sm:text-xs;
   }
   
-  /* Micro text - minimum readable size for mobile */
+/* Micro text - minimum readable size for mobile */
   .text-micro {
     @apply text-[10px] sm:text-xs;
   }
@@ -482,6 +482,37 @@ html, body, #root, #main-content {
   /* Label text - for form labels and metadata */
   .text-label {
     @apply text-xs sm:text-sm font-medium;
+  }
+  
+  /* Expedia Modal Shell */
+  #expediaModal {
+    z-index: 9999 !important;
+  }
+
+  /* Modal backdrop */
+  [data-radix-dialog-overlay] {
+    z-index: 9998 !important;
+  }
+
+  /* Goldsainte-branded modal buttons */
+  #expediaModal .gold-modal-content .btn,
+  #expediaModal .gold-modal-content button:not([data-radix-dialog-close]) {
+    background: hsl(var(--accent)) !important;
+    color: hsl(var(--primary)) !important;
+    border-radius: 10px !important;
+  }
+
+  #expediaModal .gold-modal-content input,
+  #expediaModal .gold-modal-content select {
+    border-radius: 10px;
+    border-color: hsl(var(--accent-cream));
+  }
+
+  /* Ensure modal doesn't conflict with bottom nav */
+  @media (max-width: 768px) {
+    #expediaModal {
+      margin-bottom: max(env(safe-area-inset-bottom), 64px);
+    }
   }
   
   /* Responsive spacing utilities for cards */
