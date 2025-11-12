@@ -173,10 +173,21 @@ export class RealtimeVoiceChat {
       });
 
       // ---- POST SDP via Supabase relay
-      const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
-      if (!relayUrl || !import.meta.env.VITE_SUPABASE_URL) {
-        throw new Error("VITE_SUPABASE_URL not configured");
+      // Validate environment and token before posting
+      if (!import.meta.env.VITE_SUPABASE_URL) {
+        console.error("❌ VITE_SUPABASE_URL is not set");
+        throw new Error("Voice config error: VITE_SUPABASE_URL not configured");
       }
+
+      const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
+      
+      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || !EPHEMERAL_KEY.startsWith("sk-")) {
+        console.error("❌ Bad ephemeral token:", EPHEMERAL_KEY);
+        throw new Error("Voice config error: missing/invalid ephemeral token");
+      }
+
+      console.log("[VOICE] Using relay:", relayUrl);
+      console.log("[VOICE] Token prefix:", EPHEMERAL_KEY.slice(0, 12));
       
       const model = "gpt-4o-realtime-preview-2024-12-17";
       console.log("Posting SDP via relay…");

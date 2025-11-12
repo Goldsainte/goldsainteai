@@ -215,7 +215,11 @@ export const AIBookingConcierge = () => {
     const bgMusicUrl = import.meta.env.VITE_BG_MUSIC_URL || 
       "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
     
-    bgMusicRef.current = new BackgroundMusicController(bgMusicUrl);
+    // Ensure HTTPS URL (force https for production)
+    const secureUrl = bgMusicUrl.replace(/^http:/, 'https:');
+    console.log('[Concierge] Background music URL:', secureUrl);
+    
+    bgMusicRef.current = new BackgroundMusicController(secureUrl);
     // Note: Don't arm here - wait for user gesture (widget open)
 
     const handleBgMusicGesture = () => {
