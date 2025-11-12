@@ -1,39 +1,36 @@
 /**
  * BackgroundMusicController - Manages continuous soft background music
- * Works across Chrome & Safari with iOS-specific optimizations
+ * Separate from hold music - this plays constantly at low volume
  */
 export class BackgroundMusicController {
   private audio: HTMLAudioElement;
-  private target = 0.1;
-  private fadeMs = 700;
+  private targetVolume = 0.1;
+  private fadeMs = 800;
   private armed = false;
+  private visible = true;
 
   constructor(url: string) {
     console.log('[BGMusic] Initializing with URL:', url);
-    this.audio = document.createElement("audio");
-    this.audio.src = url;
+    this.audio = new Audio(url);
     this.audio.loop = true;
     this.audio.preload = "auto";
     this.audio.volume = 0;
-    this.audio.setAttribute("playsinline", "true");
-    this.audio.setAttribute("webkit-playsinline", "true");
-    
-    // Attach to DOM for iOS reliability
-    this.audio.style.display = "none";
-    document.body.appendChild(this.audio);
 
     // Handle tab visibility changes
     document.addEventListener("visibilitychange", () => {
-      if (document.visibilityState === "hidden") {
-        console.log('[BGMusic] Tab hidden, fading out');
-        this.fadeTo(0);
+      this.visible = document.visibilityState === "visible";
+      console.log('[BGMusic] Visibility changed:', this.visible);
+      if (this.visible) {
+        this.fadeIn();
       } else {
-        console.log('[BGMusic] Tab visible, fading in');
-        this.fadeTo(this.target);
+        this.fadeOut();
       }
     });
   }
 
+  /**
+   * Arm the audio element with a user gesture (required for autoplay)
+   */
   async arm() {
     if (this.armed) {
       console.log('[BGMusic] Already armed');
@@ -47,45 +44,70 @@ export class BackgroundMusicController {
       this.audio.currentTime = 0;
       console.log('[BGMusic] ✅ Armed successfully');
     } catch (e) {
-      console.warn("[BGMusic] ⚠️ Arming failed:", e);
+      console.warn("[BGMusic] ⚠️ Arming failed (waiting for user gesture):", e);
       this.armed = false;
     }
   }
 
+  /**
+   * Start playing background music with fade-in
+   */
   async start() {
-    console.log('[BGMusic] start() called');
+    console.log('[BGMusic] start() called, armed:', this.armed);
+    if (!this.armed) await this.arm();
     try {
+      console.log('[BGMusic] Attempting to play...');
       await this.audio.play();
-      await this.fadeTo(this.target);
-      console.log("[BGMusic] ✅ Playing");
+      console.log('[BGMusic] ✅ Playing, starting fade-in');
+      this.fadeIn();
     } catch (e: any) {
       console.error('[BGMusic] ❌ Play failed:', e);
-      if (e?.name === "NotAllowedError") {
+      if (e.name === "NotAllowedError") {
         console.log('[BGMusic] Dispatching bgmusic-needs-gesture event');
         window.dispatchEvent(new CustomEvent("bgmusic-needs-gesture"));
-      } else {
-        console.warn("[BGMusic] play failed:", e);
       }
     }
   }
 
+  /**
+   * Stop background music with fade-out
+   */
   stop() {
     console.log('[BGMusic] stop() called');
-    this.fadeTo(0).then(() => {
+    this.fadeOut().then(() => {
       this.audio.pause();
       this.audio.currentTime = 0;
       console.log('[BGMusic] ✅ Stopped');
     });
   }
 
-  private async fadeTo(v: number) {
+  /**
+   * Fade in to target volume
+   */
+  private async fadeIn() {
     const steps = 10;
-    const d = this.fadeMs / steps;
-    const delta = (v - this.audio.volume) / steps;
+    const step = this.targetVolume / steps;
+    const delay = this.fadeMs / steps;
+    
     for (let i = 0; i < steps; i++) {
-      this.audio.volume = Math.max(0, Math.min(1, this.audio.volume + delta));
-      await new Promise(r => setTimeout(r, d));
+      this.audio.volume = Math.min(this.audio.volume + step, this.targetVolume);
+      await new Promise(r => setTimeout(r, delay));
     }
-    this.audio.volume = v;
+    console.log('[BGMusic] Fade-in complete, volume:', this.audio.volume);
+  }
+
+  /**
+   * Fade out to silence
+   */
+  private async fadeOut() {
+    const steps = 10;
+    const step = this.audio.volume / steps;
+    const delay = this.fadeMs / steps;
+    
+    for (let i = 0; i < steps; i++) {
+      this.audio.volume = Math.max(0, this.audio.volume - step);
+      await new Promise(r => setTimeout(r, delay));
+    }
+    console.log('[BGMusic] Fade-out complete');
   }
 }
