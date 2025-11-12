@@ -40,7 +40,7 @@ export const AIBookingConcierge = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [voiceMode, setVoiceMode] = useState(false);
-  const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
+  const [voiceStatus, setVoiceStatus] = useState<'disconnected' | 'connecting' | 'connected' | 'error' | 'needs-user-gesture'>('disconnected');
   const [wakeWordActive, setWakeWordActive] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPushToTalkActive, setIsPushToTalkActive] = useState(false);
@@ -1284,6 +1284,23 @@ export const AIBookingConcierge = () => {
               >
                 {voiceMode ? <MicOff className="h-6 w-6 md:h-5 md:w-5" /> : <Mic className="h-6 w-6 md:h-5 md:w-5" />}
               </Button>
+              
+              {/* Unmute button for autoplay block */}
+              {voiceStatus === 'needs-user-gesture' && (
+                <Button
+                  onClick={() => {
+                    if (voiceChatRef.current?.audioEl) {
+                      voiceChatRef.current.audioEl.play().catch(console.error);
+                      setVoiceStatus('connected');
+                    }
+                  }}
+                  variant="secondary"
+                  size="sm"
+                  className="ml-2"
+                >
+                  🔊 Tap to unmute
+                </Button>
+              )}
             </div>
           </div>
         </>

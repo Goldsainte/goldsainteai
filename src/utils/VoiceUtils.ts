@@ -10,7 +10,6 @@ export class AudioRecorder {
     try {
       this.stream = await navigator.mediaDevices.getUserMedia({
         audio: {
-          sampleRate: 24000,
           channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
@@ -18,9 +17,7 @@ export class AudioRecorder {
         }
       });
       
-      this.audioContext = new AudioContext({
-        sampleRate: 24000,
-      });
+      this.audioContext = new AudioContext();
       
       this.source = this.audioContext.createMediaStreamSource(this.stream);
       this.processor = this.audioContext.createScriptProcessor(4096, 1, 1);
@@ -61,7 +58,7 @@ export class AudioRecorder {
 export class RealtimeVoiceChat {
   private pc: RTCPeerConnection | null = null;
   private dc: RTCDataChannel | null = null;
-  private audioEl: HTMLAudioElement;
+  public audioEl: HTMLAudioElement;
   private recorder: AudioRecorder | null = null;
 
   constructor(
@@ -75,9 +72,9 @@ export class RealtimeVoiceChat {
   async init(getSessionToken: () => Promise<{ token: string; expiresAt?: number }>) {
     try {
       this.onStatusChange('connecting');
-      console.log("Initializing voice chat...");
+      console.log("Initializing voice chat…");
 
-      // Get ephemeral token (string), not the whole session JSON
+      // Get ephemeral token (string)
       const { token: EPHEMERAL_KEY, expiresAt } = await getSessionToken();
       
       if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string') {
@@ -91,25 +88,51 @@ export class RealtimeVoiceChat {
         console.warn("⚠️ Ephemeral token close to expiry; consider re-fetching");
       }
 
-      // Create peer connection
-      this.pc = new RTCPeerConnection();
+      // Create peer connection with STUN
+      this.pc = new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+        bundlePolicy: "max-bundle",
+        rtcpMuxPolicy: "require",
+      });
+
+      // Connection state logging
+      this.pc.onicegatheringstatechange = () =>
+        console.log("ICE gathering:", this.pc?.iceGatheringState);
+      this.pc.oniceconnectionstatechange = () =>
+        console.log("ICE connection:", this.pc?.iceConnectionState);
+      this.pc.onsignalingstatechange = () =>
+        console.log("Signaling:", this.pc?.signalingState);
+      this.pc.onconnectionstatechange = () =>
+        console.log("Peer connection:", this.pc?.connectionState);
 
       // Set up remote audio
-      this.pc.ontrack = e => {
-        console.log("Received audio track");
+      this.audioEl.setAttribute('playsInline', 'true');
+      this.pc.ontrack = (e) => {
+        console.log("Received remote audio track");
         this.audioEl.srcObject = e.streams[0];
+        const p = this.audioEl.play();
+        if (p && typeof p.catch === 'function') {
+          p.catch((err: any) => {
+            console.warn("Autoplay blocked, need user gesture to unmute:", err?.name);
+            this.onStatusChange('needs-user-gesture');
+          });
+        }
       };
 
-      // Add local audio track
+      // Add local audio track (no 24kHz constraint)
       const ms = await navigator.mediaDevices.getUserMedia({ 
         audio: {
-          sampleRate: 24000,
           channelCount: 1,
           echoCancellation: true,
           noiseSuppression: true,
+          autoGainControl: true,
         } 
       });
-      this.pc.addTrack(ms.getTracks()[0]);
+      const localTrack = ms.getTracks()[0];
+      this.pc.addTrack(localTrack, ms);
+
+      // Ensure we also receive audio
+      this.pc.addTransceiver('audio', { direction: 'sendrecv' });
 
       // Set up data channel for events
       this.dc = this.pc.createDataChannel("oai-events");
@@ -130,15 +153,30 @@ export class RealtimeVoiceChat {
         this.onStatusChange('disconnected');
       });
 
-      // Create and set local description
-      const offer = await this.pc.createOffer();
+      // Create offer
+      const offer = await this.pc.createOffer({
+        offerToReceiveAudio: true,
+      });
       await this.pc.setLocalDescription(offer);
+
+      // Wait for ICE gathering complete
+      await new Promise<void>((resolve) => {
+        if (this.pc!.iceGatheringState === "complete") return resolve();
+        const check = () => {
+          if (this.pc!.iceGatheringState === "complete") {
+            this.pc!.removeEventListener("icegatheringstatechange", check as any);
+            resolve();
+          }
+        };
+        this.pc!.addEventListener("icegatheringstatechange", check as any);
+        setTimeout(resolve, 2000); // Safety timeout
+      });
 
       // Connect to OpenAI's Realtime API (SDP POST)
       const baseUrl = "https://api.openai.com/v1/realtime";
       const model = "gpt-4o-realtime-preview-2024-12-17";
       
-      console.log("Connecting to OpenAI Realtime API with SDP…");
+      console.log("Posting SDP to OpenAI…");
       let sdpResponse: Response;
       try {
         sdpResponse = await fetch(`${baseUrl}?model=${encodeURIComponent(model)}`, {
@@ -149,9 +187,8 @@ export class RealtimeVoiceChat {
             "Authorization": `Bearer ${EPHEMERAL_KEY}`,
             "Content-Type": "application/sdp",
             "Accept": "application/sdp",
-            "Cache-Control": "no-store",
           },
-          body: offer.sdp,
+          body: this.pc.localDescription?.sdp,
         });
       } catch (e) {
         console.error("❌ SDP POST network error:", e);
@@ -174,15 +211,9 @@ export class RealtimeVoiceChat {
         }
       }
 
-      // Verify response Content-Type
-      const contentType = sdpResponse.headers.get("Content-Type");
-      if (contentType && !contentType.includes("application/sdp")) {
-        console.warn(`⚠️ Unexpected Content-Type: ${contentType} (expected application/sdp)`);
-      }
-
       const answerSdp = await sdpResponse.text();
       await this.pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
-      console.log("✅ WebRTC connection established with Realtime API");
+      console.log("✅ WebRTC connected to OpenAI Realtime");
 
     } catch (error) {
       console.error("Error initializing voice chat:", error);
