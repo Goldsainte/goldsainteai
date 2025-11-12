@@ -927,8 +927,8 @@ const queries = {
                   </Button>
                 </div>
 
-                {/* Footer - Smaller and tighter on mobile */}
-                <p className="text-[10px] md:text-xs text-muted-foreground/70 text-center pt-2 md:pt-4 px-4 leading-tight md:leading-relaxed">
+                {/* Footer - Hidden on mobile, shown on desktop */}
+                <p className="hidden md:block text-xs text-muted-foreground/70 text-center pt-4 px-4 leading-relaxed">
                   {t('home.hero.agreement')}{" "}
                   <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm py-1 inline-block">{t('home.hero.terms')}</a>
                   {" "}{t('common.and')}{" "}
