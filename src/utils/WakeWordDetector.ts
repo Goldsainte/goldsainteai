@@ -11,7 +11,6 @@ export class WakeWordDetector {
   private maxBackoffMs = 8000;
   private lastEventAt = 0;
   private watchdogTimer: number | null = null;
-  private aborting = false;
   private micKeepAliveStream: MediaStream | null = null;
 
   constructor(onWake: WakeCallback) {
@@ -57,19 +56,13 @@ export class WakeWordDetector {
       const silenceFor = Date.now() - this.lastEventAt;
       if (silenceFor >= 7000) {
         console.warn("[WakeWord] Watchdog restarting after silence");
-        this.safeRestart();
+        try {
+          this.recognition!.abort();
+        } catch {}
       } else {
         this.armWatchdog();
       }
     }, 7000);
-  }
-
-  private safeRestart() {
-    if (!this.recognition) return;
-    try {
-      this.aborting = true;
-      this.recognition.abort(); // triggers onend → we re-start there
-    } catch {}
   }
 
   private normalizeTranscript(s: string): string {
@@ -97,11 +90,11 @@ export class WakeWordDetector {
     if (!this.supported()) {
       console.warn("[WakeWord] SpeechRecognition not supported in this browser (Safari/iOS).");
       this.running = false;
-      return; // UI should enable a real KWS fallback on Safari
+      return;
     }
     if (this.running) return;
 
-    await this.startMicKeepAlive(); // keeps capture permission warm
+    await this.startMicKeepAlive();
 
     const Ctor = this.SpeechRecognitionCtor!;
     this.recognition = new Ctor();
@@ -123,10 +116,18 @@ export class WakeWordDetector {
       const last = event.results.length - 1;
       const alt = event.results[last] && event.results[last][0];
       const transcript = String(alt?.transcript || "");
-      // Debug:
-      // console.log("[WakeWord] Heard:", transcript);
+      
       if (this.matchesWake(transcript)) {
         console.log("[WakeWord] Wake word detected!");
+        // 🔴 CRITICAL FIX: Stop recognition BEFORE firing callback
+        // This prevents Chrome from aborting recognition when TTS/WebRTC starts
+        try {
+          this.recognition?.stop();
+        } catch {}
+        this.running = false;
+        this.clearWatchdog();
+        
+        // Now fire callback (recognition already stopped, safe to start voice/TTS)
         this.onWake();
       }
     };
@@ -135,20 +136,21 @@ export class WakeWordDetector {
       this.lastEventAt = Date.now();
       console.warn("[WakeWord] error:", e?.error || e);
       // Errors like 'no-speech', 'aborted', 'audio-capture', 'not-allowed'
-      // We'll try to recover unless permission is denied.
       if (e?.error === "not-allowed") {
         this.running = false;
-        this.stop(); // hard stop
+        this.stop();
         return;
       }
       // soft restart on other errors
-      this.safeRestart();
+      try {
+        this.recognition?.abort();
+      } catch {}
     };
 
     this.recognition.onend = () => {
       this.clearWatchdog();
-      console.warn("[WakeWord] onend; restarting if running");
-      if (!this.running) return;
+      if (!this.running) return; // won't restart if we stopped intentionally
+      
       // Exponential backoff to avoid hot loops when Chrome is unhappy
       setTimeout(() => {
         try {
@@ -157,11 +159,14 @@ export class WakeWordDetector {
           console.warn("[WakeWord] start() threw, backing off:", err);
           this.backoffMs = Math.min(this.backoffMs * 2, this.maxBackoffMs);
           setTimeout(() => {
-            if (this.running) this.safeRestart();
+            if (this.running) {
+              try {
+                this.recognition!.abort();
+              } catch {}
+            }
           }, this.backoffMs);
         }
       }, this.backoffMs);
-      this.aborting = false;
     };
 
     this.running = true;
