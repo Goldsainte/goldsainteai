@@ -100,9 +100,24 @@ export const CreatorStripeOnboarding = () => {
         throw new Error('No onboarding URL received from server');
       }
 
-      // ✅ Full window redirect - Stripe forbids iframes/embeds
-      console.log('[STRIPE-ONBOARDING] Redirecting to Stripe...');
-      window.location.href = data.url;
+      // 🔒 Force TOP-LEVEL navigation (escape iframe/webview)
+      const go = (u: string) => {
+        // Preferred
+        try { window.top!.location.assign(u); return; } catch {}
+        // Fallbacks
+        try { window.open(u, "_top"); return; } catch {}
+        try { window.location.assign(u); return; } catch {}
+        // Last resort
+        try { (document as any).location = u as any; } catch {}
+      };
+
+      // Detect if we are framed and log for debugging
+      const framed = (() => {
+        try { return window.top !== window.self; } catch { return true; }
+      })();
+      console.log("[STRIPE-ONBOARDING] Redirecting to Stripe...", { framed, url: data.url });
+
+      go(data.url);
       // Note: setOnboarding(false) not needed as page will redirect
       
     } catch (error: any) {
