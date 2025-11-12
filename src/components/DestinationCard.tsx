@@ -1,6 +1,6 @@
 import { MapPin } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { useNavigate } from "react-router-dom";
+import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 
 interface DestinationCardProps {
   destination: string;
@@ -15,12 +15,12 @@ export const DestinationCard = ({
   startingPrice,
   imageUrl,
 }: DestinationCardProps) => {
-  const navigate = useNavigate();
+  const { openModal: openExpediaModal } = useExpediaModal();
 
   return (
     <Card 
       className="rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
-      onClick={() => navigate(`/cocurated-journeys?destination=${destination}`)}
+      onClick={() => openExpediaModal({ destination })}
     >
       <div className="relative h-40">
         <img
