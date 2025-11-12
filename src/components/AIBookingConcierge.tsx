@@ -185,11 +185,10 @@ export const AIBookingConcierge = () => {
 
       // Set initial greeting only if not restoring a conversation
       if (shouldUseInitialGreeting) {
-        const agentName = "Madison";
-        console.log('Setting initial greeting with agent:', agentName);
+        console.log('Setting Madison\'s intro greeting');
         setMessages([{
           role: 'assistant',
-          content: `Hello! I'm ${agentName}. I can help you search for flights, hotels, restaurants, events, book Uber rides, and check visa requirements. What are you looking for today?`
+          content: `Hi, I'm Madison — your Goldsainte travel concierge. Think of me as your friendly, well-connected travel insider. I can help you explore destinations, find the best flights and hotels, and even recommend great spots to eat, sip, or unwind. To get started, just say something like: "Find me a flight to Miami next weekend," or "Show me boutique hotels in Paris." Ready to plan something amazing?`
         }]);
       }
     };
@@ -307,11 +306,10 @@ export const AIBookingConcierge = () => {
   const clearConversation = () => {
     localStorage.removeItem('aiConciergeConversation');
     
-    // Reset to initial greeting
-    const agentName = "Madison";
+    // Reset to Madison's intro greeting
     setMessages([{
       role: 'assistant',
-      content: `Hello! I'm ${agentName}. I can help you search for flights, hotels, rental cars, restaurants, events, and more. What are you looking for today?`
+      content: `Hi, I'm Madison — your Goldsainte travel concierge. Think of me as your friendly, well-connected travel insider. I can help you explore destinations, find the best flights and hotels, and even recommend great spots to eat, sip, or unwind. To get started, just say something like: "Find me a flight to Miami next weekend," or "Show me boutique hotels in Paris." Ready to plan something amazing?`
     }]);
     
     // Reset intro flag so it plays again if voice mode is reactivated
@@ -870,20 +868,14 @@ export const AIBookingConcierge = () => {
         console.log('✅ Voice mode fully activated');
         console.log('📊 [TELEMETRY] voice_mode_activated', { timestamp: new Date().toISOString() });
         
-        // Play Madison's intro greeting once on first activation
+        // Play Madison's intro greeting voice once on first activation
         if (!hasPlayedIntro && voiceChatRef.current?.dc?.readyState === 'open') {
-          console.log('🎙️ Playing Madison\'s intro greeting...');
+          console.log('🎙️ Playing Madison\'s intro greeting voice...');
           setHasPlayedIntro(true);
           
           const madisonIntro = `Hi, I'm Madison — your Goldsainte travel concierge. Think of me as your friendly, well-connected travel insider. I can help you explore destinations, find the best flights and hotels, and even recommend great spots to eat, sip, or unwind. To get started, just say something like: "Find me a flight to Miami next weekend," or "Show me boutique hotels in Paris." Ready to plan something amazing?`;
           
-          // Add intro text to chat
-          setMessages(prev => [...prev, { 
-            role: 'assistant', 
-            content: madisonIntro 
-          }]);
-          
-          // Send intro to voice session to be spoken
+          // Send intro to voice session to be spoken (text already in chat from initial greeting)
           const introMessage = {
             type: 'conversation.item.create',
             item: {
@@ -901,7 +893,7 @@ export const AIBookingConcierge = () => {
           voiceChatRef.current.dc.send(JSON.stringify(introMessage));
           voiceChatRef.current.dc.send(JSON.stringify({ type: 'response.create' }));
           
-          console.log('📊 [TELEMETRY] madison_intro_played', { timestamp: new Date().toISOString() });
+          console.log('📊 [TELEMETRY] madison_intro_voice_played', { timestamp: new Date().toISOString() });
         }
         
         toast({
