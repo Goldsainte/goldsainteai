@@ -84,7 +84,7 @@ serve(async (req) => {
     }
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2025-08-27.basil',
+      apiVersion: '2024-06-20',
     });
 
     // Create payment intent with transfer to seller

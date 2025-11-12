@@ -33,9 +33,17 @@ export function AIUsageDisplay() {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  const getAuthHeaders = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      Authorization: `Bearer ${session?.access_token}`,
+    };
+  };
+
   const fetchUsage = async () => {
     try {
-      const { data, error } = await supabase.functions.invoke('check-ai-usage');
+      const headers = await getAuthHeaders();
+      const { data, error } = await supabase.functions.invoke('check-ai-usage', { headers });
       
       if (error) throw error;
       setStats(data);
@@ -57,14 +65,16 @@ export function AIUsageDisplay() {
 
   const handleUpgrade = async (priceId: string, tier: string) => {
     try {
+      const headers = await getAuthHeaders();
       const { data, error } = await supabase.functions.invoke('create-ai-subscription-checkout', {
+        headers,
         body: { priceId, tier }
       });
 
       if (error) throw error;
       
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.assign(data.url);
       }
     } catch (error) {
       console.error('Error creating checkout:', error);

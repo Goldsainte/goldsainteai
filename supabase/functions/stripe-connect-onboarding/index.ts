@@ -37,7 +37,7 @@ serve(async (req) => {
     if (agentError) throw agentError;
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2025-08-27.basil',
+      apiVersion: '2024-06-20',
     });
 
     let accountId = agentData.stripe_account_id;

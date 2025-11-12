@@ -198,10 +198,14 @@ export default function Profile() {
               <Button 
                 onClick={async () => {
                   try {
-                    const { data, error } = await supabase.functions.invoke('customer-portal');
+                    const { data: { session } } = await supabase.auth.getSession();
+                    const headers = {
+                      Authorization: `Bearer ${session?.access_token}`,
+                    };
+                    const { data, error } = await supabase.functions.invoke('customer-portal', { headers });
                     if (error) throw error;
                     if (data?.url) {
-                      window.open(data.url, '_blank');
+                      window.location.assign(data.url);
                     }
                   } catch (error: any) {
                     toast.error('Failed to open payment portal');
