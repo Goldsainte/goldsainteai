@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
 serve(async (req) => {
@@ -40,7 +41,7 @@ serve(async (req) => {
     if (!resp.ok) {
       console.error(`OpenAI API error: ${resp.status}`, text);
       return new Response(
-        JSON.stringify({ status: resp.status, body: text }),
+        JSON.stringify({ upstreamStatus: resp.status, upstreamBody: text }),
         {
           status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

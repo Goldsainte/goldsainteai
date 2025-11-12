@@ -174,30 +174,43 @@ export class RealtimeVoiceChat {
 
       // ---- POST SDP via Supabase relay
       const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
+      if (!relayUrl || !import.meta.env.VITE_SUPABASE_URL) {
+        throw new Error("VITE_SUPABASE_URL not configured");
+      }
+      
       const model = "gpt-4o-realtime-preview-2024-12-17";
       console.log("Posting SDP via relay…");
 
-      const relayResponse = await fetch(relayUrl, {
-        method: "POST",
-        mode: "cors",
-        cache: "no-store",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          sdp: this.pc.localDescription?.sdp,
-          token: EPHEMERAL_KEY,
-          model,
-        }),
-      });
+      let relayResponse: Response;
+      try {
+        relayResponse = await fetch(relayUrl, {
+          method: "POST",
+          mode: "cors",
+          cache: "no-store",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            sdp: this.pc.localDescription?.sdp,
+            token: EPHEMERAL_KEY,
+            model,
+          }),
+        });
+      } catch (e) {
+        console.error("❌ Relay fetch threw (network/CORS):", e);
+        throw new Error("Failed to fetch (network/CORS) while posting SDP to relay.");
+      }
 
       if (!relayResponse.ok) {
         const errorBody = await relayResponse.text().catch(() => "<no body>");
-        console.error(`❌ Relay SDP failed: ${relayResponse.status}`, errorBody);
-        throw new Error(`Relay SDP failed (${relayResponse.status}): ${errorBody}`);
+        console.error(`❌ Relay returned error ${relayResponse.status}:`, errorBody);
+        throw new Error(`Relay error ${relayResponse.status}: ${errorBody}`);
       }
 
       const answerSdp = await relayResponse.text();
+      if (!answerSdp.startsWith("v=")) {
+        console.warn("Relay returned unexpected content:", answerSdp.slice(0, 80));
+      }
       await this.pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
       console.log("✅ WebRTC connected via relay");
 
