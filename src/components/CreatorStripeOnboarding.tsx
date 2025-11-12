@@ -75,6 +75,7 @@ export const CreatorStripeOnboarding = () => {
           description: "Please sign in to set up payouts",
           variant: "destructive",
         });
+        setOnboarding(false);
         return;
       }
 
@@ -88,17 +89,21 @@ export const CreatorStripeOnboarding = () => {
 
       if (error) {
         console.error('[STRIPE-ONBOARDING] Error:', error);
+        setOnboarding(false);
         throw error;
       }
       
       console.log('[STRIPE-ONBOARDING] Received URL:', data?.url);
       
       if (!data?.url) {
+        setOnboarding(false);
         throw new Error('No onboarding URL received from server');
       }
 
-      // Redirect to Stripe onboarding in same window
+      // ✅ Full window redirect - Stripe forbids iframes/embeds
+      console.log('[STRIPE-ONBOARDING] Redirecting to Stripe...');
       window.location.href = data.url;
+      // Note: setOnboarding(false) not needed as page will redirect
       
     } catch (error: any) {
       console.error('[STRIPE-ONBOARDING] Full error:', error);
@@ -120,8 +125,6 @@ export const CreatorStripeOnboarding = () => {
         description: errorMessage,
         variant: "destructive",
       });
-    } finally {
-      setOnboarding(false);
     }
   };
 

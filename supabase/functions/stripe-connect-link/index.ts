@@ -12,8 +12,8 @@ const cors = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!;
-const RETURN_URL = Deno.env.get("STRIPE_RETURN_URL") || `${SUPABASE_URL?.replace('.supabase.co', '.lovable.app')}/creator/payments/done`;
-const REFRESH_URL = Deno.env.get("STRIPE_REFRESH_URL") || `${SUPABASE_URL?.replace('.supabase.co', '.lovable.app')}/creator/payments/refresh`;
+const RETURN_URL = Deno.env.get("STRIPE_RETURN_URL") || "https://goldsainte.ai/creator-dashboard?stripe=success";
+const REFRESH_URL = Deno.env.get("STRIPE_REFRESH_URL") || "https://goldsainte.ai/creator-dashboard?stripe=refresh";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
