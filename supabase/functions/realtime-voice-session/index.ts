@@ -87,14 +87,19 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: agentProfile?.voice || "shimmer",
+        voice: agentProfile?.voice || "verse",
         turn_detection: {
           type: "server_vad",
           threshold: 0.5,
           prefix_padding_ms: 500,
           silence_duration_ms: 1200
         },
-        instructions: buildVoiceInstructions(agentProfile)
+        instructions: buildVoiceInstructions({
+          ...agentProfile,
+          personality_instructions: (agentProfile?.personality_instructions ?? "") +
+            "\n\nSpeak in short sentences with natural pauses. Avoid over-explaining. Use contractions and varied acknowledgements. If confirming details, keep it to one short sentence.",
+          communication_style: agentProfile?.communication_style ?? "concise",
+        })
       }),
     });
 

@@ -15,6 +15,7 @@ import logomark from "@/assets/logomark-seal-gold.png";
 import { RealtimeVoiceChat } from "@/utils/VoiceUtils";
 import { WakeWordDetector } from "@/utils/WakeWordDetector";
 import { HoldMusicGenerator } from "@/utils/HoldMusicGenerator";
+import { HoldMusicController } from "@/utils/HoldMusicController";
 import { CompactFlightCard } from "./CompactFlightCard";
 import { CompactHotelCard } from "./CompactHotelCard";
 import { CompactCarCard } from "./CompactCarCard";
@@ -49,6 +50,7 @@ export const AIBookingConcierge = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [showDiagnostics, setShowDiagnostics] = useState(false);
   const [showAutoplayPrompt, setShowAutoplayPrompt] = useState(false);
+  const [showUnmute, setShowUnmute] = useState(false);
   const [preferences, setPreferences] = useState<ChatPreferences>(() => {
     const saved = localStorage.getItem('aiChatPreferences');
     return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
@@ -69,6 +71,7 @@ export const AIBookingConcierge = () => {
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
   const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
+  const musicControllerRef = useRef<HoldMusicController | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -115,6 +118,13 @@ export const AIBookingConcierge = () => {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Handle hold music unmute events
+  useEffect(() => {
+    const handleUnmuteNeeded = () => setShowUnmute(true);
+    window.addEventListener("holdmusic-needs-gesture", handleUnmuteNeeded);
+    return () => window.removeEventListener("holdmusic-needs-gesture", handleUnmuteNeeded);
   }, []);
 
   // Load user's AI agent profile and restore conversation
@@ -184,41 +194,26 @@ export const AIBookingConcierge = () => {
     }
   }, [messages]);
 
-  // Initialize hold music generator lazily on first use
-  const initHoldMusic = () => {
-    if (!holdMusicRef.current) {
-      console.log('Initializing hold music generator');
-      holdMusicRef.current = new HoldMusicGenerator();
-    }
-  };
-
+  // Initialize hold music controller
   useEffect(() => {
-    return () => {
-      if (holdMusicRef.current) {
-        console.log('Cleaning up hold music');
-        holdMusicRef.current.cleanup();
-        holdMusicRef.current = null;
-      }
-    };
+    if (!musicControllerRef.current) {
+      musicControllerRef.current = new HoldMusicController();
+    }
   }, []);
 
-  // Play/stop hold music continuously throughout voice conversation
+  // Play/stop hold music based on voice status
   useEffect(() => {
-    console.log('Hold music state change:', { voiceMode, hasHoldMusic: !!holdMusicRef.current });
-    
-    if (voiceMode) {
-      initHoldMusic();
-      console.log('Starting continuous hold music');
-      if (holdMusicRef.current) {
-        holdMusicRef.current.play();
-      }
-    } else {
-      console.log('Stopping hold music');
-      if (holdMusicRef.current) {
-        holdMusicRef.current.stop();
-      }
+    const music = musicControllerRef.current;
+    if (!music) return;
+
+    if (voiceStatus === 'connecting' || isProcessing) {
+      music.play();
+    } else if (voiceStatus === 'connected' && !isProcessing) {
+      music.stop();
+    } else if (voiceStatus === 'disconnected') {
+      music.stop();
     }
-  }, [voiceMode]);
+  }, [voiceStatus, isProcessing]);
 
   // Handle URL parameters for opening AI chat with destination context
   useEffect(() => {
@@ -486,6 +481,11 @@ export const AIBookingConcierge = () => {
         console.log('📞 [Step 1/6] Starting voice mode...');
         setVoiceStatus('connecting');
 
+        // Arm hold music on user gesture
+        if (musicControllerRef.current) {
+          await musicControllerRef.current.arm();
+        }
+
         // Pause wake word while in active voice call to avoid mic conflicts
         if (wakeWordDetectorRef.current) {
           console.log('⏸️ Pausing wake word detection during voice call');
@@ -656,7 +656,7 @@ export const AIBookingConcierge = () => {
 
         // Step 6: Start hold music IMMEDIATELY after successful connection (within user gesture)
         console.log('🎵 [Step 6/6] Starting hold music...');
-        initHoldMusic();
+        // Start hold music
         try {
           await holdMusicRef.current?.play();
           console.log('✅ Hold music playing successfully');
@@ -1362,6 +1362,22 @@ export const AIBookingConcierge = () => {
               </Button>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* Unmute Music Prompt */}
+      {showUnmute && (
+        <div className="fixed bottom-24 right-4 z-[9999]">
+          <Button
+            onClick={async () => {
+              setShowUnmute(false);
+              await musicControllerRef.current?.play();
+            }}
+            size="sm"
+            className="shadow-lg"
+          >
+            Tap to unmute music
+          </Button>
         </div>
       )}
       
