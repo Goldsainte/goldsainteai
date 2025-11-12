@@ -75,12 +75,15 @@ serve(async (req) => {
   }
 
   try {
+    console.log("[VOICE-SESSION] Start request");
     const { agentProfile } = await req.json();
     const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
     if (!OPENAI_API_KEY) {
+      console.error('❌ OPENAI_API_KEY not set');
       throw new Error('OPENAI_API_KEY is not set');
     }
 
+    console.log("[VOICE-SESSION] Calling OpenAI Realtime API...");
     const sessionResp = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",
       headers: {
@@ -169,20 +172,24 @@ Speak like a modern, approachable luxury concierge — think a confident millenn
     }
 
     const session = await sessionResp.json();
+    console.log("[VOICE-SESSION] Raw session response structure:", JSON.stringify(session).slice(0, 200));
 
     // ✅ Return just the ephemeral token string and expiry
     const token = session?.client_secret?.value;
     const expiresAt = session?.client_secret?.expires_at;
 
+    console.log("[VOICE-SESSION] Extracted token type:", typeof token);
+    console.log("[VOICE-SESSION] Token prefix:", token?.slice(0, 15));
+
     if (!token || typeof token !== "string") {
-      console.error('❌ Invalid token from OpenAI:', typeof token);
+      console.error('❌ Invalid token from OpenAI:', typeof token, "session structure:", session);
       return new Response(JSON.stringify({ error: 'No client_secret.value from OpenAI' }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    console.log(`✅ Ephemeral token created: ${token.slice(0, 10)}...${token.slice(-4)}`);
+    console.log(`✅ Ephemeral token created: ${token.slice(0, 12)}...${token.slice(-4)}`);
 
     return new Response(JSON.stringify({ token }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },

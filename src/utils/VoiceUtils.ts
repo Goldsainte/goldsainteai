@@ -74,15 +74,26 @@ export class RealtimeVoiceChat {
       this.onStatusChange('connecting');
       console.log("Initializing voice chat…");
 
-      // Get ephemeral token (string)
-      const { token: EPHEMERAL_KEY, expiresAt } = await getSessionToken();
+      // Get ephemeral token (string) - with safety fallback
+      const tokenResponse: any = await getSessionToken();
+      console.log("[VOICE] Token response:", tokenResponse);
       
-      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string' || !EPHEMERAL_KEY.startsWith('sk-ephem_')) {
+      // Support multiple response formats
+      const EPHEMERAL_KEY = 
+        tokenResponse.token || 
+        tokenResponse.client_secret?.value || 
+        tokenResponse?.value;
+      
+      const expiresAt = tokenResponse.expiresAt || tokenResponse.client_secret?.expires_at;
+      
+      console.log("[VOICE] Extracted token:", EPHEMERAL_KEY?.slice(0, 15));
+      
+      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string' || EPHEMERAL_KEY.length < 20) {
         console.error("❌ Bad ephemeral token:", EPHEMERAL_KEY);
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
       
-      console.log(`Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 12)}...${EPHEMERAL_KEY.slice(-4)}`);
+      console.log(`✅ Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 12)}...${EPHEMERAL_KEY.slice(-4)}`);
       
       // Optional: basic expiry guard (tokens are ~60s)
       if (expiresAt && Date.now() > expiresAt - 10_000) {
