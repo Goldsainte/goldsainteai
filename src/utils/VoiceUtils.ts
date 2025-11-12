@@ -94,6 +94,7 @@ export class RealtimeVoiceChat {
       }
       
       console.log(`✅ Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 12)}...${EPHEMERAL_KEY.slice(-4)}`);
+      console.log("[VOICE] Token type:", typeof EPHEMERAL_KEY, "Length:", EPHEMERAL_KEY.length);
       
       // Optional: basic expiry guard (tokens are ~60s)
       if (expiresAt && Date.now() > expiresAt - 10_000) {
@@ -193,13 +194,15 @@ export class RealtimeVoiceChat {
 
       const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
       
-      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || !EPHEMERAL_KEY.startsWith("sk-ephem_")) {
+      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || EPHEMERAL_KEY.length < 20) {
         console.error("❌ Bad ephemeral token before SDP post:", EPHEMERAL_KEY);
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
 
-      console.log("[VOICE] Using relay:", relayUrl);
-      console.log("[VOICE] Token prefix:", EPHEMERAL_KEY.slice(0, 12));
+      console.log("[VOICE] ===== SDP POST ATTEMPT =====");
+      console.log("[VOICE] relayUrl:", relayUrl);
+      console.log("[VOICE] token prefix:", EPHEMERAL_KEY.slice(0, 12));
+      console.log("[VOICE] token length:", EPHEMERAL_KEY.length);
       
       const model = "gpt-4o-realtime-preview-2024-12-17";
       console.log("Posting SDP via relay…");
@@ -231,10 +234,13 @@ export class RealtimeVoiceChat {
       }
 
       const answerSdp = await relayResponse.text();
+      console.log("[VOICE] SDP answer first 40:", answerSdp.slice(0, 40));
+      
       if (!answerSdp.startsWith("v=")) {
         console.warn("Relay returned unexpected content:", answerSdp.slice(0, 80));
       }
       await this.pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
+      console.log("[VOICE] ===== SDP POST SUCCESS =====");
       console.log("✅ WebRTC connected via relay");
 
     } catch (error) {

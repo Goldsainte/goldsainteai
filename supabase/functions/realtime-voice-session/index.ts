@@ -81,10 +81,11 @@ serve(async (req) => {
     console.log("[VOICE-SESSION] Token prefix:", token?.slice(0, 12));
     console.log("[VOICE-SESSION] Extracted token type:", typeof token);
 
-    if (!token || typeof token !== "string" || !token.startsWith("sk-ephem_")) {
+    if (!token || typeof token !== "string" || token.length < 20) {
       console.error("❌ Invalid token from OpenAI:", { 
         hasToken: !!token, 
-        type: typeof token, 
+        type: typeof token,
+        tokenLength: token?.length,
         structure: session?.client_secret 
       });
       return new Response(JSON.stringify({ 
