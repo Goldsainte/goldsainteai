@@ -1,6 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.2';
 
 // AI subscription tiers and limits
+// NOTE: Keep this in sync with src/config/stripe.ts
+// Edge functions can't import from src/, so this is duplicated here
 export const AI_TIERS = {
   free: { name: 'Free', limit: 10, price: 0, priceId: null, productId: null },
   basic: { name: 'AI Basic', limit: 100, price: 30, priceId: 'price_1SR4wAFBVaLSioruemSf3tG8', productId: 'prod_TNqdEqGCkHdR1Z' },

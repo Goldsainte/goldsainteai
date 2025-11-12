@@ -49,7 +49,9 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(stripeKey);
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: "2024-06-20",
+    });
     
     // Try to get cached customer ID from profile
     const { data: profileData } = await supabaseClient

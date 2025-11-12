@@ -58,7 +58,9 @@ serve(async (req) => {
       return createRateLimitResponse(rateLimitResult, corsHeaders);
     }
 
-    const stripe = new Stripe(stripeKey);
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: "2024-06-20",
+    });
     
     // Try to get cached customer ID from profile
     const { data: profileData } = await supabaseClient
@@ -97,7 +99,7 @@ serve(async (req) => {
       logStep("Using cached customer ID", { customerId });
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${origin}/subscription`,

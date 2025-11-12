@@ -32,24 +32,35 @@ export const SUBSCRIPTION_TIERS = {
 } as const;
 
 // AI usage tier configuration
+// NOTE: Keep this in sync with supabase/functions/_shared/aiUsageTracker.ts
 export const AI_TIERS = {
   free: {
     priceId: null,
     productId: null,
     name: 'Free',
     monthlyQuota: 10,
+    price: 0,
   },
-  pro: {
-    priceId: 'price_ai_pro_monthly',
-    productId: 'prod_ai_pro',
-    name: 'Pro',
+  basic: {
+    priceId: 'price_1SR4wAFBVaLSioruemSf3tG8',
+    productId: 'prod_TNqdEqGCkHdR1Z',
+    name: 'AI Basic',
     monthlyQuota: 100,
+    price: 30,
   },
-  unlimited: {
-    priceId: 'price_ai_unlimited_monthly',
-    productId: 'prod_ai_unlimited',
-    name: 'Unlimited',
-    monthlyQuota: null, // null = unlimited
+  premium: {
+    priceId: 'price_1SR4xSF9Y0dnmu4YHArKXHLo',
+    productId: 'prod_TNqessc2xZ5yYp',
+    name: 'AI Premium',
+    monthlyQuota: 200,
+    price: 50,
+  },
+  enterprise: {
+    priceId: 'price_1SR4zAF9Y0dnmu4YKOLaM6lm',
+    productId: 'prod_TNqgBullVM9ZAC',
+    name: 'AI Enterprise',
+    monthlyQuota: 350,
+    price: 100,
   },
 } as const;
 

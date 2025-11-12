@@ -66,9 +66,9 @@ export function AIUsageDisplay() {
   const handleUpgrade = async (priceId: string, tier: string) => {
     try {
       const headers = await getAuthHeaders();
-      const { data, error } = await supabase.functions.invoke('create-ai-subscription-checkout', {
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
         headers,
-        body: { priceId, tier }
+        body: { priceId, subscriptionType: 'ai', tier }
       });
 
       if (error) throw error;

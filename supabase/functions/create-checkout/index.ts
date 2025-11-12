@@ -51,13 +51,15 @@ serve(async (req) => {
       return createRateLimitResponse(rateLimitResult, corsHeaders);
     }
 
-    const { priceId } = await req.json();
+    const { priceId, subscriptionType, tier } = await req.json();
     if (!priceId) {
       throw new Error("Price ID is required");
     }
-    logStep("Price ID received", { priceId });
+    logStep("Request details", { priceId, subscriptionType, tier });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2024-06-20",
+    });
 
     // Try to get cached customer ID from profile
     const { data: profileData } = await supabaseClient
@@ -89,7 +91,13 @@ serve(async (req) => {
       logStep("Using cached customer ID", { customerId });
     }
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
+    
+    // Build success URL based on subscription type
+    const successUrl = subscriptionType === 'ai' 
+      ? `${origin}/subscription?success=true&type=ai&tier=${tier || 'unknown'}`
+      : `${origin}/subscription?success=true&type=subscription`;
+    
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -100,11 +108,12 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${origin}/subscription?success=true`,
+      success_url: successUrl,
       cancel_url: `${origin}/subscription?canceled=true`,
       metadata: {
         user_id: user.id,
-        subscription_type: 'standard'
+        subscription_type: subscriptionType || 'main',
+        ...(tier && { tier }),
       }
     });
 

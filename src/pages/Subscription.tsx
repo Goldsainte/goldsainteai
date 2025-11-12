@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import type { Session } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Check, Crown, Zap, Star, ArrowRight } from "lucide-react";
+import { AIUsageDisplay } from "@/components/ai/AIUsageDisplay";
 
 type SubscriptionTier = 'free' | 'premium' | 'enterprise';
 
@@ -74,6 +75,7 @@ const tierFeatures = {
 
 export default function Subscription() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [currentTier, setCurrentTier] = useState<SubscriptionTier>('free');
   const [user, setUser] = useState<any>(null);
@@ -84,19 +86,27 @@ export default function Subscription() {
     loadUserSubscription();
     
     // Check for success/canceled query params
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('success')) {
-      toast.success("Subscription activated! Refreshing status...");
+    const success = searchParams.get('success');
+    const canceled = searchParams.get('canceled');
+    const type = searchParams.get('type');
+    const tier = searchParams.get('tier');
+    
+    if (success === 'true') {
+      if (type === 'ai') {
+        toast.success(`AI subscription activated! You're now on the ${tier} tier.`);
+      } else {
+        toast.success("Subscription activated! Refreshing status...");
+      }
       // Refresh subscription status after successful payment
       setTimeout(() => loadUserSubscription(), 2000);
       // Clean up URL
       window.history.replaceState({}, '', '/subscription');
-    } else if (params.get('canceled')) {
+    } else if (canceled === 'true') {
       toast.info("Checkout canceled");
       // Clean up URL
       window.history.replaceState({}, '', '/subscription');
     }
-  }, []);
+  }, [searchParams]);
 
   const getAuthHeaders = async () => {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -247,6 +257,14 @@ export default function Subscription() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/20">
       <div className="container mx-auto px-4 py-16 max-w-7xl">
+        {/* AI Usage Section */}
+        {user && (
+          <div className="mb-12 max-w-3xl mx-auto">
+            <h2 className="text-2xl font-bold mb-4">AI Search Usage</h2>
+            <AIUsageDisplay />
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-bold mb-4">Choose Your Plan</h1>
