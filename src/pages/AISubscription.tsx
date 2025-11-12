@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { AIUsageDisplay } from "@/components/ai/AIUsageDisplay";
 import { useToast } from "@/hooks/use-toast";
@@ -6,11 +6,15 @@ import { useToast } from "@/hooks/use-toast";
 export default function AISubscription() {
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const handledRef = useRef(false);
 
   useEffect(() => {
     const success = searchParams.get("success");
     const canceled = searchParams.get("canceled");
     const tier = searchParams.get("tier");
+
+    if (handledRef.current) return;
+    handledRef.current = true;
 
     if (success === "true") {
       toast({
@@ -23,6 +27,10 @@ export default function AISubscription() {
         description: "Your subscription process was canceled.",
         variant: "destructive"
       });
+    }
+    // cleanup URL
+    if (success || canceled) {
+      window.history.replaceState({}, "", "/ai-subscription");
     }
   }, [searchParams, toast]);
 

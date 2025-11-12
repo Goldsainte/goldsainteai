@@ -42,9 +42,7 @@ serve(async (req) => {
     }
     logStep("Price ID received", { priceId });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
-      apiVersion: "2023-10-16" 
-    });
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
@@ -69,6 +67,10 @@ serve(async (req) => {
       mode: "subscription",
       success_url: `${origin}/subscription?success=true`,
       cancel_url: `${origin}/subscription?canceled=true`,
+      metadata: {
+        user_id: user.id,
+        subscription_type: 'standard'
+      }
     });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });

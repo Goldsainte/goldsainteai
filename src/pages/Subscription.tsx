@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import type { Session } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -78,6 +79,8 @@ export default function Subscription() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
+    // defensive: ensure we never render with a stale toast stuck
+    toast.dismiss();
     loadUserSubscription();
     
     // Check for success/canceled query params
@@ -95,6 +98,12 @@ export default function Subscription() {
     }
   }, []);
 
+  const getAuthHeaders = async () => {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const access = (sessionData?.session as Session | null)?.access_token;
+    return { Authorization: `Bearer ${access}` };
+  };
+
   const loadUserSubscription = async () => {
     try {
       const { data: { user: authUser } } = await supabase.auth.getUser();
@@ -106,13 +115,10 @@ export default function Subscription() {
 
       setUser(authUser);
 
-      // Get access token for auth
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-
       // Check subscription status from Stripe
+      const headers = await getAuthHeaders();
       const { data: subData, error: subError } = await supabase.functions.invoke('check-subscription', {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers
       });
       
       if (subError) {
@@ -151,7 +157,7 @@ export default function Subscription() {
       return;
     }
 
-    const toastId = toast.loading("Redirecting to checkout...");
+    const toastId = toast.loading("Redirecting to checkout…");
 
     try {
       const priceId = TIER_PRICE_IDS[tier];
@@ -161,12 +167,10 @@ export default function Subscription() {
         return;
       }
       
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      
+      const headers = await getAuthHeaders();
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId },
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers,
+        body: { priceId }
       });
 
       if (error) {
@@ -175,6 +179,8 @@ export default function Subscription() {
       }
 
       if (data?.url) {
+        toast.dismiss(toastId);
+        // top-window nav avoids popup blockers
         window.location.assign(data.url);
       } else {
         toast.dismiss(toastId);
@@ -188,15 +194,11 @@ export default function Subscription() {
   };
 
   const handleManageSubscription = async () => {
-    const toastId = toast.loading("Opening subscription management...");
+    const toastId = toast.loading("Opening subscription management…");
 
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const headers = await getAuthHeaders();
+      const { data, error } = await supabase.functions.invoke('customer-portal', { headers });
 
       if (error) {
         toast.dismiss(toastId);
@@ -204,6 +206,8 @@ export default function Subscription() {
       }
 
       if (data?.url) {
+        toast.dismiss(toastId);
+        // top-window nav avoids popup blockers
         window.location.assign(data.url);
       } else {
         toast.dismiss(toastId);

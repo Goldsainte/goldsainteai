@@ -2,9 +2,13 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-  apiVersion: "2023-10-16",
-});
+// Map your paid product IDs to tiers used in app:
+const PRODUCT_TIER_MAP: Record<string, string> = { 
+  'prod_TNOppvdXPriM3E': 'premium', 
+  'prod_TNOpkzmfNXljRz': 'enterprise' 
+};
+
+const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
 
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
@@ -33,14 +37,22 @@ serve(async (req) => {
     switch (event.type) {
       case "checkout.session.completed":
         await handleCheckoutSessionCompleted(event.data.object);
+        // also persist user_subscriptions for non-verification plans
+        await handleStandardCheckout(event.data.object);
         break;
-      
+
       case "customer.subscription.updated":
         await handleSubscriptionUpdated(event.data.object);
         break;
-      
+
+      // keep parity for non-verification subs too
+      case "customer.subscription.created":
+        await upsertStandardSubscription(event.data.object);
+        break;
+
       case "customer.subscription.deleted":
         await handleSubscriptionDeleted(event.data.object);
+        await handleStandardSubscriptionDeleted(event.data.object);
         break;
       
       case "invoice.payment_failed":
@@ -266,6 +278,70 @@ async function handleSubscriptionDeleted(subscription: any) {
   } catch (error) {
     console.error("Error in handleSubscriptionDeleted:", error);
     throw error;
+  }
+}
+
+// Persist standard (non-verification) subscriptions to user_subscriptions
+async function handleStandardCheckout(session: any) {
+  try {
+    // verification flow already handled above
+    if (session.metadata?.subscription_type === 'verification') return;
+    if (session.mode !== 'subscription') return;
+    const subscriptionId = session.subscription;
+    const customerId = session.customer as string;
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId as string);
+    const productId = subscription.items.data[0]?.price?.product as string | undefined;
+    if (!productId) return;
+    const tier = PRODUCT_TIER_MAP[productId] || 'free';
+    const userId = session.metadata?.user_id;
+    let resolvedUserId = userId;
+    if (!resolvedUserId) {
+      const customer = typeof customerId === 'string' ? await stripe.customers.retrieve(customerId) : null;
+      const email = (customer as any)?.email;
+      if (email) {
+        const { data } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
+        resolvedUserId = data?.id;
+      }
+    }
+    if (!resolvedUserId) return;
+    await supabaseClient.from('user_subscriptions').upsert({ user_id: resolvedUserId, tier });
+  } catch (e) {
+    console.error('handleStandardCheckout error', e);
+  }
+}
+
+async function upsertStandardSubscription(subscription: any) {
+  try {
+    if (subscription.metadata?.subscription_type === 'verification') return;
+    const customerId = subscription.customer as string;
+    const productId = subscription.items?.data?.[0]?.price?.product as string | undefined;
+    if (!productId) return;
+    const tier = PRODUCT_TIER_MAP[productId] || 'free';
+    const customer = await stripe.customers.retrieve(customerId);
+    const email = (customer as any)?.email;
+    if (!email) return;
+    const { data } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
+    const userId = data?.id;
+    if (!userId) return;
+    await supabaseClient.from('user_subscriptions').upsert({ user_id: userId, tier });
+  } catch (e) {
+    console.error('upsertStandardSubscription error', e);
+  }
+}
+
+async function handleStandardSubscriptionDeleted(subscription: any) {
+  try {
+    if (subscription.metadata?.subscription_type === 'verification') return;
+    const customerId = subscription.customer as string;
+    const customer = await stripe.customers.retrieve(customerId);
+    const email = (customer as any)?.email;
+    if (!email) return;
+    const { data } = await supabaseClient.from('profiles').select('id').eq('email', email).single();
+    const userId = data?.id;
+    if (!userId) return;
+    await supabaseClient.from('user_subscriptions').upsert({ user_id: userId, tier: 'free' });
+  } catch (e) {
+    console.error('handleStandardSubscriptionDeleted error', e);
   }
 }
 

@@ -93,7 +93,7 @@ const BillingDashboard = () => {
 
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.assign(data.url);
       }
     } catch (error: any) {
       console.error("Error opening customer portal:", error);

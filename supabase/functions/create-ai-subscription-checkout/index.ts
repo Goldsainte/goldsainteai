@@ -33,9 +33,7 @@ serve(async (req) => {
       throw new Error("Price ID and tier are required");
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
-      apiVersion: "2023-10-16" 
-    });
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
 
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     let customerId;
