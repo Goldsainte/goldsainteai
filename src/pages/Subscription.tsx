@@ -151,14 +151,15 @@ export default function Subscription() {
       return;
     }
 
+    const toastId = toast.loading("Redirecting to checkout...");
+
     try {
       const priceId = TIER_PRICE_IDS[tier];
       if (!priceId) {
+        toast.dismiss(toastId);
         toast.error("Invalid subscription tier");
         return;
       }
-
-      toast.loading("Redirecting to checkout...");
       
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData.session?.access_token;
@@ -168,23 +169,28 @@ export default function Subscription() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
-      if (error) throw error;
+      if (error) {
+        toast.dismiss(toastId);
+        throw error;
+      }
 
       if (data?.url) {
-        window.location.href = data.url;
+        window.location.assign(data.url);
       } else {
+        toast.dismiss(toastId);
         throw new Error("No checkout URL received");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Checkout error:', error);
-      toast.error("Failed to start checkout process");
+      toast.dismiss(toastId);
+      toast.error(error?.message || "Failed to start checkout process");
     }
   };
 
   const handleManageSubscription = async () => {
+    const toastId = toast.loading("Opening subscription management...");
+
     try {
-      toast.loading("Opening subscription management...");
-      
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData.session?.access_token;
       
@@ -192,16 +198,21 @@ export default function Subscription() {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
-      if (error) throw error;
+      if (error) {
+        toast.dismiss(toastId);
+        throw error;
+      }
 
       if (data?.url) {
-        window.location.href = data.url;
+        window.location.assign(data.url);
       } else {
+        toast.dismiss(toastId);
         throw new Error("No portal URL received");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Portal error:', error);
-      toast.error("Failed to open subscription management");
+      toast.dismiss(toastId);
+      toast.error(error?.message || "Failed to open subscription management");
     }
   };
 
