@@ -306,3 +306,6 @@ verify_jwt = false
 [functions.check-flight-price-alerts]
 verify_jwt = false
 
+[functions.realtime-sdp-relay]
+verify_jwt = false
+

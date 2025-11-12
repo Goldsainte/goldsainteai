@@ -172,48 +172,34 @@ export class RealtimeVoiceChat {
         setTimeout(resolve, 2000); // Safety timeout
       });
 
-      // Connect to OpenAI's Realtime API (SDP POST)
-      const baseUrl = "https://api.openai.com/v1/realtime";
+      // ---- POST SDP via Supabase relay
+      const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
       const model = "gpt-4o-realtime-preview-2024-12-17";
-      
-      console.log("Posting SDP to OpenAI…");
-      let sdpResponse: Response;
-      try {
-        sdpResponse = await fetch(`${baseUrl}?model=${encodeURIComponent(model)}`, {
-          method: "POST",
-          mode: "cors",
-          cache: "no-store",
-          headers: {
-            "Authorization": `Bearer ${EPHEMERAL_KEY}`,
-            "Content-Type": "application/sdp",
-            "Accept": "application/sdp",
-          },
-          body: this.pc.localDescription?.sdp,
-        });
-      } catch (e) {
-        console.error("❌ SDP POST network error:", e);
-        throw new Error("Failed to fetch (network/CORS) while posting SDP. Check headers and token.");
+      console.log("Posting SDP via relay…");
+
+      const relayResponse = await fetch(relayUrl, {
+        method: "POST",
+        mode: "cors",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sdp: this.pc.localDescription?.sdp,
+          token: EPHEMERAL_KEY,
+          model,
+        }),
+      });
+
+      if (!relayResponse.ok) {
+        const errorBody = await relayResponse.text().catch(() => "<no body>");
+        console.error(`❌ Relay SDP failed: ${relayResponse.status}`, errorBody);
+        throw new Error(`Relay SDP failed (${relayResponse.status}): ${errorBody}`);
       }
 
-      if (!sdpResponse.ok) {
-        const errorText = await sdpResponse.text().catch(() => "<no body>");
-        console.error(`❌ OpenAI SDP handshake failed: ${sdpResponse.status}`, errorText);
-        
-        // Specific error messages for common status codes
-        if (sdpResponse.status === 401) {
-          throw new Error(`Authentication failed (401): Invalid or expired token. ${errorText}`);
-        } else if (sdpResponse.status === 403) {
-          throw new Error(`Access forbidden (403): Check API key permissions. ${errorText}`);
-        } else if (sdpResponse.status === 429) {
-          throw new Error(`Rate limited (429): Too many requests. ${errorText}`);
-        } else {
-          throw new Error(`OpenAI connection failed (${sdpResponse.status}): ${errorText}`);
-        }
-      }
-
-      const answerSdp = await sdpResponse.text();
+      const answerSdp = await relayResponse.text();
       await this.pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
-      console.log("✅ WebRTC connected to OpenAI Realtime");
+      console.log("✅ WebRTC connected via relay");
 
     } catch (error) {
       console.error("Error initializing voice chat:", error);
