@@ -11,123 +11,130 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
 import { ExpediaModalPortal } from "@/components/ExpediaModalPortal";
 import { initExpediaModalHandler } from "@/utils/expediaModalHandler";
-import { AIBookingConcierge } from "@/components/AIBookingConcierge";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { RequireAgentTerms } from "@/components/RequireAgentTerms";
+import { LoadingFallback } from "@/components/LoadingFallback";
 import { usePresence } from "@/hooks/usePresence";
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { initCSRFProtection } from "@/lib/security/csrf";
+
+// Critical pages loaded immediately
 import Index from "./pages/Index";
-import SearchResults from "./pages/SearchResults";
-import HotelBooking from "./pages/HotelBooking";
-import HotelDetails from "./pages/HotelDetails";
-import BookingConfirmation from "./pages/BookingConfirmation";
 import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
-import ResetPassword from "./pages/ResetPassword";
-import Onboarding from "./pages/Onboarding";
-import AIAgentOnboarding from "./pages/AIAgentOnboarding";
-import JournalListing from "./pages/JournalListing";
-import JournalArticle from "./pages/JournalArticle";
-import CreatorArticleEditor from "./pages/CreatorArticleEditor";
-import CreatorArticles from "./pages/CreatorArticles";
-import Favorites from "./pages/Favorites";
-import Collections from "./pages/Collections";
-import CollectionDetail from "./pages/CollectionDetail";
-import Dashboard from "./pages/Dashboard";
-import Marketplace from "./pages/Marketplace";
-import AgentOnboarding from "./pages/AgentOnboarding";
-import AgentDashboard from "./pages/AgentDashboard";
-import AdminAgentApprovals from "./pages/AdminAgentApprovals";
-import Admin from "./pages/Admin";
-import SystemHealth from "./pages/SystemHealth";
-import AdminInquiries from "./pages/AdminInquiries";
-import AdminCancellations from "./pages/AdminCancellations";
-import AdminCancellationAnalytics from "./pages/AdminCancellationAnalytics";
-import Subscription from "./pages/Subscription";
-import BillingDashboard from "./pages/BillingDashboard";
-import AgentProfile from "./pages/AgentProfile";
-import BrowseAgents from "./pages/BrowseAgents";
-import MyJobs from "./pages/MyJobs";
-import MyTrips from "./pages/MyTrips";
-import GroupTrips from "./pages/GroupTrips";
-import AgentTripRequests from './pages/AgentTripRequests';
-import BookingPreferences from "./pages/BookingPreferences";
-import MyBookingsRedirect from "./pages/redirects/MyBookingsRedirect";
-import FavoritesRedirect from "./pages/redirects/FavoritesRedirect";
-import BookingPreferencesRedirect from "./pages/redirects/BookingPreferencesRedirect";
-import CommissionDashboard from "./pages/CommissionDashboard";
-import EmailPreview from "./pages/EmailPreview";
-import MyBookings from "./pages/MyBookings";
-import BookingDetails from "./pages/BookingDetails";
-import BookingHistory from "./pages/BookingHistory";
-import ModifyFlight from "./pages/ModifyFlight";
-import Profile from "./pages/Profile";
-import Messages from "./pages/Messages";
-import NotFound from "./pages/NotFound";
-import Redirect from "./pages/Redirect";
-import TestGroupPayment from "./pages/TestGroupPayment";
 import TravelFeed from "./pages/TravelFeed";
-import TravelProfile from "./pages/TravelProfile";
-import TravelSettings from "./pages/TravelSettings";
-import TravelSettings2 from "./pages/TravelSettings2";
-import MusicVolumeSettings from "./pages/MusicVolumeSettings";
-import CrosspostingSettings from "./pages/CrosspostingSettings";
-import CreatorDashboard from "./pages/CreatorDashboard";
-import Search from "./pages/Search";
-import Trending from "./pages/Trending";
-import CommunityGuidelines from "./pages/CommunityGuidelines";
-import TrustSafety from "./pages/TrustSafety";
-import CancellationRefundPolicy from "./pages/CancellationRefundPolicy";
-import Shop from "./pages/Shop";
-import AffiliateManager from "./pages/AffiliateManager";
-import SupplierManagement from "./pages/SupplierManagement";
-import CoCuratedDashboard from "./pages/CoCuratedDashboard";
-import CoCuratedCreate from "./pages/CoCuratedCreate";
-import CoCuratedMarketplace from "./pages/CoCuratedMarketplace";
-import CoCuratedPackage from "./pages/CoCuratedPackage";
-import CoCuratedBookingSuccess from "./pages/CoCuratedBookingSuccess";
-import CoCuratedJourneys from "./pages/CoCuratedJourneys";
-import TourActivityDetail from "./pages/TourActivityDetail";
-import FineDining from "./pages/FineDining";
-import RestaurantDetail from "./pages/RestaurantDetail";
-import BrowseInfluencers from "./pages/BrowseInfluencers";
-import BrowseCreators from "./pages/BrowseCreators";
-import AdminSeed from "./pages/AdminSeed";
-import InstagramAPI from "./pages/InstagramAPI";
-import InstagramCallback from "./pages/InstagramCallback";
-import YourActivity from "./pages/YourActivity";
-import UploadEmailAssets from "./pages/UploadEmailAssets";
-import UploadAppleMusicKey from "./pages/UploadAppleMusicKey";
-import UploadAppleSignInKey from "./pages/UploadAppleSignInKey";
-import AppleCallback from "./pages/AppleCallback";
-import TransportationVendorApplication from "./pages/TransportationVendorApplication";
-import TransportationVendorDashboard from "./pages/TransportationVendorDashboard";
-import AdminTransportVendorVetting from "./pages/AdminTransportVendorVetting";
-import TransportationVendorPartners from "./pages/TransportationVendorPartners";
-import FleetManagementDashboard from "./components/FleetManagementDashboard";
-import DriverManagementPanel from "./components/DriverManagementPanel";
-import VendorPromotionManager from "./components/VendorPromotionManager";
-import VendorPaymentDashboard from "./components/VendorPaymentDashboard";
-import VendorAnalyticsDashboard from "./components/VendorAnalyticsDashboard";
-import VendorBookingCalendar from "./components/VendorBookingCalendar";
-import EscrowTimelineDashboard from "./components/EscrowTimelineDashboard";
-import PlatformAnalyticsDashboard from "./components/PlatformAnalyticsDashboard";
-import ActivityLogs from "./pages/ActivityLogs";
-import CustomerVerification from "./pages/CustomerVerification";
-import EmergencyContacts from "./pages/EmergencyContacts";
-import AgentPerformanceDashboard from "./pages/AgentPerformanceDashboard";
-import AdminCustomerVerifications from "./pages/AdminCustomerVerifications";
-import CorporateContact from "./pages/CorporateContact";
-import About from "./pages/About";
-import TermsPage from "./pages/Terms";
-import WhatWeDo from "./pages/WhatWeDo";
-import DisputeResolution from "./pages/DisputeResolution";
-import PrivacyCookies from "./pages/PrivacyCookies";
-import HelpCenter from "./pages/HelpCenter";
-import PriceAlerts from "./pages/PriceAlerts";
+import NotFound from "./pages/NotFound";
+
+// Lazy load heavy components
+const AIBookingConcierge = lazy(() => import("@/components/AIBookingConcierge").then(m => ({ default: m.AIBookingConcierge })));
+
+// Lazy load non-critical pages
+const SearchResults = lazy(() => import("./pages/SearchResults"));
+const HotelBooking = lazy(() => import("./pages/HotelBooking"));
+const HotelDetails = lazy(() => import("./pages/HotelDetails"));
+const BookingConfirmation = lazy(() => import("./pages/BookingConfirmation"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const AIAgentOnboarding = lazy(() => import("./pages/AIAgentOnboarding"));
+const JournalListing = lazy(() => import("./pages/JournalListing"));
+const JournalArticle = lazy(() => import("./pages/JournalArticle"));
+const CreatorArticleEditor = lazy(() => import("./pages/CreatorArticleEditor"));
+const CreatorArticles = lazy(() => import("./pages/CreatorArticles"));
+const Favorites = lazy(() => import("./pages/Favorites"));
+const Collections = lazy(() => import("./pages/Collections"));
+const CollectionDetail = lazy(() => import("./pages/CollectionDetail"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Marketplace = lazy(() => import("./pages/Marketplace"));
+const AgentOnboarding = lazy(() => import("./pages/AgentOnboarding"));
+const AgentDashboard = lazy(() => import("./pages/AgentDashboard"));
+const AdminAgentApprovals = lazy(() => import("./pages/AdminAgentApprovals"));
+const Admin = lazy(() => import("./pages/Admin"));
+const SystemHealth = lazy(() => import("./pages/SystemHealth"));
+const AdminInquiries = lazy(() => import("./pages/AdminInquiries"));
+const AdminCancellations = lazy(() => import("./pages/AdminCancellations"));
+const AdminCancellationAnalytics = lazy(() => import("./pages/AdminCancellationAnalytics"));
+const Subscription = lazy(() => import("./pages/Subscription"));
+const BillingDashboard = lazy(() => import("./pages/BillingDashboard"));
+const AgentProfile = lazy(() => import("./pages/AgentProfile"));
+const BrowseAgents = lazy(() => import("./pages/BrowseAgents"));
+const MyJobs = lazy(() => import("./pages/MyJobs"));
+const MyTrips = lazy(() => import("./pages/MyTrips"));
+const GroupTrips = lazy(() => import("./pages/GroupTrips"));
+const AgentTripRequests = lazy(() => import('./pages/AgentTripRequests'));
+const BookingPreferences = lazy(() => import("./pages/BookingPreferences"));
+const MyBookingsRedirect = lazy(() => import("./pages/redirects/MyBookingsRedirect"));
+const FavoritesRedirect = lazy(() => import("./pages/redirects/FavoritesRedirect"));
+const BookingPreferencesRedirect = lazy(() => import("./pages/redirects/BookingPreferencesRedirect"));
+const CommissionDashboard = lazy(() => import("./pages/CommissionDashboard"));
+const EmailPreview = lazy(() => import("./pages/EmailPreview"));
+const MyBookings = lazy(() => import("./pages/MyBookings"));
+const BookingDetails = lazy(() => import("./pages/BookingDetails"));
+const BookingHistory = lazy(() => import("./pages/BookingHistory"));
+const ModifyFlight = lazy(() => import("./pages/ModifyFlight"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Messages = lazy(() => import("./pages/Messages"));
+const Redirect = lazy(() => import("./pages/Redirect"));
+const TestGroupPayment = lazy(() => import("./pages/TestGroupPayment"));
+const TravelProfile = lazy(() => import("./pages/TravelProfile"));
+const TravelSettings = lazy(() => import("./pages/TravelSettings"));
+const TravelSettings2 = lazy(() => import("./pages/TravelSettings2"));
+const MusicVolumeSettings = lazy(() => import("./pages/MusicVolumeSettings"));
+const CrosspostingSettings = lazy(() => import("./pages/CrosspostingSettings"));
+const CreatorDashboard = lazy(() => import("./pages/CreatorDashboard"));
+const Search = lazy(() => import("./pages/Search"));
+const Trending = lazy(() => import("./pages/Trending"));
+const CommunityGuidelines = lazy(() => import("./pages/CommunityGuidelines"));
+const TrustSafety = lazy(() => import("./pages/TrustSafety"));
+const CancellationRefundPolicy = lazy(() => import("./pages/CancellationRefundPolicy"));
+const Shop = lazy(() => import("./pages/Shop"));
+const AffiliateManager = lazy(() => import("./pages/AffiliateManager"));
+const SupplierManagement = lazy(() => import("./pages/SupplierManagement"));
+const CoCuratedDashboard = lazy(() => import("./pages/CoCuratedDashboard"));
+const CoCuratedCreate = lazy(() => import("./pages/CoCuratedCreate"));
+const CoCuratedMarketplace = lazy(() => import("./pages/CoCuratedMarketplace"));
+const CoCuratedPackage = lazy(() => import("./pages/CoCuratedPackage"));
+const CoCuratedBookingSuccess = lazy(() => import("./pages/CoCuratedBookingSuccess"));
+const CoCuratedJourneys = lazy(() => import("./pages/CoCuratedJourneys"));
+const TourActivityDetail = lazy(() => import("./pages/TourActivityDetail"));
+const FineDining = lazy(() => import("./pages/FineDining"));
+const RestaurantDetail = lazy(() => import("./pages/RestaurantDetail"));
+const BrowseInfluencers = lazy(() => import("./pages/BrowseInfluencers"));
+const BrowseCreators = lazy(() => import("./pages/BrowseCreators"));
+const AdminSeed = lazy(() => import("./pages/AdminSeed"));
+const InstagramAPI = lazy(() => import("./pages/InstagramAPI"));
+const InstagramCallback = lazy(() => import("./pages/InstagramCallback"));
+const YourActivity = lazy(() => import("./pages/YourActivity"));
+const UploadEmailAssets = lazy(() => import("./pages/UploadEmailAssets"));
+const UploadAppleMusicKey = lazy(() => import("./pages/UploadAppleMusicKey"));
+const UploadAppleSignInKey = lazy(() => import("./pages/UploadAppleSignInKey"));
+const AppleCallback = lazy(() => import("./pages/AppleCallback"));
+const TransportationVendorApplication = lazy(() => import("./pages/TransportationVendorApplication"));
+const TransportationVendorDashboard = lazy(() => import("./pages/TransportationVendorDashboard"));
+const AdminTransportVendorVetting = lazy(() => import("./pages/AdminTransportVendorVetting"));
+const TransportationVendorPartners = lazy(() => import("./pages/TransportationVendorPartners"));
+const FleetManagementDashboard = lazy(() => import("./components/FleetManagementDashboard"));
+const DriverManagementPanel = lazy(() => import("./components/DriverManagementPanel"));
+const VendorPromotionManager = lazy(() => import("./components/VendorPromotionManager"));
+const VendorPaymentDashboard = lazy(() => import("./components/VendorPaymentDashboard"));
+const VendorAnalyticsDashboard = lazy(() => import("./components/VendorAnalyticsDashboard"));
+const VendorBookingCalendar = lazy(() => import("./components/VendorBookingCalendar"));
+const EscrowTimelineDashboard = lazy(() => import("./components/EscrowTimelineDashboard"));
+const PlatformAnalyticsDashboard = lazy(() => import("./components/PlatformAnalyticsDashboard"));
+const ActivityLogs = lazy(() => import("./pages/ActivityLogs"));
+const CustomerVerification = lazy(() => import("./pages/CustomerVerification"));
+const EmergencyContacts = lazy(() => import("./pages/EmergencyContacts"));
+const AgentPerformanceDashboard = lazy(() => import("./pages/AgentPerformanceDashboard"));
+const AdminCustomerVerifications = lazy(() => import("./pages/AdminCustomerVerifications"));
+const CorporateContact = lazy(() => import("./pages/CorporateContact"));
+const About = lazy(() => import("./pages/About"));
+const TermsPage = lazy(() => import("./pages/Terms"));
+const WhatWeDo = lazy(() => import("./pages/WhatWeDo"));
+const DisputeResolution = lazy(() => import("./pages/DisputeResolution"));
+const PrivacyCookies = lazy(() => import("./pages/PrivacyCookies"));
+const HelpCenter = lazy(() => import("./pages/HelpCenter"));
+const PriceAlerts = lazy(() => import("./pages/PriceAlerts"));
 
 const queryClient = new QueryClient();
 
@@ -238,7 +245,8 @@ function AppContent() {
       <ExpediaModalPortal />
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
-        <Routes>
+        <Suspense fallback={<LoadingFallback />}>
+          <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/journeys" element={<TravelFeed />} />
@@ -361,9 +369,14 @@ function AppContent() {
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
+        </Suspense>
       </main>
       {showFooter && <Footer />}
-      {showAIBooking && <AIBookingConcierge />}
+      {showAIBooking && (
+        <Suspense fallback={null}>
+          <AIBookingConcierge />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Star, MapPin, Wifi, Utensils, Dumbbell, ParkingCircle, Bed, Users, Check, ArrowUpDown, Clock, CreditCard, Calendar, Shield, Baby, Accessibility, Wind, Coffee, Tv, Bath, Phone, Ruler, Info } from "lucide-react";
 import { useState, useMemo } from "react";
-import { HotelMap } from "./HotelMap";
+import { LazyHotelMap } from "./LazyHotelMap";
 import { getHotelImages, getRoomImages } from "@/lib/imageHelpers";
 import { getCurrencyFromLocation } from "@/lib/currencyHelpers";
 import { BookingPolicyBanner } from "./BookingPolicyBanner";
@@ -786,7 +786,7 @@ export const HotelDetailsModal = ({ open, onClose, hotel, onSelectRoom }: HotelD
             {/* Map */}
             <div>
               <h3 className="text-lg font-semibold mb-3">Location & Map</h3>
-              <HotelMap
+              <LazyHotelMap
                 latitude={hotelLatitude}
                 longitude={hotelLongitude}
                 hotelName={hotelName}
