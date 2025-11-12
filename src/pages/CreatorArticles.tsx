@@ -48,7 +48,7 @@ export default function CreatorArticles() {
 
       const { data, error } = await supabase
         .from("journal_articles" as any)
-        .select("*")
+        .select("id, slug, title, dek, status, publish_date, created_at, read_time_minutes, hero_image_url")
         .eq("creator_id", (creator as any).id)
         .order("created_at", { ascending: false });
 
@@ -70,13 +70,7 @@ export default function CreatorArticles() {
     if (!confirm("Are you sure you want to delete this article?")) return;
 
     try {
-      // Delete blocks first
-      await supabase
-        .from("journal_article_blocks" as any)
-        .delete()
-        .eq("article_id", id);
-
-      // Delete article
+      // Delete article (blocks cascade automatically via ON DELETE CASCADE)
       const { error } = await supabase
         .from("journal_articles" as any)
         .delete()
@@ -199,10 +193,9 @@ export default function CreatorArticles() {
                     {/* Actions */}
                     <div className="flex gap-2">
                       {article.status === "published" && (
-                        <Link to={`/journal/${article.slug}`} target="_blank">
+                        <Link to={`/journal/${article.slug}`}>
                           <Button variant="outline" size="sm">
-                            <Eye className="w-4 h-4 mr-1" />
-                            View
+                            <Eye className="w-4 h-4" />
                           </Button>
                         </Link>
                       )}

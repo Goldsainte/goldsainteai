@@ -31,6 +31,11 @@ export default function JournalListing() {
 
   const fetchArticles = async () => {
     try {
+      // TODO: When article count grows, consider server-side filtering for better performance
+      // Example:
+      // .or(`title.ilike.%${searchQuery}%,dek.ilike.%${searchQuery}%`)
+      // .contains('categories', [categoryFilter])
+      
       const { data, error } = await supabase
         .from("journal_articles" as any)
         .select(`

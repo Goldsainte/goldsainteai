@@ -120,7 +120,7 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
           const u = new URL(url);
           const host = u.hostname.replace(/^www\./, '');
           
-          // YouTube
+          // YouTube - strict hostname check
           if (host === 'youtu.be' || host === 'youtube.com') {
             const id = host === 'youtu.be' 
               ? u.pathname.slice(1)
@@ -132,7 +132,7 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
                 <iframe
                   className="aspect-video w-full rounded-xl"
                   src={`https://www.youtube.com/embed/${id}`}
-                  title="YouTube video"
+                  title="Embedded video"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -142,7 +142,7 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
             );
           }
           
-          // Vimeo
+          // Vimeo - strict hostname check
           if (host === 'vimeo.com') {
             const id = u.pathname.split('/')[1];
             if (!id) throw new Error('no id');
@@ -152,7 +152,7 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
                 <iframe
                   className="aspect-video w-full rounded-xl"
                   src={`https://player.vimeo.com/video/${id}`}
-                  title="Vimeo video"
+                  title="Embedded video"
                   loading="lazy"
                   allow="autoplay; fullscreen; picture-in-picture"
                   allowFullScreen

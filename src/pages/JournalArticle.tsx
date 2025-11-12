@@ -199,8 +199,8 @@ export default function JournalArticle() {
     <>
       <ArticleSEO
         title={article.title}
-        dek={article.dek}
-        heroImageUrl={article.hero_image_url}
+        description={article.dek}
+        imageUrl={article.hero_image_url}
         publishDate={article.publish_date}
         authorName={article.creator.name}
         slug={article.slug}

@@ -62,7 +62,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
 
           {/* Meta */}
           <div className="flex items-center justify-between text-sm text-muted-foreground pt-4 border-t border-border">
-            <span className="font-medium">{article.creator.name}</span>
+            <span className="font-medium">{article.creator?.name || 'Anonymous'}</span>
             <div className="flex items-center gap-3">
               <span>
                 {article.publish_date 
