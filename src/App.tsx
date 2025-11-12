@@ -257,7 +257,6 @@ function AppContent() {
           <Route path="/admin/cancellations" element={<AdminCancellations />} />
           <Route path="/admin/analytics/cancellations" element={<AdminCancellationAnalytics />} />
           <Route path="/subscription" element={<Subscription />} />
-          <Route path="/ai-subscription" element={<AISubscription />} />
           <Route path="/billing-dashboard" element={<BillingDashboard />} />
           <Route path="/admin/customer-verifications" element={<AdminCustomerVerifications />} />
           <Route path="/admin/inquiries" element={<AdminInquiries />} />
