@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   Dialog,
   DialogContent,
@@ -50,6 +51,7 @@ const CompactHeaderSearch = ({
   prefill 
 }: CompactHeaderSearchProps = {}) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const [internalOpen, setInternalOpen] = useState(false);
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = onExternalOpenChange || setInternalOpen;
@@ -498,12 +500,11 @@ const CompactHeaderSearch = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="relative rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44] focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] pl-3 sm:pl-4 pr-10 sm:pr-12"
-          style={{ width: 'clamp(220px, 28vw, 520px)' }}
-          aria-label="Open hotel and flight search"
+          className="relative rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44] focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] pl-3 sm:pl-4 pr-10 sm:pr-12 w-full max-w-[700px]"
+          aria-label="Search flights and hotels with Goldsainte and Expedia"
         >
-          <span className="truncate text-[7px] sm:text-[15px] lg:text-[16px] leading-none">
-            {t('header.searchHotelsFlights')}
+          <span className="truncate text-[15px] lg:text-[16px] leading-none">
+            {isMobile ? "Search flights & hotels" : "Search flights and hotels with Goldsainte × Expedia"}
           </span>
           <Search className="absolute right-3 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
         </Button>
