@@ -90,6 +90,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
         voice: "verse",
+        voice_style: "conversational",
         turn_detection: {
           type: "server_vad",
           threshold: 0.5,
@@ -183,7 +184,7 @@ Speak like a modern, approachable luxury concierge — think a confident millenn
 
     console.log(`✅ Ephemeral token created: ${token.slice(0, 10)}...${token.slice(-4)}`);
 
-    return new Response(JSON.stringify({ token, expiresAt }), {
+    return new Response(JSON.stringify({ token }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
     });
   } catch (error) {
