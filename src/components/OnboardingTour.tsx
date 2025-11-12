@@ -120,54 +120,15 @@ export const OnboardingTour = () => {
   return (
     <>
       <style>{`
-        /* Header layout - flex to prevent close button overlap */
         .react-joyride__tooltip {
           position: relative;
           max-width: 100% !important;
-          max-height: calc(
-            100vh
-            - env(safe-area-inset-top, 0px)
-            - env(safe-area-inset-bottom, 0px)
-            - var(--bottom-nav-height, 64px)
-            - 24px
-          );
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-        }
-        .react-joyride__tooltip__header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 8px;
-          padding: 16px 16px 0 16px;
-          flex-shrink: 0;
         }
         .react-joyride__tooltip__footer {
           display: flex;
           justify-content: flex-end;
           gap: 8px;
           flex-wrap: wrap;
-          flex-shrink: 0;
-        }
-        /* Close button - fixed tap target */
-        .react-joyride__tooltip__close {
-          flex: 0 0 44px;
-          width: 44px !important;
-          height: 44px !important;
-          min-width: 44px !important;
-          min-height: 44px !important;
-          display: inline-flex !important;
-          align-items: center;
-          justify-content: center;
-          border: 0;
-          background: transparent;
-          cursor: pointer;
-          z-index: 2;
-        }
-        .react-joyride__tooltip__close svg {
-          width: 18px;
-          height: 18px;
         }
         .__floater__body > div > div:last-child > div:first-child {
           font-size: 12px;
@@ -176,10 +137,6 @@ export const OnboardingTour = () => {
           margin: 0;
           padding: 0;
           text-align: center;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: calc(100% - 56px);
         }
         .__floater { 
           filter: none !important;
@@ -193,38 +150,6 @@ export const OnboardingTour = () => {
           max-width: 100vw !important;
           padding: 0 16px;
           box-sizing: border-box;
-        }
-        @media (max-width: 480px) {
-          .react-joyride__tooltip__header {
-            padding: 12px 12px 0 12px;
-          }
-          .react-joyride__tooltip__close {
-            flex: 0 0 40px;
-            width: 40px !important;
-            height: 40px !important;
-            min-width: 40px !important;
-            min-height: 40px !important;
-          }
-          .react-joyride__tooltip__close svg {
-            width: 16px;
-            height: 16px;
-          }
-          .__floater__body > div > div:last-child > div:first-child {
-            font-size: 1.05rem;
-            letter-spacing: 0.2px;
-            max-width: calc(100% - 48px);
-          }
-        }
-        @supports (height: 100dvh) {
-          .react-joyride__tooltip {
-            max-height: calc(
-              100dvh
-              - env(safe-area-inset-top, 0px)
-              - env(safe-area-inset-bottom, 0px)
-              - var(--bottom-nav-height, 64px)
-              - 24px
-            );
-          }
         }
         @media (max-width: 768px) {
           .__floater {
@@ -285,13 +210,9 @@ export const OnboardingTour = () => {
           tooltipContent: {
             fontSize: window.innerWidth < 768 ? "12px" : "13px",
             lineHeight: "1.6",
-            padding: "12px 16px",
+            padding: "0 0 12px 0",
             color: "hsl(var(--foreground))",
             fontWeight: "400",
-            overflowWrap: "anywhere" as const,
-            hyphens: "auto" as const,
-            flex: "1 1 auto",
-            overflow: "auto",
           },
           tooltipFooter: {
             marginTop: window.innerWidth < 768 ? "10px" : "12px",
@@ -301,20 +222,12 @@ export const OnboardingTour = () => {
           },
           buttonClose: {
             color: "hsl(var(--muted-foreground))",
-            flex: `0 0 ${window.innerWidth < 480 ? "40px" : "44px"}`,
-            width: window.innerWidth < 480 ? "40px" : "44px",
-            height: window.innerWidth < 480 ? "40px" : "44px",
-            minWidth: window.innerWidth < 480 ? "40px" : "44px",
-            minHeight: window.innerWidth < 480 ? "40px" : "44px",
+            width: window.innerWidth < 768 ? "18px" : "20px",
+            height: window.innerWidth < 768 ? "18px" : "20px",
             padding: 0,
             lineHeight: 1,
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
+            transform: "scale(0.9)",
             opacity: 0.9,
-            background: "transparent",
-            border: 0,
-            cursor: "pointer",
           },
           buttonNext: {
             backgroundColor: "hsl(var(--primary))",

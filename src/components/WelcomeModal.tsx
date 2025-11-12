@@ -24,14 +24,17 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
-      <DialogContent className="modal-card max-w-[92vw] sm:max-w-[640px] min-w-0 p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5 flex flex-col">
-        <DialogHeader className="modal-header flex flex-row items-center justify-between p-4 sm:p-4 gap-2 flex-shrink-0">
-          <DialogTitle className="modal-title text-[1.05rem] sm:text-xl font-secondary text-primary whitespace-nowrap overflow-hidden text-ellipsis max-w-[calc(100%-56px)] sm:max-w-[calc(100%-56px)]">
-            {t('welcomeModal.title')}
-          </DialogTitle>
+      <DialogContent className="max-w-[95svw] sm:max-w-lg min-w-0 p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
+        <DialogHeader>
+          <DialogTitle className="sr-only">Welcome to Goldsainte.Ai</DialogTitle>
           <DialogDescription className="sr-only">Overview of capabilities</DialogDescription>
         </DialogHeader>
-        <div className="modal-body px-4 sm:px-6 pb-24 space-y-4 sm:space-y-6 overflow-auto flex-1">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+          <div className="text-center space-y-1 sm:space-y-2">
+            <h2 className="text-xl sm:text-2xl font-secondary text-primary">
+              {t('welcomeModal.title')}
+            </h2>
+          </div>
 
           <ScrollArea className="h-[60vh] sm:h-[65vh] pr-4 gold-scrollbar">
             <div className="space-y-3 sm:space-y-4">
@@ -168,10 +171,7 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
             </div>
             </div>
           </ScrollArea>
-        </div>
 
-        {/* Sticky CTA at bottom */}
-        <div className="modal-cta flex-shrink-0 sticky bottom-0 p-4 sm:p-6 pt-3 bg-gradient-to-t from-background via-background to-transparent space-y-2 shadow-[0_-2px_8px_rgba(0,0,0,0.06)]">
           <Button
             onClick={handleClose} 
             className="w-full h-10 sm:h-11 text-xs sm:text-sm group"
