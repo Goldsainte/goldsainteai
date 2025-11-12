@@ -500,13 +500,13 @@ const CompactHeaderSearch = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="relative rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur text-center justify-center text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44] focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] px-10 sm:px-12 w-full max-w-[700px]"
+          className="relative rounded-full border border-accent bg-accent backdrop-blur text-center justify-center text-primary hover:bg-accent/90 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] px-10 sm:px-12 w-full max-w-[700px] font-medium"
           aria-label="Search flights and hotels with Goldsainte and Expedia"
         >
           <span className="truncate text-[15px] lg:text-[16px] leading-none">
             {isMobile ? "Search flights & hotels" : "Search flights and hotels with Goldsainte × Expedia"}
           </span>
-          <Search className="absolute right-3 h-4 w-4 text-gray-400 pointer-events-none" aria-hidden="true" />
+          <Search className="absolute right-3 h-4 w-4 text-primary pointer-events-none" aria-hidden="true" />
         </Button>
       </DialogTrigger>
       <DialogContent 
