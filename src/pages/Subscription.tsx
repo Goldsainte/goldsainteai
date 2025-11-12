@@ -8,19 +8,12 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Check, Crown, Zap, Star, ArrowRight } from "lucide-react";
 import { AIUsageDisplay } from "@/components/ai/AIUsageDisplay";
-
-type SubscriptionTier = 'free' | 'premium' | 'enterprise';
+import { SUBSCRIPTION_TIERS, type SubscriptionTier } from "@/config/stripe";
 
 interface UserSubscription {
   tier: SubscriptionTier;
   created_at: string;
 }
-
-const TIER_PRICE_IDS: Record<SubscriptionTier, string> = {
-  free: '',
-  premium: 'price_1SQe1cF9Y0dnmu4YKaVKPSU6',
-  enterprise: 'price_1SQe1uF9Y0dnmu4Yk53KjWru',
-};
 
 const tierFeatures = {
   free: {
@@ -170,7 +163,7 @@ export default function Subscription() {
     const toastId = toast.loading("Redirecting to checkout…");
 
     try {
-      const priceId = TIER_PRICE_IDS[tier];
+      const priceId = SUBSCRIPTION_TIERS[tier].priceId;
       if (!priceId) {
         toast.dismiss(toastId);
         toast.error("Invalid subscription tier");

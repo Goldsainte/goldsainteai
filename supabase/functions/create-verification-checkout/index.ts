@@ -24,9 +24,11 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-    const { returnUrl } = await req.json();
+    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2024-06-20",
+    });
 
     // Try to get cached customer ID from profile
     const { data: profileData } = await supabaseClient
@@ -63,8 +65,8 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      success_url: `${returnUrl}?verification=success`,
-      cancel_url: `${returnUrl}?verification=cancelled`,
+      success_url: `${origin}?verification=success`,
+      cancel_url: `${origin}?verification=cancelled`,
       metadata: {
         user_id: user.id,
         subscription_type: 'verification',

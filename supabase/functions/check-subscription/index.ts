@@ -13,9 +13,11 @@ const logStep = (step: string, details?: any) => {
 };
 
 // Map product IDs to tiers
+// IMPORTANT: Keep this synchronized with src/config/stripe.ts SUBSCRIPTION_TIERS
+// Edge functions cannot import from src/ so this must be duplicated
 const PRODUCT_TIER_MAP: Record<string, string> = {
-  'prod_TNOppvdXPriM3E': 'premium',
-  'prod_TNOpkzmfNXljRz': 'enterprise',
+  'prod_RdSS9f3xhCGOBD': 'premium',
+  'prod_RdSSUQWWj8JXJW': 'enterprise',
 };
 
 serve(async (req) => {
