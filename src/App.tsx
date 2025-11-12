@@ -28,6 +28,8 @@ import AuthCallback from "./pages/AuthCallback";
 import ResetPassword from "./pages/ResetPassword";
 import Onboarding from "./pages/Onboarding";
 import AIAgentOnboarding from "./pages/AIAgentOnboarding";
+import JournalListing from "./pages/JournalListing";
+import JournalArticle from "./pages/JournalArticle";
 import Favorites from "./pages/Favorites";
 import Collections from "./pages/Collections";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -299,6 +301,8 @@ function AppContent() {
           <Route path="/agent-trip-requests" element={<AgentTripRequests />} />
           <Route path="/test-group-payment" element={<TestGroupPayment />} />
           <Route path="/travel-feed" element={<TravelFeed />} />
+          <Route path="/journal" element={<JournalListing />} />
+          <Route path="/journal/:slug" element={<JournalArticle />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/trust-safety" element={<TrustSafety />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
