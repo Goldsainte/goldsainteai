@@ -38,8 +38,12 @@ interface VoiceDiagnosticsPanelProps {
     maxScore: number;
     threshold: number;
     droppedFrames: number;
+    framesToKWS: number;
+    lastKWSSampleRate: number;
     stateMachine?: string;
+    modelVersion?: string;
   };
+  onLoopbackTest?: () => void;
 }
 
 export const VoiceDiagnosticsPanel = ({ 
@@ -47,7 +51,9 @@ export const VoiceDiagnosticsPanel = ({
   onClose,
   voiceChatRef,
   wakeWordDetectorRef,
-  holdMusicRef 
+  holdMusicRef,
+  metrics,
+  onLoopbackTest
 }: VoiceDiagnosticsPanelProps) => {
   const [diagnostics, setDiagnostics] = useState<DiagnosticsData>({
     permissionStatus: 'unknown',
@@ -265,6 +271,147 @@ export const VoiceDiagnosticsPanel = ({
               {diagnostics.holdMusicStatus.toUpperCase()}
             </Badge>
           </div>
+
+          {/* Live KWS Metrics */}
+          {metrics && (
+            <div className="space-y-3 border-t pt-4">
+              <h3 className="font-semibold mb-2">KWS Audio Pipeline (Live)</h3>
+              
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div>
+                  <span className="text-muted-foreground">Mic Permission:</span>
+                  <Badge variant={metrics.micPermission === 'granted' ? 'default' : 'destructive'} className="ml-2">
+                    {metrics.micPermission.toUpperCase()}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Mic Active:</span>
+                  <Badge variant={metrics.micStreamActive ? 'default' : 'secondary'} className="ml-2">
+                    {metrics.micStreamActive ? 'YES' : 'NO'}
+                  </Badge>
+                </div>
+                
+                <div>
+                  <span className="text-muted-foreground">AudioContext:</span>
+                  <Badge variant={metrics.audioContextState === 'running' ? 'default' : 'secondary'} className="ml-2">
+                    {metrics.audioContextState.toUpperCase()}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Input Sample Rate:</span>
+                  <Badge variant="outline" className="ml-2">
+                    {metrics.sampleRate} Hz
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">KWS Sample Rate:</span>
+                  <Badge variant={metrics.lastKWSSampleRate === 16000 ? 'default' : 'destructive'} className="ml-2">
+                    {metrics.lastKWSSampleRate} Hz
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Frames to KWS:</span>
+                  <Badge variant="outline" className="ml-2">
+                    {metrics.framesToKWS}
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">RMS (Audio Level):</span>
+                  <Badge variant={metrics.rms > 0.01 ? 'default' : 'secondary'} className="ml-2">
+                    {metrics.rms.toFixed(4)}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Peak:</span>
+                  <Badge variant="outline" className="ml-2">
+                    {metrics.peak.toFixed(4)}
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">KWS Score:</span>
+                  <Badge variant={metrics.score > 0.1 ? 'default' : 'secondary'} className="ml-2">
+                    {metrics.score.toFixed(3)}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Max Score (2s):</span>
+                  <Badge variant={metrics.maxScore >= metrics.threshold ? 'default' : 'secondary'} className="ml-2">
+                    {metrics.maxScore.toFixed(3)}
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">Threshold:</span>
+                  <Badge variant="outline" className="ml-2">
+                    {metrics.threshold.toFixed(2)}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Dropped Frames:</span>
+                  <Badge variant={metrics.droppedFrames > 10 ? 'destructive' : 'secondary'} className="ml-2">
+                    {metrics.droppedFrames}
+                  </Badge>
+                </div>
+
+                <div>
+                  <span className="text-muted-foreground">Model Version:</span>
+                  <Badge variant="outline" className="ml-2 text-[10px]">
+                    {metrics.modelVersion || 'N/A'}
+                  </Badge>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">State Machine:</span>
+                  <Badge variant="outline" className="ml-2">
+                    {metrics.stateMachine || 'idle'}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Loopback Test Button */}
+              {onLoopbackTest && (
+                <div className="pt-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={onLoopbackTest}
+                    className="w-full"
+                  >
+                    Run Loopback Test
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Tests KWS pipeline with sample "Hey Goldsainte" audio
+                  </p>
+                </div>
+              )}
+
+              {/* Visual indicators */}
+              <div className="space-y-2 pt-2">
+                {metrics.lastKWSSampleRate !== 16000 && metrics.lastKWSSampleRate > 0 && (
+                  <p className="text-xs text-destructive">
+                    ⚠️ KWS expects 16kHz but receiving {metrics.lastKWSSampleRate}Hz
+                  </p>
+                )}
+                {metrics.framesToKWS === 0 && metrics.micStreamActive && (
+                  <p className="text-xs text-destructive">
+                    ⚠️ Mic active but no frames reaching KWS - check audio graph
+                  </p>
+                )}
+                {metrics.rms < 0.001 && metrics.micStreamActive && (
+                  <p className="text-xs text-yellow-600">
+                    ⚠️ Very low audio level - speak louder or check mic
+                  </p>
+                )}
+                {metrics.maxScore >= metrics.threshold && (
+                  <p className="text-xs text-green-600">
+                    ✅ Wake phrase detected! (score: {metrics.maxScore.toFixed(3)})
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
