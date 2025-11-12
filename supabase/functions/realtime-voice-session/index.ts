@@ -95,52 +95,10 @@ serve(async (req) => {
           prefix_padding_ms: 500,
           silence_duration_ms: 1200
         },
-        tool_choice: "auto",
-        tools: [
-          {
-            type: "function",
-            name: "search_flights",
-            description: "Find flight options with prices. Returns real flight data from Amadeus.",
-            parameters: {
-              type: "object",
-              properties: {
-                origin: { type: "string", description: "Origin airport IATA code or city name" },
-                destination: { type: "string", description: "Destination airport IATA code or city name" },
-                depart_date: { type: "string", description: "Departure date in YYYY-MM-DD format" },
-                return_date: { type: "string", description: "Return date in YYYY-MM-DD format (optional for one-way)" },
-                adults: { type: "number", default: 1, description: "Number of adult passengers" },
-                cabin: {
-                  type: "string",
-                  enum: ["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"],
-                  default: "ECONOMY",
-                  description: "Cabin class"
-                }
-              },
-              required: ["origin", "destination", "depart_date"]
-            }
-          },
-          {
-            type: "function",
-            name: "search_hotels",
-            description: "Find hotels with prices and details. Returns real hotel data from Amadeus.",
-            parameters: {
-              type: "object",
-              properties: {
-                city: { type: "string", description: "City IATA code (e.g., MIA, NYC)" },
-                check_in: { type: "string", description: "Check-in date in YYYY-MM-DD format" },
-                check_out: { type: "string", description: "Check-out date in YYYY-MM-DD format" },
-                guests: { type: "number", default: 2, description: "Number of guests" }
-              },
-              required: ["city", "check_in", "check_out"]
-            }
-          }
-        ],
         instructions: buildVoiceInstructions({
           ...agentProfile,
           personality_instructions: (agentProfile?.personality_instructions ?? "") +
-            "\n\nSpeak in short, lively sentences with natural pauses. Use contractions. Vary your acknowledgements. Keep it bright and conversational — no over-explaining or stiff corporate language." +
-            "\n\nWhen the user asks for flights or hotels and you have dates and locations, CALL the appropriate search tool. " +
-            "After the tool returns, briefly mention that results are showing in the chat and stop speaking so the cards are visible.",
+            "\n\nSpeak in short, lively sentences with natural pauses. Use contractions. Vary your acknowledgements. Keep it bright and conversational — no over-explaining or stiff corporate language.",
           communication_style: agentProfile?.communication_style ?? "concise",
         })
       }),

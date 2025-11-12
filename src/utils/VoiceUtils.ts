@@ -57,7 +57,7 @@ export class AudioRecorder {
 
 export class RealtimeVoiceChat {
   private pc: RTCPeerConnection | null = null;
-  public dc: RTCDataChannel | null = null; // Made public to allow sending tool results
+  private dc: RTCDataChannel | null = null;
   public audioEl: HTMLAudioElement;
   private recorder: AudioRecorder | null = null;
 

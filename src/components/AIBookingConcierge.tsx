@@ -596,126 +596,8 @@ export const AIBookingConcierge = () => {
 
         console.log('🔌 [Step 4/6] Creating voice chat connection...');
         voiceChatRef.current = new RealtimeVoiceChat(
-          async (message) => {
+          (message) => {
             console.log('📨 Voice message:', message.type);
-            
-            // Handle tool calls from Realtime API
-            if (message.type === 'response.function_call_arguments.done') {
-              console.log('🔧 Tool call received:', message);
-              const toolName = message.name;
-              const callId = message.call_id;
-              let args: any = {};
-              
-              try {
-                args = JSON.parse(message.arguments || '{}');
-              } catch (e) {
-                console.error('Failed to parse tool arguments:', e);
-              }
-              
-              console.log(`🔧 Calling tool: ${toolName}`, args);
-              console.log('📊 [TELEMETRY] voice_tool_call', { tool: toolName, args, timestamp: new Date().toISOString() });
-              
-              try {
-                // Call amadeus-proxy
-                const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/amadeus-proxy`;
-                const proxyPayload = toolName === 'search_flights' 
-                  ? { type: 'flights', ...args }
-                  : { type: 'hotels', ...args };
-                
-                console.log('🌐 Calling amadeus-proxy:', proxyUrl, proxyPayload);
-                
-                const proxyResp = await fetch(proxyUrl, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
-                  },
-                  body: JSON.stringify(proxyPayload)
-                });
-                
-                console.log('📡 Proxy response status:', proxyResp.status);
-                
-                if (!proxyResp.ok) {
-                  const errorText = await proxyResp.text();
-                  console.error('❌ Proxy error:', errorText);
-                  throw new Error(`Proxy error ${proxyResp.status}`);
-                }
-                
-                const proxyData = await proxyResp.json();
-                console.log('✅ Proxy returned data:', proxyData);
-                console.log('📊 [TELEMETRY] amadeus_proxy_success', { 
-                  tool: toolName, 
-                  cardCount: proxyData.cards?.length || 0, 
-                  timestamp: new Date().toISOString() 
-                });
-                
-                // Send tool result back to Realtime API
-                if (voiceChatRef.current?.dc?.readyState === 'open') {
-                  const toolResult = {
-                    type: 'conversation.item.create',
-                    item: {
-                      type: 'function_call_output',
-                      call_id: callId,
-                      output: JSON.stringify({ success: true, card_count: proxyData.cards?.length || 0 })
-                    }
-                  };
-                  voiceChatRef.current.dc.send(JSON.stringify(toolResult));
-                  console.log('📤 Sent tool result back to AI');
-                  
-                  // Trigger response continuation
-                  voiceChatRef.current.dc.send(JSON.stringify({ type: 'response.create' }));
-                }
-                
-                // Render cards in UI immediately
-                if (proxyData.cards && Array.isArray(proxyData.cards) && proxyData.cards.length > 0) {
-                  setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: '',
-                    toolResults: [proxyData]
-                  }]);
-                  console.log('✅ Cards rendered in chat');
-                  console.log('📊 [TELEMETRY] voice_cards_rendered', { 
-                    section: proxyData.section, 
-                    count: proxyData.cards.length,
-                    timestamp: new Date().toISOString()
-                  });
-                } else {
-                  console.warn('⚠️ No cards returned from proxy');
-                  toast({
-                    title: "No Results",
-                    description: "No options found for those dates. Try different dates or locations.",
-                  });
-                }
-                
-              } catch (error) {
-                console.error('❌ Tool execution error:', error);
-                console.log('📊 [TELEMETRY] voice_tool_error', { 
-                  tool: toolName, 
-                  error: error instanceof Error ? error.message : 'Unknown',
-                  timestamp: new Date().toISOString()
-                });
-                
-                // Send error back to AI
-                if (voiceChatRef.current?.dc?.readyState === 'open') {
-                  const errorResult = {
-                    type: 'conversation.item.create',
-                    item: {
-                      type: 'function_call_output',
-                      call_id: callId,
-                      output: JSON.stringify({ error: 'lookup_failed' })
-                    }
-                  };
-                  voiceChatRef.current.dc.send(JSON.stringify(errorResult));
-                  voiceChatRef.current.dc.send(JSON.stringify({ type: 'response.create' }));
-                }
-                
-                toast({
-                  title: "Search Failed",
-                  description: "Unable to fetch results. Please try again.",
-                  variant: "destructive"
-                });
-              }
-            }
             
             if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
               setIsProcessing(false);
@@ -1259,16 +1141,7 @@ export const AIBookingConcierge = () => {
                   
                   {/* Display tool results */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
-                    // Handle Amadeus card results from voice mode (direct format)
-                    if (result.type === 'cards' && Array.isArray(result.cards)) {
-                      return (
-                        <div key={resultIdx} className="mt-2 ml-8">
-                          <ResultCards section={result.section || 'Results'} cards={result.cards} />
-                        </div>
-                      );
-                    }
-                    
-                    // Handle Amadeus card results from text mode (nested in data)
+                    // Handle Amadeus card results (flights & hotels from amadeus-proxy)
                     if (result.data?.type === 'cards' && result.data?.cards) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8">
