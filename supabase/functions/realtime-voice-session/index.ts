@@ -170,6 +170,15 @@ Speak like a modern, approachable luxury concierge — think a confident millenn
       throw new Error(`Realtime session create failed ${sessionResp.status}: ${errText}`);
     }
 
+    // Log status and a short preview of body for diagnostics
+    console.log("[VOICE-SESSION] status", sessionResp.status);
+    try {
+      const preview = await sessionResp.clone().text();
+      console.log("[VOICE-SESSION] body", preview.slice(0, 400));
+    } catch (e) {
+      console.warn("[VOICE-SESSION] Unable to preview body:", e);
+    }
+
     const session = await sessionResp.json();
     console.log("[VOICE-SESSION] Raw session response structure:", JSON.stringify(session).slice(0, 200));
 
