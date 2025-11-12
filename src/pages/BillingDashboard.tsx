@@ -25,7 +25,7 @@ const BillingDashboard = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate("/login");
+      navigate("/auth");
       return;
     }
     fetchBillingInfo();
