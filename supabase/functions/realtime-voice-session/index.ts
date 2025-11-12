@@ -4,6 +4,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
 // Helper function to build personalized voice instructions
@@ -172,8 +173,12 @@ Speak like a modern, approachable luxury concierge — think a confident millenn
     const token = session?.client_secret?.value;
     const expiresAt = session?.client_secret?.expires_at;
 
-    if (!token) {
-      throw new Error('No client_secret.value returned from OpenAI');
+    if (!token || typeof token !== "string") {
+      console.error('❌ Invalid token from OpenAI:', typeof token);
+      return new Response(JSON.stringify({ error: 'No client_secret.value from OpenAI' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log(`✅ Ephemeral token created: ${token.slice(0, 10)}...${token.slice(-4)}`);

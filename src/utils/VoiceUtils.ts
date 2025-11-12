@@ -77,11 +77,12 @@ export class RealtimeVoiceChat {
       // Get ephemeral token (string)
       const { token: EPHEMERAL_KEY, expiresAt } = await getSessionToken();
       
-      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string') {
-        throw new Error("Failed to get ephemeral token string");
+      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string' || !EPHEMERAL_KEY.startsWith('sk-ephem_')) {
+        console.error("❌ Bad ephemeral token:", EPHEMERAL_KEY);
+        throw new Error("Voice config error: missing/invalid ephemeral token");
       }
       
-      console.log(`Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 10)}...${EPHEMERAL_KEY.slice(-4)}`);
+      console.log(`Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 12)}...${EPHEMERAL_KEY.slice(-4)}`);
       
       // Optional: basic expiry guard (tokens are ~60s)
       if (expiresAt && Date.now() > expiresAt - 10_000) {
@@ -181,8 +182,8 @@ export class RealtimeVoiceChat {
 
       const relayUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/realtime-sdp-relay`;
       
-      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || !EPHEMERAL_KEY.startsWith("sk-")) {
-        console.error("❌ Bad ephemeral token:", EPHEMERAL_KEY);
+      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== "string" || !EPHEMERAL_KEY.startsWith("sk-ephem_")) {
+        console.error("❌ Bad ephemeral token before SDP post:", EPHEMERAL_KEY);
         throw new Error("Voice config error: missing/invalid ephemeral token");
       }
 
