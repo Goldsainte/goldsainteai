@@ -312,3 +312,6 @@ verify_jwt = false
 [functions.amadeus-proxy]
 verify_jwt = false
 
+[functions.stripe-connect-link]
+verify_jwt = false
+

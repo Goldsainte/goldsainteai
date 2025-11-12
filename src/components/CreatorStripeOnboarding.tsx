@@ -78,9 +78,9 @@ export const CreatorStripeOnboarding = () => {
         return;
       }
 
-      console.log('[STRIPE-ONBOARDING] Starting onboarding process...');
+      console.log('[STRIPE-ONBOARDING] Starting onboarding with stripe-connect-link...');
 
-      const { data, error } = await supabase.functions.invoke('creator-stripe-onboarding', {
+      const { data, error } = await supabase.functions.invoke('stripe-connect-link', {
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -97,17 +97,9 @@ export const CreatorStripeOnboarding = () => {
         throw new Error('No onboarding URL received from server');
       }
 
-      // Open Stripe onboarding in new tab
-      const newWindow = window.open(data.url, '_blank');
+      // Redirect to Stripe onboarding in same window
+      window.location.href = data.url;
       
-      if (!newWindow) {
-        throw new Error('Popup blocked. Please allow popups for this site.');
-      }
-      
-      toast({
-        title: "Redirecting to Stripe",
-        description: "Complete the setup in the new tab, then return here and click 'Refresh Status'.",
-      });
     } catch (error: any) {
       console.error('[STRIPE-ONBOARDING] Full error:', error);
       
@@ -118,9 +110,6 @@ export const CreatorStripeOnboarding = () => {
       if (error.message?.includes('Connect')) {
         errorTitle = "Stripe Connect Not Enabled";
         errorMessage = "Please contact support to enable creator payouts. Stripe Connect must be activated for this feature.";
-      } else if (error.message?.includes('popup') || error.message?.includes('Popup')) {
-        errorTitle = "Popup Blocked";
-        errorMessage = "Please enable popups for this site and try again.";
       } else if (error.message?.includes('managing losses') || error.message?.includes('platform-profile')) {
         errorTitle = "Platform Setup Required";
         errorMessage = "Administrator needs to complete Stripe platform profile setup. Please contact support.";
