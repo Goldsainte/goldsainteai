@@ -10,7 +10,6 @@ export const WelcomeCard = ({ onDismiss }: WelcomeCardProps) => {
     <Card className="bg-muted/30 border-muted p-4 mb-3 animate-fade-in">
       <div className="space-y-3">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-2xl">👋</span>
           <h4 className="font-serif text-sm font-semibold text-foreground">
             Welcome to Goldsainte AI Concierge
           </h4>

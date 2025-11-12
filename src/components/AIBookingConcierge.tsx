@@ -1213,7 +1213,7 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-20 md:bottom-28 right-3 md:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+      className={`font-serif fixed bottom-20 md:bottom-28 right-3 md:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
         isMinimized ? 'w-[calc(100vw-1.5rem)] sm:w-80 md:w-80' : 'w-[calc(100vw-1.5rem)] sm:w-[calc(100vw-3rem)] md:w-96 max-w-md'
       } ${isMinimized ? 'h-16' : 'h-[65vh] sm:h-[70vh] md:h-[600px] max-h-[65vh] sm:max-h-[70vh] md:max-h-[600px]'}`}
     >
@@ -1549,11 +1549,11 @@ export const AIBookingConcierge = () => {
                 onClick={toggleVoiceMode}
                 size="icon"
                 variant={voiceMode ? "default" : "outline"}
-                className={`h-14 w-14 md:h-12 md:w-12 shrink-0 ${voiceMode ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
+                className={`h-11 w-11 sm:h-12 sm:w-12 md:h-11 md:w-11 shrink-0 min-h-[44px] min-w-[44px] ${voiceMode ? "bg-gradient-to-r from-green-500 to-green-600" : ""}`}
                 disabled={voiceStatus === 'connecting'}
                 title={voiceMode ? "End voice" : "Start voice"}
               >
-                {voiceMode ? <MicOff className="h-6 w-6 md:h-5 md:w-5" /> : <Mic className="h-6 w-6 md:h-5 md:w-5" />}
+                {voiceMode ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />}
               </Button>
               
               {/* Unmute button for autoplay block */}
