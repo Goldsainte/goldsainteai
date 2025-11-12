@@ -58,6 +58,7 @@ export const AIBookingConcierge = () => {
   const [showUnmute, setShowUnmute] = useState(false);
   const [showBgMusicPrompt, setShowBgMusicPrompt] = useState(false);
   const [showWelcomeCard, setShowWelcomeCard] = useState(true);
+  const [hasPlayedIntro, setHasPlayedIntro] = useState(false);
   const [preferences, setPreferences] = useState<ChatPreferences>(() => {
     const saved = localStorage.getItem('aiChatPreferences');
     return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
@@ -312,6 +313,9 @@ export const AIBookingConcierge = () => {
       role: 'assistant',
       content: `Hello! I'm ${agentName}. I can help you search for flights, hotels, rental cars, restaurants, events, and more. What are you looking for today?`
     }]);
+    
+    // Reset intro flag so it plays again if voice mode is reactivated
+    setHasPlayedIntro(false);
 
     toast({
       title: "Conversation Cleared",
@@ -866,9 +870,43 @@ export const AIBookingConcierge = () => {
         console.log('✅ Voice mode fully activated');
         console.log('📊 [TELEMETRY] voice_mode_activated', { timestamp: new Date().toISOString() });
         
+        // Play Madison's intro greeting once on first activation
+        if (!hasPlayedIntro && voiceChatRef.current?.dc?.readyState === 'open') {
+          console.log('🎙️ Playing Madison\'s intro greeting...');
+          setHasPlayedIntro(true);
+          
+          const madisonIntro = `Hi, I'm Madison — your Goldsainte travel concierge. Think of me as your friendly, well-connected travel insider. I can help you explore destinations, find the best flights and hotels, and even recommend great spots to eat, sip, or unwind. To get started, just say something like: "Find me a flight to Miami next weekend," or "Show me boutique hotels in Paris." Ready to plan something amazing?`;
+          
+          // Add intro text to chat
+          setMessages(prev => [...prev, { 
+            role: 'assistant', 
+            content: madisonIntro 
+          }]);
+          
+          // Send intro to voice session to be spoken
+          const introMessage = {
+            type: 'conversation.item.create',
+            item: {
+              type: 'message',
+              role: 'assistant',
+              content: [
+                {
+                  type: 'input_text',
+                  text: madisonIntro
+                }
+              ]
+            }
+          };
+          
+          voiceChatRef.current.dc.send(JSON.stringify(introMessage));
+          voiceChatRef.current.dc.send(JSON.stringify({ type: 'response.create' }));
+          
+          console.log('📊 [TELEMETRY] madison_intro_played', { timestamp: new Date().toISOString() });
+        }
+        
         toast({
           title: "Voice Mode Active",
-          description: "Speak naturally - the AI is listening",
+          description: "Speak naturally - Madison is listening",
         });
       } catch (error: any) {
         console.error('❌ Voice activation error:', error);
