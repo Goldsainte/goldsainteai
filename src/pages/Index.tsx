@@ -161,6 +161,7 @@ const Index = () => {
   const [usePreferences, setUsePreferences] = useState(true);
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   const rotatingMessages = [
     t('home.rotatingPlaceholders.hotels'),
@@ -852,23 +853,22 @@ const queries = {
                   </p>
                 </div>
 
-                {/* Main Search with rotating placeholder */}
+                {/* Main Search */}
                 <div className="w-full flex justify-center px-4" data-tour="ai-search">
                   <div
-                    className="relative"
-                    style={{ width: 'clamp(320px, 60vw, 960px)' }}
+                    className="relative w-full max-w-[700px]"
                   >
                     <label htmlFor="ai-search-input" className="sr-only">Search for travel experiences</label>
                     <Input
                       id="ai-search-input"
                       type="search"
-                      placeholder={rotatingMessages[currentMessageIndex]}
-                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-transparent sm:placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                      placeholder={isMobile ? "Search flights & hotels" : "Search flights and hotels with Goldsainte × Expedia"}
+                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyPress={handleKeyPress}
                       disabled={isLoading}
-                      aria-label="Search for travel experiences, hotels, flights, and more"
+                      aria-label="Search for flights and hotels"
                     />
                     <Button
                       onClick={() => handleSearch()}
