@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Calendar, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export const Hero = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
   const [checkIn, setCheckIn] = useState("");
@@ -33,11 +35,11 @@ export const Hero = () => {
 
       <div className="container relative z-10 mx-auto px-3 sm:px-4 md:px-6 py-12 sm:py-16 md:py-20">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight tracking-wide text-white drop-shadow-lg">
-            Where Luxury Meets Intelligence
+          <h1 className="font-secondary text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold mb-4 sm:mb-6 leading-tight tracking-wide text-primary drop-shadow-lg">
+            {t('home.hero.title')}
           </h1>
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 sm:mb-10 md:mb-12 text-white/95 max-w-2xl mx-auto font-light leading-relaxed">
-            AI-powered planning. Expert agents bidding for your business. Creator-curated journeys. Travel reimagined for the discerning explorer.
+            {t('home.hero.subtitle')}
           </p>
 
           <form 
