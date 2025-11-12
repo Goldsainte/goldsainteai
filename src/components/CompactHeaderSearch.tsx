@@ -500,7 +500,7 @@ const CompactHeaderSearch = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="relative rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur text-left justify-start text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44] focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] pl-3 sm:pl-4 pr-10 sm:pr-12 w-full max-w-[700px]"
+          className="relative rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur text-center justify-center text-gray-500 hover:bg-white/95 hover:border-[#C5B88A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0E4B44] focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] px-10 sm:px-12 w-full max-w-[700px]"
           aria-label="Search flights and hotels with Goldsainte and Expedia"
         >
           <span className="truncate text-[15px] lg:text-[16px] leading-none">
