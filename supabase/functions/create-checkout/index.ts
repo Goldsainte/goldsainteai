@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { checkRateLimit, createRateLimitResponse, getClientIdentifier } from "../_shared/rateLimiter.ts";
+import { Logger, generateRequestId } from "../_shared/logger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,12 +10,13 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-const logStep = (step: string, details?: any) => {
-  const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
-};
-
 serve(async (req) => {
+  const requestId = generateRequestId();
+  const logger = new Logger({ 
+    functionName: 'create-checkout',
+    requestId 
+  });
+
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -25,7 +27,7 @@ serve(async (req) => {
   );
 
   try {
-    logStep("Function started");
+    logger.info("Checkout session creation started");
 
     const authHeader = req.headers.get("Authorization")!;
     const token = authHeader.replace("Bearer ", "");
@@ -35,7 +37,9 @@ serve(async (req) => {
     if (!user?.email) {
       throw new Error("User not authenticated or email not available");
     }
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    
+    logger.setContext({ userId: user.id });
+    logger.info("User authenticated", { email: user.email });
 
     // Rate limit check: 5 requests per minute per user for payment endpoints
     const identifier = getClientIdentifier(req, user.id);
@@ -47,7 +51,7 @@ serve(async (req) => {
     });
 
     if (!rateLimitResult.allowed) {
-      logStep("Rate limit exceeded", { identifier, retryAfter: rateLimitResult.retryAfter });
+      logger.warn("Rate limit exceeded", { identifier, retryAfter: rateLimitResult.retryAfter });
       return createRateLimitResponse(rateLimitResult, corsHeaders);
     }
 
@@ -55,7 +59,7 @@ serve(async (req) => {
     if (!priceId) {
       throw new Error("Price ID is required");
     }
-    logStep("Request details", { priceId, subscriptionType, tier });
+    logger.info("Checkout request received", { priceId, subscriptionType, tier });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2024-06-20",
@@ -83,12 +87,12 @@ serve(async (req) => {
           .update({ stripe_customer_id: customerId })
           .eq('id', user.id);
         
-        logStep("Found and cached existing customer", { customerId });
+        logger.info("Found and cached existing Stripe customer", { customerId });
       } else {
-        logStep("No existing customer, will create at checkout");
+        logger.info("No existing customer, will create at checkout");
       }
     } else {
-      logStep("Using cached customer ID", { customerId });
+      logger.info("Using cached Stripe customer ID", { customerId });
     }
 
     const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
@@ -117,18 +121,33 @@ serve(async (req) => {
       }
     });
 
-    logStep("Checkout session created", { sessionId: session.id, url: session.url });
+    logger.info("Checkout session created successfully", { 
+      sessionId: session.id, 
+      customerId: session.customer 
+    });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logStep("ERROR in create-checkout", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
-    });
+    logger.error(
+      "Failed to create checkout session",
+      error instanceof Error ? error : new Error(String(error)),
+      { 
+        statusCode: error instanceof Error && error.message.includes("not authenticated") ? 401 : 500 
+      }
+    );
+    
+    return new Response(
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : "Internal server error",
+        requestId 
+      }), 
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: error instanceof Error && error.message.includes("not authenticated") ? 401 : 500,
+      }
+    );
   }
 });
