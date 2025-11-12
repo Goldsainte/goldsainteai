@@ -309,3 +309,6 @@ verify_jwt = false
 [functions.realtime-sdp-relay]
 verify_jwt = false
 
+[functions.amadeus-proxy]
+verify_jwt = false
+

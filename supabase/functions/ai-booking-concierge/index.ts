@@ -326,6 +326,42 @@ serve(async (req) => {
       {
         type: "function",
         function: {
+          name: "search_flights",
+          description: "Search for real flight options using Amadeus. Returns actual flights with prices, carriers, and times inline in chat.",
+          parameters: {
+            type: "object",
+            properties: {
+              origin: { type: "string", description: "Origin airport code (3-letter IATA)" },
+              destination: { type: "string", description: "Destination airport code (3-letter IATA)" },
+              depart_date: { type: "string", description: "Departure date YYYY-MM-DD" },
+              return_date: { type: "string", description: "Return date YYYY-MM-DD (optional for one-way)" },
+              adults: { type: "number", description: "Number of adult passengers", default: 1 },
+              cabin: { type: "string", enum: ["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"], description: "Cabin class", default: "ECONOMY" }
+            },
+            required: ["origin", "destination", "depart_date"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
+          name: "search_hotels",
+          description: "Search for real hotel options using Amadeus. Returns actual hotels with prices and details inline in chat.",
+          parameters: {
+            type: "object",
+            properties: {
+              city: { type: "string", description: "City code (3-letter IATA like MIA, NYC, LAX)" },
+              check_in: { type: "string", description: "Check-in date YYYY-MM-DD" },
+              check_out: { type: "string", description: "Check-out date YYYY-MM-DD" },
+              guests: { type: "number", description: "Number of guests", default: 1 }
+            },
+            required: ["city", "check_in", "check_out"]
+          }
+        }
+      },
+      {
+        type: "function",
+        function: {
           name: "search_restaurants",
           description: "Search for restaurants in a location. Returns restaurant recommendations with cuisine types, ratings, and availability.",
           parameters: {
@@ -1368,6 +1404,30 @@ Remember: You're an AI search concierge that helps find perfect travel options a
               suggested_cities: args.city ? [args.city] : ["Paris", "Tokyo", "London", "Dubai", "New York City"],
               suggested_cuisines: args.cuisine ? [args.cuisine] : ["French Fine Dining", "Japanese Kaiseki", "Italian Trattoria", "Steakhouse"]
             };
+          } else if (functionName === 'search_flights') {
+            // Call Amadeus proxy for flights
+            console.log('✈️ [AMADEUS] Calling flights proxy:', args);
+            const proxyResponse = await fetch(`${supabaseUrl}/functions/v1/amadeus-proxy`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ type: 'flights', ...args }),
+            });
+            result = await proxyResponse.json();
+          } else if (functionName === 'search_hotels') {
+            // Call Amadeus proxy for hotels
+            console.log('🏨 [AMADEUS] Calling hotels proxy:', args);
+            const proxyResponse = await fetch(`${supabaseUrl}/functions/v1/amadeus-proxy`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${supabaseKey}`,
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ type: 'hotels', ...args }),
+            });
+            result = await proxyResponse.json();
           } else if (!edgeFunctionName) {
             result = { error: `Unknown function: ${functionName}` };
           } else {

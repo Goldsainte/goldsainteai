@@ -29,6 +29,7 @@ import { VoiceDiagnosticsPanel } from "./VoiceDiagnosticsPanel";
 import { WelcomeCard } from "./concierge/WelcomeCard";
 import { VoiceStatusChip } from "./concierge/VoiceStatusChip";
 import { VoiceStatusMessage } from "./concierge/VoiceStatusMessage";
+import { ResultCards } from "./concierge/ResultCards";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
@@ -1140,6 +1141,15 @@ export const AIBookingConcierge = () => {
                   
                   {/* Display tool results */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
+                    // Handle Amadeus card results (flights & hotels from amadeus-proxy)
+                    if (result.data?.type === 'cards' && result.data?.cards) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8">
+                          <ResultCards section={result.data.section} cards={result.data.cards} />
+                        </div>
+                      );
+                    }
+                    
                     // Handle agent inquiry confirmation
                     if (result.success && result.inquiryId) {
                       return (
