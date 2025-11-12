@@ -833,8 +833,13 @@ const queries = {
         {!showChat ? (
           // Initial search view - ChatGPT style centered
           <div className="flex-1 flex flex-col">
-            {/* Centered Search Area */}
-            <div className="min-h-screen flex items-center justify-center px-4 py-8">
+            {/* Centered Search Area - Vertically centered accounting for bottom nav */}
+            <div 
+              className="flex flex-col justify-center items-center px-4 md:px-6 min-h-[100dvh] md:min-h-screen pb-20 md:pb-8" 
+              style={{ 
+                minHeight: 'calc(100dvh - var(--bottom-nav-height))'
+              }}
+            >
               <div className="w-full max-w-2xl space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Logo and Title */}
                 <div className="flex flex-col items-center justify-center space-y-4 md:space-y-3">

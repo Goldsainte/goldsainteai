@@ -27,6 +27,9 @@ body {
   --fs-h2: clamp(18px, 3vw, 28px);
   --fs-h3: clamp(16px, 2.4vw, 22px);
   --fs-h4: clamp(15px, 2vw, 19px);
+  
+  /* Mobile bottom navigation height */
+  --bottom-nav-height: 4rem; /* 64px */
 }
 
 body {
@@ -82,6 +85,18 @@ p {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
   border-radius: 4px;
+}
+
+/* Webkit-specific support for dynamic viewport height */
+@supports (-webkit-touch-callout: none) {
+  :root {
+    --dvh: calc(100vh - var(--bottom-nav-height));
+  }
+  
+  .min-h-\[100dvh\] {
+    min-height: var(--dvh);
+    min-height: -webkit-fill-available;
+  }
 }
 
 /* Touch-friendly minimum sizes */
