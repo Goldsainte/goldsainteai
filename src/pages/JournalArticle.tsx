@@ -59,7 +59,7 @@ export default function JournalArticle() {
     try {
       // Fetch article
       const { data: articleData, error: articleError } = await supabase
-        .from("journal_articles")
+        .from("journal_articles" as any)
         .select(`
           id,
           title,
@@ -83,30 +83,30 @@ export default function JournalArticle() {
       if (articleError) throw articleError;
 
       // Transform creator data
-      const transformedArticle = {
-        ...articleData,
-        creator: Array.isArray(articleData.creator)
-          ? articleData.creator[0]
-          : articleData.creator,
+      const transformedArticle: any = {
+        ...(articleData as any),
+        creator: Array.isArray((articleData as any).creator)
+          ? (articleData as any).creator[0]
+          : (articleData as any).creator,
       };
 
       setArticle(transformedArticle);
 
       // Fetch article blocks
       const { data: blocksData, error: blocksError } = await supabase
-        .from("journal_article_blocks")
+        .from("journal_article_blocks" as any)
         .select("*")
-        .eq("article_id", articleData.id)
+        .eq("article_id", (articleData as any).id)
         .order("block_order", { ascending: true });
 
       if (blocksError) throw blocksError;
 
-      setBlocks(blocksData || []);
+      setBlocks((blocksData as any) || []);
 
       // Fetch related articles (by shared categories)
-      if (articleData.categories && articleData.categories.length > 0) {
+      if ((articleData as any).categories && (articleData as any).categories.length > 0) {
         const { data: relatedData } = await supabase
-          .from("journal_articles")
+          .from("journal_articles" as any)
           .select(
             `
             id,
@@ -122,8 +122,8 @@ export default function JournalArticle() {
           `
           )
           .eq("status", "published")
-          .neq("id", articleData.id)
-          .contains("categories", articleData.categories)
+          .neq("id", (articleData as any).id)
+          .contains("categories", (articleData as any).categories)
           .limit(6);
 
         if (relatedData) {
@@ -138,11 +138,11 @@ export default function JournalArticle() {
       }
 
       // Track view (analytics)
-      await supabase.from("journal_analytics").insert({
-        article_id: articleData.id,
+      await supabase.from("journal_analytics" as any).insert({
+        article_id: (articleData as any).id,
         session_id: crypto.randomUUID(),
         referrer: document.referrer,
-      });
+      } as any);
     } catch (error) {
       console.error("Error fetching article:", error);
     } finally {

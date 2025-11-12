@@ -32,7 +32,7 @@ export default function JournalListing() {
   const fetchArticles = async () => {
     try {
       const { data, error } = await supabase
-        .from("journal_articles")
+        .from("journal_articles" as any)
         .select(`
           id,
           title,
