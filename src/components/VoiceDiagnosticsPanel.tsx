@@ -25,6 +25,21 @@ interface VoiceDiagnosticsPanelProps {
   voiceChatRef: any;
   wakeWordDetectorRef: any;
   holdMusicRef: any;
+  metrics?: {
+    micPermission: PermissionState | 'unknown';
+    micStreamActive: boolean;
+    audioContextState: AudioContextState | 'suspended' | 'running' | 'closed';
+    sampleRate: number;
+    channels: number;
+    bufferSize: number;
+    rms: number;
+    peak: number;
+    score: number;
+    maxScore: number;
+    threshold: number;
+    droppedFrames: number;
+    stateMachine?: string;
+  };
 }
 
 export const VoiceDiagnosticsPanel = ({ 

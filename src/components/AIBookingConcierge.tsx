@@ -69,6 +69,26 @@ export const AIBookingConcierge = () => {
   const voiceChatRef = useRef<RealtimeVoiceChat | null>(null);
   const wakeWordDetectorRef = useRef<WakeWordDetector | null>(null);
   const holdMusicRef = useRef<HoldMusicGenerator | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const workletNodeRef = useRef<AudioWorkletNode | null>(null);
+  const [wakeWordPrimed, setWakeWordPrimed] = useState(false);
+  const [diagMetrics, setDiagMetrics] = useState({
+    micPermission: 'unknown' as PermissionState | 'unknown',
+    micStreamActive: false,
+    audioContextState: 'suspended' as AudioContextState,
+    sampleRate: 0,
+    channels: 1,
+    bufferSize: 0,
+    rms: 0,
+    peak: 0,
+    score: 0,
+    maxScore: 0,
+    threshold: 0.5,
+    droppedFrames: 0,
+    stateMachine: 'idle',
+  });
   const { toast } = useToast();
   const { user } = useAuth();
   const { language } = useLanguage();
@@ -695,8 +715,13 @@ export const AIBookingConcierge = () => {
     }
   };
 
-  const startWakeWordDetection = async () => {
+  const startWakeWordDetection = async (fromEnable?: boolean) => {
     try {
+      if (!wakeWordPrimed && !fromEnable) {
+        console.log('⚠️ [WAKE_WORD] Not primed. Ask user to enable wake word first.');
+        toast({ title: 'Enable Wake Word', description: 'Click “Enable Wake Word” to allow the assistant to listen in the background.' });
+        return;
+      }
       // Check if SpeechRecognition is available (not on iOS Safari)
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (!SpeechRecognition) {
@@ -759,6 +784,101 @@ export const AIBookingConcierge = () => {
         description: errorMessage,
         variant: "destructive",
       });
+    }
+  };
+
+  // One-time user gesture to enable wake word pipeline
+  const enableWakeWordPipeline = async () => {
+    try {
+      console.log('🎤 [ENABLE_WAKE] Initializing mic + AudioContext + Worklet');
+
+      // 1) Request mic with browser DSP disabled
+      let permission: PermissionState | 'unknown' = 'unknown';
+      try {
+        const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName });
+        permission = perm.state;
+      } catch {}
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 1,
+        }
+      });
+      micStreamRef.current = stream;
+
+      // 2) AudioContext
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioContext({ sampleRate: 24000 });
+      }
+      if (audioCtxRef.current.state !== 'running') {
+        await audioCtxRef.current.resume();
+      }
+
+      // Keep context alive on tab visibility changes
+      const resumeOnVisible = async () => {
+        if (document.visibilityState === 'visible' && audioCtxRef.current?.state === 'suspended') {
+          console.log('🔄 [ENABLE_WAKE] Resuming AudioContext after visibilitychange');
+          await audioCtxRef.current.resume();
+        }
+      };
+      document.addEventListener('visibilitychange', resumeOnVisible);
+
+      // 3) Build graph: MediaStreamSource -> (Analyser) -> Worklet
+      const ctx = audioCtxRef.current!;
+      const source = ctx.createMediaStreamSource(stream);
+      analyserRef.current = ctx.createAnalyser();
+      analyserRef.current.fftSize = 2048;
+      source.connect(analyserRef.current);
+
+      await ctx.audioWorklet.addModule('/worklets/kws-processor.js');
+      workletNodeRef.current = new AudioWorkletNode(ctx, 'kws-processor', {
+        processorOptions: { sampleRate: ctx.sampleRate }
+      });
+      source.connect(workletNodeRef.current);
+      workletNodeRef.current.port.onmessage = (e: MessageEvent) => {
+        const data = e.data || {};
+        if (data.type === 'metrics') {
+          setDiagMetrics(prev => ({
+            ...prev,
+            rms: data.rms,
+            peak: data.peak,
+            score: data.score,
+            maxScore: data.maxScore,
+            threshold: data.threshold,
+            droppedFrames: data.droppedFrames,
+            bufferSize: data.bufferSize,
+            sampleRate: data.sampleRate,
+            micStreamActive: true,
+            audioContextState: ctx.state
+          }));
+        }
+      };
+
+      setDiagMetrics(prev => ({
+        ...prev,
+        micPermission: permission,
+        micStreamActive: true,
+        audioContextState: audioCtxRef.current?.state || 'running',
+        sampleRate: audioCtxRef.current?.sampleRate || 0,
+        channels: 1,
+      }));
+
+      setWakeWordPrimed(true);
+      setWakeWordActive(true);
+
+      // Kick off speech-based wake detector (browser API)
+      await startWakeWordDetection(true);
+
+      toast({
+        title: 'Wake Word Enabled',
+        description: 'Say “Hey Goldsainte” to start voice mode',
+      });
+    } catch (e: any) {
+      console.error('❌ [ENABLE_WAKE] Failed to enable wake word pipeline', e);
+      toast({ title: 'Wake Word Error', description: e?.message || 'Failed to enable wake word', variant: 'destructive' });
     }
   };
 
