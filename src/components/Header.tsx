@@ -27,6 +27,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { NotificationInbox } from "@/components/NotificationInbox";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -225,6 +226,8 @@ export const Header = () => {
                 </a>
                 
                 <div className="flex items-center gap-2">
+                  {user && <NotificationInbox />}
+                  
                   {/* Mobile Navigation Menu */}
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
