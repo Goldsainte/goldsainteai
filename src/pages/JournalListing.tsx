@@ -86,7 +86,7 @@ export default function JournalListing() {
       filtered = filtered.filter(
         (article) =>
           article.title.toLowerCase().includes(locationLower) ||
-          article.dek.toLowerCase().includes(locationLower)
+          (article.dek || '').toLowerCase().includes(locationLower)
       );
     }
 
@@ -96,7 +96,7 @@ export default function JournalListing() {
       filtered = filtered.filter(
         (article) =>
           article.title.toLowerCase().includes(searchLower) ||
-          article.dek.toLowerCase().includes(searchLower)
+          (article.dek || '').toLowerCase().includes(searchLower)
       );
     }
 

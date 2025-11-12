@@ -56,26 +56,55 @@ export function useArticleAnalytics({ articleId }: AnalyticsParams) {
 
     trackView();
 
-    // Track scroll depth
+    // Track scroll depth with throttling
+    let ticking = false;
     const handleScroll = () => {
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const scrollTop = window.scrollY;
-      
-      // Prevent NaN on short pages
-      const denom = Math.max(1, documentHeight - windowHeight);
-      const scrollPercent = Math.round((scrollTop / denom) * 100);
-      
-      if (scrollPercent > scrollDepthRef.current) {
-        scrollDepthRef.current = Math.min(scrollPercent, 100);
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          const windowHeight = window.innerHeight;
+          const documentHeight = document.documentElement.scrollHeight;
+          const scrollTop = window.scrollY;
+          
+          // Prevent NaN on short pages
+          const denom = Math.max(1, documentHeight - windowHeight);
+          const scrollPercent = Math.round((scrollTop / denom) * 100);
+          
+          if (scrollPercent > scrollDepthRef.current) {
+            scrollDepthRef.current = Math.min(scrollPercent, 100);
+          }
+          
+          ticking = false;
+        });
       }
     };
 
     window.addEventListener("scroll", handleScroll);
+    
+    // Flush analytics on tab close/background
+    const flush = () => {
+      const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
+      supabase.from("journal_analytics" as any)
+        .update({
+          view_duration_seconds: duration,
+          scroll_depth_percent: scrollDepthRef.current,
+        } as any)
+        .eq('id', rowIdRef.current || '')
+        .then(() => void 0)
+        .catch(() => void 0);
+    };
+
+    const onPageHide = () => flush();
+    const onBeforeUnload = () => flush();
+
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('beforeunload', onBeforeUnload);
 
     // Track time spent and scroll depth on unmount
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('pagehide', onPageHide);
+      window.removeEventListener('beforeunload', onBeforeUnload);
       
       const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
       

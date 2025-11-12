@@ -114,21 +114,56 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
         );
 
       case "embed": {
-        const embedHtml = block.content.html || "";
-        const allowedProviders = [
-          "youtube.com",
-          "youtu.be",
-          "vimeo.com",
-          "instagram.com",
-          "twitter.com",
-          "x.com",
-        ];
+        const url = (block.content.url || '').trim();
         
-        const isAllowed = allowedProviders.some((provider) =>
-          embedHtml.toLowerCase().includes(provider)
-        );
-
-        if (!isAllowed && embedHtml.trim()) {
+        try {
+          const u = new URL(url);
+          const host = u.hostname.replace(/^www\./, '');
+          
+          // YouTube
+          if (host === 'youtu.be' || host === 'youtube.com') {
+            const id = host === 'youtu.be' 
+              ? u.pathname.slice(1)
+              : new URLSearchParams(u.search).get('v') || '';
+            if (!id) throw new Error('no id');
+            
+            return (
+              <div key={block.id} className="my-12">
+                <iframe
+                  className="aspect-video w-full rounded-xl"
+                  src={`https://www.youtube.com/embed/${id}`}
+                  title="YouTube video"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            );
+          }
+          
+          // Vimeo
+          if (host === 'vimeo.com') {
+            const id = u.pathname.split('/')[1];
+            if (!id) throw new Error('no id');
+            
+            return (
+              <div key={block.id} className="my-12">
+                <iframe
+                  className="aspect-video w-full rounded-xl"
+                  src={`https://player.vimeo.com/video/${id}`}
+                  title="Vimeo video"
+                  loading="lazy"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            );
+          }
+          
+          // Block untrusted sources
+          throw new Error('unsupported provider');
+        } catch {
           return (
             <div
               key={block.id}
@@ -140,15 +175,6 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
             </div>
           );
         }
-
-        return (
-          <div key={block.id} className="my-12">
-            <div
-              className="aspect-video rounded-xl overflow-hidden"
-              dangerouslySetInnerHTML={{ __html: embedHtml }}
-            />
-          </div>
-        );
       }
 
       case "cta":

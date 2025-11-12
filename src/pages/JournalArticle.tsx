@@ -157,13 +157,6 @@ export default function JournalArticle() {
           setRelatedArticles(transformedRelated);
         }
       }
-
-      // Track view (analytics)
-      await supabase.from("journal_analytics" as any).insert({
-        article_id: (articleData as any).id,
-        session_id: crypto.randomUUID(),
-        referrer: document.referrer,
-      } as any);
     } catch (error) {
       console.error("Error fetching article:", error);
     } finally {
@@ -274,7 +267,7 @@ export default function JournalArticle() {
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  {article.read_time_minutes || 5} min read
+                  {article.read_time_minutes ?? 5} min read
                 </span>
               </div>
             </div>
