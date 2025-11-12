@@ -19,8 +19,9 @@ export const DestinationCard = ({
 
   return (
     <Card 
-      className="rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
+      className="js-open-expedia rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition-all duration-300 group"
       onClick={() => openExpediaModal({ destination })}
+      data-destination={destination}
     >
       <div className="relative h-40">
         <img
