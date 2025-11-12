@@ -855,15 +855,37 @@ const queries = {
 
                 {/* Main Search */}
                 <div className="w-full flex justify-center px-4" data-tour="ai-search">
-                  <div
-                    className="relative w-full max-w-[700px]"
-                  >
+                  <div className="relative w-full max-w-[700px]">
                     <label htmlFor="ai-search-input" className="sr-only">Search for travel experiences</label>
+                    
+                    {/* Custom rotating placeholder with cross-fade */}
+                    {!searchQuery && (
+                      <div 
+                        className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none overflow-hidden min-w-0 pr-16 sm:pr-20"
+                        style={{ maxWidth: 'calc(100% - 5rem)' }}
+                      >
+                        <div className="relative h-6">
+                          {rotatingMessages.map((message, index) => (
+                            <span
+                              key={index}
+                              className={`absolute inset-0 truncate transition-opacity duration-400 text-gray-500`}
+                              style={{
+                                fontSize: 'clamp(14px, 1.1vw, 16px)',
+                                opacity: currentMessageIndex === index ? 1 : 0,
+                              }}
+                            >
+                              {message}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
                     <Input
                       id="ai-search-input"
                       type="search"
-                      placeholder={rotatingMessages[currentMessageIndex]}
-                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] placeholder:text-transparent sm:placeholder:text-gray-500 text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                      placeholder=""
+                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyPress={handleKeyPress}
