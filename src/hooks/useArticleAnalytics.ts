@@ -82,16 +82,18 @@ export function useArticleAnalytics({ articleId }: AnalyticsParams) {
     window.addEventListener("scroll", handleScroll);
     
     // Flush analytics on tab close/background
-    const flush = () => {
+    const flush = async () => {
       const duration = Math.round((Date.now() - startTimeRef.current) / 1000);
-      supabase.from("journal_analytics" as any)
-        .update({
-          view_duration_seconds: duration,
-          scroll_depth_percent: scrollDepthRef.current,
-        } as any)
-        .eq('id', rowIdRef.current || '')
-        .then(() => void 0)
-        .catch(() => void 0);
+      try {
+        await supabase.from("journal_analytics" as any)
+          .update({
+            view_duration_seconds: duration,
+            scroll_depth_percent: scrollDepthRef.current,
+          } as any)
+          .eq('id', rowIdRef.current || '');
+      } catch (error) {
+        // Silently fail - analytics shouldn't break UX
+      }
     };
 
     const onPageHide = () => flush();

@@ -2,9 +2,10 @@ import { Helmet } from "react-helmet-async";
 
 interface ArticleSEOProps {
   title: string;
-  dek: string;
-  heroImageUrl: string;
+  description: string;
+  imageUrl: string;
   publishDate: string;
+  modifiedDate?: string;
   authorName: string;
   slug: string;
   categories?: string[];
@@ -13,9 +14,10 @@ interface ArticleSEOProps {
 
 export function ArticleSEO({
   title,
-  dek,
-  heroImageUrl,
+  description,
+  imageUrl,
   publishDate,
+  modifiedDate,
   authorName,
   slug,
   categories = [],
@@ -29,10 +31,10 @@ export function ArticleSEO({
     "@context": "https://schema.org",
     "@type": "Article",
     headline: title,
-    description: dek,
-    image: heroImageUrl,
+    description: description,
+    image: imageUrl,
     datePublished: publishDate,
-    dateModified: publishDate,
+    dateModified: modifiedDate || publishDate,
     author: {
       "@type": "Person",
       name: authorName,
@@ -57,14 +59,14 @@ export function ArticleSEO({
     <Helmet>
       {/* Basic Meta Tags */}
       <title>{title} | Goldsainte Journal</title>
-      <meta name="description" content={dek} />
+      <meta name="description" content={description} />
       <link rel="canonical" href={canonicalUrl} />
 
       {/* OpenGraph Tags */}
       <meta property="og:type" content="article" />
       <meta property="og:title" content={title} />
-      <meta property="og:description" content={dek} />
-      <meta property="og:image" content={heroImageUrl} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={imageUrl} />
       <meta property="og:url" content={fullUrl} />
       <meta property="og:site_name" content="Goldsainte Journal" />
       <meta property="article:published_time" content={publishDate} />
@@ -76,8 +78,8 @@ export function ArticleSEO({
       {/* Twitter Card Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={dek} />
-      <meta name="twitter:image" content={heroImageUrl} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={imageUrl} />
       <meta name="twitter:site" content="@goldsainte" />
       <meta name="twitter:creator" content="@goldsainte" />
 
