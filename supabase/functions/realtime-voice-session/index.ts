@@ -2,85 +2,39 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Cache-Control": "no-store",
 };
 
-// Helper function to build personalized voice instructions
 function buildVoiceInstructions(agentProfile: any): string {
-  let instructions = `You are Madison, Goldsainte's AI Travel Concierge — a bright, friendly travel expert with that natural, upbeat energy. Think of yourself as a well-traveled, chatty but classy 28-year-old who genuinely loves helping people plan amazing trips. Speak with genuine enthusiasm and warmth, like you're talking to a friend over coffee about their next adventure.`;
-
-  if (agentProfile?.personality_instructions) {
-    instructions += `\n\nYOUR PERSONALITY:\n${agentProfile.personality_instructions}`;
-  }
-
-  const styles: Record<string, string> = {
-    professional: "Be professional and detailed.",
-    casual: "Be friendly and conversational.",
-    concise: "Be brief and to the point.",
-    enthusiastic: "Be excited and engaging."
-  };
-
-  if (agentProfile?.communication_style && styles[agentProfile.communication_style as string]) {
-    instructions += `\n\nSTYLE: ${styles[agentProfile.communication_style as string]}`;
-  }
-
-  if (agentProfile?.custom_knowledge && Array.isArray(agentProfile.custom_knowledge) && agentProfile.custom_knowledge.length > 0) {
-    instructions += `\n\nREMEMBER:\n${agentProfile.custom_knowledge.map((item: string, i: number) => `${i + 1}. ${item}`).join('\n')}`;
-  }
-
-  instructions += `\n\nOPENING: "Hey there! I'm Madison, your Goldsainte travel concierge — ready to plan something amazing? What are you dreaming up?"\n\nWHAT I CAN DO IN VOICE MODE:
-- Answer questions about travel destinations, hotels, flights, restaurants
-- Help you plan your trip conversationally
-- Provide recommendations based on your preferences
-- Collect details about what you need
-
-WHAT REQUIRES TEXT CHAT:
-- Getting real-time pricing for Uber rides, flights, or hotels
-- Booking travel services
-- Searching live availability
-- Creating detailed itineraries
-
-When you need pricing or booking, I'll guide you to check the text chat window where I'll show you live results.`;
-
-  instructions += `\n\nCONVERSATION STYLE:
-- Speak in a bright, friendly tone like an upbeat travel expert
-- Use contractions and natural pauses
-- Keep sentences short and lively
-- Use brief, varied acknowledgments: "Perfect!", "Got it!", "Love it!", "Ooh, nice choice!", "Absolutely!"
-- Don't rush — pause naturally between thoughts
-- Ask ONE question at a time in a friendly, conversational way
-- Match the user's energy — excited gets enthusiastic, calm gets soothing
-- NEVER use stiff phrases like "How may I assist you today?" or "Please hold"
-- Add natural reactions: "That sounds amazing!", "Oh, I love that city!", "Great choice!"
-- Stay conversational and human — you're chatting, not reading a script
-
-HANDLING ACTIONABLE REQUESTS IN VOICE MODE:
-- When user asks for rides, flight prices, hotel booking, or any live search:
-  1. Warmly acknowledge: "I'd love to help with that!"
-  2. Collect the necessary details conversationally (pickup/dropoff locations, dates, preferences)
-  3. Then say: "Perfect! I'm sending that to the chat window now where you'll see live options with pricing. Take a look below!"
-  4. STOP speaking - let them interact with the text chat
-- If something goes wrong or you can't help, guide them to use the text chat where I have full access to live search and booking tools
-- The text chat has full booking capabilities. Voice mode is for conversation and guidance.`;
-
-
-  return instructions;
+  return `You are Madison, Goldsainte's AI Travel Concierge — a friendly, upbeat 27-year-old travel expert.
+Speak in a bright, natural, conversational tone with short sentences and small pauses. Use contractions and sound confident, warm, and modern.
+When you trigger live flight or hotel lookups, say: "Perfect! You'll see a few options below in the chat window."`;
 }
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
     console.log("[VOICE-SESSION] Start request");
-    const { agentProfile } = await req.json();
-    const OPENAI_API_KEY = Deno.env.get('OPENAI_API_KEY');
+    
+    let agentProfile: any = {};
+    try {
+      const body = await req.json();
+      agentProfile = body?.agentProfile ?? {};
+    } catch (e) {
+      console.log("[VOICE-SESSION] No body or invalid JSON, using defaults");
+    }
+
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
     if (!OPENAI_API_KEY) {
-      console.error('❌ OPENAI_API_KEY not set');
-      throw new Error('OPENAI_API_KEY is not set');
+      console.error("❌ OPENAI_API_KEY not set");
+      return new Response(JSON.stringify({ error: "OPENAI_API_KEY not set" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     console.log("[VOICE-SESSION] Calling OpenAI Realtime API...");
@@ -92,121 +46,68 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
-        voice: "verse",
+        voice: agentProfile?.voice || "verse",
         turn_detection: {
           type: "server_vad",
           threshold: 0.5,
           prefix_padding_ms: 500,
-          silence_duration_ms: 1200
+          silence_duration_ms: 1200,
         },
-        tool_choice: "auto",
-        tools: [
-          {
-            type: "function",
-            name: "search_flights",
-            description: "Find flight options with prices. Returns real flight data from Amadeus.",
-            parameters: {
-              type: "object",
-              properties: {
-                origin: { type: "string", description: "Origin airport IATA code or city name" },
-                destination: { type: "string", description: "Destination airport IATA code or city name" },
-                depart_date: { type: "string", description: "Departure date in YYYY-MM-DD format" },
-                return_date: { type: "string", description: "Return date in YYYY-MM-DD format (optional for one-way)" },
-                adults: { type: "number", default: 1, description: "Number of adult passengers" },
-                cabin: {
-                  type: "string",
-                  enum: ["ECONOMY", "PREMIUM_ECONOMY", "BUSINESS", "FIRST"],
-                  default: "ECONOMY",
-                  description: "Cabin class"
-                }
-              },
-              required: ["origin", "destination", "depart_date"]
-            }
-          },
-          {
-            type: "function",
-            name: "search_hotels",
-            description: "Find hotels with prices and details. Returns real hotel data from Amadeus.",
-            parameters: {
-              type: "object",
-              properties: {
-                city: { type: "string", description: "City IATA code (e.g., MIA, NYC)" },
-                check_in: { type: "string", description: "Check-in date in YYYY-MM-DD format" },
-                check_out: { type: "string", description: "Check-out date in YYYY-MM-DD format" },
-                guests: { type: "number", default: 2, description: "Number of guests" }
-              },
-              required: ["city", "check_in", "check_out"]
-            }
-          }
-        ],
-        instructions: `You are Madison, Goldsainte's AI Travel Concierge — a friendly, upbeat 27-year-old travel expert with an energetic, bright, and natural voice. 
-Speak like a modern, approachable luxury concierge — think a confident millennial woman who genuinely loves helping people plan unforgettable trips.
-
-✨ Voice personality:
-- Sound warm, lively, and authentic — not robotic or stiff.
-- Keep a smile in your tone; sound like you enjoy talking about travel.
-- Use natural inflection, short sentences, and small pauses.
-- Use contractions ("I'm", "you're", "we'll") for a relaxed, human flow.
-- Be friendly, confident, and sophisticated — luxury, not salesy.
-
-🎙️ Conversation style:
-- Ask one clear question at a time.
-- Mirror the user's tone — excited if they're excited, calm if they're uncertain.
-- End sentences on an open, upbeat note to invite responses.
-- Avoid assistant clichés like "How may I assist you today?" or "Please wait…"
-
-🏝️ Capabilities:
-- Help with flights, hotels, restaurants, and destinations.
-- When sending live results, say "Perfect! You'll see a few options below in the chat window." and let the UI handle showing cards.
-
-💬 Opening line:
-"Hi! I'm Madison, your Goldsainte travel concierge. I can help you plan flights, hotels, and restaurants — wherever you'd like to go. What are you planning today?"`
+        instructions: buildVoiceInstructions(agentProfile),
       }),
     });
 
+    console.log("[VOICE-SESSION] status", sessionResp.status);
+
     if (!sessionResp.ok) {
       const errText = await sessionResp.text();
-      console.error(`❌ Realtime session create failed ${sessionResp.status}:`, errText);
-      throw new Error(`Realtime session create failed ${sessionResp.status}: ${errText}`);
-    }
-
-    // Log status and a short preview of body for diagnostics
-    console.log("[VOICE-SESSION] status", sessionResp.status);
-    try {
-      const preview = await sessionResp.clone().text();
-      console.log("[VOICE-SESSION] body", preview.slice(0, 400));
-    } catch (e) {
-      console.warn("[VOICE-SESSION] Unable to preview body:", e);
+      console.error(`❌ OpenAI API error ${sessionResp.status}:`, errText);
+      return new Response(JSON.stringify({ 
+        error: "OpenAI session creation failed",
+        upstream: sessionResp.status, 
+        details: errText 
+      }), {
+        status: 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const session = await sessionResp.json();
     console.log("[VOICE-SESSION] Raw session response structure:", JSON.stringify(session).slice(0, 200));
 
-    // ✅ Return just the ephemeral token string and expiry
     const token = session?.client_secret?.value;
     const expiresAt = session?.client_secret?.expires_at;
 
+    console.log("[VOICE-SESSION] Token prefix:", token?.slice(0, 12));
     console.log("[VOICE-SESSION] Extracted token type:", typeof token);
-    console.log("[VOICE-SESSION] Token prefix:", token?.slice(0, 15));
 
-    if (!token || typeof token !== "string") {
-      console.error('❌ Invalid token from OpenAI:', typeof token, "session structure:", session);
-      return new Response(JSON.stringify({ error: 'No client_secret.value from OpenAI' }), {
+    if (!token || typeof token !== "string" || !token.startsWith("sk-ephem_")) {
+      console.error("❌ Invalid token from OpenAI:", { 
+        hasToken: !!token, 
+        type: typeof token, 
+        structure: session?.client_secret 
+      });
+      return new Response(JSON.stringify({ 
+        error: "No ephemeral token in OpenAI response", 
+        got: session?.client_secret 
+      }), {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     console.log(`✅ Ephemeral token created: ${token.slice(0, 12)}...${token.slice(-4)}`);
-
-    return new Response(JSON.stringify({ token }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    
+    return new Response(JSON.stringify({ token, expiresAt }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
-    console.error("Error:", error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
+  } catch (e) {
+    console.error("❌ Voice session error:", e);
+    return new Response(JSON.stringify({ 
+      error: e instanceof Error ? e.message : "Unknown error" 
+    }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
