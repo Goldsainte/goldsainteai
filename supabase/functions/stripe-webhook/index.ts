@@ -8,7 +8,9 @@ const PRODUCT_TIER_MAP: Record<string, string> = {
   'prod_TNOpkzmfNXljRz': 'enterprise' 
 };
 
-const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
+const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+  apiVersion: "2024-06-20",
+});
 
 const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 

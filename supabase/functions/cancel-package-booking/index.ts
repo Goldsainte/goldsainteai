@@ -82,7 +82,7 @@ serve(async (req) => {
     const refundAmount = (refundableAmount * refundPercentage) / 100;
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2024-06-20',
+      apiVersion: "2024-06-20",
     });
 
     // Get paid installments to refund

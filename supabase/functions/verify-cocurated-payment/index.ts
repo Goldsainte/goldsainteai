@@ -16,7 +16,7 @@ serve(async (req) => {
     const { sessionId } = await req.json();
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2024-06-20',
+      apiVersion: "2024-06-20",
     });
 
     const session = await stripe.checkout.sessions.retrieve(sessionId);

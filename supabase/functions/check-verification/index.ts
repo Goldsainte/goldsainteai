@@ -24,7 +24,9 @@ serve(async (req) => {
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
 
-  const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "");
+  const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+    apiVersion: "2024-06-20",
+  });
 
     // Check for existing customer
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
