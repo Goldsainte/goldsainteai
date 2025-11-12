@@ -1170,7 +1170,7 @@ export const AIBookingConcierge = () => {
                 {wakeWordActive && (
                   <Badge 
                     variant="secondary" 
-                    className="absolute -top-8 right-0 text-xs whitespace-nowrap animate-pulse"
+                    className="hidden md:flex absolute -top-8 right-0 text-xs whitespace-nowrap animate-pulse"
                   >
                     <Radio className="w-3 h-3 mr-1" />
                     Listening for "Hey Goldsainte"
