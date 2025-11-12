@@ -115,7 +115,8 @@ serve(async (req) => {
 
       // Send email notification if tier changed
       if (oldTier !== tier && oldTier !== 'free') {
-        const emailType = tier > oldTier ? 'upgrade' : 'downgrade';
+        const tierOrder = ['free', 'premium', 'enterprise'];
+        const emailType = tierOrder.indexOf(tier) > tierOrder.indexOf(oldTier) ? 'upgrade' : 'downgrade';
         logStep("Tier change detected, sending email", { oldTier, newTier: tier, emailType });
         
         await supabaseClient.functions.invoke('send-subscription-email', {

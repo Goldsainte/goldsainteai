@@ -106,8 +106,14 @@ export default function Subscription() {
 
       setUser(authUser);
 
+      // Get access token for auth
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+
       // Check subscription status from Stripe
-      const { data: subData, error: subError } = await supabase.functions.invoke('check-subscription');
+      const { data: subData, error: subError } = await supabase.functions.invoke('check-subscription', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       
       if (subError) {
         console.error('Error checking subscription:', subError);
