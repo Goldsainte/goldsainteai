@@ -37,7 +37,10 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
     
     const container = containerRef.current;
     if (container) {
-      container.innerHTML = '';
+      // SECURITY: Safe - clear container without innerHTML
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
     }
     
     console.log('🧹 Expedia widget destroyed');
@@ -65,23 +68,34 @@ export const ExpediaWidgetCard = ({ payload }: ExpediaWidgetCardProps) => {
 
     console.log('🎯 Initializing inline Expedia widget with payload:', payload);
 
-    // Create widget container
-    container.innerHTML = `
-      <div class="eg-widget" 
-        data-widget="search" 
-        data-program="us-expedia" 
-        data-lobs="stays,flights"
-        data-network="pz"
-        data-camref="1101l5ujJR"
-        data-pubref="goldsainte ai inline"
-        data-theme="light"
-        ${payload.destination ? `data-destination="${payload.destination}"` : ''}
-        ${payload.checkIn ? `data-checkin="${payload.checkIn}"` : ''}
-        ${payload.checkOut ? `data-checkout="${payload.checkOut}"` : ''}
-        ${payload.adults ? `data-adults="${payload.adults}"` : ''}
-        style="width: 100%; min-height: 480px;">
-      </div>
-    `;
+    // SECURITY: Create widget container using DOM methods (not innerHTML)
+    const widgetDiv = document.createElement('div');
+    widgetDiv.className = 'eg-widget';
+    widgetDiv.setAttribute('data-widget', 'search');
+    widgetDiv.setAttribute('data-program', 'us-expedia');
+    widgetDiv.setAttribute('data-lobs', 'stays,flights');
+    widgetDiv.setAttribute('data-network', 'pz');
+    widgetDiv.setAttribute('data-camref', '1101l5ujJR');
+    widgetDiv.setAttribute('data-pubref', 'goldsainte ai inline');
+    widgetDiv.setAttribute('data-theme', 'light');
+    widgetDiv.style.width = '100%';
+    widgetDiv.style.minHeight = '480px';
+    
+    // Set optional attributes based on payload
+    if (payload.destination) {
+      widgetDiv.setAttribute('data-destination', payload.destination);
+    }
+    if (payload.checkIn) {
+      widgetDiv.setAttribute('data-checkin', payload.checkIn);
+    }
+    if (payload.checkOut) {
+      widgetDiv.setAttribute('data-checkout', payload.checkOut);
+    }
+    if (payload.adults) {
+      widgetDiv.setAttribute('data-adults', String(payload.adults));
+    }
+    
+    container.appendChild(widgetDiv);
 
     // Load Expedia script if not already loaded
     const scriptId = 'expedia-widget-script';

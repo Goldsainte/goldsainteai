@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .then(({ data: { session }, error }) => {
         if (error) {
           console.error('Auth session error:', error);
-          // Clear corrupted auth data
-          localStorage.removeItem('supabase.auth.token');
+          // SECURITY: Supabase manages auth tokens securely in httpOnly cookies
+          // Never manually store auth tokens in localStorage
           setSession(null);
           setUser(null);
         } else {
@@ -53,8 +53,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       })
       .catch((error) => {
         console.error('Fatal auth error:', error);
-        // Clear all auth data on fatal error
-        localStorage.clear();
+        // SECURITY: Clear UI preferences only, not auth tokens (handled by Supabase)
+        // Preserve non-sensitive localStorage like language, theme, tour state
         setSession(null);
         setUser(null);
         setIsLoading(false);

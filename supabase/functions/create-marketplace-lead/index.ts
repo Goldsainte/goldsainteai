@@ -1,9 +1,15 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { 
+  sanitizeText, 
+  validateNumber, 
+  validateStringLength,
+  validateRequestBody 
+} from "../_shared/inputValidation.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-csrf-token',
 };
 
 serve(async (req) => {
@@ -31,9 +37,66 @@ serve(async (req) => {
     }
 
     const payload = await req.json();
+    
+    // SECURITY: Validate required fields
+    const { valid, errors } = validateRequestBody(payload, ['tripType']);
+    if (!valid) {
+      return new Response(
+        JSON.stringify({ error: 'Missing required fields', details: errors }), 
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { tripType, hotelRequest, flightRequest, lead } = payload;
 
+    // SECURITY: Validate tripType
+    const validTripTypes = ['hotel', 'flight', 'package'];
+    if (!validTripTypes.includes(tripType)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid trip type' }), 
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Sanitize and validate destination
+    let destination = 'TBD';
+    if (hotelRequest?.destination) {
+      destination = sanitizeText(hotelRequest.destination);
+      const destValidation = validateStringLength(destination, 1, 200);
+      if (!destValidation.valid) {
+        return new Response(
+          JSON.stringify({ error: 'Destination must be 1-200 characters' }), 
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    } else if (flightRequest?.destination) {
+      destination = sanitizeText(flightRequest.destination);
+    }
+
+    // SECURITY: Validate budget values
+    const budgetValue = hotelRequest?.budgetPerNight || flightRequest?.budgetTotal || 0;
+    const budgetValidation = validateNumber(budgetValue, 0, 1000000);
+    if (!budgetValidation.valid) {
+      return new Response(
+        JSON.stringify({ error: budgetValidation.error }), 
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // SECURITY: Sanitize currency (3-letter code)
+    let currency = 'USD';
+    if (hotelRequest?.currency || flightRequest?.currency) {
+      const rawCurrency = (hotelRequest?.currency || flightRequest?.currency || 'USD').toUpperCase();
+      if (/^[A-Z]{3}$/.test(rawCurrency)) {
+        currency = rawCurrency;
+      }
+    }
+
     console.log('Creating marketplace lead:', { userId: user.id, tripType });
+
+    // SECURITY: Sanitize description to prevent XSS
+    const hotelDesc = hotelRequest ? sanitizeText(JSON.stringify(hotelRequest, null, 2)).substring(0, 5000) : 'N/A';
+    const flightDesc = flightRequest ? sanitizeText(JSON.stringify(flightRequest, null, 2)).substring(0, 5000) : 'N/A';
 
     // Create marketplace job
     const { data: job, error: jobError } = await supabaseClient
@@ -41,12 +104,12 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         title: `${tripType} Booking Request`,
-        description: `Trip type: ${tripType}\n\nHotel: ${hotelRequest ? JSON.stringify(hotelRequest, null, 2) : 'N/A'}\n\nFlight: ${flightRequest ? JSON.stringify(flightRequest, null, 2) : 'N/A'}`,
+        description: `Trip type: ${tripType}\n\nHotel: ${hotelDesc}\n\nFlight: ${flightDesc}`,
         booking_type: tripType === 'hotel' ? 'hotel' : tripType === 'flight' ? 'flight' : 'package',
-        destination: hotelRequest?.destination || flightRequest?.destination || 'TBD',
-        budget_min: hotelRequest?.budgetPerNight || flightRequest?.budgetTotal || 0,
-        budget_max: (hotelRequest?.budgetPerNight || flightRequest?.budgetTotal || 0) * 1.5,
-        currency: hotelRequest?.currency || flightRequest?.currency || 'USD',
+        destination: destination,
+        budget_min: budgetValidation.value,
+        budget_max: budgetValidation.value! * 1.5,
+        currency: currency,
         status: 'open',
         expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
       })

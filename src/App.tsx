@@ -18,6 +18,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { RequireAgentTerms } from "@/components/RequireAgentTerms";
 import { usePresence } from "@/hooks/usePresence";
 import { useState, useEffect } from "react";
+import { initCSRFProtection } from "@/lib/security/csrf";
 import Index from "./pages/Index";
 import SearchResults from "./pages/SearchResults";
 import HotelBooking from "./pages/HotelBooking";
@@ -141,6 +142,12 @@ function AppContent() {
   useEffect(() => {
     const cleanup = initExpediaModalHandler();
     return cleanup;
+  }, []);
+
+  // SECURITY: Initialize CSRF protection on app load
+  useEffect(() => {
+    initCSRFProtection();
+    console.log('🔒 CSRF protection initialized');
   }, []);
 
   // Force return to Home when the welcome modal is dismissed (first visit UX)
