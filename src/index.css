@@ -745,4 +745,24 @@ html, body, #root, #main-content {
       display: block;
     }
   }
+  
+  /* AI Concierge Mobile Optimizations */
+  @media (max-width: 768px) {
+    /* Ensure AI Concierge scales properly on small screens */
+    [class*="compact"] > * {
+      font-size: 0.85rem;
+    }
+    
+    /* Scale down card images in concierge */
+    [class*="compact"] img {
+      max-width: 100%;
+      height: auto;
+    }
+    
+    /* Ensure result cards don't overflow */
+    [class*="ResultCards"] {
+      max-width: 100%;
+      overflow-x: auto;
+    }
+  }
 }

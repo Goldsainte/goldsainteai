@@ -1213,22 +1213,22 @@ export const AIBookingConcierge = () => {
 
   return (
     <Card 
-      className={`fixed bottom-20 md:bottom-28 right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
-        isMinimized ? 'w-80 md:w-80' : 'w-[calc(100vw-3rem)] md:w-96 max-w-md'
-      } ${isMinimized ? 'h-16' : 'h-[70vh] md:h-[600px] max-h-[70vh] md:max-h-[600px]'}`}
+      className={`fixed bottom-20 md:bottom-28 right-3 md:right-6 z-50 shadow-2xl border-2 border-primary/20 transition-all ${
+        isMinimized ? 'w-[calc(100vw-1.5rem)] sm:w-80 md:w-80' : 'w-[calc(100vw-1.5rem)] sm:w-[calc(100vw-3rem)] md:w-96 max-w-md'
+      } ${isMinimized ? 'h-16' : 'h-[65vh] sm:h-[70vh] md:h-[600px] max-h-[65vh] sm:max-h-[70vh] md:max-h-[600px]'}`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-accent p-4 rounded-t-lg flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <img src={logomark} alt="Goldsainte" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
+      <div className="bg-gradient-to-r from-primary to-accent p-3 sm:p-4 rounded-t-lg flex items-center justify-between">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          <div className="relative flex-shrink-0">
+            <img src={logomark} alt="Goldsainte" className="w-7 h-7 sm:w-8 sm:h-8 md:w-10 md:h-10 object-contain" />
           </div>
-          <div>
-            <h3 className="font-serif text-lg md:text-xl font-bold text-primary-foreground">AI Concierge</h3>
-            <p className="text-xs text-primary-foreground/80">Powered by Goldsainte</p>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-serif text-base sm:text-lg md:text-xl font-bold text-primary-foreground truncate">AI Concierge</h3>
+            <p className="text-[10px] sm:text-xs text-primary-foreground/80 truncate">Powered by Goldsainte</p>
           </div>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
           <VoiceStatusChip
             state={
               voiceMode || wakeWordActive ? 'listening' : 
@@ -1236,7 +1236,7 @@ export const AIBookingConcierge = () => {
               'muted'
             }
             onClick={enableWakeWordPipeline}
-            className="text-primary-foreground border-primary-foreground/20"
+            className="text-primary-foreground border-primary-foreground/20 text-[10px] sm:text-xs"
           />
           <Tooltip>
             <TooltipTrigger asChild>
@@ -1244,9 +1244,9 @@ export const AIBookingConcierge = () => {
                 variant="ghost"
                 size="icon"
                 onClick={clearConversation}
-                className="text-primary-foreground hover:bg-white/10 h-8 w-8"
+                className="text-primary-foreground hover:bg-white/10 h-7 w-7 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] -m-2"
               >
-                <Trash2 className="h-4 w-4" />
+                <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent>
@@ -1257,9 +1257,9 @@ export const AIBookingConcierge = () => {
             variant="ghost"
             size="icon"
             onClick={() => setIsOpen(false)}
-            className="text-primary-foreground hover:bg-white/10 h-8 w-8"
+            className="text-primary-foreground hover:bg-white/10 h-7 w-7 sm:h-8 sm:w-8 min-h-[44px] min-w-[44px] -m-2"
           >
-            <X className="h-4 w-4" />
+            <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Button>
         </div>
       </div>
@@ -1267,8 +1267,8 @@ export const AIBookingConcierge = () => {
       {/* Chat Area */}
       {!isMinimized && (
         <>
-          <ScrollArea className="h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-3 overflow-x-hidden w-full max-w-full" ref={scrollRef}>
-            <div className="space-y-3">
+          <ScrollArea className="h-[calc(65vh-160px)] sm:h-[calc(70vh-180px)] md:h-[calc(600px-180px)] p-2 sm:p-3 overflow-x-hidden w-full max-w-full" ref={scrollRef}>
+            <div className="space-y-2 sm:space-y-3">
               {/* Welcome Card - Shows before first interaction */}
               {showWelcomeCard && messages.length <= 1 && (
                 <WelcomeCard onDismiss={() => setShowWelcomeCard(false)} />
@@ -1288,25 +1288,25 @@ export const AIBookingConcierge = () => {
               {messages.map((msg, idx) => (
                 <div key={idx} className="w-full">
                   <div
-                    className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    className={`flex gap-1.5 sm:gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     {msg.role === 'assistant' && (
                       <div className="flex-shrink-0">
                         <img 
                           src={logomark} 
                           alt="Goldsainte" 
-                          className="w-6 h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                          className="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-0.5 sm:p-1"
                         />
                       </div>
                     )}
                     <div
-                      className={`max-w-[75%] break-words rounded-lg px-3 py-2 ${
+                      className={`max-w-[80%] sm:max-w-[75%] break-words rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${
                         msg.role === 'user'
                           ? 'bg-gradient-to-r from-primary to-accent text-primary-foreground'
                           : 'bg-muted text-foreground'
                       }`}
                     >
-                      <p className="text-xs sm:text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
+                      <p className="text-[11px] sm:text-xs md:text-sm whitespace-pre-wrap break-words leading-relaxed">{msg.content}</p>
                     </div>
                   </div>
                   
@@ -1315,7 +1315,7 @@ export const AIBookingConcierge = () => {
                     // Handle Amadeus card results from voice mode (direct format)
                     if (result.type === 'cards' && Array.isArray(result.cards)) {
                       return (
-                        <div key={resultIdx} className="mt-2 ml-8">
+                        <div key={resultIdx} className="mt-1.5 sm:mt-2 ml-6 sm:ml-8">
                           <ResultCards section={result.section || 'Results'} cards={result.cards} />
                         </div>
                       );
@@ -1324,7 +1324,7 @@ export const AIBookingConcierge = () => {
                     // Handle Amadeus card results from text mode (nested in data)
                     if (result.data?.type === 'cards' && result.data?.cards) {
                       return (
-                        <div key={resultIdx} className="mt-2 ml-8">
+                        <div key={resultIdx} className="mt-1.5 sm:mt-2 ml-6 sm:ml-8">
                           <ResultCards section={result.data.section} cards={result.data.cards} />
                         </div>
                       );
@@ -1333,9 +1333,9 @@ export const AIBookingConcierge = () => {
                     // Handle agent inquiry confirmation
                     if (result.success && result.inquiryId) {
                       return (
-                        <div key={resultIdx} className="mt-2 ml-8">
-                          <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                            <p className="text-sm text-green-800 font-medium">
+                        <div key={resultIdx} className="mt-1.5 sm:mt-2 ml-6 sm:ml-8">
+                          <div className="bg-green-50 border border-green-200 rounded-lg p-2 sm:p-3">
+                            <p className="text-xs sm:text-sm text-green-800 font-medium">
                               ✓ {result.message || "Your request has been received! A Goldsainte agent will contact you shortly."}
                             </p>
                           </div>
@@ -1346,8 +1346,8 @@ export const AIBookingConcierge = () => {
                     // Display flight search results
                     if (result.data && Array.isArray(result.data) && result.data.length > 0 && result.data[0].itineraries) {
                       return (
-                        <div key={resultIdx} className="mt-2 ml-8 space-y-2">
-                          <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.data.length)} flight options:</p>
+                        <div key={resultIdx} className="mt-1.5 sm:mt-2 ml-6 sm:ml-8 space-y-1.5 sm:space-y-2">
+                          <p className="text-[10px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2">Top {Math.min(3, result.data.length)} flight options:</p>
                           {result.data.slice(0, 3).map((flight: any, flightIdx: number) => (
                             <CompactFlightCard 
                               key={flightIdx} 
@@ -1362,8 +1362,8 @@ export const AIBookingConcierge = () => {
                     // Display hotel search results
                     if (result.results && Array.isArray(result.results) && result.results.length > 0) {
                       return (
-                          <div key={resultIdx} className="mt-2 ml-8 space-y-2">
-                            <p className="text-xs text-muted-foreground mb-2">Top {Math.min(3, result.results.length)} hotel options:</p>
+                          <div key={resultIdx} className="mt-1.5 sm:mt-2 ml-6 sm:ml-8 space-y-1.5 sm:space-y-2">
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mb-1.5 sm:mb-2">Top {Math.min(3, result.results.length)} hotel options:</p>
                             {result.results.slice(0, 3).map((hotel: any, hotelIdx: number) => (
                               <CompactHotelCard 
                                 key={hotelIdx} 
@@ -1471,16 +1471,16 @@ export const AIBookingConcierge = () => {
                 </div>
               ))}
               {isLoading && (
-                <div className="flex justify-start gap-2">
+                <div className="flex justify-start gap-1.5 sm:gap-2">
                   <div className="flex-shrink-0">
                     <img 
                       src={logomark} 
                       alt="Goldsainte" 
-                      className="w-6 h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-1"
+                      className="w-5 h-5 sm:w-6 sm:h-6 object-contain rounded-full bg-gradient-to-br from-primary to-accent p-0.5 sm:p-1"
                     />
                   </div>
-                  <div className="bg-muted rounded-lg px-3 py-2">
-                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  <div className="bg-muted rounded-lg px-2 py-1.5 sm:px-3 sm:py-2">
+                    <Loader2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 animate-spin text-primary" />
                   </div>
                 </div>
               )}
@@ -1488,7 +1488,7 @@ export const AIBookingConcierge = () => {
           </ScrollArea>
 
           {/* Input Area */}
-          <div className="p-4 md:p-3 border-t border-border bg-background">
+          <div className="p-2.5 sm:p-3 md:p-3 border-t border-border bg-background">
             {showUnmute && (
               <Button
                 onClick={() => {
@@ -1497,7 +1497,7 @@ export const AIBookingConcierge = () => {
                 }}
                 variant="outline"
                 size="sm"
-                className="w-full mb-2"
+                className="w-full mb-2 text-xs sm:text-sm min-h-[44px]"
               >
                 🔈 Tap to enable hold music
               </Button>
@@ -1510,13 +1510,13 @@ export const AIBookingConcierge = () => {
                 }}
                 variant="outline"
                 size="sm"
-                className="w-full mb-2 gap-2"
+                className="w-full mb-2 gap-2 text-xs sm:text-sm min-h-[44px]"
               >
-                <Volume2 className="w-4 h-4" />
+                <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 Tap to enable background music
               </Button>
             )}
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 sm:gap-2">
               {!voiceMode && (
                 <>
                   <Input
@@ -1524,22 +1524,22 @@ export const AIBookingConcierge = () => {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Type your travel request..."
-                    className="flex-1 h-12 md:h-11"
+                    className="flex-1 h-11 sm:h-12 md:h-11 text-sm"
                     disabled={isLoading}
                   />
                   <Button
                     onClick={handleSend}
                     disabled={isLoading || !input.trim()}
                     size="icon"
-                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-12 w-12 md:h-11 md:w-11 shrink-0"
+                    className="bg-gradient-to-r from-primary to-accent hover:opacity-90 h-11 w-11 sm:h-12 sm:w-12 md:h-11 md:w-11 shrink-0 min-h-[44px] min-w-[44px]"
                   >
-                    <Send className="h-5 w-5" />
+                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                   </Button>
                 </>
               )}
               {voiceMode && (
-                <div className="flex-1 flex items-center justify-center gap-2 text-xs md:text-sm text-muted-foreground">
-                  <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                <div className="flex-1 flex items-center justify-center gap-2 text-[11px] sm:text-xs md:text-sm text-muted-foreground">
+                  <div className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-red-500 animate-pulse" />
                   {isProcessing ? 'Processing your request...' : 'Voice mode active - speak naturally'}
                 </div>
               )}
