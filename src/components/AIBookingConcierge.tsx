@@ -688,7 +688,7 @@ export const AIBookingConcierge = () => {
       // Check if SpeechRecognition is available (not on iOS Safari)
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        console.warn('⚠️ Wake word not supported on this browser (iOS Safari)');
+        console.warn('⚠️ [WAKE_WORD] Wake word not supported on this browser (iOS Safari)');
         toast({
           title: "Wake Word Not Supported",
           description: "Tap the microphone button to start voice mode",
@@ -697,26 +697,29 @@ export const AIBookingConcierge = () => {
         return;
       }
 
-      console.log('🎤 Starting wake word detection...');
+      console.log('🎤 [WAKE_WORD] Starting wake word detection...');
+      console.log('🎤 [WAKE_WORD] Browser:', navigator.userAgent);
+      console.log('🎤 [WAKE_WORD] Has getUserMedia:', !!navigator.mediaDevices?.getUserMedia);
+      
       wakeWordDetectorRef.current = new WakeWordDetector(() => {
-        console.log('🎉 Wake word "Hey Goldsainte" detected! Activating voice mode...');
+        console.log('🎉 [WAKE_WORD] Wake word "Hey Goldsainte" detected! Activating voice mode...');
         console.log('📊 [TELEMETRY] wake_word_detected', { timestamp: new Date().toISOString() });
         
         // Open widget if not already open
         if (!isOpen) {
-          console.log('🪟 Opening widget after wake word detection');
+          console.log('🪟 [WAKE_WORD] Opening widget after wake word detection');
           setIsOpen(true);
         }
         
         // Activate voice mode if not already active
         if (!voiceMode) {
-          console.log('🎤 Activating voice mode after wake word detection');
+          console.log('🎤 [WAKE_WORD] Activating voice mode after wake word detection');
           toggleVoiceMode();
         }
       });
 
       const started = await wakeWordDetectorRef.current.start();
-      console.log('✅ Wake word detection started:', started);
+      console.log('✅ [WAKE_WORD] Wake word detection started:', started);
       console.log('📊 [TELEMETRY] wake_word_started', { success: started, timestamp: new Date().toISOString() });
       
       if (started) {
@@ -726,12 +729,22 @@ export const AIBookingConcierge = () => {
           description: "Say 'Hey Goldsainte' to activate voice mode",
         });
       }
-    } catch (error) {
-      console.error('❌ Wake word error:', error);
-      console.log('📊 [TELEMETRY] wake_word_error', { error: error instanceof Error ? error.message : 'Unknown error', timestamp: new Date().toISOString() });
+    } catch (error: any) {
+      console.error('❌ [WAKE_WORD] Wake word error:', error);
+      console.error('❌ [WAKE_WORD] Error type:', error?.name);
+      console.error('❌ [WAKE_WORD] Error message:', error?.message);
+      console.error('❌ [WAKE_WORD] Error stack:', error?.stack);
+      console.log('📊 [TELEMETRY] wake_word_error', { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        errorType: error?.name,
+        timestamp: new Date().toISOString() 
+      });
+      
+      // Show specific error message to user
+      const errorMessage = error?.message || "Microphone access unavailable";
       toast({
-        title: "Wake Word Unavailable",
-        description: "Please use the microphone button instead",
+        title: "Wake Word Error",
+        description: errorMessage,
         variant: "destructive",
       });
     }

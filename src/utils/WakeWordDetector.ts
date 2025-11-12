@@ -5,12 +5,15 @@ export class WakeWordDetector {
   private onWakeWordDetected: () => void;
 
   constructor(onWakeWordDetected: () => void) {
+    console.log('🎤 [WakeWordDetector] Constructor called');
     this.onWakeWordDetected = onWakeWordDetected;
     // @ts-ignore - Web Speech API prefixes
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
+      console.error('❌ [WakeWordDetector] Speech recognition not supported in this browser');
       throw new Error('Speech recognition not supported in this browser');
     }
+    console.log('✅ [WakeWordDetector] SpeechRecognition API available');
 
     this.recognition = new SpeechRecognition();
     this.recognition.continuous = true;
@@ -92,24 +95,42 @@ export class WakeWordDetector {
   }
 
   async start() {
+    console.log('🎤 [WakeWordDetector] Starting wake word detection...');
     try {
       // Request mic permission once to avoid prompt later
-      await navigator.mediaDevices.getUserMedia({ audio: true });
-    } catch (e) {
-      console.error('Microphone permission error:', e);
-      // Still attempt to start recognition; some browsers allow without explicit stream
+      console.log('🎤 [WakeWordDetector] Requesting microphone permission...');
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('✅ [WakeWordDetector] Microphone permission granted');
+      // Stop tracks immediately - we just needed to check permission
+      stream.getTracks().forEach(track => track.stop());
+    } catch (e: any) {
+      console.error('❌ [WakeWordDetector] Microphone permission error:', e);
+      console.error('❌ [WakeWordDetector] Error name:', e?.name);
+      console.error('❌ [WakeWordDetector] Error message:', e?.message);
+      console.error('❌ [WakeWordDetector] Error stack:', e?.stack);
+      
+      // Show user-friendly error based on error type
+      const errorType = e?.name || 'Unknown';
+      const errorMsg = e?.message || 'Unknown error';
+      console.error(`❌ [WakeWordDetector] MICROPHONE ACCESS FAILED: ${errorType} - ${errorMsg}`);
+      
+      // Throw error to propagate to caller
+      throw new Error(`Microphone permission denied: ${errorType} - ${errorMsg}`);
     }
 
     this.isListening = true;
     this.isStarting = true;
     try {
+      console.log('🎤 [WakeWordDetector] Starting speech recognition...');
       this.recognition.start();
-      console.log('Wake word detection started');
+      console.log('✅ [WakeWordDetector] Wake word detection started successfully');
       return true;
-    } catch (error) {
-      console.error('Failed to start wake word detection:', error);
+    } catch (error: any) {
+      console.error('❌ [WakeWordDetector] Failed to start wake word detection:', error);
+      console.error('❌ [WakeWordDetector] Recognition error name:', error?.name);
+      console.error('❌ [WakeWordDetector] Recognition error message:', error?.message);
       this.isStarting = false;
-      return false;
+      throw error;
     }
   }
 
