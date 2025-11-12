@@ -31,7 +31,7 @@ const Trending = () => {
 
   const fetchExplorePosts = async () => {
     try {
-      // Fetch top posts by engagement
+      // Fetch top posts by engagement with explicit column selection (NOT select('*'))
       const { data: topPosts, error: topError } = await supabase
         .from("travel_posts")
         .select("id, user_id, video_url, thumbnail_url, caption, view_count, like_count, comment_count, created_at")
@@ -66,7 +66,7 @@ const Trending = () => {
       // Shuffle to create variety
       const shuffled = uniquePosts.sort(() => Math.random() - 0.5);
 
-      // Fetch profiles separately
+      // Fetch profiles separately - explicit columns only
       const postsWithProfiles = await Promise.all(
         shuffled.slice(0, 30).map(async (post) => {
           const { data: profile } = await supabase
@@ -154,6 +154,8 @@ const Trending = () => {
                       src={post.thumbnail_url}
                       alt={post.caption || 'Video'}
                       className="w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-purple-500/20">
