@@ -93,7 +93,6 @@ serve(async (req) => {
       body: JSON.stringify({
         model: "gpt-4o-realtime-preview-2024-12-17",
         voice: "verse",
-        voice_style: "conversational",
         turn_detection: {
           type: "server_vad",
           threshold: 0.5,
