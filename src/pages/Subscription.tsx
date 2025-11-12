@@ -154,14 +154,18 @@ export default function Subscription() {
 
       toast.loading("Redirecting to checkout...");
       
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId }
+        body: { priceId },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       if (error) throw error;
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url;
       } else {
         throw new Error("No checkout URL received");
       }
@@ -175,12 +179,17 @@ export default function Subscription() {
     try {
       toast.loading("Opening subscription management...");
       
-      const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      
+      const { data, error } = await supabase.functions.invoke('customer-portal', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
 
       if (error) throw error;
 
       if (data?.url) {
-        window.open(data.url, '_blank');
+        window.location.href = data.url;
       } else {
         throw new Error("No portal URL received");
       }

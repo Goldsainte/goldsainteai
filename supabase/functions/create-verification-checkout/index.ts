@@ -27,7 +27,7 @@ serve(async (req) => {
     const { returnUrl } = await req.json();
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
+      apiVersion: "2023-10-16",
     });
 
     // Check for existing customer
