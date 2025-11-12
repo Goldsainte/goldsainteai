@@ -100,25 +100,29 @@ export const CreatorStripeOnboarding = () => {
         throw new Error('No onboarding URL received from server');
       }
 
-      // 🔒 Force TOP-LEVEL navigation (escape iframe/webview)
-      const go = (u: string) => {
-        // Preferred
-        try { window.top!.location.assign(u); return; } catch {}
-        // Fallbacks
-        try { window.open(u, "_top"); return; } catch {}
-        try { window.location.assign(u); return; } catch {}
-        // Last resort
-        try { (document as any).location = u as any; } catch {}
-      };
-
-      // Detect if we are framed and log for debugging
-      const framed = (() => {
-        try { return window.top !== window.self; } catch { return true; }
-      })();
-      console.log("[STRIPE-ONBOARDING] Redirecting to Stripe...", { framed, url: data.url });
-
-      go(data.url);
-      // Note: setOnboarding(false) not needed as page will redirect
+      // 🧭 Force navigation outside the router context
+      console.log('[STRIPE-ONBOARDING] Performing full-page redirect to:', data.url);
+      
+      // Use the simplest, most reliable method first
+      if (typeof window !== "undefined") {
+        // Try to break out of any iframe/SPA context
+        try {
+          if (window.top && window.top !== window.self) {
+            console.log('[STRIPE-ONBOARDING] Detected iframe, using window.top');
+            window.top.location.assign(data.url);
+          } else {
+            console.log('[STRIPE-ONBOARDING] Not in iframe, using window.location');
+            window.location.assign(data.url);
+          }
+        } catch (e) {
+          console.error('[STRIPE-ONBOARDING] Redirect failed:', e);
+          // Final fallback
+          console.log('[STRIPE-ONBOARDING] Trying fallback: window.location.href');
+          window.location.href = data.url;
+        }
+      }
+      
+      // Don't set loading back to false - page should be redirecting
       
     } catch (error: any) {
       console.error('[STRIPE-ONBOARDING] Full error:', error);
