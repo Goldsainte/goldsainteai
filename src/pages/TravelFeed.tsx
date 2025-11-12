@@ -21,6 +21,7 @@ import { SuggestedUsers } from "@/components/SuggestedUsers";
 import { DraftPostsManager } from "@/components/DraftPostsManager";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
+import { fetchFeedPaginated } from "@/lib/data/posts";
 
 interface TravelPost {
   id: string;
@@ -61,6 +62,7 @@ const TravelFeed = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [cursor, setCursor] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
@@ -138,36 +140,25 @@ const TravelFeed = () => {
 
     try {
       setLoading(true);
-      let loadedPosts: TravelPost[] = [];
       
       if (user && !focusPostId) {
-        const quickPosts = await fetchChronologicalPosts(0, 3);
-        setPosts(quickPosts);
-        setLoading(false); // Show UI immediately
+        // Use cursor-based pagination for initial load
+        const response = await fetchFeedPaginated({ limit: 20 });
+        setPosts(response.items);
+        setCursor(response.nextCursor);
+        setHasMore(response.hasMore);
+        setLoading(false);
         
-        // Background: load more posts + personalized feed with individual error handling
-        const remainingPromise = fetchChronologicalPosts(3, 9).catch((err) => {
-          console.error('Failed to fetch remaining posts:', err);
-          return [];
-        });
-        
-        const personalizedPromise = supabase.functions.invoke('get-personalized-feed').catch((err) => {
+        // Background: load personalized feed with error handling
+        const { data, error } = await supabase.functions.invoke('get-personalized-feed').catch((err) => {
           console.error('Failed to fetch personalized feed:', err);
           return { data: null, error: err };
         });
         
-        const [remaining, { data, error }] = await Promise.all([
-          remainingPromise,
-          personalizedPromise
-        ]);
-        
-        // Merge all posts safely
-        const allPosts = [...quickPosts, ...remaining];
-        
         if (!error && data) {
           const personalized = ((data as any)?.posts || []) as TravelPost[];
           const map = new Map<string, TravelPost>();
-          allPosts.forEach(p => map.set(p.id, p));
+          response.items.forEach(p => map.set(p.id, p));
           personalized.forEach(p => {
             const existing = map.get(p.id) || ({} as TravelPost);
             map.set(p.id, { ...existing, ...p });
@@ -175,11 +166,9 @@ const TravelFeed = () => {
           const merged = Array.from(map.values());
           setPosts(merged);
           setIsPersonalized(true);
-        } else {
-          setPosts(allPosts);
         }
       } else if (focusPostId) {
-        loadedPosts = await fetchChronologicalPosts(0, 12);
+        const loadedPosts = await fetchChronologicalPosts(0, 12);
         const idx = loadedPosts.findIndex((p) => p.id === focusPostId);
         if (idx >= 0) {
           setCurrentIndex(idx);
@@ -192,8 +181,10 @@ const TravelFeed = () => {
         }
         setPosts(loadedPosts);
       } else {
-        loadedPosts = await fetchChronologicalPosts(0, 12);
-        setPosts(loadedPosts);
+        const response = await fetchFeedPaginated({ limit: 20 });
+        setPosts(response.items);
+        setCursor(response.nextCursor);
+        setHasMore(response.hasMore);
       }
     } catch (error) {
       console.error('Error fetching posts:', error);
@@ -250,11 +241,17 @@ const TravelFeed = () => {
   };
 
   const loadMorePosts = async () => {
-    if (loadingMore || !hasMore) return;
+    if (loadingMore || !hasMore || !cursor) return;
     
     try {
       setLoadingMore(true);
-      await fetchChronologicalPosts(posts.length, 8);
+      
+      // Use cursor-based pagination for efficient loading
+      const response = await fetchFeedPaginated({ cursor, limit: 20 });
+      
+      setPosts(prev => [...prev, ...response.items]);
+      setCursor(response.nextCursor);
+      setHasMore(response.hasMore);
     } catch (error) {
       console.error('Error loading more posts:', error);
       toast.error('Failed to load more posts');
