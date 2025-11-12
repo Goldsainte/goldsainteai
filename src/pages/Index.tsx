@@ -871,16 +871,13 @@ const queries = {
                       aria-label="Search for travel experiences, hotels, flights, and more"
                     />
                     
-                    {/* Rotating messages overlay - z-10 sits above input */}
-                    {!searchQuery && (
+                    {/* Rotating messages overlay - z-10 sits above input - hidden on mobile */}
+                    {!searchQuery && !isMobile && (
                       <div 
                         className="pointer-events-none absolute inset-y-0 left-4 sm:left-5 right-14 sm:right-16 flex items-center min-w-0 overflow-hidden z-10 leading-tight"
                         aria-hidden="true"
                       >
                         {rotatingMessages.map((message, index) => {
-                          const text = (typeof window !== 'undefined' && window.innerWidth < 768)
-                            ? (message.length > 45 ? `${message.slice(0, 45)}…` : message)
-                            : message;
                           return (
                             <span
                               key={index}
@@ -889,7 +886,7 @@ const queries = {
                                 opacity: currentMessageIndex === index ? 1 : 0,
                               }}
                             >
-                              {text}
+                              {message}
                             </span>
                           );
                         })}
@@ -899,14 +896,14 @@ const queries = {
                     <Button
                       onClick={() => handleSearch()}
                       type="submit"
-                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-[#0E4B44] text-white flex items-center justify-center hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E4B44] touch-manipulation disabled:opacity-50 z-20"
+                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 h-8 w-8 sm:h-12 sm:w-12 rounded-full bg-[#0E4B44] text-white flex items-center justify-center hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E4B44] touch-manipulation disabled:opacity-50 z-20"
                       disabled={isLoading}
                       aria-label="Submit search"
                     >
                       {isLoading ? (
-                        <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                        <Loader2 className="h-3.5 w-3.5 sm:h-5 sm:w-5 animate-spin" aria-hidden="true" />
                       ) : (
-                        <Send className="h-5 w-5" aria-hidden="true" />
+                        <Send className="h-3.5 w-3.5 sm:h-5 sm:w-5" aria-hidden="true" />
                       )}
                     </Button>
                   </div>
