@@ -120,15 +120,44 @@ export const OnboardingTour = () => {
   return (
     <>
       <style>{`
+        /* Header layout - flex to prevent close button overlap */
         .react-joyride__tooltip {
           position: relative;
           max-width: 100% !important;
+        }
+        .react-joyride__tooltip__header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          padding-right: 56px;
+          min-height: 44px;
         }
         .react-joyride__tooltip__footer {
           display: flex;
           justify-content: flex-end;
           gap: 8px;
           flex-wrap: wrap;
+        }
+        /* Close button - fixed tap target */
+        .react-joyride__tooltip__close {
+          position: absolute !important;
+          top: 8px;
+          right: 8px;
+          width: 44px !important;
+          height: 44px !important;
+          min-width: 44px !important;
+          min-height: 44px !important;
+          display: inline-flex !important;
+          align-items: center;
+          justify-content: center;
+          border: 0;
+          background: transparent;
+          cursor: pointer;
+          z-index: 2;
+        }
+        .react-joyride__tooltip__close svg {
+          width: 18px;
+          height: 18px;
         }
         .__floater__body > div > div:last-child > div:first-child {
           font-size: 12px;
@@ -150,6 +179,23 @@ export const OnboardingTour = () => {
           max-width: 100vw !important;
           padding: 0 16px;
           box-sizing: border-box;
+        }
+        @media (max-width: 480px) {
+          .react-joyride__tooltip__header {
+            padding-right: 48px;
+          }
+          .react-joyride__tooltip__close {
+            width: 40px !important;
+            height: 40px !important;
+            min-width: 40px !important;
+            min-height: 40px !important;
+            top: 6px;
+            right: 6px;
+          }
+          .react-joyride__tooltip__close svg {
+            width: 16px;
+            height: 16px;
+          }
         }
         @media (max-width: 768px) {
           .__floater {
@@ -211,8 +257,11 @@ export const OnboardingTour = () => {
             fontSize: window.innerWidth < 768 ? "12px" : "13px",
             lineHeight: "1.6",
             padding: "0 0 12px 0",
+            paddingRight: window.innerWidth < 480 ? "48px" : "56px",
             color: "hsl(var(--foreground))",
             fontWeight: "400",
+            overflowWrap: "anywhere" as const,
+            hyphens: "auto" as const,
           },
           tooltipFooter: {
             marginTop: window.innerWidth < 768 ? "10px" : "12px",
@@ -222,12 +271,20 @@ export const OnboardingTour = () => {
           },
           buttonClose: {
             color: "hsl(var(--muted-foreground))",
-            width: window.innerWidth < 768 ? "18px" : "20px",
-            height: window.innerWidth < 768 ? "18px" : "20px",
+            width: window.innerWidth < 480 ? "40px" : "44px",
+            height: window.innerWidth < 480 ? "40px" : "44px",
+            minWidth: window.innerWidth < 480 ? "40px" : "44px",
+            minHeight: window.innerWidth < 480 ? "40px" : "44px",
             padding: 0,
             lineHeight: 1,
-            transform: "scale(0.9)",
+            position: "absolute" as const,
+            top: window.innerWidth < 480 ? "6px" : "8px",
+            right: window.innerWidth < 480 ? "6px" : "8px",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
             opacity: 0.9,
+            zIndex: 2,
           },
           buttonNext: {
             backgroundColor: "hsl(var(--primary))",

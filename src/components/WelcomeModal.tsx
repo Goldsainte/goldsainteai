@@ -25,12 +25,14 @@ export const WelcomeModal = ({ open, onClose, isFirstVisit = false }: WelcomeMod
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleClose()}>
       <DialogContent className="max-w-[95svw] sm:max-w-lg min-w-0 p-0 gap-0 overflow-hidden bg-gradient-to-br from-background via-background to-primary/5">
-        <DialogHeader>
-          <DialogTitle className="sr-only">Welcome to Goldsainte.Ai</DialogTitle>
+        <DialogHeader className="flex flex-row items-start justify-between p-4 sm:p-6 pb-2 sm:pb-3">
+          <DialogTitle className="text-xl sm:text-2xl font-secondary text-primary text-center flex-1 mr-12">
+            {t('welcomeModal.title')}
+          </DialogTitle>
           <DialogDescription className="sr-only">Overview of capabilities</DialogDescription>
         </DialogHeader>
-        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-          <div className="text-center space-y-1 sm:space-y-2">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 space-y-4 sm:space-y-6">
+          <div className="sr-only" aria-hidden="true">
             <h2 className="text-xl sm:text-2xl font-secondary text-primary">
               {t('welcomeModal.title')}
             </h2>
