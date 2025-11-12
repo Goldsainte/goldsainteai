@@ -138,9 +138,39 @@ serve(async (req) => {
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
       
-      productId = subscription.items.data[0].price.product as string;
-      tier = PRODUCT_TIER_MAP[productId] || 'free';
-      logStep("Determined subscription tier", { productId, tier });
+      // PRODUCTION FIX: Fetch product dynamically to prevent mapping drift
+      const price = subscription.items.data[0].price as Stripe.Price;
+      const rawProductId = price.product;
+      productId = typeof rawProductId === 'string' ? rawProductId : rawProductId.id;
+      
+      // PRODUCTION FIX: Derive tier from product metadata (if set) instead of hard-coded map
+      // Fall back to hard-coded map for backward compatibility
+      try {
+        if (typeof rawProductId !== 'string') {
+          const productMetadata = rawProductId.metadata;
+          if (productMetadata?.tier) {
+            tier = productMetadata.tier as string;
+            logStep("Determined tier from product metadata", { productId, tier, metadata: productMetadata });
+          } else {
+            tier = PRODUCT_TIER_MAP[productId] || 'free';
+            logStep("Determined tier from hard-coded map (no metadata)", { productId, tier });
+          }
+        } else {
+          // Fetch full product to check metadata
+          const product = await stripe.products.retrieve(productId);
+          if (product.metadata?.tier) {
+            tier = product.metadata.tier as string;
+            logStep("Determined tier from fetched product metadata", { productId, tier, metadata: product.metadata });
+          } else {
+            tier = PRODUCT_TIER_MAP[productId] || 'free';
+            logStep("Determined tier from hard-coded map (no metadata in fetched product)", { productId, tier });
+          }
+        }
+      } catch (metadataError) {
+        console.error("Error fetching product metadata, falling back to map:", metadataError);
+        tier = PRODUCT_TIER_MAP[productId] || 'free';
+        logStep("Determined tier from hard-coded map (metadata fetch failed)", { productId, tier });
+      }
 
       // Get previous tier to detect changes
       const { data: existingSub } = await supabaseClient
