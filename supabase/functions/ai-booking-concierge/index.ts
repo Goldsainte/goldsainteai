@@ -1488,7 +1488,20 @@ ${result.nextSteps?.map((step: string, i: number) => `${i + 1}. ${step}`).join('
         }),
       });
       
+      if (!finalResponse.ok) {
+        const errorText = await finalResponse.text();
+        console.error('❌ Final AI response error:', finalResponse.status, errorText);
+        throw new Error(`OpenAI API error: ${finalResponse.status}`);
+      }
+      
       const finalData = await finalResponse.json();
+      console.log('✅ Final AI response received:', { hasChoices: !!finalData.choices, choicesLength: finalData.choices?.length });
+      
+      // Check if response has valid structure
+      if (!finalData.choices || !finalData.choices[0] || !finalData.choices[0].message) {
+        console.error('❌ Invalid final response structure:', finalData);
+        throw new Error('Invalid AI response structure');
+      }
       
       // Format tool results for UI rendering
       const formattedToolResults = toolResults.map(tr => {
