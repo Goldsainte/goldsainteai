@@ -30,6 +30,8 @@ import Onboarding from "./pages/Onboarding";
 import AIAgentOnboarding from "./pages/AIAgentOnboarding";
 import JournalListing from "./pages/JournalListing";
 import JournalArticle from "./pages/JournalArticle";
+import CreatorArticleEditor from "./pages/CreatorArticleEditor";
+import CreatorArticles from "./pages/CreatorArticles";
 import Favorites from "./pages/Favorites";
 import Collections from "./pages/Collections";
 import CollectionDetail from "./pages/CollectionDetail";
@@ -303,6 +305,9 @@ function AppContent() {
           <Route path="/travel-feed" element={<TravelFeed />} />
           <Route path="/journal" element={<JournalListing />} />
           <Route path="/journal/:slug" element={<JournalArticle />} />
+          <Route path="/creator-articles" element={<CreatorArticles />} />
+          <Route path="/creator-articles/new" element={<CreatorArticleEditor />} />
+          <Route path="/creator-articles/edit/:id" element={<CreatorArticleEditor />} />
           <Route path="/community-guidelines" element={<CommunityGuidelines />} />
           <Route path="/trust-safety" element={<TrustSafety />} />
           <Route path="/admin/trust-safety" element={<TrustSafety />} />
