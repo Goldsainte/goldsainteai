@@ -121,6 +121,34 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
           </div>
         );
 
+      case "cta":
+        return (
+          <div
+            key={block.id}
+            className="my-12 bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-xl p-8"
+          >
+            <h3 className="font-secondary text-2xl text-primary mb-3">
+              {block.content.title}
+            </h3>
+            {block.content.description && (
+              <p className="text-muted-foreground mb-6 leading-relaxed">
+                {block.content.description}
+              </p>
+            )}
+            {block.content.buttonText && (
+              <button
+                onClick={() => {
+                  // Will integrate with Expedia modal in future
+                  console.log("CTA clicked:", block.content.destination);
+                }}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                {block.content.buttonText}
+              </button>
+            )}
+          </div>
+        );
+
       default:
         return null;
     }

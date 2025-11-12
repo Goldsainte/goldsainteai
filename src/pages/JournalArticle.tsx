@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { ArticleBody } from "@/components/journal/ArticleBody";
+import { AuthorBio } from "@/components/journal/AuthorBio";
+import { RelatedArticles } from "@/components/journal/RelatedArticles";
 import { Helmet } from "react-helmet-async";
 import { formatDistanceToNow } from "date-fns";
 import { Clock, ArrowLeft } from "lucide-react";
@@ -25,6 +27,11 @@ interface Article {
     name: string;
     avatar_url: string;
     bio: string;
+    social_links?: {
+      instagram?: string;
+      twitter?: string;
+      website?: string;
+    };
   };
 }
 
@@ -39,6 +46,7 @@ export default function JournalArticle() {
   const { slug } = useParams<{ slug: string }>();
   const [article, setArticle] = useState<Article | null>(null);
   const [blocks, setBlocks] = useState<ArticleBlock[]>([]);
+  const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,7 +74,7 @@ export default function JournalArticle() {
           meta_title,
           meta_description,
           og_image_url,
-          creator:journal_creators(name, avatar_url, bio)
+          creator:journal_creators(name, avatar_url, bio, social_links)
         `)
         .eq("slug", slug)
         .eq("status", "published")
@@ -94,6 +102,40 @@ export default function JournalArticle() {
       if (blocksError) throw blocksError;
 
       setBlocks(blocksData || []);
+
+      // Fetch related articles (by shared categories)
+      if (articleData.categories && articleData.categories.length > 0) {
+        const { data: relatedData } = await supabase
+          .from("journal_articles")
+          .select(
+            `
+            id,
+            title,
+            slug,
+            dek,
+            hero_image_url,
+            hero_image_alt,
+            publish_date,
+            read_time_minutes,
+            categories,
+            creator:journal_creators(name, avatar_url)
+          `
+          )
+          .eq("status", "published")
+          .neq("id", articleData.id)
+          .contains("categories", articleData.categories)
+          .limit(6);
+
+        if (relatedData) {
+          const transformedRelated = relatedData.map((item: any) => ({
+            ...item,
+            creator: Array.isArray(item.creator)
+              ? item.creator[0]
+              : item.creator,
+          }));
+          setRelatedArticles(transformedRelated);
+        }
+      }
 
       // Track view (analytics)
       await supabase.from("journal_analytics").insert({
@@ -282,28 +324,15 @@ export default function JournalArticle() {
         {/* Article Body */}
         <div className="container mx-auto px-4 pb-16 max-w-3xl">
           <ArticleBody blocks={blocks} />
+
+          {/* Author Bio */}
+          <AuthorBio author={article.creator} />
         </div>
 
-        {/* Author Bio */}
-        {article.creator.bio && (
-          <div className="container mx-auto px-4 py-12 max-w-3xl border-t border-border">
-            <div className="flex gap-4">
-              {article.creator.avatar_url && (
-                <img
-                  src={article.creator.avatar_url}
-                  alt={article.creator.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-              )}
-              <div>
-                <h3 className="font-semibold text-lg mb-2">
-                  {article.creator.name}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  {article.creator.bio}
-                </p>
-              </div>
-            </div>
+        {/* Related Articles */}
+        {relatedArticles.length > 0 && (
+          <div className="container mx-auto px-4 pb-16 max-w-6xl">
+            <RelatedArticles articles={relatedArticles} />
           </div>
         )}
       </article>
