@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { checkRateLimit, createRateLimitResponse, getClientIdentifier } from "../_shared/rateLimiter.ts";
-import { Logger, generateRequestId } from "../_shared/logger.ts";
+import { logger, generateTraceId } from "../_shared/structuredLogger.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,8 +11,9 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
-  const requestId = generateRequestId();
-  const logger = new Logger({ 
+  const requestId = generateTraceId();
+  
+  logger.setContext({ 
     functionName: 'create-checkout',
     requestId 
   });
