@@ -210,13 +210,17 @@ export const AIBookingConcierge = () => {
 
   // Initialize background music controller
   useEffect(() => {
+    console.log('[Concierge] Initializing background music controller');
     const bgMusicUrl = import.meta.env.VITE_BG_MUSIC_URL || 
       "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
     
     bgMusicRef.current = new BackgroundMusicController(bgMusicUrl);
-    bgMusicRef.current.arm();
+    // Note: Don't arm here - wait for user gesture (widget open)
 
-    const handleBgMusicGesture = () => setShowBgMusicPrompt(true);
+    const handleBgMusicGesture = () => {
+      console.log('[Concierge] Background music needs gesture, showing prompt');
+      setShowBgMusicPrompt(true);
+    };
     window.addEventListener("bgmusic-needs-gesture", handleBgMusicGesture);
 
     return () => {
@@ -227,9 +231,12 @@ export const AIBookingConcierge = () => {
 
   // Start background music when widget opens
   useEffect(() => {
+    console.log('[Concierge] Widget open state changed:', isOpen);
     if (isOpen && bgMusicRef.current) {
+      console.log('[Concierge] Starting background music...');
       bgMusicRef.current.start();
     } else if (!isOpen && bgMusicRef.current) {
+      console.log('[Concierge] Stopping background music...');
       bgMusicRef.current.stop();
     }
   }, [isOpen]);
