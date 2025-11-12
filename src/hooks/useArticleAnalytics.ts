@@ -6,6 +6,9 @@ interface AnalyticsParams {
 }
 
 function getOrCreateSessionId() {
+  // SSR safety check
+  if (typeof window === 'undefined') return 'ssr';
+  
   let sid = sessionStorage.getItem("journal_sid");
   if (!sid) {
     sid = crypto.randomUUID();
@@ -19,6 +22,7 @@ export function useArticleAnalytics({ articleId }: AnalyticsParams) {
   const scrollDepthRef = useRef<number>(0);
   const hasTrackedViewRef = useRef<boolean>(false);
   const sessionIdRef = useRef<string>(getOrCreateSessionId());
+  const rowIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!articleId) return;
@@ -31,12 +35,20 @@ export function useArticleAnalytics({ articleId }: AnalyticsParams) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        await supabase.from("journal_analytics" as any).insert({
-          article_id: articleId,
-          user_id: user?.id ?? null,
-          session_id: sessionIdRef.current,
-          referrer: document.referrer || null,
-        } as any);
+        const { data: inserted, error } = await supabase
+          .from("journal_analytics" as any)
+          .insert({
+            article_id: articleId,
+            user_id: user?.id ?? null,
+            session_id: sessionIdRef.current,
+            referrer: document.referrer || null,
+          } as any)
+          .select('id')
+          .single();
+        
+        if (!error && inserted) {
+          rowIdRef.current = (inserted as any).id;
+        }
       } catch (error) {
         console.error("Error tracking view:", error);
       }
@@ -49,12 +61,13 @@ export function useArticleAnalytics({ articleId }: AnalyticsParams) {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const scrollTop = window.scrollY;
-      const scrollPercent = Math.round(
-        (scrollTop / (documentHeight - windowHeight)) * 100
-      );
+      
+      // Prevent NaN on short pages
+      const denom = Math.max(1, documentHeight - windowHeight);
+      const scrollPercent = Math.round((scrollTop / denom) * 100);
       
       if (scrollPercent > scrollDepthRef.current) {
-        scrollDepthRef.current = scrollPercent;
+        scrollDepthRef.current = Math.min(scrollPercent, 100);
       }
     };
 
@@ -69,14 +82,21 @@ export function useArticleAnalytics({ articleId }: AnalyticsParams) {
       // Update analytics with duration and scroll depth
       const updateAnalytics = async () => {
         try {
-          await supabase
+          const query = supabase
             .from("journal_analytics" as any)
             .update({
               view_duration_seconds: duration,
               scroll_depth_percent: scrollDepthRef.current,
-            } as any)
-            .eq("session_id", sessionIdRef.current)
-            .eq("article_id", articleId);
+            } as any);
+          
+          // Update by row ID if available, fallback to session + article
+          if (rowIdRef.current) {
+            await query.eq('id', rowIdRef.current);
+          } else {
+            await query
+              .eq("session_id", sessionIdRef.current)
+              .eq("article_id", articleId);
+          }
         } catch (error) {
           console.error("Error updating analytics:", error);
         }

@@ -70,6 +70,7 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
               alt={block.content.alt || ""}
               className="w-full rounded-xl object-cover"
               loading="lazy"
+              decoding="async"
             />
             {(block.content.caption || block.content.credit) && (
               <figcaption className="mt-3 flex justify-between items-start gap-4">
@@ -99,6 +100,7 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
                     alt={img.alt || ""}
                     className="w-full rounded-xl object-cover aspect-square"
                     loading="lazy"
+                    decoding="async"
                   />
                   {img.caption && (
                     <figcaption className="mt-2 text-sm text-muted-foreground">

@@ -65,13 +65,15 @@ export function ArticleCard({ article }: ArticleCardProps) {
             <span className="font-medium">{article.creator.name}</span>
             <div className="flex items-center gap-3">
               <span>
-                {formatDistanceToNow(new Date(article.publish_date), {
-                  addSuffix: true,
-                })}
+                {article.publish_date 
+                  ? formatDistanceToNow(new Date(article.publish_date), {
+                      addSuffix: true,
+                    })
+                  : '—'}
               </span>
               <span className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                {article.read_time_minutes || 5}m
+                {article.read_time_minutes ?? 5}m
               </span>
             </div>
           </div>
