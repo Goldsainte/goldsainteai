@@ -89,6 +89,12 @@ export class HoldMusicGenerator {
       console.error('❌ [HoldMusic] Error stack:', error?.stack);
       this.isPlaying = false;
       
+      // Check if it's an autoplay block
+      if (error.name === 'NotAllowedError') {
+        console.warn('⚠️ [HoldMusic] Autoplay blocked - user interaction required');
+        throw new Error('AUTOPLAY_BLOCKED');
+      }
+      
       // Re-throw to propagate to caller
       throw error;
     }

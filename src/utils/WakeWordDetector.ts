@@ -95,28 +95,7 @@ export class WakeWordDetector {
   }
 
   async start() {
-    console.log('🎤 [WakeWordDetector] Starting wake word detection...');
-    try {
-      // Request mic permission once to avoid prompt later
-      console.log('🎤 [WakeWordDetector] Requesting microphone permission...');
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      console.log('✅ [WakeWordDetector] Microphone permission granted');
-      // Stop tracks immediately - we just needed to check permission
-      stream.getTracks().forEach(track => track.stop());
-    } catch (e: any) {
-      console.error('❌ [WakeWordDetector] Microphone permission error:', e);
-      console.error('❌ [WakeWordDetector] Error name:', e?.name);
-      console.error('❌ [WakeWordDetector] Error message:', e?.message);
-      console.error('❌ [WakeWordDetector] Error stack:', e?.stack);
-      
-      // Show user-friendly error based on error type
-      const errorType = e?.name || 'Unknown';
-      const errorMsg = e?.message || 'Unknown error';
-      console.error(`❌ [WakeWordDetector] MICROPHONE ACCESS FAILED: ${errorType} - ${errorMsg}`);
-      
-      // Throw error to propagate to caller
-      throw new Error(`Microphone permission denied: ${errorType} - ${errorMsg}`);
-    }
+    console.log('🎤 [WakeWordDetector] Starting wake word detection (no permission request)...');
 
     this.isListening = true;
     this.isStarting = true;

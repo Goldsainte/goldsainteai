@@ -1,11 +1,12 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Loader2, Mic, MicOff, Trash2, Filter } from "lucide-react";
+import { X, Send, Loader2, Mic, MicOff, Trash2, Filter, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,6 +23,7 @@ import { TravelPackageCard } from "./TravelPackageCard";
 import { UberProductCard } from "./UberProductCard";
 import { UberBookingModal } from "./UberBookingModal";
 import { AIChatSettingsPanel, DEFAULT_PREFERENCES, type ChatPreferences, countNonDefaultPreferences } from "./AIChatSettingsPanel";
+import { VoiceDiagnosticsPanel } from "./VoiceDiagnosticsPanel";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 interface Message {
@@ -45,6 +47,8 @@ export const AIBookingConcierge = () => {
   const [selectedUberProduct, setSelectedUberProduct] = useState<any>(null);
   const [isUberModalOpen, setIsUberModalOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [showAutoplayPrompt, setShowAutoplayPrompt] = useState(false);
   const [preferences, setPreferences] = useState<ChatPreferences>(() => {
     const saved = localStorage.getItem('aiChatPreferences');
     return saved ? JSON.parse(saved) : DEFAULT_PREFERENCES;
@@ -72,6 +76,17 @@ export const AIBookingConcierge = () => {
   const navigate = useNavigate();
 
   console.log('[AIBookingConcierge] Component rendered, isOpen:', isOpen);
+
+  // Handle Shift+D to open diagnostics panel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.shiftKey && e.key === 'D') {
+        setShowDiagnostics(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Load user's AI agent profile and restore conversation
   useEffect(() => {
@@ -614,20 +629,17 @@ export const AIBookingConcierge = () => {
         console.log('🎵 [Step 6/6] Starting hold music...');
         initHoldMusic();
         try {
-          const playPromise = holdMusicRef.current?.play();
-          if (playPromise !== undefined) {
-            await playPromise;
-            console.log('✅ Hold music playing successfully');
-            console.log('📊 [TELEMETRY] hold_music_started', { timestamp: new Date().toISOString() });
+          await holdMusicRef.current?.play();
+          console.log('✅ Hold music playing successfully');
+          console.log('📊 [TELEMETRY] hold_music_started', { timestamp: new Date().toISOString() });
+        } catch (playError: any) {
+          console.warn('⚠️ Hold music error:', playError);
+          if (playError.message === 'AUTOPLAY_BLOCKED') {
+            console.log('📊 [TELEMETRY] hold_music_autoplay_blocked', { timestamp: new Date().toISOString() });
+            setShowAutoplayPrompt(true);
+          } else {
+            console.log('📊 [TELEMETRY] hold_music_error', { error: playError.message, timestamp: new Date().toISOString() });
           }
-        } catch (playError) {
-          console.warn('⚠️ Hold music autoplay blocked:', playError);
-          console.log('📊 [TELEMETRY] hold_music_blocked', { error: playError instanceof Error ? playError.message : 'Autoplay blocked', timestamp: new Date().toISOString() });
-          toast({
-            title: "Audio Permission Needed",
-            description: "Click anywhere to enable hold music",
-            variant: "default",
-          });
         }
         
         setVoiceMode(true);
@@ -804,33 +816,58 @@ export const AIBookingConcierge = () => {
 
   if (!isOpen) {
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <button
-            onClick={() => {
-              console.log('[AIBookingConcierge] Button clicked, opening widget');
-              setIsOpen(true);
-            }}
-            className="fixed bottom-24 md:bottom-28 right-6 z-50 group"
-            aria-label="Open AI Booking Concierge"
-            data-tour="ai-widget"
-          >
-            <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-md opacity-60 group-hover:opacity-80 transition-opacity" />
-              <div className="relative bg-gradient-to-br from-primary to-accent p-2.5 md:p-3 rounded-full shadow-xl hover:scale-110 transition-transform">
-                <img 
-                  src={logomark} 
-                  alt="Goldsainte AI Concierge" 
-                  className="w-7 h-7 md:w-6 md:h-6 object-contain"
-                />
+      <>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              onClick={() => {
+                console.log('[AIBookingConcierge] Button clicked, opening widget');
+                setIsOpen(true);
+              }}
+              className="fixed bottom-24 md:bottom-28 right-6 z-50 group"
+              aria-label="Open AI Booking Concierge"
+              data-tour="ai-widget"
+            >
+              <div className="relative">
+                {wakeWordActive && (
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute -top-8 right-0 text-xs whitespace-nowrap animate-pulse"
+                  >
+                    <Radio className="w-3 h-3 mr-1" />
+                    Listening for "Hey Goldsainte"
+                  </Badge>
+                )}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-md opacity-60 group-hover:opacity-80 transition-opacity" />
+                <div className="relative bg-gradient-to-br from-primary to-accent p-2.5 md:p-3 rounded-full shadow-xl hover:scale-110 transition-transform">
+                  <img 
+                    src={logomark} 
+                    alt="Goldsainte AI Concierge" 
+                    className="w-7 h-7 md:w-6 md:h-6 object-contain"
+                  />
+                </div>
               </div>
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <div className="space-y-1">
+              <p className="font-semibold">Goldsainte AI Concierge</p>
+              {wakeWordActive && (
+                <p className="text-xs text-muted-foreground">Say "Hey Goldsainte" or click to start</p>
+              )}
             </div>
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="left">
-          <p>Ask Goldsainte AI Mode</p>
-        </TooltipContent>
-      </Tooltip>
+          </TooltipContent>
+        </Tooltip>
+        
+        {/* Diagnostics Panel */}
+        <VoiceDiagnosticsPanel
+          isOpen={showDiagnostics}
+          onClose={() => setShowDiagnostics(false)}
+          voiceChatRef={voiceChatRef}
+          wakeWordDetectorRef={wakeWordDetectorRef}
+          holdMusicRef={holdMusicRef}
+        />
+      </>
     );
   }
 
@@ -1136,6 +1173,54 @@ export const AIBookingConcierge = () => {
         onClose={() => setShowSettings(false)}
         preferences={preferences}
         onPreferencesChange={setPreferences}
+      />
+      
+      {/* Autoplay Prompt */}
+      {showAutoplayPrompt && (
+        <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4">
+          <Card className="max-w-md">
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-full bg-primary/10">
+                  <Mic className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-semibold">Enable Audio</h3>
+                  <p className="text-sm text-muted-foreground">Click to enable hold music during your call</p>
+                </div>
+              </div>
+              <Button 
+                onClick={async () => {
+                  setShowAutoplayPrompt(false);
+                  try {
+                    await holdMusicRef.current?.play();
+                  } catch (e) {
+                    console.error('Still blocked:', e);
+                  }
+                }}
+                className="w-full"
+              >
+                Enable Audio
+              </Button>
+              <Button 
+                onClick={() => setShowAutoplayPrompt(false)}
+                variant="ghost"
+                className="w-full"
+              >
+                Continue Without Music
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+      
+      {/* Diagnostics Panel - Press Shift+D to open */}
+      <VoiceDiagnosticsPanel
+        isOpen={showDiagnostics}
+        onClose={() => setShowDiagnostics(false)}
+        voiceChatRef={voiceChatRef}
+        wakeWordDetectorRef={wakeWordDetectorRef}
+        holdMusicRef={holdMusicRef}
       />
     </Card>
   );
