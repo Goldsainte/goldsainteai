@@ -510,27 +510,27 @@ const CompactHeaderSearch = ({
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="w-[min(95svw,760px)] max-w-[95svw] sm:max-w-[760px] min-w-0 max-h-[88vh] overflow-y-auto p-4 sm:p-6"
+        className="w-[min(95svw,760px)] max-w-[95svw] sm:max-w-[760px] min-w-0 max-h-[88vh] overflow-hidden bg-gradient-to-br from-white via-luxury-ivory to-white border-2 border-accent shadow-2xl"
         aria-describedby="expedia-widget-description"
       >
-        <DialogHeader>
-          <DialogTitle className="text-[18px] sm:text-[20px] leading-tight">
+        <DialogHeader className="border-b border-accent/30 pb-4 space-y-2">
+          <DialogTitle className="font-secondary text-[20px] sm:text-[24px] leading-tight text-primary">
             Search Hotels & Flights
           </DialogTitle>
-          <DialogDescription id="expedia-widget-description" className="text-sm text-muted-foreground">
-            Search and book hotels and flights powered by Expedia
+          <DialogDescription id="expedia-widget-description" className="text-sm text-primary/70">
+            Powered by Goldsainte × Expedia
           </DialogDescription>
         </DialogHeader>
 
-        <div className="max-w-[640px] w-full mx-auto">
-          <div ref={containerRef} className="w-full overflow-visible min-w-0" style={{
+        <div className="max-w-[640px] w-full mx-auto overflow-y-auto max-h-[calc(88vh-120px)]">
+          <div ref={containerRef} className="w-full overflow-visible min-w-0 p-4" style={{
             minHeight: !widgetReady && !iframeActive && !showFallback 
               ? "320px"
               : "auto"
           }}>
           {!widgetReady && !iframeActive && !showFallback && (
             <div className="flex items-center justify-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent"></div>
             </div>
           )}
 
@@ -568,8 +568,8 @@ const CompactHeaderSearch = ({
 
 
           {showFallback && (
-            <div className="text-center py-12 space-y-4">
-              <p className="text-muted-foreground">
+            <div className="text-center py-12 space-y-4 bg-luxury-ivory/50 rounded-xl p-6">
+              <p className="text-primary/80">
                 {error?.type === 'csp_violation' 
                   ? 'Content Security Policy blocked the widget. Please contact support.'
                   : error?.type === 'network_blocked'
@@ -578,11 +578,12 @@ const CompactHeaderSearch = ({
                   ? 'Widget embed blocked. This may be due to X-Frame-Options restrictions.'
                   : 'The search widget couldn\'t load. It might be blocked by an ad or content blocker.'}
               </p>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-primary/70">
                 You can still search directly on Expedia:
               </p>
               <Button 
                 size="lg"
+                className="bg-primary hover:bg-primary/90 text-white font-secondary"
                 onClick={() => handleExpediaRedirect(
                   "https://www.expedia.com/?pwaLob=wizard-hotel-pwa-v2&camref=1101l5ujJR&pubref=goldsainte%20ai"
                 )}

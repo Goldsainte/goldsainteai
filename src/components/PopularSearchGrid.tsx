@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { useTranslation } from "react-i18next";
+import { useExpediaModal } from "@/contexts/ExpediaModalContext";
 import beachCabinImage from "@/assets/beach-cabin.jpg";
 import beachPicnicImage from "@/assets/beach-picnic.jpg";
 import redFlowersImage from "@/assets/red-flowers-loungers.jpg";
@@ -11,6 +12,7 @@ import luxuryBeachImage from "@/assets/luxury-beach.jpg";
 
 export const PopularSearchGrid = () => {
   const { t } = useTranslation();
+  const { openModal: openExpediaModal } = useExpediaModal();
   
   const popularSearches = [
     {
@@ -65,6 +67,7 @@ export const PopularSearchGrid = () => {
           {popularSearches.map((search) => (
             <Card
               key={search.id}
+              onClick={() => openExpediaModal({ destination: search.title })}
               className="relative h-[240px] sm:h-[260px] md:h-[280px] rounded-lg overflow-hidden cursor-pointer group active:scale-95 transition-transform"
             >
               <img
