@@ -596,8 +596,145 @@ export const AIBookingConcierge = () => {
 
         console.log('🔌 [Step 4/6] Creating voice chat connection...');
         voiceChatRef.current = new RealtimeVoiceChat(
-          (message) => {
+          async (message) => {
             console.log('📨 Voice message:', message.type);
+            
+            // Handle tool calls from Realtime API
+            if (message.type === 'response.function_call_arguments.done') {
+              const toolName = message.name;
+              const callId = message.call_id;
+              let args: any = {};
+              
+              try {
+                args = JSON.parse(message.arguments || '{}');
+              } catch (e) {
+                console.error('[ToolCall] Parse error:', e);
+              }
+              
+              // Enhanced logging format matching user spec
+              console.log('[ToolCall]', toolName, args);
+              console.log('📊 [TELEMETRY] voice_tool_call', { tool: toolName, args, timestamp: new Date().toISOString() });
+              
+              try {
+                // Call amadeus-proxy
+                const proxyUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/amadeus-proxy`;
+                const proxyType = toolName === 'search_flights' ? 'flights' : 'hotels';
+                const proxyPayload = { type: proxyType, ...args };
+                
+                // Log proxy call in requested format
+                console.log('[Proxy] POST', proxyType, 
+                  args.depart_date || args.check_in || '', 
+                  args.origin || args.city || '', 
+                  args.destination || args.city || ''
+                );
+                
+                const proxyResp = await fetch(proxyUrl, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`
+                  },
+                  body: JSON.stringify(proxyPayload)
+                });
+                
+                if (!proxyResp.ok) {
+                  const errorText = await proxyResp.text();
+                  console.error('[Proxy] Error - status:', proxyResp.status, errorText);
+                  throw new Error(`Proxy error ${proxyResp.status}`);
+                }
+                
+                const proxyData = await proxyResp.json();
+                const cardCount = proxyData.cards?.length || 0;
+                
+                // Log in requested format
+                console.log('[Proxy] Response - status:', proxyResp.status, ', cards.length:', cardCount);
+                console.log('📊 [TELEMETRY] amadeus_proxy_success', { 
+                  tool: toolName, 
+                  cardCount, 
+                  timestamp: new Date().toISOString() 
+                });
+                
+                // Send tool result back to Realtime API
+                if (voiceChatRef.current?.dc?.readyState === 'open') {
+                  const toolResult = {
+                    type: 'conversation.item.create',
+                    item: {
+                      type: 'function_call_output',
+                      call_id: callId,
+                      output: JSON.stringify({ success: true, card_count: proxyData.cards?.length || 0 })
+                    }
+                  };
+                  voiceChatRef.current.dc.send(JSON.stringify(toolResult));
+                  console.log('📤 Sent tool result back to AI');
+                  
+                  // Trigger response continuation
+                  voiceChatRef.current.dc.send(JSON.stringify({ type: 'response.create' }));
+                }
+                
+                // Render cards in UI immediately
+                const section = toolName === 'search_flights' ? 'Flights' : 'Hotels';
+                
+                if (cardCount > 0) {
+                  // Log in requested format
+                  console.log('[UI] cards', section, cardCount);
+                  
+                  setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: '',
+                    toolResults: [proxyData]
+                  }]);
+                  
+                  console.log('📊 [TELEMETRY] voice_cards_rendered', { 
+                    section, 
+                    count: cardCount,
+                    timestamp: new Date().toISOString()
+                  });
+                } else {
+                  // Log zero results in requested format
+                  console.log('[UI] No results - cards.length: 0');
+                  
+                  // Add system message to chat
+                  setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: 'No live options found for those dates.'
+                  }]);
+                  
+                  toast({
+                    title: "No Results",
+                    description: "No options found for those dates. Try different dates or locations.",
+                  });
+                }
+                
+              } catch (error) {
+                console.error('[ToolCall] Execution error:', error);
+                console.log('[Proxy] Error -', error instanceof Error ? error.message : 'Unknown');
+                console.log('📊 [TELEMETRY] voice_tool_error', { 
+                  tool: toolName, 
+                  error: error instanceof Error ? error.message : 'Unknown',
+                  timestamp: new Date().toISOString()
+                });
+                
+                // Send error back to AI
+                if (voiceChatRef.current?.dc?.readyState === 'open') {
+                  const errorResult = {
+                    type: 'conversation.item.create',
+                    item: {
+                      type: 'function_call_output',
+                      call_id: callId,
+                      output: JSON.stringify({ error: 'lookup_failed' })
+                    }
+                  };
+                  voiceChatRef.current.dc.send(JSON.stringify(errorResult));
+                  voiceChatRef.current.dc.send(JSON.stringify({ type: 'response.create' }));
+                }
+                
+                toast({
+                  title: "Search Failed",
+                  description: "Unable to fetch results. Please try again.",
+                  variant: "destructive"
+                });
+              }
+            }
             
             if (message.type === 'response.audio_transcript.delta' || message.type === 'response.audio.delta') {
               setIsProcessing(false);
@@ -1141,7 +1278,16 @@ export const AIBookingConcierge = () => {
                   
                   {/* Display tool results */}
                   {msg.toolResults && msg.toolResults.length > 0 && msg.toolResults.map((result, resultIdx) => {
-                    // Handle Amadeus card results (flights & hotels from amadeus-proxy)
+                    // Handle Amadeus card results from voice mode (direct format)
+                    if (result.type === 'cards' && Array.isArray(result.cards)) {
+                      return (
+                        <div key={resultIdx} className="mt-2 ml-8">
+                          <ResultCards section={result.section || 'Results'} cards={result.cards} />
+                        </div>
+                      );
+                    }
+                    
+                    // Handle Amadeus card results from text mode (nested in data)
                     if (result.data?.type === 'cards' && result.data?.cards) {
                       return (
                         <div key={resultIdx} className="mt-2 ml-8">
