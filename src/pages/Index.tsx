@@ -927,12 +927,12 @@ const queries = {
                   </Button>
                 </div>
 
-                {/* Footer */}
-                <p className="text-sm text-muted-foreground text-center pt-4 px-4 leading-relaxed">
+                {/* Footer - Smaller and tighter on mobile */}
+                <p className="text-[10px] md:text-xs text-muted-foreground/70 text-center pt-2 md:pt-4 px-4 leading-tight md:leading-relaxed">
                   {t('home.hero.agreement')}{" "}
-                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">{t('home.hero.terms')}</a>
+                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm py-1 inline-block">{t('home.hero.terms')}</a>
                   {" "}{t('common.and')}{" "}
-                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm">{t('home.hero.privacy')}</a>
+                  <a href="#" className="underline hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary rounded-sm py-1 inline-block">{t('home.hero.privacy')}</a>
                 </p>
               </div>
             </div>
