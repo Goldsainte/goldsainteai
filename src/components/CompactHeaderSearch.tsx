@@ -53,23 +53,6 @@ const CompactHeaderSearch = ({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [internalOpen, setInternalOpen] = useState(false);
-  const [currentHintIndex, setCurrentHintIndex] = useState(0);
-  
-  const hints = [
-    "Search flights and hotels with Goldsainte × Expedia",
-    "Find boutique stays in Paris",
-    "Compare flights to Miami next weekend",
-    "Book last-minute hotel deals",
-  ];
-  
-  // Rotate hints every 3 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentHintIndex((prev) => (prev + 1) % hints.length);
-    }, 3000);
-    return () => clearInterval(interval);
-  }, []);
-  
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = onExternalOpenChange || setInternalOpen;
   const [widgetReady, setWidgetReady] = useState(false);
@@ -516,37 +499,15 @@ const CompactHeaderSearch = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <div className="relative w-full max-w-[700px]">
-          {/* Input - must be z-0 so overlay can sit above */}
-          <Button
-            className="relative w-full rounded-full border border-accent bg-accent backdrop-blur text-center justify-center text-primary hover:bg-accent/90 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all min-h-[44px] h-[40px] sm:h-[44px] lg:h-[48px] px-10 sm:px-12 font-medium z-0"
-            aria-label="Search flights and hotels with Goldsainte and Expedia"
-          >
-            {/* Invisible placeholder text for proper button sizing */}
-            <span className="invisible text-[15px] lg:text-[16px] leading-none">
-              {hints[0]}
-            </span>
-            <Search className="absolute right-3 h-4 w-4 text-primary pointer-events-none z-20" aria-hidden="true" />
-          </Button>
-          
-          {/* Overlay with rotating hints - z-10 sits above button */}
-          <div
-            className="pointer-events-none absolute inset-y-0 left-10 sm:left-12 right-14 sm:right-16 flex items-center min-w-0 overflow-hidden z-10 leading-tight"
-            aria-hidden="true"
-          >
-            {hints.map((hint, index) => (
-              <span
-                key={index}
-                className="absolute inset-0 flex items-center truncate text-primary transition-opacity duration-300 text-[clamp(14px,1.1vw,16px)]"
-                style={{
-                  opacity: currentHintIndex === index ? 1 : 0,
-                }}
-              >
-                {isMobile && hint.length > 45 ? `${hint.slice(0, 45)}…` : hint}
-              </span>
-            ))}
-          </div>
-        </div>
+        <Button
+          className="relative rounded-full border border-accent bg-accent backdrop-blur text-center justify-center text-primary hover:bg-accent/90 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] px-10 sm:px-12 w-full max-w-[700px] font-medium"
+          aria-label="Search flights and hotels with Goldsainte and Expedia"
+        >
+          <span className="truncate text-[15px] lg:text-[16px] leading-none">
+            {isMobile ? "Search flights & hotels" : "Search flights and hotels with Goldsainte × Expedia"}
+          </span>
+          <Search className="absolute right-3 h-4 w-4 text-primary pointer-events-none" aria-hidden="true" />
+        </Button>
       </DialogTrigger>
       <DialogContent 
         className="w-[min(95svw,760px)] max-w-[95svw] sm:max-w-[760px] min-w-0 max-h-[88vh] overflow-y-auto p-4 sm:p-6"

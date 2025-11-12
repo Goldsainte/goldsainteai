@@ -858,52 +858,48 @@ const queries = {
                   <div className="relative w-full max-w-[700px]">
                     <label htmlFor="ai-search-input" className="sr-only">Search for travel experiences</label>
                     
-                    {/* Custom rotating placeholder with cross-fade */}
-                    {!searchQuery && (
-                      <div 
-                        className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 pointer-events-none overflow-hidden min-w-0 pr-16 sm:pr-20 z-20"
-                        style={{ maxWidth: 'calc(100% - 5rem)' }}
-                        aria-hidden="true"
-                        role="presentation"
-                      >
-                        <div className="relative" style={{ minHeight: '1.5rem' }}>
-                          {rotatingMessages.map((message, index) => {
-                            const text = (typeof window !== 'undefined' && window.innerWidth < 768)
-                              ? (message.length > 45 ? `${message.slice(0, 45)}…` : message)
-                              : message;
-                            return (
-                              <span
-                                key={index}
-                                className="absolute top-0 left-0 truncate transition-opacity duration-300 text-gray-500 whitespace-nowrap text-[clamp(14px,1.1vw,16px)]"
-                                style={{
-                                  lineHeight: '1.5rem',
-                                  opacity: currentMessageIndex === index ? 1 : 0,
-                                  maxWidth: '100%'
-                                }}
-                              >
-                                {text}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    
+                    {/* Input - z-0 so overlay sits above */}
                     <Input
                       id="ai-search-input"
                       type="search"
                       placeholder=""
-                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation"
+                      className="w-full rounded-full border border-[#D8C89B] bg-white/90 backdrop-blur shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0E4B44]/30 focus:border-[#0E4B44] text-gray-900 transition h-[52px] sm:h-14 lg:h-16 pl-4 sm:pl-5 pr-14 sm:pr-16 text-base sm:text-[17px] lg:text-lg leading-[1.25] touch-manipulation z-0"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyPress={handleKeyPress}
                       disabled={isLoading}
                       aria-label="Search for travel experiences, hotels, flights, and more"
                     />
+                    
+                    {/* Rotating messages overlay - z-10 sits above input */}
+                    {!searchQuery && (
+                      <div 
+                        className="pointer-events-none absolute inset-y-0 left-4 sm:left-5 right-14 sm:right-16 flex items-center min-w-0 overflow-hidden z-10 leading-tight"
+                        aria-hidden="true"
+                      >
+                        {rotatingMessages.map((message, index) => {
+                          const text = (typeof window !== 'undefined' && window.innerWidth < 768)
+                            ? (message.length > 45 ? `${message.slice(0, 45)}…` : message)
+                            : message;
+                          return (
+                            <span
+                              key={index}
+                              className="absolute inset-0 flex items-center truncate text-gray-500 transition-opacity duration-300 text-[clamp(14px,1.1vw,16px)]"
+                              style={{
+                                opacity: currentMessageIndex === index ? 1 : 0,
+                              }}
+                            >
+                              {text}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
                     <Button
                       onClick={() => handleSearch()}
                       type="submit"
-                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-[#0E4B44] text-white flex items-center justify-center hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E4B44] touch-manipulation disabled:opacity-50"
+                      className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 h-11 w-11 sm:h-12 sm:w-12 rounded-full bg-[#0E4B44] text-white flex items-center justify-center hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0E4B44] touch-manipulation disabled:opacity-50 z-20"
                       disabled={isLoading}
                       aria-label="Submit search"
                     >
