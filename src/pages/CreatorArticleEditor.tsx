@@ -180,15 +180,38 @@ export default function CreatorArticleEditor() {
         creatorId = (newCreator as any).id;
       }
 
-      // Generate slug
-      const slug = title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "");
+      // Generate slug only on create, preserve on update
+      let finalSlug: string;
+
+      if (id) {
+        // Editing existing - fetch and preserve existing slug
+        const { data: existing } = await supabase
+          .from("journal_articles" as any)
+          .select("slug")
+          .eq("id", id)
+          .single();
+        finalSlug = (existing as any)?.slug || "";
+      } else {
+        // New article - generate slug and check uniqueness
+        const baseSlug = title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-|-$/g, "");
+        
+        const { data: clash } = await supabase
+          .from("journal_articles" as any)
+          .select("id")
+          .eq("slug", baseSlug)
+          .limit(1);
+        
+        finalSlug = clash?.length 
+          ? `${baseSlug}-${crypto.randomUUID().slice(0, 6)}`
+          : baseSlug;
+      }
 
       const articleData = {
         title,
-        slug: `${slug}-${Date.now()}`,
+        slug: finalSlug,
         dek,
         hero_image_url: heroImageUrl,
         hero_image_alt: heroImageAlt,

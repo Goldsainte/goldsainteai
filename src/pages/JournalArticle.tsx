@@ -140,7 +140,11 @@ export default function JournalArticle() {
           )
           .eq("status", "published")
           .neq("id", (articleData as any).id)
-          .contains("categories", (articleData as any).categories)
+          .or(
+            (articleData as any).categories
+              .map((c: string) => `categories.cs.{${c}}`)
+              .join(",")
+          )
           .limit(6);
 
         if (relatedData) {
@@ -197,27 +201,6 @@ export default function JournalArticle() {
       </div>
     );
   }
-
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
-    description: article.dek,
-    image: article.hero_image_url,
-    datePublished: article.publish_date,
-    author: {
-      "@type": "Person",
-      name: article.creator.name,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Goldsainte",
-      logo: {
-        "@type": "ImageObject",
-        url: "https://goldsainte.ai/logo.png",
-      },
-    },
-  };
 
   return (
     <>
@@ -291,7 +274,7 @@ export default function JournalArticle() {
                 <span>•</span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-4 h-4" />
-                  {article.read_time_minutes} min read
+                  {article.read_time_minutes || 5} min read
                 </span>
               </div>
             </div>

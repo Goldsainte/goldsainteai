@@ -111,15 +111,43 @@ export function ArticleBody({ blocks }: ArticleBodyProps) {
           </div>
         );
 
-      case "embed":
+      case "embed": {
+        const embedHtml = block.content.html || "";
+        const allowedProviders = [
+          "youtube.com",
+          "youtu.be",
+          "vimeo.com",
+          "instagram.com",
+          "twitter.com",
+          "x.com",
+        ];
+        
+        const isAllowed = allowedProviders.some((provider) =>
+          embedHtml.toLowerCase().includes(provider)
+        );
+
+        if (!isAllowed && embedHtml.trim()) {
+          return (
+            <div
+              key={block.id}
+              className="my-12 p-6 border border-border rounded-xl bg-muted/30 text-center"
+            >
+              <p className="text-muted-foreground">
+                Embed from untrusted source blocked for security
+              </p>
+            </div>
+          );
+        }
+
         return (
           <div key={block.id} className="my-12">
             <div
               className="aspect-video rounded-xl overflow-hidden"
-              dangerouslySetInnerHTML={{ __html: block.content.html || "" }}
+              dangerouslySetInnerHTML={{ __html: embedHtml }}
             />
           </div>
         );
+      }
 
       case "cta":
         return (
