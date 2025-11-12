@@ -1,125 +1,200 @@
+// Chrome-first continuous speech-rec wake emulation, with watchdog + backoff.
+// Falls back to a no-op on Safari (so the UI can switch to a real KWS later).
+
+type WakeCallback = () => void;
+
 export class WakeWordDetector {
-  private recognition: any;
-  private isListening = false;
-  private isStarting = false;
-  private onWakeWordDetected: () => void;
+  private recognition: any | null = null;
+  private onWake: WakeCallback;
+  private running = false;
+  private backoffMs = 500;
+  private maxBackoffMs = 8000;
+  private lastEventAt = 0;
+  private watchdogTimer: number | null = null;
+  private aborting = false;
+  private micKeepAliveStream: MediaStream | null = null;
 
-  constructor(onWakeWordDetected: () => void) {
-    console.log('🎤 [WakeWordDetector] Constructor called');
-    this.onWakeWordDetected = onWakeWordDetected;
-    // @ts-ignore - Web Speech API prefixes
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      console.error('❌ [WakeWordDetector] Speech recognition not supported in this browser');
-      throw new Error('Speech recognition not supported in this browser');
-    }
-    console.log('✅ [WakeWordDetector] SpeechRecognition API available');
-
-    this.recognition = new SpeechRecognition();
-    this.recognition.continuous = true;
-    this.recognition.interimResults = false;
-    this.recognition.lang = 'en-US';
-
-    this.recognition.onstart = () => {
-      console.log('Wake word recognition started');
-      this.isStarting = false;
-    };
-
-    this.recognition.onresult = (event: any) => {
-      const last = event.results.length - 1;
-      const transcript: string = String(event.results[last][0].transcript || '').toLowerCase().trim();
-      if (!transcript) return;
-      console.log('Heard:', transcript);
-      if (
-        transcript.includes('hey goldsainte') ||
-        transcript.includes('hey gold saint') ||
-        transcript.includes('hey gold sante') ||
-        transcript.includes('gold saint') ||
-        transcript.includes('goldsainte')
-      ) {
-        console.log('Wake word detected!');
-        this.onWakeWordDetected();
-      }
-    };
-
-    this.recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event?.error || event);
-      
-      // Don't restart on aborted errors - they usually mean we're stopping intentionally
-      if (event?.error === 'aborted') {
-        this.isStarting = false;
-        return;
-      }
-      
-      // Only restart on recoverable errors
-      if (event?.error === 'no-speech') {
-        this.safeRestart(1000);
-      } else if (event?.error === 'audio-capture') {
-        // Audio capture failed - likely mic in use, don't keep retrying
-        console.warn('Microphone unavailable, wake word detection paused');
-        this.isListening = false;
-        this.isStarting = false;
-      }
-    };
-
-    this.recognition.onend = () => {
-      console.log('Wake word recognition ended');
-      if (this.isListening && !this.isStarting) {
-        this.safeRestart(500);
-      } else {
-        this.isStarting = false;
-      }
-    };
+  constructor(onWake: WakeCallback) {
+    this.onWake = onWake;
   }
 
-  private safeRestart(delayMs: number) {
-    if (!this.isListening || this.isStarting) return;
-    this.isStarting = true;
-    setTimeout(() => {
-      if (!this.isListening || this.isStarting === false) {
-        this.isStarting = false;
-        return;
-      }
-      try {
-        this.recognition.start();
-      } catch (e: any) {
-        console.warn('Recognition start failed:', e?.message || e);
-        this.isStarting = false;
-        // Don't retry indefinitely - stop after failed restart
-        if (e?.message?.includes('already started')) {
-          // Already running, we're good
-          return;
+  private get SpeechRecognitionCtor(): any | null {
+    const w = window as any;
+    return w.SpeechRecognition || w.webkitSpeechRecognition || null;
+  }
+
+  private supported(): boolean {
+    return !!this.SpeechRecognitionCtor;
+  }
+
+  private async startMicKeepAlive() {
+    // Keep a real mic stream alive so Chrome won't suspend audio capture.
+    try {
+      this.micKeepAliveStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
         }
+      });
+    } catch (e) {
+      console.warn("[WakeWord] mic keep-alive failed:", e);
+    }
+  }
+
+  private clearWatchdog() {
+    if (this.watchdogTimer) {
+      window.clearTimeout(this.watchdogTimer);
+      this.watchdogTimer = null;
+    }
+  }
+
+  private armWatchdog() {
+    this.clearWatchdog();
+    // If we get no events for 7s, restart recognition
+    this.watchdogTimer = window.setTimeout(() => {
+      if (!this.running || !this.recognition) return;
+      const silenceFor = Date.now() - this.lastEventAt;
+      if (silenceFor >= 7000) {
+        console.warn("[WakeWord] Watchdog restarting after silence");
+        this.safeRestart();
+      } else {
+        this.armWatchdog();
       }
-    }, delayMs);
+    }, 7000);
+  }
+
+  private safeRestart() {
+    if (!this.recognition) return;
+    try {
+      this.aborting = true;
+      this.recognition.abort(); // triggers onend → we re-start there
+    } catch {}
+  }
+
+  private normalizeTranscript(s: string): string {
+    return (s || "")
+      .toLowerCase()
+      .replace(/[^\w\s]/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  private matchesWake(transcript: string): boolean {
+    const t = this.normalizeTranscript(transcript);
+    // Robust regex: allows optional space and common variants
+    const patterns = [
+      /\bhey\s*goldsainte\b/,
+      /\bhey\s*gold\s*sainte\b/,
+      /\bhey\s*gold\s*saint\b/,
+      /\bgold\s*sainte\b/,
+      /\bgold\s*saint\b/
+    ];
+    return patterns.some((re) => re.test(t));
   }
 
   async start() {
-    console.log('🎤 [WakeWordDetector] Starting wake word detection (no permission request)...');
-
-    this.isListening = true;
-    this.isStarting = true;
-    try {
-      console.log('🎤 [WakeWordDetector] Starting speech recognition...');
-      this.recognition.start();
-      console.log('✅ [WakeWordDetector] Wake word detection started successfully');
-      return true;
-    } catch (error: any) {
-      console.error('❌ [WakeWordDetector] Failed to start wake word detection:', error);
-      console.error('❌ [WakeWordDetector] Recognition error name:', error?.name);
-      console.error('❌ [WakeWordDetector] Recognition error message:', error?.message);
-      this.isStarting = false;
-      throw error;
+    if (!this.supported()) {
+      console.warn("[WakeWord] SpeechRecognition not supported in this browser (Safari/iOS).");
+      this.running = false;
+      return; // UI should enable a real KWS fallback on Safari
     }
+    if (this.running) return;
+
+    await this.startMicKeepAlive(); // keeps capture permission warm
+
+    const Ctor = this.SpeechRecognitionCtor!;
+    this.recognition = new Ctor();
+    // Critical flags for Chrome:
+    this.recognition.continuous = true;       // don't stop after first result
+    this.recognition.interimResults = true;   // get partials fast
+    this.recognition.lang = "en-US";
+    this.recognition.maxAlternatives = 1;
+
+    this.recognition.onstart = () => {
+      this.lastEventAt = Date.now();
+      this.backoffMs = 500;
+      console.log("[WakeWord] recognition started");
+      this.armWatchdog();
+    };
+
+    this.recognition.onresult = (event: any) => {
+      this.lastEventAt = Date.now();
+      const last = event.results.length - 1;
+      const alt = event.results[last] && event.results[last][0];
+      const transcript = String(alt?.transcript || "");
+      // Debug:
+      // console.log("[WakeWord] Heard:", transcript);
+      if (this.matchesWake(transcript)) {
+        console.log("[WakeWord] Wake word detected!");
+        this.onWake();
+      }
+    };
+
+    this.recognition.onerror = (e: any) => {
+      this.lastEventAt = Date.now();
+      console.warn("[WakeWord] error:", e?.error || e);
+      // Errors like 'no-speech', 'aborted', 'audio-capture', 'not-allowed'
+      // We'll try to recover unless permission is denied.
+      if (e?.error === "not-allowed") {
+        this.running = false;
+        this.stop(); // hard stop
+        return;
+      }
+      // soft restart on other errors
+      this.safeRestart();
+    };
+
+    this.recognition.onend = () => {
+      this.clearWatchdog();
+      console.warn("[WakeWord] onend; restarting if running");
+      if (!this.running) return;
+      // Exponential backoff to avoid hot loops when Chrome is unhappy
+      setTimeout(() => {
+        try {
+          this.recognition!.start();
+        } catch (err) {
+          console.warn("[WakeWord] start() threw, backing off:", err);
+          this.backoffMs = Math.min(this.backoffMs * 2, this.maxBackoffMs);
+          setTimeout(() => {
+            if (this.running) this.safeRestart();
+          }, this.backoffMs);
+        }
+      }, this.backoffMs);
+      this.aborting = false;
+    };
+
+    this.running = true;
+    try {
+      this.recognition.start(); // must be called from a user-gesture context
+    } catch (err) {
+      console.warn("[WakeWord] initial start failed:", err);
+    }
+
+    // Keep AudioContext alive if you have one
+    document.addEventListener("visibilitychange", async () => {
+      try {
+        // if you maintain a shared AudioContext, resume it here
+        // await audioContext.resume();
+      } catch {}
+    });
   }
 
   stop() {
-    this.isListening = false;
-    this.isStarting = false;
-    try {
-      this.recognition.stop();
-    } catch (error) {
-      console.log('Recognition already stopped');
+    this.running = false;
+    this.clearWatchdog();
+    if (this.recognition) {
+      try { this.recognition.onresult = null; } catch {}
+      try { this.recognition.onend = null; } catch {}
+      try { this.recognition.onerror = null; } catch {}
+      try { this.recognition.stop(); } catch {}
+      this.recognition = null;
+    }
+    if (this.micKeepAliveStream) {
+      this.micKeepAliveStream.getTracks().forEach(t => t.stop());
+      this.micKeepAliveStream = null;
     }
   }
 }
+
+export default WakeWordDetector;

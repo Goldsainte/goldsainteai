@@ -747,6 +747,10 @@ export const AIBookingConcierge = () => {
         console.log('🎉 [WAKE_WORD] Wake word "Hey Goldsainte" detected! Activating voice mode...');
         console.log('📊 [TELEMETRY] wake_word_detected', { timestamp: new Date().toISOString() });
         
+        // Immediately stop recognition so TTS doesn't abort it mid-stream
+        wakeWordDetectorRef.current?.stop();
+        setWakeWordActive(false);
+        
         // Open widget if not already open
         if (!isOpen) {
           console.log('🪟 [WAKE_WORD] Opening widget after wake word detection');
@@ -760,17 +764,15 @@ export const AIBookingConcierge = () => {
         }
       });
 
-      const started = await wakeWordDetectorRef.current.start();
-      console.log('✅ [WAKE_WORD] Wake word detection started:', started);
-      console.log('📊 [TELEMETRY] wake_word_started', { success: started, timestamp: new Date().toISOString() });
+      await wakeWordDetectorRef.current.start();
+      console.log('✅ [WAKE_WORD] Wake word detection started');
+      console.log('📊 [TELEMETRY] wake_word_started', { timestamp: new Date().toISOString() });
       
-      if (started) {
-        setWakeWordActive(true);
-        toast({
-          title: "Wake Word Active",
-          description: "Say 'Hey Goldsainte' to activate voice mode",
-        });
-      }
+      setWakeWordActive(true);
+      toast({
+        title: "Wake Word Active",
+        description: "Say 'Hey Goldsainte' to activate voice mode (Chrome only)",
+      });
     } catch (error: any) {
       console.error('❌ [WAKE_WORD] Wake word error:', error);
       console.error('❌ [WAKE_WORD] Error type:', error?.name);
@@ -797,7 +799,15 @@ export const AIBookingConcierge = () => {
     try {
       console.log('🎤 [ENABLE_WAKE] Initializing mic + AudioContext + Resampler + Worklet');
 
-      // 1) Request mic with browser DSP disabled
+      // 1) Stop any hold music / TTS during listening
+      try { 
+        window.speechSynthesis?.cancel(); 
+        if (holdMusicRef.current) {
+          holdMusicRef.current.stop();
+        }
+      } catch {}
+
+      // 2) Request mic with browser DSP disabled
       let permission: PermissionState | 'unknown' = 'unknown';
       try {
         const perm = await navigator.permissions.query({ name: 'microphone' as PermissionName });
@@ -813,7 +823,7 @@ export const AIBookingConcierge = () => {
       });
       micStreamRef.current = stream;
 
-      // 2) AudioContext - use native sample rate (usually 48kHz on Chrome)
+      // 3) AudioContext - use native sample rate (usually 48kHz on Chrome)
       if (!audioCtxRef.current) {
         audioCtxRef.current = new AudioContext();
       }
@@ -843,7 +853,7 @@ export const AIBookingConcierge = () => {
         console.log('🎵 [ENABLE_WAKE] Keep-alive oscillator started');
       }
 
-      // 3) Build graph: MediaStreamSource -> Resampler (48kHz→16kHz) -> KWS Processor
+      // 4) Build graph: MediaStreamSource -> Resampler (48kHz→16kHz) -> KWS Processor
       const source = ctx.createMediaStreamSource(stream);
       
       // Load resampler worklet
