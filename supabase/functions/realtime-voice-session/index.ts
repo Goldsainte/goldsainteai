@@ -79,7 +79,7 @@ serve(async (req) => {
       throw new Error('OPENAI_API_KEY is not set');
     }
 
-    const response = await fetch("https://api.openai.com/v1/realtime/sessions", {
+    const sessionResp = await fetch("https://api.openai.com/v1/realtime/sessions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${OPENAI_API_KEY}`,
@@ -98,9 +98,26 @@ serve(async (req) => {
       }),
     });
 
-    const data = await response.json();
-    return new Response(JSON.stringify(data), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (!sessionResp.ok) {
+      const errText = await sessionResp.text();
+      console.error(`❌ Realtime session create failed ${sessionResp.status}:`, errText);
+      throw new Error(`Realtime session create failed ${sessionResp.status}: ${errText}`);
+    }
+
+    const session = await sessionResp.json();
+
+    // ✅ Return just the ephemeral token string and expiry
+    const token = session?.client_secret?.value;
+    const expiresAt = session?.client_secret?.expires_at;
+
+    if (!token) {
+      throw new Error('No client_secret.value returned from OpenAI');
+    }
+
+    console.log(`✅ Ephemeral token created: ${token.slice(0, 10)}...${token.slice(-4)}`);
+
+    return new Response(JSON.stringify({ token, expiresAt }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
     });
   } catch (error) {
     console.error("Error:", error);

@@ -72,15 +72,23 @@ export class RealtimeVoiceChat {
     this.audioEl.autoplay = true;
   }
 
-  async init(getSessionToken: () => Promise<string>) {
+  async init(getSessionToken: () => Promise<{ token: string; expiresAt?: number }>) {
     try {
       this.onStatusChange('connecting');
       console.log("Initializing voice chat...");
 
-      // Get ephemeral token
-      const EPHEMERAL_KEY = await getSessionToken();
-      if (!EPHEMERAL_KEY) {
-        throw new Error("Failed to get session token");
+      // Get ephemeral token (string), not the whole session JSON
+      const { token: EPHEMERAL_KEY, expiresAt } = await getSessionToken();
+      
+      if (!EPHEMERAL_KEY || typeof EPHEMERAL_KEY !== 'string') {
+        throw new Error("Failed to get ephemeral token string");
+      }
+      
+      console.log(`Ephemeral token acquired: ${EPHEMERAL_KEY.slice(0, 10)}...${EPHEMERAL_KEY.slice(-4)}`);
+      
+      // Optional: basic expiry guard (tokens are ~60s)
+      if (expiresAt && Date.now() > expiresAt - 10_000) {
+        console.warn("⚠️ Ephemeral token close to expiry; consider re-fetching");
       }
 
       // Create peer connection
@@ -126,33 +134,55 @@ export class RealtimeVoiceChat {
       const offer = await this.pc.createOffer();
       await this.pc.setLocalDescription(offer);
 
-      // Connect to OpenAI's Realtime API
+      // Connect to OpenAI's Realtime API (SDP POST)
       const baseUrl = "https://api.openai.com/v1/realtime";
       const model = "gpt-4o-realtime-preview-2024-12-17";
       
-      console.log("Connecting to OpenAI Realtime API...");
-      const sdpResponse = await fetch(`${baseUrl}?model=${model}`, {
-        method: "POST",
-        body: offer.sdp,
-        headers: {
-          Authorization: `Bearer ${EPHEMERAL_KEY}`,
-          "Content-Type": "application/sdp"
-        },
-      });
-
-      if (!sdpResponse.ok) {
-        const errorText = await sdpResponse.text();
-        console.error(`❌ OpenAI SDP handshake failed: ${sdpResponse.status}`, errorText);
-        throw new Error(`OpenAI connection failed (${sdpResponse.status}): ${sdpResponse.statusText}. Check model name and API access.`);
+      console.log("Connecting to OpenAI Realtime API with SDP…");
+      let sdpResponse: Response;
+      try {
+        sdpResponse = await fetch(`${baseUrl}?model=${encodeURIComponent(model)}`, {
+          method: "POST",
+          mode: "cors",
+          cache: "no-store",
+          headers: {
+            "Authorization": `Bearer ${EPHEMERAL_KEY}`,
+            "Content-Type": "application/sdp",
+            "Accept": "application/sdp",
+            "Cache-Control": "no-store",
+          },
+          body: offer.sdp,
+        });
+      } catch (e) {
+        console.error("❌ SDP POST network error:", e);
+        throw new Error("Failed to fetch (network/CORS) while posting SDP. Check headers and token.");
       }
 
-      const answer = {
-        type: "answer" as RTCSdpType,
-        sdp: await sdpResponse.text(),
-      };
-      
-      await this.pc.setRemoteDescription(answer);
-      console.log("WebRTC connection established");
+      if (!sdpResponse.ok) {
+        const errorText = await sdpResponse.text().catch(() => "<no body>");
+        console.error(`❌ OpenAI SDP handshake failed: ${sdpResponse.status}`, errorText);
+        
+        // Specific error messages for common status codes
+        if (sdpResponse.status === 401) {
+          throw new Error(`Authentication failed (401): Invalid or expired token. ${errorText}`);
+        } else if (sdpResponse.status === 403) {
+          throw new Error(`Access forbidden (403): Check API key permissions. ${errorText}`);
+        } else if (sdpResponse.status === 429) {
+          throw new Error(`Rate limited (429): Too many requests. ${errorText}`);
+        } else {
+          throw new Error(`OpenAI connection failed (${sdpResponse.status}): ${errorText}`);
+        }
+      }
+
+      // Verify response Content-Type
+      const contentType = sdpResponse.headers.get("Content-Type");
+      if (contentType && !contentType.includes("application/sdp")) {
+        console.warn(`⚠️ Unexpected Content-Type: ${contentType} (expected application/sdp)`);
+      }
+
+      const answerSdp = await sdpResponse.text();
+      await this.pc.setRemoteDescription({ type: "answer", sdp: answerSdp });
+      console.log("✅ WebRTC connection established with Realtime API");
 
     } catch (error) {
       console.error("Error initializing voice chat:", error);

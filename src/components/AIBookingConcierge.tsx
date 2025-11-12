@@ -529,12 +529,12 @@ export const AIBookingConcierge = () => {
               console.error('❌ Session token error:', error);
               throw new Error('Failed to connect to voice service. Please try again.');
             }
-            if (!data?.client_secret?.value) {
-              console.error('❌ Invalid session token received');
+            if (!data?.token) {
+              console.error('❌ Invalid session token received:', data);
               throw new Error('Invalid session token received');
             }
             console.log('✅ Session token obtained');
-            return data.client_secret.value;
+            return { token: data.token, expiresAt: data.expiresAt };
           } catch (err) {
             console.error('❌ Token fetch error:', err);
             throw new Error('Unable to connect to voice service');
