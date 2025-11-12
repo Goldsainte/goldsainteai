@@ -1,6 +1,8 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { verifyStripeWebhook, validateWebhookEvent, checkWebhookRateLimit } from "../_shared/webhookSecurity.ts";
+import { logger, generateTraceId } from "../_shared/structuredLogger.ts";
 
 // Map your paid product IDs to tiers used in app:
 const PRODUCT_TIER_MAP: Record<string, string> = { 
@@ -12,8 +14,6 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
   apiVersion: "2024-06-20",
 });
 
-const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
-
 const supabaseClient = createClient(
   Deno.env.get("SUPABASE_URL") ?? "",
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -21,25 +21,54 @@ const supabaseClient = createClient(
 );
 
 serve(async (req) => {
+  const requestId = generateTraceId();
+  logger.setContext({ functionName: 'stripe-webhook', requestId });
+
   const signature = req.headers.get("stripe-signature");
+  const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
 
   if (!signature || !webhookSecret) {
-    console.error("Missing stripe-signature header or webhook secret");
+    logger.error("Missing stripe-signature header or webhook secret");
     return new Response("Webhook signature or secret missing", { status: 400 });
   }
 
   try {
     const body = await req.text();
     
-    // Verify webhook signature
-    const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    // Verify webhook signature with enhanced security
+    const verification = await verifyStripeWebhook(body, signature, webhookSecret);
     
-    console.log(`Processing webhook event: ${event.type}`);
+    if (!verification.valid) {
+      logger.error("Webhook verification failed", new Error(verification.error || "Unknown error"));
+      return new Response(`Webhook Error: ${verification.error}`, { status: 400 });
+    }
+    
+    const event = verification.event!;
+    logger.info("Webhook received", { eventType: event.type, eventId: event.id });
+    
+    // Additional security validation
+    const validation = validateWebhookEvent(event);
+    if (!validation.valid) {
+      logger.warn("Webhook event validation failed", { error: validation.error });
+      return new Response(`Validation Error: ${validation.error}`, { status: 400 });
+    }
+    
+    // Rate limit check per event type
+    const rateLimit = checkWebhookRateLimit(event.type, 100); // 100 events per minute per type
+    if (!rateLimit.allowed) {
+      logger.warn("Webhook rate limit exceeded", { 
+        eventType: event.type,
+        retryAfter: rateLimit.retryAfter 
+      });
+      return new Response("Rate limit exceeded", { 
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfter || 60) }
+      });
+    }
 
     switch (event.type) {
       case "checkout.session.completed":
         await handleCheckoutSessionCompleted(event.data.object);
-        // also persist user_subscriptions for non-verification plans
         await handleStandardCheckout(event.data.object);
         break;
 
@@ -47,7 +76,6 @@ serve(async (req) => {
         await handleSubscriptionUpdated(event.data.object);
         break;
 
-      // keep parity for non-verification subs too
       case "customer.subscription.created":
         await upsertStandardSubscription(event.data.object);
         break;
@@ -62,27 +90,44 @@ serve(async (req) => {
         break;
       
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        logger.info("Unhandled webhook event type", { eventType: event.type });
     }
 
-    return new Response(JSON.stringify({ received: true }), {
+    logger.info("Webhook processed successfully", { 
+      eventType: event.type,
+      eventId: event.id 
+    });
+
+    return new Response(JSON.stringify({ received: true, requestId }), {
       headers: { "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error: any) {
-    console.error("Webhook error:", error.message);
-    return new Response(`Webhook Error: ${error.message}`, { status: 400 });
+    logger.error("Webhook processing failed", error, { 
+      eventType: (error as any)?.event?.type 
+    });
+    
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        requestId 
+      }), 
+      { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      }
+    );
   }
 });
 
 async function handleCheckoutSessionCompleted(session: any) {
-  console.log("Processing checkout.session.completed", session.id);
+  logger.info("Processing checkout.session.completed", { sessionId: session.id });
   
   const userId = session.metadata?.user_id;
   const subscriptionType = session.metadata?.subscription_type;
   
   if (!userId || subscriptionType !== 'verification') {
-    console.log("Not a verification subscription, skipping");
+    logger.info("Not a verification subscription, skipping");
     return;
   }
 
@@ -94,7 +139,7 @@ async function handleCheckoutSessionCompleted(session: any) {
       .eq('id', userId);
 
     if (profileError) {
-      console.error("Error updating profile:", profileError);
+      logger.error("Error updating profile", profileError);
       throw profileError;
     }
 
@@ -115,11 +160,11 @@ async function handleCheckoutSessionCompleted(session: any) {
       });
 
     if (subError) {
-      console.error("Error storing subscription:", subError);
+      logger.error("Error storing subscription", subError);
       throw subError;
     }
 
-    console.log(`✅ Granted verification badge to user ${userId}`);
+    logger.info("Granted verification badge", { userId });
     
     // Log activity
     await supabaseClient
@@ -135,17 +180,17 @@ async function handleCheckoutSessionCompleted(session: any) {
         }
       });
   } catch (error) {
-    console.error("Error in handleCheckoutSessionCompleted:", error);
+    logger.error("Error in handleCheckoutSessionCompleted", error as Error);
     throw error;
   }
 }
 
 async function handleSubscriptionUpdated(subscription: any) {
-  console.log("Processing customer.subscription.updated", subscription.id);
+  logger.info("Processing customer.subscription.updated", { subscriptionId: subscription.id });
   
   // Only process verification subscriptions
   if (subscription.metadata?.subscription_type !== 'verification') {
-    console.log("Not a verification subscription, skipping");
+    logger.info("Not a verification subscription, skipping");
     return;
   }
 
@@ -158,7 +203,7 @@ async function handleSubscriptionUpdated(subscription: any) {
       .single();
 
     if (findError || !subData) {
-      console.error("Subscription not found in database:", subscription.id);
+      logger.warn("Subscription not found in database", { subscriptionId: subscription.id });
       return;
     }
 
@@ -176,7 +221,7 @@ async function handleSubscriptionUpdated(subscription: any) {
       .eq('stripe_subscription_id', subscription.id);
 
     if (updateError) {
-      console.error("Error updating subscription:", updateError);
+      logger.error("Error updating subscription", updateError);
       throw updateError;
     }
 
@@ -189,11 +234,11 @@ async function handleSubscriptionUpdated(subscription: any) {
       .eq('id', userId);
 
     if (profileError) {
-      console.error("Error updating profile:", profileError);
+      logger.error("Error updating profile", profileError);
       throw profileError;
     }
 
-    console.log(`✅ Updated verification status for user ${userId}: ${isActive}`);
+    logger.info("Updated verification status", { userId, isActive });
     
     // Log activity
     await supabaseClient
@@ -209,16 +254,16 @@ async function handleSubscriptionUpdated(subscription: any) {
         }
       });
   } catch (error) {
-    console.error("Error in handleSubscriptionUpdated:", error);
+    logger.error("Error in handleSubscriptionUpdated", error as Error);
     throw error;
   }
 }
 
 async function handleSubscriptionDeleted(subscription: any) {
-  console.log("Processing customer.subscription.deleted", subscription.id);
+  logger.info("Processing customer.subscription.deleted", { subscriptionId: subscription.id });
   
   if (subscription.metadata?.subscription_type !== 'verification') {
-    console.log("Not a verification subscription, skipping");
+    logger.info("Not a verification subscription, skipping");
     return;
   }
 
@@ -231,7 +276,7 @@ async function handleSubscriptionDeleted(subscription: any) {
       .single();
 
     if (findError || !subData) {
-      console.error("Subscription not found in database:", subscription.id);
+      logger.warn("Subscription not found in database", { subscriptionId: subscription.id });
       return;
     }
 
@@ -244,7 +289,7 @@ async function handleSubscriptionDeleted(subscription: any) {
       .eq('id', userId);
 
     if (profileError) {
-      console.error("Error updating profile:", profileError);
+      logger.error("Error updating profile", profileError);
       throw profileError;
     }
 
@@ -258,11 +303,11 @@ async function handleSubscriptionDeleted(subscription: any) {
       .eq('stripe_subscription_id', subscription.id);
 
     if (updateError) {
-      console.error("Error updating subscription:", updateError);
+      logger.error("Error updating subscription", updateError);
       throw updateError;
     }
 
-    console.log(`✅ Revoked verification badge from user ${userId}`);
+    logger.info("Revoked verification badge", { userId });
     
     // Log activity
     await supabaseClient
@@ -278,7 +323,7 @@ async function handleSubscriptionDeleted(subscription: any) {
         }
       });
   } catch (error) {
-    console.error("Error in handleSubscriptionDeleted:", error);
+    logger.error("Error in handleSubscriptionDeleted", error as Error);
     throw error;
   }
 }
@@ -308,7 +353,7 @@ async function handleStandardCheckout(session: any) {
     if (!resolvedUserId) return;
     await supabaseClient.from('user_subscriptions').upsert({ user_id: resolvedUserId, tier });
   } catch (e) {
-    console.error('handleStandardCheckout error', e);
+    logger.error('handleStandardCheckout failed', e as Error);
   }
 }
 
@@ -327,7 +372,7 @@ async function upsertStandardSubscription(subscription: any) {
     if (!userId) return;
     await supabaseClient.from('user_subscriptions').upsert({ user_id: userId, tier });
   } catch (e) {
-    console.error('upsertStandardSubscription error', e);
+    logger.error('upsertStandardSubscription failed', e as Error);
   }
 }
 
@@ -343,12 +388,12 @@ async function handleStandardSubscriptionDeleted(subscription: any) {
     if (!userId) return;
     await supabaseClient.from('user_subscriptions').upsert({ user_id: userId, tier: 'free' });
   } catch (e) {
-    console.error('handleStandardSubscriptionDeleted error', e);
+    logger.error('handleStandardSubscriptionDeleted failed', e as Error);
   }
 }
 
 async function handlePaymentFailed(invoice: any) {
-  console.log("Processing invoice.payment_failed", invoice.id);
+  logger.info("Processing invoice.payment_failed", { invoiceId: invoice.id });
   
   try {
     const subscriptionId = invoice.subscription;
@@ -357,7 +402,7 @@ async function handlePaymentFailed(invoice: any) {
     const subscription = await stripe.subscriptions.retrieve(subscriptionId as string);
     
     if (subscription.metadata?.subscription_type !== 'verification') {
-      console.log("Not a verification subscription, skipping");
+      logger.info("Not a verification subscription, skipping");
       return;
     }
 
@@ -369,7 +414,7 @@ async function handlePaymentFailed(invoice: any) {
       .single();
 
     if (findError || !subData) {
-      console.error("Subscription not found in database:", subscriptionId);
+      logger.warn("Subscription not found in database", { subscriptionId });
       return;
     }
 
@@ -385,11 +430,11 @@ async function handlePaymentFailed(invoice: any) {
       .eq('stripe_subscription_id', subscriptionId);
 
     if (updateError) {
-      console.error("Error updating subscription:", updateError);
+      logger.error("Error updating subscription", updateError);
       throw updateError;
     }
 
-    console.log(`⚠️ Payment failed for user ${userId}, subscription marked as past_due`);
+    logger.warn("Payment failed, subscription past_due", { userId });
     
     // Log activity
     await supabaseClient
@@ -409,7 +454,7 @@ async function handlePaymentFailed(invoice: any) {
     // Note: Badge remains active during grace period (Stripe handles retry logic)
     // Badge will be revoked when subscription.deleted event fires if payment never succeeds
   } catch (error) {
-    console.error("Error in handlePaymentFailed:", error);
+    logger.error("Error in handlePaymentFailed", error as Error);
     throw error;
   }
 }

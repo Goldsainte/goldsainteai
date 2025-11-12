@@ -3,6 +3,8 @@ import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { checkRateLimit, createRateLimitResponse, getClientIdentifier } from "../_shared/rateLimiter.ts";
 import { logger, generateTraceId } from "../_shared/structuredLogger.ts";
+import { generateIdempotencyKey, withIdempotency } from "../_shared/idempotency.ts";
+import { retryStripeOperation } from "../_shared/retryWithBackoff.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -77,7 +79,10 @@ serve(async (req) => {
     
     // If no cached ID, look up by email and cache it
     if (!customerId) {
-      const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+      const customers = await retryStripeOperation(
+        async () => await stripe.customers.list({ email: user.email, limit: 1 }),
+        "customers.list"
+      );
       
       if (customers.data.length > 0) {
         customerId = customers.data[0].id;
@@ -103,24 +108,37 @@ serve(async (req) => {
       ? `${origin}/subscription?success=true&type=ai&tier=${tier || 'unknown'}`
       : `${origin}/subscription?success=true&type=subscription`;
     
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: "subscription",
-      success_url: successUrl,
-      cancel_url: `${origin}/subscription?canceled=true`,
-      metadata: {
-        user_id: user.id,
-        subscription_type: subscriptionType || 'main',
-        ...(tier && { tier }),
-      }
-    });
+    // Generate idempotency key for this checkout session
+    const idempotencyKey = generateIdempotencyKey('checkout', user.id);
+    logger.info("Generated idempotency key", { idempotencyKey });
+    
+    // Create checkout session with idempotency protection
+    const session = await withIdempotency(
+      idempotencyKey,
+      async () => {
+        return await stripe.checkout.sessions.create({
+          customer: customerId,
+          customer_email: customerId ? undefined : user.email,
+          line_items: [
+            {
+              price: priceId,
+              quantity: 1,
+            },
+          ],
+          mode: "subscription",
+          success_url: successUrl,
+          cancel_url: `${origin}/subscription?canceled=true`,
+          metadata: {
+            user_id: user.id,
+            subscription_type: subscriptionType || 'main',
+            ...(tier && { tier }),
+          }
+        }, {
+          idempotencyKey, // Stripe native idempotency key
+        });
+      },
+      { cache: true, expiresInHours: 1 } // Cache for 1 hour
+    );
 
     logger.info("Checkout session created successfully", { 
       sessionId: session.id, 
