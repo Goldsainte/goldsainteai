@@ -20,7 +20,6 @@ import { useTranslation } from "react-i18next";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import logomark from "@/assets/logomark-gold.png";
 import { ExpediaModalTrigger } from "@/components/ExpediaModalTrigger";
-import { NotificationCenter } from "@/components/NotificationCenter";
 import { CollaborationInvites } from "@/components/CollaborationInvites";
 import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -502,7 +501,6 @@ export const Header = () => {
 
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                {user && <NotificationCenter />}
                 
                 {/* Main Navigation - Desktop */}
                 <DropdownMenu>
