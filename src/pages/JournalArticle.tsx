@@ -4,7 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { ArticleBody } from "@/components/journal/ArticleBody";
 import { AuthorBio } from "@/components/journal/AuthorBio";
 import { RelatedArticles } from "@/components/journal/RelatedArticles";
-import { Helmet } from "react-helmet-async";
+import { ArticleSEO } from "@/components/journal/ArticleSEO";
+import { ShareButtons } from "@/components/journal/ShareButtons";
+import { SponsorRibbon } from "@/components/journal/SponsorRibbon";
+import { useArticleAnalytics } from "@/hooks/useArticleAnalytics";
 import { formatDistanceToNow } from "date-fns";
 import { Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,7 +26,12 @@ interface Article {
   meta_title: string;
   meta_description: string;
   og_image_url: string;
+  is_sponsored: boolean;
+  sponsor_name?: string;
+  sponsor_logo_url?: string;
+  sponsor_cta_url?: string;
   creator: {
+    id: string;
     name: string;
     avatar_url: string;
     bio: string;
@@ -48,6 +56,14 @@ export default function JournalArticle() {
   const [blocks, setBlocks] = useState<ArticleBlock[]>([]);
   const [relatedArticles, setRelatedArticles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Track analytics
+  useArticleAnalytics({
+    articleSlug: slug || "",
+    category: article?.categories?.[0],
+    authorId: article?.creator?.id,
+    isSponsored: article?.is_sponsored,
+  });
 
   useEffect(() => {
     if (slug) {
@@ -74,7 +90,11 @@ export default function JournalArticle() {
           meta_title,
           meta_description,
           og_image_url,
-          creator:journal_creators(name, avatar_url, bio, social_links)
+          is_sponsored,
+          sponsor_name,
+          sponsor_logo_url,
+          sponsor_cta_url,
+          creator:journal_creators(id, name, avatar_url, bio, social_links)
         `)
         .eq("slug", slug)
         .eq("status", "published")
@@ -204,41 +224,16 @@ export default function JournalArticle() {
 
   return (
     <>
-      <Helmet>
-        <title>{article.meta_title || article.title} | Goldsainte Journal</title>
-        <meta
-          name="description"
-          content={article.meta_description || article.dek}
-        />
-        <link rel="canonical" href={`https://goldsainte.ai/journal/${article.slug}`} />
-
-        {/* OpenGraph */}
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.dek} />
-        <meta
-          property="og:image"
-          content={article.og_image_url || article.hero_image_url}
-        />
-        <meta
-          property="og:url"
-          content={`https://goldsainte.ai/journal/${article.slug}`}
-        />
-        <meta property="article:published_time" content={article.publish_date} />
-        <meta property="article:author" content={article.creator.name} />
-
-        {/* Twitter */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={article.title} />
-        <meta name="twitter:description" content={article.dek} />
-        <meta
-          name="twitter:image"
-          content={article.og_image_url || article.hero_image_url}
-        />
-
-        {/* JSON-LD */}
-        <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
-      </Helmet>
+      <ArticleSEO
+        title={article.title}
+        dek={article.dek}
+        heroImageUrl={article.hero_image_url}
+        publishDate={article.publish_date}
+        authorName={article.creator.name}
+        slug={article.slug}
+        categories={article.categories}
+        readTime={article.read_time_minutes}
+      />
 
       <article className="min-h-screen bg-background" data-testid="article-hero">
         {/* Back button */}
@@ -321,9 +316,23 @@ export default function JournalArticle() {
           </div>
         </div>
 
+        {/* Sponsor Ribbon */}
+        {article.is_sponsored && (
+          <SponsorRibbon
+            sponsorName={article.sponsor_name}
+            sponsorLogo={article.sponsor_logo_url}
+            sponsorUrl={article.sponsor_cta_url}
+          />
+        )}
+
         {/* Article Body */}
         <div className="container mx-auto px-4 pb-16 max-w-3xl">
           <ArticleBody blocks={blocks} />
+
+          {/* Share Buttons */}
+          <div className="border-t border-b border-border py-6 my-8">
+            <ShareButtons title={article.title} slug={article.slug} />
+          </div>
 
           {/* Author Bio */}
           <AuthorBio author={article.creator} />

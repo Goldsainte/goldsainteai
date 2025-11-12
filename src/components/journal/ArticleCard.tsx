@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { OptimizedImage } from "./OptimizedImage";
 
 interface ArticleCardProps {
   article: {
@@ -29,11 +30,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
       <article className="h-full flex flex-col">
         {/* Image */}
         <div className="relative aspect-[4/3] mb-4 overflow-hidden rounded-xl">
-          <img
+          <OptimizedImage
             src={article.hero_image_url}
             alt={article.hero_image_alt || article.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            loading="lazy"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           {/* Category badge */}
           {article.categories.length > 0 && (
