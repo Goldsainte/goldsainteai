@@ -70,7 +70,7 @@ export const MarketplaceHero = ({ onSearch, activeTab }: MarketplaceHeroProps) =
           <Button
             size="lg"
             className="mt-2 md:mt-0"
-            onClick={() => navigate("/marketplace?create=true")}
+            onClick={() => navigate("/marketplace/request-trip")}
           >
             Post your dream trip
           </Button>
