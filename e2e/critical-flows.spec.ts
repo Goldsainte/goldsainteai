@@ -66,8 +66,8 @@ test.describe('Critical User Flows', () => {
       if (await selfServiceButton.isVisible()) {
         await selfServiceButton.click();
         
-        // Verify Expedia widget appears
-        await expect(page.locator('[data-testid="expedia-widget"], iframe[src*="expedia"]')).toBeVisible({ timeout: 15000 });
+        // Verify navigation to Expedia occurred
+        await page.waitForURL(/expedia\.com/, { timeout: 15000 });
       }
     });
 

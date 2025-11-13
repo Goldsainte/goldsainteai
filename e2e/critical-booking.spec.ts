@@ -35,9 +35,8 @@ test.describe('Booking Flow Critical Paths', () => {
       
       await page.waitForTimeout(3000);
       
-      // Widget should appear after explicit choice
-      const widget = page.frameLocator('iframe[src*="expedia"]').first();
-      await expect(widget.locator('body')).toBeVisible({ timeout: 10000 });
+      // Verify page navigated to Expedia
+      await expect(page).toHaveURL(/expedia\.com/, { timeout: 10000 });
     }
   });
 

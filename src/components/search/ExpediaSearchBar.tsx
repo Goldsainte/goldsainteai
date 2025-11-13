@@ -78,7 +78,7 @@ export default function ExpediaSearchBar() {
   // Keyboard handler
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      onSubmit();
+      handleSubmit();
     }
   };
 
@@ -95,21 +95,25 @@ export default function ExpediaSearchBar() {
     return () => document.removeEventListener("keydown", handleEsc);
   }, []);
 
-  function onSubmit() {
-    if (!destination.trim()) {
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+
+    const trimmedDestination = destination.trim();
+    if (!trimmedDestination) {
       setOpenWhere(true);
       return;
     }
+
     const url = buildExpediaAffiliateUrl({
-      destination: destination.trim(),
+      destination: trimmedDestination,
       checkIn,
       checkOut,
       guests: { adults, children },
     });
 
-    // Redirect (no iframe) so affiliate credit works
-    window.location.assign(url);
-  }
+    console.log("Redirecting to Expedia affiliate URL:", url);
+    window.location.href = url; // FULL redirect for affiliate tracking
+  };
 
   function onClear() {
     setDestination("");
@@ -120,13 +124,13 @@ export default function ExpediaSearchBar() {
   }
 
   return (
-    <div
-      className="mx-auto mt-3 hidden md:flex items-center"
-      style={{ maxWidth: 980 }}
+    <form
+      onSubmit={handleSubmit}
+      className="mx-auto hidden md:flex items-center w-full"
+      style={{ maxWidth: 900 }}
       aria-label="Goldsainte search"
     >
-      <div className="w-full rounded-full border border-white/40 bg-[hsl(var(--gs-gold))] text-[hsl(var(--gs-ink))] shadow-sm px-2 py-2">
-        <div className="flex items-center gap-1">
+      <div className="w-full h-12 rounded-full border border-white/40 bg-[hsl(var(--gs-gold))] text-[hsl(var(--gs-ink))] shadow-sm px-2 flex items-center gap-1">
           {/* WHERE pill */}
           <button
             ref={whereRefs.setReference}
@@ -137,7 +141,7 @@ export default function ExpediaSearchBar() {
               setOpenGuests(false);
             }}
             onKeyDown={handleKeyDown}
-            className="group flex-1 min-w-[260px] rounded-full px-4 py-2 text-left bg-white/70 hover:bg-white transition"
+            className="group flex-1 min-w-[200px] h-10 rounded-full px-4 text-left bg-white/70 hover:bg-white transition flex items-center"
           >
             <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
               Where
@@ -165,7 +169,7 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="min-w-[230px] rounded-full px-4 py-2 bg-white/70 hover:bg-white transition text-left"
+            className="min-w-[180px] h-10 rounded-full px-4 bg-white/70 hover:bg-white transition text-left flex items-center"
           >
             <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
               When
@@ -188,7 +192,7 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="min-w-[170px] rounded-full px-4 py-2 bg-white/70 hover:bg-white transition text-left"
+            className="min-w-[140px] h-10 rounded-full px-4 bg-white/70 hover:bg-white transition text-left flex items-center"
           >
             <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
               Who
@@ -203,12 +207,11 @@ export default function ExpediaSearchBar() {
 
           {/* Search button */}
           <button
-            type="button"
-            onClick={onSubmit}
-            className="ml-2 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white px-6 py-3 font-display text-[18px] leading-none flex items-center gap-2 hover:opacity-90"
+            type="submit"
+            className="h-10 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white px-5 font-display text-[16px] flex items-center gap-2 hover:opacity-90"
             aria-label="Search on Expedia"
           >
-            <SearchIcon className="h-5 w-5" />
+            <SearchIcon className="h-4 w-4" />
             Search
           </button>
 
@@ -221,14 +224,13 @@ export default function ExpediaSearchBar() {
             <button
               type="button"
               onClick={onClear}
-              className="ml-2 shrink-0 rounded-full bg-white/70 hover:bg-white text-[hsl(var(--gs-ink))] px-3 py-3"
+              className="h-10 w-10 shrink-0 rounded-full bg-white/70 hover:bg-white text-[hsl(var(--gs-ink))] flex items-center justify-center"
               aria-label="Clear all"
               title="Clear all"
             >
               <XIcon className="h-4 w-4" />
             </button>
           )}
-        </div>
       </div>
 
       {/* WHERE popover (portal so it never gets clipped) */}
@@ -386,6 +388,6 @@ export default function ExpediaSearchBar() {
           </div>,
           document.body
         )}
-    </div>
+    </form>
   );
 }
