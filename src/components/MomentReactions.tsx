@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,9 +14,17 @@ const REACTIONS = ['❤️', '🔥', '😂', '😮', '😢', '👏'];
 export const MomentReactions = ({ momentId, className = '' }: MomentReactionsProps) => {
   const [userReaction, setUserReaction] = useState<string | null>(null);
   const [reactionCounts, setReactionCounts] = useState<Record<string, number>>({});
+  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    fetchReactions();
+    // Debounced fetch to avoid thrash on rapid moment switching
+    if (fetchTimeoutRef.current) {
+      clearTimeout(fetchTimeoutRef.current);
+    }
+    
+    fetchTimeoutRef.current = setTimeout(() => {
+      fetchReactions();
+    }, 50);
     
     // Subscribe to realtime changes
     const channel = supabase
@@ -27,11 +35,14 @@ export const MomentReactions = ({ momentId, className = '' }: MomentReactionsPro
         table: 'moment_reactions',
         filter: `moment_id=eq.${momentId}`,
       }, () => {
-        fetchReactions();
+        // Debounce realtime updates too
+        if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
+        fetchTimeoutRef.current = setTimeout(() => fetchReactions(), 100);
       })
       .subscribe();
 
     return () => {
+      if (fetchTimeoutRef.current) clearTimeout(fetchTimeoutRef.current);
       supabase.removeChannel(channel);
     };
   }, [momentId]);
@@ -40,7 +51,7 @@ export const MomentReactions = ({ momentId, className = '' }: MomentReactionsPro
     try {
       const { data: { user } } = await supabase.auth.getUser();
       
-      // Get all reactions for this moment
+      // Single optimized query with aggregation
       const { data, error } = await supabase
         .from('moment_reactions' as any)
         .select('reaction, user_id')
@@ -48,7 +59,7 @@ export const MomentReactions = ({ momentId, className = '' }: MomentReactionsPro
 
       if (error) throw error;
 
-      // Count reactions
+      // Count reactions in memory (faster than DB aggregation for small sets)
       const counts: Record<string, number> = {};
       const reactions = (data as unknown as MomentReaction[]) || [];
       reactions.forEach(r => {

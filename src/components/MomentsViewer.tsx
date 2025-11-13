@@ -107,6 +107,13 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     };
 
     init();
+    
+    // Cleanup navigation timeout on unmount
+    return () => {
+      if (navigationTimeoutRef.current) {
+        clearTimeout(navigationTimeoutRef.current);
+      }
+    };
   }, [open, userId]);
 
   useEffect(() => {
@@ -228,26 +235,22 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
 
   const fetchMoments = async () => {
     try {
+      // Optimized: Join moments with profiles in single query to avoid N+1
       const { data, error } = await supabase
-    .from('moments')
-    .select('*, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service')
-    .eq('user_id', userId)
-    .gt('expires_at', new Date().toISOString())
-    .order('created_at', { ascending: false });
+        .from('moments')
+        .select(`
+          *,
+          profiles!moments_user_id_fkey(username, avatar_url)
+        `)
+        .eq('user_id', userId)
+        .gt('expires_at', new Date().toISOString())
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      // Fetch profile separately
       if (data && data.length > 0) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, avatar_url')
-          .eq('id', userId)
-          .single();
-
         const momentsWithProfile = data.map(moment => ({
           ...moment,
-          profiles: profile,
           text_styling: moment.text_styling as Moment['text_styling'],
           interactions: moment.interactions,
         }));
@@ -286,21 +289,54 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
     }
   };
 
+  // Debounced navigation to prevent setState thrash on rapid swipes
+  const navigationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
   const handleNext = () => {
-    setProgress(0); // Reset progress immediately
+    if (navigationTimeoutRef.current) return; // Guard against rapid navigation
+    
+    setProgress(0);
     if (currentIndex < moments.length - 1) {
       setCurrentIndex(prev => prev + 1);
+      // Prefetch next moment's media
+      if (currentIndex + 2 < moments.length) {
+        const nextMoment = moments[currentIndex + 2];
+        if (nextMoment?.media_url) {
+          const img = new Image();
+          img.src = nextMoment.media_url;
+        }
+      }
     } else {
       setSaveDialogOpen(false);
       onOpenChange(false);
     }
+    
+    // Debounce subsequent navigation
+    navigationTimeoutRef.current = setTimeout(() => {
+      navigationTimeoutRef.current = null;
+    }, 100);
   };
 
   const handlePrevious = () => {
-    setProgress(0); // Reset progress immediately
+    if (navigationTimeoutRef.current) return; // Guard against rapid navigation
+    
+    setProgress(0);
     if (currentIndex > 0) {
       setCurrentIndex(prev => prev - 1);
+      // Prefetch previous moment's media
+      if (currentIndex - 2 >= 0) {
+        const prevMoment = moments[currentIndex - 2];
+        if (prevMoment?.media_url) {
+          const img = new Image();
+          img.src = prevMoment.media_url;
+        }
+      }
     }
+    
+    // Debounce subsequent navigation
+    navigationTimeoutRef.current = setTimeout(() => {
+      navigationTimeoutRef.current = null;
+    }, 100);
   };
 
   const handleToggleSound = () => {
