@@ -108,10 +108,10 @@ function AppContent() {
 
   useEffect(() => {
     const hasSeenWelcome = localStorage.getItem("goldsainte-welcome-seen");
-    if (!hasSeenWelcome) {
+    if (!hasSeenWelcome && location.pathname === "/") {
       setShowWelcomeModal(true);
     }
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     const badge = document.querySelector(
