@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { redirectToExpedia } from "@/lib/expedia";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 export default function ExpediaSearchBar() {
   const [destination, setDestination] = useState("");
@@ -7,6 +12,21 @@ export default function ExpediaSearchBar() {
   const [checkOut, setCheckOut] = useState<string|undefined>();
   const [adults, setAdults] = useState<number>(2);
   const [children, setChildren] = useState<number>(0);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const handleDateSelect = (range: DateRange | undefined) => {
+    setDateRange(range);
+    if (range?.from) {
+      setCheckIn(format(range.from, "yyyy-MM-dd"));
+    } else {
+      setCheckIn(undefined);
+    }
+    if (range?.to) {
+      setCheckOut(format(range.to, "yyyy-MM-dd"));
+    } else {
+      setCheckOut(undefined);
+    }
+  };
 
   const onSearch = () => {
     try {
@@ -46,22 +66,33 @@ export default function ExpediaSearchBar() {
       {/* WHEN */}
       <div className="gs-cell">
         <div className="gs-label">WHEN</div>
-        <button
-          className="gs-buttonlike"
-          onClick={() => {
-            // open your date picker popover if you have one
-            // TEMP: clear any auto defaults; only show placeholders until selected
-          }}
-          aria-label="Choose dates"
-        >
-          {(checkIn && checkOut) ? (
-            <span>
-              {checkIn} – {checkOut}
-            </span>
-          ) : (
-            <span className="gs-placeholder">Add dates</span>
-          )}
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="gs-buttonlike"
+              aria-label="Choose dates"
+            >
+              {(checkIn && checkOut) ? (
+                <span>
+                  {format(new Date(checkIn), "MMM d")} – {format(new Date(checkOut), "MMM d")}
+                </span>
+              ) : (
+                <span className="gs-placeholder">Add dates</span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="range"
+              selected={dateRange}
+              onSelect={handleDateSelect}
+              numberOfMonths={2}
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              initialFocus
+              className={cn("p-3 pointer-events-auto")}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="gs-divider" />
