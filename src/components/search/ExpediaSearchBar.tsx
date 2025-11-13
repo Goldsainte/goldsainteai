@@ -44,6 +44,16 @@ export default function ExpediaSearchBar() {
     setChildrenAges(newAges);
   };
 
+  const handleClearAll = () => {
+    setDestination("");
+    setCheckIn(undefined);
+    setCheckOut(undefined);
+    setDateRange(undefined);
+    setAdults(2);
+    setChildren(0);
+    setChildrenAges([]);
+  };
+
   const onSearch = () => {
     try {
       redirectToExpedia({
@@ -215,6 +225,17 @@ export default function ExpediaSearchBar() {
 
       {/* SEARCH CTA */}
       <button className="gs-cta" onClick={onSearch}>Search</button>
+      
+      {/* CLEAR ALL */}
+      {(destination || checkIn || checkOut || adults !== 2 || children > 0) && (
+        <button 
+          className="gs-clear" 
+          onClick={handleClearAll}
+          aria-label="Clear all fields"
+        >
+          Clear
+        </button>
+      )}
     </div>
   );
 }

@@ -888,6 +888,23 @@ html, body, #root, #main-content {
     opacity: 0.9;
   }
 
+  /* Clear button */
+  .gs-clear {
+    margin-left: 8px;
+    height: 40px;
+    padding: 0 16px;
+    border-radius: var(--gs-radius-pill);
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    background: transparent;
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: 500;
+    font-size: 14px;
+  }
+
+  .gs-clear:hover {
+    background: rgba(0, 0, 0, 0.04);
+  }
+
   /* Remove thick focus bubbles & outlines globally for this control */
   .gs-pill *:focus {
     outline: none;
