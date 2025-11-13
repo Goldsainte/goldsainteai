@@ -9,13 +9,13 @@ export function useNewMomentsToast() {
 
   useEffect(() => {
     const channel = supabase
-      .channel('moments-insert')
+      .channel('feed-posts-insert')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'moments' },
+        { event: 'INSERT', schema: 'public', table: 'travel_posts' },
         (payload) => {
-          const newMoment = payload.new as any;
-          if (newMoment.created_at > lastSeenRef.current) {
+          const newPost = payload.new as any;
+          if (newPost.created_at > lastSeenRef.current && newPost.status === 'active') {
             setPending(v => v + 1);
           }
         }

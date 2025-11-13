@@ -22,6 +22,7 @@ import { DraftPostsManager } from "@/components/DraftPostsManager";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
 import { fetchFeedPaginated } from "@/lib/data/posts";
+import { useNewMomentsToast } from "@/hooks/useNewMomentsToast";
 
 interface TravelPost {
   id: string;
@@ -58,6 +59,7 @@ interface TravelPost {
 const TravelFeed = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  useNewMomentsToast(); // Real-time notifications for new posts
   const [posts, setPosts] = useState<TravelPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
