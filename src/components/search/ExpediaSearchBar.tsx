@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
 import { CalendarIcon, Users2Icon, SearchIcon, MapPinIcon, XIcon } from "lucide-react";
@@ -31,6 +31,9 @@ export default function ExpediaSearchBar() {
   const [checkOut, setCheckOut] = useState<string | undefined>(undefined);
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  
+  // Ref for WHERE input
+  const whereInputRef = useRef<HTMLInputElement>(null);
 
   // Popover state
   const [openDates, setOpenDates] = useState(false);
@@ -126,11 +129,17 @@ export default function ExpediaSearchBar() {
   return (
     <>
       <style>{`
-        .expedia-search-input::placeholder {
-          color: #47555E;
+        .expedia-search-input {
+          color: #1F3D36;
           font-family: "Playfair Display", serif;
           font-size: 16px;
-          line-height: 24px;
+          line-height: 1.2;
+        }
+        .expedia-search-input::placeholder {
+          color: #6F6F6F;
+          font-family: "Playfair Display", serif;
+          font-size: 16px;
+          line-height: 1.2;
         }
       `}</style>
       <form
@@ -141,35 +150,41 @@ export default function ExpediaSearchBar() {
     >
       <div className="w-full h-[56px] rounded-[28px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
           {/* WHERE pill */}
-          <button
+          <div
             ref={whereRefs.setReference}
-            type="button"
+            className="h-[54px] px-4 rounded-[21px] bg-white/40 hover:bg-white/60 transition flex items-center gap-3 cursor-text"
+            style={{ width: 238 }}
             onClick={() => {
-              setOpenWhere((v) => !v);
+              whereInputRef.current?.focus();
+              setOpenWhere(true);
               setOpenDates(false);
               setOpenGuests(false);
             }}
-            onKeyDown={handleKeyDown}
-            className="group h-[42px] rounded-[21px] px-4 text-left bg-white/40 hover:bg-white/60 transition flex flex-col justify-center"
-            style={{ width: 238 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHERE
             </div>
-              <input
-                className="w-full bg-transparent outline-none font-display expedia-search-input"
-                style={{ 
-                  fontSize: '16px', 
-                  lineHeight: '24px',
-                  color: '#47555E'
-                }}
-                placeholder="Search destinations"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                onFocus={() => setOpenWhere(true)}
-                aria-label="Destination"
-              />
-          </button>
+            <input
+              ref={whereInputRef}
+              type="text"
+              className="w-full bg-transparent outline-none font-display expedia-search-input"
+              style={{
+                padding: 0,
+                margin: 0,
+                height: 'auto'
+              }}
+              placeholder="Search destinations"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              onFocus={() => {
+                setOpenWhere(true);
+                setOpenDates(false);
+                setOpenGuests(false);
+              }}
+              onKeyDown={handleKeyDown}
+              aria-label="Destination"
+            />
+          </div>
 
           {/* Divider */}
           <div className="h-[27px] w-px bg-black/12 mx-1" />
@@ -184,13 +199,13 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            className="h-[54px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 128 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK IN
             </div>
-            <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
+            <span className="font-display" style={{ fontSize: '16px', lineHeight: 1.2, color: '#47555E' }}>
               {checkIn || "Add date"}
             </span>
           </button>
@@ -207,13 +222,13 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            className="h-[54px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 128 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK OUT
             </div>
-            <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
+            <span className="font-display" style={{ fontSize: '16px', lineHeight: 1.2, color: '#47555E' }}>
               {checkOut || "Add date"}
             </span>
           </button>
@@ -231,15 +246,15 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            className="h-[54px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 153 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHO
             </div>
-              <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
-                {adults + children} {adults + children === 1 ? "guest" : "guests"}
-              </span>
+            <span className="font-display" style={{ fontSize: '16px', lineHeight: 1.2, color: '#47555E' }}>
+              {adults + children} {adults + children === 1 ? "guest" : "guests"}
+            </span>
           </button>
 
           {/* Search button - 48px circle */}
