@@ -7,6 +7,13 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   
+  // Build-time diagnostic logging for Sentry DSN
+  const processEnvDsn = process.env.VITE_SENTRY_DSN;
+  const loadEnvDsn = env.VITE_SENTRY_DSN;
+  console.log('[Vite Config] mode:', mode);
+  console.log('[Vite Config] process.env.VITE_SENTRY_DSN present:', Boolean(processEnvDsn), processEnvDsn ? `prefix: ${processEnvDsn.substring(0, 20)}...` : 'empty');
+  console.log('[Vite Config] loadEnv VITE_SENTRY_DSN present:', Boolean(loadEnvDsn), loadEnvDsn ? `prefix: ${loadEnvDsn.substring(0, 20)}...` : 'empty');
+  
   return {
     server: {
       host: "::",
