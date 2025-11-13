@@ -26,6 +26,7 @@ import { Input } from "@/components/ui/input";
 import { MomentDrawingDisplay } from "./MomentDrawingDisplay";
 import { MomentInteractionDisplay } from "./MomentInteractionDisplay";
 import { MomentReactions } from "./MomentReactions";
+import { OptimizedImage } from "@/components/OptimizedImage";
 import { useUserPreferences } from "@/hooks/useUserPreferences";
 
 interface Moment {
@@ -690,10 +691,12 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
               </div>
             ) : currentMoment.media_type === 'image' ? (
               <div className="relative w-full h-full flex items-center justify-center">
-                <img
+                <OptimizedImage
                   src={currentMoment.media_url || ''}
                   alt="Moment"
-                  className="w-full h-full max-h-[85vh] object-contain bg-black"
+                  mode="contain"
+                  className="max-h-[85vh]"
+                  priority
                 />
                 {currentMoment.drawing_data && (
                   <MomentDrawingDisplay

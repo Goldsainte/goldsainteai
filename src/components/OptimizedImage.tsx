@@ -1,25 +1,33 @@
 import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
+type Mode = 'cover' | 'contain';
+
 interface OptimizedImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
+  width?: number;
+  height?: number;
   aspectRatio?: "square" | "video" | "auto";
+  mode?: Mode;
   priority?: boolean;
 }
 
 export const OptimizedImage = ({
   src,
   alt,
+  width,
+  height,
   className,
   aspectRatio = "auto",
+  mode = "contain",
   priority = false,
   ...props
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isInView, setIsInView] = useState(priority);
   const [error, setError] = useState(false);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (priority) return;
@@ -43,6 +51,20 @@ export const OptimizedImage = ({
     return () => observer.disconnect();
   }, [priority]);
 
+  // Calculate aspect ratio for preventing CLS
+  const ratio = width && height ? (height / width) * 100 : undefined;
+  
+  // Generate responsive sizes
+  const sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
+  
+  // Generate srcset for responsive images (if supported by storage)
+  const generateSrcSet = () => {
+    if (!src.includes("supabase")) return src;
+    return [400, 800, 1200, 1600]
+      .map(w => `${src}?w=${w}&q=80 ${w}w`)
+      .join(", ");
+  };
+
   const aspectClasses = {
     square: "aspect-square",
     video: "aspect-[9/16]",
@@ -51,12 +73,13 @@ export const OptimizedImage = ({
 
   return (
     <div
+      ref={imgRef}
       className={cn(
         "relative overflow-hidden bg-muted",
-        aspectClasses[aspectRatio],
+        !ratio && aspectClasses[aspectRatio],
         className
       )}
-      ref={imgRef}
+      style={ratio ? { paddingTop: `${ratio}%` } : undefined}
     >
       {/* Loading skeleton */}
       {!isLoaded && !error && (
@@ -76,14 +99,20 @@ export const OptimizedImage = ({
       {isInView && !error && (
         <img
           src={src}
+          srcSet={generateSrcSet()}
+          sizes={sizes}
           alt={alt}
           className={cn(
-            "h-full w-full object-cover transition-opacity duration-300",
+            ratio ? "absolute inset-0" : "",
+            "h-full w-full transition-opacity duration-300",
+            `object-${mode}`,
             isLoaded ? "opacity-100" : "opacity-0"
           )}
           onLoad={() => setIsLoaded(true)}
           onError={() => setError(true)}
           loading={priority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={priority ? "high" : "auto"}
           {...props}
         />
       )}
