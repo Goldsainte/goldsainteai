@@ -29,6 +29,7 @@ import Auth from "./pages/Auth";
 import AuthCallback from "./pages/AuthCallback";
 import TravelFeed from "./pages/TravelFeed";
 import NotFound from "./pages/NotFound";
+import DesktopShell from "./layout/DesktopShell";
 
 // Lazy load heavy components
 const AIBookingConcierge = lazy(() => import("@/components/AIBookingConcierge").then(m => ({ default: m.AIBookingConcierge })));
@@ -98,6 +99,8 @@ const CoCuratedDashboard = lazy(() => import("./pages/CoCuratedDashboard"));
 const CoCuratedCreate = lazy(() => import("./pages/CoCuratedCreate"));
 const CoCuratedMarketplace = lazy(() => import("./pages/CoCuratedMarketplace"));
 const CoCuratedPackage = lazy(() => import("./pages/CoCuratedPackage"));
+const ExplorePage = lazy(() => import("./pages/ExplorePage"));
+const ReelsViewer = lazy(() => import("./pages/ReelsViewer"));
 const CoCuratedBookingSuccess = lazy(() => import("./pages/CoCuratedBookingSuccess"));
 const CoCuratedJourneys = lazy(() => import("./pages/CoCuratedJourneys"));
 const TourActivityDetail = lazy(() => import("./pages/TourActivityDetail"));
@@ -251,8 +254,17 @@ function AppContent() {
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/travel-feed" element={<TravelFeed />} />
-          <Route path="/journeys" element={<TravelFeed />} />
+          
+          {/* Social routes with DesktopShell */}
+          <Route element={<DesktopShell />}>
+            <Route path="/travel-feed" element={<TravelFeed />} />
+            <Route path="/journeys" element={<TravelFeed />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/reels" element={<ReelsViewer />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/travel-profile" element={<TravelProfile />} />
+            <Route path="/travel-profile/:userId" element={<TravelProfile />} />
+          </Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="/login" element={<Auth />} />
           <Route path="/signup" element={<Auth />} />
@@ -292,9 +304,6 @@ function AppContent() {
           <Route path="/collections/:collectionId" element={<CollectionDetail />} />
           <Route path="/my-bookings" element={<MyBookingsRedirect />} />
           <Route path="/booking-history" element={<BookingHistory />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/travel-profile" element={<TravelProfile />} />
-          <Route path="/travel-profile/:userId" element={<TravelProfile />} />
           <Route path="/travel-settings" element={<TravelSettings2 />} />
           <Route path="/travel-settings-2" element={<TravelSettings2 />} />
           <Route path="/travel-settings/edit" element={<TravelSettings />} />
