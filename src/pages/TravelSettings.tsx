@@ -104,7 +104,11 @@ const TravelSettings = () => {
   const checkVerificationStatus = async () => {
     setCheckingVerification(true);
     try {
-      const { data, error } = await supabase.functions.invoke('check-verification');
+      // Get auth token for Edge Function calls
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers = { Authorization: `Bearer ${sessionData.session?.access_token}` };
+
+      const { data, error } = await supabase.functions.invoke('check-verification', { headers });
       
       if (error) throw error;
       
@@ -202,8 +206,13 @@ const TravelSettings = () => {
     try {
       toast.loading('Opening checkout...');
       
+      // Get auth token for Edge Function calls
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers = { Authorization: `Bearer ${sessionData.session?.access_token}` };
+      
       const { data, error } = await supabase.functions.invoke('create-verification-checkout', {
-        body: { returnUrl: window.location.origin + window.location.pathname }
+        body: { returnUrl: window.location.origin + window.location.pathname },
+        headers
       });
 
       if (error) throw error;

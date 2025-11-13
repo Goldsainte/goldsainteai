@@ -33,8 +33,13 @@ export const PaymentModal = ({
     try {
       setProcessing(true);
 
+      // Get auth token for Edge Function calls
+      const { data: sessionData } = await supabase.auth.getSession();
+      const headers = { Authorization: `Bearer ${sessionData.session?.access_token}` };
+
       const { data, error } = await supabase.functions.invoke('process-marketplace-payment', {
-        body: { jobId, bidId }
+        body: { jobId, bidId },
+        headers
       });
 
       if (error) throw error;
@@ -48,7 +53,8 @@ export const PaymentModal = ({
             bidId,
             amount,
             currency
-          }
+          },
+          headers
         });
 
         if (checkoutError) throw checkoutError;
