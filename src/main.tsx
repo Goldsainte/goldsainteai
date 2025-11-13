@@ -1,31 +1,51 @@
 import { createRoot } from "react-dom/client";
 import * as Sentry from "@sentry/react";
+import { 
+  setupLongTaskMonitoring, 
+  setupWebVitalsMonitoring,
+  monitorMemory 
+} from "@/lib/monitoring/sentry-config";
+import { 
+  setupRageClickDetection, 
+  setupDeadClickDetection,
+  initializeSessionReplay 
+} from "@/lib/monitoring/session-replay";
 import App from "./App.tsx";
 import "./index.css";
 
-// Initialize Sentry for error monitoring
-Sentry.init({
-  dsn: import.meta.env.VITE_SENTRY_DSN,
-  environment: import.meta.env.VITE_ENV || import.meta.env.MODE || 'development',
-  enabled: import.meta.env.PROD, // Only enable in production
-  tracesSampleRate: 0.2, // 20% of transactions for performance monitoring
-  replaysSessionSampleRate: 0.1, // 10% of sessions
-  replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
-  integrations: [
-    Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration({
-      maskAllText: false,
-      blockAllMedia: false,
-    }),
-  ],
-  beforeSend(event, hint) {
-    // Filter out development errors
-    if (import.meta.env.DEV) {
-      return null;
-    }
-    return event;
-  },
-});
+const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
+
+if (SENTRY_DSN) {
+  Sentry.init({
+    dsn: SENTRY_DSN,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
+        maskAllText: true,
+        blockAllMedia: true,
+      }),
+    ],
+    tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
+    replaysSessionSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+    environment: import.meta.env.MODE,
+    release: `goldsainte@${import.meta.env.VITE_APP_VERSION || 'dev'}`,
+    beforeSend(event, hint) {
+      if (event.exception) {
+        console.error('[Sentry] Capturing exception:', hint.originalException);
+      }
+      return event;
+    },
+  });
+
+  setupLongTaskMonitoring();
+  setupWebVitalsMonitoring();
+  setupRageClickDetection();
+  setupDeadClickDetection();
+  initializeSessionReplay();
+
+  setInterval(monitorMemory, 30000);
+}
 
 // Error fallback UI
 const ErrorFallback = ({ error }: { error: unknown }) => {
