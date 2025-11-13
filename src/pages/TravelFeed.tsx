@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import * as Sentry from "@sentry/react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Upload, ChevronLeft, Settings, User, PlusSquare, Home, Search as SearchIcon, Plus } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -21,64 +21,106 @@ import { SuggestedUsers } from "@/components/SuggestedUsers";
 import { DraftPostsManager } from "@/components/DraftPostsManager";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
 import VendorPromotionFeed from "@/components/VendorPromotionFeed";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchFeedPaginated } from "@/lib/data/posts";
+import type { TravelPost } from "@/lib/data/posts";
 import { useNewMomentsToast } from "@/hooks/useNewMomentsToast";
-
-interface TravelPost {
-  id: string;
-  user_id: string;
-  video_url?: string;
-  embed_url?: string;
-  embed_platform?: string;
-  original_creator?: string;
-  thumbnail_url: string | null;
-  image_urls?: string[];
-  media_type?: string;
-  caption: string | null;
-  location: string | null;
-  view_count: number;
-  like_count: number;
-  comment_count: number;
-  share_count?: number;
-  is_featured?: boolean;
-  music_track_id?: string;
-  music_track_name?: string;
-  music_track_artist?: string;
-  music_preview_url?: string;
-  music_album_art?: string;
-  music_service?: string;
-  created_at: string;
-  profiles?: {
-    username: string | null;
-    avatar_url: string | null;
-    is_verified?: boolean;
-    instagram_username?: string | null;
-  };
-}
 
 const TravelFeed = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   useNewMomentsToast(); // Real-time notifications for new posts
-  const [posts, setPosts] = useState<TravelPost[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [cursor, setCursor] = useState<string | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [createSheetOpen, setCreateSheetOpen] = useState(false);
   const [createMomentOpen, setCreateMomentOpen] = useState(false);
-  const [isPersonalized, setIsPersonalized] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [visibleVideoId, setVisibleVideoId] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const scrollSnapTimer = useRef<number | null>(null);
   const { isAdmin } = useUserRole();
   const [searchParams] = useSearchParams();
   const targetPostId = searchParams.get('postId');
   const isMobile = useIsMobile();
   const [hasInteracted, setHasInteracted] = useState(false);
+  const feedQuery = useInfiniteQuery({
+    queryKey: ["travel-feed", user?.id ?? "anonymous", targetPostId ?? null],
+    queryFn: async ({ pageParam, signal }) => {
+      const cursorParam = typeof pageParam === "string" ? pageParam : pageParam?.cursor;
+      const focusParam = typeof pageParam === "object" ? pageParam?.focusPostId : undefined;
+      return fetchFeedPaginated({
+        cursor: cursorParam ?? undefined,
+        limit: focusParam ? 12 : 20,
+        personalized: Boolean(user && !focusParam && !targetPostId),
+        focusPostId: focusParam ?? (cursorParam ? undefined : targetPostId ?? undefined),
+        signal,
+      });
+    },
+    initialPageParam: { cursor: undefined, focusPostId: targetPostId ?? undefined },
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? { cursor: lastPage.nextCursor } : undefined),
+    staleTime: 30_000,
+    gcTime: 5 * 60_000,
+  });
+
+  const posts = useMemo(
+    () => feedQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    [feedQuery.data],
+  );
+
+  const isPersonalized = useMemo(
+    () => Boolean(feedQuery.data?.pages.find((page) => page.personalized)),
+    [feedQuery.data],
+  );
+
+  const loading = feedQuery.status === "pending";
+  const loadingMore = feedQuery.isFetchingNextPage;
+  const hasMore = Boolean(feedQuery.hasNextPage);
+  const { refetch, fetchNextPage } = feedQuery;
+
+  const refreshFeed = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const loadMorePosts = useCallback(() => {
+    if (!hasMore || loadingMore) return;
+    fetchNextPage().catch((error) => {
+      Sentry.captureException(error, {
+        level: 'warning',
+        tags: { feature: 'travel_feed', operation: 'pagination' },
+      });
+      toast.error('Failed to load more posts');
+    });
+  }, [fetchNextPage, hasMore, loadingMore, toast]);
+
+  useEffect(() => {
+    if (!feedQuery.error) return;
+    Sentry.captureException(feedQuery.error, {
+      level: 'error',
+      tags: { feature: 'travel_feed', operation: 'initial_load' },
+    });
+    toast.error('Failed to load posts');
+  }, [feedQuery.error, toast]);
+
+  useEffect(() => {
+    if (!targetPostId || posts.length === 0) {
+      return;
+    }
+
+    const focusIndex = posts.findIndex((post) => post.id === targetPostId);
+    if (focusIndex >= 0) {
+      setCurrentIndex(focusIndex);
+      const container = containerRef.current;
+      if (container) {
+        requestAnimationFrame(() => {
+          container.scrollTo({ top: focusIndex * container.clientHeight, behavior: 'instant' as ScrollBehavior });
+        });
+      }
+      return;
+    }
+
+    if (hasMore && !loadingMore) {
+      fetchNextPage().catch(() => undefined);
+    }
+  }, [fetchNextPage, hasMore, loadingMore, posts, targetPostId]);
 
   // Track which video is currently visible in viewport
   useEffect(() => {
@@ -109,8 +151,6 @@ const TravelFeed = () => {
   }, [posts, isMobile]);
 
   useEffect(() => {
-    fetchPosts(targetPostId || undefined);
-    
     // Capture first user interaction for autoplay compliance
     const handleInteraction = () => {
       setHasInteracted(true);
@@ -123,144 +163,14 @@ const TravelFeed = () => {
     window.addEventListener('touchstart', handleInteraction);
     window.addEventListener('wheel', handleInteraction);
     window.addEventListener('keydown', handleInteraction);
-    
+
     return () => {
       window.removeEventListener('pointerdown', handleInteraction);
       window.removeEventListener('touchstart', handleInteraction);
       window.removeEventListener('wheel', handleInteraction);
       window.removeEventListener('keydown', handleInteraction);
     };
-  }, [targetPostId]);
-
-  const fetchPosts = async (focusPostId?: string) => {
-    const loadingTimeout = setTimeout(() => {
-      if (loading) {
-        console.warn('Loading timeout reached, showing available posts');
-        setLoading(false);
-      }
-    }, 10000);
-
-    try {
-      setLoading(true);
-      
-      if (user && !focusPostId) {
-        // Use cursor-based pagination for initial load
-        const response = await fetchFeedPaginated({ limit: 20 });
-        setPosts(response.items);
-        setCursor(response.nextCursor);
-        setHasMore(response.hasMore);
-        setLoading(false);
-        
-        // Background: load personalized feed with error handling
-        const { data, error } = await supabase.functions.invoke('get-personalized-feed').catch((err) => {
-          console.error('Failed to fetch personalized feed:', err);
-          return { data: null, error: err };
-        });
-        
-        if (!error && data) {
-          const personalized = ((data as any)?.posts || []) as TravelPost[];
-          const map = new Map<string, TravelPost>();
-          response.items.forEach(p => map.set(p.id, p));
-          personalized.forEach(p => {
-            const existing = map.get(p.id) || ({} as TravelPost);
-            map.set(p.id, { ...existing, ...p });
-          });
-          const merged = Array.from(map.values());
-          setPosts(merged);
-          setIsPersonalized(true);
-        }
-      } else if (focusPostId) {
-        const loadedPosts = await fetchChronologicalPosts(0, 12);
-        const idx = loadedPosts.findIndex((p) => p.id === focusPostId);
-        if (idx >= 0) {
-          setCurrentIndex(idx);
-          const container = containerRef.current;
-          if (container) {
-            requestAnimationFrame(() => {
-              container.scrollTo({ top: idx * container.clientHeight, behavior: 'instant' as ScrollBehavior });
-            });
-          }
-        }
-        setPosts(loadedPosts);
-      } else {
-        const response = await fetchFeedPaginated({ limit: 20 });
-        setPosts(response.items);
-        setCursor(response.nextCursor);
-        setHasMore(response.hasMore);
-      }
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      toast.error("Failed to load posts");
-    } finally {
-      clearTimeout(loadingTimeout);
-      setLoading(false);
-    }
-  };
-
-  const fetchChronologicalPosts = async (offset = 0, limit = 12): Promise<TravelPost[]> => {
-    console.log('Fetching chronological posts...', { offset, limit });
-    const { data, error } = await supabase
-      .from('travel_posts')
-      .select('id, user_id, video_url, embed_url, embed_platform, original_creator, thumbnail_url, image_urls, media_type, caption, location, view_count, like_count, comment_count, share_count, is_featured, music_track_id, music_track_name, music_track_artist, music_preview_url, music_album_art, music_service, native_video_volume, music_volume, created_at')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (error) {
-      console.error('Error fetching posts:', error);
-      throw error;
-    }
-    
-    console.log('Found posts:', data?.length || 0);
-
-    // Batch fetch profiles to avoid N+1
-    const userIds = Array.from(new Set((data || []).map((p: any) => p.user_id).filter(Boolean)));
-    let profilesData: any[] = [];
-    if (userIds.length > 0) {
-      const { data: pData } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, is_verified, instagram_username')
-        .in('id', userIds);
-      profilesData = pData || [];
-    }
-    const profilesMap = new Map((profilesData || []).map((p: any) => [p.id, p]));
-
-    const postsWithProfiles = (data || []).map((post: any) => ({
-      ...post,
-      profiles: profilesMap.get(post.user_id) || { id: post.user_id, username: 'TravelExplorer', avatar_url: null, is_verified: false, instagram_username: null }
-    }));
-    
-    console.log('Posts with profiles:', postsWithProfiles.length);
-    
-    if (offset === 0) {
-      setPosts(postsWithProfiles);
-    } else {
-      setPosts(prev => [...prev, ...postsWithProfiles]);
-    }
-    
-    setHasMore(postsWithProfiles.length === limit);
-    return postsWithProfiles;
-  };
-
-  const loadMorePosts = async () => {
-    if (loadingMore || !hasMore || !cursor) return;
-    
-    try {
-      setLoadingMore(true);
-      
-      // Use cursor-based pagination for efficient loading
-      const response = await fetchFeedPaginated({ cursor, limit: 20 });
-      
-      setPosts(prev => [...prev, ...response.items]);
-      setCursor(response.nextCursor);
-      setHasMore(response.hasMore);
-    } catch (error) {
-      console.error('Error loading more posts:', error);
-      toast.error('Failed to load more posts');
-    } finally {
-      setLoadingMore(false);
-    }
-  };
+  }, []);
 
   useEffect(() => {
     if (!isMobile) {
@@ -291,7 +201,7 @@ const TravelFeed = () => {
   };
 
   const handleVideoUpload = () => {
-    fetchPosts();
+    void refreshFeed();
     setUploadModalOpen(false);
   };
 
@@ -361,7 +271,7 @@ const TravelFeed = () => {
                       <TravelVideoCard
                         post={post}
                         isActive={visibleVideoId === post.id}
-                        onUpdate={fetchPosts}
+                        onUpdate={refreshFeed}
                         layout="desktop"
                         isMuted={visibleVideoId !== post.id}
                         onToggleMute={() => setIsMuted(!isMuted)}
@@ -447,7 +357,7 @@ const TravelFeed = () => {
                     <TravelVideoCard
                       post={post}
                       isActive={index === currentIndex}
-                      onUpdate={fetchPosts}
+                      onUpdate={refreshFeed}
                       isMuted={isMuted}
                       onToggleMute={() => setIsMuted(!isMuted)}
                       hasInteracted={hasInteracted}

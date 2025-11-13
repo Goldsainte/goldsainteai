@@ -1,6 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import * as Sentry from '@sentry/react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
+import {
+  fetchPresenceSnapshot,
+  markOffline,
+  PresenceSnapshot,
+  sendPresenceHeartbeat,
+  subscribeToPresenceStream,
+} from '@/lib/realtime/presence-service';
 
 interface UserPresence {
   user_id: string;
@@ -12,109 +19,190 @@ export const usePresence = () => {
   const { user } = useAuth();
   const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const [presenceData, setPresenceData] = useState<Map<string, UserPresence>>(new Map());
+  const snapshotIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const HEARTBEAT_INTERVAL_MS = 120000; // 2 minutes between heartbeats
+  const MAX_HEARTBEAT_INTERVAL_MS = 600000; // cap exponential backoff at 10 minutes
+  const SNAPSHOT_INTERVAL_MS = 300000; // 5-minute snapshot safeguard when SSE is unavailable
 
   useEffect(() => {
     if (!user) return;
 
-    // Create presence channel
-    const channel = supabase.channel('online-users');
+    let isMounted = true;
+    let heartbeatTimeout: ReturnType<typeof setTimeout> | null = null;
+    let currentHeartbeatInterval = HEARTBEAT_INTERVAL_MS;
+    let unsubscribeStream: (() => void) | null = null;
 
-    // Subscribe to presence
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        const state = channel.presenceState();
-        const online = new Set<string>();
-        const presenceMap = new Map<string, UserPresence>();
+    const clearHeartbeat = () => {
+      if (heartbeatTimeout) {
+        clearTimeout(heartbeatTimeout);
+        heartbeatTimeout = null;
+      }
+    };
 
-        Object.keys(state).forEach((key) => {
-          const presences = state[key] as any[];
-          presences.forEach((presence) => {
-            online.add(presence.user_id);
-            presenceMap.set(presence.user_id, presence);
-          });
-        });
+    const applySnapshot = (snapshot: PresenceSnapshot) => {
+      const nextOnline = new Set<string>();
+      const nextPresence = new Map<string, UserPresence>();
 
-        setOnlineUsers(online);
-        setPresenceData(presenceMap);
-      })
-      .on('presence', { event: 'join' }, ({ newPresences }) => {
-        newPresences.forEach((presence: any) => {
-          setOnlineUsers(prev => new Set(prev).add(presence.user_id));
-          setPresenceData(prev => new Map(prev).set(presence.user_id, presence));
-        });
-      })
-      .on('presence', { event: 'leave' }, ({ leftPresences }) => {
-        leftPresences.forEach((presence: any) => {
-          setOnlineUsers(prev => {
-            const next = new Set(prev);
-            next.delete(presence.user_id);
-            return next;
-          });
-          setPresenceData(prev => {
-            const next = new Map(prev);
-            next.delete(presence.user_id);
-            return next;
-          });
-        });
-      })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          // Track current user's presence
-          await channel.track({
-            user_id: user.id,
-            status: 'online',
-            last_seen_at: new Date().toISOString(),
-          });
+      Object.values(snapshot).forEach((value) => {
+        if (!value) return;
+        const presence = value as UserPresence;
+        nextOnline.add(presence.user_id);
+        nextPresence.set(presence.user_id, presence);
+      });
 
-          // Update database presence
-          await supabase
-            .from('user_presence')
-            .upsert({
-              user_id: user.id,
-              status: 'online',
-              last_seen_at: new Date().toISOString(),
-            }, {
-              onConflict: 'user_id'
-            });
+      setOnlineUsers(nextOnline);
+      setPresenceData(nextPresence);
+    };
+
+    const handleSnapshotUpdate = (update: PresenceSnapshot[keyof PresenceSnapshot]) => {
+      if (!update) return;
+      setOnlineUsers(prev => {
+        const next = new Set(prev);
+        next.add((update as UserPresence).user_id);
+        return next;
+      });
+      setPresenceData(prev => new Map(prev).set((update as UserPresence).user_id, update as UserPresence));
+    };
+
+    const removePresence = (update: PresenceSnapshot[keyof PresenceSnapshot]) => {
+      if (!update) return;
+      const userId = (update as UserPresence).user_id;
+      setOnlineUsers(prev => {
+        const next = new Set(prev);
+        next.delete(userId);
+        return next;
+      });
+      setPresenceData(prev => {
+        const next = new Map(prev);
+        next.delete(userId);
+        return next;
+      });
+    };
+
+    const primeStream = async () => {
+      unsubscribeStream = await subscribeToPresenceStream((message) => {
+        switch (message.type) {
+          case 'snapshot':
+            applySnapshot(message.payload as PresenceSnapshot);
+            break;
+          case 'upsert':
+            handleSnapshotUpdate(message.payload as PresenceSnapshot[keyof PresenceSnapshot]);
+            break;
+          case 'delete':
+            removePresence(message.payload as PresenceSnapshot[keyof PresenceSnapshot]);
+            break;
+          default:
+            break;
         }
       });
+    };
 
-    // Update presence every 30 seconds
-    const interval = setInterval(async () => {
-      await channel.track({
-        user_id: user.id,
-        status: 'online',
-        last_seen_at: new Date().toISOString(),
-      });
-
-      await supabase
-        .from('user_presence')
-        .upsert({
-          user_id: user.id,
-          status: 'online',
-          last_seen_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id'
+    const sendHeartbeat = async (status: 'online' | 'offline') => {
+      try {
+        const heartbeatResponse = await sendPresenceHeartbeat(status);
+        if (heartbeatResponse?.nextRecommendedHeartbeatMs) {
+          currentHeartbeatInterval = Math.min(
+            heartbeatResponse.nextRecommendedHeartbeatMs,
+            MAX_HEARTBEAT_INTERVAL_MS,
+          );
+        } else {
+          currentHeartbeatInterval = HEARTBEAT_INTERVAL_MS;
+        }
+      } catch (error) {
+        Sentry.captureException(error, {
+          level: 'warning',
+          tags: { scope: 'presence', operation: 'heartbeat' },
         });
-    }, 30000);
+        currentHeartbeatInterval = Math.min(
+          currentHeartbeatInterval * 2,
+          MAX_HEARTBEAT_INTERVAL_MS,
+        );
+      }
+    };
+
+    const scheduleHeartbeat = () => {
+      clearHeartbeat();
+      heartbeatTimeout = setTimeout(async () => {
+        if (!isMounted) return;
+        await sendHeartbeat('online');
+        if (isMounted) {
+          scheduleHeartbeat();
+        }
+      }, currentHeartbeatInterval);
+    };
+
+    const bootstrapPresence = async () => {
+      try {
+        const snapshot = await fetchPresenceSnapshot();
+        if (!isMounted || !snapshot) {
+          return;
+        }
+        applySnapshot(snapshot);
+      } catch (error) {
+        Sentry.captureException(error, {
+          level: 'warning',
+          tags: { scope: 'presence', operation: 'bootstrap' },
+        });
+      }
+    };
+
+    void bootstrapPresence();
+    void primeStream();
+
+    const startSnapshotInterval = () => {
+      if (snapshotIntervalRef.current) {
+        clearInterval(snapshotIntervalRef.current);
+      }
+
+      snapshotIntervalRef.current = setInterval(async () => {
+        try {
+          const snapshot = await fetchPresenceSnapshot();
+          if (!isMounted || !snapshot) {
+            return;
+          }
+          applySnapshot(snapshot);
+        } catch (error) {
+          Sentry.captureException(error, {
+            level: 'info',
+            tags: { scope: 'presence', operation: 'poll' },
+          });
+        }
+      }, SNAPSHOT_INTERVAL_MS);
+    };
+
+    startSnapshotInterval();
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        void sendHeartbeat('offline');
+      } else {
+        void sendHeartbeat('online');
+        void bootstrapPresence();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    void sendHeartbeat('online');
+    scheduleHeartbeat();
 
     // Cleanup on unmount
     return () => {
-      clearInterval(interval);
-      
-      // Mark as offline
-      supabase
-        .from('user_presence')
-        .upsert({
-          user_id: user.id,
-          status: 'offline',
-          last_seen_at: new Date().toISOString(),
-        }, {
-          onConflict: 'user_id'
-        })
-        .then(() => {
-          channel.untrack();
-          supabase.removeChannel(channel);
+      isMounted = false;
+      clearHeartbeat();
+      if (snapshotIntervalRef.current) {
+        clearInterval(snapshotIntervalRef.current);
+        snapshotIntervalRef.current = null;
+      }
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      unsubscribeStream?.();
+
+      // Mark as offline and cleanup asynchronously
+      void sendHeartbeat('offline')
+        .catch(() => undefined)
+        .finally(() => {
+          void markOffline();
         });
     };
   }, [user]);

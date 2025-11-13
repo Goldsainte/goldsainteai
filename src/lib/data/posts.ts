@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+import { httpJson } from '@/lib/http/client';
 
 export interface TravelPost {
   id: string;
@@ -36,92 +36,79 @@ export interface FeedResponse {
   items: TravelPost[];
   nextCursor: string | null;
   hasMore: boolean;
+  personalized?: boolean;
 }
 
-/**
- * Fetch feed with cursor-based pagination
- * Uses created_at timestamp as cursor for efficient pagination
- */
-export async function fetchFeedPaginated({
-  cursor,
-  limit = 20
-}: {
+const FEED_ENDPOINT = import.meta.env.VITE_FEED_ENDPOINT || '/api/feed';
+
+function resolveFeedUrl(): URL {
+  if (FEED_ENDPOINT.startsWith('http://') || FEED_ENDPOINT.startsWith('https://')) {
+    return new URL(FEED_ENDPOINT);
+  }
+
+  if (typeof window === 'undefined') {
+    return new URL(FEED_ENDPOINT, 'https://app.local');
+  }
+
+  return new URL(FEED_ENDPOINT, window.location.origin);
+}
+
+type FetchFeedArgs = {
   cursor?: string;
   limit?: number;
-}): Promise<FeedResponse> {
-  let query = supabase
-    .from('travel_posts')
-    .select(`
-      id,
-      user_id,
-      video_url,
-      embed_url,
-      embed_platform,
-      original_creator,
-      thumbnail_url,
-      image_urls,
-      media_type,
-      caption,
-      location,
-      view_count,
-      like_count,
-      comment_count,
-      share_count,
-      is_featured,
-      music_track_id,
-      music_track_name,
-      music_track_artist,
-      music_preview_url,
-      music_album_art,
-      music_service,
-      created_at
-    `)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false })
-    .limit(limit);
-  
-  // If cursor provided, fetch posts BEFORE that timestamp
+  personalized?: boolean;
+  focusPostId?: string;
+  signal?: AbortSignal;
+};
+
+export async function fetchFeedPaginated({
+  cursor,
+  limit = 20,
+  personalized,
+  focusPostId,
+  signal,
+}: FetchFeedArgs): Promise<FeedResponse> {
+  const url = resolveFeedUrl();
+
   if (cursor) {
-    query = query.lt('created_at', cursor);
+    url.searchParams.set('cursor', cursor);
   }
-  
-  const { data, error } = await query;
-  
-  if (error) {
-    console.error('Error fetching paginated posts:', error);
-    throw error;
+
+  if (limit) {
+    url.searchParams.set('limit', String(limit));
   }
-  
-  const items = data || [];
-  
-  // Batch fetch profiles to avoid N+1 queries
-  if (items.length > 0) {
-    const userIds = Array.from(new Set(items.map(p => p.user_id).filter(Boolean)));
-    if (userIds.length > 0) {
-      const { data: profilesData } = await supabase
-        .from('profiles')
-        .select('id, username, avatar_url, is_verified, instagram_username')
-        .in('id', userIds);
-      
-      const profilesMap = new Map((profilesData || []).map(p => [p.id, p]));
-      
-      items.forEach((post: any) => {
-        post.profiles = profilesMap.get(post.user_id) || {
-          id: post.user_id,
-          username: 'TravelExplorer',
-          avatar_url: null,
-          is_verified: false,
-          instagram_username: null
-        };
-      });
+
+  if (typeof personalized === 'boolean') {
+    url.searchParams.set('personalized', personalized ? 'true' : 'false');
+  }
+
+  if (focusPostId) {
+    url.searchParams.set('focusPostId', focusPostId);
+  }
+
+  const response = await httpJson<FeedResponse>(
+    url.toString(),
+    {
+      method: 'GET',
+      signal,
+      headers: {
+        Accept: 'application/json',
+      },
+    },
+    {
+      retry: {
+        attempts: 3,
+        backoffMs: 400,
+        maxBackoffMs: 4000,
+        jitterMs: 250,
+      },
     }
-  }
-  
-  const nextCursor = items.length === limit ? items[items.length - 1].created_at : null;
-  
+  );
+
   return {
-    items: items as TravelPost[],
-    nextCursor,
-    hasMore: items.length === limit
+    items: response.items ?? [],
+    nextCursor: response.nextCursor ?? null,
+    hasMore: Boolean(response.hasMore),
+    personalized: response.personalized,
   };
 }

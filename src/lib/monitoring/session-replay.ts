@@ -13,8 +13,6 @@ export interface SessionContext {
 export function initializeSessionReplay() {
   // Session replay is initialized in main.tsx with Sentry.init
   // This file provides helper functions for session management
-  
-  console.log('[Session Replay] Initialized with privacy masking');
 }
 
 // Update session context with user information
@@ -86,16 +84,18 @@ export function captureErrorWithReplay(
 // Monitor rage clicks (sign of frustration)
 export function setupRageClickDetection() {
   let clickCount = 0;
-  let clickTimeout: NodeJS.Timeout;
+  let clickTimeout: ReturnType<typeof setTimeout> | undefined;
 
-  document.addEventListener('click', (event) => {
-    clickCount++;
-    
-    clearTimeout(clickTimeout);
-    
+  const handleClick = (event: MouseEvent) => {
+    clickCount += 1;
+
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+    }
+
     if (clickCount >= 3) {
       const target = event.target as HTMLElement;
-      
+
       Sentry.captureMessage('Rage click detected', {
         level: 'warning',
         tags: { type: 'ux_issue' },
@@ -114,14 +114,24 @@ export function setupRageClickDetection() {
     clickTimeout = setTimeout(() => {
       clickCount = 0;
     }, 1000);
-  });
+  };
+
+  document.addEventListener('click', handleClick);
+
+  return () => {
+    if (clickTimeout) {
+      clearTimeout(clickTimeout);
+      clickTimeout = undefined;
+    }
+    document.removeEventListener('click', handleClick);
+  };
 }
 
 // Monitor dead clicks (clicks on non-interactive elements)
 export function setupDeadClickDetection() {
-  document.addEventListener('click', (event) => {
+  const handleClick = (event: MouseEvent) => {
     const target = event.target as HTMLElement;
-    const isInteractive = 
+    const isInteractive =
       target.tagName === 'BUTTON' ||
       target.tagName === 'A' ||
       target.tagName === 'INPUT' ||
@@ -141,7 +151,13 @@ export function setupDeadClickDetection() {
         },
       });
     }
-  }, { capture: true });
+  };
+
+  document.addEventListener('click', handleClick, true);
+
+  return () => {
+    document.removeEventListener('click', handleClick, true);
+  };
 }
 
 // Session replay sampling rules

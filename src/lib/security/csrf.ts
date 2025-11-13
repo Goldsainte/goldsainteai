@@ -1,109 +1,109 @@
-/**
- * CSRF Protection Utilities
- * Prevents Cross-Site Request Forgery attacks on state-changing operations
- */
+const CSRF_STORAGE_KEY = "csrf_token";
+const DEFAULT_ENDPOINT = "/api/csrf-token";
 
-const CSRF_TOKEN_KEY = "csrf_token";
-const CSRF_TOKEN_HEADER = "X-CSRF-Token";
+const csrfEndpoint = import.meta.env.VITE_CSRF_TOKEN_ENDPOINT || DEFAULT_ENDPOINT;
 
-/**
- * Generate a random CSRF token
- */
-export function generateCSRFToken(): string {
-  const array = new Uint8Array(32);
-  crypto.getRandomValues(array);
-  return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("");
-}
+const hasSessionStorage = () => typeof window !== 'undefined' && typeof window.sessionStorage !== 'undefined';
 
-/**
- * Store CSRF token in session storage
- */
-export function storeCSRFToken(token: string): void {
-  sessionStorage.setItem(CSRF_TOKEN_KEY, token);
-}
+let inMemoryToken: string | null = null;
+let pendingFetch: Promise<string | null> | null = null;
 
-/**
- * Get CSRF token from session storage
- */
-export function getCSRFToken(): string | null {
-  return sessionStorage.getItem(CSRF_TOKEN_KEY);
-}
+function cacheToken(token: string | null) {
+  inMemoryToken = token;
 
-/**
- * Initialize CSRF protection (call on app load)
- */
-export function initCSRFProtection(): string {
-  let token = getCSRFToken();
-
-  if (!token) {
-    token = generateCSRFToken();
-    storeCSRFToken(token);
+  if (!hasSessionStorage()) {
+    return;
   }
 
-  return token;
+  if (token) {
+    try {
+      window.sessionStorage.setItem(CSRF_STORAGE_KEY, token);
+    } catch (error) {
+      console.warn("Unable to persist CSRF token in sessionStorage", error);
+    }
+  } else {
+    try {
+      window.sessionStorage.removeItem(CSRF_STORAGE_KEY);
+    } catch (error) {
+      console.warn("Unable to clear CSRF token from sessionStorage", error);
+    }
+  }
 }
 
-/**
- * Get headers with CSRF token for API requests
- */
+export function getCachedCSRFToken(): string | null {
+  if (inMemoryToken) {
+    return inMemoryToken;
+  }
+
+  if (!hasSessionStorage()) {
+    return null;
+  }
+
+  try {
+    const stored = window.sessionStorage.getItem(CSRF_STORAGE_KEY);
+    if (stored) {
+      inMemoryToken = stored;
+      return stored;
+    }
+  } catch (error) {
+    console.warn("Unable to read CSRF token from sessionStorage", error);
+  }
+
+  return null;
+}
+
+async function requestToken(method: "GET" | "POST"): Promise<string | null> {
+  try {
+    const response = await fetch(csrfEndpoint, {
+      method,
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      console.warn(`CSRF token endpoint responded with ${response.status}`);
+      return null;
+    }
+
+    const body = await response.json().catch(() => ({}));
+    const token = typeof body?.token === "string" ? body.token : null;
+
+    cacheToken(token);
+    return token;
+  } catch (error) {
+    console.warn("Failed to retrieve CSRF token from server", error);
+    return null;
+  }
+}
+
+export async function ensureCSRFToken(): Promise<string | null> {
+  if (getCachedCSRFToken()) {
+    return inMemoryToken;
+  }
+
+  if (!pendingFetch) {
+    pendingFetch = requestToken("GET").finally(() => {
+      pendingFetch = null;
+    });
+  }
+
+  return pendingFetch;
+}
+
+export async function refreshCSRFToken(): Promise<string | null> {
+  pendingFetch = requestToken("POST").finally(() => {
+    pendingFetch = null;
+  });
+  return pendingFetch;
+}
+
+export function clearCSRFToken() {
+  cacheToken(null);
+}
+
 export function getCSRFHeaders(): Record<string, string> {
-  const token = getCSRFToken();
-
-  if (!token) {
-    console.warn("CSRF token not found. Call initCSRFProtection() first.");
-    return {};
-  }
-
-  return {
-    [CSRF_TOKEN_HEADER]: token,
-  };
-}
-
-/**
- * Validate CSRF token on the server side
- */
-export function validateCSRFToken(
-  requestHeaders: Headers,
-  sessionToken: string
-): boolean {
-  const tokenFromHeader = requestHeaders.get(CSRF_TOKEN_HEADER);
-
-  if (!tokenFromHeader) {
-    return false;
-  }
-
-  // Constant-time comparison to prevent timing attacks
-  return constantTimeCompare(tokenFromHeader, sessionToken);
-}
-
-/**
- * Constant-time string comparison to prevent timing attacks
- */
-function constantTimeCompare(a: string, b: string): boolean {
-  if (a.length !== b.length) {
-    return false;
-  }
-
-  let result = 0;
-  for (let i = 0; i < a.length; i++) {
-    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  }
-
-  return result === 0;
-}
-
-/**
- * Clear CSRF token (call on logout)
- */
-export function clearCSRFToken(): void {
-  sessionStorage.removeItem(CSRF_TOKEN_KEY);
-}
-
-/**
- * Refresh CSRF token (call periodically or after sensitive operations)
- */
-export function refreshCSRFToken(): string {
-  const newToken = generateCSRFToken();
-  storeCSRFToken(newToken);
-  return newToken;
+  const token = getCachedCSRFToken();
+  return token ? { "X-CSRF-Token": token } : {};
 }
