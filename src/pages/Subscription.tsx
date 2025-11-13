@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Check, Crown, Zap, Star, ArrowRight } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { AIUsageDisplay } from "@/components/ai/AIUsageDisplay";
 import { SUBSCRIPTION_TIERS, type SubscriptionTier } from "@/config/stripe";
 
@@ -348,23 +349,36 @@ export default function Subscription() {
                     ))}
                   </ul>
 
-                  <Button
-                    className="w-full"
-                    variant={isCurrentPlan ? "outline" : tier === 'premium' ? "default" : "secondary"}
-                    disabled={isCurrentPlan || !canUpgradeToThis}
-                    onClick={() => handleUpgrade(tier)}
-                  >
-                    {isCurrentPlan ? (
-                      "Current Plan"
-                    ) : canUpgradeToThis ? (
-                      <>
-                        Upgrade Now
-                        <ArrowRight className="w-4 h-4 ml-2" />
-                      </>
-                    ) : (
-                      "Lower Tier"
-                    )}
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="w-full">
+                          <Button
+                            className="w-full"
+                            variant={isCurrentPlan ? "outline" : tier === 'premium' ? "default" : "secondary"}
+                            disabled={isCurrentPlan || !canUpgradeToThis}
+                            onClick={() => handleUpgrade(tier)}
+                          >
+                            {isCurrentPlan ? (
+                              "Current Plan"
+                            ) : canUpgradeToThis ? (
+                              <>
+                                Upgrade Now
+                                <ArrowRight className="w-4 h-4 ml-2" />
+                              </>
+                            ) : (
+                              "Lower Tier"
+                            )}
+                          </Button>
+                        </div>
+                      </TooltipTrigger>
+                      {(isCurrentPlan || !canUpgradeToThis) && (
+                        <TooltipContent>
+                          <p>{isCurrentPlan ? `Already on ${config.name}` : "Contact us to downgrade"}</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
                 </CardContent>
               </Card>
             );

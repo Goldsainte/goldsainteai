@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Download, CreditCard, Calendar, DollarSign, FileText } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
@@ -254,17 +255,29 @@ const BillingDashboard = () => {
                         {formatCurrency(invoice.amount_paid || invoice.amount_due, invoice.currency)}
                       </div>
                     </div>
-                    {invoice.invoice_pdf && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(invoice.invoice_pdf, '_blank')}
-                        className="gap-2"
-                      >
-                        <Download className="h-4 w-4" />
-                        PDF
-                      </Button>
-                    )}
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => invoice.invoice_pdf && window.open(invoice.invoice_pdf, '_blank')}
+                              disabled={!invoice.invoice_pdf}
+                              className="gap-2"
+                            >
+                              <Download className="h-4 w-4" />
+                              PDF
+                            </Button>
+                          </div>
+                        </TooltipTrigger>
+                        {!invoice.invoice_pdf && (
+                          <TooltipContent>
+                            <p>PDF generating, check back soon</p>
+                          </TooltipContent>
+                        )}
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               ))}
