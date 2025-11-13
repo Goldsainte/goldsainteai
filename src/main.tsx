@@ -73,6 +73,9 @@ console.info('[Sentry] VITE_SENTRY_DSN from env:', Boolean(import.meta.env.VITE_
     setInterval(monitorMemory, 30000);
     
     console.info('[Sentry] Initialization complete');
+    
+    // Dispatch event to signal Sentry is ready
+    window.dispatchEvent(new CustomEvent('sentry-initialized'));
   } else {
     console.warn('[Sentry] DSN still missing after fallback attempt. Monitoring disabled.');
   }

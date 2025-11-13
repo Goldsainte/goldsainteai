@@ -2,10 +2,34 @@ import { Button } from "@/components/ui/button";
 import * as Sentry from "@sentry/react";
 import { trackPerformance } from "@/lib/monitoring/sentry-config";
 import { markCriticalFlow, captureErrorWithReplay } from "@/lib/monitoring/session-replay";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export function SentryTestButton() {
   const [testCount, setTestCount] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    // Listen for Sentry initialization completion
+    const handleSentryInit = () => {
+      setIsInitialized(true);
+    };
+
+    window.addEventListener('sentry-initialized', handleSentryInit);
+
+    // Fallback: check if already initialized after 500ms
+    const timeoutId = setTimeout(() => {
+      const dsnFromEnv = import.meta.env.VITE_SENTRY_DSN;
+      const fallbackUsed = (window as any).__SENTRY_FALLBACK__;
+      if (dsnFromEnv || fallbackUsed) {
+        setIsInitialized(true);
+      }
+    }, 500);
+
+    return () => {
+      window.removeEventListener('sentry-initialized', handleSentryInit);
+      clearTimeout(timeoutId);
+    };
+  }, []);
 
   const triggerTestError = () => {
     try {
@@ -50,9 +74,9 @@ export function SentryTestButton() {
 
   const fallbackUsed = (window as any).__SENTRY_FALLBACK__;
   const dsnFromEnv = import.meta.env.VITE_SENTRY_DSN;
-  const allowControls = Boolean(dsnFromEnv || fallbackUsed);
+  const allowControls = isInitialized && Boolean(dsnFromEnv || fallbackUsed);
   
-  if (!allowControls) {
+  if (!isInitialized || !allowControls) {
     console.warn('[Sentry] No DSN available (env or fallback).');
     if (import.meta.env.DEV) {
       return (
