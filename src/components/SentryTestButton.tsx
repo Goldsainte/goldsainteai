@@ -49,19 +49,19 @@ export function SentryTestButton() {
   };
 
   const fallbackUsed = (window as any).__SENTRY_FALLBACK__;
+  const dsnFromEnv = import.meta.env.VITE_SENTRY_DSN;
+  const allowControls = Boolean(dsnFromEnv || fallbackUsed);
   
-  if (!import.meta.env.VITE_SENTRY_DSN) {
-    console.warn('[Sentry] VITE_SENTRY_DSN is empty at runtime');
+  if (!allowControls) {
+    console.warn('[Sentry] No DSN available (env or fallback).');
     if (import.meta.env.DEV) {
       return (
         <div className="fixed bottom-4 right-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-sm">
           <p className="text-sm font-medium text-yellow-800 mb-1">
-            {fallbackUsed ? '⚠️ Sentry Fallback Active' : '⚠️ Sentry DSN Missing'}
+            ⚠️ Sentry DSN Missing
           </p>
           <p className="text-xs text-yellow-700">
-            {fallbackUsed 
-              ? 'VITE_SENTRY_DSN not in env; loaded from /config/sentry.json fallback'
-              : 'Add VITE_SENTRY_DSN to env or create /config/sentry.json'}
+            Add VITE_SENTRY_DSN to env or create /config/sentry.json
           </p>
         </div>
       );
