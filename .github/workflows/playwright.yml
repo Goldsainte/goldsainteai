@@ -116,6 +116,13 @@ jobs:
       - name: Merge test results
         run: |
           mkdir -p merged-results
+
+          # If no artifacts were downloaded, skip gracefully
+          if [ ! -d all-reports ] || [ -z "$(ls -A all-reports || true)" ]; then
+            echo "No artifacts found in all-reports. Skipping merge."
+            exit 0
+          fi
+
           find all-reports -name "results.json" -exec cp {} merged-results/ \;
 
       - name: Generate summary
