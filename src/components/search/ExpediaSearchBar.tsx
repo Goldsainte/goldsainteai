@@ -129,8 +129,8 @@ export default function ExpediaSearchBar() {
         .expedia-search-input::placeholder {
           color: #47555E;
           font-family: "Playfair Display", serif;
-          font-size: 20px;
-          line-height: 28px;
+          font-size: 16px;
+          line-height: 24px;
         }
       `}</style>
       <form
@@ -160,8 +160,8 @@ export default function ExpediaSearchBar() {
               <input
                 className="w-full bg-transparent outline-none font-display expedia-search-input"
                 style={{ 
-                  fontSize: '20px', 
-                  lineHeight: '28px',
+                  fontSize: '16px', 
+                  lineHeight: '24px',
                   color: '#47555E'
                 }}
                 placeholder="Search destinations"
@@ -192,7 +192,7 @@ export default function ExpediaSearchBar() {
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK IN
             </div>
-            <span className="font-display" style={{ fontSize: '20px', lineHeight: '28px', color: '#47555E' }}>
+            <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
               {checkIn || "Add date"}
             </span>
           </button>
@@ -215,7 +215,7 @@ export default function ExpediaSearchBar() {
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK OUT
             </div>
-            <span className="font-display" style={{ fontSize: '20px', lineHeight: '28px', color: '#47555E' }}>
+            <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
               {checkOut || "Add date"}
             </span>
           </button>
@@ -240,7 +240,7 @@ export default function ExpediaSearchBar() {
               WHO
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-display" style={{ fontSize: '20px', lineHeight: '28px', color: '#47555E' }}>
+              <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
                 {adults + children} {adults + children === 1 ? "guest" : "guests"}
               </span>
             </div>
