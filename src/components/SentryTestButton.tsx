@@ -94,7 +94,7 @@ export function SentryTestButton() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 flex flex-col gap-2 p-4 bg-white border border-border rounded-lg shadow-lg">
+    <div className="fixed bottom-4 left-4 flex flex-col gap-2 p-4 bg-white border border-border rounded-lg shadow-lg">
       <p className="text-sm font-medium">Sentry Test Controls</p>
       <Button onClick={triggerTestError} variant="destructive" size="sm">
         Trigger Test Error
