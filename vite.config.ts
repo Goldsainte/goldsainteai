@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       dedupe: ["react", "react-dom"],
     },
     define: {
-      'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(env.VITE_SENTRY_DSN || '')
+      'import.meta.env.VITE_SENTRY_DSN': JSON.stringify(process.env.VITE_SENTRY_DSN ?? env.VITE_SENTRY_DSN ?? '')
     }
   };
 });
