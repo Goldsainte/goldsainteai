@@ -156,7 +156,6 @@ export default function ExpediaSearchBar() {
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHERE
             </div>
-            <div className="flex items-center gap-2">
               <input
                 className="w-full bg-transparent outline-none font-display expedia-search-input"
                 style={{ 
@@ -170,7 +169,6 @@ export default function ExpediaSearchBar() {
                 onFocus={() => setOpenWhere(true)}
                 aria-label="Destination"
               />
-            </div>
           </button>
 
           {/* Divider */}
@@ -239,11 +237,9 @@ export default function ExpediaSearchBar() {
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHO
             </div>
-            <div className="flex items-center gap-2">
               <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
                 {adults + children} {adults + children === 1 ? "guest" : "guests"}
               </span>
-            </div>
           </button>
 
           {/* Search button - 48px circle */}
