@@ -159,6 +159,12 @@ html, body, #root, #main-content {
   }
 
   :root {
+    /* Expedia Search Brand Colors */
+    --gs-green: 158 64% 12%;       /* #0E3A34 - primary text/brand */
+    --gs-green-2: 158 50% 23%;     /* #1E5A53 - CTA button */
+    --gs-sand: 46 32% 67%;         /* #C7BA86 - accent gold */
+    --gs-ink: 158 64% 12%;         /* #0E3A34 - same as green */
+    
     --background: 0 0% 98%;
     --foreground: 174 15% 20%;
 

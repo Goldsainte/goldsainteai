@@ -11,18 +11,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-declare global {
-  interface Window {
-    EG?: {
-      initWidgets?: () => void;
-      init?: () => void;
-    };
-    eg?: {
-      initWidgets?: () => void;
-      init?: () => void;
-    };
-  }
-}
+// Widget integration disabled - replaced with direct Expedia affiliate link
+// declare global {
+//   interface Window {
+//     EG?: {
+//       initWidgets?: () => void;
+//       init?: () => void;
+//     };
+//     eg?: {
+//       initWidgets?: () => void;
+//       init?: () => void;
+//     };
+//   }
+// }
 
 type ErrorType = 'csp_violation' | 'network_blocked' | 'script_load_failed' | 'init_failed' | 'iframe_blocked' | 'timeout' | 'unknown';
 
@@ -96,8 +97,9 @@ export const ExpediaModalPortal = () => {
     if (typeof window === 'undefined') return null;
     if (window.EG?.initWidgets) return { obj: window.EG, method: "initWidgets" };
     if (window.EG?.init) return { obj: window.EG, method: "init" };
-    if (window.eg?.initWidgets) return { obj: window.eg, method: "initWidgets" };
-    if (window.eg?.init) return { obj: window.eg, method: "init" };
+    // Lowercase 'eg' disabled - widget integration removed
+    // if (window.eg?.initWidgets) return { obj: window.eg, method: "initWidgets" };
+    // if (window.eg?.init) return { obj: window.eg, method: "init" };
     return null;
   };
 

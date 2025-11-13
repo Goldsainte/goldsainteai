@@ -1,58 +1,66 @@
-export type SearchParams = {
-  destination: string;        // e.g., "Charlotte, NC"
-  checkIn?: string;           // ISO: "2025-11-16"
-  checkOut?: string;          // ISO: "2025-11-19"
-  adults?: number;            // default 2
-  children?: number;          // default 0
+export type GuestCounts = { 
+  adults: number; 
+  children: number; 
+  childrenAges?: number[] 
 };
 
-const AFFILIATE_BASE =
-  import.meta.env.VITE_EXPEDIA_AFFILIATE_BASE ||
-  "https://expedia.com/affiliates/expedia-home.bexNBHE";
+export type DeepLinkInput = {
+  destination: string;          // e.g., "Paris, France"
+  checkIn?: string | null;      // "YYYY-MM-DD"
+  checkOut?: string | null;     // "YYYY-MM-DD"
+  guests: GuestCounts;          // { adults, children, childrenAges? }
+};
 
-/**
- * Strategy A (default): wrap deep link with affiliate portal using ?u=<encoded target>.
- * Strategy B: direct deep link (if your affiliate desk requires a different pattern).
- */
-const STRATEGY = (import.meta.env.VITE_EXPEDIA_LINK_STRATEGY || "wrap") as
-  | "wrap"
-  | "direct";
+const AFFILIATE_BASE = "https://expedia.com/affiliates/expedia-home.bexNBHE";
 
-/** Build Expedia hotel search URL with prepopulated params. */
-export function buildHotelSearchUrl(p: SearchParams) {
-  if (!p.destination?.trim()) throw new Error("Destination is required");
+/** Build Expedia affiliate URL with direct deep-link parameters */
+export function buildExpediaAffiliateUrl(i: DeepLinkInput) {
+  const params = new URLSearchParams();
 
-  const target = new URL("https://www.expedia.com/Hotel-Search");
-  target.searchParams.set("destination", p.destination.trim());
+  // Destination – fall back to plain search term if we don't have IDs.
+  params.set("destination", i.destination);
 
-  // Only include dates/guests if the user actually provided them.
-  if (p.checkIn) target.searchParams.set("startDate", p.checkIn);
-  if (p.checkOut) target.searchParams.set("endDate", p.checkOut);
+  // Dates (only include if the user selected them)
+  if (i.checkIn) params.set("checkIn", i.checkIn);
+  if (i.checkOut) params.set("checkOut", i.checkOut);
 
-  const adults = p.adults ?? 2;
-  const children = p.children ?? 0;
-  target.searchParams.set("adults", String(adults));
-  if (children > 0) target.searchParams.set("children", String(children));
+  // Guests
+  params.set("adults", String(Math.max(1, i.guests.adults || 1)));
+  const children = Math.max(0, i.guests.children || 0);
+  params.set("children", String(children));
+  if (children > 0 && i.guests.childrenAges?.length) {
+    // Comma-delimited ages (Expedia accepts this format on most deep links)
+    params.set("childrenAges", i.guests.childrenAges.slice(0, children).join(","));
+  }
 
-  // Include campaign attribution
-  target.searchParams.set("utm_source", "goldsainte");
-  target.searchParams.set("utm_medium", "referral");
-  target.searchParams.set("utm_campaign", "header_search");
+  // Optional: hotel search intent flags commonly accepted by Expedia PWAs.
+  params.set("pwa", "true");
+  params.set("searchType", "HOTEL");
 
-  if (STRATEGY === "direct") return target.toString();
+  return `${AFFILIATE_BASE}?${params.toString()}`;
+}
 
-  // Most affiliate home pages support a URL passthrough param (?u=).
-  const aff = new URL(AFFILIATE_BASE);
-  aff.searchParams.set("u", target.toString()); // IMPORTANT: encode the target
-  aff.searchParams.set("utm_source", "goldsainte");
-  aff.searchParams.set("utm_medium", "referral");
-  aff.searchParams.set("utm_campaign", "header_search");
-  return aff.toString();
+// Legacy alias for backwards compatibility
+export function buildHotelSearchUrl(p: { destination: string; checkIn?: string; checkOut?: string; adults?: number; children?: number; }) {
+  return buildExpediaAffiliateUrl({
+    destination: p.destination,
+    checkIn: p.checkIn || null,
+    checkOut: p.checkOut || null,
+    guests: { adults: p.adults || 2, children: p.children || 0 }
+  });
 }
 
 /** Perform a hard redirect (no iframe, no popup) */
-export function redirectToExpedia(p: SearchParams) {
-  const url = buildHotelSearchUrl(p);
+export function redirectToExpedia(input: DeepLinkInput | { destination: string; checkIn?: string; checkOut?: string; adults?: number; children?: number; }) {
+  let url: string;
+  
+  // Handle both new DeepLinkInput format and legacy SearchParams format
+  if ('guests' in input) {
+    url = buildExpediaAffiliateUrl(input);
+  } else {
+    url = buildHotelSearchUrl(input);
+  }
+  
   // Use assign() so the browser sends Referer to affiliate and preserves cookies
   window.location.assign(url);
 }
