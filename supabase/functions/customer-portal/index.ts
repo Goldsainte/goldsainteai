@@ -99,7 +99,19 @@ serve(async (req) => {
       logStep("Using cached customer ID", { customerId });
     }
 
-    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
+    // Validate origin to prevent open redirect attacks
+    const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean);
+    
+    const requestOrigin = req.headers.get("origin") || "";
+    const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+      ? requestOrigin
+      : (Deno.env.get("SITE_URL") || ALLOWED_ORIGINS[0] || "https://goldsainte.ai");
+    
+    logStep("Origin validation", { requestOrigin, validatedOrigin: origin });
+    
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
       return_url: `${origin}/subscription`,

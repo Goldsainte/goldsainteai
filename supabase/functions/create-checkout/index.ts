@@ -101,7 +101,18 @@ serve(async (req) => {
       logger.info("Using cached Stripe customer ID", { customerId });
     }
 
-    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
+    // Validate origin to prevent open redirect attacks
+    const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
+      .split(",")
+      .map(s => s.trim())
+      .filter(Boolean);
+    
+    const requestOrigin = req.headers.get("origin") || "";
+    const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+      ? requestOrigin
+      : (Deno.env.get("SITE_URL") || ALLOWED_ORIGINS[0] || "https://goldsainte.ai");
+    
+    logger.info("Origin validation", { requestOrigin, validatedOrigin: origin });
     
     // Build success URL based on subscription type
     const successUrl = subscriptionType === 'ai' 

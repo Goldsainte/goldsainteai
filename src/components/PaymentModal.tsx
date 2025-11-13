@@ -60,8 +60,8 @@ export const PaymentModal = ({
         if (checkoutError) throw checkoutError;
         
         if (checkoutData?.url) {
-          // Redirect to Stripe Checkout
-          window.open(checkoutData.url, '_blank');
+          // Use same-tab navigation to avoid popup blockers
+          window.location.href = checkoutData.url;
           toast.success('Redirecting to secure payment...');
           onSuccess();
           onClose();
