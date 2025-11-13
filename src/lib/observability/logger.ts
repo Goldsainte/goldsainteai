@@ -68,12 +68,12 @@ export function logError(message: string, error?: unknown, context?: LogContext)
     Sentry.captureException(error, {
       level: "error",
       tags: context && "tags" in context ? (context.tags as Record<string, string>) : undefined,
-      extra: scrubValue(context ?? {}),
+      extra: scrubValue(context ?? {}) as Record<string, any>,
     });
   } else if (context) {
     Sentry.captureMessage(message, {
       level: "error",
-      extra: scrubValue(context),
+      extra: scrubValue(context) as Record<string, any>,
     });
   }
 }
@@ -82,7 +82,7 @@ export function logWarn(message: string, context?: LogContext) {
   emit("warn", message, context);
   Sentry.captureMessage(message, {
     level: "warning",
-    extra: scrubValue(context ?? {}),
+    extra: scrubValue(context ?? {}) as Record<string, any>,
   });
 }
 
