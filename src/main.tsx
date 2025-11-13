@@ -15,6 +15,8 @@ import "./index.css";
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 
+console.info('[Sentry] DSN present:', Boolean(SENTRY_DSN), 'mode:', import.meta.env.MODE);
+
 if (SENTRY_DSN) {
   Sentry.init({
     dsn: SENTRY_DSN,
