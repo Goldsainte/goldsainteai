@@ -28,21 +28,34 @@ export default function SystemHealth() {
         <ProductionChecklist />
         
         {import.meta.env.DEV && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Development Tools</CardTitle>
-              <CardDescription>
-                Environment validation and Sentry monitoring tools
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <EnvironmentValidator />
-              <div className="flex items-start gap-4 flex-wrap">
-                <SentryStatusChip />
-                <SentryTestButton />
-              </div>
-            </CardContent>
-          </Card>
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Environment Configuration</CardTitle>
+                <CardDescription>
+                  Required and optional environment variables for production
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <EnvironmentValidator />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Development Tools</CardTitle>
+                <CardDescription>
+                  Sentry monitoring and testing tools
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-start gap-4 flex-wrap">
+                  <SentryStatusChip />
+                  <SentryTestButton />
+                </div>
+              </CardContent>
+            </Card>
+          </>
         )}
       </div>
     </div>
