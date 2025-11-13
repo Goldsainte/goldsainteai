@@ -88,7 +88,7 @@ export function SentryTestButton() {
     console.warn('[Sentry] No DSN available (env or fallback).');
     if (import.meta.env.DEV) {
       return (
-        <div className="fixed bottom-20 left-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-sm">
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-sm">
           <p className="text-sm font-medium text-yellow-800 mb-1">
             ⚠️ Sentry DSN Missing
           </p>
@@ -102,7 +102,7 @@ export function SentryTestButton() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 flex flex-col gap-2 p-4 bg-white border border-border rounded-lg shadow-lg">
+    <div className="flex flex-col gap-2 p-4 bg-card border border-border rounded-lg">
       <p className="text-sm font-medium">Sentry Test Controls</p>
       <Button onClick={triggerTestError} variant="destructive" size="sm">
         Trigger Test Error

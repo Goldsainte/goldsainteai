@@ -380,9 +380,6 @@ function AppContent() {
           <AIBookingConcierge />
         </Suspense>
       )}
-      {import.meta.env.DEV && <EnvironmentValidator />}
-      {import.meta.env.DEV && <SentryStatusChip />}
-      {import.meta.env.DEV && <SentryTestButton />}
     </div>
   );
 }

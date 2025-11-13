@@ -1,6 +1,10 @@
 import { ProductionChecklist } from "@/components/admin/ProductionChecklist";
 import { SecurityAudit } from "@/components/system/SecurityAudit";
 import { NotificationBell } from "@/components/NotificationBell";
+import { EnvironmentValidator } from "@/components/system/EnvironmentValidator";
+import { SentryStatusChip } from "@/components/system/SentryStatusChip";
+import { SentryTestButton } from "@/components/SentryTestButton";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield } from "lucide-react";
 
 export default function SystemHealth() {
@@ -22,6 +26,24 @@ export default function SystemHealth() {
       <div className="space-y-8">
         <SecurityAudit />
         <ProductionChecklist />
+        
+        {import.meta.env.DEV && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Development Tools</CardTitle>
+              <CardDescription>
+                Environment validation and Sentry monitoring tools
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <EnvironmentValidator />
+              <div className="flex items-start gap-4 flex-wrap">
+                <SentryStatusChip />
+                <SentryTestButton />
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

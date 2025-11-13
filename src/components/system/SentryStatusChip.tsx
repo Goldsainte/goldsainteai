@@ -58,7 +58,7 @@ export function SentryStatusChip() {
   const config = statusConfig[dsnSource];
 
   return (
-    <div className={`fixed bottom-4 left-4 px-3 py-1.5 ${config.bgColor} border ${config.borderColor} rounded-md shadow-sm z-50`}>
+    <div className={`px-3 py-1.5 ${config.bgColor} border ${config.borderColor} rounded-md shadow-sm`}>
       <p className={`text-xs font-medium ${config.textColor}`}>
         {config.label}
       </p>
