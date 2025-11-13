@@ -17,6 +17,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { RequireAgentTerms } from "@/components/RequireAgentTerms";
 import { LoadingFallback } from "@/components/LoadingFallback";
 import { usePresence } from "@/hooks/usePresence";
+import { SentryTestButton } from "@/components/SentryTestButton";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { initCSRFProtection } from "@/lib/security/csrf";
 
@@ -377,6 +378,7 @@ function AppContent() {
           <AIBookingConcierge />
         </Suspense>
       )}
+      {import.meta.env.DEV && <SentryTestButton />}
     </div>
   );
 }
