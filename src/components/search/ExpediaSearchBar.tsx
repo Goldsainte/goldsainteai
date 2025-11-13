@@ -136,10 +136,10 @@ export default function ExpediaSearchBar() {
       <form
       onSubmit={handleSubmit}
       className="mx-auto hidden md:flex items-center"
-      style={{ width: 900 }}
+      style={{ width: 765 }}
       aria-label="Goldsainte search"
     >
-      <div className="w-full h-[66px] rounded-[33px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
+      <div className="w-full h-[56px] rounded-[28px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
           {/* WHERE pill */}
           <button
             ref={whereRefs.setReference}
@@ -150,8 +150,8 @@ export default function ExpediaSearchBar() {
               setOpenGuests(false);
             }}
             onKeyDown={handleKeyDown}
-            className="group h-[50px] rounded-[25px] px-4 text-left bg-white/40 hover:bg-white/60 transition flex flex-col justify-center"
-            style={{ width: 280 }}
+            className="group h-[42px] rounded-[21px] px-4 text-left bg-white/40 hover:bg-white/60 transition flex flex-col justify-center"
+            style={{ width: 238 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHERE
@@ -174,7 +174,7 @@ export default function ExpediaSearchBar() {
           </button>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-black/12 mx-1" />
+          <div className="h-[27px] w-px bg-black/12 mx-1" />
 
           {/* CHECK-IN pill */}
           <button
@@ -186,8 +186,8 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
-            style={{ width: 150 }}
+            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            style={{ width: 128 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK IN
@@ -198,7 +198,7 @@ export default function ExpediaSearchBar() {
           </button>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-black/12 mx-1" />
+          <div className="h-[27px] w-px bg-black/12 mx-1" />
 
           {/* CHECK-OUT pill */}
           <button
@@ -209,8 +209,8 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
-            style={{ width: 150 }}
+            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            style={{ width: 128 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK OUT
@@ -221,7 +221,7 @@ export default function ExpediaSearchBar() {
           </button>
 
           {/* Divider */}
-          <div className="h-8 w-px bg-black/12 mx-1" />
+          <div className="h-[27px] w-px bg-black/12 mx-1" />
 
           {/* WHO pill */}
           <button
@@ -233,8 +233,8 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
-            style={{ width: 180 }}
+            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            style={{ width: 153 }}
           >
             <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHO
@@ -249,7 +249,7 @@ export default function ExpediaSearchBar() {
           {/* Search button - 48px circle */}
           <button
             type="submit"
-            className="h-12 w-12 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white flex items-center justify-center hover:bg-[hsl(var(--gs-ink))]/90 transition ml-2"
+            className="h-[41px] w-[41px] shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white flex items-center justify-center hover:bg-[hsl(var(--gs-ink))]/90 transition ml-2"
             aria-label="Search on Expedia"
           >
             <SearchIcon className="h-5 w-5" />
@@ -261,10 +261,10 @@ export default function ExpediaSearchBar() {
             checkOut ||
             adults !== 2 ||
             children !== 0) && (
-            <button
-              type="button"
-              onClick={onClear}
-              className="h-10 w-10 shrink-0 rounded-full bg-white/40 hover:bg-white/60 text-muted-foreground flex items-center justify-center ml-2"
+          <button
+            type="button"
+            onClick={onClear}
+            className="h-[34px] w-[34px] shrink-0 rounded-full bg-white/40 hover:bg-white/60 text-muted-foreground flex items-center justify-center ml-2"
               aria-label="Clear all"
               title="Clear all"
             >
