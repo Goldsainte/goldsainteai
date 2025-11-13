@@ -18,6 +18,7 @@ import { RequireAgentTerms } from "@/components/RequireAgentTerms";
 import { LoadingFallback } from "@/components/LoadingFallback";
 import { usePresence } from "@/hooks/usePresence";
 import { SentryTestButton } from "@/components/SentryTestButton";
+import { EnvironmentValidator } from "@/components/system/EnvironmentValidator";
 import { useState, useEffect, lazy, Suspense } from "react";
 import { initCSRFProtection } from "@/lib/security/csrf";
 
@@ -378,6 +379,7 @@ function AppContent() {
           <AIBookingConcierge />
         </Suspense>
       )}
+      {import.meta.env.DEV && <EnvironmentValidator />}
       {import.meta.env.DEV && <SentryTestButton />}
     </div>
   );

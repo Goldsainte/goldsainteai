@@ -1,4 +1,5 @@
 import { ProductionChecklist } from "@/components/admin/ProductionChecklist";
+import { SecurityAudit } from "@/components/system/SecurityAudit";
 import { NotificationBell } from "@/components/NotificationBell";
 import { Shield } from "lucide-react";
 
@@ -18,7 +19,10 @@ export default function SystemHealth() {
         <NotificationBell />
       </div>
 
-      <ProductionChecklist />
+      <div className="space-y-8">
+        <SecurityAudit />
+        <ProductionChecklist />
+      </div>
     </div>
   );
 }
