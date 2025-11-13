@@ -16,18 +16,26 @@ export function SentryTestButton() {
 
     window.addEventListener('sentry-initialized', handleSentryInit);
 
-    // Fallback: check if already initialized after 500ms
-    const timeoutId = setTimeout(() => {
+    // Robust init guard: poll for up to 2 seconds
+    let pollCount = 0;
+    const maxPolls = 10; // 10 polls * 200ms = 2 seconds
+    const pollInterval = setInterval(() => {
+      pollCount++;
       const dsnFromEnv = import.meta.env.VITE_SENTRY_DSN;
       const fallbackUsed = (window as any).__SENTRY_FALLBACK__;
+      
       if (dsnFromEnv || fallbackUsed) {
         setIsInitialized(true);
+        clearInterval(pollInterval);
+      } else if (pollCount >= maxPolls) {
+        // After 2 seconds, stop polling
+        clearInterval(pollInterval);
       }
-    }, 500);
+    }, 200);
 
     return () => {
       window.removeEventListener('sentry-initialized', handleSentryInit);
-      clearTimeout(timeoutId);
+      clearInterval(pollInterval);
     };
   }, []);
 
@@ -80,7 +88,7 @@ export function SentryTestButton() {
     console.warn('[Sentry] No DSN available (env or fallback).');
     if (import.meta.env.DEV) {
       return (
-        <div className="fixed bottom-4 right-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-sm">
+        <div className="fixed bottom-20 left-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg max-w-sm">
           <p className="text-sm font-medium text-yellow-800 mb-1">
             ⚠️ Sentry DSN Missing
           </p>

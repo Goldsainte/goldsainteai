@@ -136,6 +136,12 @@ When running in development mode (`npm run dev`), users will now see:
    - Relocated from bottom-right to bottom-left
    - Test error, performance, and warning triggers
    - Test counter
+   - **New**: Robust init guard with 2-second polling to prevent false "missing" warnings
+
+3. **SentryStatusChip** (bottom-left corner, dev only):
+   - Shows DSN source: "Sentry: Env" (green), "Sentry: Fallback" (blue), or "Sentry: Missing" (yellow)
+   - Updates in real-time when Sentry initializes
+   - Clear visual indicator of which DSN mechanism is active
 
 ### Production Mode Features
 When visiting `/system-health` in any environment:
@@ -150,6 +156,47 @@ When visiting `/system-health` in any environment:
 2. **ProductionChecklist** (existing):
    - Week 8 launch checklist
    - All previous production readiness items
+
+---
+
+## Sentry DSN Debug Guide
+
+If you see "Sentry DSN Missing" warning after adding the secret:
+
+### Expected Console Logs (Success)
+```
+[Sentry] Attempting initialization...
+[Sentry] DSN from env: undefined
+[Sentry] Fetching fallback DSN from /config/sentry.json...
+[Sentry] Fallback DSN loaded, initializing...
+[Sentry] Sentry initialized successfully with fallback DSN
+[Sentry] Final DSN present: true
+```
+
+### Quick Checks
+1. **Console**: Open DevTools → Console, look for "[Sentry]" logs above
+2. **Fallback File**: Navigate to `/config/sentry.json` in browser, should return JSON with "dsn" key
+3. **Status Chip**: Bottom-left corner should show:
+   - "Sentry: Env" (green) if `VITE_SENTRY_DSN` is set
+   - "Sentry: Fallback" (blue) if fallback file loaded
+   - "Sentry: Missing" (yellow) if neither available
+4. **Test Controls**: If DSN is active, "Sentry Test Controls" panel appears bottom-left
+
+### Critical: Vite Restart Required
+**Important**: Adding `VITE_SENTRY_DSN` via Lovable secrets UI requires a **full Vite dev server restart** to be recognized. Simply refreshing the browser page will NOT pick up new environment variables.
+
+**How to restart**:
+- If running locally: Stop dev server (Ctrl+C) and restart
+- If using Lovable preview: The preview should auto-restart when secrets are added, but if not, try closing and reopening the preview tab
+
+### Fallback Mechanism
+If `VITE_SENTRY_DSN` isn't loading, the fallback mechanism will:
+1. Fetch `/config/sentry.json` at runtime
+2. Use the DSN from that file
+3. Set `window.__SENTRY_FALLBACK__ = true`
+4. Dispatch `sentry-initialized` event
+
+This fallback is a workaround for environment variable loading issues and should work immediately without restart.
 
 ---
 
