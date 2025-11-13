@@ -19,6 +19,7 @@ const RETRY_OPTIONS = {
 
 export class SessionSyncError extends Error {
   status?: number;
+  cause?: unknown;
 
   constructor(message: string, status?: number, cause?: unknown) {
     super(message);

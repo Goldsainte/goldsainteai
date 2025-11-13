@@ -36,6 +36,7 @@ const AgentPerformanceDashboard = lazy(() => import('@/pages/AgentPerformanceDas
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
 const MyBookingsRedirect = lazy(() => import('@/pages/redirects/MyBookingsRedirect'));
 const FavoritesRedirect = lazy(() => import('@/pages/redirects/FavoritesRedirect'));
+const MarketplaceRedirect = lazy(() => import('@/pages/redirects/MarketplaceRedirect'));
 const CommissionDashboard = lazy(() => import('@/pages/CommissionDashboard'));
 const EmailPreview = lazy(() => import('@/pages/EmailPreview'));
 const Collections = lazy(() => import('@/pages/Collections'));

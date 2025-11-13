@@ -56,18 +56,18 @@ const TravelFeed = () => {
       });
     },
     initialPageParam: { cursor: undefined, focusPostId: targetPostId ?? undefined },
-    getNextPageParam: (lastPage) => (lastPage.hasMore ? { cursor: lastPage.nextCursor } : undefined),
+    getNextPageParam: (lastPage) => (lastPage.hasMore ? { cursor: lastPage.nextCursor, focusPostId: undefined } : undefined),
     staleTime: 30_000,
     gcTime: 5 * 60_000,
   });
 
   const posts = useMemo(
-    () => feedQuery.data?.pages.flatMap((page) => page.items) ?? [],
+    () => feedQuery.data?.pages.flatMap((page) => (page as any).items) ?? [],
     [feedQuery.data],
   );
 
   const isPersonalized = useMemo(
-    () => Boolean(feedQuery.data?.pages.find((page) => page.personalized)),
+    () => Boolean(feedQuery.data?.pages.find((page) => (page as any).personalized)),
     [feedQuery.data],
   );
 
