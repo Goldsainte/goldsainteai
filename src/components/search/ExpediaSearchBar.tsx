@@ -126,11 +126,11 @@ export default function ExpediaSearchBar() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto hidden md:flex items-center w-full"
-      style={{ maxWidth: 900 }}
+      className="mx-auto hidden md:flex items-center"
+      style={{ width: 900 }}
       aria-label="Goldsainte search"
     >
-      <div className="w-full h-12 rounded-full border border-white/40 bg-[hsl(var(--gs-gold))] text-[hsl(var(--gs-ink))] shadow-sm px-2 flex items-center gap-1">
+      <div className="w-full h-[66px] rounded-[33px] border border-white/40 bg-[hsl(var(--gs-gold))] text-[hsl(var(--gs-ink))] shadow-sm px-2 flex items-center">
           {/* WHERE pill */}
           <button
             ref={whereRefs.setReference}
@@ -141,15 +141,15 @@ export default function ExpediaSearchBar() {
               setOpenGuests(false);
             }}
             onKeyDown={handleKeyDown}
-            className="group flex-1 min-w-[200px] h-10 rounded-full px-4 text-left bg-white/70 hover:bg-white transition flex items-center"
+            className="group h-[50px] rounded-[25px] px-4 text-left bg-white/70 hover:bg-white transition flex flex-col justify-center"
+            style={{ width: 280 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
+            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
               Where
             </div>
             <div className="flex items-center gap-2">
-              <MapPinIcon className="h-4 w-4 opacity-70" />
               <input
-                className="w-full bg-transparent outline-none placeholder:text-[hsl(var(--gs-ink)/50)] font-display text-[17px]"
+                className="w-full bg-transparent outline-none placeholder:text-[hsl(var(--gs-ink)/50)] font-display text-[15px]"
                 placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
@@ -159,7 +159,10 @@ export default function ExpediaSearchBar() {
             </div>
           </button>
 
-          {/* WHEN pill */}
+          {/* Divider */}
+          <div className="h-8 w-px bg-black/12 mx-1" />
+
+          {/* CHECK-IN pill */}
           <button
             ref={datesRefs.setReference}
             type="button"
@@ -169,18 +172,42 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="min-w-[180px] h-10 rounded-full px-4 bg-white/70 hover:bg-white transition text-left flex items-center"
+            className="h-[50px] rounded-[25px] px-4 bg-white/70 hover:bg-white transition text-left flex flex-col justify-center"
+            style={{ width: 150 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
-              When
+            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
+              Check in
             </div>
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4 opacity-70" />
-              <span className="font-display text-[17px]">
-                {checkIn && checkOut ? `${checkIn} – ${checkOut}` : "Add dates"}
-              </span>
-            </div>
+            <span className="font-display text-[15px]">
+              {checkIn || "Add date"}
+            </span>
           </button>
+
+          {/* Divider */}
+          <div className="h-8 w-px bg-black/12 mx-1" />
+
+          {/* CHECK-OUT pill */}
+          <button
+            type="button"
+            onClick={() => {
+              setOpenDates((v) => !v);
+              setOpenGuests(false);
+              setOpenWhere(false);
+            }}
+            onKeyDown={handleKeyDown}
+            className="h-[50px] rounded-[25px] px-4 bg-white/70 hover:bg-white transition text-left flex flex-col justify-center"
+            style={{ width: 150 }}
+          >
+            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
+              Check out
+            </div>
+            <span className="font-display text-[15px]">
+              {checkOut || "Add date"}
+            </span>
+          </button>
+
+          {/* Divider */}
+          <div className="h-8 w-px bg-black/12 mx-1" />
 
           {/* WHO pill */}
           <button
@@ -192,27 +219,26 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="min-w-[140px] h-10 rounded-full px-4 bg-white/70 hover:bg-white transition text-left flex items-center"
+            className="h-[50px] rounded-[25px] px-4 bg-white/70 hover:bg-white transition text-left flex flex-col justify-center"
+            style={{ width: 180 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
+            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
               Who
             </div>
             <div className="flex items-center gap-2">
-              <Users2Icon className="h-4 w-4 opacity-70" />
-              <span className="font-display text-[17px]">
+              <span className="font-display text-[15px]">
                 {adults + children} {adults + children === 1 ? "guest" : "guests"}
               </span>
             </div>
           </button>
 
-          {/* Search button */}
+          {/* Search button - 48px circle */}
           <button
             type="submit"
-            className="h-10 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white px-5 font-display text-[16px] flex items-center gap-2 hover:opacity-90"
+            className="h-12 w-12 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white flex items-center justify-center hover:opacity-90 transition ml-2"
             aria-label="Search on Expedia"
           >
-            <SearchIcon className="h-4 w-4" />
-            Search
+            <SearchIcon className="h-5 w-5" />
           </button>
 
           {/* Clear button shows when something changed */}
@@ -224,7 +250,7 @@ export default function ExpediaSearchBar() {
             <button
               type="button"
               onClick={onClear}
-              className="h-10 w-10 shrink-0 rounded-full bg-white/70 hover:bg-white text-[hsl(var(--gs-ink))] flex items-center justify-center"
+              className="h-10 w-10 shrink-0 rounded-full bg-white/70 hover:bg-white text-[hsl(var(--gs-ink))] flex items-center justify-center ml-2"
               aria-label="Clear all"
               title="Clear all"
             >
