@@ -1,8 +1,3 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Star, Eye, Heart, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface CreatorCardProps {
@@ -48,97 +43,108 @@ export const CreatorCard = ({ creator }: CreatorCardProps) => {
   };
 
   return (
-    <Card className="group cursor-pointer overflow-hidden border-border bg-card transition-all hover:shadow-lg hover:-translate-y-1">
-      {/* Header with Avatar */}
-      <div className="relative h-32 bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10">
-        <div className="absolute -bottom-12 left-1/2 -translate-x-1/2">
-          <Avatar className="h-24 w-24 border-4 border-background shadow-lg">
-            <AvatarImage src={creator.avatar_url} alt={creator.full_name} />
-            <AvatarFallback className="bg-primary/10 text-xl font-semibold">
+    <div className="flex flex-col rounded-2xl bg-background p-4 shadow-sm ring-1 ring-border/80 transition hover:-translate-y-1 hover:shadow-lg">
+      {/* Header with Avatar and Info */}
+      <div className="flex items-center gap-3">
+        <div className="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-full bg-muted">
+          {creator.avatar_url ? (
+            <img
+              src={creator.avatar_url}
+              alt={creator.full_name || creator.username || "Creator"}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-primary/10 text-sm font-semibold text-foreground">
               {getInitials(creator.full_name || creator.username)}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-
-        {/* Verified badge */}
-        {creator.identity_verified && (
-          <div className="absolute top-3 right-3">
-            <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">
-              ✓ Verified
-            </Badge>
-          </div>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="pt-14 p-5 space-y-4">
-        {/* Name & Handle */}
-        <div className="text-center space-y-1">
-          <h3 className="font-semibold text-lg text-foreground">
-            {creator.full_name || creator.username}
-          </h3>
-          {creator.username && (
-            <p className="text-sm text-muted-foreground">@{creator.username}</p>
+            </div>
           )}
         </div>
-
-        {/* Bio */}
-        {creator.bio && (
-          <p className="text-sm text-muted-foreground text-center line-clamp-2">
-            {creator.bio}
-          </p>
-        )}
-
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-3 py-3 border-y">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">
-              {creator.stats.trips_created}
-            </div>
-            <div className="text-xs text-muted-foreground">Trips Created</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">
-              {formatNumber(creator.stats.avg_views)}
-            </div>
-            <div className="text-xs text-muted-foreground">Avg Views</div>
-          </div>
-        </div>
-
-        {/* Rating */}
-        {creator.rating !== undefined && creator.review_count !== undefined && creator.review_count > 0 && (
-          <div className="flex items-center justify-center gap-1 text-sm">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="font-semibold">{creator.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">
-              ({creator.review_count} {creator.review_count === 1 ? 'review' : 'reviews'})
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-semibold text-foreground">
+              {creator.full_name || creator.username}
             </span>
+            {creator.identity_verified && (
+              <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                Verified Creator
+              </span>
+            )}
           </div>
-        )}
-
-        {/* Specialties */}
-        {creator.specialties && creator.specialties.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 justify-center">
-            {creator.specialties.slice(0, 4).map((specialty, idx) => (
-              <Badge key={idx} variant="outline" className="text-xs">
-                {specialty}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* CTA Button */}
-        <Button
-          className="w-full"
-          variant="default"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleClick();
-          }}
-        >
-          View Profile
-        </Button>
+          {creator.username && (
+            <span className="text-xs text-muted-foreground">@{creator.username}</span>
+          )}
+          {creator.rating !== undefined && creator.review_count !== undefined && creator.review_count > 0 && (
+            <div className="mt-0.5 flex items-center gap-1 text-xs text-foreground">
+              <span>★ {creator.rating.toFixed(1)}</span>
+              <span className="text-muted-foreground">
+                ({creator.review_count} {creator.review_count === 1 ? 'review' : 'reviews'})
+              </span>
+            </div>
+          )}
+        </div>
       </div>
-    </Card>
+
+      {/* Bio */}
+      {creator.bio && (
+        <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+          {creator.bio}
+        </p>
+      )}
+
+      {/* Stats */}
+      <div className="mt-3 flex items-center gap-4 text-xs">
+        <div>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Trips Created
+          </p>
+          <p className="font-semibold text-foreground">
+            {creator.stats.trips_created}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Avg. Engagement
+          </p>
+          <p className="font-semibold text-foreground">
+            {creator.stats.avg_engagement !== undefined 
+              ? `${(creator.stats.avg_engagement * 100).toFixed(1)}%` 
+              : "N/A"}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+            Avg. Views
+          </p>
+          <p className="font-semibold text-foreground">
+            {formatNumber(creator.stats.avg_views)}
+          </p>
+        </div>
+      </div>
+
+      {/* Specialties */}
+      {creator.specialties && creator.specialties.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1">
+          {creator.specialties.slice(0, 4).map((specialty, idx) => (
+            <span
+              key={idx}
+              className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-foreground"
+            >
+              {specialty}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* CTA Button */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleClick();
+        }}
+        className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700"
+      >
+        Send partnership proposal
+      </button>
+    </div>
   );
 };
