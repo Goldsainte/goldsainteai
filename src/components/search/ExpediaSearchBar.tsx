@@ -148,7 +148,7 @@ export default function ExpediaSearchBar() {
       style={{ width: 765 }}
       aria-label="Goldsainte search"
     >
-      <div className="w-full h-[56px] rounded-[28px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
+      <div className="w-full h-[56px] rounded-[28px] border border-[hsl(var(--luxury-gold))] bg-[hsl(var(--luxury-gold))] text-muted-foreground shadow-md px-2 flex items-center">
           {/* WHERE pill */}
           <div
             ref={whereRefs.setReference}
