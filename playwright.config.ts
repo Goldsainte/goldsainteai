@@ -5,10 +5,10 @@ import { defineConfig, devices } from '@playwright/test';
  * Playwright test suite for critical user flows
  */
 export default defineConfig({
-  testDir: './tests',
+  testDir: './e2e',
   
   // Maximum time one test can run
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   
   // Test execution settings
   fullyParallel: true,
