@@ -55,7 +55,7 @@ console.info('[Sentry] VITE_SENTRY_DSN from env:', Boolean(import.meta.env.VITE_
       replaysSessionSampleRate: 0.1,
       replaysOnErrorSampleRate: 1.0,
       environment: import.meta.env.MODE,
-      release: `goldsainte@${import.meta.env.VITE_APP_VERSION || 'dev'}`,
+      release: import.meta.env.VITE_RELEASE_VERSION || 'goldsainte@dev',
       beforeSend(event, hint) {
         if (event.exception) {
           console.error('[Sentry] Capturing exception:', hint.originalException);
