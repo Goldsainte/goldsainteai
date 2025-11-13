@@ -68,7 +68,7 @@ export default function ExpediaSearchBar() {
   // --- STYLE: Airbnb desktop width/height; brand colors ---
   return (
     <div
-      className="mx-auto mt-3 hidden lg:flex items-center"
+      className="mx-auto mt-3 hidden md:flex items-center"
       style={{ maxWidth: 920 }}
     >
       <div
