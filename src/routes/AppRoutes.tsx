@@ -21,6 +21,7 @@ const TravelProfile = lazy(() => import('@/pages/TravelProfile'));
 const ExplorePage = lazy(() => import('@/pages/ExplorePage'));
 const ReelsViewer = lazy(() => import('@/pages/ReelsViewer'));
 const Marketplace = lazy(() => import('@/pages/Marketplace'));
+const RequestTrip = lazy(() => import('@/pages/marketplace/RequestTrip'));
 const Search = lazy(() => import('@/pages/Search'));
 const Trending = lazy(() => import('@/pages/Trending'));
 const Shop = lazy(() => import('@/pages/Shop'));
@@ -184,6 +185,14 @@ export const AppRoutes = () => (
         element={(
           <RouteSectionBoundary section="marketplace">
             <Marketplace />
+          </RouteSectionBoundary>
+        )}
+      />
+      <Route
+        path="/marketplace/request-trip"
+        element={(
+          <RouteSectionBoundary section="marketplace">
+            <RequestTrip />
           </RouteSectionBoundary>
         )}
       />
