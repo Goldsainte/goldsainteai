@@ -1,5 +1,7 @@
 import { createRoot } from "react-dom/client";
 import * as Sentry from "@sentry/react";
+import { installConsoleRedaction } from "@/lib/observability/console-patch";
+import { scrubPII } from "@/lib/observability/logger";
 import { 
   setupLongTaskMonitoring, 
   setupWebVitalsMonitoring,
@@ -13,73 +15,88 @@ import {
 import App from "./App.tsx";
 import "./index.css";
 
-// Runtime diagnostic logging
-console.info('[Sentry] import.meta.env keys:', Object.keys(import.meta.env));
-console.info('[Sentry] VITE_SENTRY_DSN from env:', Boolean(import.meta.env.VITE_SENTRY_DSN), 
-  import.meta.env.VITE_SENTRY_DSN ? `prefix: ${import.meta.env.VITE_SENTRY_DSN.substring(0, 20)}... (length: ${import.meta.env.VITE_SENTRY_DSN.length})` : 'empty');
+installConsoleRedaction();
 
-// Async Sentry initialization with fallback
-(async () => {
-  let SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
-  
-  // Fallback: fetch from public config if env var is missing
-  if (!SENTRY_DSN) {
-    console.warn('[Sentry] VITE_SENTRY_DSN not found in import.meta.env, attempting fallback fetch from /config/sentry.json');
-    try {
-      const response = await fetch('/config/sentry.json', { cache: 'no-store' });
-      if (response.ok) {
-        const config = await response.json();
-        SENTRY_DSN = config.dsn;
-        console.info('[Sentry] Loaded DSN from fallback config:', Boolean(SENTRY_DSN));
-        // Expose fallback status for debug UI
-        (window as any).__SENTRY_FALLBACK__ = true;
-      }
-    } catch (error) {
-      console.error('[Sentry] Failed to fetch fallback config:', error);
-    }
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+const tracesSampleRate = Number(import.meta.env.VITE_SENTRY_TRACES_SAMPLE_RATE ?? (import.meta.env.PROD ? "0.2" : "1"));
+const replaySessionRate = Number(import.meta.env.VITE_REPLAY_SAMPLE_RATE ?? "0.05");
+const replayErrorRate = Number(import.meta.env.VITE_REPLAY_ERROR_SAMPLE_RATE ?? "1.0");
+const memorySampleRate = Number(import.meta.env.VITE_MEMORY_MONITOR_SAMPLE_RATE ?? "0.05");
+const rageClickSampleRate = Number(import.meta.env.VITE_RAGE_CLICK_SAMPLE_RATE ?? "0.2");
+
+const getDiagnosticsOptIn = () => {
+  try {
+    return window.localStorage.getItem("goldsainte-diagnostics-opt-in") === "true";
+  } catch (error) {
+    return false;
+  }
+};
+
+const diagnosticsOptIn = typeof window !== "undefined" ? getDiagnosticsOptIn() : false;
+const replayEnabled = import.meta.env.VITE_ENABLE_SESSION_REPLAY === "true" && diagnosticsOptIn;
+const enableRageClickListeners = replayEnabled && Math.random() < rageClickSampleRate;
+const enableMemoryMonitor = Math.random() < memorySampleRate;
+
+if (!sentryDsn && import.meta.env.PROD) {
+  console.warn("Sentry DSN missing in production build – monitoring disabled.");
+}
+
+if (sentryDsn) {
+  const integrations: NonNullable<Parameters<typeof Sentry.init>[0]["integrations"]> = [
+    Sentry.browserTracingIntegration(),
+  ];
+
+  if (replayEnabled) {
+    integrations.push(
+      Sentry.replayIntegration({
+        maskAllText: true,
+        blockAllMedia: true,
+      })
+    );
   }
 
-  console.info('[Sentry] Final DSN present:', Boolean(SENTRY_DSN), 'mode:', import.meta.env.MODE);
+  Sentry.init({
+    dsn: sentryDsn,
+    integrations,
+    tracesSampleRate,
+    replaysSessionSampleRate: replayEnabled ? replaySessionRate : 0,
+    replaysOnErrorSampleRate: replayEnabled ? replayErrorRate : 0,
+    environment: import.meta.env.MODE,
+    release: import.meta.env.VITE_RELEASE_VERSION || "goldsainte@dev",
+    beforeSend(event) {
+      const sanitized = scrubPII(event);
+      return sanitized;
+    },
+  });
 
-  if (SENTRY_DSN) {
-    Sentry.init({
-      dsn: SENTRY_DSN,
-      integrations: [
-        Sentry.browserTracingIntegration(),
-        Sentry.replayIntegration({
-          maskAllText: true,
-          blockAllMedia: true,
-        }),
-      ],
-      tracesSampleRate: import.meta.env.PROD ? 0.2 : 1.0,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1.0,
-      environment: import.meta.env.MODE,
-      release: import.meta.env.VITE_RELEASE_VERSION || 'goldsainte@dev',
-      beforeSend(event, hint) {
-        if (event.exception) {
-          console.error('[Sentry] Capturing exception:', hint.originalException);
-        }
-        return event;
-      },
+  setupLongTaskMonitoring();
+  setupWebVitalsMonitoring();
+
+  if (enableRageClickListeners) {
+    const teardownRage = setupRageClickDetection();
+    const teardownDead = setupDeadClickDetection();
+    window.addEventListener("beforeunload", () => {
+      teardownRage?.();
+      teardownDead?.();
     });
-
-    setupLongTaskMonitoring();
-    setupWebVitalsMonitoring();
-    setupRageClickDetection();
-    setupDeadClickDetection();
-    initializeSessionReplay();
-
-    setInterval(monitorMemory, 30000);
-    
-    console.info('[Sentry] Initialization complete');
-    
-    // Dispatch event to signal Sentry is ready
-    window.dispatchEvent(new CustomEvent('sentry-initialized'));
-  } else {
-    console.warn('[Sentry] DSN still missing after fallback attempt. Monitoring disabled.');
   }
-})();
+
+  if (replayEnabled) {
+    initializeSessionReplay();
+  }
+
+  if (enableMemoryMonitor && "memory" in performance) {
+    const memoryInterval = window.setInterval(() => {
+      if ("memory" in performance) {
+        monitorMemory();
+      }
+    }, 30000);
+
+    window.addEventListener("beforeunload", () => window.clearInterval(memoryInterval));
+  }
+
+  window.dispatchEvent(new CustomEvent("sentry-initialized"));
+}
 
 // Error fallback UI
 const ErrorFallback = ({ error }: { error: unknown }) => {

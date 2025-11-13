@@ -1,9 +1,11 @@
 import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import * as Sentry from '@sentry/react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { useActivityLogger } from '@/hooks/useActivityLogger';
+import { loadSessionFromServer, pushSessionToServer, SessionSyncError } from '@/lib/auth/session-service';
 
 interface AuthContextType {
   user: User | null;
@@ -25,42 +27,113 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const INACTIVITY_LIMIT = 60 * 60 * 1000; // 1 hour in milliseconds
+  const sessionBootstrapFailures = useRef(0);
+  const MAX_SESSION_FAILURES = 3;
+
+  const handleSessionSyncFailure = async (error: unknown) => {
+    sessionBootstrapFailures.current += 1;
+    Sentry.captureException(error, {
+      level: 'warning',
+      tags: { scope: 'session_sync', phase: 'bootstrap' },
+      extra: { failures: sessionBootstrapFailures.current },
+    });
+
+    if (sessionBootstrapFailures.current >= MAX_SESSION_FAILURES) {
+      await supabase.auth.signOut().catch(() => undefined);
+      setSession(null);
+      setUser(null);
+      setIsLoading(false);
+      toast({
+        title: 'Session expired',
+        description: 'We were unable to restore your session. Please sign in again.',
+        variant: 'destructive',
+      });
+      sessionBootstrapFailures.current = 0;
+    }
+  };
+
+  const resetSessionFailureCount = () => {
+    sessionBootstrapFailures.current = 0;
+  };
 
   useEffect(() => {
-    // Set up auth state listener first
+    let isMounted = true;
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         setIsLoading(false);
+        resetSessionFailureCount();
+        void pushSessionToServer(event, session).catch((error: unknown) => {
+          Sentry.captureException(error, {
+            level: 'warning',
+            tags: { scope: 'session_sync', phase: 'push', event },
+          });
+        });
       }
     );
 
-    // Then check for existing session with error handling
-    supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
+    const bootstrapSession = async () => {
+      try {
+        const serverSession = await loadSessionFromServer();
+        if (!isMounted) return;
+
+        if (serverSession) {
+          const { data: hydrated, error: setSessionError } = await supabase.auth.setSession({
+            access_token: serverSession.access_token,
+            refresh_token: serverSession.refresh_token,
+          });
+
+          if (setSessionError) {
+            console.error('Failed to hydrate Supabase session from server', setSessionError);
+            setSession(null);
+            setUser(null);
+          } else {
+            setSession(hydrated.session);
+            setUser(hydrated.session?.user ?? null);
+          }
+          setIsLoading(false);
+          resetSessionFailureCount();
+          return;
+        }
+
+        const { data, error } = await supabase.auth.getSession();
+        if (!isMounted) return;
+
         if (error) {
           console.error('Auth session error:', error);
-          // SECURITY: Supabase manages auth tokens securely in httpOnly cookies
-          // Never manually store auth tokens in localStorage
           setSession(null);
           setUser(null);
         } else {
-          setSession(session);
-          setUser(session?.user ?? null);
+          setSession(data.session);
+          setUser(data.session?.user ?? null);
         }
+        resetSessionFailureCount();
         setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error('Fatal auth error:', error);
-        // SECURITY: Clear UI preferences only, not auth tokens (handled by Supabase)
-        // Preserve non-sensitive localStorage like language, theme, tour state
-        setSession(null);
-        setUser(null);
-        setIsLoading(false);
-      });
+      } catch (error) {
+        if (!isMounted) return;
+        if (error instanceof SessionSyncError) {
+          await handleSessionSyncFailure(error);
+        } else {
+          Sentry.captureException(error, {
+            level: 'error',
+            tags: { scope: 'session_sync', phase: 'bootstrap' },
+          });
+          setSession(null);
+          setUser(null);
+          setIsLoading(false);
+        }
+      }
+    };
 
-    return () => subscription.unsubscribe();
+    void bootstrapSession();
+
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Auto sign-out after inactivity
@@ -110,7 +183,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       
       if (error) throw error;
-      
+
       // Log successful sign in
       if (data.user) {
         await logActivity({
@@ -120,7 +193,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           details: { email, timestamp: new Date().toISOString() }
         });
       }
-      
+
+      try {
+        await pushSessionToServer('SIGNED_IN', data.session ?? null);
+      } catch (error) {
+        Sentry.captureException(error, {
+          level: 'warning',
+          tags: { scope: 'session_sync', phase: 'signin' },
+        });
+      }
+
       toast({
         title: "Welcome back!",
         description: "You've successfully signed in.",
@@ -165,7 +247,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(data.user);
         setSession(data.session);
       }
-      
+
+      try {
+        await pushSessionToServer('SIGNED_IN', data.session ?? null);
+      } catch (error) {
+        Sentry.captureException(error, {
+          level: 'warning',
+          tags: { scope: 'session_sync', phase: 'signup' },
+        });
+      }
+
       return { error: null };
     } catch (error: any) {
       return { error };
@@ -185,7 +276,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     }
     
-    await supabase.auth.signOut();
+    const { error: signOutError } = await supabase.auth.signOut();
+    if (signOutError) {
+      console.error('Sign out error:', signOutError);
+    }
+    try {
+      await pushSessionToServer('SIGNED_OUT', null);
+    } catch (error) {
+      Sentry.captureException(error, {
+        level: 'warning',
+        tags: { scope: 'session_sync', phase: 'signout' },
+      });
+    }
     setUser(null);
     setSession(null);
     toast({
