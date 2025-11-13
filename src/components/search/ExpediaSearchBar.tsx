@@ -1,179 +1,123 @@
-import { useMemo, useState } from "react";
-import { format, addDays } from "date-fns";
-import { DateRange } from "react-day-picker";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Calendar } from "@/components/ui/calendar";
-import { buildExpediaStaysUrl, GuestCounts } from "@/lib/expedia";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { redirectToExpedia } from "@/lib/expedia";
 
 export default function ExpediaSearchBar() {
   const [destination, setDestination] = useState("");
-  const [range, setRange] = useState<DateRange>({ from: addDays(new Date(), 3), to: addDays(new Date(), 6) });
-  const [guests, setGuests] = useState<GuestCounts>({ adults: 2, childrenAges: [] });
-  const nights = useMemo(() => {
-    if (!range.from || !range.to) return 0;
-    return Math.max(1, Math.round((+range.to - +range.from) / 86400000));
-  }, [range]);
+  const [checkIn, setCheckIn] = useState<string|undefined>();
+  const [checkOut, setCheckOut] = useState<string|undefined>();
+  const [adults, setAdults] = useState<number>(2);
+  const [children, setChildren] = useState<number>(0);
+  const [showDestList, setShowDestList] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const canSearch = destination.trim().length > 0 && !!range.from && !!range.to && guests.adults > 0;
+  const onChangeDestination = async (val: string) => {
+    setDestination(val);
+    setShowDestList(true);
+    // Debounced fetch to our proxy
+    if (val.trim().length < 2) { setSuggestions([]); return; }
+    try {
+      const res = await fetch(`https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/destinations?q=${encodeURIComponent(val.trim())}`);
+      const data = await res.json();
+      setSuggestions(data?.results?.slice(0, 8) ?? []);
+    } catch { /* no-op */ }
+  };
 
-  const handleSearch = () => {
-    if (!canSearch) return;
-    const url = buildExpediaStaysUrl({
-      destination: destination.trim(),
-      checkIn: range.from!,
-      checkOut: range.to!,
-      guests
-    });
-    window.location.href = url;
+  const onSearch = () => {
+    try {
+      redirectToExpedia({
+        destination,
+        // only pass dates if chosen – otherwise Expedia will show date picker
+        checkIn,
+        checkOut,
+        adults,
+        children,
+      });
+    } catch (e:any) {
+      console.error(e?.message ?? e);
+    }
   };
 
   return (
     <div
-      className="mx-auto flex h-14 w-full max-w-[820px] items-center rounded-full bg-white/95 px-2 py-2 shadow-md
-                 ring-1 ring-black/10 text-foreground"
+      className="gs-pill header-search-font"
       role="search"
-      aria-label="Stays search"
+      aria-label="Hotel search"
     >
       {/* WHERE */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            className="flex-1 rounded-full px-5 py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
-            aria-label="Choose destination"
-          >
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Where</div>
-            <div className="truncate text-sm text-foreground font-medium">{destination || "Search destinations"}</div>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="start" className="w-[420px] p-3">
-          <Input
-            autoFocus
-            placeholder="City, landmark, airport"
+      <div className="gs-cell">
+        <div className="gs-label">WHERE</div>
+        <div className="relative">
+          <input
             value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            onChange={(e) => onChangeDestination(e.target.value)}
+            onFocus={() => setShowDestList(true)}
+            onBlur={() => setTimeout(() => setShowDestList(false), 150)}
+            placeholder="Search destinations"
+            className="gs-input"
+            aria-label="Destination"
           />
-        </PopoverContent>
-      </Popover>
+          {showDestList && suggestions.length > 0 && (
+            <div className="gs-popover">
+              {suggestions.map((s, i) => (
+                <button
+                  key={i}
+                  className="gs-popover-item"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => { setDestination(s); setShowDestList(false); }}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
-      <div className="h-6 w-px bg-border" />
+      <div className="gs-divider" />
 
       {/* WHEN */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            className="flex-1 rounded-full px-5 py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
-            aria-label="Choose dates"
-          >
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">When</div>
-            <div className="text-sm text-foreground font-medium">
-              {range.from && range.to
-                ? `${format(range.from, "MMM d")} – ${format(range.to, "MMM d")} · ${nights} night${nights > 1 ? "s" : ""}`
-                : "Add dates"}
-            </div>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="center" className="w-[740px]">
-          <Calendar
-            mode="range"
-            numberOfMonths={2}
-            selected={range}
-            onSelect={setRange}
-            disabled={(date) => date < new Date()}
-            className={cn("p-3 pointer-events-auto")}
-          />
-        </PopoverContent>
-      </Popover>
+      <div className="gs-cell">
+        <div className="gs-label">WHEN</div>
+        <button
+          className="gs-buttonlike"
+          onClick={() => {
+            // open your date picker popover if you have one
+            // TEMP: clear any auto defaults; only show placeholders until selected
+          }}
+          aria-label="Choose dates"
+        >
+          {(checkIn && checkOut) ? (
+            <span>
+              {checkIn} – {checkOut}
+            </span>
+          ) : (
+            <span className="gs-placeholder">Add dates</span>
+          )}
+        </button>
+      </div>
 
-      <div className="h-6 w-px bg-border" />
+      <div className="gs-divider" />
 
       {/* WHO */}
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            className="flex-1 rounded-full px-5 py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
-            aria-label="Choose guests"
-          >
-            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Who</div>
-            <div className="text-sm text-foreground font-medium">
-              {guests.adults + guests.childrenAges.length} guest{(guests.adults + guests.childrenAges.length) > 1 ? "s" : ""}
-            </div>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-[420px]">
-          <div className="space-y-4">
-            <Row
-              label="Adults"
-              value={guests.adults}
-              onChange={(v) => setGuests((g) => ({ ...g, adults: Math.max(1, v) }))}
-              min={1}
-            />
-            <ChildrenPicker
-              childrenAges={guests.childrenAges}
-              setChildrenAges={(ages) => setGuests((g) => ({ ...g, childrenAges: ages }))}
-            />
-          </div>
-        </PopoverContent>
-      </Popover>
-
-      {/* SEARCH BUTTON */}
-      <Button
-        className="ml-2 rounded-full px-6 h-9 bg-primary hover:opacity-90 text-primary-foreground font-semibold shadow-sm"
-        onClick={handleSearch}
-        disabled={!canSearch}
-      >
-        Search
-      </Button>
-    </div>
-  );
-}
-
-function Row({ label, value, onChange, min = 0, max = 16 }: { label: string; value: number; onChange: (v: number) => void; min?: number; max?: number }) {
-  return (
-    <div className="flex items-center justify-between">
-      <div className="text-sm">{label}</div>
-      <div className="flex items-center gap-2">
-        <Button variant="outline" size="icon" onClick={() => onChange(Math.max(min, value - 1))} aria-label={`Decrease ${label}`}>–</Button>
-        <div className="w-8 text-center">{value}</div>
-        <Button variant="outline" size="icon" onClick={() => onChange(Math.min(max, value + 1))} aria-label={`Increase ${label}`}>+</Button>
+      <div className="gs-cell">
+        <div className="gs-label">WHO</div>
+        <button
+          className="gs-buttonlike"
+          onClick={() => {
+            // open your guests popover if you have one
+          }}
+          aria-label="Select guests"
+        >
+          {(adults || children) ? (
+            <span>{adults + children} guest{adults + children !== 1 ? "s" : ""}</span>
+          ) : (
+            <span className="gs-placeholder">Add guests</span>
+          )}
+        </button>
       </div>
-    </div>
-  );
-}
 
-function ChildrenPicker({ childrenAges, setChildrenAges }: { childrenAges: number[]; setChildrenAges: (ages: number[]) => void }) {
-  const add = () => setChildrenAges([...childrenAges, 8]);
-  const remove = (i: number) => setChildrenAges(childrenAges.filter((_, idx) => idx !== i));
-  const setAge = (i: number, age: number) => setChildrenAges(childrenAges.map((a, idx) => idx === i ? age : a));
-
-  return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="text-sm">Children</div>
-        <Button variant="outline" size="sm" onClick={add}>Add child</Button>
-      </div>
-      {!!childrenAges.length && (
-        <div className="space-y-2">
-          {childrenAges.map((age, i) => (
-            <div key={i} className="flex items-center justify-between">
-              <div className="text-xs text-muted-foreground">Child {i + 1} age</div>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={0}
-                  max={17}
-                  className="w-20"
-                  value={age}
-                  onChange={(e) => setAge(i, Math.max(0, Math.min(17, Number(e.target.value || 0))))}
-                />
-                <Button variant="ghost" size="sm" onClick={() => remove(i)}>Remove</Button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* SEARCH CTA */}
+      <button className="gs-cta" onClick={onSearch}>Search</button>
     </div>
   );
 }
