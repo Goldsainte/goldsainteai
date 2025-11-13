@@ -1,7 +1,6 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Star, MapPin, Calendar, Users } from "lucide-react";
+import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 interface TripCardProps {
   trip: {
@@ -18,15 +17,20 @@ interface TripCardProps {
     tags?: string[];
     creator_name?: string;
     is_verified?: boolean;
-    max_participants?: number;
   };
 }
 
 export const TripCard = ({ trip }: TripCardProps) => {
   const navigate = useNavigate();
+  const [isWishlisted, setIsWishlisted] = useState(false);
 
-  const handleClick = () => {
+  const handleCardClick = () => {
     navigate(`/marketplace/trip/${trip.slug || trip.id}`);
+  };
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsWishlisted(!isWishlisted);
   };
 
   const formatPrice = (price: number, currency: string) => {
@@ -39,102 +43,93 @@ export const TripCard = ({ trip }: TripCardProps) => {
   };
 
   return (
-    <Card
-      className="group cursor-pointer overflow-hidden border-border bg-card transition-all hover:shadow-lg hover:-translate-y-1"
-      onClick={handleClick}
-    >
+    <div className="group overflow-hidden rounded-2xl bg-card shadow-sm ring-1 ring-border/80 transition hover:-translate-y-1 hover:shadow-lg">
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+      <div className="relative h-48 w-full overflow-hidden">
         {trip.cover_image_url ? (
           <img
             src={trip.cover_image_url}
             alt={trip.title}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <MapPin className="h-12 w-12 text-muted-foreground/30" />
+          <div className="flex h-full w-full items-center justify-center bg-muted">
+            <span className="text-4xl">🗺️</span>
           </div>
         )}
         
-        {/* Verified badge */}
-        {trip.is_verified && (
-          <div className="absolute top-3 right-3">
-            <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">
-              ✓ Verified
-            </Badge>
-          </div>
-        )}
-
-        {/* Duration badge */}
-        <div className="absolute bottom-3 left-3">
-          <Badge variant="secondary" className="bg-background/90 backdrop-blur-sm">
-            <Calendar className="mr-1 h-3 w-3" />
-            {trip.duration_days} {trip.duration_days === 1 ? 'day' : 'days'}
-          </Badge>
+        {/* Top badges */}
+        <div className="pointer-events-none absolute inset-x-3 top-3 flex items-center justify-between">
+          {trip.is_verified && (
+            <span className="rounded-full bg-background/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 shadow-sm backdrop-blur-sm">
+              Verified
+            </span>
+          )}
+          <button 
+            onClick={handleWishlistClick}
+            className="pointer-events-auto inline-flex h-7 w-7 items-center justify-center rounded-full bg-background/90 shadow-sm backdrop-blur-sm hover:bg-background transition"
+          >
+            <Heart 
+              className={`h-4 w-4 transition ${isWishlisted ? 'fill-red-500 text-red-500' : 'text-foreground/60'}`} 
+            />
+          </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
-        {/* Location */}
-        <div className="flex items-center text-sm text-muted-foreground">
-          <MapPin className="mr-1 h-4 w-4" />
-          <span className="font-medium">{trip.destination}</span>
-        </div>
-
-        {/* Title */}
-        <h3 className="font-semibold text-lg leading-tight text-foreground line-clamp-2">
-          {trip.title}
-        </h3>
-
-        {/* Rating & Reviews */}
-        {trip.rating !== undefined && trip.review_count !== undefined && trip.review_count > 0 && (
-          <div className="flex items-center gap-1 text-sm">
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span className="font-semibold">{trip.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">
-              ({trip.review_count} {trip.review_count === 1 ? 'review' : 'reviews'})
-            </span>
-          </div>
-        )}
-
-        {/* Tags */}
-        {trip.tags && trip.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5">
-            {trip.tags.slice(0, 3).map((tag, idx) => (
-              <Badge key={idx} variant="outline" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Footer: Price & Creator */}
-        <div className="flex items-end justify-between pt-2 border-t">
-          <div>
-            <div className="text-xs text-muted-foreground">From</div>
-            <div className="text-xl font-bold text-foreground">
-              {formatPrice(trip.price_per_person, trip.currency)}
-            </div>
-            <div className="text-xs text-muted-foreground">per person</div>
-          </div>
-
-          {trip.max_participants && (
-            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-              <Users className="h-4 w-4" />
-              <span>Max {trip.max_participants}</span>
+      <div className="flex flex-col gap-1.5 px-3.5 pb-3.5 pt-3">
+        {/* Title and Rating */}
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="line-clamp-1 text-sm font-semibold text-foreground">
+            {trip.title}
+          </h3>
+          {trip.rating !== undefined && trip.review_count !== undefined && trip.review_count > 0 && (
+            <div className="flex items-center gap-0.5 text-xs text-foreground">
+              <span>★</span>
+              <span>{trip.rating.toFixed(1)}</span>
+              <span className="text-muted-foreground">
+                ({trip.review_count})
+              </span>
             </div>
           )}
         </div>
 
-        {/* Creator */}
-        {trip.creator_name && (
-          <div className="text-xs text-muted-foreground">
-            by {trip.creator_name}
+        {/* Location */}
+        <p className="text-xs text-muted-foreground">{trip.destination}</p>
+
+        {/* Price */}
+        <p className="mt-0.5 text-sm font-semibold text-foreground">
+          {formatPrice(trip.price_per_person, trip.currency)}
+          <span className="text-xs font-normal text-muted-foreground"> / person · {trip.duration_days}d</span>
+        </p>
+
+        {/* Tags and Creator */}
+        <div className="mt-1 flex items-center justify-between">
+          <div className="flex flex-wrap gap-1">
+            {trip.tags?.slice(0, 3).map((tag, idx) => (
+              <span
+                key={idx}
+                className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
-        )}
+          {trip.creator_name && (
+            <span className="text-[11px] text-muted-foreground">
+              by {trip.creator_name}
+            </span>
+          )}
+        </div>
+
+        {/* CTA Button */}
+        <button 
+          onClick={handleCardClick}
+          className="mt-2 inline-flex w-full items-center justify-center rounded-full bg-foreground px-3 py-1.5 text-xs font-semibold text-background hover:bg-foreground/90 transition"
+        >
+          View trip details
+        </button>
       </div>
-    </Card>
+    </div>
   );
 };
