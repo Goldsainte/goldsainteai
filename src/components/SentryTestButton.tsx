@@ -50,13 +50,16 @@ export function SentryTestButton() {
 
   if (!import.meta.env.VITE_SENTRY_DSN) {
     console.warn('[Sentry] VITE_SENTRY_DSN is empty at runtime');
-    return (
-      <div className="fixed bottom-4 right-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <p className="text-sm text-yellow-800">
-          Sentry DSN not configured. Add VITE_SENTRY_DSN to enable monitoring.
-        </p>
-      </div>
-    );
+    if (import.meta.env.DEV) {
+      return (
+        <div className="fixed bottom-4 right-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800">
+            Sentry DSN not configured. Add VITE_SENTRY_DSN to enable monitoring.
+          </p>
+        </div>
+      );
+    }
+    return null;
   }
 
   return (
