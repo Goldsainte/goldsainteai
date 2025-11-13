@@ -18,10 +18,10 @@ export default defineConfig({
   
   // Reporter configuration
   reporter: [
-    ['html', { outputFolder: 'playwright-report' }],
+    ['list'],
     ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/junit.xml' }],
-    ['list']
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['junit', { outputFile: 'test-results/junit.xml' }]
   ],
   
   // Shared settings for all projects
