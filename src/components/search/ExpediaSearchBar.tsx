@@ -127,10 +127,10 @@ export default function ExpediaSearchBar() {
     <>
       <style>{`
         .expedia-search-input::placeholder {
-          color: #47555E;
+          color: #6F6F6F;
           font-family: "Playfair Display", serif;
           font-size: 16px;
-          line-height: 24px;
+          line-height: 1.2;
         }
       `}</style>
       <form
@@ -139,7 +139,7 @@ export default function ExpediaSearchBar() {
       style={{ width: 765 }}
       aria-label="Goldsainte search"
     >
-      <div className="w-full h-[56px] rounded-[28px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
+      <div className="w-full h-[68px] rounded-[34px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
           {/* WHERE pill */}
           <button
             ref={whereRefs.setReference}
@@ -150,18 +150,22 @@ export default function ExpediaSearchBar() {
               setOpenGuests(false);
             }}
             onKeyDown={handleKeyDown}
-            className="group h-[42px] rounded-[21px] px-4 text-left bg-white/40 hover:bg-white/60 transition flex flex-col justify-center"
+            className="group h-[54px] rounded-[27px] px-4 py-3 text-left bg-white/40 hover:bg-white/60 transition flex items-center gap-1"
             style={{ width: 238 }}
           >
-            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
-              WHERE
-            </div>
+            <div className="flex flex-col gap-0">
+              <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
+                WHERE
+              </div>
               <input
                 className="w-full bg-transparent outline-none font-display expedia-search-input"
                 style={{ 
-                  fontSize: '16px', 
-                  lineHeight: '24px',
-                  color: '#47555E'
+                  fontSize: '16px',
+                  lineHeight: '1.2',
+                  color: '#1F3D36',
+                  padding: 0,
+                  margin: 0,
+                  height: 'auto'
                 }}
                 placeholder="Search destinations"
                 value={destination}
@@ -169,10 +173,11 @@ export default function ExpediaSearchBar() {
                 onFocus={() => setOpenWhere(true)}
                 aria-label="Destination"
               />
+            </div>
           </button>
 
           {/* Divider */}
-          <div className="h-[27px] w-px bg-black/12 mx-1" />
+          <div className="h-[42px] w-px bg-black/12 mx-1" />
 
           {/* CHECK-IN pill */}
           <button
@@ -184,19 +189,21 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            className="h-[54px] rounded-[27px] px-4 py-3 bg-white/40 hover:bg-white/60 transition text-left flex items-center gap-1"
             style={{ width: 128 }}
           >
-            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
-              CHECK IN
+            <div className="flex flex-col gap-0">
+              <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
+                CHECK IN
+              </div>
+              <span className="font-display" style={{ fontSize: '16px', lineHeight: '1.2', color: '#1F3D36' }}>
+                {checkIn || "Add date"}
+              </span>
             </div>
-            <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
-              {checkIn || "Add date"}
-            </span>
           </button>
 
           {/* Divider */}
-          <div className="h-[27px] w-px bg-black/12 mx-1" />
+          <div className="h-[42px] w-px bg-black/12 mx-1" />
 
           {/* CHECK-OUT pill */}
           <button
@@ -207,19 +214,21 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            className="h-[54px] rounded-[27px] px-4 py-3 bg-white/40 hover:bg-white/60 transition text-left flex items-center gap-1"
             style={{ width: 128 }}
           >
-            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
-              CHECK OUT
+            <div className="flex flex-col gap-0">
+              <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
+                CHECK OUT
+              </div>
+              <span className="font-display" style={{ fontSize: '16px', lineHeight: '1.2', color: '#1F3D36' }}>
+                {checkOut || "Add date"}
+              </span>
             </div>
-            <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
-              {checkOut || "Add date"}
-            </span>
           </button>
 
           {/* Divider */}
-          <div className="h-[27px] w-px bg-black/12 mx-1" />
+          <div className="h-[42px] w-px bg-black/12 mx-1" />
 
           {/* WHO pill */}
           <button
@@ -231,15 +240,17 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[42px] rounded-[21px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
+            className="h-[54px] rounded-[27px] px-4 py-3 bg-white/40 hover:bg-white/60 transition text-left flex items-center gap-1"
             style={{ width: 153 }}
           >
-            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
-              WHO
-            </div>
-              <span className="font-display" style={{ fontSize: '16px', lineHeight: '24px', color: '#47555E' }}>
+            <div className="flex flex-col gap-0">
+              <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
+                WHO
+              </div>
+              <span className="font-display" style={{ fontSize: '16px', lineHeight: '1.2', color: '#1F3D36' }}>
                 {adults + children} {adults + children === 1 ? "guest" : "guests"}
               </span>
+            </div>
           </button>
 
           {/* Search button - 48px circle */}
