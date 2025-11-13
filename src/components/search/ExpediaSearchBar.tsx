@@ -7,20 +7,6 @@ export default function ExpediaSearchBar() {
   const [checkOut, setCheckOut] = useState<string|undefined>();
   const [adults, setAdults] = useState<number>(2);
   const [children, setChildren] = useState<number>(0);
-  const [showDestList, setShowDestList] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  const onChangeDestination = async (val: string) => {
-    setDestination(val);
-    setShowDestList(true);
-    // Debounced fetch to our proxy
-    if (val.trim().length < 2) { setSuggestions([]); return; }
-    try {
-      const res = await fetch(`https://iwdevxltjuedijrcdejs.supabase.co/functions/v1/destinations?q=${encodeURIComponent(val.trim())}`);
-      const data = await res.json();
-      setSuggestions(data?.results?.slice(0, 8) ?? []);
-    } catch { /* no-op */ }
-  };
 
   const onSearch = () => {
     try {
@@ -46,31 +32,13 @@ export default function ExpediaSearchBar() {
       {/* WHERE */}
       <div className="gs-cell">
         <div className="gs-label">WHERE</div>
-        <div className="relative">
-          <input
-            value={destination}
-            onChange={(e) => onChangeDestination(e.target.value)}
-            onFocus={() => setShowDestList(true)}
-            onBlur={() => setTimeout(() => setShowDestList(false), 150)}
-            placeholder="Search destinations"
-            className="gs-input"
-            aria-label="Destination"
-          />
-          {showDestList && suggestions.length > 0 && (
-            <div className="gs-popover">
-              {suggestions.map((s, i) => (
-                <button
-                  key={i}
-                  className="gs-popover-item"
-                  onMouseDown={(e) => e.preventDefault()}
-                  onClick={() => { setDestination(s); setShowDestList(false); }}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <input
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          placeholder="Search destinations"
+          className="gs-input"
+          aria-label="Destination"
+        />
       </div>
 
       <div className="gs-divider" />
