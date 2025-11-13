@@ -25,6 +25,7 @@ import { PartnershipApprovals } from "@/components/PartnershipApprovals";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { SearchBar } from "@/components/SearchBar";
 import { useCoinBalance } from "@/hooks/useCoinBalance";
+import ExpediaSearchBar from "@/components/search/ExpediaSearchBar";
 import { BuyCoinsModal } from "@/components/BuyCoinsModal";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { NotificationInbox } from "@/components/NotificationInbox";
@@ -500,16 +501,7 @@ export const Header = () => {
 
               {/* Compact Search Bar - Center */}
               <div className="flex justify-center min-w-0" data-tour="traditional-search">
-                <Button
-                  onClick={() => openExpediaModal()}
-                  className="relative rounded-full border border-accent bg-accent backdrop-blur text-center justify-center text-primary hover:bg-accent/90 hover:border-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 transition-all min-h-[44px] min-w-[44px] h-[40px] sm:h-[44px] lg:h-[48px] px-10 sm:px-12 w-full max-w-[700px] font-medium"
-                  aria-label="Search flights and hotels with Goldsainte and Expedia"
-                >
-                  <span className="truncate text-[15px] lg:text-[16px] leading-none">
-                    Search flights and hotels with Goldsainte × Expedia
-                  </span>
-                  <Search className="absolute right-3 h-4 w-4 text-primary pointer-events-none" aria-hidden="true" />
-                </Button>
+                <ExpediaSearchBar />
               </div>
 
               {/* Right side actions */}
