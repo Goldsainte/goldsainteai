@@ -147,6 +147,7 @@ export default function ExpediaSearchBar() {
       className="mx-auto hidden md:flex items-center"
       style={{ width: 765 }}
       aria-label="Goldsainte search"
+      data-testid="expedia-search-bar"
     >
       <div className="w-full h-[56px] rounded-[28px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
           {/* WHERE pill */}
