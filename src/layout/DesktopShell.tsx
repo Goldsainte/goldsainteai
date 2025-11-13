@@ -5,29 +5,29 @@ import { Panels } from "@/components/social/panels/Panels";
 
 export default function DesktopShell() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <div className="mx-auto" style={{ maxWidth: 1500 }}>
-        <div className="grid" style={{ gridTemplateColumns: "244px 1fr 320px" }}>
+    <div className="hidden lg:block">
+      {/* Constrain shell to IG-like width: 244 + 24 + 630 + 24 + 320 = 1242px */}
+      <div className="mx-auto max-w-[1280px] px-4">
+        {/* 3-column grid with fixed tracks so center never shrinks */}
+        <div className="grid grid-cols-[244px_630px_320px] gap-6">
           {/* Left nav */}
-          <aside className="hidden xl:block border-r border-border min-h-screen sticky top-0">
+          <aside className="min-h-screen sticky top-0">
             <LeftNav />
           </aside>
 
-          {/* Center feed */}
-          <main className="min-h-screen flex justify-center">
-            <div className="w-full max-w-[630px]">
-              <Outlet />
-            </div>
+          {/* Center feed (fixed 630px) */}
+          <main className="min-h-screen">
+            <Outlet />
           </main>
 
-          {/* Right suggestions */}
-          <aside className="hidden lg:block pt-8 pl-6">
+          {/* Right rail (suggested) */}
+          <aside className="min-h-screen sticky top-0">
             <RightRail />
           </aside>
         </div>
       </div>
 
-      {/* Slide-out panels anchored to the left */}
+      {/* Left slide-out panels overlay (search/notifications/messages) */}
       <Panels />
     </div>
   );

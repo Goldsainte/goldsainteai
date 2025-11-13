@@ -1,29 +1,27 @@
 interface MediaFrameProps {
-  media: {
-    type: "image" | "video";
-    url: string;
-  };
+  src: string;
+  alt?: string;
+  ratio?: number;
+  video?: boolean;
+  poster?: string;
 }
 
-export function MediaFrame({ media }: MediaFrameProps) {
+export function MediaFrame({
+  src,
+  alt,
+  ratio = 1,
+  video = false,
+  poster,
+}: MediaFrameProps) {
   return (
-    <div className="relative w-full" style={{ maxHeight: "calc(100vh - 160px)" }}>
-      {media.type === "image" ? (
-        <img
-          src={media.url}
-          alt=""
-          className="mx-auto block max-w-full h-auto"
-          style={{ maxHeight: "calc(100vh - 200px)" }}
-          loading="lazy"
-          decoding="async"
-        />
+    <div className="relative w-full overflow-hidden bg-black rounded-lg"
+         style={{ aspectRatio: `${ratio} / 1` }}>
+      {video ? (
+        <video className="absolute inset-0 w-full h-full object-contain bg-black" controls playsInline poster={poster}>
+          <source src={src} />
+        </video>
       ) : (
-        <video
-          src={media.url}
-          controls
-          className="mx-auto block max-w-full h-auto"
-          style={{ maxHeight: "calc(100vh - 200px)" }}
-        />
+        <img src={src} alt={alt} className="absolute inset-0 w-full h-full object-contain bg-black" />
       )}
     </div>
   );

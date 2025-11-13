@@ -44,7 +44,7 @@ export function Lightbox({ open, onOpenChange, post }: LightboxProps) {
       <DialogContent className="p-0 max-w-[min(935px,96vw)] max-h-[90vh]">
         <div className="grid md:grid-cols-2">
           <div className="bg-black flex items-center justify-center">
-            <MediaFrame media={post.media} />
+            <MediaFrame src={post.media.url} video={post.media.type === "video"} />
           </div>
           <div className="min-h-[60vh] max-h-[calc(100vh-140px)] overflow-y-auto border-l border-border p-4">
             <PostSidebar post={post} />

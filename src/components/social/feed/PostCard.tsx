@@ -36,7 +36,7 @@ export function PostCard({ post }: PostCardProps) {
 
         {/* Media */}
         <div className="bg-black cursor-pointer" onClick={() => setLightboxOpen(true)}>
-          <MediaFrame media={post.media} />
+          <MediaFrame src={post.media.url} video={post.media.type === "video"} />
         </div>
 
         {/* Actions (below the image) */}

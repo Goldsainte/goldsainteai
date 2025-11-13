@@ -19,7 +19,7 @@ export function Panels() {
     <Sheet open={open} onOpenChange={(o) => !o && close()}>
       <SheetContent
         side="left"
-        className="w-[397px] p-0 border-r border-border"
+        className="w-[397px] p-0 border-r border-border z-[60]"
       >
         {type === "search" && <SearchPanel />}
         {type === "notifications" && <NotificationsPanel />}
