@@ -52,7 +52,7 @@ export default function Marketplace() {
     queryKey: ["packaged-trips", filters],
     queryFn: async () => {
       let query = supabase
-        .from("packaged_trips")
+        .from("packaged_trips" as any)
         .select(`*,profiles:creator_id(full_name,username),travel_agents:agent_id(agency_name)`)
         .eq("status", "published");
 
@@ -142,7 +142,30 @@ export default function Marketplace() {
 
   const handleSearch = (newFilters: SearchFilters) => setFilters(newFilters);
   const handleTabChange = (tab: Tab) => setActiveTab(tab);
-  const handleJobCreated = () => { toast.success("Trip request posted!"); setIsCreateDialogOpen(false); refetchRequests(); };
+  
+  const handleJobSubmit = async (formData: any) => {
+    try {
+      const { error } = await supabase.from("marketplace_jobs").insert({
+        user_id: user!.id,
+        title: formData.title,
+        description: formData.description,
+        destination: formData.destinationCity || formData.destinations,
+        budget_min: formData.budgetMin,
+        budget_max: formData.budgetMax,
+        currency: formData.currency,
+        status: "open",
+      } as any);
+      
+      if (error) throw error;
+      
+      toast.success("Trip request posted!");
+      setIsCreateDialogOpen(false);
+      refetchRequests();
+    } catch (error) {
+      toast.error("Failed to post trip request");
+      console.error(error);
+    }
+  };
 
   if (authLoading) return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   if (!user) return null;
@@ -166,7 +189,7 @@ export default function Marketplace() {
         {activeTab === "agents" && (isLoadingAgents ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-96" />)}</div> : agents?.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{agents.map((a: any) => <AgentCard key={a.id} agent={a} />)}</div> : <div className="text-center py-20"><p>No agents found</p></div>)}
         {activeTab === "requests" && (isLoadingRequests ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{[...Array(6)].map((_, i) => <Skeleton key={i} className="h-64" />)}</div> : requests?.length ? <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{requests.map((r: any) => <Card key={r.id} className="cursor-pointer hover:shadow-lg" onClick={() => navigate(`/marketplace/request/${r.id}`)}><CardHeader><CardTitle>{r.title}</CardTitle><CardDescription><MapPin className="inline h-3 w-3 mr-1"/>{r.destination}</CardDescription></CardHeader><CardContent><p className="text-sm line-clamp-2">{r.description}</p></CardContent></Card>)}</div> : <div className="text-center py-20"><p>No requests found</p><Button onClick={() => setIsCreateDialogOpen(true)} className="mt-4">Post a Trip Request</Button></div>)}
       </section>
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"><ComprehensiveJobForm onJobCreated={handleJobCreated} /></DialogContent></Dialog>
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}><DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto"><ComprehensiveJobForm onSubmit={handleJobSubmit} onCancel={() => setIsCreateDialogOpen(false)} /></DialogContent></Dialog>
     </div>
   );
 }
