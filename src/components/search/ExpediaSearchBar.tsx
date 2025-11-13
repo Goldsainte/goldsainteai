@@ -124,7 +124,16 @@ export default function ExpediaSearchBar() {
   }
 
   return (
-    <form
+    <>
+      <style>{`
+        .expedia-search-input::placeholder {
+          color: #47555E;
+          font-family: "Playfair Display", serif;
+          font-size: 20px;
+          line-height: 28px;
+        }
+      `}</style>
+      <form
       onSubmit={handleSubmit}
       className="mx-auto hidden md:flex items-center"
       style={{ width: 900 }}
@@ -144,12 +153,17 @@ export default function ExpediaSearchBar() {
             className="group h-[50px] rounded-[25px] px-4 text-left bg-white/40 hover:bg-white/60 transition flex flex-col justify-center"
             style={{ width: 280 }}
           >
-            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHERE
             </div>
             <div className="flex items-center gap-2">
               <input
-                className="w-full bg-transparent outline-none placeholder:text-muted-foreground/50 font-display text-[18px]"
+                className="w-full bg-transparent outline-none font-display expedia-search-input"
+                style={{ 
+                  fontSize: '20px', 
+                  lineHeight: '28px',
+                  color: '#47555E'
+                }}
                 placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
@@ -175,10 +189,10 @@ export default function ExpediaSearchBar() {
             className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 150 }}
           >
-            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK IN
             </div>
-            <span className="font-display text-[18px]">
+            <span className="font-display" style={{ fontSize: '20px', lineHeight: '28px', color: '#47555E' }}>
               {checkIn || "Add date"}
             </span>
           </button>
@@ -198,10 +212,10 @@ export default function ExpediaSearchBar() {
             className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 150 }}
           >
-            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               CHECK OUT
             </div>
-            <span className="font-display text-[18px]">
+            <span className="font-display" style={{ fontSize: '20px', lineHeight: '28px', color: '#47555E' }}>
               {checkOut || "Add date"}
             </span>
           </button>
@@ -222,11 +236,11 @@ export default function ExpediaSearchBar() {
             className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 180 }}
           >
-            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+            <div className="text-[12px] tracking-wide uppercase font-display" style={{ color: '#4A4A4A' }}>
               WHO
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-display text-[18px]">
+              <span className="font-display" style={{ fontSize: '20px', lineHeight: '28px', color: '#47555E' }}>
                 {adults + children} {adults + children === 1 ? "guest" : "guests"}
               </span>
             </div>
@@ -414,6 +428,7 @@ export default function ExpediaSearchBar() {
           </div>,
           document.body
         )}
-    </form>
+      </form>
+    </>
   );
 }
