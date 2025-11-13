@@ -130,7 +130,7 @@ export default function ExpediaSearchBar() {
       style={{ width: 900 }}
       aria-label="Goldsainte search"
     >
-      <div className="w-full h-[66px] rounded-[33px] border border-white/40 bg-[hsl(var(--gs-gold))] text-[hsl(var(--gs-ink))] shadow-sm px-2 flex items-center">
+      <div className="w-full h-[66px] rounded-[33px] border border-[hsl(var(--luxury-gold))] bg-luxury-ivory text-muted-foreground shadow-md px-2 flex items-center">
           {/* WHERE pill */}
           <button
             ref={whereRefs.setReference}
@@ -141,15 +141,15 @@ export default function ExpediaSearchBar() {
               setOpenGuests(false);
             }}
             onKeyDown={handleKeyDown}
-            className="group h-[50px] rounded-[25px] px-4 text-left bg-white/70 hover:bg-white transition flex flex-col justify-center"
+            className="group h-[50px] rounded-[25px] px-4 text-left bg-white/40 hover:bg-white/60 transition flex flex-col justify-center"
             style={{ width: 280 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
-              Where
+            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+              WHERE
             </div>
             <div className="flex items-center gap-2">
               <input
-                className="w-full bg-transparent outline-none placeholder:text-[hsl(var(--gs-ink)/50)] font-display text-[15px]"
+                className="w-full bg-transparent outline-none placeholder:text-muted-foreground/50 font-display text-[18px]"
                 placeholder="Search destinations"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
@@ -172,13 +172,13 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[50px] rounded-[25px] px-4 bg-white/70 hover:bg-white transition text-left flex flex-col justify-center"
+            className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 150 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
-              Check in
+            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+              CHECK IN
             </div>
-            <span className="font-display text-[15px]">
+            <span className="font-display text-[18px]">
               {checkIn || "Add date"}
             </span>
           </button>
@@ -195,13 +195,13 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[50px] rounded-[25px] px-4 bg-white/70 hover:bg-white transition text-left flex flex-col justify-center"
+            className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 150 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
-              Check out
+            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+              CHECK OUT
             </div>
-            <span className="font-display text-[15px]">
+            <span className="font-display text-[18px]">
               {checkOut || "Add date"}
             </span>
           </button>
@@ -219,14 +219,14 @@ export default function ExpediaSearchBar() {
               setOpenWhere(false);
             }}
             onKeyDown={handleKeyDown}
-            className="h-[50px] rounded-[25px] px-4 bg-white/70 hover:bg-white transition text-left flex flex-col justify-center"
+            className="h-[50px] rounded-[25px] px-4 bg-white/40 hover:bg-white/60 transition text-left flex flex-col justify-center"
             style={{ width: 180 }}
           >
-            <div className="text-[10px] tracking-[.12em] uppercase font-bold font-display text-[hsl(var(--gs-ink)/70)]">
-              Who
+            <div className="text-[12px] tracking-[.12em] uppercase font-display text-muted-foreground/70">
+              WHO
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-display text-[15px]">
+              <span className="font-display text-[18px]">
                 {adults + children} {adults + children === 1 ? "guest" : "guests"}
               </span>
             </div>
@@ -235,7 +235,7 @@ export default function ExpediaSearchBar() {
           {/* Search button - 48px circle */}
           <button
             type="submit"
-            className="h-12 w-12 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white flex items-center justify-center hover:opacity-90 transition ml-2"
+            className="h-12 w-12 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white flex items-center justify-center hover:bg-[hsl(var(--gs-ink))]/90 transition ml-2"
             aria-label="Search on Expedia"
           >
             <SearchIcon className="h-5 w-5" />
@@ -250,7 +250,7 @@ export default function ExpediaSearchBar() {
             <button
               type="button"
               onClick={onClear}
-              className="h-10 w-10 shrink-0 rounded-full bg-white/70 hover:bg-white text-[hsl(var(--gs-ink))] flex items-center justify-center ml-2"
+              className="h-10 w-10 shrink-0 rounded-full bg-white/40 hover:bg-white/60 text-muted-foreground flex items-center justify-center ml-2"
               aria-label="Clear all"
               title="Clear all"
             >
@@ -265,10 +265,10 @@ export default function ExpediaSearchBar() {
           <div
             ref={whereRefs.setFloating}
             style={whereStyles as React.CSSProperties}
-            className="z-[1000] w-[360px] rounded-2xl bg-white shadow-xl p-2 border"
+            className="z-[1000] w-[360px] rounded-2xl bg-white shadow-xl p-2 border border-border"
           >
             {suggestions.length === 0 && (
-              <div className="text-sm text-neutral-500 p-3">
+              <div className="text-sm text-muted-foreground p-3">
                 Start typing a city or destination…
               </div>
             )}
@@ -276,7 +276,7 @@ export default function ExpediaSearchBar() {
               {suggestions.map((s) => (
                 <li key={s.id}>
                   <button
-                    className="w-full text-left px-3 py-2 hover:bg-neutral-100 rounded-md"
+                    className="w-full text-left px-3 py-2 hover:bg-muted rounded-md text-foreground"
                     onClick={() => {
                       setDestination(s.label);
                       setOpenWhere(false);
@@ -297,27 +297,27 @@ export default function ExpediaSearchBar() {
           <div
             ref={datesRefs.setFloating}
             style={datesStyles as React.CSSProperties}
-            className="z-[1000] w-[360px] rounded-2xl bg-white shadow-xl p-4 border"
+            className="z-[1000] w-[360px] rounded-2xl bg-white shadow-xl p-4 border border-border"
           >
             <div className="flex gap-3 items-end">
               <div className="flex-1">
-                <label className="block text-xs font-medium text-neutral-600">
+                <label className="block text-xs font-medium text-muted-foreground">
                   Check in
                 </label>
                 <input
                   type="date"
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="mt-1 w-full border border-border rounded-md px-3 py-2"
                   value={checkIn ?? ""}
                   onChange={(e) => setCheckIn(e.target.value || undefined)}
                 />
               </div>
               <div className="flex-1">
-                <label className="block text-xs font-medium text-neutral-600">
+                <label className="block text-xs font-medium text-muted-foreground">
                   Check out
                 </label>
                 <input
                   type="date"
-                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  className="mt-1 w-full border border-border rounded-md px-3 py-2"
                   value={checkOut ?? ""}
                   onChange={(e) => setCheckOut(e.target.value || undefined)}
                 />
@@ -325,7 +325,7 @@ export default function ExpediaSearchBar() {
             </div>
             <div className="mt-3 flex justify-end gap-2">
               <button
-                className="px-3 py-2 text-sm"
+                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   setCheckIn(undefined);
                   setCheckOut(undefined);
@@ -334,7 +334,7 @@ export default function ExpediaSearchBar() {
                 Clear
               </button>
               <button
-                className="px-3 py-2 text-sm bg-[hsl(var(--gs-ink))] text-white rounded-md"
+                className="px-3 py-2 text-sm bg-[hsl(var(--gs-ink))] text-white rounded-md hover:bg-[hsl(var(--gs-ink))]/90"
                 onClick={() => setOpenDates(false)}
               >
                 Done
@@ -350,23 +350,23 @@ export default function ExpediaSearchBar() {
           <div
             ref={guestsRefs.setFloating}
             style={guestsStyles as React.CSSProperties}
-            className="z-[1000] w-[320px] rounded-2xl bg-white shadow-xl p-4 border"
+            className="z-[1000] w-[320px] rounded-2xl bg-white shadow-xl p-4 border border-border"
           >
             <div className="flex items-center justify-between py-2">
               <div>
-                <div className="font-medium">Adults</div>
-                <div className="text-xs text-neutral-500">Ages 13+</div>
+                <div className="font-medium text-foreground">Adults</div>
+                <div className="text-xs text-muted-foreground">Ages 13+</div>
               </div>
               <div className="flex items-center gap-3">
                 <button
-                  className="border rounded-full w-8 h-8"
+                  className="border border-border rounded-full w-8 h-8 text-foreground hover:bg-muted"
                   onClick={() => setAdults(Math.max(1, adults - 1))}
                 >
                   -
                 </button>
-                <div>{adults}</div>
+                <div className="text-foreground">{adults}</div>
                 <button
-                  className="border rounded-full w-8 h-8"
+                  className="border border-border rounded-full w-8 h-8 text-foreground hover:bg-muted"
                   onClick={() => setAdults(adults + 1)}
                 >
                   +
@@ -375,19 +375,19 @@ export default function ExpediaSearchBar() {
             </div>
             <div className="flex items-center justify-between py-2">
               <div>
-                <div className="font-medium">Children</div>
-                <div className="text-xs text-neutral-500">Ages 0–12</div>
+                <div className="font-medium text-foreground">Children</div>
+                <div className="text-xs text-muted-foreground">Ages 0–12</div>
               </div>
               <div className="flex items-center gap-3">
                 <button
-                  className="border rounded-full w-8 h-8"
+                  className="border border-border rounded-full w-8 h-8 text-foreground hover:bg-muted"
                   onClick={() => setChildren(Math.max(0, children - 1))}
                 >
                   -
                 </button>
-                <div>{children}</div>
+                <div className="text-foreground">{children}</div>
                 <button
-                  className="border rounded-full w-8 h-8"
+                  className="border border-border rounded-full w-8 h-8 text-foreground hover:bg-muted"
                   onClick={() => setChildren(children + 1)}
                 >
                   +
@@ -396,7 +396,7 @@ export default function ExpediaSearchBar() {
             </div>
             <div className="mt-3 flex justify-end gap-2">
               <button
-                className="px-3 py-2 text-sm"
+                className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
                 onClick={() => {
                   setAdults(2);
                   setChildren(0);
@@ -405,7 +405,7 @@ export default function ExpediaSearchBar() {
                 Clear
               </button>
               <button
-                className="px-3 py-2 text-sm bg-[hsl(var(--gs-ink))] text-white rounded-md"
+                className="px-3 py-2 text-sm bg-[hsl(var(--gs-ink))] text-white rounded-md hover:bg-[hsl(var(--gs-ink))]/90"
                 onClick={() => setOpenGuests(false)}
               >
                 Done
