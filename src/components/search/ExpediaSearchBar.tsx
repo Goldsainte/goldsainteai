@@ -32,8 +32,8 @@ export default function ExpediaSearchBar() {
 
   return (
     <div
-      className="mx-auto flex w-full max-w-5xl items-center rounded-full bg-background/80 px-2 py-2 shadow-sm
-                 ring-1 ring-border backdrop-blur-sm"
+      className="mx-auto flex h-14 w-full max-w-[820px] items-center rounded-full bg-white/95 px-2 py-2 shadow-md
+                 ring-1 ring-black/10 text-foreground"
       role="search"
       aria-label="Stays search"
     >
@@ -41,11 +41,11 @@ export default function ExpediaSearchBar() {
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="flex-1 rounded-full px-4 py-3 text-left hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
+            className="flex-1 rounded-full px-5 py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
             aria-label="Choose destination"
           >
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Where</div>
-            <div className="truncate text-base text-foreground">{destination || "Search destinations"}</div>
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Where</div>
+            <div className="truncate text-sm text-foreground font-medium">{destination || "Search destinations"}</div>
           </button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-[420px] p-3">
@@ -64,11 +64,11 @@ export default function ExpediaSearchBar() {
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="flex-1 rounded-full px-4 py-3 text-left hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
+            className="flex-1 rounded-full px-5 py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
             aria-label="Choose dates"
           >
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">When</div>
-            <div className="text-base text-foreground">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">When</div>
+            <div className="text-sm text-foreground font-medium">
               {range.from && range.to
                 ? `${format(range.from, "MMM d")} – ${format(range.to, "MMM d")} · ${nights} night${nights > 1 ? "s" : ""}`
                 : "Add dates"}
@@ -93,11 +93,11 @@ export default function ExpediaSearchBar() {
       <Popover>
         <PopoverTrigger asChild>
           <button
-            className="flex-1 rounded-full px-4 py-3 text-left hover:bg-muted/60 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-colors"
+            className="flex-1 rounded-full px-5 py-2 text-left hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
             aria-label="Choose guests"
           >
-            <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Who</div>
-            <div className="text-base text-foreground">
+            <div className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Who</div>
+            <div className="text-sm text-foreground font-medium">
               {guests.adults + guests.childrenAges.length} guest{(guests.adults + guests.childrenAges.length) > 1 ? "s" : ""}
             </div>
           </button>
@@ -120,8 +120,7 @@ export default function ExpediaSearchBar() {
 
       {/* SEARCH BUTTON */}
       <Button
-        className="ml-2 rounded-full px-6"
-        size="lg"
+        className="ml-2 rounded-full px-6 h-9 bg-primary hover:opacity-90 text-primary-foreground font-semibold shadow-sm"
         onClick={handleSearch}
         disabled={!canSearch}
       >

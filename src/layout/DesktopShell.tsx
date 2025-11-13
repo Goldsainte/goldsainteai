@@ -12,24 +12,22 @@ export default function DesktopShell() {
       </div>
 
       {/* Desktop: 3-column layout */}
-      <div className="hidden lg:block">
-        <div className="mx-auto max-w-[1280px] px-4">
-          <div className="grid grid-cols-[244px_630px_320px] gap-6">
-            {/* Left nav */}
-            <aside className="min-h-screen sticky top-0">
-              <LeftNav />
-            </aside>
+      <div className="hidden lg:block min-h-screen bg-background">
+        <div className="mx-auto grid grid-cols-[244px_minmax(560px,700px)_350px] gap-6 px-6">
+          {/* Left nav */}
+          <aside className="sticky top-0 h-screen py-6">
+            <LeftNav />
+          </aside>
 
-            {/* Center feed (fixed 630px) */}
-            <main className="min-h-screen">
-              <Outlet />
-            </main>
+          {/* Center feed (fluid 560-700px) */}
+          <main className="py-6">
+            <Outlet />
+          </main>
 
-            {/* Right rail (suggested) */}
-            <aside className="min-h-screen sticky top-0">
-              <RightRail />
-            </aside>
-          </div>
+          {/* Right rail (suggested) */}
+          <aside className="sticky top-0 h-screen py-6">
+            <RightRail />
+          </aside>
         </div>
 
         {/* Left slide-out panels overlay (search/notifications/messages) */}
