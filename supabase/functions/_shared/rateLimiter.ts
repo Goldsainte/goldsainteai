@@ -215,25 +215,26 @@ export function getTieredRateLimit(
 }
 
 /**
- * Create rate limit response with appropriate headers
+ * Create rate limit response with appropriate headers and helpful payload
  */
 export function createRateLimitResponse(result: RateLimitResult, corsHeaders: any) {
+  const retryAfterSeconds = result.retryAfter || 60;
+  
   const headers = {
     ...corsHeaders,
     'Content-Type': 'application/json',
     'X-RateLimit-Limit': result.remaining.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
     'X-RateLimit-Reset': result.resetTime.toISOString(),
+    'Retry-After': retryAfterSeconds.toString(), // Always include for 429 responses
   };
-
-  if (!result.allowed && result.retryAfter) {
-    headers['Retry-After'] = result.retryAfter.toString();
-  }
 
   return new Response(
     JSON.stringify({
       error: 'Rate limit exceeded. Please try again later.',
-      retryAfter: result.retryAfter
+      retry_after_seconds: retryAfterSeconds,
+      reset_at: result.resetTime.toISOString(),
+      message: `Too many requests. Please wait ${retryAfterSeconds} seconds before trying again.`
     }),
     {
       status: 429,
