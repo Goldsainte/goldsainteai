@@ -1,3 +1,18 @@
+/* ============================================
+   DEPRECATED - Widget-based modal replaced
+   ============================================
+   
+   This component used Expedia's widget embed pattern,
+   which has been replaced with a direct affiliate
+   redirect approach for better UX and commission tracking.
+   
+   See: src/components/search/ExpediaSearchBar.tsx
+   See: src/lib/expedia.ts
+   
+   DO NOT RENDER THIS COMPONENT ANYWHERE.
+   Kept for rollback safety only.
+*/
+
 import { useState, useEffect, useRef } from "react";
 import { useExpediaModal } from '@/contexts/ExpediaModalContext';
 import { Button } from "@/components/ui/button";

@@ -1,288 +1,391 @@
-import * as React from "react";
-import { CalendarDays, Users, Search } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { createPortal } from "react-dom";
+import { useFloating, offset, flip, shift, autoUpdate } from "@floating-ui/react";
+import { CalendarIcon, Users2Icon, SearchIcon, MapPinIcon, XIcon } from "lucide-react";
 import { buildExpediaAffiliateUrl } from "@/lib/expedia";
-import { cn } from "@/lib/utils";
+
+// Simple debounce helper
+const debounce = (fn: (...a: any[]) => void, ms = 250) => {
+  let t: any;
+  return (...a: any[]) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...a), ms);
+  };
+};
 
 type Suggestion = { id: string; label: string };
 
-const DEFAULT_ADULTS = 2;
+// Static suggestions (TODO: replace with real autocomplete API)
+const STATIC_SUGGESTIONS: Suggestion[] = [
+  { id: "CLT", label: "Charlotte, NC" },
+  { id: "NYC", label: "New York, NY" },
+  { id: "LAX", label: "Los Angeles, CA" },
+  { id: "MIA", label: "Miami, FL" },
+  { id: "ATL", label: "Atlanta, GA" },
+];
 
 export default function ExpediaSearchBar() {
-  const [destination, setDestination] = React.useState("");
-  const [showDestMenu, setShowDestMenu] = React.useState(false);
-  const [suggestions, setSuggestions] = React.useState<Suggestion[]>([]);
+  // Controlled state
+  const [destination, setDestination] = useState("");
+  const [checkIn, setCheckIn] = useState<string | undefined>(undefined);
+  const [checkOut, setCheckOut] = useState<string | undefined>(undefined);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
 
-  const [checkIn, setCheckIn] = React.useState<string | null>(null);
-  const [checkOut, setCheckOut] = React.useState<string | null>(null);
+  // Popover state
+  const [openDates, setOpenDates] = useState(false);
+  const [openGuests, setOpenGuests] = useState(false);
+  const [openWhere, setOpenWhere] = useState(false);
 
-  const [adults, setAdults] = React.useState<number>(DEFAULT_ADULTS);
-  const [children, setChildren] = React.useState<number>(0);
-  const [childrenAges, setChildrenAges] = React.useState<number[]>([]);
+  // Suggestions
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const runSuggest = useMemo(
+    () =>
+      debounce((q: string) => {
+        if (!q) return setSuggestions([]);
+        // TODO: replace with real autocomplete source (Algolia, Mapbox, etc.)
+        const list = STATIC_SUGGESTIONS.filter((s) =>
+          s.label.toLowerCase().includes(q.toLowerCase())
+        );
+        setSuggestions(list.slice(0, 8));
+      }, 200),
+    []
+  );
 
-  const [openDates, setOpenDates] = React.useState(false);
-  const [openGuests, setOpenGuests] = React.useState(false);
+  useEffect(() => {
+    runSuggest(destination);
+  }, [destination, runSuggest]);
 
-  // --- DESTINATION AUTOCOMPLETE (stub - wire to Mapbox/Algolia) ---
-  const fetchSuggestions = React.useMemo(() => {
-    let t: number | undefined;
-    return (q: string) => {
-      window.clearTimeout(t);
-      t = window.setTimeout(async () => {
-        if (!q.trim()) { setSuggestions([]); return; }
-        // TODO: replace with real provider (Mapbox/Algolia/Supabase RPC)
-        const res: Suggestion[] = [
-          { id: "1", label: `${q}, United States` },
-          { id: "2", label: `${q}, Canada` },
-          { id: "3", label: `${q}, Europe` },
-        ];
-        setSuggestions(res);
-      }, 150);
-    };
-  }, []);
+  // Floating UI for popovers (prevents clipping under header)
+  const { refs: datesRefs, floatingStyles: datesStyles } = useFloating({
+    placement: "bottom-start",
+    middleware: [offset(8), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
 
-  React.useEffect(() => { fetchSuggestions(destination); }, [destination, fetchSuggestions]);
+  const { refs: guestsRefs, floatingStyles: guestsStyles } = useFloating({
+    placement: "bottom-start",
+    middleware: [offset(8), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
 
-  const onPickSuggestion = (s: Suggestion) => {
-    setDestination(s.label);
-    setShowDestMenu(false);
+  const { refs: whereRefs, floatingStyles: whereStyles } = useFloating({
+    placement: "bottom-start",
+    middleware: [offset(8), flip(), shift()],
+    whileElementsMounted: autoUpdate,
+  });
+
+  // Keyboard handler
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      onSubmit();
+    }
   };
 
-  const onSubmit = () => {
+  // Escape key closes popovers
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpenWhere(false);
+        setOpenDates(false);
+        setOpenGuests(false);
+      }
+    };
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, []);
+
+  function onSubmit() {
     if (!destination.trim()) {
-      setShowDestMenu(true);
+      setOpenWhere(true);
       return;
     }
     const url = buildExpediaAffiliateUrl({
-      destination,
+      destination: destination.trim(),
       checkIn,
       checkOut,
-      guests: { adults, children, childrenAges },
+      guests: { adults, children },
     });
+
+    // Redirect (no iframe) so affiliate credit works
     window.location.assign(url);
-  };
+  }
 
-  // formatters
-  const dateLabel = !checkIn || !checkOut ? "Add dates" : `${checkIn} – ${checkOut}`;
-  const guestLabel = `${adults + children} ${adults + children === 1 ? "guest" : "guests"}`;
+  function onClear() {
+    setDestination("");
+    setCheckIn(undefined);
+    setCheckOut(undefined);
+    setAdults(2);
+    setChildren(0);
+  }
 
-  // --- STYLE: Airbnb desktop width/height; brand colors ---
   return (
     <div
       className="mx-auto mt-3 hidden md:flex items-center"
-      style={{ maxWidth: 920 }}
+      style={{ maxWidth: 980 }}
+      aria-label="Goldsainte search"
     >
-      <div
-        className="flex w-full h-14 rounded-full shadow-md border border-[rgba(0,0,0,0.08)] overflow-hidden bg-[#F5F7F6]"
-      >
-        {/* WHERE */}
-        <div
-          className="relative flex-1 min-w-[34%] px-5 py-2 flex flex-col justify-center cursor-text hover:bg-white/70 transition-colors"
-          onClick={() => {
-            setShowDestMenu(true);
-            setOpenDates(false);
-            setOpenGuests(false);
-          }}
-        >
-          <div className="text-[10px] tracking-[0.08em] font-semibold text-[#334F47]">WHERE</div>
-          <input
-            aria-label="Search destinations"
-            placeholder="Search destinations"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            onFocus={() => setShowDestMenu(true)}
-            className="bg-transparent outline-none text-[15px] text-[#0E3A34] placeholder:text-[#8AA39B]"
-          />
-          {/* suggestions dropdown */}
-          {showDestMenu && suggestions.length > 0 && (
-            <div
-              className="absolute top-full left-0 z-50 mt-2 w-[32rem] max-w-[90vw] bg-white rounded-2xl shadow-xl border border-black/5"
-              onMouseLeave={() => setShowDestMenu(false)}
+      <div className="w-full rounded-full border border-white/40 bg-[hsl(var(--gs-gold))] text-[hsl(var(--gs-ink))] shadow-sm px-2 py-2">
+        <div className="flex items-center gap-1">
+          {/* WHERE pill */}
+          <button
+            ref={whereRefs.setReference}
+            type="button"
+            onClick={() => {
+              setOpenWhere((v) => !v);
+              setOpenDates(false);
+              setOpenGuests(false);
+            }}
+            onKeyDown={handleKeyDown}
+            className="group flex-1 min-w-[260px] rounded-full px-4 py-2 text-left bg-white/70 hover:bg-white transition"
+          >
+            <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
+              Where
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPinIcon className="h-4 w-4 opacity-70" />
+              <input
+                className="w-full bg-transparent outline-none placeholder:text-[hsl(var(--gs-ink)/50)] font-display text-[17px]"
+                placeholder="Search destinations"
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+                onFocus={() => setOpenWhere(true)}
+                aria-label="Destination"
+              />
+            </div>
+          </button>
+
+          {/* WHEN pill */}
+          <button
+            ref={datesRefs.setReference}
+            type="button"
+            onClick={() => {
+              setOpenDates((v) => !v);
+              setOpenGuests(false);
+              setOpenWhere(false);
+            }}
+            onKeyDown={handleKeyDown}
+            className="min-w-[230px] rounded-full px-4 py-2 bg-white/70 hover:bg-white transition text-left"
+          >
+            <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
+              When
+            </div>
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="h-4 w-4 opacity-70" />
+              <span className="font-display text-[17px]">
+                {checkIn && checkOut ? `${checkIn} – ${checkOut}` : "Add dates"}
+              </span>
+            </div>
+          </button>
+
+          {/* WHO pill */}
+          <button
+            ref={guestsRefs.setReference}
+            type="button"
+            onClick={() => {
+              setOpenGuests((v) => !v);
+              setOpenDates(false);
+              setOpenWhere(false);
+            }}
+            onKeyDown={handleKeyDown}
+            className="min-w-[170px] rounded-full px-4 py-2 bg-white/70 hover:bg-white transition text-left"
+          >
+            <div className="text-[10px] tracking-[.12em] uppercase font-semibold text-[hsl(var(--gs-ink)/70)]">
+              Who
+            </div>
+            <div className="flex items-center gap-2">
+              <Users2Icon className="h-4 w-4 opacity-70" />
+              <span className="font-display text-[17px]">
+                {adults + children} {adults + children === 1 ? "guest" : "guests"}
+              </span>
+            </div>
+          </button>
+
+          {/* Search button */}
+          <button
+            type="button"
+            onClick={onSubmit}
+            className="ml-2 shrink-0 rounded-full bg-[hsl(var(--gs-ink))] text-white px-6 py-3 font-display text-[18px] leading-none flex items-center gap-2 hover:opacity-90"
+            aria-label="Search on Expedia"
+          >
+            <SearchIcon className="h-5 w-5" />
+            Search
+          </button>
+
+          {/* Clear button shows when something changed */}
+          {(destination ||
+            checkIn ||
+            checkOut ||
+            adults !== 2 ||
+            children !== 0) && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="ml-2 shrink-0 rounded-full bg-white/70 hover:bg-white text-[hsl(var(--gs-ink))] px-3 py-3"
+              aria-label="Clear all"
+              title="Clear all"
             >
-              <ul className="py-2">
-                {suggestions.map((s) => (
-                  <li
-                    key={s.id}
-                    className="px-4 py-2 hover:bg-[#F5F7F6] cursor-pointer text-[15px] text-[#0E3A34]"
-                    onClick={() => onPickSuggestion(s)}
+              <XIcon className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* WHERE popover (portal so it never gets clipped) */}
+      {openWhere &&
+        createPortal(
+          <div
+            ref={whereRefs.setFloating}
+            style={whereStyles as React.CSSProperties}
+            className="z-[1000] w-[360px] rounded-2xl bg-white shadow-xl p-2 border"
+          >
+            {suggestions.length === 0 && (
+              <div className="text-sm text-neutral-500 p-3">
+                Start typing a city or destination…
+              </div>
+            )}
+            <ul>
+              {suggestions.map((s) => (
+                <li key={s.id}>
+                  <button
+                    className="w-full text-left px-3 py-2 hover:bg-neutral-100 rounded-md"
+                    onClick={() => {
+                      setDestination(s.label);
+                      setOpenWhere(false);
+                    }}
                   >
                     {s.label}
-                  </li>
-                ))}
-              </ul>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>,
+          document.body
+        )}
+
+      {/* DATES popover (use native pickers for now; can swap to a calendar later) */}
+      {openDates &&
+        createPortal(
+          <div
+            ref={datesRefs.setFloating}
+            style={datesStyles as React.CSSProperties}
+            className="z-[1000] w-[360px] rounded-2xl bg-white shadow-xl p-4 border"
+          >
+            <div className="flex gap-3 items-end">
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-neutral-600">
+                  Check in
+                </label>
+                <input
+                  type="date"
+                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  value={checkIn ?? ""}
+                  onChange={(e) => setCheckIn(e.target.value || undefined)}
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-neutral-600">
+                  Check out
+                </label>
+                <input
+                  type="date"
+                  className="mt-1 w-full border rounded-md px-3 py-2"
+                  value={checkOut ?? ""}
+                  onChange={(e) => setCheckOut(e.target.value || undefined)}
+                />
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className="w-px bg-black/10 self-stretch my-2" />
-
-        {/* WHEN */}
-        <button
-          type="button"
-          className={cn(
-            "flex-1 min-w-[33%] px-5 py-2 text-left hover:bg-white/70 transition-colors",
-            "focus:outline-none"
-          )}
-          onClick={() => { setOpenDates(true); setShowDestMenu(false); setOpenGuests(false); }}
-        >
-          <div className="text-[10px] tracking-[0.08em] font-semibold text-[#334F47]">WHEN</div>
-          <div className="flex items-center gap-2 text-[15px] text-[#0E3A34]">
-            <CalendarDays className="w-4 h-4 opacity-70" />
-            <span>{dateLabel}</span>
-          </div>
-        </button>
-
-        <div className="w-px bg-black/10 self-stretch my-2" />
-
-        {/* WHO */}
-        <button
-          type="button"
-          className="flex-1 min-w-[25%] px-5 py-2 text-left hover:bg-white/70 transition-colors focus:outline-none"
-          onClick={() => { setOpenGuests(true); setShowDestMenu(false); setOpenDates(false); }}
-        >
-          <div className="text-[10px] tracking-[0.08em] font-semibold text-[#334F47]">WHO</div>
-          <div className="flex items-center gap-2 text-[15px] text-[#0E3A34]">
-            <Users className="w-4 h-4 opacity-70" />
-            <span>{guestLabel}</span>
-          </div>
-        </button>
-
-        {/* SEARCH CTA */}
-        <button
-          aria-label="Search"
-          className="h-14 px-5 rounded-full bg-[#1E5A53] text-white flex items-center gap-2 font-semibold hover:brightness-110 focus:outline-none"
-          onClick={onSubmit}
-        >
-          <Search className="w-4 h-4" />
-          Search
-        </button>
-      </div>
-
-      {/* Date & Guests popovers */}
-      {openDates && (
-        <DatePopover
-          onClose={() => setOpenDates(false)}
-          value={{ checkIn, checkOut }}
-          onChange={({ checkIn: ci, checkOut: co }) => { setCheckIn(ci); setCheckOut(co); }}
-        />
-      )}
-
-      {openGuests && (
-        <GuestsPopover
-          onClose={() => setOpenGuests(false)}
-          adults={adults}
-          children={children}
-          childrenAges={childrenAges}
-          onChange={(n) => {
-            setAdults(n.adults);
-            setChildren(n.children);
-            setChildrenAges(n.childrenAges || []);
-          }}
-        />
-      )}
-    </div>
-  );
-}
-
-/* --------- lightweight popovers (desktop) ---------- */
-
-function DatePopover(props: {
-  value: { checkIn: string | null; checkOut: string | null };
-  onChange: (v: { checkIn: string | null; checkOut: string | null }) => void;
-  onClose: () => void;
-}) {
-  const [ci, setCi] = React.useState(props.value.checkIn || "");
-  const [co, setCo] = React.useState(props.value.checkOut || "");
-
-  return (
-    <div className="absolute z-50 mt-2 bg-white rounded-2xl shadow-2xl border border-black/5 p-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="flex flex-col">
-          <label className="text-xs text-neutral-600 mb-1">Check in</label>
-          <input type="date" value={ci} onChange={(e) => setCi(e.target.value)} className="border rounded-md px-2 py-2" />
-        </div>
-        <div className="flex flex-col">
-          <label className="text-xs text-neutral-600 mb-1">Check out</label>
-          <input type="date" value={co} onChange={(e) => setCo(e.target.value)} className="border rounded-md px-2 py-2" />
-        </div>
-      </div>
-      <div className="flex justify-end gap-2 mt-3">
-        <button className="text-sm px-3 py-2" onClick={() => { setCi(""); setCo(""); props.onChange({ checkIn: null, checkOut: null }); props.onClose(); }}>
-          Clear
-        </button>
-        <button
-          className="text-sm px-3 py-2 rounded-md bg-[#1E5A53] text-white"
-          onClick={() => { props.onChange({ checkIn: ci || null, checkOut: co || null }); props.onClose(); }}
-        >
-          Done
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function GuestsPopover(props: {
-  adults: number; children: number; childrenAges: number[]; onChange: (v: { adults: number; children: number; childrenAges?: number[] }) => void; onClose: () => void;
-}) {
-  const [ad, setAd] = React.useState(props.adults);
-  const [ch, setCh] = React.useState(props.children);
-  const [ages, setAges] = React.useState<number[]>(props.childrenAges || []);
-
-  React.useEffect(() => {
-    if (ch > ages.length) setAges((a) => a.concat(Array(ch - a.length).fill(5)));
-    else if (ch < ages.length) setAges((a) => a.slice(0, ch));
-  }, [ch, ages.length]);
-
-  return (
-    <div className="absolute z-50 mt-2 bg-white rounded-2xl shadow-2xl border border-black/5 p-4 w-[340px]">
-      <Row label="Adults" value={ad} setValue={setAd} min={1} />
-      <Row label="Children" value={ch} setValue={setCh} min={0} />
-
-      {ch > 0 && (
-        <div className="mt-3 space-y-2">
-          <div className="text-xs text-neutral-600">Children ages</div>
-          <div className="grid grid-cols-3 gap-2">
-            {ages.map((age, idx) => (
-              <input
-                key={idx}
-                type="number"
-                min={0}
-                max={17}
-                value={age}
-                onChange={(e) => {
-                  const v = Math.max(0, Math.min(17, Number(e.target.value || 0)));
-                  setAges((a) => a.map((x, i) => (i === idx ? v : x)));
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                className="px-3 py-2 text-sm"
+                onClick={() => {
+                  setCheckIn(undefined);
+                  setCheckOut(undefined);
                 }}
-                className="border rounded-md px-2 py-1 text-sm"
-              />
-            ))}
-          </div>
-        </div>
-      )}
+              >
+                Clear
+              </button>
+              <button
+                className="px-3 py-2 text-sm bg-[hsl(var(--gs-ink))] text-white rounded-md"
+                onClick={() => setOpenDates(false)}
+              >
+                Done
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
 
-      <div className="flex justify-end gap-2 mt-4">
-        <button className="text-sm px-3 py-2" onClick={() => { setAd(DEFAULT_ADULTS); setCh(0); setAges([]); props.onChange({ adults: DEFAULT_ADULTS, children: 0, childrenAges: [] }); props.onClose(); }}>
-          Clear
-        </button>
-        <button
-          className="text-sm px-3 py-2 rounded-md bg-[#1E5A53] text-white"
-          onClick={() => { props.onChange({ adults: ad, children: ch, childrenAges: ages }); props.onClose(); }}
-        >
-          Done
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function Row({ label, value, setValue, min }: { label: string; value: number; setValue: (n: number) => void; min: number; }) {
-  return (
-    <div className="flex items-center justify-between py-1">
-      <div className="text-[15px] text-[#0E3A34]">{label}</div>
-      <div className="flex items-center gap-3">
-        <button className="w-7 h-7 rounded-full border hover:bg-neutral-50" onClick={() => setValue(Math.max(min, value - 1))}>-</button>
-        <div className="w-6 text-center">{value}</div>
-        <button className="w-7 h-7 rounded-full border hover:bg-neutral-50" onClick={() => setValue(value + 1)}>+</button>
-      </div>
+      {/* GUESTS popover */}
+      {openGuests &&
+        createPortal(
+          <div
+            ref={guestsRefs.setFloating}
+            style={guestsStyles as React.CSSProperties}
+            className="z-[1000] w-[320px] rounded-2xl bg-white shadow-xl p-4 border"
+          >
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <div className="font-medium">Adults</div>
+                <div className="text-xs text-neutral-500">Ages 13+</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  className="border rounded-full w-8 h-8"
+                  onClick={() => setAdults(Math.max(1, adults - 1))}
+                >
+                  -
+                </button>
+                <div>{adults}</div>
+                <button
+                  className="border rounded-full w-8 h-8"
+                  onClick={() => setAdults(adults + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <div>
+                <div className="font-medium">Children</div>
+                <div className="text-xs text-neutral-500">Ages 0–12</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  className="border rounded-full w-8 h-8"
+                  onClick={() => setChildren(Math.max(0, children - 1))}
+                >
+                  -
+                </button>
+                <div>{children}</div>
+                <button
+                  className="border rounded-full w-8 h-8"
+                  onClick={() => setChildren(children + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="mt-3 flex justify-end gap-2">
+              <button
+                className="px-3 py-2 text-sm"
+                onClick={() => {
+                  setAdults(2);
+                  setChildren(0);
+                }}
+              >
+                Clear
+              </button>
+              <button
+                className="px-3 py-2 text-sm bg-[hsl(var(--gs-ink))] text-white rounded-md"
+                onClick={() => setOpenGuests(false)}
+              >
+                Done
+              </button>
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

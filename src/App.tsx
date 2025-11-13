@@ -9,8 +9,9 @@ import { SkipNavigation } from "@/components/SkipNavigation";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ExpediaModalProvider } from "@/contexts/ExpediaModalContext";
-import { ExpediaModalPortal } from "@/components/ExpediaModalPortal";
-import { initExpediaModalHandler } from "@/utils/expediaModalHandler";
+// Widget integration removed - replaced with direct affiliate redirect pattern
+// import { ExpediaModalPortal } from "@/components/ExpediaModalPortal";
+// import { initExpediaModalHandler } from "@/utils/expediaModalHandler";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
@@ -151,11 +152,11 @@ function AppContent() {
   usePresence(); // Initialize presence tracking
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
 
-  // Initialize global Expedia modal handler
-  useEffect(() => {
-    const cleanup = initExpediaModalHandler();
-    return cleanup;
-  }, []);
+  // Widget integration removed - using direct affiliate redirect pattern
+  // useEffect(() => {
+  //   const cleanup = initExpediaModalHandler();
+  //   return cleanup;
+  // }, []);
 
   // SECURITY: Initialize CSRF protection on app load
   useEffect(() => {
@@ -248,7 +249,8 @@ function AppContent() {
       <SkipNavigation />
       <WelcomeModal open={showWelcomeModal} onClose={handleCloseWelcome} isFirstVisit={true} />
       <OnboardingTour />
-      <ExpediaModalPortal />
+      {/* Widget integration removed - using direct affiliate redirect pattern */}
+      {/* <ExpediaModalPortal /> */}
       {showHeader && <Header />}
       <main id="main-content" className="flex-1" tabIndex={-1}>
         <Suspense fallback={<LoadingFallback />}>
