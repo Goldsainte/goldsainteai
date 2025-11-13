@@ -1,17 +1,23 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-type PanelType = 'search' | 'notifications' | 'messages' | null;
+export type PanelType = "search" | "notifications" | "messages" | null;
 
-interface PanelStore {
+type PanelState = {
   open: boolean;
   type: PanelType;
-  openType: (type: Exclude<PanelType, null>) => void;
+  openType: (t: Exclude<PanelType, null>) => void;
   close: () => void;
-}
+  toggle: (t: Exclude<PanelType, null>) => void;
+};
 
-export const usePanelStore = create<PanelStore>((set) => ({
+export const usePanelStore = create<PanelState>((set, get) => ({
   open: false,
   type: null,
-  openType: (type) => set({ open: true, type }),
+  openType: (t) => set({ open: true, type: t }),
   close: () => set({ open: false, type: null }),
+  toggle: (t) => {
+    const { open, type } = get();
+    if (open && type === t) set({ open: false, type: null });
+    else set({ open: true, type: t });
+  },
 }));

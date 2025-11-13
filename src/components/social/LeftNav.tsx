@@ -1,86 +1,45 @@
-import { Home, Search, Compass, MessageCircle, Heart, PlusSquare, User } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { cn } from "@/lib/utils";
+import { Home, Compass, Search, MessageCircle, Heart, PlusSquare, User2 } from "lucide-react";
 
-interface NavItemProps {
-  icon: React.ReactNode;
-  label: string;
+function Item({
+  children,
+  onClick,
+  to,
+}: {
+  children: React.ReactNode;
   onClick?: () => void;
-  active?: boolean;
-}
-
-function NavItem({ icon, label, onClick, active }: NavItemProps) {
+  to?: string;
+}) {
+  const base = "flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/60 text-base";
+  if (to) {
+    return (
+      <NavLink to={to} className={({ isActive }) => `${base} ${isActive ? "font-semibold" : ""}`}>
+        {children}
+      </NavLink>
+    );
+  }
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "w-full flex items-center gap-4 px-3 py-3 rounded-lg hover:bg-accent transition-colors",
-        active && "font-bold"
-      )}
-    >
-      {icon}
-      <span>{label}</span>
+    <button onClick={onClick} className={base}>
+      {children}
     </button>
   );
 }
 
 export default function LeftNav() {
-  const navigate = useNavigate();
-  const location = useLocation();
   const { openType } = usePanelStore();
-
   return (
-    <nav className="p-4 space-y-2">
-      <div className="mb-8 px-3 py-4">
-        <h1 className="text-2xl font-bold">Goldsainte</h1>
-      </div>
-      
-      <NavItem
-        icon={<Home className="w-6 h-6" />}
-        label="Home"
-        onClick={() => navigate("/travel-feed")}
-        active={location.pathname === "/travel-feed"}
-      />
-      
-      <NavItem
-        icon={<Search className="w-6 h-6" />}
-        label="Search"
-        onClick={() => openType("search")}
-      />
-      
-      <NavItem
-        icon={<Compass className="w-6 h-6" />}
-        label="Explore"
-        onClick={() => navigate("/explore")}
-        active={location.pathname === "/explore"}
-      />
-      
-      <NavItem
-        icon={<MessageCircle className="w-6 h-6" />}
-        label="Messages"
-        onClick={() => openType("messages")}
-      />
-      
-      <NavItem
-        icon={<Heart className="w-6 h-6" />}
-        label="Notifications"
-        onClick={() => openType("notifications")}
-      />
-      
-      <NavItem
-        icon={<PlusSquare className="w-6 h-6" />}
-        label="Create"
-        onClick={() => navigate("/create-moment")}
-        active={location.pathname === "/create-moment"}
-      />
-      
-      <NavItem
-        icon={<User className="w-6 h-6" />}
-        label="Profile"
-        onClick={() => navigate("/profile")}
-        active={location.pathname === "/profile"}
-      />
-    </nav>
+    <div className="h-screen flex flex-col p-3">
+      <div className="px-3 py-4 text-2xl font-extrabold">Goldsainte</div>
+      <nav className="space-y-1">
+        <Item to="/travel-feed"><Home className="w-6 h-6"/> Home</Item>
+        <Item onClick={() => openType("search")}><Search className="w-6 h-6"/> Search</Item>
+        <Item to="/explore"><Compass className="w-6 h-6"/> Explore</Item>
+        <Item onClick={() => openType("messages")}><MessageCircle className="w-6 h-6"/> Messages</Item>
+        <Item onClick={() => openType("notifications")}><Heart className="w-6 h-6"/> Notifications</Item>
+        <Item to="/create-moment"><PlusSquare className="w-6 h-6"/> Create</Item>
+        <Item to="/profile"><User2 className="w-6 h-6"/> Profile</Item>
+      </nav>
+    </div>
   );
 }
