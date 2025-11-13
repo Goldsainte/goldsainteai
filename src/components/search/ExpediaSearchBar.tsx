@@ -12,6 +12,7 @@ export default function ExpediaSearchBar() {
   const [checkOut, setCheckOut] = useState<string|undefined>();
   const [adults, setAdults] = useState<number>(2);
   const [children, setChildren] = useState<number>(0);
+  const [childrenAges, setChildrenAges] = useState<number[]>([]);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
 
   const handleDateSelect = (range: DateRange | undefined) => {
@@ -26,6 +27,21 @@ export default function ExpediaSearchBar() {
     } else {
       setCheckOut(undefined);
     }
+  };
+
+  const handleChildrenChange = (newCount: number) => {
+    setChildren(newCount);
+    if (newCount > childrenAges.length) {
+      setChildrenAges([...childrenAges, ...Array(newCount - childrenAges.length).fill(0)]);
+    } else {
+      setChildrenAges(childrenAges.slice(0, newCount));
+    }
+  };
+
+  const handleChildAgeChange = (index: number, age: number) => {
+    const newAges = [...childrenAges];
+    newAges[index] = Math.max(0, Math.min(17, age));
+    setChildrenAges(newAges);
   };
 
   const onSearch = () => {
@@ -100,19 +116,101 @@ export default function ExpediaSearchBar() {
       {/* WHO */}
       <div className="gs-cell">
         <div className="gs-label">WHO</div>
-        <button
-          className="gs-buttonlike"
-          onClick={() => {
-            // open your guests popover if you have one
-          }}
-          aria-label="Select guests"
-        >
-          {(adults || children) ? (
-            <span>{adults + children} guest{adults + children !== 1 ? "s" : ""}</span>
-          ) : (
-            <span className="gs-placeholder">Add guests</span>
-          )}
-        </button>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              className="gs-buttonlike"
+              aria-label="Select guests"
+            >
+              {(adults + children > 0) ? (
+                <span>{adults + children} guest{adults + children !== 1 ? "s" : ""}</span>
+              ) : (
+                <span className="gs-placeholder">Add guests</span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-4" align="start">
+            <div className="space-y-4">
+              {/* Adults */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-sm">Adults</div>
+                  <div className="text-xs text-muted-foreground">Ages 18+</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setAdults(Math.max(1, adults - 1))}
+                    disabled={adults <= 1}
+                    className="h-8 w-8 rounded-full border border-border hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Decrease adults"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 text-center font-medium">{adults}</span>
+                  <button
+                    onClick={() => setAdults(adults + 1)}
+                    className="h-8 w-8 rounded-full border border-border hover:border-foreground"
+                    aria-label="Increase adults"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Children */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="font-medium text-sm">Children</div>
+                  <div className="text-xs text-muted-foreground">Ages 0-17</div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleChildrenChange(Math.max(0, children - 1))}
+                    disabled={children <= 0}
+                    className="h-8 w-8 rounded-full border border-border hover:border-foreground disabled:opacity-30 disabled:cursor-not-allowed"
+                    aria-label="Decrease children"
+                  >
+                    −
+                  </button>
+                  <span className="w-8 text-center font-medium">{children}</span>
+                  <button
+                    onClick={() => handleChildrenChange(children + 1)}
+                    className="h-8 w-8 rounded-full border border-border hover:border-foreground"
+                    aria-label="Increase children"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Children Ages */}
+              {children > 0 && (
+                <div className="border-t border-border pt-4 space-y-2">
+                  <div className="text-sm font-medium">Children's ages</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {Array.from({ length: children }).map((_, i) => (
+                      <div key={i}>
+                        <label htmlFor={`child-age-${i}`} className="text-xs text-muted-foreground block mb-1">
+                          Child {i + 1}
+                        </label>
+                        <input
+                          id={`child-age-${i}`}
+                          type="number"
+                          min="0"
+                          max="17"
+                          value={childrenAges[i] || 0}
+                          onChange={(e) => handleChildAgeChange(i, parseInt(e.target.value) || 0)}
+                          className="w-full px-2 py-1.5 text-sm border border-border rounded focus:outline-none focus:ring-2 focus:ring-primary"
+                          aria-label={`Age of child ${i + 1}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* SEARCH CTA */}
