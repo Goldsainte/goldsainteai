@@ -20,105 +20,136 @@ export function ProposalCard({
   const isDeclined = proposal.status === "declined";
 
   return (
-    <div
-      className={[
-        "rounded-2xl bg-card p-4 shadow-sm ring-1 transition-all",
-        isAccepted
-          ? "ring-emerald-500 ring-2"
-          : isDeclined
-          ? "opacity-50 ring-border"
-          : "ring-border hover:ring-primary/50",
-      ].join(" ")}
-    >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3">
-          {/* Avatar */}
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
-            {proposal.avatarInitials}
+    <article className="rounded-2xl bg-white p-4 text-xs shadow-sm ring-1 ring-neutral-200/80">
+      {/* Header: avatar + author info + rating */}
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-[11px] font-semibold text-neutral-700">
+          {proposal.avatarInitials}
+        </div>
+
+        <div className="flex-1">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <h3 className="text-sm font-semibold text-neutral-900">
+              {proposal.authorName}
+            </h3>
+            {proposal.handle && (
+              <span className="text-[11px] text-neutral-500">
+                {proposal.handle}
+              </span>
+            )}
+            <span className="inline-flex items-center rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium capitalize text-neutral-700">
+              {proposal.authorType === "agent"
+                ? "Certified agent"
+                : "Travel creator"}
+            </span>
+            {isAccepted && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700 ring-1 ring-emerald-200">
+                <CheckCircle className="h-3 w-3" />
+                Accepted
+              </span>
+            )}
           </div>
 
-          {/* Author info */}
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-foreground">{proposal.authorName}</h3>
-              {isAccepted && (
-                <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-medium text-emerald-700">
-                  <CheckCircle className="h-3 w-3" />
-                  Accepted
-                </span>
-              )}
+          <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] text-neutral-600">
+            <div className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+              <span className="font-medium">{proposal.rating.toFixed(1)}</span>
             </div>
-            {proposal.handle && (
-              <p className="text-xs text-muted-foreground">{proposal.handle}</p>
-            )}
-            <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                <span className="font-medium text-foreground">{proposal.rating.toFixed(1)}</span>
-              </div>
-              <span>·</span>
-              <span>{proposal.reviewsCount} reviews</span>
-              <span>·</span>
-              <span className="capitalize">{proposal.authorType}</span>
-            </div>
+            <span className="text-neutral-400">·</span>
+            <span className="text-neutral-500">
+              {proposal.reviewsCount} reviews
+            </span>
+            <span className="text-neutral-400">·</span>
+            <span className="text-neutral-500">
+              Sent {new Date(proposal.createdAt).toLocaleDateString()}
+            </span>
           </div>
         </div>
 
-        {/* Status badge for declined */}
+        {/* Status pill */}
         {isDeclined && (
-          <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+          <span className="inline-flex rounded-full bg-neutral-50 px-2 py-0.5 text-[10px] font-medium text-neutral-400 ring-1 ring-neutral-200">
             Declined
           </span>
         )}
       </div>
 
-      {/* Proposal message */}
-      <div className="mt-3 text-xs text-foreground">
-        <p>{proposal.message}</p>
+      {/* Budget + timeline */}
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <div className="space-y-0.5">
+          <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+            Estimated budget
+          </p>
+          <p className="text-sm font-semibold text-neutral-900">
+            {formattedBudgetRange}
+          </p>
+          <p className="text-[11px] text-neutral-500">
+            Final price depends on selection.
+          </p>
+        </div>
+
+        <div className="space-y-0.5 md:col-span-2">
+          <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+            Timeline
+          </p>
+          <p className="text-xs text-neutral-700">{proposal.timelineLabel}</p>
+        </div>
       </div>
 
       {/* Highlights */}
-      {proposal.highlights.length > 0 && (
-        <ul className="mt-3 space-y-1 text-xs text-muted-foreground">
-          {proposal.highlights.map((highlight, idx) => (
-            <li key={idx} className="flex items-start gap-2">
-              <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
-              <span>{highlight}</span>
-            </li>
-          ))}
-        </ul>
+      {proposal.highlights && proposal.highlights.length > 0 && (
+        <div className="mt-3">
+          <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+            Highlights
+          </p>
+          <ul className="mt-1 space-y-0.5 text-[11px] text-neutral-700">
+            {proposal.highlights.map((item, idx) => (
+              <li key={idx} className="flex items-start gap-2">
+                <span className="mt-1 h-1 w-1 flex-shrink-0 rounded-full bg-neutral-400" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
-      {/* Footer: pricing + actions */}
-      <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-3">
-        <div>
-          <p className="text-xs text-muted-foreground">Proposal price</p>
-          <p className="text-sm font-semibold text-foreground">{formattedBudgetRange}</p>
-          <p className="text-[11px] text-muted-foreground">{proposal.timelineLabel}</p>
-        </div>
+      {/* Message */}
+      <div className="mt-3 border-t border-neutral-100 pt-3">
+        <p className="text-[11px] uppercase tracking-wide text-neutral-400">
+          Proposal details
+        </p>
+        <p className="mt-1 whitespace-pre-line text-xs text-neutral-700">
+          {proposal.message}
+        </p>
+      </div>
 
-        <div className="flex items-center gap-2">
+      {/* Actions */}
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={onOpenChat}
+          className="inline-flex items-center gap-1.5 rounded-full border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 hover:border-neutral-300 hover:text-neutral-900"
+        >
+          <MessageCircle className="h-3 w-3" />
+          Message
+        </button>
+
+        {isRequestOwner && (
           <button
             type="button"
-            onClick={onOpenChat}
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-medium text-foreground hover:bg-accent"
+            onClick={onAccept}
+            disabled={isAccepted || isDeclined}
+            className={[
+              "inline-flex items-center rounded-full px-3 py-1.5 text-xs font-semibold shadow-sm transition-colors",
+              isAccepted || isDeclined
+                ? "cursor-not-allowed bg-neutral-200 text-neutral-500"
+                : "bg-neutral-900 text-white hover:bg-neutral-800",
+            ].join(" ")}
           >
-            <MessageCircle className="h-3 w-3" />
-            Chat
+            {isAccepted ? "Accepted" : "Accept proposal"}
           </button>
-
-          {isRequestOwner && !isAccepted && !isDeclined && (
-            <button
-              type="button"
-              onClick={onAccept}
-              className="inline-flex items-center rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90"
-            >
-              Accept proposal
-            </button>
-          )}
-        </div>
+        )}
       </div>
-    </div>
+    </article>
   );
 }
