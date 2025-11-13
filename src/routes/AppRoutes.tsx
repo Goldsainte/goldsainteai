@@ -183,7 +183,7 @@ export const AppRoutes = () => (
         path="/marketplace"
         element={(
           <RouteSectionBoundary section="marketplace">
-            <MarketplaceRedirect />
+            <Marketplace />
           </RouteSectionBoundary>
         )}
       />

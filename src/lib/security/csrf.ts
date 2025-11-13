@@ -93,7 +93,9 @@ export async function ensureCSRFToken(): Promise<string | null> {
 }
 
 export async function refreshCSRFToken(): Promise<string | null> {
-  pendingFetch = requestToken("POST").finally(() => {
+  // The server currently only exposes a GET handler for the CSRF token endpoint,
+  // so refreshes must use the same verb to successfully obtain a new token.
+  pendingFetch = requestToken("GET").finally(() => {
     pendingFetch = null;
   });
   return pendingFetch;
