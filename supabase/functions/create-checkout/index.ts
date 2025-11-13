@@ -24,6 +24,16 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Validate request origin against allowlist
+  const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+  const requestOrigin = req.headers.get("origin") || "";
+  const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+    ? requestOrigin
+    : (ALLOWED_ORIGINS[0] || Deno.env.get("SITE_URL") || "https://goldsainte.ai");
+
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_ANON_KEY") ?? ""
@@ -101,19 +111,6 @@ serve(async (req) => {
       logger.info("Using cached Stripe customer ID", { customerId });
     }
 
-    // Validate origin to prevent open redirect attacks
-    const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
-      .split(",")
-      .map(s => s.trim())
-      .filter(Boolean);
-    
-    const requestOrigin = req.headers.get("origin") || "";
-    const origin = ALLOWED_ORIGINS.includes(requestOrigin)
-      ? requestOrigin
-      : (Deno.env.get("SITE_URL") || ALLOWED_ORIGINS[0] || "https://goldsainte.ai");
-    
-    logger.info("Origin validation", { requestOrigin, validatedOrigin: origin });
-    
     // Build success URL based on subscription type
     const successUrl = subscriptionType === 'ai' 
       ? `${origin}/subscription?success=true&type=ai&tier=${tier || 'unknown'}`

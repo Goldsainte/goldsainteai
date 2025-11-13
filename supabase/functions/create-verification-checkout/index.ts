@@ -13,6 +13,16 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  // Validate request origin against allowlist
+  const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") || "")
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+  const requestOrigin = req.headers.get("origin") || "";
+  const origin = ALLOWED_ORIGINS.includes(requestOrigin)
+    ? requestOrigin
+    : (ALLOWED_ORIGINS[0] || Deno.env.get("SITE_URL") || "https://goldsainte.ai");
+
   const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_ANON_KEY") ?? ""
@@ -24,8 +34,6 @@ serve(async (req) => {
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated");
-
-    const origin = req.headers.get("origin") || Deno.env.get("SITE_URL") || "https://goldsainte.ai";
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2024-06-20",

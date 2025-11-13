@@ -35,11 +35,11 @@ export const PaymentModal = ({
 
       // Get auth token for Edge Function calls
       const { data: sessionData } = await supabase.auth.getSession();
-      const headers = { Authorization: `Bearer ${sessionData.session?.access_token}` };
+      const authHeaders = { Authorization: `Bearer ${sessionData.session?.access_token}` };
 
       const { data, error } = await supabase.functions.invoke('process-marketplace-payment', {
         body: { jobId, bidId },
-        headers
+        headers: authHeaders
       });
 
       if (error) throw error;
@@ -54,13 +54,13 @@ export const PaymentModal = ({
             amount,
             currency
           },
-          headers
+          headers: authHeaders
         });
 
         if (checkoutError) throw checkoutError;
         
         if (checkoutData?.url) {
-          // Use same-tab navigation to avoid popup blockers
+          // Same-tab navigation to avoid popup blockers
           window.location.href = checkoutData.url;
           toast.success('Redirecting to secure payment...');
           onSuccess();

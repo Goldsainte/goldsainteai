@@ -119,7 +119,7 @@ export default function Subscription() {
 
       setUser(authUser);
 
-      // Check subscription status from Stripe
+      // Check subscription status from Stripe (with auth headers)
       const headers = await getAuthHeaders();
       const { data: subData, error: subError } = await supabase.functions.invoke('check-subscription', {
         headers
@@ -184,8 +184,8 @@ export default function Subscription() {
 
       if (data?.url) {
         toast.dismiss(toastId);
-        // top-window nav avoids popup blockers
-        window.location.assign(data.url);
+        // Same-tab navigation to avoid popup blockers
+        window.location.href = data.url;
       } else {
         toast.dismiss(toastId);
         throw new Error("No checkout URL received");
@@ -211,8 +211,8 @@ export default function Subscription() {
 
       if (data?.url) {
         toast.dismiss(toastId);
-        // top-window nav avoids popup blockers
-        window.location.assign(data.url);
+        // Same-tab navigation to avoid popup blockers
+        window.location.href = data.url;
       } else {
         toast.dismiss(toastId);
         throw new Error("No portal URL received");

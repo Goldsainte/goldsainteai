@@ -94,7 +94,8 @@ const BillingDashboard = () => {
 
       if (error) throw error;
       if (data?.url) {
-        window.location.assign(data.url);
+        // Same-tab navigation to avoid popup blockers
+        window.location.href = data.url;
       }
     } catch (error: any) {
       console.error("Error opening customer portal:", error);
