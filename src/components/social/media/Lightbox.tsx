@@ -1,6 +1,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { MediaFrame } from "./MediaFrame";
 import PostSidebar from "../feed/PostSidebar";
+import { useEffect } from "react";
 
 interface Post {
   id: string;
@@ -24,6 +25,20 @@ interface LightboxProps {
 }
 
 export function Lightbox({ open, onOpenChange, post }: LightboxProps) {
+  // Keyboard handler: Esc closes lightbox
+  useEffect(() => {
+    if (!open) return;
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onOpenChange(false);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [open, onOpenChange]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="p-0 max-w-[min(935px,96vw)] max-h-[90vh]">

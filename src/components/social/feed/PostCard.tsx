@@ -42,17 +42,17 @@ export function PostCard({ post }: PostCardProps) {
         {/* Actions (below the image) */}
         <div className="px-3 py-2 border-t border-border">
           <div className="flex items-center gap-4">
-            <button className="hover:opacity-70 transition-opacity">
+            <button className="hover:opacity-70 transition-opacity" aria-label="Like">
               <Heart className="w-6 h-6" />
             </button>
-            <button className="hover:opacity-70 transition-opacity">
+            <button className="hover:opacity-70 transition-opacity" aria-label="Comment">
               <MessageCircle className="w-6 h-6" />
             </button>
-            <button className="hover:opacity-70 transition-opacity">
+            <button className="hover:opacity-70 transition-opacity" aria-label="Share">
               <Share2 className="w-6 h-6" />
             </button>
             <div className="ml-auto">
-              <button className="hover:opacity-70 transition-opacity">
+              <button className="hover:opacity-70 transition-opacity" aria-label="Bookmark">
                 <Bookmark className="w-6 h-6" />
               </button>
             </div>

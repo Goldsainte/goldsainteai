@@ -1,11 +1,25 @@
 import { ChevronUp, ChevronDown, Heart, MessageCircle, Share2, MoreVertical } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ReelsViewer() {
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleNext = () => setCurrentIndex((i) => i + 1);
   const handlePrev = () => setCurrentIndex((i) => Math.max(0, i - 1));
+
+  // Keyboard navigation: J/K for next/prev
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "j" || e.key === "J" || e.key === "ArrowDown") {
+        handleNext();
+      } else if (e.key === "k" || e.key === "K" || e.key === "ArrowUp") {
+        handlePrev();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -22,12 +36,14 @@ export default function ReelsViewer() {
               onClick={handlePrev}
               disabled={currentIndex === 0}
               className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors disabled:opacity-50"
+              aria-label="Previous reel (K)"
             >
               <ChevronUp className="w-5 h-5 text-white" />
             </button>
             <button
               onClick={handleNext}
               className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center hover:bg-white/30 transition-colors"
+              aria-label="Next reel (J)"
             >
               <ChevronDown className="w-5 h-5 text-white" />
             </button>
@@ -35,18 +51,18 @@ export default function ReelsViewer() {
 
           {/* Actions on right */}
           <div className="absolute right-3 bottom-24 flex flex-col gap-4 items-center">
-            <button className="flex flex-col items-center gap-1">
+            <button className="flex flex-col items-center gap-1" aria-label="Like">
               <Heart className="w-7 h-7 text-white" />
               <span className="text-xs text-white">1.2K</span>
             </button>
-            <button className="flex flex-col items-center gap-1">
+            <button className="flex flex-col items-center gap-1" aria-label="Comment">
               <MessageCircle className="w-7 h-7 text-white" />
               <span className="text-xs text-white">45</span>
             </button>
-            <button className="flex flex-col items-center gap-1">
+            <button className="flex flex-col items-center gap-1" aria-label="Share">
               <Share2 className="w-7 h-7 text-white" />
             </button>
-            <button className="flex flex-col items-center gap-1">
+            <button className="flex flex-col items-center gap-1" aria-label="More options">
               <MoreVertical className="w-7 h-7 text-white" />
             </button>
           </div>

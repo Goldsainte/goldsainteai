@@ -37,17 +37,17 @@ export default function PostSidebar({ post }: PostSidebarProps) {
       {/* Actions */}
       <div className="border-t border-border pt-4 space-y-3">
         <div className="flex items-center gap-4">
-          <button className="hover:opacity-70 transition-opacity">
+          <button className="hover:opacity-70 transition-opacity" aria-label="Like">
             <Heart className="w-6 h-6" />
           </button>
-          <button className="hover:opacity-70 transition-opacity">
+          <button className="hover:opacity-70 transition-opacity" aria-label="Comment">
             <MessageCircle className="w-6 h-6" />
           </button>
-          <button className="hover:opacity-70 transition-opacity">
+          <button className="hover:opacity-70 transition-opacity" aria-label="Share">
             <Share2 className="w-6 h-6" />
           </button>
           <div className="ml-auto">
-            <button className="hover:opacity-70 transition-opacity">
+            <button className="hover:opacity-70 transition-opacity" aria-label="Bookmark">
               <Bookmark className="w-6 h-6" />
             </button>
           </div>
