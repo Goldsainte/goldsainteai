@@ -605,7 +605,7 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
             </div>
           )}
 
-          <div className="w-full h-full flex items-center justify-center">
+          <div className="flex items-center justify-center w-full h-full bg-black p-2 md:p-4">
             {currentMoment.media_type === 'text' ? (
               <div 
                 className="w-full h-full flex items-center justify-center p-8"
@@ -653,11 +653,11 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 </div>
               </div>
             ) : currentMoment.media_type === 'image' ? (
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full flex items-center justify-center">
                 <img
                   src={currentMoment.media_url || ''}
                   alt="Moment"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full max-h-[85vh] object-contain bg-black"
                 />
                 {currentMoment.drawing_data && (
                   <MomentDrawingDisplay
@@ -668,11 +668,11 @@ export const MomentsViewer = ({ open, onOpenChange, userId, initialMomentId }: M
                 )}
               </div>
             ) : (
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full flex items-center justify-center">
                 <video
                   ref={videoRef}
                   src={currentMoment.media_url || ''}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full max-h-[85vh] object-contain bg-black"
                   autoPlay
                   muted={!isSoundOn}
                   playsInline
