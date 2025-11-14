@@ -3,9 +3,11 @@ import { test, expect } from '@playwright/test';
 /**
  * E2E Test: Search Journey and Follow Creator
  * Tests: search → open journey → follow creator
+ * 
+ * NOTE: Legacy social feed disabled in favor of TikTok creator ecosystem
  */
 
-test.describe('Search Journey and Follow Creator', () => {
+test.describe.skip('Search Journey and Follow Creator - DISABLED', () => {
   test.beforeEach(async ({ page }) => {
     // Log in before each test
     await page.goto('/auth');

@@ -30,8 +30,9 @@ const HIDE_HEADER_PAGES = new Set([
   "/auth",
   "/login",
   "/signup",
-  "/travel-feed",
-  "/journeys",
+  // Legacy social feed - disabled
+  // "/travel-feed",
+  // "/journeys",
   "/travel-profile",
   "/travel-settings",
   "/cocurated-journeys",
@@ -40,12 +41,13 @@ const HIDE_HEADER_PAGES = new Set([
 ]);
 
 const HIDE_AI_BOOKING_PAGES = new Set([
-  "/travel-feed",
-  "/journeys",
+  // Legacy social feed - disabled
+  // "/travel-feed",
+  // "/journeys",
+  // "/search",
+  // "/trending",
   "/travel-profile",
   "/travel-settings",
-  "/search",
-  "/trending",
 ]);
 
 const HIDE_FOOTER_PREFIXES = [
@@ -55,14 +57,15 @@ const HIDE_FOOTER_PREFIXES = [
   "/reset-password",
   "/onboarding",
   "/ai-agent-setup",
-  "/travel-feed",
-  "/journeys",
+  // Legacy social feed - disabled
+  // "/travel-feed",
+  // "/journeys",
+  // "/search",
+  // "/trending",
   "/travel-profile",
   "/travel-settings",
   "/crossposting-settings",
   "/creator-dashboard",
-  "/search",
-  "/trending",
   "/your-activity",
   "/browse-influencers",
   "/browse-creators",
@@ -73,8 +76,9 @@ const HIDE_FOOTER_PREFIXES = [
   "/commission-dashboard",
   "/email-preview",
   "/test-group-payment",
-  "/instagram-api",
-  "/instagram-callback",
+  // Legacy Instagram demo - disabled
+  // "/instagram-api",
+  // "/instagram-callback",
   "/admin/upload-email-assets",
   "/admin/upload-apple-music-key",
   "/admin/upload-apple-signin-key",
@@ -118,10 +122,8 @@ function AppContent() {
       ".lovable-badge, [data-lovable-badge], iframe[src*=\"lovable\"]",
     );
     if (badge instanceof HTMLElement) {
-      badge.style.display =
-        location.pathname === "/travel-feed" || location.pathname === "/journeys"
-          ? "none"
-          : "block";
+      // Legacy paths disabled - always show badge now
+      badge.style.display = "block";
     }
   }, [location.pathname]);
 

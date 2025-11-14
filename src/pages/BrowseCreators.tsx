@@ -1,270 +1,312 @@
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Search, Users, TrendingUp, Star, ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { BrandPartnershipProposal } from "@/components/BrandPartnershipProposal";
-import { useToast } from "@/hooks/use-toast";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Search, Globe, Users, TrendingUp, MapPin } from "lucide-react";
 
-interface Creator {
+interface MockCreator {
   id: string;
-  username: string;
-  avatar_url: string | null;
-  bio: string | null;
-  follower_count: number;
-  total_posts: number;
-  engagement_rate: number;
-  average_views: number;
+  name: string;
+  tiktokHandle: string;
+  avatarUrl: string;
+  niche: string[];
+  regions: string[];
+  followers: number;
+  avgViews: number;
+  engagementRate: number;
+  bio: string;
 }
 
+const MOCK_CREATORS: MockCreator[] = [
+  {
+    id: "1",
+    name: "Sarah Chen",
+    tiktokHandle: "@sarahgoesglobal",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    niche: ["Luxury Travel", "Fine Dining", "Hotels"],
+    regions: ["Europe", "Asia"],
+    followers: 450000,
+    avgViews: 125000,
+    engagementRate: 8.5,
+    bio: "Luxury travel curator sharing 5-star experiences and hidden gems across Europe and Asia",
+  },
+  {
+    id: "2",
+    name: "Marcus Adventure",
+    tiktokHandle: "@marcusadventure",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Marcus",
+    niche: ["Adventure", "Hiking", "Wildlife"],
+    regions: ["South America", "Africa"],
+    followers: 680000,
+    avgViews: 210000,
+    engagementRate: 12.3,
+    bio: "Adventure seeker documenting extreme travel experiences and wildlife encounters",
+  },
+  {
+    id: "3",
+    name: "Elena Beaches",
+    tiktokHandle: "@elenabeaches",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Elena",
+    niche: ["Beach Resorts", "Island Hopping", "Wellness"],
+    regions: ["Caribbean", "Pacific Islands"],
+    followers: 320000,
+    avgViews: 95000,
+    engagementRate: 9.8,
+    bio: "Island life specialist sharing the world's most stunning beaches and wellness retreats",
+  },
+  {
+    id: "4",
+    name: "James Foodie",
+    tiktokHandle: "@jamesfoodietravel",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
+    niche: ["Food Tourism", "Street Food", "Michelin Dining"],
+    regions: ["Asia", "Europe"],
+    followers: 890000,
+    avgViews: 340000,
+    engagementRate: 15.2,
+    bio: "Culinary explorer showcasing street food gems and Michelin-starred experiences",
+  },
+];
+
 export default function BrowseCreators() {
-  const { user } = useAuth();
-  const { toast } = useToast();
   const navigate = useNavigate();
-  const [creators, setCreators] = useState<Creator[]>([]);
-  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCreator, setSelectedCreator] = useState<Creator | null>(null);
-  const [proposalOpen, setProposalOpen] = useState(false);
+  const [selectedNiche, setSelectedNiche] = useState<string | null>(null);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchCreators();
-  }, []);
+  const filteredCreators = MOCK_CREATORS.filter((creator) => {
+    const matchesSearch =
+      searchQuery === "" ||
+      creator.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      creator.tiktokHandle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      creator.bio.toLowerCase().includes(searchQuery.toLowerCase());
 
-  const fetchCreators = async () => {
-    try {
-      setLoading(true);
+    const matchesNiche =
+      !selectedNiche || creator.niche.some((n) => n === selectedNiche);
 
-      // Get profiles with basic info
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, username, avatar_url, bio")
-        .not("username", "is", null);
+    const matchesRegion =
+      !selectedRegion || creator.regions.some((r) => r === selectedRegion);
 
-      if (profilesError) throw profilesError;
+    return matchesSearch && matchesNiche && matchesRegion;
+  });
 
-      // Get follower counts
-      const creatorIds = profiles?.map(p => p.id) || [];
-      const { data: followData } = await supabase
-        .from("user_follows")
-        .select("following_id")
-        .in("following_id", creatorIds);
+  const allNiches = Array.from(
+    new Set(MOCK_CREATORS.flatMap((c) => c.niche))
+  ).sort();
+  const allRegions = Array.from(
+    new Set(MOCK_CREATORS.flatMap((c) => c.regions))
+  ).sort();
 
-      // Get post stats
-      const { data: postData } = await supabase
-        .from("travel_posts")
-        .select("user_id, view_count, like_count, comment_count")
-        .in("user_id", creatorIds);
-
-      // Aggregate data per creator
-      const creatorsWithStats = profiles?.map(profile => {
-        const followerCount = followData?.filter(f => f.following_id === profile.id).length || 0;
-        const userPosts = postData?.filter(p => p.user_id === profile.id) || [];
-        const totalPosts = userPosts.length;
-        const totalViews = userPosts.reduce((sum, p) => sum + (p.view_count || 0), 0);
-        const totalEngagement = userPosts.reduce((sum, p) => sum + (p.like_count || 0) + (p.comment_count || 0), 0);
-        
-        const averageViews = totalPosts > 0 ? Math.round(totalViews / totalPosts) : 0;
-        const engagementRate = totalViews > 0 ? Number(((totalEngagement / totalViews) * 100).toFixed(2)) : 0;
-
-        return {
-          id: profile.id,
-          username: profile.username || "Unknown",
-          avatar_url: profile.avatar_url,
-          bio: profile.bio,
-          follower_count: followerCount,
-          total_posts: totalPosts,
-          engagement_rate: engagementRate,
-          average_views: averageViews,
-        };
-      }) || [];
-
-      // Filter creators with at least some activity
-      const activeCreators = creatorsWithStats
-        .filter(c => c.follower_count >= 100 || c.total_posts >= 5)
-        .sort((a, b) => b.follower_count - a.follower_count);
-
-      setCreators(activeCreators);
-    } catch (error) {
-      console.error("Error fetching creators:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load creators",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(0)}K`;
+    return num.toString();
   };
-
-  const handleSendProposal = (creator: Creator) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to send partnership proposals",
-        variant: "destructive",
-      });
-      return;
-    }
-    setSelectedCreator(creator);
-    setProposalOpen(true);
-  };
-
-  const filteredCreators = creators.filter(creator =>
-    creator.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    creator.bio?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   return (
-    <div className="container mx-auto px-4 sm:px-6 py-6 md:py-8">
-      <div className="max-w-6xl mx-auto space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            className="shrink-0"
-            aria-label="Go back"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">Discover Travel Creators</h1>
-            <p className="text-sm md:text-base text-muted-foreground">
-              Partner with influential travel creators to promote your brand
-            </p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold mb-2">Creator Marketplace</h1>
+          <p className="text-muted-foreground">
+            Discover TikTok travel creators to collaborate on curated trip experiences
+          </p>
         </div>
 
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+        {/* Search Bar */}
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
-            placeholder="Search creators by name or bio..."
+            placeholder="Search creators by name, handle, or expertise..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 min-h-[44px]"
+            className="pl-10"
           />
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <Card key={i}>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <Skeleton className="h-12 w-12 rounded-full" />
-                    <div className="space-y-2">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-24" />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-20 w-full" />
-                </CardContent>
-              </Card>
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4 mb-8">
+          {/* Niche Filter */}
+          <div className="flex flex-wrap gap-2">
+            <span className="text-sm font-medium text-muted-foreground self-center">
+              Niche:
+            </span>
+            <Button
+              variant={selectedNiche === null ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedNiche(null)}
+            >
+              All
+            </Button>
+            {allNiches.map((niche) => (
+              <Button
+                key={niche}
+                variant={selectedNiche === niche ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedNiche(niche)}
+              >
+                {niche}
+              </Button>
             ))}
           </div>
-        )}
 
-        {/* No Results */}
-        {!loading && filteredCreators.length === 0 && (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-12">
-              <Users className="h-12 w-12 text-muted-foreground mb-4" />
-              <p className="text-lg font-medium mb-2">No creators found</p>
-              <p className="text-sm text-muted-foreground">
-                Try adjusting your search criteria
-              </p>
-            </CardContent>
+          {/* Region Filter */}
+          <div className="flex flex-wrap gap-2">
+            <span className="text-sm font-medium text-muted-foreground self-center">
+              Region:
+            </span>
+            <Button
+              variant={selectedRegion === null ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSelectedRegion(null)}
+            >
+              All
+            </Button>
+            {allRegions.map((region) => (
+              <Button
+                key={region}
+                variant={selectedRegion === region ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedRegion(region)}
+              >
+                {region}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Results Count */}
+        <div className="mb-6">
+          <p className="text-sm text-muted-foreground">
+            Showing {filteredCreators.length} creator{filteredCreators.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+
+        {/* Creator Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCreators.map((creator) => (
+            <Card key={creator.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-4">
+                <div className="flex items-start gap-4">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={creator.avatarUrl} alt={creator.name} />
+                    <AvatarFallback>{creator.name.slice(0, 2)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="text-lg mb-1">{creator.name}</CardTitle>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {creator.tiktokHandle}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+
+              <CardContent className="space-y-4">
+                {/* Bio */}
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {creator.bio}
+                </p>
+
+                {/* Stats */}
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <div className="flex items-center justify-center gap-1 text-sm font-semibold">
+                      <Users className="h-3 w-3" />
+                      {formatNumber(creator.followers)}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Followers</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center gap-1 text-sm font-semibold">
+                      <Globe className="h-3 w-3" />
+                      {formatNumber(creator.avgViews)}
+                    </div>
+                    <p className="text-xs text-muted-foreground">Avg Views</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-center gap-1 text-sm font-semibold">
+                      <TrendingUp className="h-3 w-3" />
+                      {creator.engagementRate}%
+                    </div>
+                    <p className="text-xs text-muted-foreground">Engagement</p>
+                  </div>
+                </div>
+
+                {/* Niches */}
+                <div>
+                  <p className="text-xs font-medium mb-2">Niches</p>
+                  <div className="flex flex-wrap gap-1">
+                    {creator.niche.map((n) => (
+                      <Badge key={n} variant="secondary" className="text-xs">
+                        {n}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Regions */}
+                <div>
+                  <p className="text-xs font-medium mb-2">Regions</p>
+                  <div className="flex flex-wrap gap-1">
+                    {creator.regions.map((r) => (
+                      <Badge key={r} variant="outline" className="text-xs">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        {r}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => navigate(`/creator/${creator.id}`)}
+                  >
+                    View Creator
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() =>
+                      navigate(`/collabs/new?creatorId=${creator.id}`)
+                    }
+                  >
+                    Propose Collab
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {filteredCreators.length === 0 && (
+          <Card className="p-12 text-center">
+            <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">No creators found</h3>
+            <p className="text-muted-foreground mb-4">
+              Try adjusting your search or filters
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedNiche(null);
+                setSelectedRegion(null);
+              }}
+            >
+              Clear Filters
+            </Button>
           </Card>
         )}
-
-        {/* Creators Grid */}
-        {!loading && filteredCreators.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {filteredCreators.map((creator) => (
-              <Card key={creator.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5 sm:gap-3">
-                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
-                        <AvatarImage src={creator.avatar_url || undefined} />
-                        <AvatarFallback>
-                          {creator.username.substring(0, 2).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <CardTitle className="text-sm sm:text-base lg:text-lg truncate">@{creator.username}</CardTitle>
-                        <Badge variant="secondary" className="mt-1">
-                          <Users className="h-3 w-3 mr-1" />
-                          <span className="text-xs">{creator.follower_count.toLocaleString()}</span>
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {creator.bio && (
-                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
-                      {creator.bio}
-                    </p>
-                  )}
-                </CardHeader>
-
-                <CardContent className="space-y-3 pt-0">
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <TrendingUp className="h-4 w-4 text-primary shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm sm:text-base">{creator.total_posts}</p>
-                        <p className="text-xs text-muted-foreground">Posts</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Star className="h-4 w-4 text-primary shrink-0" />
-                      <div className="min-w-0">
-                        <p className="font-medium text-sm sm:text-base">{creator.engagement_rate}%</p>
-                        <p className="text-xs text-muted-foreground">Engagement</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-3 border-t">
-                    <p className="text-xs sm:text-sm text-muted-foreground mb-1">Avg. Views per Post</p>
-                    <p className="text-base sm:text-lg font-semibold">{creator.average_views.toLocaleString()}</p>
-                  </div>
-
-                  <Button 
-                    onClick={() => handleSendProposal(creator)}
-                    className="w-full min-h-[44px] text-sm"
-                  >
-                    Send Partnership Proposal
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
       </div>
-
-      {/* Partnership Proposal Modal */}
-      {selectedCreator && (
-        <BrandPartnershipProposal
-          open={proposalOpen}
-          onOpenChange={setProposalOpen}
-          creatorId={selectedCreator.id}
-        />
-      )}
     </div>
   );
 }
