@@ -199,18 +199,13 @@ const Auth = () => {
   const handleFacebookSignIn = async () => {
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'facebook',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-
-      if (error) throw error;
+      const origin = encodeURIComponent(window.location.origin);
+      const timestamp = Date.now();
+      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/facebook-signin-init?origin=${origin}&cb=${timestamp}`;
     } catch (error: any) {
       toast({
         title: "Facebook sign-in failed",
-        description: error.message,
+        description: error?.message || 'Failed to initiate Facebook Sign-In',
         variant: "destructive",
       });
       setIsLoading(false);
