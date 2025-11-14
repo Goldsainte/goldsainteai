@@ -102,14 +102,24 @@ Deno.serve(async (req) => {
     });
 
     const tokenData = await tokenResponse.json();
-    console.log('Token exchange response:', { success: !!tokenData.access_token, error: tokenData.error });
+    console.log('Token exchange response status:', tokenResponse.status);
+    console.log('Token exchange response:', JSON.stringify(tokenData, null, 2));
 
     if (tokenData.error || !tokenData.access_token) {
-      console.error('Token exchange failed:', tokenData.error);
-      return new Response(
-        JSON.stringify({ error: 'Failed to exchange code for token' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      console.error('Token exchange failed:', {
+        error: tokenData.error,
+        error_description: tokenData.error_description,
+        full_response: tokenData
+      });
+      const errorRedirect = `${stateRecord.app_origin || 'https://goldsainte.ai'}/auth?error=tiktok_token_failed`;
+      return new Response(null, {
+        status: 302,
+        headers: {
+          'Location': errorRedirect,
+          'Set-Cookie': 'tiktok_state=; HttpOnly; Secure; SameSite=None; Path=/; Max-Age=0',
+          ...corsHeaders
+        }
+      });
     }
 
     // Fetch TikTok user info
