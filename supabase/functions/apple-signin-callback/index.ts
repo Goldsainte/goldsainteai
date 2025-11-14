@@ -225,7 +225,7 @@ Deno.serve(async (req) => {
     }
 
     // Construct callback URL with token
-    const callbackUrl = `${appOrigin}/apple-callback?token=${encodeURIComponent(token)}&type=${encodeURIComponent(type)}`;
+    const callbackUrl = `${appOrigin}/auth/callback/apple?token=${encodeURIComponent(token)}&type=${encodeURIComponent(type)}`;
     
     console.log('Redirecting to app with session token');
 
