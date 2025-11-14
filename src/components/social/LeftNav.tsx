@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { usePanelStore } from "@/stores/panelStore";
-import { Home, Compass, Search, MessageCircle, Bell, PlusSquare, User2 } from "lucide-react";
+import { Home, Users, Video, Search, MessageCircle, Bell, BarChart3, User2 } from "lucide-react";
 
 const itemCls = "flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-muted/60 text-base";
 
@@ -27,13 +27,14 @@ export default function LeftNav() {
     <div className="h-screen flex flex-col py-4">
       <div className="px-3 pb-4 text-2xl font-extrabold">GOLDSAINTE</div>
       <nav className="space-y-1">
-        <NavItemLink to="/travel-feed"><Home className="w-6 h-6" /> Home</NavItemLink>
+        <NavItemLink to="/home"><Home className="w-6 h-6" /> Home</NavItemLink>
+        <NavItemLink to="/browse-creators"><Users className="w-6 h-6" /> Creator Marketplace</NavItemLink>
+        <NavItemLink to="/tiktok-lab"><Video className="w-6 h-6" /> TikTok Lab</NavItemLink>
         <NavItemBtn onClick={() => openType("search")}><Search className="w-6 h-6" /> Search</NavItemBtn>
-        <NavItemLink to="/explore"><Compass className="w-6 h-6" /> Explore</NavItemLink>
         <NavItemBtn onClick={() => openType("messages")}><MessageCircle className="w-6 h-6" /> Messages</NavItemBtn>
         <NavItemBtn onClick={() => openType("notifications")}><Bell className="w-6 h-6" /> Notifications</NavItemBtn>
-        <NavItemLink to="/create-moment"><PlusSquare className="w-6 h-6" /> Create</NavItemLink>
-        <NavItemLink to="/profile"><User2 className="w-6 h-6" /> Profile</NavItemLink>
+        <NavItemLink to="/creator-dashboard"><BarChart3 className="w-6 h-6" /> Dashboard</NavItemLink>
+        <NavItemLink to="/travel-profile"><User2 className="w-6 h-6" /> Profile</NavItemLink>
       </nav>
     </div>
   );
