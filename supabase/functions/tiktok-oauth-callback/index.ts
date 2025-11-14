@@ -127,7 +127,7 @@ Deno.serve(async (req) => {
         302
       );
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in tiktok-oauth-callback:', error);
     const APP_URL = Deno.env.get('APP_URL') || 'http://localhost:8080';
     return Response.redirect(
