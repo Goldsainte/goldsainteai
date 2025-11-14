@@ -212,6 +212,22 @@ const Auth = () => {
     }
   };
 
+  const handleTikTokSignIn = async () => {
+    try {
+      setIsLoading(true);
+      const origin = encodeURIComponent(window.location.origin);
+      const timestamp = Date.now();
+      window.location.href = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/tiktok-signin-init?origin=${origin}&cb=${timestamp}`;
+    } catch (error: any) {
+      toast({
+        title: "TikTok sign-in failed",
+        description: error?.message || 'Failed to initiate TikTok Sign-In',
+        variant: "destructive",
+      });
+      setIsLoading(false);
+    }
+  };
+
   const handleAppleSignIn = async () => {
     try {
       setIsLoading(true);
@@ -319,6 +335,25 @@ const Auth = () => {
                   <path fill="#1877F2" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
                 Continue with Facebook
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full h-12 bg-card border-2"
+                onClick={handleTikTokSignIn}
+                disabled={isLoading}
+              >
+                <svg className="mr-2 h-5 w-5" viewBox="0 0 48 48" fill="none">
+                  <path d="M34.6 8.9c-1.8-3.2-2.7-5.5-2.7-5.5h-7.3v28.9c0 1.8-.9 3.5-2.4 4.5-1.5 1-3.4 1.1-5 .4-1.6-.7-2.7-2.2-3-4-.3-1.8.3-3.6 1.6-4.9 1.3-1.3 3.1-1.8 4.8-1.4V19c-1.4-.3-2.8-.3-4.2 0-5.1 1.1-8.6 5.8-8.1 11.1.5 5.3 4.8 9.4 10 9.9 5.3.5 10-3.2 11.1-8.3.1-.5.2-1 .2-1.6V16.7c2.5 1.8 5.5 2.8 8.6 2.8v-7.2c-1.9.1-3.6-.5-5.1-1.5-1.5-1-2.6-2.4-3.5-4.9z" fill="url(#tiktok-gradient)"/>
+                  <defs>
+                    <linearGradient id="tiktok-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#00F2EA"/>
+                      <stop offset="100%" stopColor="#FF0050"/>
+                    </linearGradient>
+                  </defs>
+                </svg>
+                Continue with TikTok
               </Button>
 
               <Button
