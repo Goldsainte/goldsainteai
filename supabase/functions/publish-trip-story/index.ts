@@ -150,7 +150,8 @@ Deno.serve(async (req) => {
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
         );
-      } catch (tiktokError: any) {
+      } catch (tiktokError: unknown) {
+        const errorMessage = tiktokError instanceof Error ? tiktokError.message : 'Failed to post to TikTok';
         console.error('TikTok posting error:', tiktokError);
         await supabase
           .from('trip_stories')
@@ -160,7 +161,7 @@ Deno.serve(async (req) => {
         return new Response(
           JSON.stringify({
             id: story.id,
-            error: 'Failed to post to TikTok',
+            error: errorMessage,
             status: 'failed',
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
@@ -177,10 +178,11 @@ Deno.serve(async (req) => {
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'Failed to publish trip story';
     console.error('Error in publish-trip-story:', error);
     return new Response(
-      JSON.stringify({ error: error.message || 'Failed to publish trip story' }),
+      JSON.stringify({ error: errorMessage }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );
   }
