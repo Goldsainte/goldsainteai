@@ -166,12 +166,13 @@ Deno.serve(async (req) => {
           console.log("✅ [OUTLOOK SYNC] Event created:", event.subject);
           results.push({ success: true, event: event.subject, id: created.id });
         }
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("❌ [OUTLOOK SYNC] Exception creating event:", error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         results.push({
           success: false,
           event: event.subject,
-          error: error.message,
+          error: errorMessage,
         });
       }
     }
@@ -199,12 +200,13 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("❌ [OUTLOOK SYNC ERROR]:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: errorMessage,
       }),
       {
         status: 500,

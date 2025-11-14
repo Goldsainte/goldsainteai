@@ -70,11 +70,11 @@ serve(async (req) => {
 
     // Fetch all products with pagination
     while (hasNextPage) {
-      const url = pageInfo 
+      const url: string = pageInfo 
         ? `https://${connection.store_url}/admin/api/2024-01/products.json?limit=250&page_info=${pageInfo}`
         : `https://${connection.store_url}/admin/api/2024-01/products.json?limit=250`;
 
-      const response = await fetch(url, {
+      const response: Response = await fetch(url, {
         headers: { 'X-Shopify-Access-Token': connection.access_token },
       });
 
@@ -86,9 +86,9 @@ serve(async (req) => {
       allProducts = allProducts.concat(data.products || []);
 
       // Check for next page
-      const linkHeader = response.headers.get('Link');
+      const linkHeader: string | null = response.headers.get('Link');
       if (linkHeader && linkHeader.includes('rel="next"')) {
-        const match = linkHeader.match(/<[^>]*page_info=([^>&]+)>; rel="next"/);
+        const match: RegExpMatchArray | null = linkHeader.match(/<[^>]*page_info=([^>&]+)>; rel="next"/);
         pageInfo = match ? match[1] : null;
         hasNextPage = !!pageInfo;
       } else {

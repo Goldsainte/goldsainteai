@@ -97,7 +97,21 @@ serve(async (req) => {
       clearTimeout(timeoutId);
       return new Response(
         JSON.stringify({ 
-          error: validation.error.message || 'Invalid input',
+          error: validation.error?.message || 'Invalid input',
+          results: [] 
+        }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400,
+        }
+      );
+    }
+    
+    if (!validation.data) {
+      clearTimeout(timeoutId);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Invalid query data',
           results: [] 
         }),
         {
@@ -150,8 +164,7 @@ serve(async (req) => {
       status: 200,
     });
 
-  } catch (error) {
-    clearTimeout(timeoutId);
+  } catch (error: unknown) {
     console.error('Error in search-destinations:', error);
     
     if (error instanceof Error && error.name === 'AbortError') {

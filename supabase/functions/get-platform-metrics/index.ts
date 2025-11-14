@@ -112,12 +112,13 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({ success: true, metrics }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("❌ [PLATFORM METRICS ERROR]:", error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message,
+        error: errorMessage,
       }),
       {
         status: 500,

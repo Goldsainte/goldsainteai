@@ -136,7 +136,7 @@ serve(async (req) => {
 
     // Apply server-side price filtering BEFORE returning results
     const maxPrice = max_total_price ?? Infinity;
-    const hotels = allHotels.filter(h => 
+    const hotels = allHotels.filter((h: any) => 
       h.currency === currency && h.price <= maxPrice
     );
     
@@ -146,10 +146,11 @@ serve(async (req) => {
       JSON.stringify({ hotels, total: hotels.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in hotelbeds-search-hotels:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message, hotels: [] }),
+      JSON.stringify({ error: errorMessage, hotels: [] }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

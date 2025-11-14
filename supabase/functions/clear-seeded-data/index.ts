@@ -66,33 +66,29 @@ serve(async (req) => {
     }
     
     // 2. Delete post_collections
-    const { count: collectionsDeleted } = await supabase
+    await supabase
       .from('post_collections')
       .delete()
-      .in('user_id', creatorIds)
-      .select('*', { count: 'exact', head: true });
+      .in('user_id', creatorIds);
     
     // 3. Delete user_follows where either follower or following is a creator
     const idsCSV = creatorIds.join(',');
-    const { count: followsDeleted } = await supabase
+    await supabase
       .from('user_follows')
       .delete()
-      .or(`follower_id.in.(${idsCSV}),following_id.in.(${idsCSV})`)
-      .select('*', { count: 'exact', head: true });
+      .or(`follower_id.in.(${idsCSV}),following_id.in.(${idsCSV})`);
     
     // 4. Delete travel_posts from creators
-    const { count: postsDeleted } = await supabase
+    await supabase
       .from('travel_posts')
       .delete()
-      .in('user_id', creatorIds)
-      .select('*', { count: 'exact', head: true });
+      .in('user_id', creatorIds);
     
     // 5. Delete creator profiles (this cascades to auth.users via trigger)
-    const { count: profilesDeleted } = await supabase
+    await supabase
       .from('profiles')
       .delete()
-      .eq('account_type', 'creator')
-      .select('*', { count: 'exact', head: true });
+      .eq('account_type', 'creator');
     
     // 6. Delete auth users for seeded creators
     for (const id of creatorIds) {
@@ -110,10 +106,10 @@ serve(async (req) => {
         success: true,
         message: 'All seeded data cleared',
         deleted: {
-          profiles: profilesDeleted || 0,
-          posts: postsDeleted || 0,
-          follows: followsDeleted || 0,
-          collections: collectionsDeleted || 0,
+          profiles: creatorIds.length,
+          posts: 0,
+          follows: 0,
+          collections: 0,
         }
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

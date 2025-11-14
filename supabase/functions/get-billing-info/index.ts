@@ -108,7 +108,7 @@ serve(async (req) => {
           product: item.price.product,
         })),
       })),
-      invoices: invoices.data.map(inv => ({
+      invoices: invoices.data.map((inv: any) => ({
         id: inv.id,
         number: inv.number,
         status: inv.status,
@@ -127,7 +127,7 @@ serve(async (req) => {
         period_end: upcomingInvoice.period_end,
         next_payment_attempt: upcomingInvoice.next_payment_attempt,
       } : null,
-      paymentMethods: paymentMethods.data.map(pm => ({
+      paymentMethods: paymentMethods.data.map((pm: any) => ({
         id: pm.id,
         brand: pm.card?.brand,
         last4: pm.card?.last4,

@@ -127,7 +127,7 @@ serve(async (req) => {
       {
         headers: { 
           'Authorization': `Bearer ${accessToken}`,
-          'x-api-key': clientId,
+          'x-api-key': clientId || '',
         },
       }
     );
@@ -163,7 +163,7 @@ serve(async (req) => {
             {
               headers: { 
                 'Authorization': `Bearer ${accessToken}`,
-                'x-api-key': clientId,
+                'x-api-key': clientId || '',
               },
             }
           );
