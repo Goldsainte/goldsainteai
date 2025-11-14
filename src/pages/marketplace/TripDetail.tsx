@@ -63,7 +63,7 @@ export default function TripDetail() {
   const { data: trip, isLoading, error } = useQuery({
     queryKey: ["trip", id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("packaged_trips")
         .select(`
           *,
@@ -92,7 +92,7 @@ export default function TripDetail() {
     if (!trip || !user) return;
 
     try {
-      const { error } = await supabase.from("trip_bookings").insert({
+      const { error } = await (supabase as any).from("trip_bookings").insert({
         trip_id: trip.id,
         customer_id: user.id,
         guests: selectedGuests,
@@ -125,7 +125,7 @@ export default function TripDetail() {
       const creatorUserId = trip.travel_agents?.user_id || trip.creator_id;
 
       // Check for existing conversation
-      const { data: existingConversation } = await supabase
+      const { data: existingConversation } = await (supabase as any)
         .from("user_conversations")
         .select("id")
         .eq("customer_id", user.id)
@@ -136,7 +136,7 @@ export default function TripDetail() {
         navigate(`/messages?conversation=${existingConversation.id}`);
       } else if (trip.agent_id) {
         // Create new conversation
-        const { data: newConversation } = await supabase
+        const { data: newConversation } = await (supabase as any)
           .from("user_conversations")
           .insert({
             customer_id: user.id,
