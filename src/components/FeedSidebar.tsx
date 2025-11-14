@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { Home, Search, Compass, Video, MessageCircle, Heart, PlusSquare, BarChart3, User, Menu, LogOut } from "lucide-react";
+import { Home, Users, Video, MessageCircle, BarChart3, User, LogOut } from "lucide-react";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { NotificationCenter } from "@/components/NotificationCenter";
@@ -34,9 +34,8 @@ export function FeedSidebar() {
 
   const navItems = [
     { to: "/home", icon: Home, label: "Home" },
-    { to: "/search", icon: Search, label: "Search" },
-    { to: "/trending", icon: Compass, label: "Explore" },
-    { to: "/", icon: Video, label: "Journeys" },
+    { to: "/browse-creators", icon: Users, label: "Creator Marketplace" },
+    { to: "/tiktok-lab", icon: Video, label: "TikTok Lab" },
     { to: "/messages", icon: MessageCircle, label: "Messages" },
     { to: "/creator-dashboard", icon: BarChart3, label: "Dashboard" },
   ];
