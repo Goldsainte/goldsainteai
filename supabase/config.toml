@@ -237,6 +237,12 @@ verify_jwt = false
 [functions.apple-signin-callback]
 verify_jwt = false
 
+[functions.facebook-signin-init]
+verify_jwt = false
+
+[functions.facebook-signin-callback]
+verify_jwt = false
+
 [functions.create-agent-inquiry]
 verify_jwt = false
 
