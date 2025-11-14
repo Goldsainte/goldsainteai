@@ -243,6 +243,15 @@ verify_jwt = false
 [functions.facebook-signin-callback]
 verify_jwt = false
 
+[functions.tiktok-oauth-start]
+verify_jwt = false
+
+[functions.tiktok-oauth-callback]
+verify_jwt = false
+
+[functions.publish-trip-story]
+verify_jwt = true
+
 [functions.create-agent-inquiry]
 verify_jwt = false
 
