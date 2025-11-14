@@ -3,9 +3,11 @@ import { test, expect } from '@playwright/test';
 /**
  * E2E Test: Feed Moment Interaction
  * Tests: feed scroll → open moment → add comment → like/unlike
+ * 
+ * NOTE: Legacy social feed disabled in favor of TikTok creator ecosystem
  */
 
-test.describe('Feed Moment Interaction', () => {
+test.describe.skip('Feed Moment Interaction - DISABLED', () => {
   test.beforeEach(async ({ page }) => {
     // Log in before each test
     await page.goto('/auth');

@@ -4,7 +4,8 @@ import { Route, Routes } from 'react-router-dom';
 import Index from '@/pages/Index';
 import Auth from '@/pages/Auth';
 import AuthCallback from '@/pages/AuthCallback';
-import TravelFeed from '@/pages/TravelFeed';
+// Legacy social feed - disabled
+// import TravelFeed from '@/pages/TravelFeed';
 import NotFound from '@/pages/NotFound';
 import DesktopShell from '@/layout/DesktopShell';
 import { RequireAgentTerms } from '@/components/RequireAgentTerms';
@@ -24,8 +25,9 @@ const Marketplace = lazy(() => import('@/pages/Marketplace'));
 const RequestTrip = lazy(() => import('@/pages/marketplace/RequestTrip'));
 const TripRequestDetail = lazy(() => import('@/pages/marketplace/TripRequestDetail'));
 const TripDetail = lazy(() => import('@/pages/marketplace/TripDetail'));
-const Search = lazy(() => import('@/pages/Search'));
-const Trending = lazy(() => import('@/pages/Trending'));
+// Legacy social feed - disabled
+// const Search = lazy(() => import('@/pages/Search'));
+// const Trending = lazy(() => import('@/pages/Trending'));
 const Shop = lazy(() => import('@/pages/Shop'));
 const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const BrowseAgents = lazy(() => import('@/pages/BrowseAgents'));
@@ -50,11 +52,15 @@ const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
 const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
 const CrosspostingSettings = lazy(() => import('@/pages/CrosspostingSettings'));
-const InstagramCallback = lazy(() => import('@/pages/InstagramCallback'));
-const InstagramAPI = lazy(() => import('@/pages/InstagramAPI'));
+// Legacy Instagram demo - disabled
+// const InstagramCallback = lazy(() => import('@/pages/InstagramCallback'));
+// const InstagramAPI = lazy(() => import('@/pages/InstagramAPI'));
 const TikTokLab = lazy(() => import('@/pages/TikTokLab'));
 const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
+// New TikTok creator ecosystem pages
+const CreatorTripPage = lazy(() => import('@/pages/CreatorTripPage'));
+const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const BookingDetails = lazy(() => import('@/pages/BookingDetails'));
@@ -153,22 +159,10 @@ export const AppRoutes = () => (
 
     <Route element={<MemberLayout />}>
       <Route element={<DesktopShell />}>
-        <Route
-          path="/travel-feed"
-          element={(
-            <RouteSectionBoundary section="travel-feed">
-              <TravelFeed />
-            </RouteSectionBoundary>
-          )}
-        />
-        <Route
-          path="/journeys"
-          element={(
-            <RouteSectionBoundary section="journeys">
-              <TravelFeed />
-            </RouteSectionBoundary>
-          )}
-        />
+        {/* Legacy social feed routes - DISABLED
+        <Route path="/travel-feed" element={<TravelFeed />} />
+        <Route path="/journeys" element={<TravelFeed />} />
+        */}
         <Route path="/explore" element={<ExplorePage />} />
         <Route path="/reels" element={<ReelsViewer />} />
         <Route path="/profile" element={<Profile />} />
@@ -239,8 +233,10 @@ export const AppRoutes = () => (
       <Route path="/travel-settings/edit" element={<TravelSettings />} />
       <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
       <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
+      {/* Legacy Instagram demo routes - DISABLED
       <Route path="/instagram-callback" element={<InstagramCallback />} />
       <Route path="/instagram-api" element={<InstagramAPI />} />
+      */}
       <Route
         path="/tiktok-lab"
         element={(
@@ -258,8 +254,13 @@ export const AppRoutes = () => (
         )}
       />
       <Route path="/creator-dashboard" element={<CreatorDashboard />} />
+      {/* Legacy social feed routes - DISABLED
       <Route path="/search" element={<Search />} />
       <Route path="/trending" element={<Trending />} />
+      */}
+      {/* New TikTok Creator Ecosystem Routes */}
+      <Route path="/trip/:id" element={<CreatorTripPage />} />
+      <Route path="/collabs/new" element={<NewCollabRequestPage />} />
       <Route
         path="/messages"
         element={(

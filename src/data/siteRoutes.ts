@@ -27,16 +27,21 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/my-trips', label: 'My Trips', description: 'View your trips', category: 'booking', requiresAuth: true },
   { path: '/collections', label: 'Collections', description: 'Saved collections', category: 'booking', requiresAuth: true },
   
-  // Social / Journeys
-  { path: '/travel-feed', label: 'Journeys Feed', description: 'Instagram-style travel content', category: 'social' },
-  { path: '/journeys', label: 'Journeys', description: 'Same as Travel Feed', category: 'social' },
-  { path: '/travel-profile', label: 'Travel Profile', description: 'Your travel social profile', category: 'social', requiresAuth: true },
-  { path: '/travel-settings', label: 'Travel Settings', description: 'Configure profile settings', category: 'social', requiresAuth: true },
-  { path: '/creator-dashboard', label: 'Creator Dashboard', description: 'Manage your content', category: 'social', requiresAuth: true },
-  { path: '/search', label: 'Search', description: 'Search content', category: 'social' },
-  { path: '/trending', label: 'Trending', description: 'Trending travel content', category: 'social' },
-  { path: '/browse-creators', label: 'Browse Creators', description: 'Find travel creators', category: 'social' },
-  { path: '/tiktok-lab', label: 'TikTok Travel Lab', description: 'Create TikTok-ready travel stories and link them to bookable trips', category: 'social', requiresAuth: true },
+  // Creator & TikTok Ecosystem (formerly Social / Journeys)
+  // Legacy internal social feed routes - DISABLED
+  // { path: '/travel-feed', label: 'Journeys Feed', description: 'Instagram-style travel content', category: 'social' },
+  // { path: '/journeys', label: 'Journeys', description: 'Same as Travel Feed', category: 'social' },
+  // { path: '/search', label: 'Search', description: 'Search content', category: 'social' },
+  // { path: '/trending', label: 'Trending', description: 'Trending travel content', category: 'social' },
+  
+  // Creator Platform - TikTok-based ecosystem
+  { path: '/travel-profile', label: 'Creator Profile', description: 'Your public Goldsainte creator page', category: 'social', requiresAuth: true },
+  { path: '/travel-settings', label: 'Creator Settings', description: 'Configure TikTok + trip connections', category: 'social', requiresAuth: true },
+  { path: '/creator-dashboard', label: 'Creator Dashboard', description: 'Your TikTok travel performance and earnings', category: 'social', requiresAuth: true },
+  { path: '/browse-creators', label: 'Creator Marketplace', description: 'Agents can discover TikTok travel creators', category: 'social' },
+  { path: '/tiktok-lab', label: 'TikTok Travel Lab', description: 'Build TikTok-ready stories linked to trips', category: 'social', requiresAuth: true },
+  { path: '/trip/:id', label: 'Creator Trip Page', description: 'Bookable experience behind TikTok content', category: 'social' },
+  { path: '/collabs/new', label: 'New Collaboration', description: 'Agents & creators partner on selling trips', category: 'social', requiresAuth: true },
   { path: '/tiktok-callback', label: 'TikTok Callback', description: 'OAuth callback handler for TikTok connection', category: 'social', requiresAuth: true },
   
   // CoCurated
