@@ -122,7 +122,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    userId = userId || null;
+    userId = userId || undefined;
 
     const additionalEmails = travelerInfo.additionalEmails || [];
 

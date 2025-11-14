@@ -43,7 +43,7 @@ async function getAmadeusToken(): Promise<string> {
   tokenExpiry = now + (tokenData.expires_in * 1000) - 60000; // Refresh 1 min early
   
   console.log('✅ Amadeus token obtained');
-  return cachedToken;
+  return cachedToken || '';
 }
 
 async function searchFlights(params: any, token: string) {

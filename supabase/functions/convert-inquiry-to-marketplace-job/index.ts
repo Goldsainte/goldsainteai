@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     // Generate title
     const titleParts = [];
     if (serviceType !== 'general_inquiry') {
-      titleParts.push(serviceType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+      titleParts.push(serviceType.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase()));
     }
     if (destination !== 'Not specified') {
       titleParts.push(`to ${destination}`);

@@ -38,7 +38,8 @@ export function isValidUrl(url: string): boolean {
 }
 
 /**
- * Rate limiting check using Supabase
+ * Rate limiting check
+ * Note: Currently disabled - returns allowed=true. To enable, create rate_limits table in database.
  */
 export async function checkRateLimit(
   supabase: ReturnType<typeof createClient>,
@@ -46,44 +47,10 @@ export async function checkRateLimit(
   maxRequests: number = 10,
   windowMs: number = 60000
 ): Promise<{ allowed: boolean; remaining: number }> {
-  const windowStart = new Date(Date.now() - windowMs).toISOString();
-
-  const { data, error } = await supabase
-    .from("rate_limits")
-    .select("request_count, window_start")
-    .eq("identifier", identifier)
-    .gte("window_start", windowStart)
-    .single();
-
-  if (error && error.code !== "PGRST116") {
-    console.error("Rate limit check error:", error);
-    return { allowed: true, remaining: maxRequests };
-  }
-
-  if (!data) {
-    // First request in window
-    await supabase.from("rate_limits").insert({
-      identifier,
-      request_count: 1,
-      window_start: new Date().toISOString(),
-    });
-    return { allowed: true, remaining: maxRequests - 1 };
-  }
-
-  if (data.request_count >= maxRequests) {
-    return { allowed: false, remaining: 0 };
-  }
-
-  // Increment counter
-  await supabase
-    .from("rate_limits")
-    .update({ request_count: data.request_count + 1 })
-    .eq("identifier", identifier);
-
-  return {
-    allowed: true,
-    remaining: maxRequests - data.request_count - 1,
-  };
+  // Rate limiting disabled - rate_limits table doesn't exist
+  // To enable, create the table with: identifier (text), request_count (int), window_start (timestamptz)
+  console.log(`Rate limit check for ${identifier} - skipped (table not configured)`);
+  return { allowed: true, remaining: maxRequests };
 }
 
 /**
