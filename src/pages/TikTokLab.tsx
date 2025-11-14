@@ -30,6 +30,7 @@ export default function TikTokLab() {
 
   useEffect(() => {
     loadStories();
+    checkTikTokConnection();
   }, []);
 
   async function loadStories() {
@@ -46,6 +47,31 @@ export default function TikTokLab() {
       console.error('Failed to load stories:', error);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function checkTikTokConnection() {
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+
+      const { data, error } = await supabase
+        .from('tiktok_tokens')
+        .select('expires_at')
+        .eq('user_id', user.user.id)
+        .single();
+
+      if (!error && data) {
+        const expiresAt = new Date(data.expires_at);
+        if (expiresAt > new Date()) {
+          toast({
+            title: "TikTok Connected",
+            description: "Your TikTok account is connected",
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error checking TikTok connection:', error);
     }
   }
 

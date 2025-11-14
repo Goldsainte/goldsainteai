@@ -95,20 +95,23 @@ Deno.serve(async (req) => {
     const { access_token, refresh_token, expires_in } = tokenData;
     const expiresAt = new Date(Date.now() + expires_in * 1000).toISOString();
 
-    // If user was logged in during OAuth start, update their profile
+    // If user was logged in during OAuth start, store tokens in tiktok_tokens table
     if (stateRecord.user_id) {
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({
-          tiktok_access_token: access_token,
-          tiktok_refresh_token: refresh_token,
-          tiktok_token_expires_at: expiresAt,
-          tiktok_connected_at: new Date().toISOString(),
-        })
-        .eq('id', stateRecord.user_id);
+      const { error: upsertError } = await supabase
+        .from('tiktok_tokens')
+        .upsert({
+          user_id: stateRecord.user_id,
+          tiktok_user_id: tokenData.open_id,
+          access_token,
+          refresh_token,
+          expires_at: expiresAt,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'user_id'
+        });
 
-      if (updateError) {
-        console.error('Failed to update profile:', updateError);
+      if (upsertError) {
+        console.error('Failed to store tokens:', upsertError);
         return Response.redirect(
           `${APP_URL}/tiktok-callback?error=update_failed`,
           302

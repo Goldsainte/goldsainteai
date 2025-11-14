@@ -74,14 +74,14 @@ Deno.serve(async (req) => {
     // If user wants to post to TikTok, attempt to publish
     if (postToTikTok) {
       try {
-        // Get user's TikTok tokens
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('tiktok_access_token, tiktok_refresh_token, tiktok_token_expires_at')
-          .eq('id', user.id)
+        // Get user's TikTok tokens from tiktok_tokens table
+        const { data: tokenData, error: tokenError } = await supabase
+          .from('tiktok_tokens')
+          .select('access_token, refresh_token, expires_at, tiktok_user_id')
+          .eq('user_id', user.id)
           .single();
 
-        if (profileError || !profile?.tiktok_access_token) {
+        if (tokenError || !tokenData?.access_token) {
           console.warn('User does not have TikTok connected');
           await supabase
             .from('trip_stories')
@@ -99,7 +99,7 @@ Deno.serve(async (req) => {
         }
 
         // Check if token is expired
-        const tokenExpiry = new Date(profile.tiktok_token_expires_at);
+        const tokenExpiry = new Date(tokenData.expires_at);
         const now = new Date();
 
         if (tokenExpiry <= now) {
