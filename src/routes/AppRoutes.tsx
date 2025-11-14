@@ -241,8 +241,22 @@ export const AppRoutes = () => (
       <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
       <Route path="/instagram-callback" element={<InstagramCallback />} />
       <Route path="/instagram-api" element={<InstagramAPI />} />
-      <Route path="/tiktok-lab" element={<TikTokLab />} />
-      <Route path="/tiktok-callback" element={<TikTokCallback />} />
+      <Route
+        path="/tiktok-lab"
+        element={(
+          <RouteSectionBoundary section="tiktok-lab">
+            <TikTokLab />
+          </RouteSectionBoundary>
+        )}
+      />
+      <Route
+        path="/tiktok-callback"
+        element={(
+          <RouteSectionBoundary section="tiktok-callback">
+            <TikTokCallback />
+          </RouteSectionBoundary>
+        )}
+      />
       <Route path="/creator-dashboard" element={<CreatorDashboard />} />
       <Route path="/search" element={<Search />} />
       <Route path="/trending" element={<Trending />} />
