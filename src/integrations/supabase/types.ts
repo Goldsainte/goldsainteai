@@ -2820,6 +2820,30 @@ export type Database = {
         }
         Relationships: []
       }
+      facebook_signin_credentials: {
+        Row: {
+          app_id: string
+          app_secret: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          app_id: string
+          app_secret: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          app_id?: string
+          app_secret?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       favorites: {
         Row: {
           created_at: string
@@ -5137,6 +5161,172 @@ export type Database = {
             columns: ["resold_package_id"]
             isOneToOne: false
             referencedRelation: "package_marketing_materials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      packaged_trips: {
+        Row: {
+          agent_id: string | null
+          available_from: string | null
+          available_until: string | null
+          booking_count: number | null
+          cancellation_policy: string | null
+          cover_image_url: string | null
+          created_at: string
+          creator_id: string | null
+          creator_type: string
+          currency: string
+          departure_dates: Json | null
+          description: string | null
+          destination: string
+          difficulty_level: string | null
+          duration_days: number
+          duration_nights: number | null
+          fitness_level_required: string | null
+          highlights: Json | null
+          id: string
+          image_gallery: Json | null
+          included: Json | null
+          is_featured: boolean | null
+          is_verified: boolean | null
+          max_participants: number | null
+          min_participants: number | null
+          not_included: Json | null
+          original_price: number | null
+          passport_required: boolean | null
+          price_per_person: number
+          published_at: string | null
+          rating: number | null
+          refund_policy: string | null
+          review_count: number | null
+          slug: string | null
+          status: string
+          tags: string[] | null
+          terms_conditions: string | null
+          title: string
+          trip_type: string | null
+          updated_at: string
+          vaccination_required: boolean | null
+          video_url: string | null
+          view_count: number | null
+          visa_required: boolean | null
+          wishlist_count: number | null
+        }
+        Insert: {
+          agent_id?: string | null
+          available_from?: string | null
+          available_until?: string | null
+          booking_count?: number | null
+          cancellation_policy?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id?: string | null
+          creator_type?: string
+          currency?: string
+          departure_dates?: Json | null
+          description?: string | null
+          destination: string
+          difficulty_level?: string | null
+          duration_days: number
+          duration_nights?: number | null
+          fitness_level_required?: string | null
+          highlights?: Json | null
+          id?: string
+          image_gallery?: Json | null
+          included?: Json | null
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          max_participants?: number | null
+          min_participants?: number | null
+          not_included?: Json | null
+          original_price?: number | null
+          passport_required?: boolean | null
+          price_per_person: number
+          published_at?: string | null
+          rating?: number | null
+          refund_policy?: string | null
+          review_count?: number | null
+          slug?: string | null
+          status?: string
+          tags?: string[] | null
+          terms_conditions?: string | null
+          title: string
+          trip_type?: string | null
+          updated_at?: string
+          vaccination_required?: boolean | null
+          video_url?: string | null
+          view_count?: number | null
+          visa_required?: boolean | null
+          wishlist_count?: number | null
+        }
+        Update: {
+          agent_id?: string | null
+          available_from?: string | null
+          available_until?: string | null
+          booking_count?: number | null
+          cancellation_policy?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          creator_id?: string | null
+          creator_type?: string
+          currency?: string
+          departure_dates?: Json | null
+          description?: string | null
+          destination?: string
+          difficulty_level?: string | null
+          duration_days?: number
+          duration_nights?: number | null
+          fitness_level_required?: string | null
+          highlights?: Json | null
+          id?: string
+          image_gallery?: Json | null
+          included?: Json | null
+          is_featured?: boolean | null
+          is_verified?: boolean | null
+          max_participants?: number | null
+          min_participants?: number | null
+          not_included?: Json | null
+          original_price?: number | null
+          passport_required?: boolean | null
+          price_per_person?: number
+          published_at?: string | null
+          rating?: number | null
+          refund_policy?: string | null
+          review_count?: number | null
+          slug?: string | null
+          status?: string
+          tags?: string[] | null
+          terms_conditions?: string | null
+          title?: string
+          trip_type?: string | null
+          updated_at?: string
+          vaccination_required?: boolean | null
+          video_url?: string | null
+          view_count?: number | null
+          visa_required?: boolean | null
+          wishlist_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packaged_trips_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "travel_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "packaged_trips_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "packaged_trips_creator_id_fkey"
+            columns: ["creator_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
