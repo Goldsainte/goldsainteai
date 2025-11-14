@@ -6154,6 +6154,10 @@ export type Database = {
           stripe_onboarding_completed: boolean | null
           stripe_payouts_enabled: boolean | null
           tax_id: string | null
+          tiktok_access_token: string | null
+          tiktok_connected_at: string | null
+          tiktok_refresh_token: string | null
+          tiktok_token_expires_at: string | null
           tiktok_username: string | null
           updated_at: string
           username: string | null
@@ -6201,6 +6205,10 @@ export type Database = {
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
+          tiktok_access_token?: string | null
+          tiktok_connected_at?: string | null
+          tiktok_refresh_token?: string | null
+          tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
           updated_at?: string
           username?: string | null
@@ -6248,6 +6256,10 @@ export type Database = {
           stripe_onboarding_completed?: boolean | null
           stripe_payouts_enabled?: boolean | null
           tax_id?: string | null
+          tiktok_access_token?: string | null
+          tiktok_connected_at?: string | null
+          tiktok_refresh_token?: string | null
+          tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
           updated_at?: string
           username?: string | null
@@ -8381,6 +8393,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trip_stories: {
+        Row: {
+          caption: string
+          created_at: string
+          hero_image_url: string | null
+          hook: string | null
+          id: string
+          itinerary_lines: string[] | null
+          platforms: string[] | null
+          status: string | null
+          tiktok_post_id: string | null
+          tiktok_published_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          hero_image_url?: string | null
+          hook?: string | null
+          id?: string
+          itinerary_lines?: string[] | null
+          platforms?: string[] | null
+          status?: string | null
+          tiktok_post_id?: string | null
+          tiktok_published_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          hero_image_url?: string | null
+          hook?: string | null
+          id?: string
+          itinerary_lines?: string[] | null
+          platforms?: string[] | null
+          status?: string | null
+          tiktok_post_id?: string | null
+          tiktok_published_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       trip_suggestions: {
         Row: {

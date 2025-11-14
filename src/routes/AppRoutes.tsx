@@ -52,6 +52,8 @@ const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
 const CrosspostingSettings = lazy(() => import('@/pages/CrosspostingSettings'));
 const InstagramCallback = lazy(() => import('@/pages/InstagramCallback'));
 const InstagramAPI = lazy(() => import('@/pages/InstagramAPI'));
+const TikTokLab = lazy(() => import('@/pages/TikTokLab'));
+const TikTokCallback = lazy(() => import('@/pages/TikTokCallback'));
 const CreatorDashboard = lazy(() => import('@/pages/CreatorDashboard'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
@@ -239,6 +241,8 @@ export const AppRoutes = () => (
       <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
       <Route path="/instagram-callback" element={<InstagramCallback />} />
       <Route path="/instagram-api" element={<InstagramAPI />} />
+      <Route path="/tiktok-lab" element={<TikTokLab />} />
+      <Route path="/tiktok-callback" element={<TikTokCallback />} />
       <Route path="/creator-dashboard" element={<CreatorDashboard />} />
       <Route path="/search" element={<Search />} />
       <Route path="/trending" element={<Trending />} />
