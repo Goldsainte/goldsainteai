@@ -21,14 +21,14 @@ Deno.serve(async (req) => {
     // Get job details
     const { data: job } = await supabaseClient
       .from('marketplace_jobs')
-      .select('title')
+      .select('title, contact_info')
       .eq('id', jobId)
       .single();
 
     // Get bid details
     const { data: bid } = await supabaseClient
       .from('agent_bids')
-      .select('customer_facing_price, currency')
+      .select('customer_facing_price, currency, agent_payout_amount')
       .eq('id', bidId)
       .single();
 
@@ -116,9 +116,9 @@ Deno.serve(async (req) => {
                   <ol>
                     <li>Complete payment to secure your booking</li>
                     <li>Your agent will begin planning immediately</li>
-                    <li>You'll receive trip details within 24-48 hours</li>
+                  <li>You'll receive trip details within 24-48 hours</li>
                   </ol>
-                  <a href="${Deno.env.get('SUPABASE_URL').replace('//', '//app.')}/marketplace?job=${jobId}" class="button">Complete Payment</a>
+                  <a href="${(Deno.env.get('SUPABASE_URL') || '').replace('//', '//app.')}/marketplace?job=${jobId}" class="button">Complete Payment</a>
                 </div>
               </div>
             </div>
@@ -176,12 +176,12 @@ Deno.serve(async (req) => {
                   <h2 style="margin-top: 0; color: #10b981;">Your bid was accepted!</h2>
                   <p><strong>Trip:</strong> ${job.title}</p>
                   <p><strong>Customer:</strong> ${job.contact_info?.name || 'Customer'}</p>
-                  <p><strong>Your Payout:</strong> ${bid.currency} ${bid.agent_payout}</p>
+                  <p><strong>Your Payout:</strong> ${bid.currency} ${bid.agent_payout_amount || bid.customer_facing_price}</p>
                 </div>
 
                 <div class="section">
                   <h3 style="margin-top: 0;">Customer Contact Information</h3>
-                  <p><strong>Email:</strong> ${job.contact_info?.email}</p>
+                  <p><strong>Email:</strong> ${job.contact_info?.email || 'Not provided'}</p>
                   <p><strong>Phone:</strong> ${job.contact_info?.phone || 'Not provided'}</p>
                 </div>
 

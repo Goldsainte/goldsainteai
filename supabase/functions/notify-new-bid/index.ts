@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
                 <div class="section">
                   <h3 style="margin-top: 0;">Next Steps</h3>
                   <p>Review this bid along with any others you've received and choose the agent that best fits your needs.</p>
-                  <a href="${Deno.env.get('SUPABASE_URL').replace('//', '//app.')}/marketplace?job=${jobId}" class="button">Review Bid</a>
+                  <a href="${(Deno.env.get('SUPABASE_URL') || '').replace('//', '//app.')}/marketplace?job=${jobId}" class="button">Review Bid</a>
                 </div>
               </div>
             </div>

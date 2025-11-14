@@ -68,15 +68,15 @@ serve(async (req) => {
     const { access_token, refresh_token, expires_in } = tokens;
 
     // Get shop details
-    const clientId = Deno.env.get('ETSY_CLIENT_ID');
-    if (!clientId) {
+    const etsyClientId = Deno.env.get('ETSY_CLIENT_ID');
+    if (!etsyClientId) {
       throw new Error('ETSY_CLIENT_ID not configured');
     }
     
     const shopResponse = await fetch('https://api.etsy.com/v3/application/users/me', {
       headers: { 
         'Authorization': `Bearer ${access_token}`,
-        'x-api-key': clientId,
+        'x-api-key': etsyClientId,
       },
     });
 
@@ -123,14 +123,15 @@ serve(async (req) => {
       },
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in etsy-oauth-callback:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     const appUrl = req.headers.get('referer') || Deno.env.get('APP_URL') || 'https://lovable.app';
     return new Response(null, {
       status: 302,
       headers: {
         ...corsHeaders,
-        'Location': `${appUrl}/dashboard?etsy=error&message=${encodeURIComponent(error.message)}`,
+        'Location': `${appUrl}/dashboard?etsy=error&message=${encodeURIComponent(errorMessage)}`,
       },
     });
   }

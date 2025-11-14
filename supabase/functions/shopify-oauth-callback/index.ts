@@ -108,14 +108,15 @@ serve(async (req) => {
       },
     });
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in shopify-oauth-callback:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     const appUrl = req.headers.get('referer') || Deno.env.get('APP_URL') || 'https://lovable.app';
     return new Response(null, {
       status: 302,
       headers: {
         ...corsHeaders,
-        'Location': `${appUrl}/dashboard?shopify=error&message=${encodeURIComponent(error.message)}`,
+        'Location': `${appUrl}/dashboard?shopify=error&message=${encodeURIComponent(errorMessage)}`,
       },
     });
   }

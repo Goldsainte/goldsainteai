@@ -253,7 +253,7 @@ serve(async (req) => {
     try {
       const { data: rankedData, error: rankError } = await supabaseClient.functions.invoke('rank-search-results', {
         body: {
-          results: markedUpResults.map(f => ({
+          results: markedUpResults.map((f: any) => ({
             ...f,
             numericPrice: parseFloat(f.price.total), // Numeric price for ranking only
             rating: 4.0 // Default for flights

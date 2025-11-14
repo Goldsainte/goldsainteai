@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const jobUrl = `${Deno.env.get('SUPABASE_URL').replace('//', '//app.')}/marketplace?job=${jobId}`;
+    const jobUrl = `${(Deno.env.get('SUPABASE_URL') || '').replace('//', '//app.')}/marketplace?job=${jobId}`;
 
     // Send notifications to each creator
     for (const creator of creators) {

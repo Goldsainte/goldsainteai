@@ -120,10 +120,11 @@ serve(async (req) => {
       JSON.stringify({ transfers, total: transfers.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in hotelbeds-search-transfers:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message, transfers: [] }),
+      JSON.stringify({ error: errorMessage, transfers: [] }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

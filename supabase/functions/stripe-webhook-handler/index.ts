@@ -80,9 +80,10 @@ serve(async (req) => {
       }
 
       await updateWebhookStatus(supabaseClient, event.id, 'success');
-    } catch (handlerError) {
+    } catch (handlerError: unknown) {
       console.error('Handler error:', handlerError);
-      await updateWebhookStatus(supabaseClient, event.id, 'failed', handlerError.message);
+      const errorMessage = handlerError instanceof Error ? handlerError.message : 'Unknown error occurred';
+      await updateWebhookStatus(supabaseClient, event.id, 'failed', errorMessage);
       throw handlerError;
     }
 

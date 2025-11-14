@@ -107,10 +107,11 @@ serve(async (req) => {
       JSON.stringify({ activities, total: activities.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error in hotelbeds-search-activities:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message, activities: [] }),
+      JSON.stringify({ error: errorMessage, activities: [] }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

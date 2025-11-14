@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     }
 
     const travelDetails = inquiry.conversation_data?.travelDetails || {};
-    const dashboardUrl = `${Deno.env.get('SUPABASE_URL').replace('//', '//app.')}/marketplace?job=${jobId}`;
+    const dashboardUrl = `${(Deno.env.get('SUPABASE_URL') || '').replace('//', '//app.')}/marketplace?job=${jobId}`;
 
     // Send confirmation email
     const emailHtml = `

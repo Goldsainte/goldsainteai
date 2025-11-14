@@ -417,7 +417,7 @@ serve(async (req) => {
         let finalText = stripRoutes(assistantMessage.content || "I apologize, but I'm having trouble processing your request right now.");
         
         // Check if we've already made a booking decision in this conversation
-        const hasExistingBookingDecision = messages.some(msg => 
+        const hasExistingBookingDecision = messages.some((msg: any) => 
           msg.role === 'assistant' && 
           msg.content && (
             msg.content.includes('Would you like a Goldsainte Certified Travel Agent') ||
