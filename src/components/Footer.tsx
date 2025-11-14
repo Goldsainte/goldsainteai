@@ -43,9 +43,9 @@ export const Footer = () => {
             <AccordionTrigger className="text-sm font-semibold">{t('footer.discover')}</AccordionTrigger>
             <AccordionContent>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link to="/journeys" className="hover:text-primary transition-colors">{t('footer.journeys')}</Link></li>
+                <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
+                <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
                 <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">{t('footer.cocuratedJourneys')}</Link></li>
-                <li><Link to="/trending" className="hover:text-primary transition-colors">{t('footer.seasonalDeals')}</Link></li>
                 <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
                 <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
                 <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
@@ -117,9 +117,9 @@ export const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-base">{t('footer.discover')}</h4>
             <ul className="space-y-3 text-sm text-muted-foreground">
-              <li><Link to="/journeys" className="hover:text-primary transition-colors">{t('footer.journeys')}</Link></li>
+              <li><Link to="/browse-creators" className="hover:text-primary transition-colors">Creator Marketplace</Link></li>
+              <li><Link to="/tiktok-lab" className="hover:text-primary transition-colors">TikTok Travel Lab</Link></li>
               <li><Link to="/cocurated-journeys" className="hover:text-primary transition-colors">{t('footer.cocuratedJourneys')}</Link></li>
-              <li><Link to="/trending" className="hover:text-primary transition-colors">{t('footer.seasonalDeals')}</Link></li>
               <li><Link to="/browse-agents" className="hover:text-primary transition-colors">{t('footer.travelAgentServices')}</Link></li>
               <li><Link to="/cocurated-marketplace" className="hover:text-primary transition-colors">{t('footer.cocuratedPackages')}</Link></li>
               <li><Link to="/marketplace" className="hover:text-primary transition-colors">{t('footer.marketplace')}</Link></li>
