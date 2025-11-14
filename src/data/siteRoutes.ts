@@ -36,6 +36,8 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/search', label: 'Search', description: 'Search content', category: 'social' },
   { path: '/trending', label: 'Trending', description: 'Trending travel content', category: 'social' },
   { path: '/browse-creators', label: 'Browse Creators', description: 'Find travel creators', category: 'social' },
+  { path: '/tiktok-lab', label: 'TikTok Travel Lab', description: 'Create TikTok-ready travel stories and link them to bookable trips', category: 'social', requiresAuth: true },
+  { path: '/tiktok-callback', label: 'TikTok Callback', description: 'OAuth callback handler for TikTok connection', category: 'social', requiresAuth: true },
   
   // CoCurated
   { path: '/cocurated-marketplace', label: 'CoCurated Marketplace', description: 'Expertly designed travel packages', category: 'cocurated' },
