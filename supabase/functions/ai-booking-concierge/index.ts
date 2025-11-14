@@ -1270,7 +1270,7 @@ Remember: You're an AI search concierge that helps find perfect travel options a
             continue; // Skip functionMap routing
           }
           
-          const functionMap: Record<string, string> = {
+          const functionMap: Record<string, string | null> = {
             'search_flights': null, // Intent extraction only - opens Expedia widget
             'search_hotels': null, // Intent extraction only - opens Expedia widget
             'search_restaurants': 'tripadvisor-search-restaurants',

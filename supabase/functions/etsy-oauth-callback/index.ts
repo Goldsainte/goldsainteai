@@ -68,6 +68,11 @@ serve(async (req) => {
     const { access_token, refresh_token, expires_in } = tokens;
 
     // Get shop details
+    const clientId = Deno.env.get('ETSY_CLIENT_ID');
+    if (!clientId) {
+      throw new Error('ETSY_CLIENT_ID not configured');
+    }
+    
     const shopResponse = await fetch('https://api.etsy.com/v3/application/users/me', {
       headers: { 
         'Authorization': `Bearer ${access_token}`,

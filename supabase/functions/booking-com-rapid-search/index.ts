@@ -96,7 +96,8 @@ serve(async (req) => {
           break;
         }
       } catch (error) {
-        console.warn(`⚠️ Error trying query "${query}":`, error.message);
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.warn(`⚠️ Error trying query "${query}":`, errorMessage);
         continue;
       }
     }
@@ -208,7 +209,7 @@ serve(async (req) => {
         const reviewCount = hotel.property?.reviewCount ?? hotel.reviewCount ?? 0;
 
         // Collect photos from multiple known fields
-        const photoStrings: string[] = []
+        const photoStrings: string[] = ([] as string[])
           .concat(Array.isArray(hotel.property?.photoUrls) ? hotel.property.photoUrls : [])
           .concat(Array.isArray(hotel.photoUrls) ? hotel.photoUrls : [])
           .concat(hotel.max_photo_url ? [hotel.max_photo_url] : [])
@@ -290,8 +291,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Booking.com search error:", error);
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
     return new Response(
-      JSON.stringify({ error: error.message, hotels: [] }),
+      JSON.stringify({ error: errorMessage, hotels: [] }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }

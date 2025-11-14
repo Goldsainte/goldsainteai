@@ -94,14 +94,14 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       customer: customers.data[0],
-      subscriptions: subscriptions.data.map(sub => ({
+      subscriptions: subscriptions.data.map((sub: any) => ({
         id: sub.id,
         status: sub.status,
         current_period_start: sub.current_period_start,
         current_period_end: sub.current_period_end,
         cancel_at_period_end: sub.cancel_at_period_end,
         canceled_at: sub.canceled_at,
-        items: sub.items.data.map(item => ({
+        items: sub.items.data.map((item: any) => ({
           price: item.price.unit_amount,
           currency: item.price.currency,
           interval: item.price.recurring?.interval,
