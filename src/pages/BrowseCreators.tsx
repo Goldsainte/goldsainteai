@@ -11,6 +11,11 @@ type Creator = {
   avgViews: string;
   primaryRegion: string;
   partnershipType: string;
+  featuredTrips: Array<{
+    id: string;
+    title: string;
+    price: string;
+  }>;
 };
 
 const MOCK_CREATORS: Creator[] = [
@@ -25,6 +30,10 @@ const MOCK_CREATORS: Creator[] = [
     avgViews: "45K avg views",
     primaryRegion: "US → Europe",
     partnershipType: "Revenue share per booking",
+    featuredTrips: [
+      { id: "trip-1", title: "Santorini Honeymoon Escape", price: "$3,950" },
+      { id: "trip-2", title: "Amalfi Coast Romance", price: "$4,200" },
+    ],
   },
   {
     id: "creator-2",
@@ -37,6 +46,10 @@ const MOCK_CREATORS: Creator[] = [
     avgViews: "18K avg views",
     primaryRegion: "US → SE Asia",
     partnershipType: "Flat fee + bonuses",
+    featuredTrips: [
+      { id: "trip-3", title: "Thailand Island Hopping", price: "$1,200" },
+      { id: "trip-4", title: "Vietnam Street Food Tour", price: "$890" },
+    ],
   },
 ];
 
@@ -201,6 +214,31 @@ function CreatorCard({ creator }: { creator: Creator }) {
           <span>{creator.primaryRegion}</span>
           <span>{creator.partnershipType}</span>
         </div>
+
+        {/* Featured Trips */}
+        {creator.featuredTrips.length > 0 && (
+          <div className="mt-3 border-t border-neutral-100 pt-3">
+            <p className="text-[10px] font-medium text-neutral-500 mb-2">
+              Featured Trips
+            </p>
+            <div className="flex flex-col gap-1.5">
+              {creator.featuredTrips.map((trip) => (
+                <Link
+                  key={trip.id}
+                  to={`/trip/${trip.id}`}
+                  className="flex items-center justify-between rounded-lg bg-neutral-50 px-2 py-1.5 text-[11px] hover:bg-neutral-100 transition-colors"
+                >
+                  <span className="font-medium text-neutral-900 truncate">
+                    {trip.title}
+                  </span>
+                  <span className="text-neutral-600 ml-2 flex-shrink-0">
+                    {trip.price}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-3 flex gap-2 text-xs">
           <Link
