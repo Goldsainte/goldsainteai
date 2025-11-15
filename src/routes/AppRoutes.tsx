@@ -51,6 +51,7 @@ const Subscription = lazy(() => import('@/pages/Subscription'));
 const BillingDashboard = lazy(() => import('@/pages/BillingDashboard'));
 const TravelSettings = lazy(() => import('@/pages/TravelSettings'));
 const TravelSettings2 = lazy(() => import('@/pages/TravelSettings2'));
+const CreatorSettingsPage = lazy(() => import('@/pages/CreatorSettingsPage'));
 const MusicVolumeSettings = lazy(() => import('@/pages/MusicVolumeSettings'));
 const CrosspostingSettings = lazy(() => import('@/pages/CrosspostingSettings'));
 // Legacy Instagram demo - disabled
@@ -231,9 +232,9 @@ export const AppRoutes = () => (
       <Route path="/booking-history" element={<BookingHistory />} />
       <Route path="/subscription" element={<Subscription />} />
       <Route path="/billing-dashboard" element={<BillingDashboard />} />
-      <Route path="/travel-settings" element={<TravelSettings2 />} />
+      <Route path="/travel-settings" element={<CreatorSettingsPage />} />
       <Route path="/travel-settings-2" element={<TravelSettings2 />} />
-      <Route path="/travel-settings/edit" element={<TravelSettings />} />
+      <Route path="/travel-settings/general" element={<TravelSettings />} />
       <Route path="/travel-settings/music-volume" element={<MusicVolumeSettings />} />
       <Route path="/crossposting-settings" element={<CrosspostingSettings />} />
       {/* Legacy Instagram demo routes - DISABLED
