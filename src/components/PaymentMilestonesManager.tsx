@@ -29,6 +29,7 @@ interface PaymentMilestonesManagerProps {
   totalAmount: number;
   currency: string;
   isAgent: boolean;
+  isAdmin: boolean;
 }
 
 export const PaymentMilestonesManager = ({
@@ -36,6 +37,7 @@ export const PaymentMilestonesManager = ({
   totalAmount,
   currency,
   isAgent,
+  isAdmin,
 }: PaymentMilestonesManagerProps) => {
   const { toast } = useToast();
   const [milestones, setMilestones] = useState<Milestone[]>([]);
@@ -175,7 +177,7 @@ export const PaymentMilestonesManager = ({
               Break down the payment into manageable milestones
             </CardDescription>
           </div>
-          {isAgent && (
+          {(isAdmin || isAgent) && (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button size="sm">
@@ -284,7 +286,7 @@ export const PaymentMilestonesManager = ({
             <p className="text-sm text-muted-foreground">
               No payment milestones set up yet
             </p>
-            {isAgent && (
+            {(isAdmin || isAgent) && (
               <p className="text-xs text-muted-foreground mt-1">
                 Add milestones to break down the payment
               </p>

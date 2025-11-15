@@ -27,7 +27,7 @@ interface Profile {
 export default function Profile() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { isAgent, loading: roleLoading } = useUserRole();
+  const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [editProfileOpen, setEditProfileOpen] = useState(false);
 
@@ -254,7 +254,7 @@ export default function Profile() {
                 <Phone className="h-4 w-4" />
                 Emergency Contacts
               </Button>
-              {!isAgent && !roleLoading && (
+              {!isAdmin && !isAgent && !roleLoading && (
                 <Button onClick={() => navigate('/agent-onboarding')} variant="outline" className="w-full justify-start gap-2">
                   <Briefcase className="h-4 w-4" />
                   Become a Travel Agent

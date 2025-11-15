@@ -27,6 +27,22 @@ export const RequireAgentTerms = ({ children }: RequireAgentTermsProps) => {
         return;
       }
 
+      // Check if user is admin
+      const { data: roles } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      
+      const isAdmin = roles?.some(r => r.role === 'admin');
+      
+      // Admins bypass all checks
+      if (isAdmin) {
+        setTermsAccepted(true);
+        setLoading(false);
+        return;
+      }
+
+      // For non-admins, check agent record
       const { data: agent } = await supabase
         .from('travel_agents')
         .select('id, terms_accepted')

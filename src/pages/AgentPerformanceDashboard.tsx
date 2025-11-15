@@ -12,7 +12,7 @@ import { toast } from "sonner";
 
 export default function AgentPerformanceDashboard() {
   const { user, isLoading: authLoading } = useAuth();
-  const { isAgent, loading: roleLoading } = useUserRole();
+  const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -25,14 +25,14 @@ export default function AgentPerformanceDashboard() {
       return;
     }
 
-    if (!isAgent) {
+    if (!isAdmin && !isAgent) {
       toast.error('Agent access required');
       navigate('/');
       return;
     }
 
     fetchAgentData();
-  }, [user, isAgent, authLoading, roleLoading, navigate]);
+  }, [user, isAdmin, isAgent, authLoading, roleLoading, navigate]);
 
   const fetchAgentData = async () => {
     try {

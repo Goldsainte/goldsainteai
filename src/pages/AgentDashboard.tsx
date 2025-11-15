@@ -614,6 +614,7 @@ export default function AgentDashboard() {
                       totalAmount={selectedBidForDetails.marketplace_jobs.total_paid_amount}
                       currency={selectedBidForDetails.currency || 'USD'}
                       isAgent={true}
+                      isAdmin={isAdmin}
                     />
                   )}
 
