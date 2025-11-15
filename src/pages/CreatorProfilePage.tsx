@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 
 type CreatorProfileResponse = {
   creator: {
@@ -197,6 +198,16 @@ export default function CreatorProfilePage() {
             </Link>
           </div>
         </header>
+
+        {/* STORYBOARD */}
+        <section className="mt-8">
+          <TravelStoryboard
+            title={`${creator.name}'s Travel Inspiration`}
+            subtitle={`Visual moodboard for ${creator.primaryRegions.join(', ')} trips`}
+            maxItems={12}
+            highlightTags={creator.primaryRegions}
+          />
+        </section>
 
         {/* TRIPS */}
         <section className="mt-8">

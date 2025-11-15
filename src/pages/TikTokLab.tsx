@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
+import { TravelStoryboard } from "@/components/storyboards/TravelStoryboard";
 
 type TripStory = {
   id: string;
@@ -27,6 +28,7 @@ export default function TikTokLab() {
   const [itinerary, setItinerary] = useState("");
   const [isConnectingTikTok, setIsConnectingTikTok] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [selectedHeroImage, setSelectedHeroImage] = useState<string>("");
 
   useEffect(() => {
     loadStories();
@@ -138,12 +140,14 @@ export default function TikTokLab() {
           .split("\n")
           .map((line) => line.trim())
           .filter(Boolean),
-        postToTikTok: true,
+        platforms: ["tiktok"],
       };
 
       const { data, error } = await supabase.functions.invoke(
-        "publish-trip-story",
-        { body: payload }
+        "publish-tiktok-story",
+        {
+          body: payload,
+        }
       );
 
       if (error) {
@@ -165,6 +169,7 @@ export default function TikTokLab() {
         setCaption("");
         setHeroImageUrl("");
         setItinerary("");
+        setSelectedHeroImage("");
 
         // Reload stories
         loadStories();
@@ -179,6 +184,15 @@ export default function TikTokLab() {
     } finally {
       setIsPublishing(false);
     }
+  }
+
+  function handleSelectStoryboardImage(image: any) {
+    setHeroImageUrl(image.url);
+    setSelectedHeroImage(image.id);
+    toast({
+      title: "Hero Image Selected",
+      description: `Using "${image.label || 'Untitled'}" as your story's hero image`,
+    });
   }
 
   return (
@@ -319,8 +333,27 @@ export default function TikTokLab() {
             </div>
           </section>
 
-          {/* RIGHT: Recent Stories */}
+          {/* RIGHT: Storyboard + Recent Stories */}
           <aside className="w-full space-y-4 md:w-1/3">
+            {/* Storyboard Picker */}
+            <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-neutral-200/80 md:sticky md:top-4 md:max-h-[calc(100vh-2rem)] md:overflow-y-auto">
+              <TravelStoryboard
+                title="Visual Library"
+                subtitle="Click an image to use as your hero image"
+                maxItems={24}
+                highlightTags={[]}
+                onImageClick={handleSelectStoryboardImage}
+              />
+              
+              {selectedHeroImage && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+                  <span>✓</span>
+                  <span>Hero image selected</span>
+                </div>
+              )}
+            </div>
+
+            {/* Recent Stories */}
             <div className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-neutral-200/80">
               <h2 className="text-sm font-semibold text-neutral-900">
                 Recent TikTok Trip Stories
