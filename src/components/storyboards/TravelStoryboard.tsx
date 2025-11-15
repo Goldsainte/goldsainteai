@@ -35,19 +35,11 @@ export function TravelStoryboard({
     async function loadImages() {
       setLoading(true);
       try {
-        let query = supabase
+        const query = supabase
           .from("storyboard_media_library")
           .select("id, url, thumbnail_url, label, destination_tags, mood_tags")
           .order("created_at", { ascending: false })
           .limit(maxItems);
-
-        // Properly filter by tags if provided using array overlap operator
-        if (highlightTags.length > 0) {
-          const tagFilter = highlightTags.join(',');
-          query = query.or(
-            `destination_tags.ov.{${tagFilter}},mood_tags.ov.{${tagFilter}}`
-          );
-        }
 
         const { data, error } = await query;
 
@@ -58,6 +50,9 @@ export function TravelStoryboard({
         } else if (isMounted) {
           setImages((data ?? []) as StoryboardImage[]);
         }
+      } catch (err) {
+        console.error("Unexpected error loading storyboard:", err);
+        if (isMounted) setImages([]);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -68,7 +63,7 @@ export function TravelStoryboard({
     return () => {
       isMounted = false;
     };
-  }, [maxItems, highlightTags.join("|")]);
+  }, [maxItems]);
 
   return (
     <section className="space-y-3">
