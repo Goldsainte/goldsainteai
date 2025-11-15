@@ -330,3 +330,12 @@ verify_jwt = false
 [functions.stripe-connect-link]
 verify_jwt = false
 
+[functions.seed-storyboard-media]
+verify_jwt = false
+
+[functions.match-trip-request]
+verify_jwt = false
+
+[functions.match-agent-creators]
+verify_jwt = false
+
