@@ -1,37 +1,40 @@
-import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useTranslation } from "react-i18next";
+// src/pages/Index.tsx
+import { Helmet } from "react-helmet-async";
+import { WelcomeModal } from "@/components/home/WelcomeModal";
 import { HomeHero } from "@/components/home/HomeHero";
-import { WelcomeModal } from "@/components/WelcomeModal";
-import VendorPromotionFeed from "@/components/VendorPromotionFeed";
+import { HowItWorks } from "@/components/home/HowItWorks";
+import { MarketplaceShowcase } from "@/components/home/MarketplaceShowcase";
 
-const Index = () => {
-  const { user } = useAuth();
-  const { t } = useTranslation();
-  const [showWelcomeModal, setShowWelcomeModal] = useState(false);
-
+export default function Index() {
   return (
-    <main className="min-h-screen w-full max-w-full bg-gradient-to-b from-background via-background to-muted/20">
-      <HomeHero />
-      
-      <section className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <h2 className="text-sm font-semibold tracking-tight text-foreground md:text-base">
-          Featured partners & experiences
-        </h2>
-        <p className="mt-1 text-[11px] text-muted-foreground md:text-xs">
-          Handpicked vendors, experiences, and launch partners powering the Goldsainte marketplace.
-        </p>
-        <div className="mt-4">
-          <VendorPromotionFeed displayContext="homepage" limit={6} />
-        </div>
-      </section>
+    <>
+      <Helmet>
+        <title>Goldsainte · Luxury Travel Marketplace</title>
+        <meta
+          name="description"
+          content="Goldsainte connects TikTok creators, certified travel agents, and travelers. Browse a luxury marketplace of trips or post your own dream journey."
+        />
+      </Helmet>
 
-      <WelcomeModal 
-        open={showWelcomeModal} 
-        onClose={() => setShowWelcomeModal(false)}
-      />
-    </main>
+      {/* Global Welcome Modal */}
+      <WelcomeModal />
+
+      <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6] text-foreground">
+        {/* Hero with Expedia search + brand positioning */}
+        <HomeHero />
+
+        {/* How it works (three-sided marketplace) */}
+        <HowItWorks />
+
+        {/* Marketplace showcase with Pinterest-style cards */}
+        <MarketplaceShowcase />
+
+        {/* You can add more sections below as needed:
+            - TikTok Travel Lab teaser
+            - Creator / Agent call-to-action strips
+            - Testimonials, etc.
+        */}
+      </main>
+    </>
   );
-};
-
-export default Index;
+}
