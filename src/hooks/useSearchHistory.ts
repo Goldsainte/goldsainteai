@@ -29,7 +29,7 @@ export const useSearchHistory = () => {
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
 
   useEffect(() => {
-    const loadHistory = async () => {
+  const loadHistory = async () => {
       if (!user) {
         setHistory([]);
         return;
@@ -40,6 +40,7 @@ export const useSearchHistory = () => {
           .from('search_history')
           .select('*')
           .eq('user_id', user.id)
+          .not('search_type', 'in', '("hotel","flight","event")')
           .order('created_at', { ascending: false })
           .limit(MAX_HISTORY_ITEMS);
 

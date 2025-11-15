@@ -14,10 +14,7 @@ import { RequireAgentTerms } from '@/components/RequireAgentTerms';
 import { MarketingLayout, AuthLayout, MemberLayout, AdminLayout } from './Layouts';
 import { RouteSectionBoundary } from './RouteSectionBoundary';
 
-// Lazy load non-critical pages
 const SearchResults = lazy(() => import('@/pages/SearchResults'));
-const HotelBooking = lazy(() => import('@/pages/HotelBooking'));
-const BookingConfirmation = lazy(() => import('@/pages/BookingConfirmation'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const AdminDashboardPage = lazy(() => import('@/pages/admin/AdminDashboardPage'));
 const TravelProfileRedirect = lazy(() => import('@/pages/redirects/TravelProfileRedirectPage'));
@@ -80,7 +77,6 @@ const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const BookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
 const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
 const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
-const HotelDetails = lazy(() => import('@/pages/HotelDetails'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const MyTrips = lazy(() => import('@/pages/MyTrips'));
 const GroupTrips = lazy(() => import('@/pages/GroupTrips'));
@@ -294,11 +290,6 @@ export const AppRoutes = () => (
           </RouteSectionBoundary>
         )}
       />
-      <Route path="/price-alerts" element={<PriceAlerts />} />
-      <Route path="/search-results" element={<SearchResults />} />
-      <Route path="/hotel/:id" element={<HotelDetails />} />
-      <Route path="/hotel-booking" element={<HotelBooking />} />
-      <Route path="/booking-confirmation" element={<BookingConfirmation />} />
       <Route path="/my-jobs" element={<MyJobs />} />
       <Route path="/my-trips" element={<MyTrips />} />
       <Route path="/group-trips" element={<GroupTrips />} />
