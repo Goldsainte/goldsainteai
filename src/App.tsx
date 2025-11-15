@@ -11,6 +11,7 @@ import { Footer } from "@/components/Footer";
 import { SkipNavigation } from "@/components/SkipNavigation";
 import { OnboardingTour } from "@/components/OnboardingTour";
 import { WelcomeModal } from "@/components/WelcomeModal";
+import { OnboardingWelcomeModal } from "@/components/OnboardingWelcomeModal";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { SentryTestButton } from "@/components/SentryTestButton";
 import { SentryStatusChip } from "@/components/system/SentryStatusChip";
@@ -136,6 +137,7 @@ function AppContent() {
   return (
     <div className="min-h-screen w-full max-w-full flex flex-col overflow-x-hidden box-border viewport-guard">
       <SkipNavigation />
+      <OnboardingWelcomeModal />
       <WelcomeModal open={showWelcomeModal} onClose={() => setShowWelcomeModal(false)} isFirstVisit />
       <OnboardingTour />
       {hideHeader ? null : <Header />}
