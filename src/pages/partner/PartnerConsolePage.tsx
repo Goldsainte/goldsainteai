@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { getMyPartnerPipeline } from "@/services/partnerPipelineService";
 import { getMyEarningsSummary } from "@/services/earningsService";
 import { Sparkles, FileText, DollarSign, Video, ArrowRight } from "lucide-react";
+import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
 
 export default function PartnerConsolePage() {
+  const { checking, allowed } = useRequireOnboarding();
   const navigate = useNavigate();
   const [pipeline, setPipeline] = useState<{ proposals: any[]; bookings: any[] }>({
     proposals: [],
@@ -60,6 +62,14 @@ export default function PartnerConsolePage() {
   }, [navigate]);
 
   const currency = earnings?.currency || "USD";
+
+  if (checking || !allowed) {
+    return (
+      <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6] flex items-center justify-center">
+        <p className="text-xs">Loading your Goldsainte space…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background text-foreground px-4 py-6">

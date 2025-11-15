@@ -6451,6 +6451,7 @@ export type Database = {
         Row: {
           account_status: string | null
           account_type: string | null
+          agency_name: string | null
           ai_calls_reset_at: string | null
           ai_calls_used: number | null
           ai_subscription_tier: string | null
@@ -6463,6 +6464,7 @@ export type Database = {
           country: string | null
           created_at: string
           destinations_focus_tags: string[] | null
+          display_name: string | null
           email_notifications: boolean | null
           first_name: string | null
           followers_count: number | null
@@ -6477,6 +6479,7 @@ export type Database = {
           last_name: string | null
           last_warning_at: string | null
           location: string | null
+          onboarding_completed: boolean
           payout_schedule: string | null
           phone: string | null
           preferences: Json | null
@@ -6508,6 +6511,7 @@ export type Database = {
         Insert: {
           account_status?: string | null
           account_type?: string | null
+          agency_name?: string | null
           ai_calls_reset_at?: string | null
           ai_calls_used?: number | null
           ai_subscription_tier?: string | null
@@ -6520,6 +6524,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           destinations_focus_tags?: string[] | null
+          display_name?: string | null
           email_notifications?: boolean | null
           first_name?: string | null
           followers_count?: number | null
@@ -6534,6 +6539,7 @@ export type Database = {
           last_name?: string | null
           last_warning_at?: string | null
           location?: string | null
+          onboarding_completed?: boolean
           payout_schedule?: string | null
           phone?: string | null
           preferences?: Json | null
@@ -6565,6 +6571,7 @@ export type Database = {
         Update: {
           account_status?: string | null
           account_type?: string | null
+          agency_name?: string | null
           ai_calls_reset_at?: string | null
           ai_calls_used?: number | null
           ai_subscription_tier?: string | null
@@ -6577,6 +6584,7 @@ export type Database = {
           country?: string | null
           created_at?: string
           destinations_focus_tags?: string[] | null
+          display_name?: string | null
           email_notifications?: boolean | null
           first_name?: string | null
           followers_count?: number | null
@@ -6591,6 +6599,7 @@ export type Database = {
           last_name?: string | null
           last_warning_at?: string | null
           location?: string | null
+          onboarding_completed?: boolean
           payout_schedule?: string | null
           phone?: string | null
           preferences?: Json | null
