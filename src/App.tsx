@@ -73,6 +73,7 @@ const HIDE_FOOTER_PREFIXES = [
   "/customer-verification",
   "/emergency-contacts",
   "/agent-performance",
+  "/agent-deals",
   "/commission-dashboard",
   "/email-preview",
   "/test-group-payment",

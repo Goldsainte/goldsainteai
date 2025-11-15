@@ -57,6 +57,7 @@ export const siteRoutes: RouteInfo[] = [
   { path: '/agent-dashboard', label: 'Agent Dashboard', description: 'Manage agent work', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/agent-trip-requests', label: 'Trip Requests', description: 'View trip requests', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/agent-performance', label: 'Performance', description: 'View performance metrics', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
+  { path: '/agent-deals', label: 'Agent Deals', description: 'Track your collaborations with TikTok creators', category: 'marketplace', requiresAuth: true, requiresRole: 'agent' },
   { path: '/my-jobs', label: 'My Jobs', description: 'View your jobs', category: 'marketplace', requiresAuth: true },
   
   // Commerce
