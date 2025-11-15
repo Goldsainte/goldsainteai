@@ -45,7 +45,7 @@ export default function MyTrips() {
   const fetchTrips = async () => {
     try {
       const { data, error } = await supabase
-        .from('cocurated_trip_requests')
+        .from('trip_requests')
         .select('*')
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });

@@ -29,6 +29,7 @@ const Auth = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const [accountType, setAccountType] = useState<'traveler' | 'creator' | 'agent' | ''>('');
   const [isLoading, setIsLoading] = useState(false);
   const { signIn, signUp, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -178,6 +179,16 @@ const Auth = () => {
       setIsLoading(false);
       return;
     }
+
+    if (!accountType) {
+      toast({
+        title: "Missing information",
+        description: "Please select your account type.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
     
     const passwordValidation = passwordSchema.safeParse(password);
     if (!passwordValidation.success) {
@@ -202,7 +213,7 @@ const Auth = () => {
             first_name: firstName,
             last_name: lastName,
             phone: phone || null,
-            // account_type will be collected later in profile step
+            account_type: accountType,
           },
         },
       });
