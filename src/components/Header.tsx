@@ -866,7 +866,7 @@ export const Header = () => {
             </button>
             
             <button
-              onClick={() => user ? navigate('/travel-profile') : navigate('/auth')}
+              onClick={() => user ? navigate(`/creator/${user.id}`) : navigate('/auth')}
               className="flex flex-col items-center justify-center gap-1 hover:bg-muted transition-colors min-h-[44px]"
               aria-label="Profile"
               data-tour="profile"

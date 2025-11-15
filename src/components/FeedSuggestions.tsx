@@ -85,7 +85,10 @@ export function FeedSuggestions() {
         <div className="flex items-center justify-between">
           <div 
             className="flex items-center gap-3 cursor-pointer hover:opacity-80"
-            onClick={() => navigate('/travel-profile')}
+            onClick={async () => {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) navigate(`/creator/${user.id}`);
+            }}
           >
             <Avatar className="h-11 w-11">
               <AvatarImage src={currentUserProfile?.avatar_url || ''} />
@@ -128,7 +131,7 @@ export function FeedSuggestions() {
             <div key={suggestion.id} className="flex items-center justify-between">
               <div 
                 className="flex items-center gap-3 cursor-pointer hover:opacity-80 flex-1 min-w-0"
-                onClick={() => navigate(`/travel-profile/${suggestion.id}`)}
+                onClick={() => navigate(`/creator/${suggestion.id}`)}
               >
                 <Avatar className="h-11 w-11 flex-shrink-0">
                   <AvatarImage src={suggestion.avatar_url || ''} />

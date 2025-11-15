@@ -120,7 +120,7 @@ export const MomentReactions = ({ momentId, className = '' }: MomentReactionsPro
               notification_type: 'moment_reaction',
               title: 'New Reaction',
               message: `Someone reacted ${reaction} to your moment`,
-              link: `/travel-profile/${moment.user_id}?momentId=${momentId}`,
+              link: `/creator/${moment.user_id}?momentId=${momentId}`,
               metadata: { moment_id: momentId, reaction, from_user_id: user.id }
             });
         }

@@ -35,7 +35,7 @@ export const siteRoutes: RouteInfo[] = [
   // { path: '/trending', label: 'Trending', description: 'Trending travel content', category: 'social' },
   
   // Creator Platform - TikTok-based ecosystem
-  { path: '/travel-profile', label: 'Creator Profile', description: 'Your public Goldsainte creator page', category: 'social', requiresAuth: true },
+  { path: '/creator/:id', label: 'Creator Profile', description: 'Public creator profile page', category: 'social', requiresAuth: false },
   { path: '/travel-settings', label: 'Creator Settings', description: 'Configure TikTok + trip connections', category: 'social', requiresAuth: true },
   { path: '/creator-dashboard', label: 'Creator Dashboard', description: 'Your TikTok travel performance and earnings', category: 'social', requiresAuth: true },
   { path: '/browse-creators', label: 'Creator Marketplace', description: 'Agents can discover TikTok travel creators', category: 'social' },

@@ -176,7 +176,7 @@ export default function Profile() {
             <Button
               variant="secondary"
               onClick={() => {
-                const profileUrl = `${window.location.origin}/travel-profile/${profile?.username || user.id}`;
+                const profileUrl = `${window.location.origin}/creator/${profile?.username || user.id}`;
                 navigator.clipboard.writeText(profileUrl);
                 toast.success('Profile link copied!');
               }}

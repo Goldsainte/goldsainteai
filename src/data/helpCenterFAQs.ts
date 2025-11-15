@@ -142,7 +142,7 @@ export const helpCenterFAQs: FAQ[] = [
   {
     id: 'creator-join',
     question: 'How do I become a creator?',
-    answer: 'Create an account, go to your Travel Profile (/travel-profile), and start posting content. Upload travel photos, videos, or create CoCurated packages to earn commissions.',
+    answer: 'Create an account, navigate to your Creator Profile, and start posting content. Upload travel photos, videos, or create CoCurated packages to earn commissions.',
     category: 'creator'
   },
   {

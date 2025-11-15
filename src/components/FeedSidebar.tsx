@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Home, Users, Video, MessageCircle, BarChart3, User, LogOut } from "lucide-react";
 import logoWordmark from "@/assets/primary-horizontal-logo-gold-2.png";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function FeedSidebar() {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
 
@@ -72,9 +73,12 @@ export function FeedSidebar() {
         {user && <NotificationCenter />}
         
         {/* Profile with Avatar */}
-        <NavLink
-          to="/travel-profile"
-          className={getNavClass}
+        <button
+          onClick={async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) navigate(`/creator/${user.id}`);
+          }}
+          className={getNavClass({ isActive: false })}
         >
           {avatarUrl ? (
             <Avatar className="h-6 w-6">
@@ -87,7 +91,7 @@ export function FeedSidebar() {
             <User className="h-6 w-6" />
           )}
           <span className="text-base">Profile</span>
-        </NavLink>
+        </button>
       </nav>
 
       {/* Sign Out Button */}

@@ -141,7 +141,8 @@ const TravelSettings = () => {
       if (error) throw error;
       
       toast.success('Profile updated successfully!');
-      navigate('/travel-profile');
+      const { data: { user: currentUser } } = await supabase.auth.getUser();
+      if (currentUser) navigate(`/creator/${currentUser.id}`);
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Failed to update profile');
@@ -274,7 +275,10 @@ const TravelSettings = () => {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate('/travel-profile')}
+            onClick={async () => {
+              const { data: { user } } = await supabase.auth.getUser();
+              if (user) navigate(`/creator/${user.id}`);
+            }}
           >
             <ChevronLeft className="h-6 w-6" />
           </Button>
