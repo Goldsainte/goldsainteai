@@ -5,8 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { getMyTrips } from "@/services/tripService";
 import { getMyTravelerBookingsDetailed } from "@/services/bookingService";
 import { Sparkles, Plane, Calendar, ArrowRight } from "lucide-react";
+import { useRequireOnboarding } from "@/hooks/useRequireOnboarding";
 
 export default function TravelerDashboardPage() {
+  const { checking, allowed } = useRequireOnboarding();
   const navigate = useNavigate();
   const [trips, setTrips] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
@@ -50,6 +52,14 @@ export default function TravelerDashboardPage() {
       cancelled = true;
     };
   }, [navigate]);
+
+  if (checking || !allowed) {
+    return (
+      <main className="min-h-screen bg-[#0a2225] text-[#E5DFC6] flex items-center justify-center">
+        <p className="text-xs">Loading your Goldsainte space…</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background text-foreground px-4 py-6">

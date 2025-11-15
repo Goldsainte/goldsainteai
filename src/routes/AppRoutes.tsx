@@ -128,6 +128,8 @@ const PlatformAnalyticsDashboard = lazy(() => import('@/components/PlatformAnaly
 const SystemHealth = lazy(() => import('@/pages/SystemHealth'));
 const Redirect = lazy(() => import('@/pages/Redirect'));
 const About = lazy(() => import('@/pages/About'));
+const AuthPage = lazy(() => import('@/pages/AuthPage'));
+const OnboardingProfilePage = lazy(() => import('@/pages/OnboardingProfilePage'));
 const TermsPage = lazy(() => import('@/pages/Terms'));
 const WhatWeDo = lazy(() => import('@/pages/WhatWeDo'));
 const DisputeResolution = lazy(() => import('@/pages/DisputeResolution'));
@@ -161,7 +163,7 @@ export const AppRoutes = () => (
     </Route>
 
     <Route element={<AuthLayout />}>
-      <Route path="/auth" element={<Auth />} />
+      <Route path="/auth" element={<AuthPage />} />
       <Route path="/login" element={<Auth />} />
       <Route path="/signup" element={<Auth />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
@@ -170,6 +172,7 @@ export const AppRoutes = () => (
       <Route path="/auth/email-confirmed" element={<EmailConfirmedPage />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/onboarding" element={<Onboarding />} />
+      <Route path="/onboarding/profile" element={<OnboardingProfilePage />} />
       <Route path="/ai-agent-setup" element={<AIAgentOnboarding />} />
     </Route>
 
