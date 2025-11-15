@@ -1,6 +1,5 @@
 // src/pages/Index.tsx
 import { Helmet } from "react-helmet-async";
-import { WelcomeModal } from "@/components/home/WelcomeModal";
 import { HomeHero } from "@/components/home/HomeHero";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { MarketplaceShowcase } from "@/components/home/MarketplaceShowcase";
@@ -15,9 +14,6 @@ export default function Index() {
           content="Goldsainte connects TikTok creators, certified travel agents, and travelers. Browse a luxury marketplace of trips or post your own dream journey."
         />
       </Helmet>
-
-      {/* Global Welcome Modal */}
-      <WelcomeModal />
 
       <main className="min-h-screen bg-gradient-to-b from-[#0a2225] via-[#0a2225] to-[#E5DFC6] text-foreground">
         {/* Hero with Expedia search + brand positioning */}
