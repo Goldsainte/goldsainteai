@@ -2225,6 +2225,75 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_collab_requests: {
+        Row: {
+          actual_revenue: number | null
+          agent_id: string
+          agent_notes: string | null
+          compensation: string | null
+          created_at: string
+          creator_id: string
+          creator_response: string | null
+          estimated_revenue: number | null
+          id: string
+          package_id: string | null
+          proposal_text: string
+          status: string
+          trip_story_id: string | null
+          trip_title: string
+          updated_at: string
+        }
+        Insert: {
+          actual_revenue?: number | null
+          agent_id: string
+          agent_notes?: string | null
+          compensation?: string | null
+          created_at?: string
+          creator_id: string
+          creator_response?: string | null
+          estimated_revenue?: number | null
+          id?: string
+          package_id?: string | null
+          proposal_text: string
+          status?: string
+          trip_story_id?: string | null
+          trip_title: string
+          updated_at?: string
+        }
+        Update: {
+          actual_revenue?: number | null
+          agent_id?: string
+          agent_notes?: string | null
+          compensation?: string | null
+          created_at?: string
+          creator_id?: string
+          creator_response?: string | null
+          estimated_revenue?: number | null
+          id?: string
+          package_id?: string | null
+          proposal_text?: string
+          status?: string
+          trip_story_id?: string | null
+          trip_title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "creator_collab_requests_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "creator_collab_requests_trip_story_id_fkey"
+            columns: ["trip_story_id"]
+            isOneToOne: false
+            referencedRelation: "trip_stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       creator_earnings: {
         Row: {
           amount: number | null

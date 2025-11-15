@@ -24,6 +24,7 @@ import { AgentVerificationUpload } from "@/components/AgentVerificationUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PaymentMilestonesManager } from "@/components/PaymentMilestonesManager";
 import { InvoiceGenerator } from "@/components/InvoiceGenerator";
+import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 
 export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -32,6 +33,7 @@ export default function AgentDashboard() {
   const [agent, setAgent] = useState<any>(null);
   const [jobs, setJobs] = useState<any[]>([]);
   const [myBids, setMyBids] = useState<any[]>([]);
+  const [collabRequests, setCollabRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState<any>(null);
   const [isBidDialogOpen, setIsBidDialogOpen] = useState(false);
@@ -98,6 +100,25 @@ export default function AgentDashboard() {
 
       if (bidsError) throw bidsError;
       setMyBids(bidsData || []);
+
+      // Fetch collaboration requests
+      const { data: collabsData, error: collabsError } = await supabase
+        .from('creator_collab_requests')
+        .select(`
+          *,
+          creator:profiles!creator_collab_requests_creator_id_fkey(
+            username,
+            avatar_url,
+            tiktok_username
+          ),
+          trip_story:trip_stories(id, title, tiktok_post_id),
+          package:packaged_trips(id, title, status)
+        `)
+        .eq('agent_id', user?.id)
+        .order('created_at', { ascending: false });
+
+      if (collabsError) throw collabsError;
+      setCollabRequests(collabsData || []);
 
     } catch (error: any) {
       console.error('Error fetching data:', error);
@@ -262,6 +283,7 @@ export default function AgentDashboard() {
           <TabsList>
             <TabsTrigger value="available">Available Jobs ({jobs.length})</TabsTrigger>
             <TabsTrigger value="my-bids">My Bids ({myBids.length})</TabsTrigger>
+            <TabsTrigger value="creator-collabs">Creator Collabs ({collabRequests.length})</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
             <TabsTrigger value="availability">Availability</TabsTrigger>
             <TabsTrigger value="verification">Verification</TabsTrigger>
@@ -419,6 +441,16 @@ export default function AgentDashboard() {
                 </Card>
               ))
             )}
+            </TabsContent>
+
+            <TabsContent value="creator-collabs">
+              {agent && (
+                <AgentCreatorCollabs 
+                  collabRequests={collabRequests} 
+                  agentId={user?.id || ''} 
+                  onRefresh={fetchData} 
+                />
+              )}
             </TabsContent>
 
             <TabsContent value="availability">
