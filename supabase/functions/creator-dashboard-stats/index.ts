@@ -71,9 +71,47 @@ Deno.serve(async (req) => {
       tiktokVideoId: story.tiktok_post_id,
     }));
 
-    // Calculate estimated earnings (placeholder logic - in a real app, you'd sum from bookings/commissions)
-    // For now, we'll estimate $50 per published TikTok story as a placeholder
-    const totalEstimatedEarnings = totalTripsLinked * 50;
+    // Calculate real earnings from creator_earnings table
+    const { data: earningsData, error: earningsError } = await supabaseClient
+      .from('creator_earnings')
+      .select('amount, status')
+      .eq('user_id', user.id)
+      .in('status', ['completed', 'paid']);
+
+    if (earningsError) {
+      console.error('Error fetching earnings:', earningsError);
+    }
+
+    // Sum up all completed/paid earnings
+    const totalRealEarnings = (earningsData || []).reduce((sum, earning) => {
+      return sum + (parseFloat(String(earning.amount)) || 0);
+    }, 0);
+
+    // Calculate bookings-based revenue
+    const { data: creatorPackages } = await supabaseClient
+      .from('package_marketing_materials')
+      .select('id')
+      .eq('creator_id', user.id);
+
+    const packageIds = (creatorPackages || []).map(p => p.id);
+
+    let bookingsRevenue = 0;
+    if (packageIds.length > 0) {
+      const { data: bookingsData } = await supabaseClient
+        .from('package_bookings')
+        .select('total_price')
+        .in('package_id', packageIds)
+        .in('payment_status', ['paid', 'completed']);
+      
+      // Apply 40% commission rate for bookings
+      const BOOKING_COMMISSION_RATE = 0.4;
+      bookingsRevenue = (bookingsData || []).reduce((sum, booking) => {
+        return sum + (parseFloat(String(booking.total_price)) || 0) * BOOKING_COMMISSION_RATE;
+      }, 0);
+    }
+
+    // Combined total earnings
+    const totalEstimatedEarnings = totalRealEarnings + bookingsRevenue;
 
     console.log(`Stats calculated - Stories: ${totalTripStories}, Linked: ${totalTripsLinked}, Earnings: $${totalEstimatedEarnings}`);
 
