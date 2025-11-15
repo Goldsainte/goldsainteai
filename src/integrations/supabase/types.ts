@@ -1869,6 +1869,35 @@ export type Database = {
           },
         ]
       }
+      chat_threads: {
+        Row: {
+          created_at: string
+          id: string
+          trip_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          trip_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          trip_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_threads_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       close_friends: {
         Row: {
           created_at: string
@@ -6276,8 +6305,10 @@ export type Database = {
           avatar_url: string | null
           billing_address: Json | null
           bio: string | null
+          content_style_tags: string[] | null
           country: string | null
           created_at: string
+          destinations_focus_tags: string[] | null
           email_notifications: boolean | null
           first_name: string | null
           followers_count: number | null
@@ -6309,6 +6340,9 @@ export type Database = {
           tax_id: string | null
           tiktok_access_token: string | null
           tiktok_connected_at: string | null
+          tiktok_followers: number | null
+          tiktok_handle: string | null
+          tiktok_niche_tags: string[] | null
           tiktok_refresh_token: string | null
           tiktok_token_expires_at: string | null
           tiktok_username: string | null
@@ -6328,8 +6362,10 @@ export type Database = {
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
+          content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          destinations_focus_tags?: string[] | null
           email_notifications?: boolean | null
           first_name?: string | null
           followers_count?: number | null
@@ -6361,6 +6397,9 @@ export type Database = {
           tax_id?: string | null
           tiktok_access_token?: string | null
           tiktok_connected_at?: string | null
+          tiktok_followers?: number | null
+          tiktok_handle?: string | null
+          tiktok_niche_tags?: string[] | null
           tiktok_refresh_token?: string | null
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
@@ -6380,8 +6419,10 @@ export type Database = {
           avatar_url?: string | null
           billing_address?: Json | null
           bio?: string | null
+          content_style_tags?: string[] | null
           country?: string | null
           created_at?: string
+          destinations_focus_tags?: string[] | null
           email_notifications?: boolean | null
           first_name?: string | null
           followers_count?: number | null
@@ -6413,6 +6454,9 @@ export type Database = {
           tax_id?: string | null
           tiktok_access_token?: string | null
           tiktok_connected_at?: string | null
+          tiktok_followers?: number | null
+          tiktok_handle?: string | null
+          tiktok_niche_tags?: string[] | null
           tiktok_refresh_token?: string | null
           tiktok_token_expires_at?: string | null
           tiktok_username?: string | null
@@ -8410,6 +8454,41 @@ export type Database = {
           },
         ]
       }
+      trip_matches: {
+        Row: {
+          created_at: string
+          id: string
+          provider_id: string
+          provider_type: string
+          score: number
+          trip_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          provider_id: string
+          provider_type: string
+          score?: number
+          trip_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          provider_id?: string
+          provider_type?: string
+          score?: number
+          trip_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trip_matches_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trip_members: {
         Row: {
           created_at: string
@@ -9064,6 +9143,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trips: {
+        Row: {
+          budget_range: string | null
+          created_at: string
+          description: string | null
+          destination: string | null
+          end_date: string | null
+          id: string
+          start_date: string | null
+          status: string
+          title: string | null
+          traveler_id: string
+          travelers_count: number | null
+          updated_at: string
+        }
+        Insert: {
+          budget_range?: string | null
+          created_at?: string
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          title?: string | null
+          traveler_id: string
+          travelers_count?: number | null
+          updated_at?: string
+        }
+        Update: {
+          budget_range?: string | null
+          created_at?: string
+          description?: string | null
+          destination?: string | null
+          end_date?: string | null
+          id?: string
+          start_date?: string | null
+          status?: string
+          title?: string | null
+          traveler_id?: string
+          travelers_count?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       uber_ride_requests: {
         Row: {
