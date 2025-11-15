@@ -44,6 +44,10 @@ const TripRequestsBoardPage = lazy(() => import('@/pages/TripRequestsBoardPage')
 const TripRequestDetailPage = lazy(() => import('@/pages/TripRequestDetailPage'));
 const TripChatPage = lazy(() => import('@/pages/TripChatPage'));
 const MyTripRequestsPage = lazy(() => import('@/pages/MyTripRequestsPage'));
+const MyTripsPage = lazy(() => import('@/pages/MyTripsPage'));
+const PostTripPage = lazy(() => import('@/pages/PostTripPage'));
+const AgentTripsPage = lazy(() => import('@/pages/AgentTripsPage'));
+const CreatorTripsPage = lazy(() => import('@/pages/CreatorTripsPage'));
 const MyBookingsPage = lazy(() => import('@/pages/MyBookingsPage'));
 const PartnerBookingsPage = lazy(() => import('@/pages/PartnerBookingsPage'));
 const BookingPreferencesRedirect = lazy(() => import('@/pages/redirects/BookingPreferencesRedirect'));
@@ -228,6 +232,10 @@ export const AppRoutes = () => (
       <Route path="/trip-request/:id" element={<TripRequestDetailPage />} />
       <Route path="/trip-request/:id/chat" element={<TripChatPage />} />
       <Route path="/my-trip-requests" element={<MyTripRequestsPage />} />
+      <Route path="/my-trips" element={<MyTripsPage />} />
+      <Route path="/post-trip" element={<PostTripPage />} />
+      <Route path="/agent-trips" element={<AgentTripsPage />} />
+      <Route path="/creator-trips" element={<CreatorTripsPage />} />
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/booking/:id" element={<BookingDetailPage />} />
