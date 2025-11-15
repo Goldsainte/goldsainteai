@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import logomark from '@/assets/logomark-gold.png';
 import { z } from 'zod';
 import { supabase } from '@/integrations/supabase/client';
+import { AccountTypeStep } from '@/components/auth/AccountTypeStep';
 
 const passwordSchema = z.string()
   .min(8, "Password must be at least 8 characters")
@@ -19,7 +20,7 @@ const passwordSchema = z.string()
   .regex(/[0-9]/, "Password must contain at least one number")
   .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
-type AuthStep = 'email' | 'signin' | 'signup' | 'forgot-password';
+type AuthStep = 'email' | 'signin' | 'signup' | 'forgot-password' | 'profile';
 
 const Auth = () => {
   const [step, setStep] = useState<AuthStep>('email');
@@ -115,9 +116,25 @@ const Auth = () => {
         description: error.message || "Please check your credentials and try again.",
         variant: "destructive",
       });
+      setIsLoading(false);
+    } else {
+      // Check if profile is complete
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("account_type, is_profile_complete")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        if (!profile?.account_type || !profile?.is_profile_complete) {
+          setStep('profile');
+          setIsLoading(false);
+          return;
+        }
+      }
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -164,15 +181,15 @@ const Auth = () => {
         description: error.message || "Please try again.",
         variant: "destructive",
       });
+      setIsLoading(false);
     } else {
       toast({
         title: "Account created!",
-        description: "Let's create your personalized AI travel agent.",
+        description: "Let's complete your profile.",
       });
-      navigate('/ai-agent-setup');
+      setStep('profile');
+      setIsLoading(false);
     }
-    
-    setIsLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -271,6 +288,27 @@ const Auth = () => {
     }
 
     setIsLoading(false);
+  };
+
+  const handleProfileComplete = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("account_type")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const accountType = profile?.account_type;
+
+    if (accountType === 'agent') {
+      navigate('/agent-dashboard', { replace: true });
+    } else if (accountType === 'creator') {
+      navigate('/creator-dashboard', { replace: true });
+    } else {
+      navigate('/', { replace: true });
+    }
   };
 
   // Show loading state while auth is processing or redirecting
@@ -610,6 +648,11 @@ const Auth = () => {
               </button>
             </div>
           </form>
+        )}
+
+        {/* Profile Step */}
+        {step === 'profile' && (
+          <AccountTypeStep onComplete={handleProfileComplete} />
         )}
       </Card>
     </div>

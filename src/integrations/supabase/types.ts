@@ -6248,6 +6248,7 @@ export type Database = {
           id: string
           instagram_username: string | null
           is_business_verified: boolean | null
+          is_profile_complete: boolean | null
           is_shadowbanned: boolean | null
           is_verified: boolean | null
           last_name: string | null
@@ -6299,6 +6300,7 @@ export type Database = {
           id: string
           instagram_username?: string | null
           is_business_verified?: boolean | null
+          is_profile_complete?: boolean | null
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
@@ -6350,6 +6352,7 @@ export type Database = {
           id?: string
           instagram_username?: string | null
           is_business_verified?: boolean | null
+          is_profile_complete?: boolean | null
           is_shadowbanned?: boolean | null
           is_verified?: boolean | null
           last_name?: string | null
