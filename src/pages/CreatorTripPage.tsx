@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { TripStoryboardViewer } from "@/components/TripStoryboardViewer";
 
 type CreatorTripData = {
   tripStory: {
@@ -222,6 +223,13 @@ export default function CreatorTripPage() {
             </Link>
           </div>
         </section>
+
+        {/* Trip Storyboard Viewer */}
+        {journey?.id && (
+          <div className="mt-6">
+            <TripStoryboardViewer tripId={journey.id} />
+          </div>
+        )}
       </div>
     </div>
   );
