@@ -78,6 +78,8 @@ const NewCollabRequestPage = lazy(() => import('@/pages/NewCollabRequestPage'));
 const Messages = lazy(() => import('@/pages/Messages'));
 const PriceAlerts = lazy(() => import('@/pages/PriceAlerts'));
 const BookingDetailPage = lazy(() => import('@/pages/BookingDetailPage'));
+const TravelerDashboardPage = lazy(() => import('@/pages/traveler/TravelerDashboardPage'));
+const PartnerConsolePage = lazy(() => import('@/pages/partner/PartnerConsolePage'));
 const HotelDetails = lazy(() => import('@/pages/HotelDetails'));
 const MyJobs = lazy(() => import('@/pages/MyJobs'));
 const MyTrips = lazy(() => import('@/pages/MyTrips'));
@@ -231,6 +233,8 @@ export const AppRoutes = () => (
       <Route path="/my-bookings" element={<MyBookingsPage />} />
       <Route path="/partner-bookings" element={<PartnerBookingsPage />} />
       <Route path="/booking/:id" element={<BookingDetailPage />} />
+      <Route path="/traveler" element={<TravelerDashboardPage />} />
+      <Route path="/partner" element={<PartnerConsolePage />} />
       <Route path="/agent/:agentId" element={<AgentProfile />} />
       <Route path="/agent-onboarding" element={<AgentOnboarding />} />
       <Route path="/agent-dashboard" element={<RequireAgentTerms><AgentDashboard /></RequireAgentTerms>} />

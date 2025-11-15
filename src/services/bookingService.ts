@@ -114,3 +114,39 @@ export async function getMyBookings() {
   }
   return data ?? [];
 }
+
+export async function getMyTravelerBookingsDetailed() {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) throw new Error("Not authenticated");
+
+  const { data, error } = await supabase
+    .from("bookings")
+    .select(`
+      id,
+      status,
+      total_amount,
+      currency,
+      created_at,
+      trip_id,
+      trips (
+        title,
+        destination,
+        start_date,
+        end_date
+      ),
+      trip_proposals (
+        id,
+        message,
+        proposer_role
+      )
+    `)
+    .eq("traveler_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    throw new Error("Could not load your bookings.");
+  }
+
+  return data ?? [];
+}
