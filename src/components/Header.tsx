@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, User, Menu, Hotel, Plane, Ticket, Car, Briefcase, Video, Search, Bell, TrendingUp, ArrowLeft, Plus, Coins, ShoppingCart, Link2, LayoutDashboard, Calendar, Settings, Info, Crown, CreditCard, PlaneTakeoff, HandCoins } from "lucide-react";
+import { NotificationBell } from '@/components/NotificationBell';
 import CreateContentSheet from "@/components/CreateContentSheet";
 import ContentUploadModal from "@/components/ContentUploadModal";
 import { CreateMomentModal } from "@/components/CreateMomentModal";
@@ -230,7 +231,7 @@ export const Header = () => {
                 </a>
                 
                 <div className="flex items-center gap-2">
-                  {user && <NotificationInbox />}
+                  {user && <NotificationBell />}
                   
                   {/* Mobile Navigation Menu */}
                   <DropdownMenu>
@@ -564,6 +565,7 @@ export const Header = () => {
 
               {/* Right side actions */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                {user && <NotificationBell />}
                 
                 {/* Main Navigation - Desktop */}
                 <DropdownMenu>
