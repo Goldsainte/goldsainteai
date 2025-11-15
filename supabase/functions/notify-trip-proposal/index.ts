@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { Resend } from "https://esm.sh/resend@2.0.0";
+import { generateProposalReceivedEmail } from "./_templates/proposal-received-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,7 +25,9 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Fetch trip request to get user_id
+    const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+
+    // Fetch trip request to get user_id and traveler profile
     const { data: tripRequest, error: tripError } = await supabaseClient
       .from("trip_requests")
       .select("user_id, title, destination")
@@ -34,6 +38,13 @@ serve(async (req) => {
       console.error("[NOTIFY_TRIP_PROPOSAL] Trip request not found:", tripError);
       throw new Error("Trip request not found");
     }
+
+    // Get traveler profile
+    const { data: travelerProfile } = await supabaseClient
+      .from("profiles")
+      .select("first_name, email")
+      .eq("id", tripRequest.user_id)
+      .single();
 
     // Get the latest proposal for this trip with proposer info
     const { data: proposal, error: proposalError } = await supabaseClient
@@ -59,8 +70,41 @@ serve(async (req) => {
     const proposerName = proposerProfile?.first_name || proposerProfile?.username || "A creator";
     const roleLabel = proposal.proposer_role === "creator" ? "TikTok Creator" : "Travel Agent";
     const priceText = proposal.price_from ? ` starting from $${proposal.price_from} per person` : "";
+    const travelerFirstName = travelerProfile?.first_name || "there";
+    const travelerEmail = travelerProfile?.email;
 
-    // Send notification via existing send-notification function
+    // Send email notification via Resend
+    if (travelerEmail) {
+      try {
+        const emailHtml = generateProposalReceivedEmail({
+          firstName: travelerFirstName,
+          tripTitle: tripRequest.title || `Trip to ${tripRequest.destination}`,
+          destination: tripRequest.destination || "your destination",
+          proposerName,
+          proposerRole: roleLabel,
+          priceFrom: proposal.price_from,
+          headline: proposal.headline,
+          tripRequestId,
+        });
+
+        const { error: emailError } = await resend.emails.send({
+          from: "Goldsainte <onboarding@resend.dev>",
+          to: [travelerEmail],
+          subject: "Your Goldsainte trip just received a new proposal",
+          html: emailHtml,
+        });
+
+        if (emailError) {
+          console.error("[NOTIFY_TRIP_PROPOSAL] Email error:", emailError);
+        } else {
+          console.log("[NOTIFY_TRIP_PROPOSAL] Email sent successfully to:", travelerEmail);
+        }
+      } catch (emailError) {
+        console.error("[NOTIFY_TRIP_PROPOSAL] Email send failed:", emailError);
+      }
+    }
+
+    // Send in-app notification via existing send-notification function
     const { data: notificationResult, error: notificationError } = await supabaseClient.functions.invoke("send-notification", {
       body: {
         userId: tripRequest.user_id,
