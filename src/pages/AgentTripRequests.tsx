@@ -66,6 +66,13 @@ export default function AgentTripRequests() {
 
       if (error) throw error;
       
+      // If admin and no agent record, allow viewing all requests
+      if (!agent && isAdmin) {
+        setAgentId(null);
+        fetchRequests(null);
+        return;
+      }
+      
       if (!agent) {
         toast({ title: 'You must be a registered agent to access this page', variant: 'destructive' });
         navigate('/');
@@ -80,13 +87,19 @@ export default function AgentTripRequests() {
     }
   };
 
-  const fetchRequests = async (agentId: string) => {
+  const fetchRequests = async (agentId: string | null) => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('cocurated_trip_requests')
         .select('*')
-        .or(`status.eq.pending,assigned_agent_id.eq.${agentId}`)
         .order('created_at', { ascending: false });
+      
+      // Admins without agent ID see all requests
+      if (agentId !== null) {
+        query = query.or(`status.eq.pending,assigned_agent_id.eq.${agentId}`);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setRequests((data as any) || []);
@@ -99,6 +112,11 @@ export default function AgentTripRequests() {
   };
 
   const handleClaimRequest = async (requestId: string) => {
+    if (!agentId) {
+      toast({ title: 'Admin cannot claim requests without agent profile', variant: 'destructive' });
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('cocurated_trip_requests')

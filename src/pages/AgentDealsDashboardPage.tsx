@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useUserRole } from "@/hooks/useUserRole";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 type AgentDealsStats = {
   totalDeals: number;
@@ -24,11 +28,20 @@ const EMPTY_STATS: AgentDealsStats = {
 };
 
 export default function AgentDealsDashboardPage() {
+  const navigate = useNavigate();
+  const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const [stats, setStats] = useState<AgentDealsStats>(EMPTY_STATS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (roleLoading) return;
+    
+    if (!isAdmin && !isAgent) {
+      navigate('/');
+      return;
+    }
+
     let isMounted = true;
 
     async function load() {
@@ -69,7 +82,15 @@ export default function AgentDealsDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [isAdmin, isAgent, roleLoading, navigate]);
+
+  if (roleLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -118,9 +139,17 @@ export default function AgentDealsDashboardPage() {
         </section>
 
         {error && (
-          <div className="mt-4 rounded-xl border border-destructive/50 bg-destructive/10 px-3 py-2 text-xs text-destructive">
-            {error}
-          </div>
+          <Alert variant="destructive" className="mt-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+              {isAdmin && (
+                <span className="block mt-2 text-xs">
+                  Note: Backend access for admins may be pending. Contact system administrator.
+                </span>
+              )}
+            </AlertDescription>
+          </Alert>
         )}
 
         <section className="mt-6 rounded-2xl bg-card p-4 shadow-sm ring-1 ring-border">

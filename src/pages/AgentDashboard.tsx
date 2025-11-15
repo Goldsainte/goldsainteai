@@ -28,7 +28,7 @@ import { AgentCreatorCollabs } from "@/components/AgentCreatorCollabs";
 
 export default function AgentDashboard() {
   const { user, isLoading: authLoading } = useAuth();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isAgent, loading: roleLoading } = useUserRole();
   const navigate = useNavigate();
   const [agent, setAgent] = useState<any>(null);
   const [jobs, setJobs] = useState<any[]>([]);
@@ -52,15 +52,18 @@ export default function AgentDashboard() {
   const [bidDetailsOpen, setBidDetailsOpen] = useState(false);
 
   useEffect(() => {
-    if (authLoading) return;
+    if (authLoading || roleLoading) return;
     if (!user) {
       navigate('/auth');
       return;
     }
+    if (!isAdmin && !isAgent) {
+      toast.error('Agent access required');
+      navigate('/');
+      return;
+    }
     fetchData();
-  }, [user, authLoading, navigate]);
-
-  // Allow admins to access this page even if they're not agents
+  }, [user, isAdmin, isAgent, authLoading, roleLoading, navigate]);
 
   const fetchData = async () => {
     try {
@@ -70,18 +73,58 @@ export default function AgentDashboard() {
         .from('travel_agents')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (agentError) throw agentError;
-      setAgent(agentData);
       
-      setVerificationStatus({
-        identity_verified: agentData.identity_verified || false,
-        background_check_status: agentData.background_check_status || "not_started",
-        professional_license_verified: agentData.professional_license_verified || false,
-        insurance_verified: agentData.insurance_verified || false,
-        trust_score: agentData.trust_score || 0,
-      });
+      // If admin and no agent record, load first available agent for viewing
+      if (!agentData && isAdmin) {
+        const { data: firstAgent, error: firstAgentError } = await supabase
+          .from('travel_agents')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+        
+        if (firstAgentError) throw firstAgentError;
+        if (!firstAgent) {
+          toast.error('No agent profiles found in system');
+          setLoading(false);
+          return;
+        }
+        setAgent(firstAgent);
+        
+        setVerificationStatus({
+          identity_verified: firstAgent.identity_verified || false,
+          background_check_status: firstAgent.background_check_status || "not_started",
+          professional_license_verified: firstAgent.professional_license_verified || false,
+          insurance_verified: firstAgent.insurance_verified || false,
+          trust_score: firstAgent.trust_score || 0,
+        });
+      } else if (!agentData) {
+        // Non-admin without agent record
+        toast.error('Please complete agent onboarding first');
+        navigate('/agent-onboarding');
+        return;
+      } else {
+        setAgent(agentData);
+        
+        setVerificationStatus({
+          identity_verified: agentData.identity_verified || false,
+          background_check_status: agentData.background_check_status || "not_started",
+          professional_license_verified: agentData.professional_license_verified || false,
+          insurance_verified: agentData.insurance_verified || false,
+          trust_score: agentData.trust_score || 0,
+        });
+      }
+
+      if (!agentData && !isAdmin) {
+        throw new Error('No agent profile found');
+      }
+      const agentId = agentData?.id || agent?.id;
+      if (!agentId) {
+        setLoading(false);
+        return;
+      }
 
       const { data: jobsData, error: jobsError } = await supabase
         .from('marketplace_jobs')
@@ -95,7 +138,7 @@ export default function AgentDashboard() {
       const { data: bidsData, error: bidsError } = await supabase
         .from('agent_bids')
         .select('*, marketplace_jobs(*)')
-        .eq('agent_id', agentData?.id)
+        .eq('agent_id', agentId)
         .order('created_at', { ascending: false });
 
       if (bidsError) throw bidsError;

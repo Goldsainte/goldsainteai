@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AgentPerformanceMetrics } from "@/components/AgentPerformanceMetrics";
 import { AgentPerformanceBadges } from "@/components/AgentPerformanceBadges";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, TrendingUp, Award, Clock } from "lucide-react";
 import { toast } from "sonner";
@@ -40,14 +41,34 @@ export default function AgentPerformanceDashboard() {
         .from('travel_agents')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
-      setAgent(data);
+      
+      // If admin and no agent record, load first available agent for viewing
+      if (!data && isAdmin) {
+        const { data: firstAgent, error: firstAgentError } = await supabase
+          .from('travel_agents')
+          .select('*')
+          .limit(1)
+          .maybeSingle();
+        
+        if (firstAgentError) throw firstAgentError;
+        setAgent(firstAgent);
+      } else if (!data) {
+        // Non-admin without agent record
+        toast.error('Agent profile required');
+        navigate('/agent-onboarding');
+        return;
+      } else {
+        setAgent(data);
+      }
     } catch (error: any) {
       console.error('Error fetching agent:', error);
       toast.error('Failed to load agent data');
-      navigate('/agent-onboarding');
+      if (!isAdmin) {
+        navigate('/agent-onboarding');
+      }
     } finally {
       setLoading(false);
     }
@@ -66,14 +87,18 @@ export default function AgentPerformanceDashboard() {
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-8 max-w-6xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate('/agent-dashboard')}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Agent Dashboard
-        </Button>
+        <div className="flex items-center gap-2 mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/agent-dashboard')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Agent Dashboard
+          </Button>
+          {isAdmin && agent?.user_id !== user?.id && (
+            <Badge variant="outline">Viewing as Admin</Badge>
+          )}
+        </div>
 
         <div className="mb-8">
           <h1 className="text-4xl font-secondary text-primary mb-2">Performance Dashboard</h1>
