@@ -7138,6 +7138,59 @@ export type Database = {
           },
         ]
       }
+      storyboard_items: {
+        Row: {
+          caption: string | null
+          category_tag: string | null
+          created_at: string
+          day_number: number | null
+          id: string
+          layout_type: string
+          location_label: string | null
+          media_attribution: string | null
+          media_url: string | null
+          order_index: number
+          storyboard_id: string
+          time_of_day: string | null
+        }
+        Insert: {
+          caption?: string | null
+          category_tag?: string | null
+          created_at?: string
+          day_number?: number | null
+          id?: string
+          layout_type?: string
+          location_label?: string | null
+          media_attribution?: string | null
+          media_url?: string | null
+          order_index?: number
+          storyboard_id: string
+          time_of_day?: string | null
+        }
+        Update: {
+          caption?: string | null
+          category_tag?: string | null
+          created_at?: string
+          day_number?: number | null
+          id?: string
+          layout_type?: string
+          location_label?: string | null
+          media_attribution?: string | null
+          media_url?: string | null
+          order_index?: number
+          storyboard_id?: string
+          time_of_day?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storyboard_items_storyboard_id_fkey"
+            columns: ["storyboard_id"]
+            isOneToOne: false
+            referencedRelation: "storyboards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       storyboard_media_library: {
         Row: {
           created_at: string
@@ -7176,6 +7229,53 @@ export type Database = {
           usage_count?: number | null
         }
         Relationships: []
+      }
+      storyboards: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          owner_id: string
+          owner_role: string | null
+          theme_tags: string[] | null
+          title: string | null
+          trip_id: string | null
+          updated_at: string
+          visibility: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id: string
+          owner_role?: string | null
+          theme_tags?: string[] | null
+          title?: string | null
+          trip_id?: string | null
+          updated_at?: string
+          visibility?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          owner_id?: string
+          owner_role?: string | null
+          theme_tags?: string[] | null
+          title?: string | null
+          trip_id?: string | null
+          updated_at?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storyboards_trip_id_fkey"
+            columns: ["trip_id"]
+            isOneToOne: false
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       suggestion_participants: {
         Row: {
