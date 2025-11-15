@@ -67,8 +67,8 @@ const Auth = () => {
     }
   }, [user, authLoading, navigate]);
 
-  const handleContinueWithEmail = async () => {
-    if (!email) {
+  const handleContinueWithEmail = () => {
+    if (!email.trim()) {
       toast({
         title: "Email required",
         description: "Please enter your email address.",
@@ -77,31 +77,18 @@ const Auth = () => {
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      // Check if user exists by attempting to sign in with a dummy password
-      // This is a workaround since Supabase doesn't have a direct "check if email exists" endpoint
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password: 'dummy-password-check-12345',
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
       });
-
-      // If error is "Invalid login credentials", the user exists
-      if (error?.message.includes('Invalid login credentials')) {
-        setStep('signin');
-      } else if (error?.message.includes('Email not confirmed')) {
-        setStep('signin');
-      } else {
-        // User doesn't exist, show signup
-        setStep('signup');
-      }
-    } catch (error) {
-      // Default to signup if check fails
-      setStep('signup');
+      return;
     }
 
-    setIsLoading(false);
+    // Default to sign-in step - users can explicitly choose sign-up via the button
+    setStep('signin');
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -450,11 +437,18 @@ const Auth = () => {
             </div>
 
             {/* Footer Links */}
-            <div className="text-center mt-6">
+            <div className="mt-6 space-y-2 text-center">
+              <button
+                type="button"
+                onClick={() => setStep('signup')}
+                className="block w-full text-sm text-primary hover:underline font-medium"
+              >
+                New to Goldsainte? Create an account
+              </button>
               <button
                 type="button"
                 onClick={() => navigate('/')}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                className="block w-full text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Continue without signing in
               </button>
@@ -465,6 +459,17 @@ const Auth = () => {
         {/* Sign In Step */}
         {step === 'signin' && (
           <form onSubmit={handleSignIn} className="space-y-4">
+            <div className="text-xs text-muted-foreground mb-4">
+              Signing in as <span className="font-medium text-foreground">{email}</span>
+              {' '}
+              <button
+                type="button"
+                onClick={() => setStep('email')}
+                className="text-primary hover:underline"
+              >
+                Change
+              </button>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -506,6 +511,15 @@ const Auth = () => {
                 className="text-primary hover:underline"
               >
                 Forgot password?
+              </button>
+            </div>
+            <div className="mt-3 text-center text-xs text-muted-foreground">
+              <button
+                type="button"
+                onClick={() => setStep('signup')}
+                className="hover:text-foreground hover:underline"
+              >
+                Need an account? Create one instead
               </button>
             </div>
           </form>
