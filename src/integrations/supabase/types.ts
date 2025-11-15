@@ -8435,6 +8435,7 @@ export type Database = {
           hook: string | null
           id: string
           itinerary_lines: string[] | null
+          journey_id: string | null
           platforms: string[] | null
           status: string | null
           tiktok_post_id: string | null
@@ -8450,6 +8451,7 @@ export type Database = {
           hook?: string | null
           id?: string
           itinerary_lines?: string[] | null
+          journey_id?: string | null
           platforms?: string[] | null
           status?: string | null
           tiktok_post_id?: string | null
@@ -8465,6 +8467,7 @@ export type Database = {
           hook?: string | null
           id?: string
           itinerary_lines?: string[] | null
+          journey_id?: string | null
           platforms?: string[] | null
           status?: string | null
           tiktok_post_id?: string | null
@@ -8473,7 +8476,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "trip_stories_journey_id_fkey"
+            columns: ["journey_id"]
+            isOneToOne: false
+            referencedRelation: "packaged_trips"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       trip_suggestions: {
         Row: {
