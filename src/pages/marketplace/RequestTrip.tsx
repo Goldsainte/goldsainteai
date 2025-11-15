@@ -99,27 +99,26 @@ export default function RequestTrip() {
         .map((s) => s.trim())
         .filter(Boolean);
 
-      // 1) Insert trip request
+      // 1) Insert trip into trip_requests table
       const { data: inserted, error: insertError } = await supabase
         .from("trip_requests")
         .insert({
           user_id: userData.user.id,
-          title: form.title || null,
+          title: form.title || "Untitled Trip",
+          description: form.description || null,
           destination: form.destination || null,
           start_date: form.startDate || null,
           end_date: form.endDate || null,
-          flexible_dates: form.flexibleDates,
           travelers_adults: adults,
           travelers_children: children,
           budget_min: minBudget,
           budget_max: maxBudget,
-          trip_style: tripStyleArray,
-          description: form.description || null,
+          trip_style: form.tripStyle ? [form.tripStyle] : [],
           tiktok_link: form.tiktokLink || null,
           status: "open",
         })
         .select("id")
-        .maybeSingle();
+        .single();
 
       if (insertError || !inserted) {
         console.error(insertError);
@@ -130,13 +129,49 @@ export default function RequestTrip() {
         return;
       }
 
-      const tripRequestId = inserted.id as string;
-      setSuccessId(tripRequestId);
+      const tripId = inserted.id as string;
+      setSuccessId(tripId);
 
-      // 2) Optionally call AI matching function in the background
+      // 2) Auto-create chat thread for this trip (if chat_threads table exists)
+      try {
+        await supabase.from("trip_request_messages").insert({
+          trip_request_id: tripId,
+          sender_id: userData.user.id,
+          body: "Trip request created",
+          is_system: true
+        });
+      } catch (chatError) {
+        console.error("Error creating initial message:", chatError);
+      }
+
+      // 3) Notify agents & creators of new trip
+      try {
+        // For now, just notify all active agents
+        const { data: agents } = await supabase
+          .from("travel_agents")
+          .select("user_id")
+          .eq("is_active", true)
+          .limit(10);
+
+        if (agents && agents.length > 0) {
+          const notifications = agents.map(agent => ({
+            user_id: agent.user_id,
+            notification_type: "new_trip",
+            title: "New Trip Request",
+            message: `A new trip to ${form.destination || "destination"} has been posted`,
+            metadata: { trip_id: tripId }
+          }));
+
+          await supabase.from("notifications").insert(notifications);
+        }
+      } catch (notificationError) {
+        console.error("Error sending notifications:", notificationError);
+      }
+
+      // 4) Optionally call AI matching function in the background
       try {
         await supabase.functions.invoke("match-trip-request", {
-          body: { tripRequestId },
+          body: { tripId },
         });
       } catch (matchError) {
         console.error("Error invoking match-trip-request:", matchError);
